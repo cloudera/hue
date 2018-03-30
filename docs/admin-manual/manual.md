@@ -1,12 +1,7 @@
 
-<link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-
-<style>
-body {
-  padding: 75px 0 0 0 !important;
-}
-</style>
+<link rel="stylesheet" href="../css/bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 <div class="row-fluid doc-title">
   <h1><a href=../index.html>Doc</a> > Hue Administration Guide</h1>
@@ -18,8 +13,8 @@ body {
 
 [TOC]
 
-   </div>
-   <div class="span9">
+  </div>
+  <div class="span9">
 
 # Installation
 
@@ -1260,6 +1255,10 @@ your bug reports.
 
    </div>
 </div>
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.treed.js"></script>
+<script src="../js/hue-docs.js"></script>
 
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>

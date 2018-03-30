@@ -2,11 +2,11 @@
    Hue Docs styles
 --------------------------------------------------------------------------- */
 
-@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono:300,400,500,700');
+@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono:300,400,500,700,900');
 
 body {
   background-color: #FFFFFF;
-  padding: 30px;
+  padding: 75px 0 0 0;
   font-family: 'Roboto', sans-serif;
   color: #333333;
   margin: 0;
@@ -14,13 +14,7 @@ body {
 }
 
 hr {
-  border-color: #EEEEEE;
-  border-bottom: 1px solid #FFFFFF;
-  border-top: 1px solid #CCCCCC;
-  border-image: none;
-  border-left: 0 none;
-  border-right: 0 none;
-  margin: 20px 0;
+  display: none;
 }
 
 .section {
@@ -277,6 +271,15 @@ pre {
   width: 22%;
 }
 
+.toc ul {
+  margin-left: 10px;
+  list-style: none;
+}
+
+#tocFilter {
+  width: 100%;
+}
+
 .note {
   background-color: #fcf8e3;
   border: 1px solid #fbeed5;
@@ -285,10 +288,39 @@ pre {
 }
 
 .doc-title {
-  border-top: 3px solid #287DBD;
   position: fixed;
   background-color: #FFF;
   z-index: 1000;
   padding-left: 30px;
   top: 0;
+  border-top: 3px solid #287DBD;
+}
+
+.article {
+  padding: 0 30px;
+}
+
+.article>.titlepage:first-child {
+  position: fixed;
+  background-color: #FFF;
+  z-index: 1000;
+  padding-left: 30px;
+  top: 0;
+  border-top: 3px solid #287DBD;
+  width: 100%;
+  margin-left: -30px;
+}
+
+.article>.titlepage:first-child img, .doc-title img {
+  width: 115px;
+  height: 29px;
+}
+
+.doc-title h1 {
+  margin-top: 8px;
+}
+
+a.highlighted {
+  text-decoration: underline;
+  font-weight: bold;
 }
