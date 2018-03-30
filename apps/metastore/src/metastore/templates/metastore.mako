@@ -612,7 +612,7 @@ ${ components.menubar(is_embeddable) }
                 <!-- /ko -->
                 <span data-bind="text: catalogEntry.name"></span>
                 <!-- ko if: $root.optimizerEnabled() && optimizerStats() && optimizerStats().popularity  -->
-              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + optimizerStats().popularity}() + '%' }"></i>
+              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + optimizerStats().popularity + '%' }"></i>
                 <!-- /ko -->
               </a>
             </td>
