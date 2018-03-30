@@ -88,8 +88,42 @@
         editableOptions.toggle = 'manual';
       }
 
+      var multiLineEllipsisHandler;
+      if (editableOptions.multiLineEllipsis) {
+        editableOptions.display = function (value) {
+          if (!multiLineEllipsisHandler) {
+            multiLineEllipsisHandler = new MultiLineEllipsisHandler({
+              element: this,
+              text: value,
+              overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
+              expandable: editableOptions.multiLineEllipsis
+            });
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+              multiLineEllipsisHandler.dispose();
+            });
+          } else {
+            multiLineEllipsisHandler.setText(value);
+          }
+        }
+      }
+
       //create editable
       var $editable = $element.editable(editableOptions);
+
+      if (editableOptions.multiLineEllipsis) {
+        $editable.off('.multiLine');
+        $editable.on('hidden.multiLine', function () {
+          if (multiLineEllipsisHandler) {
+            multiLineEllipsisHandler.resume();
+          }
+        });
+        $editable.on('shown.multiLine', function () {
+          if (multiLineEllipsisHandler) {
+            multiLineEllipsisHandler.pause();
+          }
+        })
+      }
 
       //update observable on save
       if (ko.isObservable(value)) {

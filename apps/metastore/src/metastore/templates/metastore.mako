@@ -127,7 +127,7 @@ ${ components.menubar(is_embeddable) }
         <!-- ko if: $root.optimizerEnabled  -->
           <th width="15%">${_('Popularity')}</th>
         <!-- /ko -->
-        <th width="50%">${_('Description')}</th>
+        <th width="50%" class="metastore-description-col">${_('Description')}</th>
       </tr>
       </thead>
       <tbody data-bind="hueach: { data: $data, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
@@ -150,21 +150,13 @@ ${ components.menubar(is_embeddable) }
             </div>
           </td>
           <!-- /ko -->
-          <td>
-            % if has_write_access:
-              <!-- ko ifnot: table.isView() -->
-              <div class="show-inactive-on-hover">
-              <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil"></i></a>
-              <span data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('Add a description...') }', inputclass: 'input-xlarge'}">
-                ${ _('Add a description...') }</span>
-              </div>
-              <!-- /ko -->
-              <!-- ko if: table.isView() -->
-                <span style="white-space: pre;" data-bind="text: comment"></span>
-              <!-- /ko -->
-            % else:
+          <td class="metastore-description-col" >
+            <!-- ko ifnot: table.isView() -->
+            <!-- ko template: 'metastore-td-description' --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: table.isView() -->
               <span style="white-space: pre;" data-bind="text: comment"></span>
-            % endif
+            <!-- /ko -->
           </td>
         </tr>
       </tbody>
@@ -285,23 +277,31 @@ ${ components.menubar(is_embeddable) }
   <!-- ko with: tableDetails -->
   <h4>${ _('Properties') } <i data-bind="visible: $parent.loadingDetails()" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
   <div class="row-fluid">
-    <div title="${ _('Type') }">
+    <div class="metastore-property">
+      <div>${ _('Type') }</div>
       <!-- ko if: is_view -->
-        <i class="fa fa-fw fa-eye muted"></i> ${ _('View') }
+      <div>${ _('View') }</div>
       <!-- /ko -->
       <!-- ko ifnot: is_view -->
-        <i class="fa fa-fw fa-table muted"></i> ${ _('Table') }
+      <div>${ _('Table') }</div>
       <!-- /ko -->
     </div>
-    <div title="${ _('Owner') }">
-      <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
+    <div class="metastore-property">
+      <div>${ _('Owner') }</div>
+      <div data-bind="text: details.properties.owner"></div>
     </div>
-    <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(details.properties.create_time) != 'Invalid Date' ? localeFormat(details.properties.create_time) : details.properties.create_time"></span></div>
-    <div title="${ _('Format') }">
-      <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
-      <i class="fa fa-fw fa-archive muted"></i>
-      <span data-bind="visible: details.properties.table_type == 'MANAGED_TABLE'" style="display: none;">${_('Managed')}</span>
-      <span data-bind="visible: details.properties.table_type == 'EXTERNAL_TABLE'" style="display: none;">${_('External')}</span>
+    <div class="metastore-property">
+      <div>${ _('Created') }</div>
+      <div data-bind="text: localeFormat(details.properties.create_time) != 'Invalid Date' ? localeFormat(details.properties.create_time) : details.properties.create_time"></div>
+    </div>
+    <div class="metastore-property">
+      <div>${ _('Format') }</div>
+      <!-- ko if: details.properties.table_type == 'MANAGED_TABLE' -->
+      <div>${_('Managed')}</div>
+      <!-- /ko -->
+      <!-- ko if: details.properties.table_type == 'EXTERNAL_TABLE' -->
+      <div>${_('External')}</div>
+      <!-- /ko -->
     </div>
   </div>
   <!-- /ko -->
@@ -324,41 +324,57 @@ ${ components.menubar(is_embeddable) }
       <!-- /ko -->
     </h4>
     <div class="row-fluid">
-      <div>
-        <i class="fa fa-fw fa-hdd-o muted"></i>
-        <!-- ko if: details.properties.format == 'kudu' -->
-          ${_('Stored in')} Kudu
+      <div class="metastore-property">
+        <div>${ _('Storage') }</div>
+        <!-- ko if: details.properties.format === 'kudu' -->
+        <div>${_('Kudu')}</div>
         <!-- /ko -->
-        <!-- ko if: details.properties.format != 'kudu' -->
+        <!-- ko if: details.properties.format !== 'kudu' -->
+        <div>
           % if IS_EMBEDDED.get():
-          <span data-bind="attr: {'title': path_location}">${_('Location')}</span>
+            <span data-bind="attr: {'title': path_location}">${_('Location')}</span>
           % else:
-          <a data-bind="hueLink: hdfs_link" title="${_('Open data location')}">${_('Location')}</a>
+            <a data-bind="hueLink: hdfs_link" title="${_('Open data location')}">${_('Location')}</a>
           % endif
+        </div>
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
         <!-- ko if: typeof transient_lastDdlTime !== 'undefined' -->
-          <span title="${ _('Last data update') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(transient_lastDdlTime * 1000)"></span></span>
+          <div class="metastore-property">
+            <div>${ _('Last data update') }</div>
+            <div data-bind="text: localeFormat(transient_lastDdlTime * 1000)"></div>
+          </div>
         <!-- /ko -->
-        <!-- ko if: typeof last_modified_by !== 'undefined' || typeof last_modified_time !== 'undefined' -->
-          <div>
-          <!-- ko if: typeof last_modified_time !== 'undefined' -->
-            <span title="${ _('Last DDL modified time') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(last_modified_time*1000)"></span></span>
-          <!-- /ko -->
-          <!-- ko if: typeof last_modified_by !== 'undefined' -->
-            <span title="${ _('Last DDL modified by') }"><i class="fa fa-fw fa-user muted"></i> <span data-bind="text: last_modified_by"></span></span>
-          <!-- /ko -->
+        <!-- ko if: typeof last_modified_time !== 'undefined' -->
+          <div class="metastore-property">
+            <div>${ _('Last DDL modified time') }</div>
+            <div data-bind="text: localeFormat(last_modified_time*1000)"></div>
+          </div>
+        <!-- /ko -->
+        <!-- ko if: typeof last_modified_by !== 'undefined' -->
+          <div class="metastore-property">
+            <div>${ _('Last DDL modified by') }</div>
+            <div data-bind="text: last_modified_by"></div>
           </div>
         <!-- /ko -->
         <!-- ko if: typeof numFiles !== 'undefined' && typeof last_modified_by === 'undefined' -->
-          <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span> ${ _('files') }</div>
+          <div class="metastore-property">
+            <div>${ _('Files') }</div>
+            <div data-bind="text: numFiles"></div>
+          </div>
         <!-- /ko -->
         <!-- ko if: typeof numRows !== 'undefined' -->
-          <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span> ${ _('rows') }</div>
+          <div class="metastore-property">
+            <div>${ _('Rows') }</div>
+            <div data-bind="text: numRows"></div>
+          </div>
         <!-- /ko -->
         <!-- ko if: typeof totalSize !== 'undefined' && typeof last_modified_by === 'undefined' -->
-          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: filesize(totalSize)"></span></div>
+          <div class="metastore-property">
+            <div>${ _('Total size') }</div>
+            <div data-bind="text: filesize(totalSize)"></div>
+          </div>
         <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -431,36 +447,96 @@ ${ components.menubar(is_embeddable) }
   <span class="margin-left-10" data-bind="visible: filteredDatabases().length === 0" style="font-style: italic; display: none;">${_('No databases found')}</span>
 </script>
 
+<script type="text/html" id="metastore-td-description">
+% if has_write_access:
+  <div class="show-inactive-on-hover">
+    <div class="edit-description-action"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil"></i></a></div>
+    <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
+        mode: 'inline',
+        enabled: true,
+        type: 'textarea',
+        showbuttons: 'bottom',
+        inputclass: 'hue-table-browser-desc-input',
+        toggle: 'manual',
+        toggleElement: '.toggle-editable',
+        placeholder: '${ _ko('Add a description...') }',
+        emptytext: '${ _ko('Add a description...') }',
+        inputclass: 'hue-table-browser-desc-input',
+        rows: 6,
+        multiLineEllipsis: { overflowHeight: '40px', expandable: true }
+      }">
+      ${ _('Add a description...') }</div>
+  </div>
+% else:
+  <span style="white-space: pre;" data-bind="text: comment"></span>
+% endif
+</script>
+
+<script type="text/html" id="metastore-main-description">
+% if has_write_access:
+  <!-- ko if: $root.navigatorEnabled() -->
+  <div class="hue-table-browser-desc-container show-inactive-on-hover">
+    <div class="edit-description-action">
+      <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a>
+    </div>
+    <div class="hue-table-browser-desc">
+      <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
+        mode: 'inline',
+        enabled: true,
+        type: 'textarea',
+        showbuttons: 'bottom',
+        inputclass: 'hue-table-browser-desc-input',
+        toggle: 'manual',
+        toggleElement: '.toggle-editable',
+        placeholder: '${ _ko('Add a description...') }',
+        emptytext: '${ _ko('No description available') }',
+        rows: 8,
+        multiLineEllipsis: { overflowHeight: '120px', expandable: true },
+      }" class="inline-block">
+        ${ _('Add a description...') }
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+  <!-- ko ifnot: $root.navigatorEnabled() -->
+  <div data-bind="text: comment, attr: { title: comment }" class="table-description"></div>
+  <!-- /ko -->
+% else:
+  <div data-bind="text: comment, attr: { title: comment }" class="table-description"></div>
+%endif
+</script>
+
+<script type="text/html" id="metastore-nav-tags">
+  <!-- ko if: $root.navigatorEnabled()  -->
+  <div class="margin-top-10" style="margin-left:16px;" data-bind="component: { name: 'nav-tags', params: { catalogEntry: catalogEntry }}"></div>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="metastore-nav-properties">
+  <!-- ko if: $root.navigatorEnabled()  -->
+  <div class="margin-top-5" style="margin-left:20px;" data-bind="component: { name: 'nav-properties', params: { catalogEntry: catalogEntry }}"></div>
+  <!-- /ko -->
+</script>
+
 <script type="text/html" id="metastore-tables">
   <div class="row-fluid">
-    % if has_write_access:
-      <!-- ko if: $root.navigatorEnabled() -->
-      <div style="position: relative;" class="show-inactive-on-hover margin-bottom-20">
-        <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
-        <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
-          <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
-            ${ _('Add a description...') }
-          </div>
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- ko ifnot: $root.navigatorEnabled() -->
-      <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
-      <!-- /ko -->
-    % else:
-      <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
-    %endif
+    <!-- ko if: $root.navigatorEnabled() -->
+    <!-- ko template: 'metastore-main-description' --><!-- /ko -->
+    <!-- ko template: 'metastore-nav-tags' --><!-- /ko -->
+    <!-- ko template: 'metastore-nav-properties' --><!-- /ko -->
+    <!-- /ko -->
 
     <!-- ko with: stats  -->
-    <div class="span12 tile">
-        <div class="span6 tile">
-          <h4>${ _('Properties') }</h4>
-          <div title="${ _('Owner') }">
-            <i class="fa fa-fw fa-user muted"></i>
-            <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
-          </div>
-          <div title="${ _('Location') }">
-            <i class="fa fa-fw fa-hdd-o muted"></i>
+    <div class="span12 tile margin-top-10">
+      <div class="span6 tile">
+        <h4>${ _('Properties') }</h4>
+        <div class="metastore-property">
+          <div>${ _('Owner') }</div>
+          <div><span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span></div>
+        </div>
+        <div class="metastore-property">
+          <div>${ _('Location') }</div>
+          <div>
             % if IS_EMBEDDED.get():
               <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
             % else:
@@ -468,13 +544,6 @@ ${ components.menubar(is_embeddable) }
             % endif
           </div>
         </div>
-        <div class="span5 tile">
-          <!-- ko if: $root.navigatorEnabled()  -->
-          <h4>${ _('Tags') }</h4>
-          <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-            catalogEntry: $parent.catalogEntry
-          }}"></div>
-          <!-- /ko -->
       </div>
       <!-- ko with: parameters -->
       <div class="row-fluid">
@@ -509,7 +578,7 @@ ${ components.menubar(is_embeddable) }
           <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
           <th>&nbsp;</th>
           <th width="30%">${ _('Table Name') }</th>
-          <th width="48%">${ _('Description') }</th>
+          <th class="metastore-description-col" width="48%">${ _('Description') }</th>
           <!-- ko if: $root.optimizerEnabled  -->
           <th width="10%">${ _('Popularity') }</th>
           <th width="10%">${ _('Columns') }</th>
@@ -526,7 +595,9 @@ ${ components.menubar(is_embeddable) }
             <td>
               <a class="tableLink" href="javascript:void(0);" data-bind="text: catalogEntry.name, click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
             </td>
-            <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: commentWithoutNewLines, attr: { title: hueUtils.html2text(commentWithoutNewLines()) }"></td>
+            <td class="metastore-description-col" data-bind="attr: { title: hueUtils.html2text(commentWithoutNewLines()) }">
+              <!-- ko template: 'metastore-td-description' --><!-- /ko -->
+            </td>
             <!-- ko if: $root.optimizerEnabled -->
               <!-- ko if: optimizerStats() -->
               <td>
@@ -679,20 +750,12 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-overview-tab">
   <div class="row-fluid margin-top-10">
-    <div class="span3 tile">
+    <div class="span4 tile">
       <!-- ko template: 'metastore-table-properties' --><!-- /ko -->
     </div>
-    <div class="span3 tile">
+    <div class="span4 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    <!-- ko if: $root.navigatorEnabled() && navigatorMeta() -->
-    <div class="span6 tile">
-      <h4>${ _('Tags') }</h4>
-      <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-        catalogEntry: catalogEntry
-      }}"></div>
-    </div>
-    <!-- /ko -->
   </div>
 
   <div class="tile">
@@ -1084,21 +1147,13 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-describe-table">
   <div class="clearfix"></div>
+  <!-- ko template: 'metastore-main-description' --><!-- /ko -->
+  <!-- ko if: $root.navigatorEnabled() -->
+  <!-- ko template: 'metastore-nav-tags' --><!-- /ko -->
+  <!-- ko template: 'metastore-nav-properties' --><!-- /ko -->
+  <!-- /ko -->
 
-  % if has_write_access:
-  <div style="position: relative;" class="show-inactive-on-hover">
-    <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
-    <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
-      <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
-        ${ _('Add a description...') }
-      </div>
-    </div>
-  </div>
-  % else:
-    <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
-  %endif
-
-  <ul class="nav nav-tabs nav-tabs-border margin-top-30">
+  <ul class="nav nav-tabs nav-tabs-border margin-top-20">
     <li data-bind="css: { 'active': $root.currentTab() === 'overview' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('overview'); }">${_('Overview')}</a></li>
     <li data-bind="css: { 'active': $root.currentTab() === 'columns' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->

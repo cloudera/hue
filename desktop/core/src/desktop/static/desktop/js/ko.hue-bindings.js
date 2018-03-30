@@ -570,48 +570,125 @@
     }
   };
 
+  window.MultiLineEllipsisHandler = (function () {
+
+    function MultiLineEllipsisHandler(options) {
+      var self = this;
+
+      self.element = options.element;
+      self.$element = $(options.element);
+      self.overflowHeight = options.overflowHeight;
+      self.expandable = options.expandable;
+      self.overflowing = options.overflowing;
+
+      self.lastKnownOffsetHeight;
+      self.lastKnownOffsetWidth;
+      self.isOverflowing;
+
+      self.expanded = false;
+      self.updateOverflowHeight();
+
+      self.fullText = options.text;
+      self.element.textContent = self.fullText;
+
+      window.setTimeout(function () {
+        self.resume();
+      }, 0);
+    }
+
+    MultiLineEllipsisHandler.prototype.updateOverflowHeight = function () {
+      var self = this;
+      if (self.overflowHeight) {
+        self.$element.css('max-height', self.expanded ? '' : self.overflowHeight);
+        self.$element.css('overflow', self.expanded ? '' : 'hidden');
+      }
+    };
+
+    MultiLineEllipsisHandler.prototype.resume = function () {
+      var self = this;
+      self.refresh();
+      self.sizeCheckInterval = window.setInterval(function () {
+        if (self.element.offsetWidth !== self.lastKnownOffsetWidth || self.element.offsetHeight !== self.lastKnownOffsetHeight) {
+          self.element.textContent = self.fullText;
+          self.refresh();
+        }
+      }, 500);
+    };
+
+    MultiLineEllipsisHandler.prototype.pause = function () {
+      var self = this;
+      window.clearInterval(self.sizeCheckInterval);
+    };
+
+    MultiLineEllipsisHandler.prototype.dispose = function () {
+      var self = this;
+      window.clearInterval(self.sizeCheckInterval);
+    };
+
+    MultiLineEllipsisHandler.prototype.refresh = function () {
+      var self = this;
+      self.$element.empty();
+      var textElement = self.element;
+      if (self.expandable) {
+        textElement = $('<span>').appendTo(self.$element)[0];
+        textElement.textContent = self.fullText;
+        if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
+          self.$element.append('&nbsp;');
+          $('<a href="javscript:void(0);">' + (self.expanded ? HUE_I18n.editable.showLess : HUE_I18n.editable.showMore) + '</a>').click(function (e) {
+            self.expanded = !self.expanded;
+            self.updateOverflowHeight();
+            if (self.expanded) {
+              self.refresh();
+              self.pause();
+            } else {
+              self.resume();
+            }
+            e.stopPropagation();
+          }).appendTo(self.$element);
+        }
+      } else {
+        textElement.textContent = self.fullText;
+      }
+
+      self.isOverflowing = false;
+      while (self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
+        self.isOverflowing = true;
+        var lastSpaceIndex = textElement.textContent.lastIndexOf(' ');
+        if (lastSpaceIndex !== -1) {
+          textElement.textContent = textElement.textContent.substring(0, lastSpaceIndex) + '...';
+        } else {
+          break;
+        }
+      }
+
+      if (ko.isObservable(self.overflowing) && self.overflowing() !== self.isOverflowing) {
+        self.overflowing(self.isOverflowing);
+      }
+      self.lastKnownOffsetHeight = self.element.offsetHeight;
+      self.lastKnownOffsetWidth = self.element.offsetWidth;
+    };
+
+    MultiLineEllipsisHandler.prototype.setText = function (text) {
+      var self = this;
+      self.fullText = text;
+      self.refresh();
+    };
+
+    return MultiLineEllipsisHandler;
+  })();
+
   ko.bindingHandlers.multiLineEllipsis = {
     after: ['text', 'value'],
     init: function (element, valueAccessor) { },
     update: function (element, valueAccessor) {
-      var originalContent;
-      var lastKnownOffsetHeight;
-      var lastKnownOffsetWidth;
-
-      var checkOverflow = function () {
-        if (!originalContent) {
-          originalContent = element.textContent;
-        }
-
-        lastKnownOffsetHeight = element.offsetHeight;
-        lastKnownOffsetWidth = element.offsetWidth;
-
-        var overflowing = false;
-        while (element.offsetHeight < element.scrollHeight || element.offsetWidth < element.scrollWidth) {
-          overflowing = true;
-          var lastSpaceIndex = element.textContent.lastIndexOf(' ');
-          if (lastSpaceIndex !== -1) {
-            element.textContent = element.textContent.substring(0, lastSpaceIndex) + '...';
-          } else {
-            break;
-          }
-        }
-        if (typeof valueAccessor() === 'function') {
-          valueAccessor()(overflowing);
-        }
-      };
-
-      window.setTimeout(checkOverflow, 0);
-
-      var sizeCheckInterval = window.setInterval(function () {
-        if (element.offsetWidth !== lastKnownOffsetWidth || element.offsetHeight !== lastKnownOffsetHeight) {
-          element.textContent = originalContent;
-          checkOverflow();
-        }
-      }, 500);
+      var multiLineEllipsisHandler = new MultiLineEllipsisHandler({
+        element: element,
+        text: element.textContent,
+        overflowing: valueAccessor()
+      });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-        window.clearInterval(sizeCheckInterval);
+        multiLineEllipsisHandler.dispose();
       });
     }
   };

@@ -409,6 +409,7 @@ var MetastoreTable = (function () {
     self.loadingQueries = ko.observable(true);
 
     self.comment = ko.observable();
+    self.editingComment = ko.observable();
 
     if (self.catalogEntry.hasResolvedComment()) {
       self.comment(self.catalogEntry.getResolvedComment());

@@ -117,6 +117,10 @@
       uploadCanceled: '${ _('The upload has been canceled') }',
       uploadSucceeded: '${ _('uploaded successfully') }'
     },
+    editable: {
+      showMore: '${ _('Show more') }',
+      showLess: '${ _('Show less') }',
+    },
     jHueHdfsTree: {
       GO_TO_COLUMN: '${_('Go to column:')}',
       PLACEHOLDER: '${_('column name...')}',
