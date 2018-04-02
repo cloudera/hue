@@ -1243,7 +1243,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
             <!-- /ko -->
             <!-- ko ifnot: meta.placeholder() -->
+              <!-- ko if: type() == 'datetime-local' || type() == 'date' -->
+              <input class="input-large" type="text" required="true" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, css:{ 'input-large': type() == 'datetime-local', 'input-medium': type() == 'date'}">
+              <!-- /ko -->
+              <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date') -->
               <input class="input-medium" type="text" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+              <!-- /ko -->
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: meta.type() == 'select' -->

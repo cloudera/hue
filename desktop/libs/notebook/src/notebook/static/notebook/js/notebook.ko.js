@@ -731,6 +731,8 @@ var EditorViewModel = (function() {
         variableValues[variable.name()].value = variable.value();
         variableValues[variable.name()].sampleUser = variable.sampleUser();
         variableValues[variable.name()].catalogEntry = variable.catalogEntry;
+        variableValues[variable.name()].path = variable.path;
+        variableValues[variable.name()].type = variable.type;
         return variableValues;
       }, self.variableValues);
       if (needsMore) {
@@ -786,6 +788,7 @@ var EditorViewModel = (function() {
           case 'timestamp':
             variablesValues.type = 'datetime-local';
             variablesValues.step = '1';
+            variablesValues.value = moment(Date.parse(variable.value()) || Date.now()).utc().format().substring(0, 19);
             break;
           case 'decimal':
           case 'double':
@@ -803,6 +806,7 @@ var EditorViewModel = (function() {
           case 'date':
             variablesValues.type = 'date';
             variablesValues.step = '';
+            variablesValues.value = moment(Date.parse(variable.value()) || Date.now()).utc().format().substring(0, 10);
             break;
           case 'boolean':
             variablesValues.type = 'checkbox';
@@ -811,6 +815,11 @@ var EditorViewModel = (function() {
           default:
             variablesValues.type = 'text';
             variablesValues.step = '';
+        }
+        if (variablesValues.value) {
+          setTimeout(function () {
+            variable.value(variablesValues.value);
+          }, 0);
         }
         variable.type(variablesValues.type);
         variable.step(variablesValues.step);
