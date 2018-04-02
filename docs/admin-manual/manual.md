@@ -393,12 +393,12 @@ leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed,
 We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:
 
 <pre>
-[desktop]
-# Enable X-Forwarded-Host header if the load balancer requires it.
-use_x_forwarded_host=false
+  [desktop]
+  # Enable X-Forwarded-Host header if the load balancer requires it.
+  use_x_forwarded_host=false
 
-# Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
-secure_proxy_ssl_header=false
+  # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
+  secure_proxy_ssl_header=false
 </pre>
 
 ### Configuring SSL
@@ -438,9 +438,9 @@ When getting a bigger result set from Hive/Impala or bigger files like images fr
 the buffer size of SASL lib for thrift sasl communication.
 
 <pre>
-[desktop]
-# This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
-sasl_max_buffer=2 * 1024 * 1024
+  [desktop]
+  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
+  sasl_max_buffer=2 * 1024 * 1024
 </pre>
 
 ### User Admin Configuration
