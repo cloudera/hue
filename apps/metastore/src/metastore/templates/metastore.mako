@@ -451,7 +451,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-td-description">
 % if has_write_access:
-  <div class="show-inactive-on-hover">
+  <div data-bind="visibleOnHover: { selector: '.inactive-action' }">
     <div class="edit-description-action"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil"></i></a></div>
     <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
         mode: 'inline',
@@ -465,7 +465,7 @@ ${ components.menubar(is_embeddable) }
         emptytext: '${ _ko('Add a description...') }',
         inputclass: 'hue-table-browser-desc-input',
         rows: 6,
-        multiLineEllipsis: { overflowHeight: '40px', expandable: true }
+        multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'inactive-action' }
       }">
       ${ _('Add a description...') }</div>
   </div>
@@ -493,7 +493,7 @@ ${ components.menubar(is_embeddable) }
         placeholder: '${ _ko('Add a description...') }',
         emptytext: '${ _ko('No description available') }',
         rows: 8,
-        multiLineEllipsis: { overflowHeight: '120px', expandable: true },
+        multiLineEllipsis: { overflowHeight: '120px', expandable: true, expandClass: 'inactive-action' },
       }" class="inline-block">
         ${ _('Add a description...') }
       </div>

@@ -96,7 +96,8 @@
               element: this,
               text: value,
               overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
-              expandable: editableOptions.multiLineEllipsis
+              expandable: editableOptions.multiLineEllipsis,
+              expandClass: editableOptions.multiLineEllipsis.expandClass
             });
 
             ko.utils.domNodeDisposal.addDisposeCallback(element, function() {

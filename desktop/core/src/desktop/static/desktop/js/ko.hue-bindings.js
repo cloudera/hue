@@ -579,6 +579,7 @@
       self.$element = $(options.element);
       self.overflowHeight = options.overflowHeight;
       self.expandable = options.expandable;
+      self.expandClass = options.expandClass;
       self.overflowing = options.overflowing;
 
       self.lastKnownOffsetHeight;
@@ -634,7 +635,7 @@
         textElement.textContent = self.fullText;
         if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
           self.$element.append('&nbsp;');
-          $('<a href="javscript:void(0);">' + (self.expanded ? HUE_I18n.editable.showLess : HUE_I18n.editable.showMore) + '</a>').click(function (e) {
+          var $expandLink = $('<a href="javscript:void(0);">' + (self.expanded ? HUE_I18n.editable.showLess : HUE_I18n.editable.showMore) + '</a>').click(function (e) {
             self.expanded = !self.expanded;
             self.updateOverflowHeight();
             if (self.expanded) {
@@ -644,7 +645,11 @@
               self.resume();
             }
             e.stopPropagation();
-          }).appendTo(self.$element);
+          });
+          if (self.expandClass) {
+            $expandLink.addClass(self.expandClass);
+          }
+          $expandLink.appendTo(self.$element);
         }
       } else {
         textElement.textContent = self.fullText;
