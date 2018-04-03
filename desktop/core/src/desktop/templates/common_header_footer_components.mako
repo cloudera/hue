@@ -293,7 +293,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
   <div class="modal-footer"></div>
 </div>
 
-<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important;z-index:1071">
+<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:90%;margin-left:-45%!important;z-index:1071">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Row details')}</h2>
@@ -342,7 +342,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
             value = $el.data('data')[data.idx][colIdx];
           }
           var link = typeof value == 'string' && value.match(/^https?:\/\//i) ? '<a href="' + escapeOutput(value) + '" target="_blank">' + value + ' <i class="fa fa-external-link"></i></a>' : value;
-          html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td>' + hueUtils.deXSS(link) + '</td></tr>';
+          html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td style="word-break: break-all">' + hueUtils.deXSS(link) + '</td></tr>';
         }
       });
       $t.html(html);
