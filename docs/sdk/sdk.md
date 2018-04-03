@@ -995,6 +995,26 @@ How to create a new locale for an app::
       });
 </pre>
 
+ 
+### Creating a namespace property
+
+<pre>
+     $.post("/metadata/api/navigator/namespace/property/create/", {
+        "namespace": "huecatalog",
+        "properties": ko.mapping.toJSON({
+          "name" : "relatedEntities2",
+          "displayName" : "Related objects",
+          "description" : "My desc",
+          "multiValued" : true,
+          "maxLength" : 50,
+          "pattern" : ".*",
+          "enumValues" : null,
+          "type" : "TEXT"
+        })
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
 
 # Testing
 

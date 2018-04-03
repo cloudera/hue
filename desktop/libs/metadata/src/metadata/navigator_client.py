@@ -513,6 +513,16 @@ class NavigatorApi(object):
       raise NavigatorApiException(e.message)
 
 
+  def create_namespace_property(self, namespace, properties):
+    try:
+      data = json.dumps(properties)
+      return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+    except RestException, e:
+      msg = 'Failed to search for namespace: %s' % namespace
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
+
   def _get_boosted_term(self, term):
     return 'AND'.join([
       '(%s)' % 'OR'.join(['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]),  # Matching fields

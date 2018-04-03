@@ -552,3 +552,32 @@ def get_namespace(request):
 
   return JsonResponse(response)
 
+
+@error_handler
+def create_namespace_property(request):
+  """
+  {
+  "name" : "relatedEntities",
+  "displayName" : "Related objects",
+  "creator" : "admin",
+  "description" : "My desc",,
+  "multiValued" : true,
+  "maxLength" : 50,
+  "pattern" : ".*",
+  "enumValues" : null,
+  "type" : "TEXT",
+  "createdDate" : "2018-04-02T22:36:19.001Z"
+}"""
+  response = {'status': -1}
+
+  api = NavigatorApi(request.user)
+  namespace = request.POST.get('namespace')
+  properties = json.loads(request.POST.get('properties', '{}'))
+
+  namespace = api.create_namespace_property(namespace, properties)
+
+  response['namespace'] = namespace
+  response['status'] = 0
+
+  return JsonResponse(response)
+
