@@ -3952,11 +3952,8 @@ $(document).ready(function () {
               overlapZoneSideToSide = 'E';
             }
 
-             if (coords.row < dimensions.row + sidesHeight) {
+            if (coords.row < dimensions.row + sidesHeight) {
               overlapZoneTopDown = 'N';
-            }
-            else if (coords.row >= (dimensions.row + sidesHeight) && coords.row < (dimensions.row + sidesHeight + centerHeight)) {
-              overlapZoneTopDown = '';
             }
             else {
               overlapZoneTopDown = 'S';
