@@ -1171,6 +1171,9 @@
           sel.removeAllRanges();
         }
 
+        if (typeof options.beforeOpen === 'function') {
+          options.beforeOpen.bind(viewModel)();
+        }
         var $menu = $('#hueContextMenu_' + options.template);
         if ($menu.length === 0) {
           $menu = $('<ul id="hueContextMenu_' + options.template  + '" class="hue-context-menu" data-bind="template: { name: \'' + options.template + '\', data: viewModel, afterRender: afterRender }"></ul>').appendTo(HUE_CONTAINER);

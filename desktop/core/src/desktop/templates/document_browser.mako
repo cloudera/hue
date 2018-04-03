@@ -250,50 +250,6 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
-      <!-- ko with: activeEntry -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: entriesToDelete().length === 0 -->
-        <h2 class="modal-title">${ _('The trash is empty') }</h2>
-        <!-- /ko -->
-        <!-- ko if: entriesToDelete().length > 0 -->
-        <h2 class="modal-title"> ${ _('Do you really want to delete the following document(s)?') } </h2>
-        <!-- /ko -->
-      </div>
-      <div class="modal-body">
-        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: entriesToDelete().length > 0 && selectedDocsWithDependents().length === 0">
-          <i class="fa fa-spinner fa-spin fa-2x"></i>
-        </div>
-        <ul data-bind="foreach: selectedDocsWithDependents()">
-          <li>
-            <span data-bind="text: $data.name"></span>
-            <!-- ko if: $data.dependents.length > 0 -->
-              (${_('used by')}
-              <a class="pointer" data-bind="hueLink: $data.dependents[0].absoluteUrl, text: $data.dependents[0].name"></a>
-              <!-- ko if: $data.dependents.length > 1 -->
-              ${_('and')} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name"></a>
-                <!-- ko if: $data.dependents.length > 2 -->
-                  ${_('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${_('other')}
-                <!-- /ko -->
-              <!-- /ko -->
-              )
-            <!-- /ko -->
-          </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <!-- ko if: entriesToDelete().length === 0 -->
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Close') }">
-        <!-- /ko -->
-        <!-- ko if: entriesToDelete().length > 0 -->
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="submit" data-bind="click: function() { if (isTrash() || isTrashed()) { removeDocuments(true) } else { moveToTrash() } }, disable: deletingEntries" class="btn btn-danger disable-feedback" value="${_('Yes')}"/>
-        <!-- /ko -->
-      </div>
-      <!-- /ko -->
-    </div>
-
     <div class="doc-browser-container" data-bind="docSelect: activeEntry.entries, docDroppable: { entries: activeEntry.entries }">
       <div class="navbar hue-title-bar">
         <div class="navbar-inner">
@@ -420,7 +376,7 @@ from desktop.views import _ko
                     </li>
                     <!-- /ko -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && !superuser) }">
-                      <a href="javascript:void(0);" data-bind="click: function() { getSelectedDocsWithDependents(); showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
+                      <a href="javascript:void(0);" data-bind="click: function() {huePubSub.publish('doc.show.delete.modal', $data);getSelectedDocsWithDependents(); showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
                     </li>
                     <li data-bind="css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || !canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }">
                       <a href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }"><i class="fa fa-fw fa-edit"></i> ${_('Rename folder')}</a>
@@ -511,7 +467,7 @@ from desktop.views import _ko
             <div class="doc-browser-row" data-bind="contextMenu: { scrollContainer: '.doc-browser-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
-                <li><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showRestoreConfirmation(); }"><i class="fa fa-fw fa-undo"></i> ${ _('Restore to Home') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: isTrashed -->
@@ -520,10 +476,10 @@ from desktop.views import _ko
                 <!-- /ko -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-file-o"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
+                <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
                   <i class="fa fa-fw fa-times"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a>
                 </li>
-                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->
               </ul>

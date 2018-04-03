@@ -694,6 +694,7 @@ var HueFileEntry = (function () {
           errorCallback: function () {
             self.activeEntry().load();
             $('#deleteEntriesModal').modal('hide');
+            $(".modal-backdrop").remove();
             self.deletingEntries(false);
           }
         });
@@ -701,6 +702,7 @@ var HueFileEntry = (function () {
         self.deletingEntries(false);
         huePubSub.publish('assist.document.refresh');
         $('#deleteEntriesModal').modal('hide');
+        $(".modal-backdrop").remove();
         self.activeEntry().load();
       }
     };
