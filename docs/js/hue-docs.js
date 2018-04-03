@@ -17,8 +17,10 @@
 $(document).ready(function () {
   $('.doc-title h1 a').html('<img src="../images/hue_logo.png" alt="Hue Logo">');
   $('.toc ul').treed();
-  var $tocFilter = $('<input id="tocFilter" type="text">').addClass('form-control').attr('placeholder', 'Filter Table of Content');
-  $tocFilter.prependTo($('.toc'));
+  var $tocFilterContainer = $('<div>').addClass('toc-filter-container');
+  $tocFilterContainer.prependTo($('.toc'));
+  var $tocFilter = $('<input type="text">').addClass('form-control toc-filter').attr('placeholder', 'Filter Table of Content');
+  $tocFilter.appendTo($tocFilterContainer);
   var tocTimeout = -1;
   $tocFilter.on('keyup', function (e) {
     if (![13, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {

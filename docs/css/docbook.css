@@ -265,10 +265,15 @@ pre {
 .toc {
   background-color: #F6F6F6;
   padding: 10px;
+  padding-top: 0;
   position: fixed;
   overflow-y: auto;
-  height: calc(100% - 95px);
+  height: calc(100% - 85px);
   width: 22%;
+}
+
+.toc > ul {
+  margin-top: 50px;
 }
 
 .toc ul {
@@ -276,7 +281,14 @@ pre {
   list-style: none;
 }
 
-#tocFilter {
+.toc-filter-container {
+  padding-top: 10px;
+  background-color: #F6F6F6;
+  width: 21%;
+  position: fixed;
+}
+
+.toc-filter {
   width: 100%;
 }
 
