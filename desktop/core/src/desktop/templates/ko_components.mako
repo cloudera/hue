@@ -25,6 +25,7 @@
 <%namespace name="koNavTags" file="/ko_components/ko_nav_tags.mako" />
 <%namespace name="koSimpleAceEditor" file="/ko_components/ko_simple_ace_editor.mako" />
 <%namespace name="koSqlColumnsTable" file="/ko_components/ko_sql_columns_table.mako" />
+<%namespace name="koDeleteDocModal" file="/ko_components/ko_delete_doc_modal.mako" />
 
 <%def name="all()">
   ${ koBreadCrumbs.breadCrumbs() }
@@ -38,4 +39,5 @@
   ${ koNavTags.navTags() }
   ${ koSimpleAceEditor.simpleAceEditor() }
   ${ koSqlColumnsTable.sqlColumnsTable() }
+  ${ koDeleteDocModal.deleteDoc() }
 </%def>
