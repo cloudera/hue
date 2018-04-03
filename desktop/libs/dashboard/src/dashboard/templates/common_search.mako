@@ -3931,9 +3931,9 @@ $(document).ready(function () {
           widgetId: parseInt($(this).attr('data-widgetid'))
         }
         var $widget = $(this);
-        isEmptyWidget = $widget.children('.empty-gridster-widget').length > 0;
         isOverSelf = tempDraggableGridsterWidget !== null && tempDraggableGridsterWidget.widgetId() === dimensions.widgetId;
         if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
+          isEmptyWidget = $widget.children('.empty-gridster-widget').length > 0;
           overlaps = true;
           if (!isOverSelf) {
             var sidesWidth = Math.min(Math.floor(dimensions.sizex / 3), 1);
