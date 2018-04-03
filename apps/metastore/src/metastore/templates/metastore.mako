@@ -451,8 +451,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-td-description">
 % if has_write_access:
-  <div data-bind="visibleOnHover: { selector: '.inactive-action' }">
-    <div class="edit-description-action"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil"></i></a></div>
+  <div data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
     <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
         mode: 'inline',
         enabled: true,
@@ -465,7 +464,8 @@ ${ components.menubar(is_embeddable) }
         emptytext: '${ _ko('Add a description...') }',
         inputclass: 'hue-table-browser-desc-input',
         rows: 6,
-        multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'inactive-action' }
+        inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
+        multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'editable-inline-action' }
       }">
       ${ _('Add a description...') }</div>
   </div>
@@ -477,10 +477,7 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-main-description">
 % if has_write_access:
   <!-- ko if: $root.navigatorEnabled() -->
-  <div class="hue-table-browser-desc-container show-inactive-on-hover">
-    <div class="edit-description-action">
-      <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a>
-    </div>
+  <div class="hue-table-browser-desc-container" data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
     <div class="hue-table-browser-desc">
       <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
         mode: 'inline',
@@ -493,7 +490,8 @@ ${ components.menubar(is_embeddable) }
         placeholder: '${ _ko('Add a description...') }',
         emptytext: '${ _ko('No description available') }',
         rows: 8,
-        multiLineEllipsis: { overflowHeight: '120px', expandable: true, expandClass: 'inactive-action' },
+        inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
+        multiLineEllipsis: { overflowHeight: '120px', expandable: true, expandClass: 'editable-inline-action', inlineEditAction: true },
       }" class="inline-block">
         ${ _('Add a description...') }
       </div>

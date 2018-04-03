@@ -165,10 +165,10 @@
 
 .selectize-edit {
   opacity: 0;
-  font-size: 18px;
+  font-size: 16px;
   vertical-align: middle !important;
   margin-left: 5px;
-  color: #999;
+  color: #787878;
   transition: all 0.2s linear;
 }
 

@@ -88,6 +88,18 @@
         editableOptions.toggle = 'manual';
       }
 
+      var onActionRender = undefined;
+
+      if (editableOptions.inlineEditAction) {
+        onActionRender = function ($container) {
+          var $editAction = $('<a href="javascript:void(0);"><i class="fa fa-fw fa-pencil"></i></a>');
+          if (editableOptions.inlineEditAction.editClass) {
+            $editAction.addClass(editableOptions.inlineEditAction.editClass);
+          }
+          $editAction.appendTo($container);
+        }
+      }
+
       var multiLineEllipsisHandler;
       if (editableOptions.multiLineEllipsis) {
         editableOptions.display = function (value) {
@@ -97,7 +109,8 @@
               text: value,
               overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
               expandable: editableOptions.multiLineEllipsis,
-              expandClass: editableOptions.multiLineEllipsis.expandClass
+              expandClass: editableOptions.multiLineEllipsis.expandClass,
+              onActionRender: onActionRender
             });
 
             ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
@@ -106,6 +119,20 @@
           } else {
             multiLineEllipsisHandler.setText(value);
           }
+        }
+      } else if (onActionRender) {
+        editableOptions.display = function (value) {
+          var $container = $(this);
+          $('<span>').html(value).appendTo($container);
+          onActionRender($container);
+        };
+
+        onActionRender = function ($container) {
+          var $editAction = $('<a href="javascript:void(0);"><i class="fa fa-fw fa-pencil"></i></a>');
+          if (editableOptions.inlineEditAction.editClass) {
+            $editAction.addClass(editableOptions.inlineEditAction.editClass);
+          }
+          $editAction.appendTo($container);
         }
       }
 

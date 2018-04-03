@@ -504,7 +504,7 @@
         });
 
         if (! options.readOnly && !options.hasErrors()) {
-          $('<i>').addClass('fa fa-edit selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
+          $('<i>').addClass('fa fa-pencil selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
           $readOnlyInner.click(function () {
             showEdit();
           });
@@ -582,6 +582,8 @@
       self.expandClass = options.expandClass;
       self.overflowing = options.overflowing;
 
+      self.onActionRender = options.onActionRender;
+
       self.lastKnownOffsetHeight;
       self.lastKnownOffsetWidth;
       self.isOverflowing;
@@ -629,13 +631,12 @@
     MultiLineEllipsisHandler.prototype.refresh = function () {
       var self = this;
       self.$element.empty();
-      var textElement = self.element;
+      var  textElement = $('<span>').appendTo(self.$element)[0];
       if (self.expandable) {
-        textElement = $('<span>').appendTo(self.$element)[0];
         textElement.textContent = self.fullText;
         if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
           self.$element.append('&nbsp;');
-          var $expandLink = $('<a href="javscript:void(0);">' + (self.expanded ? HUE_I18n.editable.showLess : HUE_I18n.editable.showMore) + '</a>').click(function (e) {
+          var $expandLink = $('<a href="javscript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>').click(function (e) {
             self.expanded = !self.expanded;
             self.updateOverflowHeight();
             if (self.expanded) {
@@ -653,6 +654,10 @@
         }
       } else {
         textElement.textContent = self.fullText;
+      }
+
+      if (self.onActionRender) {
+        self.onActionRender(self.$element);
       }
 
       self.isOverflowing = false;
