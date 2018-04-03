@@ -43,6 +43,8 @@ VERSION = 'v9'
 _JSON_CONTENT_TYPE = 'application/json'
 CLUSTER_SOURCE_IDS_CACHE_KEY = 'nav-cluster-source-ids-id'
 
+_HAS_CATALOG_NAMESPACE = None
+
 
 def get_cluster_source_ids(api):
   '''
@@ -114,6 +116,7 @@ class NavigatorApi(object):
   http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
   DEFAULT_SEARCH_FIELDS = (('originalName', 3), ('originalDescription', 1), ('name', 10), ('description', 3), ('tags', 5))
+  CATALOG_NAMESPACE = '__cloudera_internal_catalog_hue'
 
   def __init__(self, user=None):
     self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
@@ -128,6 +131,8 @@ class NavigatorApi(object):
 
     self.__headers = {}
     self.__params = ()
+
+    self._fillup_properties()
 
 
   def _get_types_from_sources(self, sources):
@@ -532,6 +537,16 @@ class NavigatorApi(object):
       LOG.error(msg)
       raise NavigatorApiException(e.message)
 
+
+  def get_namespace_properties(self, namespace):
+    try:
+      return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
+    except RestException, e:
+      msg = 'Failed to create namespace %s property' % namespace
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
+
   def map_namespace_property(self, clazz, properties):
     try:
       data = json.dumps(properties)
@@ -540,6 +555,38 @@ class NavigatorApi(object):
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
       raise NavigatorApiException(e.message)
+
+
+  def _fillup_properties(self):
+    global _HAS_CATALOG_NAMESPACE
+
+    if _HAS_CATALOG_NAMESPACE is None:
+      response = self.get_namespace(namespace=NavigatorApi.CATALOG_NAMESPACE)
+      if not response:
+        self.create_namespace(namespace=NavigatorApi.CATALOG_NAMESPACE, description="Set of fields to augment the data catalog")
+
+      properties = self.get_namespace_properties(namespace=NavigatorApi.CATALOG_NAMESPACE)
+
+      if not [_property for _property in properties if _property['name'] == 'relatedQueries']:
+        self.create_namespace_property(namespace=NavigatorApi.CATALOG_NAMESPACE, properties={
+          "name": "relatedQueries",
+          "displayName": "Related queries",
+          "description": "List of saved SQL queries UUIDs that show how to analyze this table",
+          "multiValued": True,
+          "maxLength": 36,
+          "pattern": ".*", # UUID
+          "enumValues": None,
+          "type": "TEXT"
+         })
+
+        # Might want to check if the mapping is already done
+        for clazz in ('hv_table', 'hv_view'):
+          self.map_namespace_property(clazz, properties=[{
+             "namespace": NavigatorApi.CATALOG_NAMESPACE,
+             "name": "relatedQueries"
+          }])
+
+      _HAS_CATALOG_NAMESPACE = True
 
 
   def _get_boosted_term(self, term):
