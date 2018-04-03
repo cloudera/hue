@@ -4190,7 +4190,9 @@ $(document).ready(function () {
 
   huePubSub.subscribe('draggable.text.meta', function (options) {
     if (searchViewModel.isGridster()) {
+      isDraggingOrResizingWidgets = true;
       setPreviousWidgetSizes();
+      skipRestoreOnStop = false;
       addPreviewHolder(options);
     }
   }, 'dashboard');
@@ -4705,6 +4707,9 @@ $(document).ready(function () {
           selectedWidget = searchViewModel.draggableFacet();
         }
         var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+        var widgetClone = ko.mapping.toJS(selectedWidget);
+        widgetClone.id = UUID();
+        selectedWidget = new Widget(widgetClone);
         fakeRow.addWidget(selectedWidget);
         addFacetDemiModalFieldPreview({
           'name': function () {
