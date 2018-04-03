@@ -34,6 +34,7 @@ urlpatterns = patterns('metadata.navigator_api',
   url(r'^api/navigator/namespace/create/?$', 'create_namespace', name='create_namespace'),
   url(r'^api/navigator/namespace/?$', 'get_namespace', name='get_namespace'),
   url(r'^api/navigator/namespace/property/create/?$', 'create_namespace_property', name='create_namespace_property'),
+  url(r'^api/navigator/namespace/property/map/?$', 'map_namespace_property', name='map_namespace_property'),
 )
 
 

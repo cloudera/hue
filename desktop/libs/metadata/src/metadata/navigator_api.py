@@ -597,3 +597,23 @@ def create_namespace_property(request):
 
   return JsonResponse(response)
 
+
+@error_handler
+def map_namespace_property(request):
+  """
+  {
+  namespace: "huecatalog",
+  name: "relatedEntities"
+  }"""
+  response = {'status': -1}
+
+  api = NavigatorApi(request.user)
+  clazz = request.POST.get('class')
+  properties = json.loads(request.POST.get('properties', '[]'))
+
+  namespace = api.map_namespace_property(clazz=clazz, properties=properties)
+
+  response['namespace'] = namespace
+  response['status'] = 0
+
+  return JsonResponse(response)

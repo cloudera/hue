@@ -984,7 +984,7 @@ How to create a new locale for an app::
 # API
 
 ## Metadata
- 
+
 ### Getting a namespace
 
 <pre>
@@ -1023,6 +1023,20 @@ How to create a new locale for an app::
           "enumValues" : null,
           "type" : "TEXT"
         })
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+### Map a namespace property to a class entity
+
+<pre>
+     $.post("/metadata/api/navigator/namespace/property/map/", {
+        "class": "hv_view",
+        "properties": ko.mapping.toJSON([{
+           namespace: "huecatalog",
+           name: "relatedQueries"
+        }])
       }, function(data) {
         console.log(ko.mapping.toJSON(data));
       });

@@ -532,6 +532,15 @@ class NavigatorApi(object):
       LOG.error(msg)
       raise NavigatorApiException(e.message)
 
+  def map_namespace_property(self, clazz, properties):
+    try:
+      data = json.dumps(properties)
+      return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+    except RestException, e:
+      msg = 'Failed to map class %s property' % clazz
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
 
   def _get_boosted_term(self, term):
     return 'AND'.join([
