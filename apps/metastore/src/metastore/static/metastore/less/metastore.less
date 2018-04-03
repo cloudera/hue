@@ -38,6 +38,10 @@
     white-space: nowrap;
   }
 
+  .hue-breadcrumbs-bar {
+    padding-left: 0;
+  }
+
   h2.card-heading {
     border-bottom: 1px solid @cui-gray-100!important;
     font-size: 12px!important;
@@ -88,6 +92,7 @@
   .empty-header-col,
   .metastore-main h4 {
     .section-h4-border;
+    margin-bottom: 0;
   }
 
   .tile {
@@ -249,7 +254,11 @@
 
   .hue-table-browser-desc {
     width: 100%;
-    margin-left: 25px;
+    margin: 5px 14px 14px 14px;
+  }
+
+  .hue-tags {
+    margin: 5px 7px 0 7px;
   }
 
   .metastore-description-col .control-group > div,
@@ -263,6 +272,10 @@
 
   .metastore-description-col {
     position: relative;
+  }
+
+  .metastore-property:first-child {
+    margin-top: 0;
   }
 
   .metastore-property {

@@ -508,13 +508,13 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-nav-tags">
   <!-- ko if: $root.navigatorEnabled()  -->
-  <div class="margin-top-10" style="margin-left:16px;" data-bind="component: { name: 'nav-tags', params: { catalogEntry: catalogEntry }}"></div>
+  <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: catalogEntry }}"></div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="metastore-nav-properties">
   <!-- ko if: $root.navigatorEnabled()  -->
-  <div class="margin-top-5" style="margin-left:20px;" data-bind="component: { name: 'nav-properties', params: { catalogEntry: catalogEntry }}"></div>
+  <div data-bind="component: { name: 'nav-properties', params: { catalogEntry: catalogEntry }}"></div>
   <!-- /ko -->
 </script>
 
@@ -527,21 +527,23 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
 
     <!-- ko with: stats  -->
-    <div class="span12 tile margin-top-10">
+    <div class="span12 tile" style="margin: 5px 10px;">
       <div class="span6 tile">
         <h4>${ _('Properties') }</h4>
-        <div class="metastore-property">
-          <div>${ _('Owner') }</div>
-          <div><span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span></div>
-        </div>
-        <div class="metastore-property">
-          <div>${ _('Location') }</div>
-          <div>
-            % if IS_EMBEDDED.get():
-              <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
-            % else:
-              <a data-bind="hueLink: hdfs_link"> ${_('Location')}</a>
-            % endif
+        <div>
+          <div class="metastore-property">
+            <div>${ _('Owner') }</div>
+            <div><span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span></div>
+          </div>
+          <div class="metastore-property">
+            <div>${ _('Location') }</div>
+            <div>
+              % if IS_EMBEDDED.get():
+                <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
+              % else:
+                <a data-bind="hueLink: hdfs_link"> ${_('Location')}</a>
+              % endif
+            </div>
           </div>
         </div>
       </div>
@@ -559,9 +561,9 @@ ${ components.menubar(is_embeddable) }
   </div>
 
   <div class="row-fluid">
-    <div class="span12 tile">
+    <div class="span12 tile" style="margin: 0 10px;">
       <h4>${ _('Tables') }</h4>
-      <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
+      <div class="actionbar-actions" style="margin-top:5px;" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
         <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
         <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
         <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.sourceType()) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
@@ -753,7 +755,7 @@ ${ components.menubar(is_embeddable) }
   </div>
 
   <div class="tile">
-    <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>) <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
+    <h4 style="margin-bottom: 5px;">${ _('Columns') } (<span data-bind="text: columns().length"></span>) <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
     <!-- ko with: favouriteColumns -->
     <!-- ko template: "metastore-columns-table" --><!-- /ko -->
     <!-- /ko -->
@@ -1147,7 +1149,7 @@ ${ components.menubar(is_embeddable) }
   <!-- ko template: 'metastore-nav-properties' --><!-- /ko -->
   <!-- /ko -->
 
-  <ul class="nav nav-tabs nav-tabs-border margin-top-20">
+  <ul class="nav nav-tabs nav-tabs-border margin-top-10">
     <li data-bind="css: { 'active': $root.currentTab() === 'overview' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('overview'); }">${_('Overview')}</a></li>
     <li data-bind="css: { 'active': $root.currentTab() === 'columns' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
