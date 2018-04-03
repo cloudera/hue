@@ -31,6 +31,7 @@ urlpatterns = patterns('metadata.navigator_api',
   url(r'^api/navigator/update_properties/?$', 'update_properties', name='update_properties'),
   url(r'^api/navigator/delete_metadata_properties/?$', 'delete_metadata_properties', name='delete_metadata_properties'),
   url(r'^api/navigator/lineage/?$', 'get_lineage', name='get_lineage'),
+  url(r'^api/navigator/namespace/create/?$', 'create_namespace', name='create_namespace'),
   url(r'^api/navigator/namespace/?$', 'get_namespace', name='get_namespace'),
   url(r'^api/navigator/namespace/property/create/?$', 'create_namespace_property', name='create_namespace_property'),
 )

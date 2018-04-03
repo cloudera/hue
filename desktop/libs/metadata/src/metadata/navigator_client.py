@@ -504,11 +504,21 @@ class NavigatorApi(object):
       raise NavigatorApiException(e.message)
 
 
+  def create_namespace(self, namespace, description=None):
+    try:
+      data = json.dumps({'name': namespace, 'description': description})
+      return self._root.post('models/namespaces/', data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+    except RestException, e:
+      msg = 'Failed to create namespace: %s' % namespace
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
+
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
     except RestException, e:
-      msg = 'Failed to search for namespace: %s' % namespace
+      msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
       raise NavigatorApiException(e.message)
 
@@ -518,7 +528,7 @@ class NavigatorApi(object):
       data = json.dumps(properties)
       return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
     except RestException, e:
-      msg = 'Failed to search for namespace: %s' % namespace
+      msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise NavigatorApiException(e.message)
 
