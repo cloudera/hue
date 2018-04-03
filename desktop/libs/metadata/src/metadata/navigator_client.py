@@ -504,6 +504,15 @@ class NavigatorApi(object):
       raise NavigatorApiException(e.message)
 
 
+  def get_namespace(self, namespace):
+    try:
+      return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
+    except RestException, e:
+      msg = 'Failed to search for namespace: %s' % namespace
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
+
   def _get_boosted_term(self, term):
     return 'AND'.join([
       '(%s)' % 'OR'.join(['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]),  # Matching fields

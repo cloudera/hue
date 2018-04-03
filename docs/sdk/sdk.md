@@ -981,6 +981,21 @@ How to create a new locale for an app::
     cd $APP_ROOT/src/$APP_NAME/locale
     $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 
+# API
+
+## Metadata
+ 
+### Getting a namespace
+
+<pre>
+     $.post("/metadata/api/navigator/namespace/", {
+        namespace: 'huecatalog'
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
 # Testing
 
 ## The short story

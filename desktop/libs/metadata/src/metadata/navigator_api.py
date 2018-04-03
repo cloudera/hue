@@ -536,3 +536,19 @@ def get_lineage(request):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+@error_handler
+def get_namespace(request):
+  response = {'status': -1}
+
+  api = NavigatorApi(request.user)
+  namespace = request.POST.get('namespace')
+
+  namespace = api.get_namespace(namespace)
+
+  response['namespace'] = namespace
+  response['status'] = 0
+
+  return JsonResponse(response)
+
