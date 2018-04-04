@@ -1,11 +1,6 @@
-<link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-
-<style>
-body {
-  padding: 75px 0 0 0 !important;
-}
-</style>
+<link rel="stylesheet" href="../css/bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 <div class="row-fluid doc-title">
   <h1><a href=../index.html>Doc</a> > Hue SDK Documentation</h1>
@@ -120,6 +115,16 @@ body {
 <li><a href="#documentation">Documentation</a></li>
 <li><a href="#css-less">CSS / LESS</a></li>
 <li><a href="#internationalization">Internationalization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#api">API</a><ul>
+<li><a href="#metadata_1">Metadata</a><ul>
+<li><a href="#getting-a-namespace">Getting a namespace</a></li>
+<li><a href="#creating-a-namespace">Creating a namespace</a></li>
+<li><a href="#creating-a-namespace-property">Creating a namespace property</a></li>
+<li><a href="#map-a-namespace-property-to-a-class-entity">Map a namespace property to a class entity</a></li>
 </ul>
 </li>
 </ul>
@@ -911,6 +916,59 @@ make compile-locale
 <pre><code>cd $APP_ROOT/src/$APP_NAME/locale
 $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 </code></pre>
+<h1 id="api">API</h1>
+<h2 id="metadata_1">Metadata</h2>
+<h3 id="getting-a-namespace">Getting a namespace</h3>
+<pre>
+     $.post("/metadata/api/navigator/namespace/", {
+        namespace: 'huecatalog'
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+<h3 id="creating-a-namespace">Creating a namespace</h3>
+<pre>
+     $.post("/metadata/api/navigator/namespace/create/", {
+        "namespace": "huecatalog",
+        "description": "my desc"
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+<h3 id="creating-a-namespace-property">Creating a namespace property</h3>
+<pre>
+     $.post("/metadata/api/navigator/namespace/property/create/", {
+        "namespace": "huecatalog",
+        "properties": ko.mapping.toJSON({
+          "name" : "relatedEntities2",
+          "displayName" : "Related objects",
+          "description" : "My desc",
+          "multiValued" : true,
+          "maxLength" : 50,
+          "pattern" : ".*",
+          "enumValues" : null,
+          "type" : "TEXT"
+        })
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+<h3 id="map-a-namespace-property-to-a-class-entity">Map a namespace property to a class entity</h3>
+<pre>
+     $.post("/metadata/api/navigator/namespace/property/map/", {
+        "class": "hv_view",
+        "properties": ko.mapping.toJSON([{
+           namespace: "huecatalog",
+           name: "relatedQueries"
+        }])
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
 <h1 id="testing">Testing</h1>
 <h2 id="the-short-story">The short story</h2>
 <p>Install the mini cluster (only once):
@@ -988,6 +1046,11 @@ via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.</p>
 <p></div>
 </div></p>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.treed.js"></script>
+<script src="../js/jquery.highlight.js"></script>
+<script src="../js/hue-docs.js"></script>
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
 
 <script>

@@ -1,11 +1,6 @@
-<link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-
-<style>
-body {
-  padding: 75px 0 0 0 !important;
-}
-</style>
+<link rel="stylesheet" href="../css/bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 <div class="row-fluid doc-title">
   <h1><a href=../index.html>Doc</a> > Hue User Guide</h1>
@@ -42,7 +37,7 @@ body {
 <li><a href="#editors-notebook">Editors / Notebook</a><ul>
 <li><a href="#concepts">Concepts</a><ul>
 <li><a href="#running-queries">Running Queries</a></li>
-<li><a href="#downloading-and-saving-query-results">Downloading and Saving Query Results</a></li>
+<li><a href="#downloading-and-exporting-query-results">Downloading and Exporting Query Results</a></li>
 <li><a href="#advanced-query-settings">Advanced Query Settings</a></li>
 <li><a href="#autocomplete">Autocomplete</a></li>
 <li><a href="#variables">Variables</a></li>
@@ -195,7 +190,7 @@ body {
 </ul>
 </div>
 <p></div>
-   <div class="span9"></p>
+  <div class="span9"></p>
 <h1 id="concept">Concept</h1>
 <p>Hue consists in 4 apps in a single page interface that allow the users to perform data
 analyzes without losing any context. The goal is to promote self service and stay simple like Excel
@@ -369,34 +364,36 @@ server.</p>
 <p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: Use CTRL/Cmd + ENTER to execute queries.</p>
 <p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: Under the logs panel, you can view any
 MapReduce or <a href="#impala-queries">Impala jobs</a> that the query generated.</p>
-<h3 id="downloading-and-saving-query-results">Downloading and Saving Query Results</h3>
-<p><img alt="image" src="images/important.jpg" /> <strong>Important</strong>:</p>
-<ul>
-<li>You can only save results to a file when the results were generated
-    by a MapReduce job.</li>
-<li>
-<p>This is the preferred way to save when the result is large (for
-    example &gt; 1M rows).</p>
-</li>
-<li>
-<p>Do any of the following to download or save the query results:</p>
-<ul>
-<li>Click <strong>Download as CSV</strong> to download the results in a
-    comma-separated values file suitable for use in other
-    applications.</li>
-<li>Click <strong>Download as XLS</strong> to download the results in a Microsoft
-    Office Excel worksheet file.</li>
-<li>Click <strong>Save</strong> to save the results in a table or HDFS file.<ul>
-<li>To save the results in a new table, select <strong>In a new
-    table</strong>, enter a table name, and then click <strong>Save</strong>.</li>
-<li>To save the results in an HDFS file, select <strong>In an HDFS
-    directory</strong>, enter a path and then click <strong>Save</strong>. You can
-    then download the file with <a href="../filebrowser.html">File Browser</a>.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<h3 id="downloading-and-exporting-query-results">Downloading and Exporting Query Results</h3>
+<p>To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query. </p>
+<p><img alt="image" src="images/note.jpg" /> Two of them offer great scalability:
+1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
+2.  Export to a table. You can choose an already existing table or a new one. In the export icon, choose Export and then Table.</p>
+<p><img alt="image" src="images/note.jpg" /> Two of them offer limited scalability:
+1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
+2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.</p>
+<p>Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+<pre>
+  [beeswax]
+  # A limit to the number of rows that can be downloaded from a query before it is truncated.
+  # A value of -1 means there will be no limit.
+  download_row_limit=-1</p>
+<p># A limit to the number of bytes that can be downloaded from a query before it is truncated.
+  # A value of -1 means there will be no limit.
+  download_bytes_limit=-1
+</pre></p>
+<p>In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
+<pre>
+  [desktop]
+  # Global setting to allow or disable end user downloads in all Hue.
+  # e.g. Query result in Editors and Dashboards, file in File Browser...
+  enable_download=false
+</pre></p>
+<p>The download feature in the file browser can be disabled separately with the following options in your hue.ini:
+<pre>
+[filebrowser]
+show_download_button=false
+</pre></p>
 <p><a id="advancedQuerySettings"></a></p>
 <h3 id="advanced-query-settings">Advanced Query Settings</h3>
 <p>The pane to the top of the Editor lets you specify the following
@@ -1336,6 +1333,11 @@ and specify the correct hostnames and ports:</p>
 <p>A basic read only version is done <a href="https://issues.cloudera.org/browse/HUE-951">HUE-951</a>.</p>
 <p></div>
 </div></p>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.treed.js"></script>
+<script src="../js/jquery.highlight.js"></script>
+<script src="../js/hue-docs.js"></script>
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
 
 <script>

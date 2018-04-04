@@ -1,11 +1,6 @@
-<link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
-
-<style>
-body {
-  padding: 75px 0 0 0 !important;
-}
-</style>
+<link rel="stylesheet" href="../css/bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 <div class="row-fluid doc-title">
   <h1><a href=../index.html>Doc</a> > Hue Administration Guide</h1>
@@ -17,7 +12,19 @@ body {
 <div class="toc">
 <ul>
 <li><a href="#installation">Installation</a><ul>
-<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#dependencies">Dependencies</a><ul>
+<li><a href="#ubuntu">Ubuntu</a><ul>
+<li><a href="#install-oracle-jdk">Install Oracle JDK</a></li>
+</ul>
+</li>
+<li><a href="#centosrhel">CentOS/RHEL</a></li>
+<li><a href="#macos">MacOS</a><ul>
+<li><a href="#fix-openssl-errors">Fix openssl errors</a></li>
+<li><a href="#install-oracle-instant-client">Install Oracle Instant Client</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#build">Build</a></li>
 <li><a href="#docker">Docker</a></li>
 <li><a href="#troubleshooting-the-tarball-installation">Troubleshooting the tarball Installation</a></li>
@@ -48,6 +55,7 @@ body {
 <li><a href="#change-your-maps-look-and-feel">Change your maps look and feel</a></li>
 <li><a href="#configure-a-proxy">Configure a Proxy</a></li>
 <li><a href="#configuring-ssl">Configuring SSL</a></li>
+<li><a href="#sasl">SASL</a></li>
 <li><a href="#user-admin-configuration">User Admin Configuration</a></li>
 <li><a href="#banner">Banner</a></li>
 <li><a href="#splash-screen">Splash Screen</a></li>
@@ -79,13 +87,15 @@ body {
 <li><a href="#oozie-configuration">Oozie Configuration</a></li>
 <li><a href="#solr-configuration">Solr Configuration</a></li>
 <li><a href="#hbase-configuration">HBase Configuration</a></li>
-<li><a href="#configuration-validation">Configuration Validation</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a href="#administration">Administration</a><ul>
+<li><a href="#configuration-validation">Configuration Validation</a></li>
 <li><a href="#server-logs">Server Logs</a></li>
+<li><a href="#threads">Threads</a></li>
+<li><a href="#metrics">Metrics</a></li>
 <li><a href="#user-management">User management</a><ul>
 <li><a href="#ldap_1">LDAP</a></li>
 <li><a href="#users">Users</a><ul>
@@ -128,7 +138,7 @@ body {
 </ul>
 </div>
 <p></div>
-   <div class="span9"></p>
+  <div class="span9"></p>
 <h1 id="installation">Installation</h1>
 <p>The following instructions describe how to install the Hue tarball on a
 multi-node cluster. You need to also install Hadoop and its satellite components
@@ -144,9 +154,68 @@ you can use your existing master node as the Hue Server.</p>
 <h2 id="dependencies">Dependencies</h2>
 <p>Hue employs some Python modules which use native code and requires
 certain development libraries be installed on your system. To install from the
-tarball, you must have the following installed:</p>
-<p>Required Dependencies
-The full list is here: <a href="https://github.com/cloudera/hue#prerequisites">https://github.com/cloudera/hue#prerequisites</a></p>
+tarball, you'll need these library development packages and tools installed on your system:</p>
+<ul>
+<li>Python 2.6.5 - 2.7</li>
+</ul>
+<h3 id="ubuntu">Ubuntu</h3>
+<pre><code>sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
+</code></pre>
+<ul>
+<li><a href="https://help.ubuntu.com/community/Java">Oracle JDK</a></li>
+<li>mvn (from maven package or maven3 tarball)</li>
+<li>openldap-dev / libldap2-dev</li>
+<li>libtidy-0.99-0 (for unit tests only)</li>
+</ul>
+<h4 id="install-oracle-jdk">Install Oracle JDK</h4>
+<pre><code>sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java7-installer
+</code></pre>
+<h3 id="centosrhel">CentOS/RHEL</h3>
+<pre><code>sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make  mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
+</code></pre>
+<ul>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora">Oracle JDK</a></li>
+<li>mvn (from <a href="https://gist.github.com/sebsto/19b99f1fa1f32cae5d00"><code>apache-maven</code></a> package or maven3 tarball)</li>
+<li>libtidy (for unit tests only)</li>
+<li>openssl-devel (for version 7+)</li>
+</ul>
+<h3 id="macos">MacOS</h3>
+<ul>
+<li>Xcode command line tools</li>
+<li>Oracle's JDK 1.7+</li>
+<li>maven (Homebrew)</li>
+<li>mysql (Homebrew)</li>
+<li>gmp (Homebrew)</li>
+<li>openssl (Homebrew)</li>
+<li><a href="http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html">Oracle Instant Client</a></li>
+</ul>
+<h4 id="fix-openssl-errors">Fix openssl errors</h4>
+<p>Required for MacOS 10.11+</p>
+<pre><code>export LDFLAGS=-L/usr/local/opt/openssl/lib &amp;&amp; export CPPFLAGS=-I/usr/local/opt/openssl/include
+</code></pre>
+<h4 id="install-oracle-instant-client">Install Oracle Instant Client</h4>
+<p>Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add</p>
+<pre><code>export ORACLE_HOME=/usr/local/share/oracle
+export VERSION=11.2.0.4.0
+export ARCH=x86_64
+export DYLD_LIBRARY_PATH=$ORACLE_HOME
+export LD_LIBRARY_PATH=$ORACLE_HOME
+</code></pre>
+<p>and then</p>
+<pre><code>source ~/.bash_profile
+sudo mkdir -p $ORACLE_HOME
+sudo chmod 775 $ORACLE_HOME
+</code></pre>
+<p>then unzip the content of both downloaded zip files into the newly created $ORACLE_HOME in a way that the 'sdk' folder is at the same level with the other files and then</p>
+<pre><code>ln -s libclntsh.dylib.11.1 libclntsh.dylib
+ln -s libocci.dylib.11.1 libocci.dylib
+</code></pre>
+<p>and finally</p>
+<pre><code>cd sdk
+unzip ottclasses.zip
+</code></pre>
 <h2 id="build">Build</h2>
 <p>Configure <code>$PREFIX</code> with the path where you want to install Hue by running:</p>
 <pre><code>PREFIX=/usr/share make install
@@ -358,12 +427,12 @@ leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed,
 <h3 id="configure-a-proxy">Configure a Proxy</h3>
 <p>We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:</p>
 <pre>
-[desktop]
-# Enable X-Forwarded-Host header if the load balancer requires it.
-use_x_forwarded_host=false
+  [desktop]
+  # Enable X-Forwarded-Host header if the load balancer requires it.
+  use_x_forwarded_host=false
 
 # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
-secure_proxy_ssl_header=false
+  secure_proxy_ssl_header=false
 </pre>
 
 <h3 id="configuring-ssl">Configuring SSL</h3>
@@ -394,6 +463,15 @@ To upload files using the Hue File Browser over HTTPS requires
 using a proper SSL Certificate.  Self-signed certificates don't
 work.
 </div>
+
+<h3 id="sasl">SASL</h3>
+<p>When getting a bigger result set from Hive/Impala or bigger files like images from HBase, the response requires to increase
+the buffer size of SASL lib for thrift sasl communication.</p>
+<pre>
+  [desktop]
+  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
+  sasl_max_buffer=2 * 1024 * 1024
+</pre>
 
 <h3 id="user-admin-configuration">User Admin Configuration</h3>
 <p>In the <code>[useradmin]</code> section of the configuration file, you can
@@ -747,18 +825,38 @@ specify:</p>
 specify:</p>
 <p>hbase_clusters::
   Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".</p>
-<h3 id="configuration-validation">Configuration Validation</h3>
-<p>Hue can detect certain invalid configuration.</p>
-<p>To view the configuration of a running Hue instance, navigate to
-<code>http://myserver:8888/hue/dump_config</code>, also accessible through the About
-application.</p>
 <h1 id="administration">Administration</h1>
 <p>Now that you've installed and started Hue, you can feel free to skip ahead
 to the &lt;<usage,Using Hue>&gt; section. Administrators may want to refer to this
 section for more details about managing and operating a Hue installation.</p>
+<h2 id="configuration-validation">Configuration Validation</h2>
+<p>Hue can detect certain invalid configuration.</p>
+<p>To view the configuration of a running Hue instance, navigate to
+<code>http://myserver:8888/hue/dump_config</code>, also accessible through the About
+application.</p>
 <h2 id="server-logs">Server Logs</h2>
 <p>Displays the Hue Server log and allows you to download the log to your
 local system in a zip file.</p>
+<h2 id="threads">Threads</h2>
+<p>Read more on the <a href="http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/">Threads and Metrics pages
+ blog post</a></p>
+<p>Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using 'desktop/debug/threads'</p>
+<h2 id="metrics">Metrics</h2>
+<p>Read more on the <a href="http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/">Threads and Metrics pages
+ blog post</a></p>
+<p>Hue uses the <strong>PyFormance</strong> Python library to collect the metrics. These metrics are represented as gauge, counters, meter, rate of events over time, histogram, statistical distribution of values. A REST API endpoint '/desktop/metrics/' to get all the metrics dump as json is also exposed</p>
+<p>The below metrics of most concern to us are displayed on the page:</p>
+<ul>
+<li>requests.active</li>
+<li>requests.exceptions</li>
+<li>requests.response-time</li>
+<li>threads.daemon</li>
+<li>threads.total</li>
+<li>users</li>
+<li>users.active</li>
+</ul>
+<p>One of the most useful ones are the percentiles of response time of requests and the count of active users.
+Admins can either filter a particular property in all the metrics or select a particular metric for all properties</p>
 <h2 id="user-management">User management</h2>
 <p>The User Admin application lets a superuser add, delete, and manage Hue
 users and groups, and configure group permissions. Superusers can add
@@ -1082,7 +1180,7 @@ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
 <h2 id="supported-browsers">Supported Browsers</h2>
 <p>The two latest LTS versions of each browsers:</p>
 <ul>
-<li>IE/Edge</li>
+<li>Edge</li>
 <li>Safari</li>
 <li>Chrome</li>
 <li>Firefox</li>
@@ -1098,6 +1196,11 @@ logs as a zip (or cut and paste the ones that look relevant) and send those with
 your bug reports.</p>
 <p></div>
 </div></p>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.treed.js"></script>
+<script src="../js/jquery.highlight.js"></script>
+<script src="../js/hue-docs.js"></script>
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
 
 <script>
