@@ -39,7 +39,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
 
+<script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 % if not is_embeddable:
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
@@ -1243,8 +1245,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
             <!-- /ko -->
             <!-- ko ifnot: meta.placeholder() -->
-              <!-- ko if: type() == 'datetime-local' || type() == 'date' -->
-              <input class="input-large" type="text" required="true" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, css:{ 'input-large': type() == 'datetime-local', 'input-medium': type() == 'date'}">
+              <!-- ko if: type() == 'datetime-local' -->
+              <input class="input-medium" type="text" data-bind="value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
+              <!-- /ko -->
+              <!-- ko if: type() == 'date' -->
+              <input class="input-medium" type="text" data-bind="value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
               <!-- /ko -->
               <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date') -->
               <input class="input-medium" type="text" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">

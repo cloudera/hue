@@ -731,8 +731,8 @@ var EditorViewModel = (function() {
         variableValues[variable.name()].value = variable.value();
         variableValues[variable.name()].sampleUser = variable.sampleUser();
         variableValues[variable.name()].catalogEntry = variable.catalogEntry;
-        variableValues[variable.name()].path = variable.path;
-        variableValues[variable.name()].type = variable.type;
+        variableValues[variable.name()].path = variable.path();
+        variableValues[variable.name()].type = variable.type();
         return variableValues;
       }, self.variableValues);
       if (needsMore) {
@@ -784,11 +784,12 @@ var EditorViewModel = (function() {
           type = 'string';
         }
         var variablesValues = {};
+        var value = variable.value();
         switch (type) {
           case 'timestamp':
             variablesValues.type = 'datetime-local';
             variablesValues.step = '1';
-            variablesValues.value = moment(Date.parse(variable.value()) || Date.now()).utc().format().substring(0, 19);
+            variablesValues.value = value && moment.utc(value).format("YYYY-MM-DD HH:mm:ss.S") || moment(Date.now()).format("YYYY-MM-DD 00:00:00.0");
             break;
           case 'decimal':
           case 'double':
@@ -806,7 +807,7 @@ var EditorViewModel = (function() {
           case 'date':
             variablesValues.type = 'date';
             variablesValues.step = '';
-            variablesValues.value = moment(Date.parse(variable.value()) || Date.now()).utc().format().substring(0, 10);
+            variablesValues.value = value && moment.utc(value).format("YYYY-MM-DD") || moment(Date.now()).format("YYYY-MM-DD");
             break;
           case 'boolean':
             variablesValues.type = 'checkbox';
