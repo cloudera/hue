@@ -319,6 +319,17 @@ var DataCatalog = (function () {
     /**
      * @param {Object} options
      * @param {string|string[]} options.path
+     * @return {DataCatalogEntry}
+     */
+    DataCatalog.prototype.getKnownEntry = function (options) {
+      var self = this;
+      var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
+      return self.entries[identifier];
+    };
+
+    /**
+     * @param {Object} options
+     * @param {string|string[]} options.path
      * @param {Object} [options.definition] - The initial definition if not already set on the entry
      * @param {boolean} [options.cachedOnly] - Default false
      * @return {Promise}
@@ -615,6 +626,14 @@ var DataCatalog = (function () {
       self.navOptPopularityForChildrenPromise = undefined;
 
       self.childrenPromise = undefined;
+      
+      if (self.path.length) {
+        var parent = self.dataCatalog.getKnownEntry({ path: self.path.slice(0, self.path.length - 1) });
+        if (parent) {
+          parent.navigatorMetaForChildrenPromise = undefined;
+          parent.navOptPopularityForChildrenPromise = undefined;
+        }
+      }
     };
 
     /**
@@ -864,6 +883,7 @@ var DataCatalog = (function () {
               var matchingChildEntry = childEntryIndex[(entity.original_name || entity.originalName).toLowerCase()];
               if (matchingChildEntry) {
                 matchingChildEntry.navigatorMeta = entity;
+                entity.hueTimestamp = Date.now();
                 matchingChildEntry.navigatorMetaPromise = $.Deferred().resolve(matchingChildEntry.navigatorMeta).promise();
                 if (entity && matchingChildEntry.commentObservable) {
                   matchingChildEntry.commentObservable(matchingChildEntry.getResolvedComment());

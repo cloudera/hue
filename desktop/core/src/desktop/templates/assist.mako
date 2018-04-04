@@ -297,22 +297,22 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-db-breadcrumb">
     <div class="assist-flex-header assist-breadcrumb">
-      <!-- ko if: selectedSource()  && ! selectedSource().selectedDatabase() && sources().length === 1 -->
+      <!-- ko if: selectedSource() && !selectedSource().selectedDatabase() && sources().length === 1 -->
       <i class="fa fa-server assist-breadcrumb-text"></i>
-      <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
+      <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
       <!-- /ko -->
-      <!-- ko if: selectedSource()  && ! selectedSource().selectedDatabase() && sources().length > 1 -->
+      <!-- ko if: selectedSource() && !selectedSource().selectedDatabase() && sources().length > 1 -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
       </a>
       <!-- /ko -->
-      <!-- ko if: selectedSource()  && selectedSource().selectedDatabase() -->
+      <!-- ko if: selectedSource() && selectedSource().selectedDatabase() -->
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedDatabase() }">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
         <i class="fa fa-database assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
       </a>
       <!-- /ko -->
     </div>

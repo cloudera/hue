@@ -1230,9 +1230,15 @@ ${ components.menubar(is_embeddable) }
               % if has_write_access:
                 <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>
               % endif
+              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
+              <!-- /ko -->
+              <!-- ko if: !table() -->
+              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the database')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- /ko -->
+              <!-- ko if: !database() -->
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
+              <!-- /ko -->
             </div>
 
             <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->

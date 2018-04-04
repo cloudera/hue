@@ -538,7 +538,7 @@ var MetastoreTable = (function () {
       $.post('/metadata/api/navigator/lineage', {
         id: self.navigatorMeta().identity
       }, function(data) {
-        if (data && data.status == 0) {
+        if (data && data.status === 0) {
           self.relationshipsDetails(ko.mapping.fromJS(data));
         } else {
           $(document).trigger("error", data.message);

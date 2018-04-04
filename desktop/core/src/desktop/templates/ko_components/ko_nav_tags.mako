@@ -72,7 +72,18 @@ from django.utils.translation import ugettext as _
         };
 
         self.loadTags();
+
+        self.refreshSub = huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+          if (details.entry === self.catalogEntry) {
+            self.loadTags();
+          }
+        });
       }
+
+      NavTags.prototype.dispose = function () {
+        var self = this;
+        self.refreshSub.remove();
+      };
 
       NavTags.prototype.loadTags = function () {
         var self = this;

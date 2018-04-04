@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%def name="navProperties()">
   <script type="text/html" id="nav-properties-template">
      <!-- ko if: loading -->
-     <div data-bind="hueSpinner: { spin: loading }"></div>
+     <div class="hue-nav-properties"><div data-bind="hueSpinner: { spin: loading, inline: true }"></div></div>
      <!-- /ko -->
      <!-- ko ifnot: loading -->
      <div class="hue-nav-properties" data-bind="foreach: properties">
@@ -56,7 +56,18 @@ from django.utils.translation import ugettext as _
         self.catalogEntry = params.catalogEntry;
 
         self.loadProperties();
+
+        self.refreshSub = huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+          if (details.entry === self.catalogEntry) {
+            self.loadProperties();
+          }
+        });
       }
+
+      NavProperties.prototype.dispose = function () {
+        var self = this;
+        self.refreshSub.remove();
+      };
 
       NavProperties.prototype.loadProperties = function () {
         var self = this;
