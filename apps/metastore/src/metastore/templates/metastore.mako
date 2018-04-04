@@ -429,6 +429,14 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
         </form>
       </div>
+
+      % if is_embeddable:
+        <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+      % elif ENABLE_NEW_CREATE_TABLE.get():
+        <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+      % else:
+        <button href="${ url('beeswax:create_database') }" class="btn btn-default" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+      % endif
     % endif
   </div>
   <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px" data-bind="visible: filteredDatabases().length > 0">
@@ -575,7 +583,15 @@ ${ components.menubar(is_embeddable) }
           <i class="fa fa-play fa-fw"></i> ${_('Query')}
         </button>
         % if has_write_access:
-          <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
+          <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
+          % if is_embeddable:
+            <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+          % elif ENABLE_NEW_CREATE_TABLE.get():
+            <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+          % else:
+            <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/import_wizard/' + database().catalogEntry.name }" title="${_('Create a new table from a file')}"><i class="fa fa-stack"></i> ${_('New from file')}</button>
+            <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/create_table/' + database().catalogEntry.name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i> ${_('New manually')}</button>
+          % endif
         % endif
       </div>
 
@@ -686,65 +702,6 @@ ${ components.menubar(is_embeddable) }
     <div class="inline margin-right-20"><i class="fa fa-fw fa-cog muted"></i></div>
     <!-- ko foreach: Object.keys($data) -->
       <div class="inline margin-right-20"><strong data-bind="text: $data"></strong>: <span data-bind="text: $parent[$data]"></span></div>
-    <!-- /ko -->
-  </div>
-</script>
-
-<script type="text/html" id="metastore-databases-actions">
-  <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: reload">
-      <i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i>
-    </a>
-    % if has_write_access:
-      % if is_embeddable:
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }'); }" title="${_('Create a new database')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-      % elif ENABLE_NEW_CREATE_TABLE.get():
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
-      % else:
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
-      % endif
-    % endif
-  </div>
-</script>
-
-<script type="text/html" id="metastore-tables-actions">
-  <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: reload" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
-    % if has_write_access:
-      % if is_embeddable:
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name ); }" title="${_('Create a new table')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
-      % elif ENABLE_NEW_CREATE_TABLE.get():
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i></a>
-      % else:
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/import_wizard/' + database().catalogEntry.name }" title="${_('Create a new table from a file')}"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
-        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/create_table/' + database().catalogEntry.name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i></a>
-      % endif
-    % endif
-  </div>
-</script>
-
-<script type="text/html" id="metastore-describe-table-actions">
-  <div class="inline-block pull-right">
-    <!-- ko with: database -->
-    <!-- ko with: table -->
-    % if USE_NEW_EDITOR.get():
-    <!-- ko if: IS_HUE_4 -->
-      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { queryAndWatch('/notebook/browse/' + catalogEntry.path.join('/') + '/', $root.sourceType()); }" title="${_('Query the table')}" href="javascript:void(0)"><i class="fa fa-play fa-fw"></i></a>
-    <!-- /ko -->
-    <!-- ko if: ! IS_HUE_4 -->
-      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/notebook/browse/' + catalogEntry.path.join('/') }" title="${_('Query the table')}"><i class="fa fa-play fa-fw"></i></a>
-    <!-- /ko -->
-    % else:
-      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
-    % endif
-    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: reload" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
-    % if has_write_access:
-      <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
-    % endif
-    % if has_write_access:
-      <a class="inactive-action" href="#dropSingleTable" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i></a>
-    % endif
-    <!-- /ko -->
     <!-- /ko -->
   </div>
 </script>
@@ -1254,9 +1211,30 @@ ${ components.menubar(is_embeddable) }
           <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
           <!-- ko ifnot: loading -->
           <h1>
-            <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
-            <!-- ko template: { if: database() !== null && database().table() === null, name: 'metastore-tables-actions' }--><!-- /ko -->
-            <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
+            <div class="inline-block pull-right">
+              <!-- ko with: database -->
+              <!-- ko with: table -->
+              % if USE_NEW_EDITOR.get():
+                <!-- ko if: IS_HUE_4 -->
+                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch('/notebook/browse/' + catalogEntry.path.join('/') + '/', $root.sourceType()); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
+                <!-- /ko -->
+                <!-- ko if: ! IS_HUE_4 -->
+                <a class="btn btn-default" data-bind="attr: { 'href': '/notebook/browse/' + catalogEntry.path.join('/') }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
+                <!-- /ko -->
+              % else:
+                <a class="btn btn-default" data-bind="attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i> ${_('Browse Data')}</a>
+              % endif
+              % if has_write_access:
+                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: tableDetails() && !tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
+              % endif
+              % if has_write_access:
+                <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>
+              % endif
+              <!-- /ko -->
+              <!-- /ko -->
+              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
+            </div>
+
             <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
           </h1>
           <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
