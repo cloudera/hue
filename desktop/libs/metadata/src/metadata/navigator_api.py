@@ -207,7 +207,7 @@ def search_entities_interactive(request):
       }
     }
 
-  field_facets = ["tags", "type"] + f.keys()
+  auto_field_facets = ["tags", "type"] + f.keys()
   query_s = query_s.strip() + '*'
 
   last_query_term = [term for term in query_s.split()][-1]
@@ -215,14 +215,13 @@ def search_entities_interactive(request):
   if last_query_term and last_query_term != '*':
     last_query_term = last_query_term.rstrip('*')
     (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
-    field_facets = [f for f in field_facets if f.startswith(fname)]
-  field_facets = field_facets[:5]
+    auto_field_facets = [f for f in auto_field_facets if f.startswith(fname)]
 
   response = api.search_entities_interactive(
       query_s=query_s,
       limit=limit,
       offset=offset,
-      facetFields=field_facets,
+      facetFields=field_facets or auto_field_facets[:5],
       facetPrefix=prefix,
       facetRanges=None,
       firstClassEntitiesOnly=None,

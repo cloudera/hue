@@ -244,10 +244,10 @@ ${ common_home.navbar() }
 
 <div id="catalogComponents">
 
-<input data-bind="value: query"/>
-<a class="btn" data-bind="click: search">
-  Search
-</a>
+  <input data-bind="value: query"/>
+  <a class="btn" data-bind="click: search">
+    Search
+  </a>
 
 </id>
 
@@ -261,9 +261,11 @@ ${ common_home.navbar() }
 
       self.apiHelper = ApiHelper.getInstance();
 
-      self.query = ko.observable("cust type:");
+      self.query = ko.observable("cust");
       self.search = function() {
-        self.apiHelper.fetchNavEntitiesInteractive(self.query()).done(function (data) {
+        self.apiHelper.fetchNavEntitiesInteractive({query: self.query(), facets: [
+            'type', 'owner', 'tags', 'lastModified'
+          ]}).done(function (data) {
           console.log(data);
         });
       }

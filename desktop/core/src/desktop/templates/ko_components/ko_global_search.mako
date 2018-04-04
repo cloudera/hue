@@ -470,7 +470,7 @@ from desktop.views import _ko
           });
 
           self.loadingNav(true);
-          self.cancellablePromises.push(self.apiHelper.fetchNavEntitiesInteractive(navQuery).always(function () {
+          self.cancellablePromises.push(self.apiHelper.fetchNavEntitiesInteractive({query: navQuery}).always(function () {
             self.loadingNav(false);
             window.clearTimeout(clearNavTimeout);
           }).done(function (data) {

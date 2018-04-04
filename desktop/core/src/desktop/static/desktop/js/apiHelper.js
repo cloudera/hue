@@ -1893,10 +1893,11 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.fetchNavEntitiesInteractive = function (query) {
+  ApiHelper.prototype.fetchNavEntitiesInteractive = function (options) {
     var deferred = $.Deferred();
     var request = $.post(INTERACTIVE_SEARCH_API, {
-      query_s: ko.mapping.toJSON(query),
+      query_s: ko.mapping.toJSON(options.query),
+      field_facets: ko.mapping.toJSON(options.facets || []),
       limit: 50,
       sources: '["sql", "hdfs", "s3"]'
     }).done(function (data) {
