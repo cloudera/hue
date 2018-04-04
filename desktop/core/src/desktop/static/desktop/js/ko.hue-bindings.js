@@ -636,7 +636,7 @@
         textElement.textContent = self.fullText;
         if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
           self.$element.append('&nbsp;');
-          var $expandLink = $('<a href="javscript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>').click(function (e) {
+          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>').click(function (e) {
             self.expanded = !self.expanded;
             self.updateOverflowHeight();
             if (self.expanded) {
@@ -661,9 +661,10 @@
       }
 
       self.isOverflowing = false;
+
       while (self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
         self.isOverflowing = true;
-        var lastSpaceIndex = textElement.textContent.lastIndexOf(' ');
+        var lastSpaceIndex = textElement.textContent.regexLastIndexOf(/\s\S+/);
         if (lastSpaceIndex !== -1) {
           textElement.textContent = textElement.textContent.substring(0, lastSpaceIndex) + '...';
         } else {

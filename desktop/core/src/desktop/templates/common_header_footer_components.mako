@@ -327,11 +327,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
       hueAnalytics.convert('hue', 'pageReloaded' + window.location.pathname);
     }
 
+    var multiLineHandlers = [];
+
     huePubSub.subscribe('table.row.dblclick', function (data) {
       var $el = $(data.table);
       var $t = $('#rowDetailsModal').find('table');
       $t.html('');
       var html = '';
+      multiLineHandlers = [];
       $el.find('thead th').each(function (colIdx, col) {
         if (colIdx > 0) {
           var value = '';
@@ -342,10 +345,18 @@ from metadata.conf import has_optimizer, OPTIMIZER
             value = $el.data('data')[data.idx][colIdx];
           }
           var link = typeof value == 'string' && value.match(/^https?:\/\//i) ? '<a href="' + escapeOutput(value) + '" target="_blank">' + value + ' <i class="fa fa-external-link"></i></a>' : value;
-          html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td style="word-break: break-all">' + hueUtils.deXSS(link) + '</td></tr>';
+          html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td class="multi-line-ellipsis" style="word-break: break-all"><div style="position: relative">' + hueUtils.deXSS(link) + '</div></td></tr>';
         }
       });
       $t.html(html);
+      $t.find('.multi-line-ellipsis div').each(function(cnt, el){
+        multiLineHandlers.push(new MultiLineEllipsisHandler({
+          element: el,
+          text: el.textContent,
+          overflowHeight: 48,
+          expandable: true
+        }));
+      });
       $('#rowDetailsModal').modal('show');
     });
 
@@ -353,6 +364,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
       $('.modal-backdrop').css('z-index', '1070');
       $('#rowDetailsModal .modal-body').scrollTop(0);
       $('#rowDetailsModal .modal-body').scrollLeft(0);
+    });
+
+    $('#rowDetailsModal').on('hidden', function () {
+      multiLineHandlers.forEach(function (multiLineEllipsisHandler) {
+        multiLineEllipsisHandler.dispose();
+      });
     });
 
     if ($.fn.editableform) {
