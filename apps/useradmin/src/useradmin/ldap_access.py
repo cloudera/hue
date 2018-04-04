@@ -141,9 +141,14 @@ class LdapConnection(object):
     self._username = bind_user
     self._ldap_cert = cert_file
 
-    if cert_file is not None:
-      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
-      ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, cert_file)
+    # Certificate-related config settings
+    if ldap_config.LDAP_CERT.get():
+      setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
+      ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
+    else:
+      setattr(self._backend.settings, 'START_TLS', False)
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
     if self.ldap_config.FOLLOW_REFERRALS.get():
       ldap.set_option(ldap.OPT_REFERRALS, 1)
