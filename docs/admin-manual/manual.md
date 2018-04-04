@@ -37,10 +37,79 @@ You can download the Hue tarball here:
 
 Hue employs some Python modules which use native code and requires
 certain development libraries be installed on your system. To install from the
-tarball, you must have the following installed:
+tarball, you'll need these library development packages and tools installed on your system:
 
-Required Dependencies
-The full list is here: [https://github.com/cloudera/hue#prerequisites](https://github.com/cloudera/hue#prerequisites)
+* Python 2.6.5 - 2.7
+
+### Ubuntu
+
+    sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
+
+* [Oracle JDK](https://help.ubuntu.com/community/Java)
+* mvn (from maven package or maven3 tarball)
+* openldap-dev / libldap2-dev
+* libtidy-0.99-0 (for unit tests only)
+
+#### Install Oracle JDK
+
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    sudo apt-get install oracle-java7-installer
+
+
+### CentOS/RHEL
+
+    sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make  mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
+
+* [Oracle JDK](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora)
+* mvn (from [``apache-maven``](https://gist.github.com/sebsto/19b99f1fa1f32cae5d00) package or maven3 tarball)
+* libtidy (for unit tests only)
+* openssl-devel (for version 7+)
+
+
+### MacOS
+
+* Xcode command line tools
+* Oracle's JDK 1.7+
+* maven (Homebrew)
+* mysql (Homebrew)
+* gmp (Homebrew)
+* openssl (Homebrew)
+* [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
+
+
+#### Fix openssl errors
+Required for MacOS 10.11+
+
+    export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+
+#### Install Oracle Instant Client
+
+Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add
+
+    export ORACLE_HOME=/usr/local/share/oracle
+    export VERSION=11.2.0.4.0
+    export ARCH=x86_64
+    export DYLD_LIBRARY_PATH=$ORACLE_HOME
+    export LD_LIBRARY_PATH=$ORACLE_HOME
+
+and then
+
+    source ~/.bash_profile
+    sudo mkdir -p $ORACLE_HOME
+    sudo chmod 775 $ORACLE_HOME
+
+then unzip the content of both downloaded zip files into the newly created $ORACLE_HOME in a way that the 'sdk' folder is at the same level with the other files and then
+
+    ln -s libclntsh.dylib.11.1 libclntsh.dylib
+    ln -s libocci.dylib.11.1 libocci.dylib
+
+and finally
+
+    cd sdk
+    unzip ottclasses.zip
+
 
 ## Build
 
@@ -1235,7 +1304,7 @@ The link:user-guide/index.html[user guide] will help users go through the variou
 
 The two latest LTS versions of each browsers:
 
-* IE/Edge
+* Edge
 * Safari
 * Chrome
 * Firefox
