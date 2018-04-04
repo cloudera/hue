@@ -760,7 +760,9 @@ var Collection = function (vm, collection) {
     if (! field) {
       return HIT_OPTIONS;
     } else {
-      return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : HIT_OPTIONS;
+      return facet.widgetType() == 'hit-widget' ? (
+         isNumericColumn(field.type()) ? NUMERIC_HIT_OPTIONS : ALPHA_HIT_COUNTER_OPTIONS
+      ) : HIT_OPTIONS;
     }
   };
 
