@@ -47,9 +47,8 @@ class MetadataApiException(Exception):
 
 def error_handler(view_fn):
   def decorator(*args, **kwargs):
-    status = 200
+    status = 500
     response = {
-      'status': -1,
       'message': ''
     }
 
@@ -62,19 +61,16 @@ def error_handler(view_fn):
       raise e
     except EntityDoesNotExistException, e:
       response['message'] = e.message
-      response['status'] = -3
-      status = 200
+      status = 404
     except NavigathorAuthException, e:
       response['message'] = force_unicode(e.message)
-      response['status'] = -2
+      status = 403
     except NavigatorApiException, e:
       try:
         response['message'] = json.loads(e.message)
-        response['status'] = -2
       except Exception:
         response['message'] = force_unicode(e.message)
     except Exception, e:
-      status = 500
       message = force_unicode(e)
       LOG.exception(message)
 
@@ -539,33 +535,23 @@ def get_lineage(request):
 
 @error_handler
 def create_namespace(request):
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   namespace = request.POST.get('namespace')
   description = request.POST.get('description')
 
   namespace = api.create_namespace(namespace=namespace, description=description)
 
-  response['namespace'] = namespace
-  response['status'] = 0
-
-  return JsonResponse(response)
+  return JsonResponse(namespace)
 
 
 @error_handler
 def get_namespace(request):
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   namespace = request.POST.get('namespace')
 
   namespace = api.get_namespace(namespace)
 
-  response['namespace'] = namespace
-  response['status'] = 0
-
-  return JsonResponse(response)
+  return JsonResponse(namespace)
 
 
 @error_handler
@@ -583,18 +569,13 @@ def create_namespace_property(request):
   "type" : "TEXT",
   "createdDate" : "2018-04-02T22:36:19.001Z"
 }"""
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   namespace = request.POST.get('namespace')
   properties = json.loads(request.POST.get('properties', '{}'))
 
   namespace = api.create_namespace_property(namespace, properties)
 
-  response['namespace'] = namespace
-  response['status'] = 0
-
-  return JsonResponse(response)
+  return JsonResponse(namespace)
 
 
 @error_handler
@@ -604,15 +585,10 @@ def map_namespace_property(request):
   namespace: "huecatalog",
   name: "relatedEntities"
   }"""
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   clazz = request.POST.get('class')
   properties = json.loads(request.POST.get('properties', '[]'))
 
   namespace = api.map_namespace_property(clazz=clazz, properties=properties)
 
-  response['namespace'] = namespace
-  response['status'] = 0
-
-  return JsonResponse(response)
+  return JsonResponse(namespace)
