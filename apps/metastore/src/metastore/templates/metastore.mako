@@ -117,7 +117,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-condensed table-nowrap">
+    <table class="table table-condensed table-nowrap metastore-table">
       <thead>
       <tr>
         <th width="2%">&nbsp;</th>
@@ -168,7 +168,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-partition-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-condensed table-nowrap">
+    <table class="table table-condensed table-nowrap metastore-table">
       <thead>
         <tr>
           <th style="width: 1%">&nbsp;</th>
@@ -191,7 +191,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-partition-values-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table id="partitionsTable" class="table table-condensed table-nowrap">
+    <table id="partitionsTable" class="table table-condensed table-nowrap metastore-table">
       <thead>
         <tr>
           <th style="width: 1%" class="vertical-align-middle">
@@ -245,7 +245,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <table id="sampleTable" class="table table-condensed table-nowrap sample-table old-datatable">
+  <table id="sampleTable" class="table table-condensed table-nowrap sample-table old-datatable metastore-table">
     <thead>
       <tr>
         <th style="width: 1%">&nbsp;</th>
@@ -722,7 +722,7 @@ ${ components.menubar(is_embeddable) }
     <!-- ko template: "metastore-columns-table" --><!-- /ko -->
     <!-- /ko -->
 
-    <a class="pointer" data-bind="visible: columns().length > favouriteColumns().length, click: function() { $root.currentTab('columns'); $('.page-content').scrollTop(0); }">
+    <a href="javascript: void(0);" title="${_('View more...')}" class="metastore-view-more" data-bind="visible: columns().length > favouriteColumns().length, click: function() { $root.currentTab('columns'); $('.page-content').scrollTop(0); }">
       ${_('View more...')}
     </a>
   </div>
@@ -735,7 +735,7 @@ ${ components.menubar(is_embeddable) }
         <div style="overflow: auto">
         <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
         </div>
-        <a class="pointer" data-bind="visible: rows().length >= 3, click: function() { $root.currentTab('sample'); $('.page-content').scrollTop(0);  }"  style="display: none;">
+        <a href="javascript: void(0);" title="${_('View more...')}" class="metastore-view-more" data-bind="visible: rows().length >= 3, click: function() { $root.currentTab('sample'); $('.page-content').scrollTop(0);  }"  style="display: none;">
           ${_('View more...')}
         </a>
         <!-- /ko -->
@@ -756,7 +756,7 @@ ${ components.menubar(is_embeddable) }
     <!-- ko if: loaded -->
     <!-- ko with: preview -->
     <!-- ko template: { if: values().length, name: 'metastore-partition-values-table', data: { values: values, withDrop: false } } --><!-- /ko -->
-    <a class="pointer" data-bind="visible: values().length >= 3, click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }"  style="display: none;">
+    <a href="javascript: void(0);" title="${_('View more...')}" class="metastore-view-more" data-bind="visible: values().length >= 3, click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }"  style="display: none;">
       ${_('View more...')}
     </a>
     <!-- /ko -->
