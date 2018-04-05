@@ -489,6 +489,7 @@ def get_banner_message(request):
     (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
     message = _('You are accessing a non-optimized Hue, please switch to one of the available addresses: %s') % \
       (", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
+    LOG.warn('User %s is bypassing the load balancer' % request.user.username)
 
   if message:
     banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' % message
