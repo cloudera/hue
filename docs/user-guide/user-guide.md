@@ -386,7 +386,25 @@ We've got an extensive test suite but not every possible statement is covered, i
 Leanr more about it in [Autocompleter for Hive and Impala](http://gethue.com/brand-new-autocompleter-for-hive-and-impala/).
 
 ### Variables
-Variables can have default values, e.g. ${n=10} instead of just ${n}.
+Variables are used to easily configure parameters in a query. They can be of two types:
+
+
+<b>Single Valued</b>
+<pre>
+select * from web_logs where country_code = "${country_code}"
+</pre>
+The variable can have a default value.
+<pre>
+select * from web_logs where country_code = "${country_code=US}"
+</pre>
+<b>Multi Valued</b>
+<pre>
+select * from web_logs where country_code = "${country_code=CA, FR, US}"
+</pre>
+In addition, the displayed text for multi valued variables can be changed.
+<pre>
+select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
+</pre>
 
 ### Syntax checker
 
