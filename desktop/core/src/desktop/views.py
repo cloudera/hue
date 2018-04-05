@@ -506,6 +506,7 @@ def get_banner_message(request):
     url = request.build_absolute_uri("/hue")
     link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
     message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
+    LOG.warn('User %s is using Hue 3 UI' % request.user.username)
 
   if HUE_LOAD_BALANCER.get() and HUE_LOAD_BALANCER.get() != [''] and \
     (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
