@@ -567,11 +567,11 @@ class NavigatorApi(object):
 
       properties = self.get_namespace_properties(namespace=NavigatorApi.CATALOG_NAMESPACE)
 
-      if not [_property for _property in properties if _property['name'] == 'relatedQueries']:
+      if not [_property for _property in properties if _property['name'] == 'relatedDocuments']:
         self.create_namespace_property(namespace=NavigatorApi.CATALOG_NAMESPACE, properties={
-          "name": "relatedQueries",
-          "displayName": "Related queries",
-          "description": "List of saved SQL queries UUIDs that show how to analyze this table",
+          "name": "relatedDocuments",
+          "displayName": "Related documents",
+          "description": "List of Hue document UUIDs related to this entity",
           "multiValued": True,
           "maxLength": 36,
           "pattern": ".*", # UUID
@@ -583,7 +583,7 @@ class NavigatorApi(object):
         for clazz in ('hv_table', 'hv_view'):
           self.map_namespace_property(clazz, properties=[{
              "namespace": NavigatorApi.CATALOG_NAMESPACE,
-             "name": "relatedQueries"
+             "name": "relatedDocuments"
           }])
 
       _HAS_CATALOG_NAMESPACE = True
