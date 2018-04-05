@@ -135,19 +135,19 @@ ${ components.menubar(is_embeddable) }
             <!-- ko if: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
             <span data-bind="text: catalogEntry.name"></span>
             <!-- ko if: $root.optimizerEnabled() && popularity()  -->
-            &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + popularity() + '%' }"></i>
+            &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + popularity() + '%' }, tooltip"></i>
             <!-- /ko -->
-            <i class="fa fa-key" title="${ _("Primary key") }" data-bind="visible: catalogEntry.isPrimaryKey()"></i>
-            <i class="fa fa-key" title="${ _("Partition key") }" data-bind="visible: catalogEntry.isPartitionKey()"></i>
+            <i class="fa fa-key" title="${ _("Primary key") }" data-bind="visible: catalogEntry.isPrimaryKey(), tooltip"></i>
+            <i class="fa fa-key" title="${ _("Partition key") }" data-bind="visible: catalogEntry.isPartitionKey(), tooltip"></i>
             <!-- /ko -->
             <!-- ko ifnot: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
             <a href="javascript:void(0)" class="column-selector" data-bind="click: $root.scrollToColumn">
               <span data-bind="text: catalogEntry.name"></span>
               <!-- ko if: $root.optimizerEnabled() && popularity()  -->
-              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + popularity() + '%' }"></i>
+              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + popularity() + '%' }, tooltip"></i>
               <!-- /ko -->
-              <i class="fa fa-key" title="${ _("Primary key") }" data-bind="visible: catalogEntry.isPrimaryKey()"></i>
-              <i class="fa fa-key" title="${ _("Partition key") }" data-bind="visible: catalogEntry.isPartitionKey()"></i>
+              <i class="fa fa-key" title="${ _("Primary key") }" data-bind="visible: catalogEntry.isPrimaryKey(), tooltip"></i>
+              <i class="fa fa-key" title="${ _("Partition key") }" data-bind="visible: catalogEntry.isPartitionKey(), tooltip"></i>
             </a>
             <!-- /ko -->
           </td>
@@ -633,7 +633,7 @@ ${ components.menubar(is_embeddable) }
                 <!-- /ko -->
                 <span data-bind="text: catalogEntry.name"></span>
                 <!-- ko if: $root.optimizerEnabled() && optimizerStats() && optimizerStats().popularity  -->
-              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + optimizerStats().popularity + '%' }"></i>
+              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + optimizerStats().popularity + '%' }, tooltip"></i>
                 <!-- /ko -->
               </a>
             </td>

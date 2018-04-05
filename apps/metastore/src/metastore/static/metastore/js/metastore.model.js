@@ -465,8 +465,11 @@ var MetastoreTable = (function () {
 
           var favorites = [];
           var nonFavorites = [];
+          var keys = [];
           self.columns().forEach(function (column) {
-            if (topColIndex[column.catalogEntry.name]) {
+            if (column.catalogEntry.isPrimaryKey() || column.catalogEntry.isPartitionKey()) {
+              keys.push(column);
+            } else if (topColIndex[column.catalogEntry.name]) {
               favorites.push(column);
               column.popularity(topColIndex[column.catalogEntry.name].score);
             } else {
@@ -477,7 +480,7 @@ var MetastoreTable = (function () {
             return colB.popularity() - colA.popularity();
           });
 
-          self.favouriteColumns(favorites.concat(nonFavorites).slice(0, 5));
+          self.favouriteColumns(keys.concat(favorites).concat(nonFavorites).slice(0, 5));
         }).always(function () {
           self.loadingQueries(false);
         });
