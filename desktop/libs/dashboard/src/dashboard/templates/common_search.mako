@@ -742,13 +742,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <!-- ko if: typeof isLoading !== 'undefined' -->
+    <!-- ko if: typeof $parent.isLoading !== 'undefined' -->
     <div data-bind="visible: $root.isGridster() || $root.isEditing(), with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
-    <!-- /ko -->
     <div class="clearfix"></div>
+    <!-- /ko -->
+
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.facets()[0].type() == 'field' -->
         <!-- ko if: properties.facets()[0].multiselect -->

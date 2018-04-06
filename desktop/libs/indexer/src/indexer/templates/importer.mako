@@ -655,11 +655,6 @@ ${ assist.assistPanel() }
         <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' && ['file', 'table', 'hbase'].indexOf(outputFormat()) != -1 -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
-          <div class="control-group">
-            <label><div>${ _('Mappers') }</div>
-              <input type="number" class="form-control input-small" data-bind="value: numMappers, valueUpdate: 'afterkeydown'">
-            </label>
-          </div>
 
           <div class="card-body">
             <label class="control-label"><div>${ _('Libs') }</div>
@@ -691,6 +686,11 @@ ${ assist.assistPanel() }
           </div>
 
           <span data-bind="visible: showProperties">
+            <div class="control-group">
+              <label><div>${ _('Mappers') }</div>
+                <input type="number" class="form-control input-small" data-bind="textInput: numMappers">
+              </label>
+            </div>
             <div class="control-group">
               <label for="rdbmsSplitBy" class="control-label"><div>${ _('Split By') }</div>
                 <select id="rdbmsSplitBy" data-bind="selectize: columns, value: rdbmsSplitByColumn, optionsValue: 'name', optionsText: 'name'"></select>
@@ -907,17 +907,18 @@ ${ assist.assistPanel() }
     <label class="checkbox">
       <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
     </label>
-
   </span>
 
   <!-- ko if: operations().length == 0 -->
-  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
+  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation, visible: $root.createWizard.destination.outputFormat() == 'index'" title="${_('Add Operation')}">
+    <i class="fa fa-plus"></i> ${_('Operation')}
+  </a>
   <!-- /ko -->
 
   <div class="inline-block" data-bind="template: { name: 'field-column-example' }"></div>
 
   <div data-bind="foreach: operations">
-    <div data-bind="template: { name:'operation-template',data:{operation: $data, list: $parent.operations}}"></div>
+    <div data-bind="template: { name:'operation-template',data: { operation: $data, list: $parent.operations } }"></div>
   </div>
 
   <!-- ko if: operations().length > 0 -->

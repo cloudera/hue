@@ -2765,8 +2765,6 @@ function togglePresentation(value) {};
           });
         }
       }
-
-
     }
 
     var returndDatum = [];
@@ -2776,7 +2774,6 @@ function togglePresentation(value) {};
         values: rawDatum.snippet.chartLimit() ? datum[key].slice(0, rawDatum.snippet.chartLimit()) : datum[key]
       });
     });
-
 
     return returndDatum;
   }

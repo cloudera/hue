@@ -174,6 +174,9 @@ from desktop.views import _ko
             shell: {
               snippetIcon: 'fa-terminal'
             },
+            sqoop1: {
+              sqlDialect: false
+            },
           }
         });
         self.editorViewModel.editorMode(true);
