@@ -1667,11 +1667,19 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.updateNavigatorMetadata = function (options) {
+  ApiHelper.prototype.updateNavigatorProperties = function (options) {
     var self = this;
     return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, {
       id: ko.mapping.toJSON(options.identity),
       properties: ko.mapping.toJSON(options.properties)
+    }, options)
+  };
+
+  ApiHelper.prototype.updateNavigatorCustomProperties = function (options) {
+    var self = this;
+    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, {
+      id: ko.mapping.toJSON(options.identity),
+      metadata: ko.mapping.toJSON(options.customProperties)
     }, options)
   };
 

@@ -1115,6 +1115,41 @@ var DataCatalog = (function () {
       return applyCancellable(new CancellablePromise(deferred, undefined, cancellablePromises), options);
     };
 
+    DataCatalogEntry.prototype.setNavigatorCustomProperties = function (customProperties, apiOptions) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (self.canHaveNavigatorMetadata()) {
+        if (self.navigatorMeta === {} || (self.navigatorMeta && typeof self.navigatorMeta.identity === 'undefined')) {
+          if (!apiOptions) {
+            apiOptions = {};
+          }
+          apiOptions.refreshCache = true;
+        }
+        self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
+          if (navigatorMeta) {
+            ApiHelper.getInstance().updateNavigatorCustomProperties({
+              identity: navigatorMeta.identity,
+              customProperties: customProperties
+            }).done(function (updateResponse) {
+              if (updateResponse.entity) {
+                self.navigatorMeta = updateResponse.entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+                deferred.resolve(self.navigatorMeta);
+              } else {
+                deferred.reject();
+              }
+            }).fail(deferred.reject);
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+
+      return deferred.promise();
+    };
+
     /**
      * Sets the comment in the proper source
      *
@@ -1138,17 +1173,22 @@ var DataCatalog = (function () {
         }
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
-            ApiHelper.getInstance().updateNavigatorMetadata({
+            ApiHelper.getInstance().updateNavigatorProperties({
               identity: navigatorMeta.identity,
               properties: {
                 description: comment
               }
-            }).done(function () {
-              reloadNavigatorMeta(self, {
-                silenceErrors: apiOptions && apiOptions.silenceErrors,
-                refreshCache: true
-              }).done(function() {
-                self.getComment(apiOptions).done(deferred.resolve);
+            }).done(function (updateResponse) {
+              if (updateResponse.entity) {
+                self.navigatorMeta = updateResponse.entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+              }
+              self.getComment(apiOptions).done(function (comment) {
+                if (self.commentObservable && self.commentObservable() !== comment) {
+                  self.commentObservable(comment);
+                }
+                deferred.resolve(comment);
               });
             }).fail(deferred.reject);
           }

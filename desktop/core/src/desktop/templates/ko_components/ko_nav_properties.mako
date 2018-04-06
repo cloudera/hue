@@ -20,24 +20,102 @@ from django.utils.translation import ugettext as _
 %>
 
 <%def name="navProperties()">
+
+  <script type="text/html" id="nav-property-edit-popover-content">
+    <div class="hue-nav-property-edit-content">
+      <a href="javascript: void(0);" class="close-popover"><i class="fa fa-times"></i></a>
+      <div class="control-group" data-bind="css: { 'error': keyInvalid }">
+        <label class="control-label">${ _("Key") }</label>
+        <div class="controls">
+          <input type="text" placeholder="${ _("Key") }" data-bind="textInput: key">
+        </div>
+      </div>
+      <div class="control-group" data-bind="css: { 'error': valueInvalid }">
+        <label class="control-label">${ _("Value") }</label>
+        <div class="controls">
+          <input type="text" placeholder="${ _("Value") }" data-bind="textInput: value">
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="nav-properties-template">
      <!-- ko if: loading -->
      <div class="hue-nav-properties"><div data-bind="hueSpinner: { spin: loading, inline: true }"></div></div>
      <!-- /ko -->
      <!-- ko ifnot: loading -->
-     <div class="hue-nav-properties" data-bind="foreach: properties">
-       <div class="hue-nav-property"><div class="hue-nav-property-key" data-bind="text: key"></div><div class="hue-nav-property-value" data-bind="html: value"></div></div>
+     <!-- ko ifnot: editMode -->
+
+     <div class="hue-nav-properties" data-bind="click: startEdit, visibleOnHover: { selector: '.editable-inline-action' }">
+       <!-- ko ifnot: properties().length -->
+       ${ _("No properties") }
+       <!-- /ko -->
+       <!-- ko foreach: properties -->
+       <div class="hue-nav-property"><div class="hue-nav-property-key" data-bind="text: key, attr: { 'title': key }"></div><div class="hue-nav-property-value" data-bind="text: value, attr: { 'title': value }"></div></div>
+       <!-- /ko -->
+       <div class="editable-inline-action" title="${ _("Edit") }"><a href="javascript: void(0);" data-bind="click: startEdit"><i class="fa fa-pencil"></i></a></div>
      </div>
+     <!-- /ko -->
+     <!-- ko if: editMode -->
+     <div class="hue-nav-properties hue-nav-properties-edit">
+       <!-- ko foreach: editProperties -->
+       <div class="hue-nav-property hue-nav-property-edit" data-bind="css: { 'hue-nav-property-invalid': invalid }, templatePopover: { trigger: 'click', placement: 'bottom', visible: editPropertyVisible, contentTemplate: 'nav-property-edit-popover-content' }">
+         <div class="hue-nav-property-key" data-bind="text: key, attr: { 'title': key }"></div><div class="hue-nav-property-value" data-bind="text: value, attr: { 'title': value }"></div>
+         <div class="hue-nav-property-remove"><a href="javascript: void(0);" title="${ _("Remove") }" data-bind="click: function (entry) { $parent.removeProperty(entry); }"><i class="fa fa-times"></i></a></div>
+       </div>
+       <!-- /ko -->
+       <div class="hue-nav-property-add"><a href="javascript: void(0);" title="${ _("Add") }" data-bind="click: addProperty"><i class="fa fa-plus"></i></a></div>
+       <div class="hue-nav-properties-edit-actions">
+         <a href="javascript: void(0);" title="${ _("Save") }" data-bind="click: saveEdit"><i class="fa fa-check"></i></a>
+         <a href="javascript: void(0);" title="${ _("Cancel") }" data-bind="click: cancelEdit"><i class="fa fa-close"></i></a>
+       </div>
+     </div>
+     <!-- /ko -->
      <!-- /ko -->
   </script>
 
   <script type="text/javascript">
     (function () {
 
-      function NavProperty(key, value) {
+      function NavProperty(key, value, isNew) {
         var self = this;
-        self.key = key;
-        self.value = value;
+        self.key = ko.observable(key);
+        self.keyEdited = ko.observable(false);
+
+        self.value = ko.observable(value);
+        self.valueEdited = ko.observable(false);
+
+        self.editPropertyVisible = ko.observable(isNew);
+
+        var keySub = self.key.subscribe(function () {
+          keySub.dispose();
+          self.keyEdited(true);
+        });
+
+        var valueSub = self.value.subscribe(function () {
+          valueSub.dispose();
+          self.valueEdited(true);
+        });
+
+        var editSub = self.editPropertyVisible.subscribe(function () {
+          editSub.dispose();
+          keySub.dispose();
+          valueSub.dispose();
+          self.keyEdited(true);
+          self.valueEdited(true);
+        });
+
+        self.keyInvalid = ko.pureComputed(function () {
+          return self.keyEdited() && !self.key();
+        });
+
+        self.valueInvalid = ko.pureComputed(function () {
+          return self.valueEdited() && !self.value();
+        });
+
+        self.invalid = ko.pureComputed(function () {
+          return self.keyInvalid() || self.valueInvalid() || (!self.editPropertyVisible() && !self.key() && !self.value());
+        })
       }
 
       /**
@@ -46,14 +124,17 @@ from django.utils.translation import ugettext as _
        *
        * @constructor
        */
-      function NavProperties(params) {
+      function NavProperties(params, element) {
         var self = this;
 
+        self.element = element;
         self.hasErrors = ko.observable(false);
         self.loading = ko.observable(true);
         self.properties = ko.observableArray();
+        self.editProperties = ko.observableArray();
 
         self.catalogEntry = params.catalogEntry;
+        self.editMode = ko.observable(false);
 
         self.loadProperties();
 
@@ -63,6 +144,66 @@ from django.utils.translation import ugettext as _
           }
         });
       }
+
+      NavProperties.prototype.startEdit = function () {
+        var self = this;
+        var editProperties = [];
+        self.properties().forEach(function (property) {
+          editProperties.push(new NavProperty(property.key(), property.value()));
+        });
+        self.editProperties(editProperties);
+        self.editMode(true);
+
+        $(document).on('click.navProperties', function (event) {
+          if ($.contains(document, event.target) && !$.contains(self.element, event.target) &&
+              !self.editProperties().some(function (prop) { return prop.editPropertyVisible() })) {
+            self.saveEdit();
+          }
+        });
+      };
+
+      NavProperties.prototype.cancelEdit = function () {
+        var self = this;
+        $(document).off('click.navProperties');
+        self.editMode(false);
+      };
+
+      NavProperties.prototype.saveEdit = function () {
+        var self = this;
+
+        var someInvalid = self.editProperties().some(function (property) {
+          return !property.key() || !property.value();
+        });
+
+        if (someInvalid) {
+          return;
+        }
+
+        $(document).off('click.navProperties');
+        self.editMode(false);
+        if (ko.mapping.toJSON(self.editProperties()) !== ko.mapping.toJSON(self.properties())) {
+          var newProperties = {};
+          self.editProperties().forEach(function(property) {
+            newProperties[property.key()] = property.value();
+          });
+          self.loading(true);
+          self.catalogEntry.setNavigatorCustomProperties(newProperties).always(function () {
+            self.loadProperties();
+          });
+        }
+      };
+
+      NavProperties.prototype.removeProperty = function (property) {
+        var self = this;
+        self.editProperties.remove(property);
+      };
+
+      NavProperties.prototype.addProperty = function () {
+        var self = this;
+        var newProperty = new NavProperty('', '', true);
+        newProperty.editPropertyVisible(true);
+        self.editProperties.push(newProperty);
+      };
 
       NavProperties.prototype.dispose = function () {
         var self = this;
@@ -83,7 +224,7 @@ from django.utils.translation import ugettext as _
               }
             });
             newProps.sort(function (a, b) {
-              return a.key.localeCompare(b.key);
+              return a.key().localeCompare(b.key());
             })
           }
           self.properties(newProps);
@@ -95,7 +236,11 @@ from django.utils.translation import ugettext as _
       };
 
       ko.components.register('nav-properties', {
-        viewModel: NavProperties,
+        viewModel: {
+          createViewModel: function(params, componentInfo) {
+            return new NavProperties(params, componentInfo.element);
+          }
+        },
         template: { element: 'nav-properties-template' }
       });
     })();

@@ -1420,18 +1420,23 @@
 
       var $element = $(element);
 
-      var visible = false;
+      var visible = options.visible || ko.observable(false);
+
+      var trackElementInterval = -1;
 
       var hidePopover = function () {
-        $element.popover('hide');
-        visible = false;
-        $(document).off('click', hideOnClickOutside)
+        if (visible()) {
+          window.clearInterval(trackElementInterval);
+          $element.popover('hide');
+          visible(false);
+          $(document).off('click', hideOnClickOutside);
+        }
       };
 
-      huePubSub.subscribe('close.popover', hidePopover);
+      var closeSub = huePubSub.subscribe('close.popover', hidePopover);
 
       var hideOnClickOutside = function (event) {
-        if (visible && $element.data('popover') && ! $.contains($element.data('popover').$tip[0], event.target)) {
+        if (visible() && $element.data('popover') && ! $.contains($element.data('popover').$tip[0], event.target)) {
           hidePopover();
         }
       };
@@ -1440,49 +1445,84 @@
         if (visible && $element.data('popover')) {
           hidePopover();
         }
+        closeSub.remove();
       });
 
-      var showPopover = function () {
+      var afterRender = function () {
+        options.content = $content.html();
+        options.title = $title.html();
+        $element.popover(options);
+        $element.popover('show');
+        var $tip = $element.data('popover').$tip;
+        if (HUE_CONTAINER !== 'body') {
+          $tip.appendTo(HUE_CONTAINER);
+          var tipOffset = $tip.offset();
+          var containerOffset = $(HUE_CONTAINER).offset();
+          $tip.offset({ left: tipOffset.left - containerOffset.left, top: tipOffset.top - containerOffset.top });
+        }
+        ko.cleanNode($tip.get(0));
+        ko.applyBindings(viewModel, $tip.get(0));
+        $tip.find(".close-popover").click(function (event) {
+          hidePopover();
+          event.stopPropagation();
+        });
+        if (options.minWidth) {
+          var heightBefore = $tip.height();
+          $tip.css('min-width', options.minWidth);
+          // The width might affect the height in which case we need to reposition the popover
+          var diff = (heightBefore - $tip.height()) / 2;
+          if (diff !== 0) {
+            $tip.css('top', ($tip.position().top + diff) + 'px');
+          }
+        }
+        var lastWidth = $element.outerWidth(true);
+        var lastOffset = $element.offset();
+        var lastHeight = $element.outerHeight(true);
+        trackElementInterval = window.setInterval(function () {
+          var elementWidth = $element.outerWidth(true);
+          var elementHeight = $element.outerHeight(true);
+          var elementOffset = $element.offset();
+          if (lastHeight !== elementHeight || lastWidth !== $element.outerWidth(true) || lastOffset.top !== elementOffset.top || lastOffset.left !== elementOffset.left) {
+            $tip.css({ 'left': elementOffset.left + (elementWidth / 2) - ($tip.outerWidth(true) / 2) , 'top': elementOffset.top + elementHeight + 10 });
+            lastWidth = elementWidth;
+            lastOffset = elementOffset;
+            lastHeight = elementHeight;
+          }
+        }, 50);
+        $content.empty();
+        $title.empty();
+        $(document).on('click', hideOnClickOutside);
+        visible(true);
+      };
+
+      var showPopover = function (preventClose) {
+        if (!preventClose) {
+          huePubSub.publish('close.popover');
+        }
         ko.renderTemplate(options.contentTemplate, viewModel, {
           afterRender: function () {
-            ko.renderTemplate(options.titleTemplate, viewModel, {
-              afterRender: function () {
-                options.content = $content.html();
-                options.title = $title.html();
-                $element.popover(options);
-                $element.popover('show');
-                var $tip = $element.data('popover').$tip;
-                if (HUE_CONTAINER !== 'body') {
-                  $tip.appendTo(HUE_CONTAINER);
-                  var tipOffset = $tip.offset();
-                  var containerOffset = $(HUE_CONTAINER).offset();
-                  $tip.offset({ left: tipOffset.left - containerOffset.left, top: tipOffset.top - containerOffset.top });
+            if (options.titleTemplate) {
+              ko.renderTemplate(options.titleTemplate, viewModel, {
+                afterRender: function () {
+                  afterRender();
                 }
-                ko.cleanNode($tip.get(0));
-                ko.applyBindings(viewModel, $tip.get(0));
-                $tip.find(".close-popover").click(hidePopover);
-                if (options.minWidth) {
-                  var heightBefore = $tip.height();
-                  $tip.css('min-width', options.minWidth);
-                  // The width might affect the height in which case we need to reposition the popover
-                  var diff = (heightBefore - $tip.height()) / 2;
-                  if (diff !== 0) {
-                    $tip.css('top', ($tip.position().top + diff) + 'px');
-                  }
-                }
-                $content.empty();
-                $title.empty();
-                $(document).on('click', hideOnClickOutside);
-                visible = true;
-              }
-            }, $title.get(0), 'replaceChildren');
+              }, $title.get(0), 'replaceChildren');
+            } else {
+              afterRender();
+            }
           }
         }, $content.get(0), 'replaceChildren');
       };
 
+      if (visible()) {
+        window.setTimeout(function () {
+          showPopover(true);
+        }, 0);
+      }
+
       if (clickTrigger) {
         $element.click(function (e) {
-          if (visible) {
+          if (visible()) {
             hidePopover();
           } else {
             showPopover();
