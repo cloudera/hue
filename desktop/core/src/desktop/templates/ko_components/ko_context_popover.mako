@@ -165,10 +165,10 @@ from metadata.conf import has_navigator
     <div style="width:100%; text-align: center; margin-top: 40px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
     <div style="width: 100%; margin-top: 20px; text-align:center">
       <!-- ko if: type === 'directory' -->
-      <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, publish: 'context.popover.show.in.assist'"></a>
+      <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: name, publish: 'context.popover.show.in.assist'"></a>
       <!-- /ko -->
       <!-- ko if: type !== 'directory' -->
-      <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
+      <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
       <!-- /ko -->
       <br/>
       <span data-bind="text: HUE_I18n.documentType[type] || type"></span>
@@ -183,7 +183,7 @@ from metadata.conf import has_navigator
       <div style="padding: 8px">
         <div style="width:100%; text-align: center; margin-top: 30px; font-size: 100px; color: #787878;" data-bind="template: { name: 'app-icon-template', data: { icon: interpreter.type } }"></div>
          <div style="width: 100%; margin-top: 20px; text-align:center">
-           <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: interpreter.displayName, hueLink: interpreter.page, click: function () { $parents[1].close(); }, attr: { 'title': interpreter.tooltip }"></a>
+           <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: interpreter.displayName, hueLink: interpreter.page, click: function () { $parents[1].close(); }, attr: { 'title': interpreter.tooltip }"></a>
          </div>
       </div>
     </div>
@@ -197,7 +197,7 @@ from metadata.conf import has_navigator
         </div>
         <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
         <!-- ko with: details -->
-        <div class="context-popover-doc-header-link" ><a href="javscript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
+        <div class="context-popover-doc-header-link" ><a href="javascript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
         <!-- ko if: description -->
         <div class="context-popover-doc-description" data-bind="html: description"></div>
         <!-- /ko -->
