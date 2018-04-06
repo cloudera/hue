@@ -1320,18 +1320,6 @@ body {
   text-decoration: none;
 }
 
-input:invalid,textarea:invalid,select:invalid {
-  color: #b94a48;
-  border-color: #ee5f5b
-}
-
-input:invalid:focus,textarea:invalid:focus,select:invalid:focus {
-  border-color: #e9322d;
-  -webkit-box-shadow: 0 0 6px #f8b9b7;
-  -moz-box-shadow: 0 0 6px #f8b9b7;
-  box-shadow: 0 0 6px #f8b9b7
-}
-
 .uploadstatus {
   border: 1px solid #d8d8d8;
   border-bottom: none;
