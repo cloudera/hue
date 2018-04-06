@@ -739,7 +739,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+    <div data-bind="visible: $root.isGridster() || $root.isEditing(), with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
