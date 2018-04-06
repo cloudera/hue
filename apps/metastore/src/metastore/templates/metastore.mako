@@ -229,35 +229,29 @@ ${ components.menubar(is_embeddable) }
   <h4>${ _('Properties') } <i data-bind="visible: $parent.loadingDetails()" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
   <div class="row-fluid">
     <div class="metastore-property">
-      <div>${ _('Type') }</div>
-      <!-- ko if: is_view -->
-      <div>${ _('View') }</div>
-      <!-- /ko -->
-      <!-- ko ifnot: is_view -->
-      <span data-bind="visible: partition_keys.length" style="display: none;">
-        <a class="pointer" data-bind="click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }">
-          ${ _("Partitioned") }
-        </a>
-      </span>
-      <div>${ _('Table') }</div>
-      <!-- /ko -->
-    </div>
-    <div class="metastore-property">
-      <div>${ _('Owner') }</div>
-      <div data-bind="text: details.properties.owner"></div>
-    </div>
-    <div class="metastore-property">
-      <div>${ _('Created') }</div>
-      <div data-bind="text: localeFormat(details.properties.create_time) != 'Invalid Date' ? localeFormat(details.properties.create_time) : details.properties.create_time"></div>
-    </div>
-    <div class="metastore-property">
-      <div>${ _('Format') }</div>
       <!-- ko if: details.properties.table_type == 'MANAGED_TABLE' -->
-      <div>${_('Managed')}</div>
+        ${_('Managed')}
       <!-- /ko -->
       <!-- ko if: details.properties.table_type == 'EXTERNAL_TABLE' -->
-      <div>${_('External')}</div>
+        ${_('External')}
       <!-- /ko -->
+      <!-- ko if: is_view -->
+        ${ _('View') }
+      <!-- /ko -->
+      <!-- ko ifnot: is_view -->
+        <span data-bind="visible: partition_keys.length" style="display: none;">
+          <a class="pointer" data-bind="click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }">
+            ${ _("Partitioned") }
+          </a>
+        </span>
+        ${ _('Table') }
+      <!-- /ko -->
+    </div>
+    <div class="metastore-property">
+      ${ _('Created by') }
+      <span data-bind="text: details.properties.owner"></span>
+      ${ _('on') }
+      <span data-bind="text: localeFormat(details.properties.create_time) != 'Invalid Date' ? localeFormat(details.properties.create_time) : details.properties.create_time"></span>
     </div>
   </div>
   <!-- /ko -->

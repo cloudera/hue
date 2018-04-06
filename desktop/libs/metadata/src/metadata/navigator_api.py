@@ -539,6 +539,12 @@ def create_namespace(request):
   namespace = request.POST.get('namespace')
   description = request.POST.get('description')
 
+  request.audit = {
+    'allowed': request.user.has_hue_permission(action='write', app='metadata'),
+    'operation': 'NAVIGATOR_CREATE_NAMESPACE',
+    'operationText': 'Creating namespace %s' % namespace
+  }
+
   namespace = api.create_namespace(namespace=namespace, description=description)
 
   return JsonResponse(namespace)

@@ -985,6 +985,18 @@ How to create a new locale for an app::
 
 ## Metadata
 
+### Deleting a key/value property
+
+<pre>
+     $.post("/metadata/api/navigator/delete_metadata_properties/", {
+        "id": "32",
+        "keys": ko.mapping.toJSON(["project", "steward"])
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
 ### Getting a namespace
 
 <pre>
