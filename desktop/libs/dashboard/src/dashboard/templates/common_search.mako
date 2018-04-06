@@ -4129,9 +4129,9 @@ $(document).ready(function () {
     });
   }
 
-
-  window.setInterval(function () {
+  function equalizeWidgetsHeights() {
     if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
+      // avoid scrollbars inside the widgets
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
         if (scrollDifference > 0) {
@@ -4141,8 +4141,43 @@ $(document).ready(function () {
           });
         }
       });
+
+      // widgets on the same row should have the same height
+      var touched = [];
+      searchViewModel.gridItems().forEach(function (existingWidget) {
+        var siblings = [];
+        if (touched.indexOf(existingWidget.widgetId()) === -1) {
+          touched.push(existingWidget.widgetId());
+          var biggestSize = existingWidget.size_y();
+          searchViewModel.gridItems().forEach(function (siblingWidget) {
+            if (siblingWidget.row() === existingWidget.row() && existingWidget.widgetId() !== siblingWidget.widgetId()) {
+              siblings.push(siblingWidget);
+              if (siblingWidget.size_y() > biggestSize) {
+                biggestSize = siblingWidget.size_y();
+              }
+              touched.push(siblingWidget.widgetId());
+            }
+          });
+          if (siblings.length > 0) {
+            siblings.push(existingWidget);
+            if (!siblings.map(function (a) {
+              return a.size_y()
+            }).reduce(function (a, b) {
+              return (a === b) ? a : NaN;
+            })) {
+              siblings.forEach(function (siblingWidget) {
+                siblingWidget.size_y(biggestSize);
+                $gridster.resize_widget($(siblingWidget.gridsterElement), siblingWidget.size_x(), siblingWidget.size_y());
+              });
+            }
+          }
+        }
+      });
     }
-  }, 1000, 'dashboard');
+  }
+
+  window.setInterval(equalizeWidgetsHeights, 1000, 'dashboard');
+
 
   var tempDraggable = null;
   var skipRestoreOnStop = false;
