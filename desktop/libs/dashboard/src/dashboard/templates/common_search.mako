@@ -733,16 +733,21 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="text-facet-widget">
+  ## When coming from a widget chart switch
+  <!-- ko if: typeof isLoading !== 'undefined' -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <i class="fa fa-spinner fa-spin"></i>
   </div>
+  <!-- /ko -->
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <!-- ko if: typeof isLoading !== 'undefined' -->
     <div data-bind="visible: $root.isGridster() || $root.isEditing(), with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
+    <!-- /ko -->
     <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.facets()[0].type() == 'field' -->
@@ -1366,6 +1371,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
              data-bind="css: {'active': template.showChart() }, click: function(){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
             % if HAS_REPORT_ENABLED.get():
             <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
+            <i class="fa fa-sort-amount-asc fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT"></i>
             % endif
             <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
             <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
@@ -1384,6 +1390,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.COUNTER); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TEXTSELECT); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 class="active">
+                <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
               </a>
             </li>
             <li>
@@ -1572,6 +1585,10 @@ ${ dashboard.layout_skeleton(suffix='search') }
               <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
             <!-- /ko -->
           <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: widgetType() == 'text-facet-widget' -->
+          <span data-bind="template: { name: 'text-facet-widget' }"></span>
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'bucket-widget' -->

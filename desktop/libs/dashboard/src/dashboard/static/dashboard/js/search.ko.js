@@ -858,7 +858,8 @@ var Collection = function (vm, collection) {
             newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
             (newValue == ko.HUE_CHARTS.TYPES.TIMELINECHART ? 'timeline-widget' :
             (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' :
-            (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' : 'bucket-widget')))
+            (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' :
+            (newValue == ko.HUE_CHARTS.TYPES.TEXTSELECT ? 'text-facet-widget' : 'bucket-widget'))))
         );
       });
 
