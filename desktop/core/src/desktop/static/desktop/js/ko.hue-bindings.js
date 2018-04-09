@@ -631,7 +631,7 @@
     MultiLineEllipsisHandler.prototype.refresh = function () {
       var self = this;
       self.$element.empty();
-      var  textElement = $('<span>').appendTo(self.$element)[0];
+      var textElement = $('<span>').appendTo(self.$element)[0];
       if (self.expandable) {
         textElement.textContent = self.fullText;
         if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {

@@ -333,7 +333,7 @@ from metadata.conf import has_navigator
       <div class="context-popover-flex-fill" data-bind="with: catalogEntry, niceScroll">
         <div class="context-popover-inner-content">
           <!-- ko if: $parent.comment() -->
-          <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis: $parent.commentOverflowing, style: { 'min-height': $parent.commentOverflowing() ? '40px' : null }, text: $parent.comment"></div>
+          <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis, text: $parent.comment"></div>
           <!-- /ko -->
 
           %if has_navigator(user):
@@ -410,7 +410,6 @@ from metadata.conf import has_navigator
 
         self.analysis = ko.observable();
         self.comment = ko.observable();
-        self.commentOverflowing = ko.observable();
         self.viewSql = ko.observable();
         self.viewSqlVisible = ko.observable(false);
 
