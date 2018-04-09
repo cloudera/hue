@@ -256,10 +256,22 @@
   .hue-table-browser-desc {
     width: 100%;
     margin: 5px 14px 14px 14px;
+
+    .editable:not(.editable-open) {
+      margin-left: 9px;
+    }
+
+    .editable-inline-empty {
+      font-style: italic;
+      display: inline-block;
+      font-size: 13px;
+      color: @cui-gray-700;
+      margin-right: 4px;
+    }
   }
 
-  .hue-tags {
-    margin: 5px 7px 0 7px;
+  .metastore-nav-tags {
+    margin: 5px 0 0 14px;
   }
 
   .metastore-description-col .control-group > div,

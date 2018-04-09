@@ -103,6 +103,21 @@
       var multiLineEllipsisHandler;
       if (editableOptions.multiLineEllipsis) {
         editableOptions.display = function (value) {
+          if (!value) {
+            if (multiLineEllipsisHandler) {
+              multiLineEllipsisHandler.pause();
+            }
+            var $container = $(this);
+            $container.empty();
+            if (editableOptions.placeholder) {
+              $('<div>').addClass('editable-inline-empty').text(editableOptions.placeholder).appendTo($container);
+            }
+            if (onActionRender) {
+              onActionRender($container);
+            }
+            return;
+          }
+
           if (!multiLineEllipsisHandler) {
             multiLineEllipsisHandler = new MultiLineEllipsisHandler({
               element: this,
@@ -118,12 +133,17 @@
             });
           } else {
             multiLineEllipsisHandler.setText(value);
+            multiLineEllipsisHandler.resume();
           }
         }
       } else if (onActionRender) {
         editableOptions.display = function (value) {
           var $container = $(this);
-          $('<span>').html(value).appendTo($container);
+          if (!value && editableOptions.placeholder) {
+            $('<div>').addClass('editable-inline-empty').text(editableOptions.placeholder).appendTo($container);
+          } else {
+            $('<span>').html(value).appendTo($container);
+          }
           onActionRender($container);
         };
 
@@ -142,7 +162,7 @@
       if (editableOptions.multiLineEllipsis) {
         $editable.off('.multiLine');
         $editable.on('hidden.multiLine', function () {
-          if (multiLineEllipsisHandler) {
+          if (multiLineEllipsisHandler && ko.unwrap(value)) {
             multiLineEllipsisHandler.resume();
           }
         });

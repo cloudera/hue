@@ -408,7 +408,7 @@
 }
 
 .selectize-no-tags {
-  color: #999;
-  margin-top: 4px;
+  font-style: italic;
+  color: #787878;
   margin-right: 4px;
 }

@@ -18,9 +18,19 @@
 
 .hue-nav-properties {
   position: relative;
-  margin: 5px 14px;
+  margin: 5px 0 5px 14px;
   font-size: 14px;
   line-height: 20px;
+  padding-left: 6px;
+
+  .hue-nav-properties-empty {
+    overflow: hidden;
+    font-style: italic;
+    display: inline-block;
+    font-size: 13px;
+    color: @cui-gray-700;
+    margin-left: 3px;
+  }
 
   &.hue-nav-properties-edit {
     padding-right: 40px;
@@ -28,8 +38,8 @@
     .hue-nav-properties-edit-actions {
       position: absolute;
       font-size: 18px;
-      right: 0;
-      top: 0;
+      right: 2px;
+      top: 2px;
 
       a {
         color: @cui-gray-600;

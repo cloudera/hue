@@ -48,7 +48,7 @@ from django.utils.translation import ugettext as _
 
      <div class="hue-nav-properties" data-bind="click: startEdit, visibleOnHover: { selector: '.editable-inline-action' }">
        <!-- ko ifnot: properties().length -->
-       ${ _("No properties") }
+       <div class="hue-nav-properties-empty">${ _("Add properties...") }</div>
        <!-- /ko -->
        <!-- ko foreach: properties -->
        <div class="hue-nav-property"><div class="hue-nav-property-key" data-bind="text: key, attr: { 'title': key }"></div><div class="hue-nav-property-value" data-bind="text: value, attr: { 'title': value }"></div></div>

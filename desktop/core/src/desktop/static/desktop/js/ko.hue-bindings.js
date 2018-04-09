@@ -550,11 +550,11 @@
           if (options.hasErrors()) {
             $('<span>').addClass('selectize-no-tags').text(options.errorMessage).appendTo($readOnlyInner);
           } else {
-            $('<span>').addClass('selectize-no-tags').text(options.placeholder).appendTo($readOnlyInner);
+            $('<span>').addClass('selectize-no-tags').text(options.emptyPlaceholder).appendTo($readOnlyInner);
           }
 
           if (! options.readOnly && !options.hasErrors()) {
-            $('<i>').addClass('fa fa-edit selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
+            $('<i>').addClass('fa fa-pencil selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
             $readOnlyInner.click(function () {
               showEdit();
             });
@@ -594,7 +594,7 @@
       self.fullText = options.text;
       self.element.textContent = self.fullText;
 
-      window.setTimeout(function () {
+      self.delayedResumeTimeout = window.setTimeout(function () {
         self.resume();
       }, 0);
     }
@@ -610,6 +610,7 @@
     MultiLineEllipsisHandler.prototype.resume = function () {
       var self = this;
       self.refresh();
+      window.clearInterval(self.sizeCheckInterval);
       self.sizeCheckInterval = window.setInterval(function () {
         if (self.element.offsetWidth !== self.lastKnownOffsetWidth || self.element.offsetHeight !== self.lastKnownOffsetHeight) {
           self.element.textContent = self.fullText;
@@ -620,12 +621,13 @@
 
     MultiLineEllipsisHandler.prototype.pause = function () {
       var self = this;
+      window.clearTimeout(self.delayedResumeTimeout);
       window.clearInterval(self.sizeCheckInterval);
     };
 
     MultiLineEllipsisHandler.prototype.dispose = function () {
       var self = this;
-      window.clearInterval(self.sizeCheckInterval);
+      self.pause();
     };
 
     MultiLineEllipsisHandler.prototype.refresh = function () {

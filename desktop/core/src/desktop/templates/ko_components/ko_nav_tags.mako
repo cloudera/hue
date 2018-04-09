@@ -29,7 +29,7 @@ from django.utils.translation import ugettext as _
      <!-- ko if: !loading() && (!readOnly || readOnly && currentTags().length) -->
      <div class="hue-tags" style="width: 100%" data-bind="ifnot: loading, css: { 'read-only-tags': readOnly }">
        <textarea style="width: 100%" data-bind="tagEditor: {
-          placeholder: '${_ko('No tags')}',
+          emptyPlaceholder: '${_ko('Add tags...')}',
           readOnly: readOnly,
           hasErrors: hasErrors,
           errorMessage: '${_ko("Tags could not be loaded.")}',
