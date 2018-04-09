@@ -638,7 +638,12 @@
         textElement.textContent = self.fullText;
         if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
           self.$element.append('&nbsp;');
-          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>').click(function (e) {
+          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>');
+          if (self.expandClass) {
+            $expandLink.addClass(self.expandClass);
+          }
+          $expandLink.appendTo(self.$element);
+          $expandLink.add(textElement).click(function (e) {
             self.expanded = !self.expanded;
             self.updateOverflowHeight();
             if (self.expanded) {
@@ -647,12 +652,7 @@
             } else {
               self.resume();
             }
-            e.stopPropagation();
-          });
-          if (self.expandClass) {
-            $expandLink.addClass(self.expandClass);
-          }
-          $expandLink.appendTo(self.$element);
+          })
         }
       } else {
         textElement.textContent = self.fullText;

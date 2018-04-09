@@ -465,7 +465,7 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-td-description">
 % if has_write_access:
   <div data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
-    <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
+    <div data-bind="editable: comment, editableOptions: {
         mode: 'inline',
         enabled: true,
         type: 'textarea',
@@ -492,7 +492,7 @@ ${ components.menubar(is_embeddable) }
   <!-- ko if: $root.navigatorEnabled() -->
   <div class="hue-table-browser-desc-container" data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
     <div class="hue-table-browser-desc">
-      <div class="toggle-editable" data-bind="editable: comment, editableOptions: {
+      <div data-bind="editable: comment, editableOptions: {
         mode: 'inline',
         enabled: true,
         type: 'textarea',
