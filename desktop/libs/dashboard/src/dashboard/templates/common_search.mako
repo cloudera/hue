@@ -3876,11 +3876,10 @@ $(document).ready(function () {
   var $gridster = $('.gridster>ul').gridster({
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
-    autogenerate_stylesheet: true,
     scroll_container: '.page-content',
     avoid_overlapped_widgets: true,
     max_cols: 12,
-    max_rows: 400,
+    max_rows: 200,
     resize: {
       axes: ['x'],
       enabled: true,
@@ -4131,14 +4130,22 @@ $(document).ready(function () {
 
   function equalizeWidgetsHeights() {
     if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
-      // avoid scrollbars inside the widgets
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
-        if (scrollDifference > 0) {
+        if (scrollDifference > 0) { // avoid scrollbars inside the widgets
           existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
           $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function () {
             huePubSub.publish('gridster.clean.whitespace');
           });
+        }
+        else { // or remove additional whitespace
+          var contentHeight = $(existingWidget.gridsterElement).find('.card-widget').height();
+          if (existingWidget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
+            existingWidget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
+            $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function () {
+              huePubSub.publish('gridster.clean.whitespace');
+            });
+          }
         }
       });
 
