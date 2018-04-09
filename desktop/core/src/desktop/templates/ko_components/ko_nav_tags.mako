@@ -20,8 +20,6 @@ from django.utils.translation import ugettext as _
 %>
 
 <%def name="navTags()">
-  <link href="${ static('desktop/ext/css/selectize.css') }" rel="stylesheet">
-
   <script type="text/html" id="nav-tags-template">
      <!-- ko if: loading -->
      <div style="width: 100%; height: 20px; left: 6px; top: 8px; position: relative;" data-bind="hueSpinner: { spin: loading }"></div>

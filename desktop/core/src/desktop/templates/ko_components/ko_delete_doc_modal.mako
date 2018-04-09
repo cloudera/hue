@@ -20,8 +20,6 @@ from django.utils.translation import ugettext as _
 %>
 
 <%def name="deleteDoc()">
-  <link href="${ static('desktop/ext/css/selectize.css') }" rel="stylesheet">
-
   <script type="text/html" id="delete-entry-template">
   <!-- ko with: activeEntry -->
   <div class="modal-header">

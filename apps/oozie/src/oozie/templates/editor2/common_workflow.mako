@@ -30,7 +30,6 @@
 
 
 <%def name="render()">
-<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 
 <script type="text/html" id="doc-search-autocomp-item">

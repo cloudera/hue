@@ -57,7 +57,6 @@ ${ assist.assistJSModels() }
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 ${ assist.assistPanel() }
 
-<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 %endif
 
 <link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">

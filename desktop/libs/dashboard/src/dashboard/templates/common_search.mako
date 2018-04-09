@@ -2957,7 +2957,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.gridster.min.css') }">
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>

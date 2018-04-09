@@ -23,8 +23,6 @@ from desktop.views import _ko
 
 <%def name="config()">
 
-  <link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
-
   <style>
     .config-property {
       display: block;
