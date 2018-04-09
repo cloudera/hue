@@ -51,7 +51,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     </div>
   </form>
 %else:
-<div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
+<div class="search-bar" data-bind="visible: !$root.isPlayerMode(), dockable: { scrollable: '.page-content', jumpCorrection: 0, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 50 }">
   <div class="search-bar-header">
     <div class="search-bar-logo">
       <div class="app-header">

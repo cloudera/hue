@@ -6324,7 +6324,7 @@
 
       var initialTopPosition = -1;
       var initialSize = {
-        w: $(element).width(),
+        w: $(element).width() - hueUtils.scrollbarWidth(),
         h: $(element).outerHeight() + (options.jumpCorrection || 0)
       };
 
@@ -6368,7 +6368,7 @@
       function resetInitialStyle() {
         $(element).removeAttr('style');
         initialSize = {
-          w: $(element).width(),
+          w: $(element).width() - hueUtils.scrollbarWidth(),
           h: $(element).outerHeight() + (options.jumpCorrection || 0)
         };
         dock();
