@@ -4329,15 +4329,25 @@ $(document).ready(function () {
           dimensions.col = adjustedDropPosition;
           dimensions.sizex = newOptimalWidth;
 
-          var siblingCounter = 0;
-          for (var i = 1; i <= 12 / newOptimalWidth; i++) {
-            if (i !== droppedWidgetFauxColumn) {
-              if (collidingWidgets[siblingCounter]) {
-                resizeAndMove(collidingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
+          var resizeAndMoveSiblings = function() {
+            var siblingCounter = 0;
+            for (var i = 1; i <= 12 / newOptimalWidth; i++) {
+              if (i !== droppedWidgetFauxColumn) {
+                if (collidingWidgets[siblingCounter]) {
+                  resizeAndMove(collidingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
+                }
+                siblingCounter++;
               }
-              siblingCounter++;
             }
           }
+
+          if (tempDraggableGridsterWidget) {
+            $gridster.move_widget($(tempDraggableGridsterWidget.gridsterElement), -100, -100, resizeAndMoveSiblings); // temporarily move it off grid
+          }
+          else {
+            resizeAndMoveSiblings();
+          }
+
         }
       }
 
