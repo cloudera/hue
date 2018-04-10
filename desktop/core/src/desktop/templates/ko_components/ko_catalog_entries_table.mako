@@ -22,6 +22,34 @@ from desktop.views import _ko
 
 <%def name="catalogEntriesTable()">
 
+  <script type="text/html" id="entries-table-td-description">
+    <td data-bind="attr: { 'title': comment }">
+    <!-- ko if: $parent.editableDescriptions -->
+      <div data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
+        <div data-bind="editable: comment, editableOptions: {
+          mode: 'inline',
+          enabled: true,
+          type: 'textarea',
+          showbuttons: 'bottom',
+          inputclass: 'hue-table-browser-desc-input',
+          toggle: 'manual',
+          toggleElement: '.toggle-editable',
+          placeholder: '${ _ko('Add a description...') }',
+          emptytext: '${ _ko('Add a description...') }',
+          inputclass: 'hue-table-browser-desc-input',
+          rows: 6,
+          save: saveComment,
+          inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
+          multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'editable-inline-action' }
+        }">${ _('Add a description...') }</div>
+      </div>
+    <!-- /ko -->
+    <!-- ko ifnot: $parent.editableDescriptions -->
+      <span style="white-space: pre;" data-bind="text: comment"></span>
+    <!-- /ko -->
+    </td>
+  </script>
+
   <script type="text/html" id="catalog-entries-list-template">
     <!-- ko if: !loading() -->
     <div class="catalog-entries-list-filter context-popover-inline-autocomplete">
@@ -40,10 +68,50 @@ from desktop.views import _ko
     <div class="catalog-entries-list-container" data-bind="niceScroll" style="overflow:hidden;">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
 
+      <!-- ko if: !loading() && catalogEntry.isSource() -->
+      <table id="entryTable" class="table table-condensed table-nowrap">
+        <thead>
+          <tr>
+            <!-- ko if: typeof selectedEntries !== 'undefined' -->
+            <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredEntries, selectedValues: selectedEntries }"></div></th>
+            <!-- /ko -->
+            <th>${ _("Database") }</th>
+            <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
+          </tr>
+        </thead>
+        <!-- ko if: filteredEntries().length -->
+        <tbody data-bind="foreach: filteredEntries">
+          <tr data-bind="click: onRowClick">
+            <!-- ko if: typeof $parent.selectedEntries !== 'undefined' -->
+            <td width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="multiCheck: '#entryTable', value: $data, hueChecked: $parent.selectedEntries"></div></td>
+            <!-- /ko -->
+            <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
+            <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+          </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: filteredEntries().length === 0 -->
+        <tbody>
+          <tr>
+            <!-- ko ifnot: hasErrors -->
+            <td style="font-style: italic;" data-bind="attr: { 'colspan': typeof selectedEntries !== 'undefined' ? 3 : 2 }">${ _("No entries found") }</td>
+            <!-- /ko -->
+            <!-- ko if: hasErrors -->
+            <td style="font-style: italic;" data-bind="attr: { 'colspan': typeof selectedEntries !== 'undefined' ? 3 : 2 }">${ _("Error loading entries") }</td>
+            <!-- /ko -->
+          </tr>
+        </tbody>
+        <!-- /ko -->
+      </table>
+      <!-- /ko -->
+
       <!-- ko if: !loading() && catalogEntry.isDatabase() -->
-      <table class="table table-condensed table-nowrap">
+      <table id="entryTable" class="table table-condensed table-nowrap">
         <thead>
         <tr>
+          <!-- ko if: typeof selectedEntries !== 'undefined' -->
+          <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredEntries, selectedValues: selectedEntries }"></div></th>
+          <!-- /ko -->
           <th data-bind="text: catalogEntry.getSourceType() !== 'solr' ? '${ _ko("Table") }' : '${ _ko("Collection") }'"></th>
           <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
         </tr>
@@ -51,8 +119,11 @@ from desktop.views import _ko
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
         <tr>
+          <!-- ko if: typeof $parent.selectedEntries !== 'undefined' -->
+          <td width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="multiCheck: '#entryTable', value: $data, hueChecked: $parent.selectedEntries"></div></td>
+          <!-- /ko -->
           <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
-          <td data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
+          <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
         </tr>
         </tbody>
         <!-- /ko -->
@@ -60,10 +131,10 @@ from desktop.views import _ko
         <tbody>
         <tr>
           <!-- ko ifnot: hasErrors -->
-          <td colspan="2" style="font-style: italic;">${ _("No entries found") }</td>
+          <td style="font-style: italic;" data-bind="attr: { 'colspan': typeof selectedEntries !== 'undefined' ? 3 : 2 }">${ _("No entries found") }</td>
           <!-- /ko -->
           <!-- ko if: hasErrors -->
-          <td colspan="2" style="font-style: italic;">${ _("Error loading entries") }</td>
+          <td style="font-style: italic;" data-bind="attr: { 'colspan': typeof selectedEntries !== 'undefined' ? 3 : 2 }">${ _("Error loading entries") }</td>
           <!-- /ko -->
         </tr>
         </tbody>
@@ -99,7 +170,7 @@ from desktop.views import _ko
             </a>
           </td>
           <td class="type-column" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
-          <td class="comment-column" data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
+          <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
           <td class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
           <td class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
         </tr>
@@ -152,19 +223,33 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
-      function SampleEnrichedEntry(catalogEntry, onClick) {
+      function SampleEnrichedEntry(catalogEntry, onClick, onRowClick) {
         var self = this;
         self.catalogEntry = catalogEntry;
         self.popularity = ko.observable();
         self.firstSample = ko.observable();
         self.secondSample = ko.observable();
         self.onClick = onClick;
+        self.onRowClick = onRowClick;
+        self.selected = ko.observable(false);
+        self.comment = self.catalogEntry.getCommentObservable();
       }
+
+      SampleEnrichedEntry.prototype.saveComment = function () {
+        var self = this;
+        if (self.comment() !== self.catalogEntry.getResolvedComment()) {
+          self.catalogEntry.setComment(self.comment()).done(self.comment).fail(function () {
+            self.comment(self.catalogEntry.getResolvedComment());
+          })
+        }
+      };
 
       function CatalogEntriesList(params) {
         var self = this;
         self.catalogEntry = params.catalogEntry;
+        self.selectedEntries = params.selectedEntries;
         self.entries = ko.observableArray();
+        self.editableDescriptions = params.editableDescriptions;
 
         // If the entry is a column without children
         self.columnSamples = ko.observableArray();
@@ -271,11 +356,18 @@ from desktop.views import _ko
               self.loading(false);
             }));
           } else {
-            var onClick = function (sampleEnrichedEntry) {
-              params.onClick(sampleEnrichedEntry.catalogEntry);
+            var onClick = function (sampleEnrichedEntry, event) {
+              if (params.onClick) {
+                params.onClick(sampleEnrichedEntry.catalogEntry, event);
+              }
+            };
+            var onRowClick = function (sampleEnrichedEntry) {
+              if (self.selectedEntries) {
+                sampleEnrichedEntry.selected(!sampleEnrichedEntry.selected());
+              }
             };
             var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
-              self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick) }));
+              self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick, onRowClick) }));
             }).fail(function () {
               self.hasErrors(true);
             }).always(function () {

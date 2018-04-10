@@ -218,7 +218,7 @@
       }
 
       if (editableOptions.save) {
-        $editable.on('save', editableOptions.save);
+        $editable.on('save', editableOptions.save.bind(viewModel));
       }
 
       //setup observable to fire only when editable changes, not when options change

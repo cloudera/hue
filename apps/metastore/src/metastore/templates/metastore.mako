@@ -390,8 +390,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-databases">
-  <div class="actionbar-actions" data-bind="dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
-    <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
+  <div style="float: right" class="actionbar-actions" data-bind="dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
     % if has_write_access:
       <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
       <div id="dropDatabase" class="modal hide fade">
@@ -413,9 +412,6 @@ ${ components.menubar(is_embeddable) }
             <ul data-bind="foreach: selectedDatabases">
               <li>
                 <span data-bind="text: catalogEntry.name"></span>
-                <!-- ko if: $data.tables().length > 0 -->
-                    (<span data-bind="text: $data.tables().length"></span> tables)
-                <!-- /ko -->
               </li>
             </ul>
           </div>
@@ -439,27 +435,11 @@ ${ components.menubar(is_embeddable) }
       % endif
     % endif
   </div>
-  <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px" data-bind="visible: filteredDatabases().length > 0">
-    <thead>
-    <tr>
-      <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
-      <th>&nbsp;</th>
-      <th>${ _('Database Name') }</th>
-    </tr>
-    </thead>
-    <tbody data-bind="hueach: { data: filteredDatabases, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 145, scrollUp: true }">
-    <tr>
-      <td width="1%" style="text-align: center">
-        <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
-      </td>
-      <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
-      <td>
-        <a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: function () { $parent.setDatabase($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-  <span class="margin-left-10" data-bind="visible: filteredDatabases().length === 0" style="font-style: italic; display: none;">${_('No databases found')}</span>
+  <div style="clear:both;">
+    <!-- ko if: catalogEntry() -->
+    <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: catalogEntry(), onClick: onDatabaseClick.bind($data), selectedEntries: selectedDatabases, editableDescriptions: /true/i.test('${ has_write_access }') } } --><!-- /ko -->
+    <!-- /ko -->
+  </div>
 </script>
 
 <script type="text/html" id="metastore-td-description">
@@ -574,84 +554,27 @@ ${ components.menubar(is_embeddable) }
   </div>
 
   <div class="row-fluid">
-    <div class="span12 tile" style="margin: 0 10px;">
-      <h4>${ _('Tables') }</h4>
-      <div class="actionbar-actions" style="margin-top:5px;" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
-        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
-        <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
+    <div class="span12 tile" style="margin: 0 10px; position:relative">
+      <h4 style="margin-bottom: 15px">${ _('Tables') }</h4>
+      <div class="actionbar-actions" style="position:absolute; right:0; top: 0" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
+        <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { onTableClick(selectedTables()[0].catalogEntry); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
         <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.sourceType()) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
           <i class="fa fa-play fa-fw"></i> ${_('Query')}
         </button>
         % if has_write_access:
           <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
           % if is_embeddable:
-            <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+            <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
           % elif ENABLE_NEW_CREATE_TABLE.get():
-            <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+            <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + catalogEntry.name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
           % else:
-            <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/import_wizard/' + database().catalogEntry.name }" title="${_('Create a new table from a file')}"><i class="fa fa-stack"></i> ${_('New from file')}</button>
-            <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/create_table/' + database().catalogEntry.name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i> ${_('New manually')}</button>
+            <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/import_wizard/' + catalogEntry.name }" title="${_('Create a new table from a file')}"><i class="fa fa-stack"></i> ${_('New from file')}</button>
+            <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/create_table/' + catalogEntry.name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i> ${_('New manually')}</button>
           % endif
         % endif
       </div>
 
-      <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
-        <thead>
-        <tr>
-          <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
-          <th>&nbsp;</th>
-          <th width="20%">${ _('Name') }</th>
-          <th class="metastore-description-col" width="69%">${ _('Description') }</th>
-          <!-- ko if: $root.optimizerEnabled  -->
-          <th width="10%">${ _('Columns') }</th>
-          <!-- /ko -->
-        </tr>
-        </thead>
-        <tbody data-bind="hueach: { data: filteredTables, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 277, scrollUp: true }">
-          <tr>
-            <td width="1%" style="text-align: center">
-              <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
-            </td>
-            <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
-            <td>
-              <a class="tableLink" href="javascript:void(0);" data-bind="click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }">
-                <!-- ko ifnot: $root.optimizerEnabled && optimizerStats() -->
-                <!-- ko if: catalogEntry.isTable() -->
-                  <i class="fa fa-fw fa-table" title="${ _('Table') }"></i>
-                <!-- /ko -->
-                <!-- ko if: catalogEntry.isView() -->
-                  <i class="fa fa-fw fa-eye" title="${ _('View') }"></i>
-                <!-- /ko -->
-                <!-- /ko -->
-                <!-- ko if: $root.optimizerEnabled && optimizerStats() -->
-                <!-- ko if: optimizerStats().is_fact -->
-                  <i class="fa fa-fw fa-database" title="${ _('Fact table') }"></i>
-                <!-- /ko -->
-                <!-- ko ifnot: optimizerStats().is_fact -->
-                  <i class="fa fa-fw fa-calendar" title="${ _('Dimension table') }"></i>
-                <!-- /ko -->
-                <!-- /ko -->
-                <span data-bind="text: catalogEntry.name"></span>
-                <!-- ko if: $root.optimizerEnabled() && optimizerStats() && optimizerStats().popularity  -->
-              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + optimizerStats().popularity + '%' }, tooltip"></i>
-                <!-- /ko -->
-              </a>
-            </td>
-            <td class="metastore-description-col" data-bind="attr: { title: hueUtils.html2text(commentWithoutNewLines()) }">
-              <!-- ko template: 'metastore-td-description' --><!-- /ko -->
-            </td>
-            <!-- ko if: $root.optimizerEnabled -->
-              <!-- ko if: optimizerStats() -->
-              <td data-bind="text: optimizerStats().column_count"></td>
-              <!-- /ko -->
-            <!-- ko ifnot: optimizerStats() -->
-              <td></td>
-            <!-- /ko -->
-            <!-- /ko -->
-          </tr>
-        </tbody>
-      </table>
-      <div data-bind="visible: filteredTables().length === 0, css: { 'margin-left-10': tables().length > 0 }" style="font-style: italic; display: none;">${_('No tables found.')}</div>
+      <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: catalogEntry, onClick: onTableClick.bind($data), selectedEntries: selectedTables, editableDescriptions: /true/i.test('${ has_write_access }') } } --><!-- /ko -->
     </div>
   </div>
 
@@ -718,9 +641,10 @@ ${ components.menubar(is_embeddable) }
 
   <div class="tile">
     <h4 style="margin-bottom: 5px;">${ _('Columns') } (<span data-bind="text: columns().length"></span>) <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
-    <!-- ko with: favouriteColumns -->
-    <!-- ko template: "metastore-columns-table" --><!-- /ko -->
-    <!-- /ko -->
+    <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: catalogEntry, onClick: showContextPopover.bind($data), editableDescriptions: /true/i.test('${ has_write_access }') } } --><!-- /ko -->
+##     <!-- ko with: favouriteColumns -->
+##     <!-- ko template: "metastore-columns-table" --><!-- /ko -->
+##     <!-- /ko -->
 
     <a href="javascript: void(0);" title="${_('View more...')}" class="metastore-view-more" data-bind="visible: columns().length > favouriteColumns().length, click: function() { $root.currentTab('columns'); $('.page-content').scrollTop(0); }">
       ${_('View more...')}

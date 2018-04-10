@@ -49,41 +49,22 @@ var MetastoreDatabase = (function () {
 
     self.showAddTagName = ko.observable(false);
     self.addTagName = ko.observable('');
-    self.tableQuery = ko.observable('').extend({rateLimit: 150});
-
-    self.filteredTables = ko.computed(function () {
-      var returned = self.tables();
-      if (self.tableQuery() !== '') {
-        returned = self.tables().filter(function (table) {
-          return table.catalogEntry.name.toLowerCase().indexOf(self.tableQuery()) > -1
-            || (table.comment() && table.comment().toLowerCase().indexOf(self.tableQuery()) > -1);
-        });
-      }
-      return returned.sort(function (a, b) {
-        if (options.optimizerEnabled()) {
-          if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
-            if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-              if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
-                return a.catalogEntry.name.toLowerCase().localeCompare(b.catalogEntry.name.toLowerCase());
-              }
-              return  b.optimizerStats().popularity - a.optimizerStats().popularity;
-            }
-            return -1
-          }
-          if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-            return 1;
-          }
-        }
-
-        return a.catalogEntry.name.toLowerCase().localeCompare(b.catalogEntry.name.toLowerCase());
-      });
-    });
 
     self.selectedTables = ko.observableArray();
 
     self.editingTable = ko.observable(false);
     self.table = ko.observable(null);
   }
+
+  MetastoreDatabase.prototype.onTableClick = function (catalogEntry) {
+    var self = this;
+    self.tables().some(function (table) {
+      if (table.catalogEntry === catalogEntry) {
+        self.setTable(table, function() { huePubSub.publish('metastore.url.change'); });
+        return true;
+      }
+    })
+  };
 
   MetastoreDatabase.prototype.reload = function () {
     var self = this;
@@ -654,8 +635,10 @@ var MetastoreColumn = (function () {
   }
 
   MetastoreColumn.prototype.showContextPopover = function (entry, event) {
+    console.log('here');
     var $source = $(event.target);
     var offset = $source.offset();
+    console.log(entry.catalogEntry);
     huePubSub.publish('context.popover.show', {
       data: {
         type: 'catalogEntry',
