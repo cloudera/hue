@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from hadoop.yarn import resource_manager_api
 
@@ -228,7 +229,7 @@ class YarnApi(Api):
       else:
         logs = None
     except PopupException, e:
-      LOG.warn('No task attempt found for logs: %s' % e)
+      LOG.warn('No task attempt found for logs: %s' % smart_str(e))
     return {'logs': logs}
 
 
