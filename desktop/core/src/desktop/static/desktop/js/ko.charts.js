@@ -1251,13 +1251,15 @@
   };
 
   function chartsUpdatingState() {
-    $(document).find("svg").css("opacity", "0.5");
+    $('.nvd3').parents('svg').css('opacity', '0.5');
   }
+
   window.chartsUpdatingState = chartsUpdatingState;
 
   function chartsNormalState() {
-    $(document).find("svg").css("opacity", "1");
+    $('.nvd3').parents('svg').css('opacity', '1');
   }
+
   window.chartsNormalState = chartsNormalState;
 
   var tipBuilder = function () {
