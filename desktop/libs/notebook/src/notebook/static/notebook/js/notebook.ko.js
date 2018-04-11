@@ -592,6 +592,7 @@ var EditorViewModel = (function() {
         variable.value = variable.value || "";
         variable.sample = variable.entry || [];
         variable.type = variable.type || "";
+        variable.step = '';
         delete variable.defaultValue;
       });
     }
