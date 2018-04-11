@@ -552,7 +552,7 @@ nv.models.growingMultiBarChart = function() {
 
   chart.selectBars = function(args) {
     if (!arguments.length) return selectBars;
-    selectBars(args);
+    if (selectBars) selectBars(args);
     return chart;
   };
 

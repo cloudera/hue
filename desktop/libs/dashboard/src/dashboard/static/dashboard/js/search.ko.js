@@ -650,6 +650,10 @@ var Collection = function (vm, collection) {
 
   self.template = ko.mapping.fromJS(collection.template);
 
+  self.template.chartSettings.hideStacked = ko.computed(function () {
+    return self.template.chartSettings.chartYMulti().length <= 1;
+  });
+
   for (var setting in self.template.chartSettings) {
     self.template.chartSettings[setting].subscribe(function () {
       huePubSub.publish('gridChartForceUpdate');
@@ -900,12 +904,57 @@ var Collection = function (vm, collection) {
 
     if (facet.properties.facets) { // Sub facet
       $.each(facet.properties.facets(), function (index, nestedFacet) {
-        self._addObservablesToNestedFacet(facet, nestedFacet, vm);
+        self._addObservablesToNestedFacet(facet, nestedFacet, vm, index);
       });
     }
+
+    facet.canReset = ko.computed(function () {
+      var _fq = (function() {
+        var _fq, fqs = vm.query && vm.query.fqs();
+        for (var i = 0; fqs && i < fqs.length; i++) {
+          var fq = fqs[i];
+          if (fq.id() == facet.id()) {
+            _fq = fq;
+            break;
+          }
+        }
+        return _fq;
+      })();
+      return _fq && _fq.filter().length;
+    });
   }
 
-  self._addObservablesToNestedFacet = function(facet, nestedFacet, vm) {
+  self.template.getMeta = function (extraCheck) {
+    var iterable = self.template.fieldsAttributes();
+    if (self.template.fields().length > 0) {
+      iterable = self.template.fields();
+    }
+    return $.map(iterable, function (field) {
+      if (typeof field !== 'undefined' && field.name() != '' && extraCheck(field.type())) {
+        return field;
+      }
+    }).sort(function (a, b) {
+      return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
+    });
+  }
+
+  self.template.cleanedMeta = ko.computed(function () {
+    return self.template.getMeta(alwaysTrue);
+  });
+
+  self.template.cleanedNumericMeta = ko.computed(function () {
+    return self.template.getMeta(isNumericColumn);
+  });
+
+  self.template.cleanedStringMeta = ko.computed(function () {
+    return self.template.getMeta(isStringColumn);
+  });
+
+  self.template.cleanedDateTimeMeta = ko.computed(function () {
+    return self.template.getMeta(isDateTimeColumn);
+  });
+
+  self._addObservablesToNestedFacet = function(facet, nestedFacet, vm, index) {
     nestedFacet.limit.subscribe(function () {
       vm.search();
     });
@@ -927,7 +976,17 @@ var Collection = function (vm, collection) {
       });
 
       nestedFacet.aggregate.facetFieldsNames = ko.computed(function () {
-        return self._getCompatibleMetricFields(nestedFacet);
+        if (index != 0) {
+          return self._getCompatibleMetricFields(nestedFacet);
+        }
+        var template = self.template;
+        if (facet.properties.canRange() && facet.properties.isDate()) {
+          return template.cleanedDateTimeMeta();
+        } else if (facet.properties.canRange()) {
+          return template.cleanedNumericMeta();
+        } else {
+          return template.cleanedStringMeta();
+        }
       }).extend({ trackArrayChanges: true });
     }
 
@@ -1260,20 +1319,6 @@ var Collection = function (vm, collection) {
     });
   });
 
-  self.template.getMeta = function (extraCheck) {
-    var iterable = self.template.fieldsAttributes();
-    if (self.template.fields().length > 0) {
-      iterable = self.template.fields();
-    }
-    return $.map(iterable, function (field) {
-      if (typeof field !== 'undefined' && field.name() != '' && extraCheck(field.type())) {
-        return field;
-      }
-    }).sort(function (a, b) {
-      return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
-    });
-  }
-
   function alwaysTrue() {
     return true;
   }
@@ -1290,25 +1335,10 @@ var Collection = function (vm, collection) {
     return !isNumericColumn(type) && !isDateTimeColumn(type);
   }
 
-  self.template.cleanedMeta = ko.computed(function () {
-    return self.template.getMeta(alwaysTrue);
-  });
-
-  self.template.cleanedNumericMeta = ko.computed(function () {
-    return self.template.getMeta(isNumericColumn);
-  });
-
-  self.template.cleanedStringMeta = ko.computed(function () {
-    return self.template.getMeta(isStringColumn);
-  });
-
-  self.template.cleanedDateTimeMeta = ko.computed(function () {
-    return self.template.getMeta(isDateTimeColumn);
-  });
-
   self.template.hasDataForChart = ko.computed(function () {
     var hasData = false;
-    if (self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART) {
+
+    if ([ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.LINECHART, ko.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(self.template.chartSettings.chartType()) >= 0) {
       hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && self.template.chartSettings.chartYMulti().length > 0;
     }
     else {
@@ -1641,8 +1671,6 @@ var Collection = function (vm, collection) {
     var nestedFacet = facet.properties.facets()[0];
 
     if (nestedFacet.isDate()) {
-      nestedFacet.start(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
-      nestedFacet.end(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
       nestedFacet.min(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
       nestedFacet.max(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
     }
@@ -1928,6 +1956,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           id: facet_id,
           has_data: false,
           resultHash: '',
+          filterHash: '',
           counts: [],
           label: '',
           field: '',
@@ -2351,6 +2380,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
             query: ko.mapping.toJSON(self.query),
             layout: ko.mapping.toJSON(self.columns)
           }, function (data) {
+            huePubSub.publish('charts.state');
             data = JSON.bigdataParse(data);
             try {
               if (self.collection.engine() == 'solr') {
@@ -2435,8 +2465,19 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     self._make_result_facet = function (new_facet) {
       var facet = self.getFacetFromQuery(new_facet.id);
       var _hash = ko.mapping.toJSON(new_facet);
-
-      if (!facet.has_data() || facet.resultHash() != _hash) {
+      var _fq = (function() {
+        var _fq, fqs = self.query.fqs();
+        for (var i = 0; i < fqs.length; i++) {
+          var fq = fqs[i];
+          if (fq.id() == new_facet.id) {
+            _fq = fq;
+            break;
+          }
+        }
+        return _fq;
+      })();
+      var _filterHash = _fq ? ko.mapping.toJSON(_fq) : '';
+      if (!facet.has_data() || facet.resultHash() != _hash || facet.filterHash() != _filterHash) {
         if (facet.countsSelectedSubscription) {
           facet.countsSelectedSubscription.dispose();
         }
@@ -2455,19 +2496,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         $.each(facet.counts(), function (index, item) {
           item.text = item.value + ' (' + item.count + ')';
         });
-        var countsSelected = (function() {
-          var _fq;
-          var fqs = self.query.fqs();
-          for (var i = 0; i < fqs.length; i++) {
-            var fq = fqs[i];
-            if (fq.id() == new_facet.id) {
-              _fq = fq;
-              break;
-            }
-          }
-          return _fq && _fq.filter()[0].value();
-        })();
-
+        var countsSelected = _fq && _fq.filter()[0].value() || "";
         if (!facet.countsFiltered) {
           facet.countsSelected = ko.observable(countsSelected);
           facet.countsFiltered = ko.pureComputed(function() {
@@ -2481,8 +2510,17 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           });
         }
         setTimeout(function () { // Delay the execution, because setting facet.counts() above sets the value of countsSelected to ""
-          facet.countsSelected(countsSelected);
           facet.countsSelectedSubscription = facet.countsSelected.subscribe(function (value) {
+            var bIsSingleSelect = self.collection.facets()
+            .filter(function (facet) { return facet.id() == new_facet.id; })
+            .reduce(function (isSingle, facet) {
+              if (!facet.properties.facets) {
+                return isSingle;
+              }
+              var dimension = facet.properties.facets()[0];
+              return isSingle || (dimension.multiselect && !dimension.multiselect());
+            }, false);
+            if (!bIsSingleSelect) return;
             var counts = facet.counts();
             for (var i = 0; i < counts.length; i++) {
               if (counts[i].value == value && value !== '') {
@@ -2492,8 +2530,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
             }
             self.query.toggleFacetClear({ widget_id: new_facet.id });
           });
+          facet.countsSelected(countsSelected);
         },1);
-
         if (typeof new_facet.docs != 'undefined') {
           var _docs = [];
 
@@ -2515,7 +2553,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         facet.field(new_facet.field);
         facet.dimension(new_facet.dimension);
         facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
+        facet.hideStacked = ko.computed(function () {
+          return !facet.extraSeries() || !facet.extraSeries().length;
+        });
         facet.resultHash(_hash);
+        facet.filterHash(_filterHash);
         facet.has_data(true);
       }
     }
@@ -2845,6 +2887,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     }, c.template.chartSettings);
 
     ko.mapping.fromJS(c.template, self.collection.template);
+
+    self.collection.template.chartSettings.hideStacked = ko.computed(function () {
+      return self.collection.template.chartSettings.chartYMulti().length <= 1;
+    });
 
     for (var setting in self.collection.template.chartSettings) {
       self.collection.template.chartSettings[setting].subscribe(function () {

@@ -18,6 +18,8 @@
 from __future__ import division
 
 import collections
+import datetime
+import dateutil
 import itertools
 import json
 import logging
@@ -585,7 +587,14 @@ def augment_solr_response(response, collection, query):
             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
             counts = [_v for _f in counts for _v in (_f['val'], _f[column])]
-            counts = range_pair2(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet['properties']['facets'][0], collection_facet=collection_facet)
+            counts = range_pair2(
+                                 facet['field'],
+                                 name,
+                                 selected_values.get(facet['id'], []),
+                                 counts,
+                                 datetime.datetime(datetime.MAXYEAR, 12, 31, 23, 59, 59, 0, dateutil.tz.tzoffset('Z', 0)) if facet['properties'].get('isDate') else 1,
+                                 collection_facet['properties']['facets'][0],
+                                 collection_facet=collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
             agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')] if counts else []
@@ -607,7 +616,13 @@ def augment_solr_response(response, collection, query):
                   _series[legend].append(cell)
 
             for _name, val in _series.iteritems():
-              _c = range_pair2(facet['field'], _name, selected_values.get(facet['id'], []), val, 1, collection_facet['properties']['facets'][0])
+              _c = range_pair2(
+                               facet['field'],
+                               _name,
+                               selected_values.get(facet['id'], []),
+                               val,
+                               datetime.datetime(datetime.MAXYEAR, 12, 31, 23, 59, 59, 0, dateutil.tz.tzoffset('Z', 0)) if facet['properties'].get('isDate') else 1,
+                               collection_facet['properties']['facets'][0])
               extraSeries.append({'counts': _c, 'label': _name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
@@ -664,7 +679,8 @@ def augment_solr_response(response, collection, query):
           'dimension': dimension,
           'response': {'response': {'start': 0, 'numFound': num_bucket}}, # Todo * nested buckets + offsets
           'docs': [dict(zip(cols, row)) for row in rows],
-          'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'aggr' if '(' in col else 'string'}) for col in cols]
+          'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'aggr' if '(' in col else 'string'}) for col in cols],
+          'multiselect': collection_facet['properties']['facets'][0].get('multiselect', True)
         }
 
         normalized_facets.append(facet)

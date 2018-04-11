@@ -170,7 +170,4 @@
     }
   };
 
-  window.chartsUpdatingState = function(){};
-  window.chartsNormalState = function(){};
-
 })();
