@@ -46,6 +46,7 @@ nv.models.lineWithBrushChart = function() {
     , rightAlignYAxis = false
     , useInteractiveGuideline = false
     , tooltips = true
+    , tooltip = null
     , tooltipSingle = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -93,11 +94,20 @@ nv.models.lineWithBrushChart = function() {
   //------------------------------------------------------------
 
   var showTooltip = function(e, offsetElement) {
-    var values = (e.list || [e]).map(function (e) {
-      var x = xAxis.tickFormat()(lines.x()(e.point, e.pointIndex)),
-      y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex));
-      return {x: x, y: y, key: e.series.key};
-    });
+    var values;
+    if (!tooltip) {
+      values = (e.list || [e]).map(function (e) {
+        var x = xAxis.tickFormat()(lines.x()(e.point, e.pointIndex)),
+        y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex));
+        return {x: x, y: y, key: e.series.key};
+      });
+    } else {
+      values = tooltip((e.list || [e]).map(function (e) {
+        var x = lines.x()(e.point, e.pointIndex),
+        y = lines.y()(e.point, e.pointIndex);
+        return {x: x, y: y, key: e.series.key};
+      }));
+    }
 
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
@@ -688,6 +698,7 @@ nv.models.lineWithBrushChart = function() {
   chart.legend = legend;
   chart.xAxis = xAxis;
   chart.yAxis = yAxis;
+  chart.xScale = lines.xScale;
   chart.interactiveLayer = interactiveLayer;
 
   d3v3.rebind(chart, lines, 'defined', 'isArea', 'x', 'y', 'size', 'xScale', 'yScale', 'xDomain', 'yDomain', 'xRange', 'yRange'

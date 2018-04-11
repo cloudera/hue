@@ -48,6 +48,7 @@ nv.models.multiBarWithBrushChart = function() {
     , staggerLabels = false
     , rotateLabels = 0
     , tooltips = true
+    , tooltip = null
     , tooltipSingle = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -103,11 +104,20 @@ nv.models.multiBarWithBrushChart = function() {
   //------------------------------------------------------------
 
   var showTooltip = function(e, offsetElement) {
-    var values = (e.list || [e]).map(function (e) {
-      var x = xAxis.tickFormat()(multibar.x()(e.point, e.pointIndex)),
-      y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex));
-      return {x: x, y: y, key: e.series.key};
-    });
+    var values;
+    if (!tooltip) {
+      values = (e.list || [e]).map(function (e) {
+        var x = xAxis.tickFormat()(multibar.x()(e.point, e.pointIndex)),
+        y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex));
+        return {x: x, y: y, key: e.series.key};
+      });
+    } else {
+      values = tooltip((e.list || [e]).map(function (e) {
+        var x = multibar.x()(e.point, e.pointIndex),
+        y = multibar.y()(e.point, e.pointIndex);
+        return {x: x, y: y, key: e.series.key};
+      }));
+    }
 
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
@@ -846,7 +856,7 @@ nv.models.multiBarWithBrushChart = function() {
 
   chart.tooltipContent = function(_) {
     if (!arguments.length) return tooltip;
-    tooltipSingle = _;
+    tooltip = _;
     return chart;
   };
 

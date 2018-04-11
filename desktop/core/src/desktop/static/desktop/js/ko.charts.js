@@ -660,6 +660,167 @@
       }
     }
   };
+  function multi(xAxis) {
+    var previous = new Date(9999,11,31);
+    var minDiff = 5.1;
+    var s = 1000,
+    m = s * 60,
+    h = m * 60,
+    day = h * 24,
+    mn = day * 30.5,
+    y = day * 365;
+    return d3v3.time.format.utc.multi([
+      ["%L %H:%M:%S", function(d) {
+        var domain = xAxis.domain();
+        var domainDiff = domain[domain.length - 1] - domain[0];
+        var result = previous > d && domainDiff < s * minDiff;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%S %H:%M", function(d) {
+        var domain = xAxis.domain();
+        var domainDiff = domain[domain.length - 1] - domain[0];
+        var result = previous > d && domainDiff < m * minDiff;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%H:%M %Y-%m-%d", function(d) {
+        var domain = xAxis.domain();
+        var domainDiff = domain[domain.length - 1] - domain[0];
+        var result = previous > d && domainDiff < h * minDiff;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%H:%M %Y-%m-%d", function(d) {
+        var domain = xAxis.domain();
+        var domainDiff = domain[domain.length - 1] - domain[0];
+        var result = previous > d && domainDiff < day * minDiff;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%d %Y-%m", function(d) {
+        var domain = xAxis.domain();
+        var domainDiff = domain[domain.length - 1] - domain[0];
+        var result = previous > d && domainDiff < mn * minDiff;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%m %Y", function(d) {
+        var domain = xAxis.domain();
+        var domainDiff = domain[domain.length - 1] - domain[0];
+        var result = previous > d && domainDiff < y * minDiff;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%Y", function(d) {
+        var test = xAxis;
+        var result = previous > d;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%L %H:%M:%S", function(d) {
+        var result = moment(previous).utc().seconds() !== moment(d).utc().seconds() && d - previous < s;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%L", function(d) {
+        var result = moment(previous).utc().milliseconds() !== moment(d).utc().milliseconds();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%S %H:%M", function(d) {
+        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes() && d - previous < m;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%S", function(d) {
+        var result = moment(previous).utc().seconds() !== moment(d).utc().seconds();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%H:%M %Y-%m-%d", function(d) {
+        var result = moment(previous).utc().date() !== moment(d).utc().date() && d - previous < h;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%H:%M", function(d) {
+        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%H:%M %Y-%m-%d", function(d) {
+        var result = moment(previous).utc().date() !== moment(d).utc().date() && d - previous < day;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%H:%M", function(d) {
+        var result = moment(previous).utc().hours() !== moment(d).utc().hours();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%d %Y-%m", function(d) {
+        var result = moment(previous).utc().months() !== moment(d).utc().months() && d - previous < mn;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%d", function(d) {
+        var result = moment(previous).utc().date() !== moment(d).utc().date();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%m %Y", function(d) {
+        var result = moment(previous).utc().years() !== moment(d).utc().years() && d - previous < y;
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%m", function(d) {
+        var result = moment(previous).utc().months() !== moment(d).utc().months();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
+      ["%Y", function() {
+        return true;
+      }]
+    ]);
+  }
 
   function lineChartBuilder(element, options, isTimeline) {
     var _datum = options.transformer(options.datum);
@@ -689,9 +850,15 @@
         });
         _chart.xAxis.showMaxMin(false);
         if (isTimeline){
-          _chart.xAxis.tickFormat(function(d) {
-            return moment(d).utc().format("YYYY-MM-DD HH:mm:ss");
+          _chart.xScale(d3v3.time.scale.utc());
+          _chart.tooltipContent(function(values){
+            return values.map(function (value) {
+              var x = moment(value.x).utc().format("YYYY-MM-DD HH:mm:ss"),
+              y = _chart.yAxis.tickFormat()(value.y);
+              return {x: x, y: y, key: value.key};
+            });
           });
+          _chart.xAxis.tickFormat(multi(_chart.xAxis));
           _chart.onChartUpdate(function () {
             _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
               insertLinebreaks(_chart, d, this);
@@ -866,9 +1033,14 @@
           return isTimeline ? new Date(moment(values1[0].obj.from).valueOf()) : parseFloat(d);
         };
         _chart.staggerLabels(false);
-        _chart.xAxis.tickFormat(function(d) {
-          return moment(d).utc().format("YYYY-MM-DD HH:mm:ss");
+        _chart.tooltipContent(function(values){
+          return values.map(function (value) {
+            var x = moment(value.x).utc().format("YYYY-MM-DD HH:mm:ss"),
+            y = _chart.yAxis.tickFormat()(value.y);
+            return {x: x, y: y, key: value.key};
+          });
         });
+        _chart.xAxis.tickFormat(multi(_chart.xAxis));
         _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
         _chart.onChartUpdate(function () {
           _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
