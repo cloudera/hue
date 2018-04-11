@@ -4265,6 +4265,11 @@ $(document).ready(function () {
 
   huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
 
+  huePubSub.subscribe('gridster.empty.drop', function (options) {
+    showAddFacetDemiModal(options.widget, options.target);
+    tempDraggable = null;
+  }, 'dashboard');
+
   huePubSub.subscribe('gridster.clean.whitespace', function () {
     if (searchViewModel.isGridster()) {
       var maxRow = 0;

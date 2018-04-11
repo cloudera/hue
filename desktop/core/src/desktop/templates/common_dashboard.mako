@@ -223,7 +223,7 @@
           <a href="javascript:void(0)" class="remove-widget" data-bind="publish: { 'gridster.remove': $data }"><i class="fa fa-times"></i></a>
         </div>
       </h2>
-      <div class="empty-content" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover', drop: function(){ huePubSub.publish('gridster.added.widget'); } }}, css: { 'query-builder': $root.isQueryBuilder }"></div>
+      <div class="empty-content" data-bind="droppable: { data: function(w) { huePubSub.publish('gridster.empty.drop', { widget: w, target: $data }); }, options: { greedy:true, hoverClass: 'droppable-hover', drop: function(){ huePubSub.publish('gridster.added.widget'); } }}, css: { 'query-builder': $root.isQueryBuilder }"></div>
     </div>
     <!-- /ko -->
   <!-- ko with: widget -->
