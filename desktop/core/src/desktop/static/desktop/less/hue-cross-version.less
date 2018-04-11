@@ -19,6 +19,7 @@
 @import (reference) "hue-mixins.less";
 
 @import "components/hue-breadcrumbs.less";
+@import "components/hue-catalog-entries-table.less";
 @import "components/hue-demi-modal.less";
 @import "components/hue-filechooser.less";
 @import "components/hue-gridster.less";
@@ -140,7 +141,7 @@ input[type='password']::-ms-reveal {
 
 // Hue Checkbox
 
-.hueCheckbox {
+.hue-checkbox {
   width: 15px;
   height: 15px;
   border: 1px solid @cui-gray-400;
@@ -148,30 +149,31 @@ input[type='password']::-ms-reveal {
   padding: 0 !important;
   display: block !important;
   cursor: default;
-}
 
-.hueCheckbox.disabled {
-  border: 1px solid @cui-gray-300;
-  background-color: @cui-gray-050;
-  cursor: not-allowed;
-}
+  &.disabled {
+    border: 1px solid @cui-gray-300;
+    background-color: @cui-gray-050;
+    cursor: not-allowed;
+  }
 
-.hueCheckbox:hover {
-  border-color: @cui-gray-600;
-}
+  &:hover {
+    border-color: @cui-gray-600;
+  }
 
-.hueCheckbox.disabled:hover {
-  border-color: @cui-gray-300;
+  &.disabled:hover {
+    border-color: @cui-gray-300;
+  }
+
+  &.hide {
+    display: none!important;
+  }
+
 }
 
 .hueCheckboxText {
   left: 3px;
   position: relative;
   top: -3px;
-}
-
-.hueCheckbox.hide {
-  display: none!important;
 }
 
 .hue-uncheck::before {

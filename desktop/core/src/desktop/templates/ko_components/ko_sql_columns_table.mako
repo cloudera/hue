@@ -63,7 +63,7 @@ from desktop.views import _ko
             <!-- /ko -->
             <!-- ko if: typeof selected !== 'undefined' -->
             <td class="center" data-bind="multiCheckForeachVisible: { entries: $parent.filteredColumns, selectedAttr: 'selected' }" style="cursor: default;">
-              <div class="hueCheckbox fa" data-bind="css: {'fa-check': selected }"></div>
+              <div class="hue-checkbox fa" data-bind="css: {'fa-check': selected }"></div>
             </td>
 
             <!-- /ko -->

@@ -227,7 +227,7 @@ ${ assist.assistPanel() }
                 <thead>
                   <tr>
                     <th style="width: 1%">
-                      <div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: alias.availableCollections, selectedValues: alias.chosenCollections }"></div>
+                      <div class="hue-checkbox fa" data-bind="hueCheckAll: { allValues: alias.availableCollections, selectedValues: alias.chosenCollections }"></div>
                     </th>
                     <th>${_('Collection')}</th>
                   </tr>
@@ -236,7 +236,7 @@ ${ assist.assistPanel() }
                 <!-- ko foreach: alias.availableCollections -->
                 <tr>
                   <td>
-                    <div class="hueCheckbox fa" data-bind="multiCheck: '#indexesChecksTable', value: $data, hueChecked: $parent.alias.chosenCollections"></div>
+                    <div class="hue-checkbox fa" data-bind="multiCheck: '#indexesChecksTable', value: $data, hueChecked: $parent.alias.chosenCollections"></div>
                   </td>
                   <td data-bind="text: name"></td>
                 </tr>
@@ -265,7 +265,7 @@ ${ assist.assistPanel() }
   <table class="table table-condensed datatables" id="list-indexes-table">
     <thead>
       <tr>
-        <th class="vertical-align-middle" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="vertical-align-middle" width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Type') }</th>
         <th>${ _('Collections') }</th>
@@ -274,7 +274,7 @@ ${ assist.assistPanel() }
     <tbody data-bind="foreach: { data: filteredIndexes }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
-          <div data-bind="multiCheck: '#list-indexes-table', css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
+          <div data-bind="multiCheck: '#list-indexes-table', css: { 'hue-checkbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
         <td><a class="pointer" data-bind="text: name, click: function() { $root.fetchIndex($data); }"></a></td>
         <td data-bind="text: type"></td>

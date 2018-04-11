@@ -196,7 +196,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <table id="jobsTable" class="datatables table table-condensed status-border-container">
                   <thead>
                   <tr>
-                    <th width="1%" class="vertical-align-middle"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
+                    <th width="1%" class="vertical-align-middle"><div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
                     <th width="15%">${_('Id')}</th>
                     <th width="20%">${_('Name')}</th>
                     <th width="6%">${_('User')}</th>
@@ -211,7 +211,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <tbody data-bind="foreach: jobs.apps">
                     <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
                       <td data-bind="click: function() {}, clickBubble: false">
-                        <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
+                        <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                       </td>
                       <td data-bind="text: id"></td>
                       <td data-bind="text: name"></td>
@@ -1594,7 +1594,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <table id="schedulesTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+              <th width="1%"><div class="select-all hue-checkbox fa"></div></th>
               <th>${_('Status')}</th>
               <th>${_('Title')}</th>
               <th>${_('type')}</th>
@@ -1610,7 +1610,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tbody data-bind="foreach: apps">
               <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob(); } }">
                 <td data-bind="click: function() {}, clickBubble: false">
-                  <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
+                  <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
                 <td data-bind="text: properties.status"></td>
                 <td data-bind="text: properties.title"></td>

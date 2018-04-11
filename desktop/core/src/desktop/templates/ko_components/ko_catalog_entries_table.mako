@@ -22,9 +22,70 @@ from desktop.views import _ko
 
 <%def name="catalogEntriesTable()">
 
+  <script type="text/html" id="entries-table-td-description">
+    <td data-bind="attr: { 'title': comment }">
+    <!-- ko if: $parent.editableDescriptions -->
+      <div class="hue-catalog-entries-table-desc" data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
+        <div data-bind="editable: comment, editableOptions: {
+          mode: 'inline',
+          enabled: true,
+          type: 'textarea',
+          showbuttons: 'bottom',
+          inputclass: 'hue-table-browser-desc-input',
+          toggle: 'manual',
+          toggleElement: '.toggle-editable',
+          placeholder: '${ _ko('Add a description...') }',
+          emptytext: '${ _ko('Add a description...') }',
+          inputclass: 'hue-catalog-entries-table-desc-input',
+          rows: 6,
+          save: saveComment,
+          inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
+          multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'editable-inline-action' }
+        }">${ _('Add a description...') }</div>
+      </div>
+    <!-- /ko -->
+    <!-- ko ifnot: $parent.editableDescriptions -->
+      <div class="entries-table-description" data-bind="text: comment, multiLineEllipsis"></div>
+    <!-- /ko -->
+    </td>
+  </script>
+
+  <script type="text/html" id="entries-table-tbody-no-entries">
+    <tbody>
+      <tr>
+        <td style="font-style: italic;" data-bind="attr: { 'colspan': colCount + (typeof $component.selectedEntries !== 'undefined' ? 1 : 0) + ($component.contextPopoverEnabled ? 1 : 0) }">
+          <!-- ko ifnot: hasErrors -->
+          ${ _("No entries found") }
+          <!-- /ko -->
+          <!-- ko if: hasErrors -->
+          ${ _("Error loading entries") }
+          <!-- /ko -->
+        </td>
+      </tr>
+    </tbody>
+  </script>
+
+  <script type="text/html" id="entries-table-shared-headers">
+    <!-- ko if: typeof selectedEntries !== 'undefined' -->
+    <th width="1%" class="select-column"><div class="hue-checkbox fa" data-bind="hueCheckAll: { allValues: filteredEntries, selectedValues: selectedEntries }"></div></th>
+    <!-- /ko -->
+    <!-- ko if: contextPopoverEnabled -->
+    <th width="1%">&nbsp;</th>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="entries-table-shared-columns">
+    <!-- ko if: typeof $parent.selectedEntries !== 'undefined' -->
+    <td width="1%" class="select-column"><div class="hue-checkbox fa" data-bind="multiCheck: '#entryTable', value: $data, hueChecked: $parent.selectedEntries"></div></td>
+    <!-- /ko -->
+    <!-- ko if: $parent.contextPopoverEnabled -->
+    <td width="1%"><a href="javascript: void(0);" data-bind="click: showContextPopover"><i class="fa fa-info"></i></a></td>
+    <!-- /ko -->
+  </script>
+
   <script type="text/html" id="catalog-entries-list-template">
     <!-- ko if: !loading() -->
-    <div class="catalog-entries-list-filter context-popover-inline-autocomplete">
+    <div class="context-popover-inline-autocomplete">
       <!-- ko component: {
         name: 'inline-autocomplete',
         params: {
@@ -39,34 +100,50 @@ from desktop.views import _ko
 
     <div class="catalog-entries-list-container">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
+      <!-- ko if: !loading() && catalogEntry.isSource() -->
+      <table id="entryTable" class="table table-condensed table-nowrap">
+        <thead>
+          <tr>
+            <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
+            <th>${ _("Database") }</th>
+            <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
+          </tr>
+        </thead>
+        <!-- ko if: filteredEntries().length -->
+        <tbody data-bind="foreach: filteredEntries">
+          <tr data-bind="click: onRowClick">
+            <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
+            <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
+            <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+          </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: filteredEntries().length === 0 -->
+        <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 2, hasErrors: hasErrors } } --><!-- /ko -->
+        <!-- /ko -->
+      </table>
+      <!-- /ko -->
 
       <!-- ko if: !loading() && catalogEntry.isDatabase() -->
-      <table class="table table-condensed table-nowrap">
+      <table id="entryTable" class="table table-condensed table-nowrap">
         <thead>
         <tr>
+          <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
           <th data-bind="text: catalogEntry.getSourceType() !== 'solr' ? '${ _ko("Table") }' : '${ _ko("Collection") }'"></th>
           <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
         </tr>
         </thead>
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
-        <tr>
+        <tr data-bind="click: onRowClick">
+          <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
           <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
-          <td data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
+          <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
         </tr>
         </tbody>
         <!-- /ko -->
         <!-- ko if: filteredEntries().length === 0 -->
-        <tbody>
-        <tr>
-          <!-- ko ifnot: hasErrors -->
-          <td colspan="2" style="font-style: italic;">${ _("No entries found") }</td>
-          <!-- /ko -->
-          <!-- ko if: hasErrors -->
-          <td colspan="2" style="font-style: italic;">${ _("Error loading entries") }</td>
-          <!-- /ko -->
-        </tr>
-        </tbody>
+        <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 2, hasErrors: hasErrors } } --><!-- /ko -->
         <!-- /ko -->
       </table>
       <!-- /ko -->
@@ -75,6 +152,7 @@ from desktop.views import _ko
       <table class="table table-condensed table-nowrap">
         <thead>
         <tr>
+          <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
           <th><span data-bind="text: catalogEntry.getSourceType() !== 'solr' ? '${ _ko("Column") }' : '${ _ko("Field") }'"></span> (<span data-bind="text: filteredEntries().length"></span>)</th>
           <th>${ _("Type") }</th>
           <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
@@ -83,7 +161,8 @@ from desktop.views import _ko
         </thead>
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
-        <tr>
+        <tr data-bind="click: onRowClick">
+          <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
           <td class="name-column" data-bind="attr: { 'title': catalogEntry.name + ' - ${ _ko("Click for more details") }' }">
             <a href="javascript: void(0);" data-bind="click: onClick">
               <span data-bind="text: catalogEntry.name"></span>
@@ -99,23 +178,14 @@ from desktop.views import _ko
             </a>
           </td>
           <td class="type-column" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
-          <td class="comment-column" data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
+          <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
           <td class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
           <td class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
         </tr>
         </tbody>
         <!-- /ko -->
         <!-- ko if: filteredEntries().length === 0 -->
-        <tbody>
-        <tr>
-          <!-- ko ifnot: hasErrors -->
-          <td colspan="5" style="font-style: italic;">${ _("No entries found") }</td>
-          <!-- /ko -->
-          <!-- ko if: hasErrors -->
-          <td colspan="5" style="font-style: italic;">${ _("Error loading entries") }</td>
-          <!-- /ko -->
-        </tr>
-        </tbody>
+        <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 5, hasErrors: hasErrors } } --><!-- /ko -->
         <!-- /ko -->
       </table>
       <!-- /ko -->
@@ -152,19 +222,53 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
-      function SampleEnrichedEntry(catalogEntry, onClick) {
+      function SampleEnrichedEntry(index, catalogEntry, onClick, onRowClick) {
         var self = this;
+        self.index = index;
         self.catalogEntry = catalogEntry;
-        self.popularity = ko.observable();
+        self.popularity = ko.observable(0);
         self.firstSample = ko.observable();
         self.secondSample = ko.observable();
         self.onClick = onClick;
+        self.onRowClick = onRowClick;
+        self.comment = self.catalogEntry.getCommentObservable();
       }
+
+      SampleEnrichedEntry.prototype.showContextPopover = function (entry, event) {
+        var $source = $(event.currentTarget || event.target);
+        var offset = $source.offset();
+        huePubSub.publish('context.popover.show', {
+          data: {
+            type: 'catalogEntry',
+            catalogEntry: entry.catalogEntry
+          },
+          orientation: 'right',
+          source: {
+            element: event.target,
+            left: offset.left,
+            top: offset.top - 2,
+            right: offset.left + $source.width() + 1,
+            bottom: offset.top + $source.height() - 2
+          }
+        });
+      };
+
+      SampleEnrichedEntry.prototype.saveComment = function () {
+        var self = this;
+        if (self.comment() !== self.catalogEntry.getResolvedComment()) {
+          self.catalogEntry.setComment(self.comment()).done(self.comment).fail(function () {
+            self.comment(self.catalogEntry.getResolvedComment());
+          })
+        }
+      };
 
       function CatalogEntriesList(params) {
         var self = this;
         self.catalogEntry = params.catalogEntry;
+        self.selectedEntries = params.selectedEntries;
         self.entries = ko.observableArray();
+        self.editableDescriptions = !!params.editableDescriptions;
+        self.contextPopoverEnabled = !!params.contextPopoverEnabled;
 
         // If the entry is a column without children
         self.columnSamples = ko.observableArray();
@@ -259,6 +363,19 @@ from desktop.views import _ko
 
         self.loading(true);
 
+        var entrySort = function (a, b) {
+          var aIsKey = a.catalogEntry.isPrimaryKey() || a.catalogEntry.isPartitionKey();
+          var bIsKey = b.catalogEntry.isPrimaryKey() || b.catalogEntry.isPartitionKey();
+          if (aIsKey && !bIsKey) {
+            return -1;
+          }
+          if (bIsKey && !aIsKey) {
+            return 1;
+          }
+
+          return (b.popularity() - a.popularity()) || (a.index - b.index);
+        };
+
         window.setTimeout(function () {
           if (self.catalogEntry.isField() && !self.catalogEntry.isComplex()) {
             self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
@@ -271,11 +388,22 @@ from desktop.views import _ko
               self.loading(false);
             }));
           } else {
-            var onClick = function (sampleEnrichedEntry) {
-              params.onClick(sampleEnrichedEntry.catalogEntry);
+            var onClick = function (sampleEnrichedEntry, event) {
+              if (params.onClick) {
+                params.onClick(sampleEnrichedEntry.catalogEntry, event);
+              } else if (self.contextPopoverEnabled) {
+                sampleEnrichedEntry.showContextPopover(sampleEnrichedEntry, event);
+              }
+            };
+            var onRowClick = function (sampleEnrichedEntry, event) {;
+              if (self.selectedEntries && $(event.target).is('td')) {
+               $(event.currentTarget).find('.hue-checkbox').trigger('click');
+              }
             };
             var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
-              self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick) }));
+              var entries = $.map(childEntries, function (entry, index) { return new SampleEnrichedEntry(index, entry, onClick, onRowClick) });
+              entries.sort(entrySort);
+              self.entries(entries);
             }).fail(function () {
               self.hasErrors(true);
             }).always(function () {
@@ -307,8 +435,12 @@ from desktop.views import _ko
                       });
                     }
                   });
+                  var foundPopularEntries = popularityToApply.length !== 0;
                   while (popularityToApply.length) {
                     popularityToApply.pop()();
+                  }
+                  if (foundPopularEntries) {
+                    self.entries().sort(entrySort);
                   }
                 });
               }

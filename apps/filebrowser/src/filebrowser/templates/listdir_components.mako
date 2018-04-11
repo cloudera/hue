@@ -45,7 +45,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <table id="fileBrowserTable" class="table table-condensed table-huedatatable tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
     <thead>
       <tr>
-        <th class="sorting_disabled" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="sorting_disabled" width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th class="sortable sorting" data-sort="type" width="1%" data-bind="click: sort">&nbsp;</th>
         <th class="sortable sorting_asc" data-sort="name" data-bind="click: sort">${_('Name')}</th>
         <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
@@ -624,7 +624,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <script id="fileTemplate" type="text/html">
     <tr class="row-animated" style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default" data-bind="enabled: name !== '..' ">
-        <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
+        <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { 'hue-checkbox': name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
       <td class="left"><i data-bind="click: $root.viewFile, css: { 'fa': true,
        % if 'oozie' in apps:

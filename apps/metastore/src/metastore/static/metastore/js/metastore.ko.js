@@ -61,18 +61,7 @@ var MetastoreViewModel = (function () {
 
     self.selectedDatabases = ko.observableArray();
 
-    self.databaseQuery = ko.observable('').extend({ rateLimit: 150 });
-
     self.currentTab = ko.observable('');
-
-    self.filteredDatabases = ko.pureComputed(function () {
-      if (self.databaseQuery() === '') {
-        return self.databases();
-      }
-      return self.databases().filter(function (database) {
-        return database.catalogEntry.name.toLowerCase().indexOf(self.databaseQuery().toLowerCase()) !== -1;
-      });
-    });
 
     self.database = ko.observable(null);
 
@@ -192,6 +181,17 @@ var MetastoreViewModel = (function () {
       self.database().table(null);
       huePubSub.publish('metastore.url.change')
     }
+  }
+
+  MetastoreViewModel.prototype.onDatabaseClick = function (catalogEntry) {
+    var self = this;
+
+    self.databases().some(function (database) {
+      if (database.catalogEntry === catalogEntry) {
+        self.setDatabase(database, function() { huePubSub.publish('metastore.url.change') });
+        return true;
+      }
+    });
   }
 
   var lastLoadDatabasesPromise = null;

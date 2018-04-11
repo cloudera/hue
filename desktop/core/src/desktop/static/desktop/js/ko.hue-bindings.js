@@ -1358,7 +1358,7 @@
           var insideGroup = false;
           var allCheckboxes = $container.find(":checkbox");
           if (allCheckboxes.length == 0) {
-            allCheckboxes = $container.find(".hueCheckbox");
+            allCheckboxes = $container.find(".hue-checkbox");
           }
           for (var i = 0; i < allCheckboxes.length; i++) {
             var checkbox = allCheckboxes[i];
@@ -5632,7 +5632,7 @@
     after: ['value', 'attr'],
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var value = valueAccessor();
-      $(element).addClass('hueCheckbox fa');
+      $(element).addClass('hue-checkbox fa');
 
       var updateCheckedState = function () {
         ko.utils.toggleDomNodeCssClass(element, 'fa-check', value());

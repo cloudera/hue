@@ -68,7 +68,7 @@ ${ layout.menubar(section='bundles') }
   <table id="bundleTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="bundleCheck"></div></th>
+        <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="bundleCheck"></div></th>
         <th width="10%">${ _('Name') }</th>
         <th width="20%">${ _('Description') }</th>
         <th width="35%">${ _('Coordinators') }</th>
@@ -82,7 +82,7 @@ ${ layout.menubar(section='bundles') }
       % for bundle in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox bundleCheck fa" data-row-selector-exclude="true"
+            <div class="hue-checkbox bundleCheck fa" data-row-selector-exclude="true"
               % if bundle.can_read(user):
                   data-clone-url="${ url('oozie:clone_bundle', bundle=bundle.id) }"
                   data-submit-url="${ url('oozie:submit_bundle', bundle=bundle.id) }"
@@ -196,7 +196,7 @@ ${ layout.menubar(section='bundles') }
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox[checked='checked']:not(.selectAll)");
+      var selector = $(".hue-checkbox[checked='checked']:not(.selectAll)");
       if (selector.length == 1) {
         var action_buttons = [
           ['#submit-btn', 'data-submit-url'],
@@ -211,7 +211,7 @@ ${ layout.menubar(section='bundles') }
           }
         });
       }
-      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
+      var can_delete = $(".hue-checkbox[checked='checked'][data-delete-id]");
       if (can_delete.length > 0 && can_delete.length == selector.length) {
         $("#trash-btn").removeAttr("disabled");
         $("#trash-btn-caret").removeAttr("disabled");
@@ -220,7 +220,7 @@ ${ layout.menubar(section='bundles') }
 
     $("#trash-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("delete-id"));
       });
       $("#trash-job").modal("show");
@@ -228,14 +228,14 @@ ${ layout.menubar(section='bundles') }
 
     $("#destroy-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("delete-id"));
       });
       $("#destroy-job").modal("show");
     });
 
     $("#submit-btn").click(function () {
-      var _this = $(".hueCheckbox[checked='checked']");
+      var _this = $(".hue-checkbox[checked='checked']");
       var _action = _this.attr("data-submit-url");
       $.get(_action, function (response) {
           $("#submit-job-modal").html(response);
@@ -246,7 +246,7 @@ ${ layout.menubar(section='bundles') }
 
     $("#clone-btn").click(function (e) {
       viewModel.isLoading(true);
-      var _this = $(".hueCheckbox[checked='checked']");
+      var _this = $(".hue-checkbox[checked='checked']");
       var _url = _this.attr("data-clone-url");
       $.post(_url, function (data) {
         window.location = data.url;

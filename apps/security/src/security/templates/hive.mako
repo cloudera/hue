@@ -288,7 +288,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
           <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <thead>
               <tr>
-                <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
+                <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
                 <th width="2%"></th>
                 <th width="20%" style="text-align:left">${ _('Name') }</th>
                 <th width="74%" style="text-align:left">${ _('Groups') }</th>
@@ -298,7 +298,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
             <tbody data-bind="foreach: $root.filteredRoles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
-                  <div data-bind="css: { hueCheckbox: true, 'fa': true, 'fa-check': selected }"></div>
+                  <div data-bind="css: { 'hue-checkbox': true, 'fa': true, 'fa-check': selected }"></div>
                 </td>
                 <td class="center">
                   <a href="javascript:void(0);" title="${ _('Show privileges') }">

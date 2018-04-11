@@ -49,41 +49,22 @@ var MetastoreDatabase = (function () {
 
     self.showAddTagName = ko.observable(false);
     self.addTagName = ko.observable('');
-    self.tableQuery = ko.observable('').extend({rateLimit: 150});
-
-    self.filteredTables = ko.computed(function () {
-      var returned = self.tables();
-      if (self.tableQuery() !== '') {
-        returned = self.tables().filter(function (table) {
-          return table.catalogEntry.name.toLowerCase().indexOf(self.tableQuery()) > -1
-            || (table.comment() && table.comment().toLowerCase().indexOf(self.tableQuery()) > -1);
-        });
-      }
-      return returned.sort(function (a, b) {
-        if (options.optimizerEnabled()) {
-          if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
-            if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-              if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
-                return a.catalogEntry.name.toLowerCase().localeCompare(b.catalogEntry.name.toLowerCase());
-              }
-              return  b.optimizerStats().popularity - a.optimizerStats().popularity;
-            }
-            return -1
-          }
-          if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-            return 1;
-          }
-        }
-
-        return a.catalogEntry.name.toLowerCase().localeCompare(b.catalogEntry.name.toLowerCase());
-      });
-    });
 
     self.selectedTables = ko.observableArray();
 
     self.editingTable = ko.observable(false);
     self.table = ko.observable(null);
   }
+
+  MetastoreDatabase.prototype.onTableClick = function (catalogEntry) {
+    var self = this;
+    self.tables().some(function (table) {
+      if (table.catalogEntry === catalogEntry) {
+        self.setTable(table, function() { huePubSub.publish('metastore.url.change'); });
+        return true;
+      }
+    })
+  };
 
   MetastoreDatabase.prototype.reload = function () {
     var self = this;
@@ -372,25 +353,12 @@ var MetastoreTable = (function () {
     self.loadingDetails = ko.observable(false);
     self.loadingColumns = ko.observable(false);
 
-    self.columnQuery = ko.observable('').extend({ rateLimit: 150 });
     self.columns = ko.observableArray();
-    self.filteredColumns = ko.computed(function () {
-      var returned = self.columns();
-      if (self.columnQuery() !== '') {
-        returned = self.columns().filter(function (column) {
-          var entry = column.catalogEntry;
-          return entry.name.toLowerCase().indexOf(self.columnQuery().toLowerCase()) !== -1
-            || (entry.getType().toLowerCase().indexOf(self.columnQuery().toLowerCase()) !== -1)
-            || (column.comment() && column.comment().toLowerCase().indexOf(self.columnQuery().toLowerCase()) !== -1);
-        });
-      }
-      return returned;
-    });
 
-    self.favouriteColumns = ko.observableArray();
     self.samples = new MetastoreTableSamples({
       metastoreTable: self
     });
+
     self.partitions = new MetastoreTablePartitions({
       metastoreTable: self
     });
@@ -453,7 +421,6 @@ var MetastoreTable = (function () {
             table: self
           })
         }));
-        self.favouriteColumns(self.columns().slice(0, 5));
 
         self.catalogEntry.getNavOptMeta().done(function (navOptMeta) {
           self.optimizerDetails(navOptMeta);
@@ -463,30 +430,16 @@ var MetastoreTable = (function () {
             topColIndex[topCol.name] = topCol;
           });
 
-          var favorites = [];
-          var nonFavorites = [];
-          var keys = [];
           self.columns().forEach(function (column) {
-            if (column.catalogEntry.isPrimaryKey() || column.catalogEntry.isPartitionKey()) {
-              keys.push(column);
-            } else if (topColIndex[column.catalogEntry.name]) {
-              favorites.push(column);
+            if (topColIndex[column.catalogEntry.name]) {
               column.popularity(topColIndex[column.catalogEntry.name].score);
-            } else {
-              nonFavorites.push(column);
             }
           });
-          favorites.sort(function (colA, colB) {
-            return colB.popularity() - colA.popularity();
-          });
-
-          self.favouriteColumns(keys.concat(favorites).concat(nonFavorites).slice(0, 5));
         }).always(function () {
           self.loadingQueries(false);
         });
       }).fail(function () {
         self.columns([]);
-        self.favouriteColumns([]);
       }).always(function () {
         self.loadingColumns(false);
       });

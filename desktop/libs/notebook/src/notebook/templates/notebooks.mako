@@ -104,7 +104,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
   <table id="notebookTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Owner') }</th>
@@ -114,7 +114,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
     <tbody data-bind="foreach: { data: jobs }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div class="hueCheckbox fa" data-bind="multiCheck: '#notebookTable', css: {'fa-check': isSelected }" data-row-selector-exclude="true"></div>
+          <div class="hue-checkbox fa" data-bind="multiCheck: '#notebookTable', css: {'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <a data-bind="attr: { 'href': absoluteUrl }" data-row-selector="true"></a>
         </td>
         <td data-bind="text: name"></td>

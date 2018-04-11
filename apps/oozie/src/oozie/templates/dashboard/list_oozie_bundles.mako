@@ -66,7 +66,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th width="1%"><div class="select-all hue-checkbox fa"></div></th>
           <th width="14%">${ _('Kickoff Time') }</th>
           <th width="10%">${ _('Status') }</th>
           <th width="20%">${ _('Name') }</th>
@@ -449,7 +449,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(bundle.status) > -1) {
                 try {
                   runningTable.fnAddData([
-                    bundle.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>' : '',
+                    bundle.canEdit ? '<div class="hue-checkbox fa" data-row-selector-exclude="true"></div>' : '',
                     '<span data-sort-value="'+ bundle.kickoffTimeInMillis +'" data-type="date">' + emptyStringIfNull(bundle.kickoffTime) + '</span>',
                     '<span class="' + bundle.statusClass + '" data-type="status">' + bundle.status + '</span>',
                     bundle.appName,

@@ -110,7 +110,7 @@
           <thead>
             <tr>
               <th style="width: 1%">
-                <span data-bind="click: toggleSelectAll, css: {'fa-check': ! ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
+                <span data-bind="click: toggleSelectAll, css: {'fa-check': ! ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hue-checkbox fa"></span>
               </th>
               <th>${ _('Name') }</th>
               <th>${ _('Description') }</th>
@@ -120,7 +120,7 @@
           <tbody data-bind="foreach: filteredCollections">
             <tr>
               <td data-bind="click: $root.toggleCollectionSelect.bind($root), clickBubble: false">
-                <span data-bind="css: {'fa-check': $root.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
+                <span data-bind="css: {'fa-check': $root.filteredCollections()[$index()].selected()}" class="hue-checkbox fa"></span>
               </td>
               <td><a data-bind="text: name, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
               <td><span data-bind="text: description"></span></td>
@@ -136,7 +136,7 @@
 <script id="importableTemplate" type="text/html">
   <tr>
     <td width="24">
-      <div data-bind="click: handleSelect, css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+      <div data-bind="click: handleSelect, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': selected}"></div>
     </td>
     <td data-bind="text: name"></td>
   </tr>

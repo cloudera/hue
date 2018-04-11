@@ -64,7 +64,7 @@ ${layout.menubar(section='groups')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div class="select-all hueCheckbox fa"></div>
+              <div class="select-all hue-checkbox fa"></div>
             </th>
         %endif
         <th>${_('Group Name')}</th>
@@ -78,7 +78,7 @@ ${layout.menubar(section='groups')}
               data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
           %if user.is_superuser:
             <td data-row-selector-exclude="true">
-              <div class="hueCheckbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
+              <div class="hue-checkbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
             </td>
           %endif
           <td>
@@ -225,7 +225,7 @@ ${layout.menubar(section='groups')}
     $groupsComponents.find(".delete-group-btn").click(function () {
       viewModel.chosenGroups.removeAll();
 
-      $groupsComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
+      $groupsComponents.find(".hue-checkbox[checked='checked']").each(function (index) {
         viewModel.chosenGroups.push($(this).data("name").toString()); // needed for numeric group names
       });
 

@@ -65,7 +65,7 @@ ${layout.menubar(section='saved queries')}
     <table class="table table-condensed datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="savedCheck"></div></th>
+        <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="savedCheck"></div></th>
         <th>${_('Name')}</th>
         <th>${_('Description')}</th>
         <th>${_('Owner')}</th>
@@ -79,7 +79,7 @@ ${layout.menubar(section='saved queries')}
         %>
       <tr>
         <td data-row-selector-exclude="true">
-          <div class="hueCheckbox savedCheck fa"
+          <div class="hue-checkbox savedCheck fa"
             % if may_edit:
               data-delete-id="${ design.id }"
             % endif
@@ -183,7 +183,7 @@ ${layout.menubar(section='saved queries')}
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
 
-      var selector = $(".hueCheckbox[checked='checked']");
+      var selector = $(".hue-checkbox[checked='checked']");
 
       if (selector.length >= 1) {
         $(".toolbarBtn").removeAttr("disabled");
@@ -192,7 +192,7 @@ ${layout.menubar(section='saved queries')}
 
     function restoreQuery() {
       viewModel.chosenSavedQueries.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenSavedQueries.push($(this).data("delete-id"));
       });
 

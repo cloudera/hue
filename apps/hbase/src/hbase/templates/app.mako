@@ -47,7 +47,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   <table data-datasource="${datasource}" class="table table-condensed datatables tablescroller-disable" style="padding-left: 0;padding-right: 0">
       <thead>
         <tr>
-          <th width="1%"><div data-bind="click: ${datasource}.toggleSelectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': ${datasource}.allVisibleSelected() }"></div></th>
+          <th width="1%"><div data-bind="click: ${datasource}.toggleSelectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': ${datasource}.allVisibleSelected() }"></div></th>
           <!-- ko foreach: ${datasource}.columns() -->
             <th data-bind="text:$data"></th> <!-- need to i18n first -->
           <!-- /ko -->
@@ -179,7 +179,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
     <script id="itemTemplate" type="text/html">
       <tr>
-        <td><div data-bind="click: $data.select, css: {hueCheckbox: true,'fa': true, 'fa-check':$data.isSelected}" data-row-selector-exclude="true"></div></td>
+        <td><div data-bind="click: $data.select, css: { 'hue-checkbox': true,'fa': true, 'fa-check':$data.isSelected}" data-row-selector-exclude="true"></div></td>
         <td width="90%"><a data-bind="text:$data.name,attr: {href: '#'+hbaseApp.cluster()+'/'+$data.name}" data-row-selector="true"></a></td>
         <td width="5%"><i data-bind="click: $data.toggle, css: {'fa': true, 'fa-check-square':$data.enabled, 'fa-square-o':$data.enabled != true}" data-row-selector-exclude="true"></i></td>
       </tr>

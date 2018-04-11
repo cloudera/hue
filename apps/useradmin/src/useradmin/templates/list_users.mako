@@ -68,7 +68,7 @@ ${layout.menubar(section='users')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div class="select-all hueCheckbox fa"></div>
+              <div class="select-all hue-checkbox fa"></div>
             </th>
         %endif
         <th>${_('Username')}</th>
@@ -85,7 +85,7 @@ ${layout.menubar(section='users')}
               data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
           %if user.is_superuser:
               <td data-row-selector-exclude="true">
-                <div class="hueCheckbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
+                <div class="hue-checkbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
               </td>
           %endif
           <td>
@@ -282,7 +282,7 @@ ${layout.menubar(section='users')}
     $usersComponents.find(".delete-user-btn").click(function () {
       viewModel.chosenUsers.removeAll();
 
-      $usersComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
+      $usersComponents.find(".hue-checkbox[checked='checked']").each(function (index) {
         viewModel.chosenUsers.push($(this).data("id"));
       });
 
