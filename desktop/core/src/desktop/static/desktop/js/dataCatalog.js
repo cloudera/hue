@@ -1115,7 +1115,17 @@ var DataCatalog = (function () {
       return applyCancellable(new CancellablePromise(deferred, undefined, cancellablePromises), options);
     };
 
-    DataCatalogEntry.prototype.updateNavigatorCustomMetadata = function (customMetadata, deletedCustomMetadataKeys, apiOptions) {
+    /**
+     * Updates custom navigator metadata for the catalog entry
+     *
+     * @param {Object} [modifiedCustomMetadata] - The custom metadata to update, only supply what has been changed
+     * @param {string[]} [deletedCustomMetadataKeys] - The custom metadata to delete identifier by the keys
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     *
+     * @return {Promise}
+     */
+    DataCatalogEntry.prototype.updateNavigatorCustomMetadata = function (modifiedCustomMetadata, deletedCustomMetadataKeys, apiOptions) {
       var self = this;
       var deferred = $.Deferred();
 
@@ -1130,7 +1140,7 @@ var DataCatalog = (function () {
           if (navigatorMeta) {
             ApiHelper.getInstance().updateNavigatorProperties({
               identity: navigatorMeta.identity,
-              customMetadata: customMetadata,
+              modifiedCustomMetadata: modifiedCustomMetadata,
               deletedCustomMetadataKeys: deletedCustomMetadataKeys
             }).done(function (entity) {
               if (entity) {

@@ -473,14 +473,14 @@ class NavigatorApi(object):
     return self.update_entity(entity, tags=new_tags)
 
 
-  def update_properties(self, entity_id, properties, custom_properties=None, deleted_custom_properties=None):
+  def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
     entity = self.get_entity(entity_id)
-    if custom_properties:
+    if modified_custom_metadata:
       properties['properties'] = entity['properties'] or {}
-      properties['properties'].update(custom_properties)
-    if deleted_custom_properties:
+      properties['properties'].update(modified_custom_metadata)
+    if deleted_custom_metadata_keys:
       properties['properties'] = entity['properties'] or {}
-      for key in deleted_custom_properties:
+      for key in deleted_custom_metadata_keys:
         if key in properties['properties']:
           del properties['properties'][key]
     return self.update_entity(entity, **properties)

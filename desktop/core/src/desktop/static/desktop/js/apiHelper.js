@@ -400,6 +400,8 @@ var ApiHelper = (function () {
    * @param {function} [options.successCallback]
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   *
+   * @return {Promise}
    */
   ApiHelper.prototype.simplePost = function (url, data, options) {
     var self = this;
@@ -1667,6 +1669,18 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
+  /**
+   * Updates Navigator properties and custom metadata for the given entity
+   *
+   * @param {Object} options
+   * @param {string} options.identity - The identifier for the Navigator entity to update
+   * @param {Object} [options.properties]
+   * @param {Object} [options.modifiedCustomMetadata]
+   * @param {string[]} [options.deletedCustomMetadataKeys]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {Promise}
+   */
   ApiHelper.prototype.updateNavigatorProperties = function (options) {
     var self = this;
     var data = { id: ko.mapping.toJSON(options.identity) };
@@ -1674,8 +1688,8 @@ var ApiHelper = (function () {
     if (options.properties) {
       data.properties = ko.mapping.toJSON(options.properties);
     }
-    if (options.customMetadata) {
-      data.customMetadata = ko.mapping.toJSON(options.customMetadata);
+    if (options.modifiedCustomMetadata) {
+      data.modifiedCustomMetadata = ko.mapping.toJSON(options.modifiedCustomMetadata);
     }
     if (options.deletedCustomMetadataKeys) {
       data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);

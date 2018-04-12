@@ -455,7 +455,7 @@ def update_properties(request):
   api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', '""'))
   properties = json.loads(request.POST.get('properties', '{}')) # Entity properties
-  custom_metadata = json.loads(request.POST.get('customMetadata', '{}')) # Aka "Custom Metadata"
+  modified_custom_metadata = json.loads(request.POST.get('modifiedCustomMetadata', '{}')) # Aka "Custom Metadata"
   deleted_custom_metadata_keys = json.loads(request.POST.get('deletedCustomMetadataKeys', '[]'))
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
@@ -463,7 +463,7 @@ def update_properties(request):
   request.audit = {
     'allowed': is_allowed,
     'operation': 'NAVIGATOR_UPDATE_PROPERTIES',
-    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
+    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (modified_custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
   }
 
   if not entity_id:
@@ -475,7 +475,7 @@ def update_properties(request):
     # TODO: HueAuthException?
     raise Exception("The user does not have proper Hue permissions to update Navigator properties.")
 
-  return JsonResponse(api.update_properties(entity_id, properties, custom_metadata, deleted_custom_metadata_keys))
+  return JsonResponse(api.update_properties(entity_id, properties, modified_custom_metadata, deleted_custom_metadata_keys))
 
 
 @require_POST

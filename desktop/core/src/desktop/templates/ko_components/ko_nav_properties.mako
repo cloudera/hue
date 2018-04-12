@@ -182,19 +182,29 @@ from django.utils.translation import ugettext as _
         $(document).off('click.navProperties');
         self.editMode(false);
         if (ko.mapping.toJSON(self.editProperties()) !== ko.mapping.toJSON(self.properties())) {
-          var customMetadata = {};
-          self.editProperties().forEach(function (property) {
-            customMetadata[property.key()] = property.value();
-          });
-          var deletedCustomMetadataKeys = [];
-          self.properties().forEach(function (property) {
-            if (!customMetadata[property.key()]) {
-              deletedCustomMetadataKeys.push(property.key());
-            }
-          });
-
           self.loading(true);
-          self.catalogEntry.updateNavigatorCustomMetadata(customMetadata, deletedCustomMetadataKeys).always(function () {
+          self.catalogEntry.getNavigatorMeta().done(function (navigatorMeta) {
+            var keysAfterEdit = {};
+            var modifiedCustomMetadata = {};
+
+            self.editProperties().forEach(function (property) {
+              if (navigatorMeta.properties[property.key()] !== property.value()) {
+                modifiedCustomMetadata[property.key()] = property.value();
+              }
+              keysAfterEdit[property.key()] = true;
+            });
+
+            var deletedCustomMetadataKeys = [];
+            self.properties().forEach(function (property) {
+              if (!keysAfterEdit[property.key()]) {
+                deletedCustomMetadataKeys.push(property.key());
+              }
+            });
+
+            self.catalogEntry.updateNavigatorCustomMetadata(modifiedCustomMetadata, deletedCustomMetadataKeys).always(function () {
+              self.loadProperties();
+            });
+          }).fail(function () {
             self.loadProperties();
           });
         }
