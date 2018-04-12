@@ -182,12 +182,19 @@ from django.utils.translation import ugettext as _
         $(document).off('click.navProperties');
         self.editMode(false);
         if (ko.mapping.toJSON(self.editProperties()) !== ko.mapping.toJSON(self.properties())) {
-          var newProperties = {};
-          self.editProperties().forEach(function(property) {
-            newProperties[property.key()] = property.value();
+          var customMetadata = {};
+          self.editProperties().forEach(function (property) {
+            customMetadata[property.key()] = property.value();
           });
+          var deletedCustomMetadataKeys = [];
+          self.properties().forEach(function (property) {
+            if (!customMetadata[property.key()]) {
+              deletedCustomMetadataKeys.push(property.key());
+            }
+          });
+
           self.loading(true);
-          self.catalogEntry.setNavigatorCustomProperties(newProperties).always(function () {
+          self.catalogEntry.updateNavigatorCustomMetadata(customMetadata, deletedCustomMetadataKeys).always(function () {
             self.loadProperties();
           });
         }

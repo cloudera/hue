@@ -1115,7 +1115,7 @@ var DataCatalog = (function () {
       return applyCancellable(new CancellablePromise(deferred, undefined, cancellablePromises), options);
     };
 
-    DataCatalogEntry.prototype.setNavigatorCustomProperties = function (customProperties, apiOptions) {
+    DataCatalogEntry.prototype.updateNavigatorCustomMetadata = function (customMetadata, deletedCustomMetadataKeys, apiOptions) {
       var self = this;
       var deferred = $.Deferred();
 
@@ -1128,12 +1128,13 @@ var DataCatalog = (function () {
         }
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
-            ApiHelper.getInstance().updateNavigatorCustomProperties({
+            ApiHelper.getInstance().updateNavigatorProperties({
               identity: navigatorMeta.identity,
-              customProperties: customProperties
-            }).done(function (updateResponse) {
-              if (updateResponse.entity) {
-                self.navigatorMeta = updateResponse.entity;
+              customMetadata: customMetadata,
+              deletedCustomMetadataKeys: deletedCustomMetadataKeys
+            }).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                 self.saveLater();
                 deferred.resolve(self.navigatorMeta);
@@ -1178,9 +1179,9 @@ var DataCatalog = (function () {
               properties: {
                 description: comment
               }
-            }).done(function (updateResponse) {
-              if (updateResponse.entity) {
-                self.navigatorMeta = updateResponse.entity;
+            }).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                 self.saveLater();
               }

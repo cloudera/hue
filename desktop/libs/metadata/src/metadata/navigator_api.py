@@ -72,6 +72,7 @@ def error_handler(view_fn):
         response['message'] = force_unicode(e.message)
     except Exception, e:
       message = force_unicode(e)
+      response['message'] = message
       LOG.exception(message)
 
     return JsonResponse(response, status=status)
@@ -451,28 +452,30 @@ def delete_tags(request):
 @require_POST
 @error_handler
 def update_properties(request):
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', '""'))
   properties = json.loads(request.POST.get('properties', '{}')) # Entity properties
-  metadata = json.loads(request.POST.get('metadata', '{}')) # Aka "Custom Metadata"
+  custom_metadata = json.loads(request.POST.get('customMetadata', '{}')) # Aka "Custom Metadata"
+  deleted_custom_metadata_keys = json.loads(request.POST.get('deletedCustomMetadataKeys', '[]'))
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
   request.audit = {
     'allowed': is_allowed,
     'operation': 'NAVIGATOR_UPDATE_PROPERTIES',
-    'operationText': 'Updating metadata %s properties %s of entity %s' % (metadata, properties, entity_id)
+    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
   }
 
-  if not entity_id or (not properties and not metadata) or not is_allowed:
-    response['error'] = _("update_properties requires an 'id' parameter and 'properties' or 'metadata' parameters that are non-empty dicts")
-  else:
-    response['entity'] = api.update_properties(entity_id, properties, metadata)
-    response['status'] = 0
+  if not entity_id:
+    # TODO: raise HueApiException(message="Missing required parameter 'id' for update_properties", source="Hue")
+    # source so the user knows which service that failed right away, in UI: "[source] responded with error: [message]"
+    raise Exception("Missing required parameter 'id' for the Hue update_properties API.")
 
-  return JsonResponse(response)
+  if not is_allowed:
+    # TODO: HueAuthException?
+    raise Exception("The user does not have proper Hue permissions to update Navigator properties.")
+
+  return JsonResponse(api.update_properties(entity_id, properties, custom_metadata, deleted_custom_metadata_keys))
 
 
 @require_POST

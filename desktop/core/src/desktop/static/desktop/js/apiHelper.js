@@ -1669,18 +1669,18 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.updateNavigatorProperties = function (options) {
     var self = this;
-    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, {
-      id: ko.mapping.toJSON(options.identity),
-      properties: ko.mapping.toJSON(options.properties)
-    }, options)
-  };
+    var data = { id: ko.mapping.toJSON(options.identity) };
 
-  ApiHelper.prototype.updateNavigatorCustomProperties = function (options) {
-    var self = this;
-    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, {
-      id: ko.mapping.toJSON(options.identity),
-      metadata: ko.mapping.toJSON(options.customProperties)
-    }, options)
+    if (options.properties) {
+      data.properties = ko.mapping.toJSON(options.properties);
+    }
+    if (options.customMetadata) {
+      data.customMetadata = ko.mapping.toJSON(options.customMetadata);
+    }
+    if (options.deletedCustomMetadataKeys) {
+      data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
+    }
+    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options)
   };
 
   /**
