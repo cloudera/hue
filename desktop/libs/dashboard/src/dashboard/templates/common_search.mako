@@ -1362,14 +1362,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div>
         <div style="margin-top: 3px">
           <a class="grid-side-btn active" href="javascript: void(0)"
-             data-bind="click: function(){ template.showChart(false); template.showGrid(true); }, css: {'active': template.showGrid() }" title="${_('Grid')}">
+             data-bind="click: function(collection, event){ template.showChart(false); template.showGrid(true); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-table' } ); }, css: {'active': template.showGrid() }" title="${_('Grid')}">
             <i class="fa fa-th fa-fw"></i>
           </a>
         </div>
 
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
-             data-bind="css: {'active': template.showChart() }, click: function(){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
+             data-bind="css: {'active': template.showChart() }, click: function(collection, event){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate'); }">
             % if HAS_REPORT_ENABLED.get():
             <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
             <i class="fa fa-sort-amount-asc fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT"></i>
@@ -1388,47 +1388,47 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <ul class="dropdown-menu">
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.COUNTER); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.COUNTER); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TEXTSELECT); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TEXTSELECT); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
               </a>
             </li>
             ##<!-- ko if: widgetType() != 'resultset-widget' -->
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TIMELINECHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TIMELINECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
               </a>
             </li>
@@ -1536,7 +1536,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         ${ _('Your search did not match any documents.') }
       </div>
 
-      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showGrid()">
+      <div class="grid-results-table" data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showGrid()">
         <!-- ko if: $parent.response().response -->
           <div data-bind="template: {name: 'resultset-pagination', data: $parent.response()}" style="padding:8px; color:#666"></div>
         <!-- /ko -->
@@ -1576,7 +1576,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </div>
       </div>
 
-      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
+      <div class="grid-results-chart" data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
         <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
         <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
 
@@ -4170,25 +4170,6 @@ $(document).ready(function () {
 
   function equalizeWidgetsHeights() {
     if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
-      searchViewModel.gridItems().forEach(function (existingWidget) {
-        var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
-        if (scrollDifference > 0) { // avoid scrollbars inside the widgets
-          existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
-          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function () {
-            huePubSub.publish('gridster.clean.whitespace');
-          });
-        }
-        else { // or remove additional whitespace
-          var contentHeight = $(existingWidget.gridsterElement).find('.card-widget').height();
-          if (existingWidget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
-            existingWidget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
-            $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function () {
-              huePubSub.publish('gridster.clean.whitespace');
-            });
-          }
-        }
-      });
-
       // widgets on the same row should have the same height
       var touched = [];
       searchViewModel.gridItems().forEach(function (existingWidget) {
@@ -4292,6 +4273,50 @@ $(document).ready(function () {
     showAddFacetDemiModal(options.widget, options.target);
     tempDraggable = null;
   }, 'dashboard');
+
+  huePubSub.subscribe('gridster.clean.grid.whitespace', function (options) {
+    var $gridsterWidget = $(options.event.target).parents('li.gs-w');
+    var contentHeight = $gridsterWidget.find('.card-widget').height();
+
+    var heightCheckInterval = -1;
+    var elapsedTime = 0;
+
+    hueUtils.waitForRendered(options.lookFor, function (el) {
+      return el.is(':visible')
+    }, function () {
+      // monitor height for two seconds, as we don't have reliable animation/rendered events from the current chart library
+      heightCheckInterval = window.setInterval(function () {
+        if (contentHeight !== $gridsterWidget.find('.card-widget').height()) {
+          searchViewModel.gridItems().forEach(function (widget) {
+            if (widget.widgetId() === parseInt($gridsterWidget.data('widgetid'))) {
+              var scrollDifference = widget.gridsterElement.scrollHeight - widget.gridsterElement.clientHeight;
+              if (scrollDifference > 0) { // avoid scrollbars inside the widget
+                widget.size_y(widget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
+                $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
+                  huePubSub.publish('gridster.clean.whitespace');
+                });
+              }
+
+              contentHeight = $(widget.gridsterElement).find('.card-widget').height();
+              if (widget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
+                widget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
+                $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
+                  huePubSub.publish('gridster.clean.whitespace');
+                  equalizeWidgetsHeights();
+                });
+              }
+            }
+          });
+          window.clearInterval(heightCheckInterval);
+        }
+        if (elapsedTime > 2000) {
+          window.clearInterval(heightCheckInterval);
+        }
+        elapsedTime += 50;
+      }, 50);
+
+    });
+  });
 
   huePubSub.subscribe('gridster.clean.whitespace', function () {
     if (searchViewModel.isGridster()) {
