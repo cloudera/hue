@@ -83,6 +83,7 @@ def _negotiate_value(response):
 class HTTPKerberosAuth(AuthBase):
     """Attaches HTTP GSSAPI/Kerberos Authentication to the given Request
     object."""
+
     def __init__(self, mutual_authentication=REQUIRED, service="HTTP"):
         self.context = {}
         self.mutual_authentication = mutual_authentication
@@ -103,6 +104,7 @@ class HTTPKerberosAuth(AuthBase):
                                          urlparse(response.url).port,
                                          threading.current_thread().ident)
 
+        log.debug("generate_request_header(): host_port_thread: {0}".format(host_port_thread))
         try:
             result, self.context[host_port_thread] = kerberos.authGSSClientInit(
                 "{0}@{1}".format(self.service, host))
@@ -131,7 +133,7 @@ class HTTPKerberosAuth(AuthBase):
             gss_response = kerberos.authGSSClientResponse(self.context[host_port_thread])
         except kerberos.GSSError:
             log.exception("generate_request_header(): authGSSClientResponse() "
-                      "failed:")
+                          "failed:")
             return None
 
         return "Negotiate {0}".format(gss_response)
@@ -232,11 +234,24 @@ class HTTPKerberosAuth(AuthBase):
                                          urlparse(response.url).port,
                                          threading.current_thread().ident)
 
+        log.debug("authenticate_server(): host_port_thread: {0}".format(host_port_thread))
         try:
             result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                 _negotiate_value(response))
-        except kerberos.GSSError:
-            log.exception("authenticate_server(): authGSSClientStep() failed:")
+        except kerberos.GSSError as e:
+            # Since Isilon's webhdfs host and port will be the same for
+            # both 'NameNode' and 'DataNode' connections, Mutual Authentication will fail here
+            # due to the fact that a 307 redirect is made to the same host and port.
+            # host_port_thread will be the same when calling authGssClientStep().
+            # If we get a "Context is already fully established" response, that is OK if
+            # the response.url contains "datanode=true".  "datanode=true" is Isilon-specific
+            # in that it is not part of CDH.  It is an indicator to the Isilon server
+            # that the operation is a DataNode operation.
+
+            if 'datanode=true' in response.url and 'Context is already fully established' in e.args[1][0]:
+                log.debug("Caught Isilon mutual auth exception %s - %s" % (response.url, e.args[1][0]))
+                return True
+            log.exception("GSSError: authenticate_server(): authGSSClientStep() failed:")
             return False
 
         if result < 1:
