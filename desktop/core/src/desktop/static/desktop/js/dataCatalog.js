@@ -1237,16 +1237,16 @@ var DataCatalog = (function () {
       if (self.canHaveNavigatorMetadata()) {
         self.getNavigatorMeta().done(function (navMeta) {
           if (navMeta && typeof navMeta.identity !== 'undefined') {
-            ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (response) {
-              if (response && response.entity) {
-                self.navigatorMeta = response.entity;
+            ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                 self.saveLater();
               } else {
                 deferred.reject();
               }
               deferred.resolve(self.navigatorMeta);
-            });
+            }).fail(deferred.reject);
           } else {
             deferred.reject();
           }
@@ -1270,16 +1270,16 @@ var DataCatalog = (function () {
       if (self.canHaveNavigatorMetadata()) {
         self.getNavigatorMeta().done(function (navMeta) {
           if (navMeta && typeof navMeta.identity !== 'undefined') {
-            ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (response) {
-              if (response && response.entity) {
-                self.navigatorMeta = response.entity;
+            ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                 self.saveLater();
               } else {
                 deferred.reject();
               }
               deferred.resolve(self.navigatorMeta);
-            });
+            }).fail(deferred.reject);
           } else {
             deferred.reject();
           }

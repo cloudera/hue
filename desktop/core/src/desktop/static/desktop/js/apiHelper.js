@@ -1728,14 +1728,16 @@ var ApiHelper = (function () {
   };
 
   ApiHelper.prototype.addNavTags = function (entityId, tags) {
-    return $.post(NAV_URLS.ADD_TAGS, {
+    var self = this;
+    return self.simplePost(NAV_URLS.ADD_TAGS, {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });
   };
 
   ApiHelper.prototype.deleteNavTags = function (entityId, tags) {
-    return $.post(NAV_URLS.DELETE_TAGS, {
+    var self = this;
+    return self.simplePost(NAV_URLS.DELETE_TAGS, {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });

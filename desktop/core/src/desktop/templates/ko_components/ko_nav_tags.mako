@@ -135,23 +135,16 @@ from django.utils.translation import ugettext as _
 
         var deleteTagsPromise = tagsToRemove.length > 0 ? ko.unwrap(self.catalogEntry).deleteNavigatorTags(tagsToRemove) : $.Deferred().resolve().promise();
 
-        addTagsPromise.fail(function (error) {
-          hueUtils.logError(error);
-          $(document).trigger('error', '${ _("Could not add tags, see the server log for details.") }');
-        });
-
-        deleteTagsPromise.fail(function (error) {
-          hueUtils.logError(error);
-          $(document).trigger('error', '${ _("Could not remove tags, see the server log for details.") }');
-        });
-
         $.when(addTagsPromise, deleteTagsPromise).done(function () {
           if (tagsToAdd.length || tagsToRemove.length) {
             DataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
             ko.unwrap(self.catalogEntry).save();
           }
-          self.loading(false);
           self.loadTags();
+        }).fail(function () {
+          self.hasErrors(true);
+        }).always(function () {
+          self.loading(false);
         });
       };
 

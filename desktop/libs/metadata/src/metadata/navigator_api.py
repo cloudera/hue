@@ -400,8 +400,6 @@ def get_entity(request):
 @require_POST
 @error_handler
 def add_tags(request):
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', '""'))
   tags = json.loads(request.POST.get('tags', "[]"))
@@ -414,20 +412,19 @@ def add_tags(request):
     'operationText': 'Adding tags %s to entity %s' % (tags, entity_id)
   }
 
-  if not entity_id or not tags or not isinstance(tags, list) or not is_allowed:
-    response['error'] = _("add_tags requires an 'id' parameter and 'tags' parameter that is a non-empty list of tags")
-  else:
-    response['entity'] = api.add_tags(entity_id, tags)
-    response['status'] = 0
+  if not is_allowed:
+    raise Exception("The user does not have proper Hue permissions to add Navigator tags.")
+  if not entity_id:
+    raise Exception("Missing required parameter 'id' for the Hue add_tags API.")
+  if not tags:
+    raise Exception("Missing required parameter 'tags' for the Hue add_tags API.")
 
-  return JsonResponse(response)
+  return JsonResponse(api.add_tags(entity_id, tags))
 
 
 @require_POST
 @error_handler
 def delete_tags(request):
-  response = {'status': -1}
-
   api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', '""'))
   tags = json.loads(request.POST.get('tags', '[]'))
@@ -440,13 +437,14 @@ def delete_tags(request):
     'operationText': 'Removing tags %s to entity %s' % (tags, entity_id)
   }
 
-  if not entity_id or not tags or not isinstance(tags, list) or not is_allowed:
-    response['error'] = _("add_tags requires an 'id' parameter and 'tags' parameter that is a non-empty list of tags")
-  else:
-    response['entity'] = api.delete_tags(entity_id, tags)
-    response['status'] = 0
+  if not is_allowed:
+    raise Exception("The user does not have proper Hue permissions to delete Navigator tags.")
+  if not entity_id:
+    raise Exception("Missing required parameter 'id' for the Hue delete_tags API.")
+  if not tags:
+    raise Exception("Missing required parameter 'tags' for the Hue delete_tags API.")
 
-  return JsonResponse(response)
+  return JsonResponse(api.delete_tags(entity_id, tags))
 
 
 @require_POST
