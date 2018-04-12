@@ -586,7 +586,7 @@ ${ components.menubar(is_embeddable) }
   </div>
 
   <div class="tile">
-    <h4 style="margin-bottom: 5px;">${ _('Columns') } (<span data-bind="text: columns().length"></span>) <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
+    <h4 style="margin-bottom: 5px;">${ _('Columns') } <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
     <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: catalogEntry, contextPopoverEnabled: true, editableDescriptions: /true/i.test('${ has_write_access }') } } --><!-- /ko -->
   </div>
 
