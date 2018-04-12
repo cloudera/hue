@@ -900,8 +900,8 @@ class HiveServerClient:
 
     with mc_pool.reserve(True) as cache:
       guid = base64.encodestring(res.operationHandle.operationId.guid)
-      cache.set(str(session.guid), str(self.user), 30 * 60) # set to expire after 30min, if the user keeps using the session, the expiration times keeps being pushed further
-      cache.set(guid, str(session.guid), 3600 * 24) # mapping from operationId.guid to session.guid expires in 24h
+      cache.set(str(session.guid), str(self.user), 3600 * 24)
+      cache.set(guid, str(session.guid), 3600 * 24) # mapping from operationId.guid to session.guid
       LOG.debug('Assigining session_guid %s to user %s' % (session.guid, self.user))
       LOG.debug('Mapping from operationId.guid %s to session_guid %s' % (guid, session.guid))
 
