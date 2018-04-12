@@ -997,6 +997,15 @@ How to create a new locale for an app::
 </pre>
 
 
+### Getting the model mapping of custom metadata
+
+<pre>
+     $.get("/metadata/api/navigator/models/properties/mappings/", function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
 ### Getting a namespace
 
 <pre>

@@ -598,3 +598,12 @@ def map_namespace_property(request):
   namespace = api.map_namespace_property(clazz=clazz, properties=properties)
 
   return JsonResponse(namespace)
+
+
+@error_handler
+def get_model_properties_mapping(request):
+  api = NavigatorApi(request.user)
+
+  namespace = api.get_model_properties_mapping()
+
+  return JsonResponse(namespace)

@@ -557,6 +557,15 @@ class NavigatorApi(object):
       raise NavigatorApiException(e.message)
 
 
+  def get_model_properties_mapping(self):
+    try:
+      return self._root.get('models/properties/mappings')
+    except RestException, e:
+      msg = 'Failed to get models properties mappings'
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
+
   def _fillup_properties(self):
     global _HAS_CATALOG_NAMESPACE
 
