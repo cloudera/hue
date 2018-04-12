@@ -229,12 +229,6 @@ ${ components.menubar(is_embeddable) }
   <h4>${ _('Properties') } <i data-bind="visible: $parent.loadingDetails()" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
   <div class="row-fluid">
     <div class="metastore-property">
-      <!-- ko if: details.properties.table_type == 'MANAGED_TABLE' -->
-        ${_('Managed')}
-      <!-- /ko -->
-      <!-- ko if: details.properties.table_type == 'EXTERNAL_TABLE' -->
-        ${_('External')}
-      <!-- /ko -->
       <!-- ko if: is_view -->
         ${ _('View') }
       <!-- /ko -->
@@ -247,6 +241,29 @@ ${ components.menubar(is_embeddable) }
         ${ _('Table') }
       <!-- /ko -->
     </div>
+    <!-- ko ifnot: is_view -->
+    <div class="metastore-property">
+      <!-- ko if: details.properties.table_type == 'MANAGED_TABLE' -->
+        ${_('Managed')}
+      <!-- /ko -->
+      <!-- ko if: details.properties.table_type == 'EXTERNAL_TABLE' -->
+        ${_('External')}
+      <!-- /ko -->
+      ${_('and stored in')}
+      <!-- ko if: details.properties.format === 'kudu' -->
+        <div>${_('Kudu')}</div>
+        <!-- /ko -->
+        <!-- ko if: details.properties.format !== 'kudu' -->
+        <div>
+          % if IS_EMBEDDED.get():
+            <span data-bind="attr: {'title': path_location}">${_('Location')}</span>
+          % else:
+            <a data-bind="hueLink: hdfs_link" title="${_('Open data location')}">${_('Location')}</a>
+          % endif
+        </div>
+      <!-- /ko -->
+    </div>
+    <!-- /ko -->
     <div class="metastore-property">
       ${ _('Created by') }
       <span data-bind="text: details.properties.owner"></span>
@@ -274,56 +291,37 @@ ${ components.menubar(is_embeddable) }
       <!-- /ko -->
     </h4>
     <div class="row-fluid">
-      <div class="metastore-property">
-        <div>${ _('Storage') }</div>
-        <!-- ko if: details.properties.format === 'kudu' -->
-        <div>${_('Kudu')}</div>
-        <!-- /ko -->
-        <!-- ko if: details.properties.format !== 'kudu' -->
-        <div>
-          % if IS_EMBEDDED.get():
-            <span data-bind="attr: {'title': path_location}">${_('Location')}</span>
-          % else:
-            <a data-bind="hueLink: hdfs_link" title="${_('Open data location')}">${_('Location')}</a>
-          % endif
-        </div>
-        <!-- /ko -->
-      </div>
       <!-- ko with: $parent.tableStats -->
+        <!-- ko if: typeof numFiles !== 'undefined' && typeof last_modified_by === 'undefined' -->
+          <span class="metastore-property">
+            <div>${ _('Files') }</div>
+            <div data-bind="text: numFiles"></div>
+          </span>
+        <!-- /ko -->
+        <!-- ko if: typeof numRows !== 'undefined' -->
+          <span class="metastore-property">
+            <div>${ _('Rows') }</div>
+            <div data-bind="text: numRows"></div>
+          </span>
+        <!-- /ko -->
+        <!-- ko if: typeof totalSize !== 'undefined' && typeof last_modified_by === 'undefined' -->
+          <span class="metastore-property">
+            <div>${ _('Total size') }</div>
+            <div data-bind="text: filesize(totalSize)"></div>
+          </span>
+        <!-- /ko -->
         <!-- ko if: typeof transient_lastDdlTime !== 'undefined' -->
           <div class="metastore-property">
-            <div>${ _('Last data update') }</div>
-            <div data-bind="text: localeFormat(transient_lastDdlTime * 1000)"></div>
+            ${ _('Data last updated on') }
+            <span data-bind="text: localeFormat(transient_lastDdlTime * 1000)"></span>
           </div>
         <!-- /ko -->
         <!-- ko if: typeof last_modified_time !== 'undefined' -->
           <div class="metastore-property">
-            <div>${ _('Last DDL modified time') }</div>
-            <div data-bind="text: localeFormat(last_modified_time*1000)"></div>
-          </div>
-        <!-- /ko -->
-        <!-- ko if: typeof last_modified_by !== 'undefined' -->
-          <div class="metastore-property">
-            <div>${ _('Last DDL modified by') }</div>
-            <div data-bind="text: last_modified_by"></div>
-          </div>
-        <!-- /ko -->
-        <!-- ko if: typeof numFiles !== 'undefined' && typeof last_modified_by === 'undefined' -->
-          <div class="metastore-property">
-            <div>${ _('Files') }</div>
-            <div data-bind="text: numFiles"></div>
-          </div>
-        <!-- /ko -->
-        <!-- ko if: typeof numRows !== 'undefined' -->
-          <div class="metastore-property">
-            <div>${ _('Rows') }</div>
-            <div data-bind="text: numRows"></div>
-          </div>
-        <!-- /ko -->
-        <!-- ko if: typeof totalSize !== 'undefined' && typeof last_modified_by === 'undefined' -->
-          <div class="metastore-property">
-            <div>${ _('Total size') }</div>
-            <div data-bind="text: filesize(totalSize)"></div>
+            ${ _('Schema last modified on') }
+            <span data-bind="text: localeFormat(last_modified_time*1000)"></span>
+            ${ _('by') }
+            <span data-bind="text: last_modified_by"></span>
           </div>
         <!-- /ko -->
       <!-- /ko -->
@@ -586,7 +584,7 @@ ${ components.menubar(is_embeddable) }
   </div>
 
   <div class="tile">
-    <h4 style="margin-bottom: 5px;">${ _('Columns') } <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
+    <h4 style="margin-bottom: 5px;">${ _('Schema') } <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
     <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: catalogEntry, contextPopoverEnabled: true, editableDescriptions: /true/i.test('${ has_write_access }') } } --><!-- /ko -->
   </div>
 </script>
