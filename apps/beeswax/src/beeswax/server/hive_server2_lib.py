@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import logging
 import itertools
 import json
@@ -45,6 +46,11 @@ from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException
 from beeswax.server import dbms
+
+import pylibmc
+
+mc = pylibmc.Client(["127.0.0.1"], binary=True, behaviors={"tcp_nodelay": True, "ketama": True})
+mc_pool = pylibmc.ClientPool(mc, 8)
 
 
 LOG = logging.getLogger(__name__)
@@ -687,57 +693,21 @@ class HiveServerClient:
     # Get 2 + n_sessions sessions and filter out the busy ones
     sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
     LOG.debug('%s sessions found' % len(sessions))
-    db = dbms.get(self.user, dbms.get_query_server_config())
 
     if sessions:
-      for session in sessions:
-        handle = session.get_handle()
-        try:
-          operation = db.get_operation_status(handle)
-          status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
-          if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index):
-            continue
+      available = []
+      with mc_pool.reserve(True) as cache:
+        for session in sessions:
+          if cache.get(session.guid): # if a guid is already used in the cache for this user
+            LOG.debug('Found busy session guid %s used by %s' % (session.guid, self.user))
           else:
-            return session
-        except (AttributeError):
-          # when session's handle doesn't have an RPC handle, just skip it
-          continue
-      # see which one is in used
-      # Include trashed documents to keep the query lazy
-      # and avoid retrieving all documents
-      docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
-      busy_sessions = set()
+            available.append(session)
 
-      # Only check last 40 documents for performance
-      for doc in docs[:40]:
-        try:
-          snippet_data = json.loads(doc.data)['snippets'][0]
-        except (KeyError, IndexError):
-          # data might not contain a 'snippets' field or it might be empty
-          LOG.warn('No snippets in Document2 object of type query-hive')
-          continue
-        session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
-        status = snippet_data.get('status')
-
-        if status in [str(QueryHistory.STATE.submitted), str(QueryHistory.STATE.running)]:
-          if session_guid is not None and session_guid not in busy_sessions:
-            busy_sessions.add(session_guid)
-
-      n_busy_sessions = 0
-      available_sessions = []
-      for session in sessions:
-        if session.guid not in busy_sessions:
-          available_sessions.append(session)
+        if available:
+          session = available[0]
         else:
-          n_busy_sessions += 1
-
-      if n_busy_sessions == n_sessions:
-        raise Exception('Too many open sessions. Stop a running query before starting a new one')
-
-      if available_sessions:
-        session = available_sessions[0]
-      else:
-        session = None # No available session found
+          LOG.debug('No available session to assign to user %s' % self.user)
+          session = None # No available session found
 
       return session
 
@@ -905,11 +875,35 @@ class HiveServerClient:
 
 
   def execute_async_statement(self, statement, confOverlay, with_multiple_session=False):
+    # check query concurrency before submitting an async statement
+    n_sessions = conf.MAX_NUMBER_OF_SESSIONS.get()
+    sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
+    LOG.debug('execute_async_statement: %s sessions found' % len(sessions))
+
+    num_busy = 0
+    if sessions:
+      with mc_pool.reserve(True) as cache:
+        for session in sessions:
+          if cache.get(session.guid): # if a guid is already used in the cache for this user
+            LOG.debug('Found busy session guid %s used by %s' % (session.guid, self.user))
+            num_busy += 1
+
+    if num_busy == n_sessions:
+      LOG.debug('execute_async_statement: There are %s busy sessions' % str(n_sessions))
+      raise Exception('There are ' + str(n_sessions) + ' running queries. Stop a running query before starting a new one')
+
     if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
     (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, with_multiple_session=with_multiple_session)
+
+    with mc_pool.reserve(True) as cache:
+      guid = base64.encodestring(res.operationHandle.operationId.guid)
+      cache.set(str(session.guid), str(self.user), 30 * 60) # set to expire after 30min, if the user keeps using the session, the expiration times keeps being pushed further
+      cache.set(guid, str(session.guid), 3600 * 24) # mapping from operationId.guid to session.guid expires in 24h
+      LOG.debug('Assigining session_guid %s to user %s' % (session.guid, self.user))
+      LOG.debug('Mapping from operationId.guid %s to session_guid %s' % (guid, session.guid))
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
                                  guid=res.operationHandle.operationId.guid,
@@ -927,7 +921,17 @@ class HiveServerClient:
 
   def cancel_operation(self, operation_handle):
     req = TCancelOperationReq(operationHandle=operation_handle)
-    return self.call(self._client.CancelOperation, req)
+    res = self.call(self._client.CancelOperation, req)
+
+    # session is not busy anymore when it's canceled
+    with mc_pool.reserve(True) as cache:
+      guid = base64.encodestring(operation_handle.operationId.guid)
+      session_guid = cache.get(guid)
+      cache.delete(session_guid)
+      cache.delete(guid)
+      LOG.debug('cancel_operation: Removed session_guid %s from busy session. Operation handle guid %s' % (session_guid, guid))
+
+    return res
 
 
   def close_operation(self, operation_handle):
@@ -1246,6 +1250,14 @@ class HiveServerClientCompatible(object):
         orientation = TFetchOrientation.FETCH_FIRST
       else:
         orientation = TFetchOrientation.FETCH_NEXT
+
+      # when get_log is called, the query must be finished
+      with mc_pool.reserve(True) as cache:
+        guid = base64.encodestring(operationHandle.operationId.guid)
+        session_guid = cache.get(guid)
+        cache.delete(session_guid)
+        cache.delete(guid)
+        LOG.debug('get_log: Removed session_guid %s from busy session. Operation handle guid %s' % (session_guid, guid))
 
       return self._client.fetch_log(operationHandle, orientation=orientation, max_rows=-1)
 
