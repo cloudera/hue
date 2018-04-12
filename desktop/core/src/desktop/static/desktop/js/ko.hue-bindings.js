@@ -3745,8 +3745,9 @@
 
 
   ko.bindingHandlers.delayedOverflow = {
-    init: function (element) {
+    init: function (element, valueAccessor) {
       var $element = $(element);
+
       $element.css("overflow", "hidden");
 
       var isTouch = false;
@@ -3758,7 +3759,7 @@
       $element.hover(function () {
         scrollTimeout = window.setTimeout(function () {
           $element.css("overflow", "auto");
-        }, 500);
+        }, valueAccessor && valueAccessor() === 'slow' ? 500 : 30);
       }, function () {
         if (!isTouch) {
           clearTimeout(scrollTimeout);
