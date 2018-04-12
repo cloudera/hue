@@ -589,21 +589,6 @@ ${ components.menubar(is_embeddable) }
     <h4 style="margin-bottom: 5px;">${ _('Columns') } <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
     <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: catalogEntry, contextPopoverEnabled: true, editableDescriptions: /true/i.test('${ has_write_access }') } } --><!-- /ko -->
   </div>
-
-  <div class="tile" data-bind="visible: tableDetails() && tableDetails().partition_keys.length" style="display: none;">
-    <!-- ko with: partitions -->
-    <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
-    <!-- ko if: loaded -->
-    <!-- ko with: preview -->
-    <!-- ko template: { if: values().length, name: 'metastore-partition-values-table', data: { values: values, withDrop: false } } --><!-- /ko -->
-    <a href="javascript: void(0);" title="${_('View more...')}" class="metastore-view-more" data-bind="visible: values().length >= 3, click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }"  style="display: none;">
-      ${_('View more...')}
-    </a>
-    <!-- /ko -->
-    <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
-    <!-- /ko -->
-    <!-- /ko -->
-  </div>
 </script>
 
 <script type="text/html" id="metastore-partitions-tab">
