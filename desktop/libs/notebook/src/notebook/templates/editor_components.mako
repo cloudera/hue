@@ -3828,7 +3828,7 @@ function togglePresentation(value) {};
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {
         var snippet = viewModel.selectedNotebook().snippets()[0];
-        if (snippet.type() === 'impala') {
+        if (!snippet || snippet.type() === 'impala') {
           return;
         }
         if (jobs.length > 0) {

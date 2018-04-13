@@ -555,7 +555,21 @@ var EditorViewModel = (function() {
         } else {
           self.statementsList([]);
         }
+        if (!notebook.isPresentationModeInitialized()) {
+          if (notebook.isPresentationModeDefault()) {
+            // When switching to presentation mode, the snippet in non presentation mode cannot get status notification.
+            // On initiailization, status is set to loading and does not get updated, because we moved to presentation mode.
+            self.status('ready');
+          }
+          // Changing to presentation mode requires statementsList to be initialized. statementsList is initialized asynchronously.
+          // When presentation mode is default, we cannot change before statementsList has been calculated.
+          // Cleaner implementation would be to make toggleEditorMode statementsList asynchronous
+          // However this is currently impossible due to delete _notebook.presentationSnippets()[key];
+          notebook.isPresentationModeInitialized(true);
+          notebook.isPresentationMode(notebook.isPresentationModeDefault());
+        }
       }
+
     }, vm.huePubSubId);
 
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
@@ -2211,6 +2225,7 @@ var EditorViewModel = (function() {
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
     self.isPresentationModeDefault = ko.observable(typeof notebook.isPresentationModeDefault != "undefined" && notebook.isPresentationModeDefault != null ? notebook.isPresentationModeDefault : false);
     self.isPresentationMode = ko.observable(false);
+    self.isPresentationModeInitialized = ko.observable(false);
     self.isPresentationMode.subscribe(function(newValue) {
       wasResultFullScreenMode = false;
       if (! newValue) {
@@ -2222,7 +2237,6 @@ var EditorViewModel = (function() {
         hueAnalytics.convert('editor', 'presentation');
       }
     });
-    self.isPresentationMode(self.isPresentationModeDefault());
     self.presentationSnippets = ko.observable({});
     self.isHidingCode = ko.observable(typeof notebook.isHidingCode != "undefined" && notebook.isHidingCode != null ? notebook.isHidingCode : false);
 
