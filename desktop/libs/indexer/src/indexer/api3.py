@@ -24,11 +24,12 @@ from django.utils.translation import ugettext as _
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
 from librdbms.server import dbms as rdbms
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
-from notebook.models import make_notebook, MockedDjangoRequest
+from notebook.models import make_notebook, MockedDjangoRequest, escape_rows
 
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
@@ -132,6 +133,12 @@ def guess_field_types(request):
         },
       "format": file_format['format']
     })
+
+    if 'sample' in format_:
+      format_['sample'] = escape_rows(format_['sample'], nulls_only=True)
+    for col in format_['columns']:
+      col['name'] = smart_unicode(col['name'], errors='replace')
+
   elif file_format['inputFormat'] == 'table':
     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
     db = dbms.get(request.user)
