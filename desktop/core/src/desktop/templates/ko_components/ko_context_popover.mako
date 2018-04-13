@@ -517,18 +517,21 @@ from metadata.conf import has_navigator
           sourceType: self.catalogEntry().getSourceType(),
           path: self.catalogEntry().path
         });
+        huePubSub.publish('global.search.close');
       };
 
       DataCatalogContext.prototype.openInDashboard = function() {
         var self = this;
         huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry().path.join('.') + '?engine=' + self.catalogEntry().getSourceType());
         huePubSub.publish('context.popover.hide');
+        huePubSub.publish('global.search.close');
       };
 
       DataCatalogContext.prototype.openInTableBrowser = function () {
         var self = this;
         huePubSub.publish('open.link', '/metastore/table' + (self.catalogEntry().isTableOrView() ? '/' : 's/') + self.catalogEntry().path.join('/'));
         huePubSub.publish('context.popover.hide');
+        huePubSub.publish('global.search.close');
       };
 
       function AsteriskData(data, sourceType, defaultDatabase) {

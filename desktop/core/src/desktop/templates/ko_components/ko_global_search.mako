@@ -165,6 +165,7 @@ from desktop.views import _ko
           }, 0);
         };
 
+        huePubSub.subscribe('global.search.close', deferredCloseIfVisible);
         huePubSub.subscribe('context.popover.open.in.metastore', deferredCloseIfVisible);
         huePubSub.subscribe('context.popover.show.in.assist', deferredCloseIfVisible);
         huePubSub.subscribe('sample.error.insert.click', deferredCloseIfVisible);
