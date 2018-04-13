@@ -5893,6 +5893,10 @@
           'position': 'relative',
           'width': '100%'
         }).addClass('foreach-wrapper').insertBefore($element);
+        if (options.usePreloadBackground) {
+          $wrapper.addClass('assist-preloader-wrapper');
+          $element.addClass('assist-preloader');
+        }
         $element.css({
           'position': 'absolute',
           'top': 0,
