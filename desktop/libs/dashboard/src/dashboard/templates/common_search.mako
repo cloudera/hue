@@ -141,7 +141,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster() && !$root.isQueryBuilder() -->
       <div class="btn-group">
-        <a class="btn pointer" title="${ _('Add widget') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+        <a class="btn pointer draggable-plus-button" title="${ _('Click or drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: draggableBar(), options: getDraggableOptions({ data: draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
           <i class="fa fa-plus"></i>
         </a>
       </div>
@@ -3245,6 +3245,16 @@ var getDraggableOptions = function (options) {
       };
       setup.handle = 'h2';
     }
+    if (options.plusButton) { // extra options for dragging from the plus button
+      setup.appendTo = '.gridster';
+      setup.helper = function () {
+        return '<div class="gridster-helper">${ _ko('Add a widget')}</div>'
+      };
+      setup.cursorAt = {
+        top: 5,
+        left: 5
+      };
+    }
     return setup
   }
   else {
@@ -4616,7 +4626,7 @@ $(document).ready(function () {
   });
 
   $('#searchComponents .dashboard').droppable({
-    accept: '.draggable-widget, .draggableText, .card-widget',
+    accept: '.draggable-widget, .draggableText, .card-widget, .draggable-plus-button',
     drop: function( event, ui ) {
       if (searchViewModel.isGridster() && !searchViewModel.isQueryBuilder()) {
         huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
