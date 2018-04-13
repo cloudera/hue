@@ -3097,6 +3097,19 @@ function getPrettyMetric(facet) {
   }
 }
 
+// if the date separator is a dot and there's no 4 digit year at either end we invalidate it because it's most likely a version
+function getParsedDate(date) {
+  var parsedDate = moment(date);
+
+  if (parsedDate.isValid()) {
+    var splits = date.split('.');
+    if (splits.length === 3 && (splits[0].length !== 4 && splits[2].length !== 4)) {
+      return moment.invalid(date);
+    }
+  }
+  return parsedDate;
+}
+
 function prettifyDate(from, widget, to) {
   if (typeof from == "undefined" || $.isNumeric(from)) {
     return from;
@@ -3104,7 +3117,7 @@ function prettifyDate(from, widget, to) {
   if (typeof to != "undefined" && !$.isNumeric(to)) {
     return prettifyDateRange(from, to, widget);
   }
-  var _mFrom = moment(from);
+  var _mFrom = getParsedDate(from);
   if (_mFrom.isValid()) {
     var _format = "YYYY-MM-DD HH:mm:ss";
     var _minMaxDiff = 0;
