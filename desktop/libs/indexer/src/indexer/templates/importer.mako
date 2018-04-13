@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER
   from notebook.conf import ENABLE_SQL_INDEXER
 %>
 
@@ -248,14 +248,14 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
-              <div class="control-group input-append">
+              <div class="control-group">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here e.g. mysql.domain.com or 123.123.123.123') }">
                 </label>
               </div>
 
               <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
-              <div class="control-group input-append">
+              <div class="control-group">
                 <label for="rdbmsJdbcDriver" class="control-label"><div>${ _('JDBC Driver') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcDriver">
                 </label>
@@ -265,7 +265,7 @@ ${ assist.assistPanel() }
               <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
               <div class="control-group">
                 <label for="rdbmsPort" class="control-label"><div>${ _('Port') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here e.g. 3306') }">
                 </label>
               </div>
               <!-- /ko -->
@@ -320,6 +320,22 @@ ${ assist.assistPanel() }
               <!-- /ko -->
             <!-- /ko -->
 
+          <!-- /ko -->
+
+          <!-- ko if: createWizard.source.inputFormat() == 'kafka' -->
+            ## Service
+
+            <div class="control-group">
+              <label for="rdbmsHostname" class="control-label"><div>${ _('Brokers') }</div>
+                <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaBrokers" placeholder="${ _('Enter a csv list of brokers, e.g.brokers1:9092,brokers2:9092') }">
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label for="rdbmsHostname" class="control-label"><div>${ _('Topic') }</div>
+                <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }">
+              </label>
+            </div>
           <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -415,13 +431,13 @@ ${ assist.assistPanel() }
           <div class="control-group">
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <!-- ko if: outputFormat() == 'file' -->
-              <input type="text" class="form-control name input-xlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
+              <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
             <!-- ko if: outputFormat() == 'index' -->
               <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
-              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+              <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
@@ -717,7 +733,34 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: ['table', 'index', 'file', 'hbase'].indexOf(outputFormat()) != -1 -->
+        <!-- ko if: $root.createWizard.source.inputFormat() == 'kafka' -->
+        <div class="card step">
+          <h4>${_('Properties')}</h4>
+
+          <div class="card-body">
+            <label class="control-label"><div>${ _('Libs') }</div>
+              <div class="inline-table">
+                <ul data-bind="sortable: { data: sqoopJobLibPaths, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: sqoopJobLibPaths().length" class="unstyled">
+                  <li>
+                    <div class="input-append" style="margin-bottom: 4px">
+                      <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+                      <span class="add-on move-widget muted" data-bind="visible: $parent.sqoopJobLibPaths().length > 1"><i class="fa fa-arrows"></i></span>
+                      <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeSqoopJobLibPath($data); }"><i class="fa fa-minus"></i></a>
+                    </div>
+                  </li>
+                </ul>
+                <div class="config-property-add-value" style="margin-top: 5px;">
+                  <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addSqoopJobLibPath">
+                    <i class="fa fa-plus"></i>
+                  </a>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: ['table', 'index', 'hbase'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
             <h4 class="show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h4>
             <div class="card-body no-margin-top columns-form">
@@ -1250,6 +1293,9 @@ ${ assist.assistPanel() }
           % if ENABLE_SQOOP.get():
           {'value': 'rdbms', 'name': 'External Database'},
           % endif
+          % if ENABLE_KAFKA.get():
+          {'value': 'kafka', 'name': 'Kafka Stream'},
+          % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           ##{'value': 'table', 'name': 'Table'},
@@ -1443,6 +1489,15 @@ ${ assist.assistPanel() }
       });
       self.draggedQuery = ko.observable();
 
+      // Kafka
+      self.kafkaBrokers = ko.observable('brokers1:9092,brokers2:9092');
+      self.kafkaTopics = ko.observable('');
+      self.kafkaTopics.subscribe(function(newValue) {
+        if (newValue) {
+          viewModel.createWizard.guessFieldTypes();
+        }
+      });
+
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
         if (typeof newVal.hasHeader !== 'undefined') {
@@ -1472,6 +1527,8 @@ ${ assist.assistPanel() }
           return self.query();
         } else if (self.inputFormat() == 'manual') {
           return true;
+        } else if (self.inputFormat() == 'kafka') {
+          return self.kafkaBrokers().length > 0 && self.kafkaTopics().length > 0;
         } else if (self.inputFormat() == 'rdbms') {
           return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.rdbmsAllTablesSelected());
         }
@@ -1570,8 +1627,10 @@ ${ assist.assistPanel() }
           {'name': 'Search index', 'value': 'index'},
           % endif
           {'name': 'Database', 'value': 'database'},
-          % if ENABLE_SQOOP.get():
+          % if ENABLE_SQOOP.get() or ENABLE_KAFKA.get():
           {'name': 'File', 'value': 'file'},
+          % endif
+          % if ENABLE_SQOOP.get():
           {'name': 'HBase Table', 'value': 'hbase'},
           % endif
       ]);
@@ -1580,7 +1639,7 @@ ${ assist.assistPanel() }
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
-          if (format.value == 'file' && ['manual', 'rdbms'].indexOf(wizard.source.inputFormat()) == -1) {
+          if (format.value == 'file' && ['manual', 'rdbms', 'kafka'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
           else if (format.value == 'index' && ['file', 'query', 'table'].indexOf(wizard.source.inputFormat()) == -1) {

@@ -36,6 +36,7 @@ from notebook.models import make_notebook, MockedDjangoRequest, escape_rows
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
+from indexer.indexers.envelope import EnvelopeIndexer
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
@@ -197,6 +198,9 @@ def guess_field_types(request):
             for col in table_metadata
         ]
     }
+  elif file_format['inputFormat'] == 'kafka':
+    # Mocked currently
+    format_ = {"sample": [["0", "US", "This tremendous 100% varietal wine hails from Oakville and was aged over three years in oak. Juicy red-cherry fruit and a compelling hint of caramel greet the palate, framed by elegant, fine tannins and a subtle minty tone in the background. Balanced and rewarding from start to finish, it has years ahead of it to develop further nuance. Enjoy 2022\u20132030.", "Martha's Vineyard", "96", "235.0", "California", "Napa Valley", "Napa", "Cabernet Sauvignon", "Heitz"], ["1", "Spain", "Ripe aromas of fig, blackberry and cassis are softened and sweetened by a slathering of oaky chocolate and vanilla. This is full, layered, intense and cushioned on the palate, with rich flavors of chocolaty black fruits and baking spices. A toasty, everlasting finish is heady but ideally balanced. Drink through 2023.", "Carodorum Selecci\u00f3n Especial Reserva", "96", "110.0", "Northern Spain", "Toro", "", "Tinta de Toro", "Bodega Carmen Rodr\u00edguez"], ["2", "US", "Mac Watson honors the memory of a wine once made by his mother in this tremendously delicious, balanced and complex botrytised white. Dark gold in color, it layers toasted hazelnut, pear compote and orange peel flavors, reveling in the succulence of its 122 g/L of residual sugar.", "Special Selected Late Harvest", "96", "90.0", "California", "Knights Valley", "Sonoma", "Sauvignon Blanc", "Macauley"], ["3", "US", "This spent 20 months in 30% new French oak, and incorporates fruit from Ponzi's Aurora, Abetina and Madrona vineyards, among others. Aromatic, dense and toasty, it deftly blends aromas and flavors of toast, cigar box, blackberry, black cherry, coffee and graphite. Tannins are polished to a fine sheen, and frame a finish loaded with dark chocolate and espresso. Drink now through 2032.", "Reserve", "96", "65.0", "Oregon", "Willamette Valley", "Willamette Valley", "Pinot Noir", "Ponzi"], ["4", "France", "This is the top wine from La B\u00e9gude, named after the highest point in the vineyard at 1200 feet. It has structure, density and considerable acidity that is still calming down. With 18 months in wood, the wine has developing an extra richness and concentration. Produced by the Tari family, formerly of Ch\u00e2teau Giscours in Margaux, it is a wine made for aging. Drink from 2020.", "La Br\u00fblade", "95", "66.0", "Provence", "Bandol", "", "Provence red blend", "Domaine de la B\u00e9gude"]], "columns": [{"operations": [], "comment": "", "nested": [], "name": "id", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "long", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "country", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "description", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "text_general", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "designation", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "points", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "long", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "price", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "double", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "province", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "region_1", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "region_2", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "variety", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "winery", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}]}
 
   return JsonResponse(format_)
 
@@ -231,6 +235,8 @@ def importer_submit(request):
   elif source['inputFormat'] == 'rdbms':
     if destination['outputFormat'] in ('file', 'table', 'hbase'):
       job_handle = run_sqoop(request, source, destination, start_time)
+  elif source['inputFormat'] == 'kafka':
+    job_handle = _envelope_job(request, source, destination['name'], start_time=start_time, lib_path=destination['indexerJobLibPath'])
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
@@ -401,3 +407,23 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
   morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field, lib_path=lib_path)
 
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
+
+
+def _envelope_job(request, file_format, collection_name, start_time=None, lib_path=None):
+  indexer = EnvelopeIndexer(request.user, request.fs)
+
+  lib_path = '/tmp/envelope-0.5.0.jar'
+
+  if file_format['inputFormat'] == 'table':
+    db = dbms.get(request.user)
+    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
+    input_path = table_metadata.path_location
+  elif file_format['inputFormat'] == 'file':
+    input_path = '${nameNode}%s' % file_format["path"]
+  else:
+    input_path = None
+
+  morphline = indexer.generate_config()
+
+  return indexer.run(request, collection_name, morphline, input_path, start_time=start_time, lib_path=lib_path)
+

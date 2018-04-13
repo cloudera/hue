@@ -177,6 +177,9 @@ from desktop.views import _ko
             sqoop1: {
               sqlDialect: false
             },
+            spark: {
+              sqlDialect: false
+            },
           }
         });
         self.editorViewModel.editorMode(true);

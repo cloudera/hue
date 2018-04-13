@@ -103,6 +103,13 @@ ENABLE_SQOOP = Config(
   default=False
 )
 
+ENABLE_KAFKA = Config(
+  key="enable_kafka",
+  help=_t("Flag to turn on Kafka imports."),
+  type=bool,
+  default=False
+)
+
 # Unused
 BATCH_INDEXER_PATH = Config(
   key="batch_indexer_path",

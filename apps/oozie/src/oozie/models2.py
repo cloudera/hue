@@ -3741,6 +3741,8 @@ class WorkflowBuilder():
         node = self.get_hive_snippet_node(snippet, user)
       elif snippet['type'] == 'impala':
         node = self.get_impala_snippet_node(snippet, user)
+      elif snippet['type'] == 'spark':
+        node = self.get_spark_snippet_node(snippet, user)
       elif snippet['type'] == 'shell':
         node = self.get_shell_snippet_node(snippet)
       else:
@@ -3879,7 +3881,7 @@ class WorkflowBuilder():
     return {
         u'id': node_id,
         u'name': u'spark2-%s' % node_id[:4],
-        u"type": u"spark2-document-widget", # if is_document_node else u"hive2-widget",
+        u"type": u"spark2-document-widget" if is_document_node else u"spark-widget",
         u'properties': {
             u'files': [],
             u'job_xml': u'',
@@ -3911,15 +3913,14 @@ class WorkflowBuilder():
         u'actionParameters': [],
     }
 
-  def get_spark_snippet_node(self, snippet):
-    credentials = []
-
+  def get_spark_snippet_node(self, snippet, user):
     node_id = snippet.get('id', str(uuid.uuid4()))
 
-    node = self._get_java_node(node_id, credentials)
+    node = self._get_spark_node(node_id, user)
     node['properties']['class'] = snippet['properties']['class']
     node['properties']['jars'] = snippet['properties']['app_jar'] # Not used, submission add it to oozie.libpath instead
-    node['properties']['spark_opts'] = [{'value': f['path']} for f in snippet['properties']['files']]
+    node['properties']['files'] = [{'value': f['path']} for f in snippet['properties']['files']]
+    node['properties']['spark_opts'] = snippet['properties']['spark_opts']
     node['properties']['spark_arguments'] = [{'value': f} for f in snippet['properties']['arguments']]
 
     return node
