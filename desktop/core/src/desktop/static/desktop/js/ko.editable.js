@@ -134,6 +134,7 @@
               overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
               expandable: editableOptions.multiLineEllipsis,
               expandClass: editableOptions.multiLineEllipsis.expandClass,
+              linkify: true,
               onActionRender: onActionRender
             });
 

@@ -579,8 +579,15 @@
       self.expanded = false;
       self.updateOverflowHeight();
 
-      self.fullText = options.text;
-      self.element.textContent = self.fullText;
+      self.contents = options.text;
+      self.element.innerHTML = self.contents;
+
+      self.renderContents = function (contents) {
+        if (options.linkify) {
+          return hueUtils.deXSS(contents.replace(/((?:(?:[a-z]+:\/\/)|www\.)[a-z0-9_%\-]+(?:[.\/][a-z0-9_%\-]+)*)/ig, '<a href="$1" target="_blank">$1</a>'));
+        };
+        return hueUtils.deXSS(contents);
+      };
 
       self.delayedResumeTimeout = window.setTimeout(function () {
         self.resume();
@@ -601,7 +608,6 @@
       window.clearInterval(self.sizeCheckInterval);
       self.sizeCheckInterval = window.setInterval(function () {
         if (self.element.offsetWidth !== self.lastKnownOffsetWidth || self.element.offsetHeight !== self.lastKnownOffsetHeight) {
-          self.element.textContent = self.fullText;
           self.refresh();
         }
       }, 500);
@@ -623,7 +629,7 @@
       self.$element.empty();
       var textElement = $('<span>').appendTo(self.$element)[0];
       if (self.expandable) {
-        textElement.textContent = self.fullText;
+        textElement.innerHTML = self.renderContents ? self.renderContents(self.contents) : self.contents;
         if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
           self.$element.append('&nbsp;');
           var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>');
@@ -643,7 +649,7 @@
           })
         }
       } else {
-        textElement.textContent = self.fullText;
+        textElement.innerHTML = self.renderContents ? self.renderContents(self.contents) : self.contents;
       }
 
       if (self.onActionRender) {
@@ -654,11 +660,20 @@
 
       while (self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
         self.isOverflowing = true;
-        var lastSpaceIndex = textElement.textContent.regexLastIndexOf(/\s\S+/);
-        if (lastSpaceIndex !== -1) {
-          textElement.textContent = textElement.textContent.substring(0, lastSpaceIndex) + '...';
-        } else {
-          break;
+        var contents = $(textElement).contents();
+        var lastContent = contents[contents.length - 1];
+        // Check for text node
+        if (lastContent.nodeType === 3 ) {
+          var lastSpaceIndex = lastContent.textContent.regexLastIndexOf(/\s\S+/);
+          if (lastSpaceIndex !== -1) {
+            lastContent.replaceWith(document.createTextNode(lastContent.textContent.substring(0, lastSpaceIndex) + '...'));
+          } else if (contents.length > 1) {
+            textElement.removeChild(lastContent);
+          } else {
+            break;
+          }
+        } else if (contents.length > 1) { // Remove any elements like links
+          textElement.removeChild(lastContent)
         }
       }
 
@@ -671,7 +686,7 @@
 
     MultiLineEllipsisHandler.prototype.setText = function (text) {
       var self = this;
-      self.fullText = text;
+      self.contents = text;
       self.refresh();
     };
 
@@ -685,7 +700,8 @@
       var multiLineEllipsisHandler = new MultiLineEllipsisHandler({
         element: element,
         text: element.textContent,
-        overflowing: valueAccessor()
+        overflowing: valueAccessor(),
+        linkify: true
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
