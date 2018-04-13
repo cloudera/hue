@@ -54,13 +54,13 @@ def validate_encoding(encoding):
   except LookupError:
     return False
 
-def smart_unicode(s, strings_only=False, errors='strict'):
+def smart_unicode(s, strings_only=False, errors='strict', encoding=None):
   """
   Wrapper around Django's version, while supplying our configured encoding.
   Decode char array to unicode.
   """
   return django.utils.encoding.smart_unicode(
-        s, get_site_encoding(), strings_only, errors)
+        s, encoding if encoding is not None else get_site_encoding(), strings_only, errors)
 
 def force_unicode(s, strings_only=False, errors='strict'):
   """

@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 
 # Materialize and HTML escape results
-def escape_rows(rows, nulls_only=False):
+def escape_rows(rows, nulls_only=False, encoding=None):
   data = []
 
   for row in rows:
@@ -46,7 +46,7 @@ def escape_rows(rows, nulls_only=False):
       elif field is None:
         escaped_field = 'NULL'
       else:
-        escaped_field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
+        escaped_field = smart_unicode(field, errors='replace', encoding=encoding) # Prevent error when getting back non utf8 like charset=iso-8859-1
         if not nulls_only:
           escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
       escaped_row.append(escaped_field)

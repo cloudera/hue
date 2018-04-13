@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import chardet
 import json
 import logging
 
@@ -124,6 +125,8 @@ def guess_field_types(request):
   if file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
     stream = request.fs.open(file_format["path"])
+    encoding = chardet.detect(stream.read(10000)).get('encoding')
+    stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
 
     format_ = indexer.guess_field_types({
@@ -134,10 +137,11 @@ def guess_field_types(request):
       "format": file_format['format']
     })
 
+    # Note: Would also need to set charset to table (only supported in Hive)
     if 'sample' in format_:
-      format_['sample'] = escape_rows(format_['sample'], nulls_only=True)
+      format_['sample'] = escape_rows(format_['sample'], nulls_only=True, encoding=encoding)
     for col in format_['columns']:
-      col['name'] = smart_unicode(col['name'], errors='replace')
+      col['name'] = smart_unicode(col['name'], errors='replace', encoding=encoding)
 
   elif file_format['inputFormat'] == 'table':
     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
