@@ -772,6 +772,7 @@ var EditorViewModel = (function() {
             }
             var variablesValues = self.variableValues[variable.name];
             var type = sample.full_headers[0].type;
+            sample = { rows: [] }; // Temporary fix for 5.15.0 to remove sample drop down.
             switch (type) {
               case 'TIMESTAMP_TYPE':
                 variablesValues.type = 'datetime-local';
