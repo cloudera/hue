@@ -624,13 +624,17 @@
       self.pause();
     };
 
+    var checkOverflow = function (element) {
+      return element.offsetHeight < element.scrollHeight || element.offsetWidth < element.scrollWidth
+    };
+
     MultiLineEllipsisHandler.prototype.refresh = function () {
       var self = this;
       self.$element.empty();
       var textElement = $('<span>').appendTo(self.$element)[0];
       if (self.expandable) {
         textElement.innerHTML = self.renderContents ? self.renderContents(self.contents) : self.contents;
-        if (self.expanded || self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
+        if (self.expanded || checkOverflow(self.element)) {
           self.$element.append('&nbsp;');
           var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>');
           if (self.expandClass) {
@@ -653,12 +657,12 @@
       }
 
       if (self.onActionRender) {
-        self.onActionRender(self.$element);
+        self.onActionRender(self.$element, checkOverflow(self.element));
       }
 
       self.isOverflowing = false;
 
-      while (self.element.offsetHeight < self.element.scrollHeight || self.element.offsetWidth < self.element.scrollWidth) {
+      while (checkOverflow(self.element)) {
         self.isOverflowing = true;
         var contents = $(textElement).contents();
         var lastContent = contents[contents.length - 1];

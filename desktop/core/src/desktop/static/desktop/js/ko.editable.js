@@ -91,15 +91,17 @@
       var onActionRender = undefined;
 
       if (editableOptions.inlineEditAction) {
-        onActionRender = function ($container) {
-          var $editAction = $('<a href="javascript:void(0);"><i class="fa fa-fw fa-pencil"></i></a>');
-          if (editableOptions.inlineEditAction.editClass) {
-            $editAction.addClass(editableOptions.inlineEditAction.editClass);
+        onActionRender = function ($container, overflowing) {
+          if (!overflowing) {
+            var $editAction = $('<a href="javascript:void(0);"><i class="fa fa-fw fa-pencil"></i></a>');
+            if (editableOptions.inlineEditAction.editClass) {
+              $editAction.addClass(editableOptions.inlineEditAction.editClass);
+            }
+            $editAction.on('click', function () {
+              $editable.editable('toggle');
+            });
+            $editAction.appendTo($container);
           }
-          $editAction.on('click', function () {
-            $editable.editable('toggle');
-          });
-          $editAction.appendTo($container);
         }
       }
 
