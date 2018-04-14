@@ -465,18 +465,6 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group">
-              <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
-                <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Store in Default location')}
-              </label>
-            </div>
-
-            <div class="control-group" data-bind="visible: !useDefaultLocation()">
-              <label for="path" class="control-label"><div>${ _('External location') }</div>
-                <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
-              </label>
-            </div>
-
-            <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
                   <i class="fa fa-sliders fa-padding-top"></i>
@@ -485,6 +473,18 @@ ${ assist.assistPanel() }
             </div>
 
             <span data-bind="visible: showProperties">
+              <div class="control-group">
+                <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
+                  <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Store in Default location')}
+                </label>
+              </div>
+
+              <div class="control-group" data-bind="visible: !useDefaultLocation()">
+                <label for="path" class="control-label"><div>${ _('External location') }</div>
+                  <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                </label>
+              </div>
+
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
                   <input type="checkbox" data-bind="checked: importData, disable: !useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
