@@ -141,7 +141,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster() && !$root.isQueryBuilder() -->
       <div class="btn-group">
-        <a class="btn pointer draggable-plus-button" title="${ _('Click or drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: draggableBar(), options: getDraggableOptions({ data: draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+        <a class="btn draggable-plus-button move-cursor" title="${ _('Click or drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: draggableBar(), options: getDraggableOptions({ data: draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
           <i class="fa fa-plus"></i>
         </a>
       </div>
