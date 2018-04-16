@@ -63,13 +63,6 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     </div>
     <div class="search-bar-middle">
       <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0, submit: function() { return false }">
-        <!-- ko if: $root.initial.engines().length > 1 -->
-        <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
-        <!-- /ko -->
-        <!-- ko ifnot: $root.initial.engines().length > 1 -->
-        ${_('index')}
-        <!-- /ko -->
-
         <!-- ko if: $root.collection.engine() == 'solr' -->
         <!-- ko if: columns().length == 0 -->
         <select data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name, disable: isSyncingCollections, selectizeOptions: { clearable: true }"></select>
