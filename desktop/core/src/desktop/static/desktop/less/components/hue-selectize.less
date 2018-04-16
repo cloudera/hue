@@ -466,6 +466,12 @@
   top: 5px;
   cursor: pointer;
   color: @cui-gray-700;
+  opacity: 0;
+  .hue-linear-transition(opacity);
+}
+
+.selectize-control.plugin-clear_button:hover .clearAll {
+  opacity: 1;
 }
 
 .hue-tag-overflow {
