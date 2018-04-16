@@ -268,7 +268,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-db-entries">
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length == 0 -->
     <ul class="assist-tables">
-      <li class="assist-entry assist-no-entries"><!-- ko if: catalogEntry.isTable() -->${_('No columns found')}<!--/ko--><!-- ko if: catalogEntry.isDatabase() -->${_('No tables found')}<!--/ko--><!-- ko if: catalogEntry.isField() -->${_('No results found')}<!--/ko--></li>
+      <li class="assist-entry assist-no-entries"><!-- ko if: catalogEntry.isTableOrView() -->${_('No columns found')}<!--/ko--><!-- ko if: catalogEntry.isDatabase() -->${_('No tables found')}<!--/ko--><!-- ko if: catalogEntry.isField() -->${_('No results found')}<!--/ko--></li>
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->
@@ -2379,7 +2379,7 @@ from desktop.views import _ko
             getFilteredTablesPureComputed: function (vm) {
               var openedByFilter = [];
               return ko.pureComputed(function () {
-                if (vm.filter == null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
+                if (vm.filter === null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
                   while (openedByFilter.length) {
                     openedByFilter.pop().open(false);
                   }
@@ -2483,9 +2483,9 @@ from desktop.views import _ko
             query: '',
             facets: {},
             text: []
-          }),
-          showViews: ko.observable(true),
-          showTables: ko.observable(true)
+          }).extend({ rateLimit: 300 }),
+          showViews: ko.observable(true).extend({ rateLimit: 300 }),
+          showTables: ko.observable(true).extend({ rateLimit: 300 })
         };
 
         self.filteredTables = AssistantUtils.getFilteredTablesPureComputed(self);
@@ -2528,7 +2528,7 @@ from desktop.views import _ko
           var added = {};
           var result = [];
           var partialLower = partial.toLowerCase();
-          self.activeTables().forEach(function (table) {
+          self.filteredTables().forEach(function (table) {
             if (!added[table.catalogEntry.name] && table.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
               added[table.catalogEntry.name] = true;
               result.push(nonPartial + partial + table.catalogEntry.name.substring(partial.length))
@@ -2966,7 +2966,7 @@ from desktop.views import _ko
             query: '',
             facets: {},
             text: []
-          })
+          }).extend({ rateLimit: 300 })
         };
 
         self.activeTables = ko.observableArray();

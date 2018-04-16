@@ -74,7 +74,7 @@ var AssistDbSource = (function () {
     });
 
     self.filter = {
-      querySpec: ko.observable({})
+      querySpec: ko.observable({}).extend({ rateLimit: 300 })
     };
 
     self.filterActive = ko.pureComputed(function () {
@@ -189,9 +189,9 @@ var AssistDbSource = (function () {
     self.dbIndex = {};
 
     var nestedFilter = {
-      querySpec: ko.observable({}),
-      showTables: ko.observable(true),
-      showViews: ko.observable(true)
+      querySpec: ko.observable({}).extend({ rateLimit: 300 }),
+      showTables: ko.observable(true).extend({ rateLimit: 300 }),
+      showViews: ko.observable(true).extend({ rateLimit: 300 })
     };
 
     self.setDatabase = function (databaseName) {
