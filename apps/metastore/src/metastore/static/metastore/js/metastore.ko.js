@@ -115,7 +115,7 @@ var MetastoreViewModel = (function () {
             return true;
           }
         })
-      } else if (refreshedEntry.isTable()) {
+      } else if (refreshedEntry.isTableOrView()) {
         self.databases().some(function (database) {
           if (database.catalogEntry.name === refreshedEntry.path[0]) {
             database.tables().some(function (table) {

@@ -68,7 +68,8 @@ var DataCatalog = (function () {
       sourceType: entry.dataCatalog.sourceType,
       path: entry.path, // Set for DataCatalogEntry
       paths: entry.paths, // Set for MultiTableEntry
-      silenceErrors: apiOptions && apiOptions.silenceErrors
+      silenceErrors: apiOptions && apiOptions.silenceErrors,
+      isView: entry.isView()
     }).done(function (data) {
       entry[attributeName] = data;
       entry.saveLater();

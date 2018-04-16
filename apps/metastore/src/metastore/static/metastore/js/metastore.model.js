@@ -29,8 +29,22 @@ var MetastoreDatabase = (function () {
     self.metastoreViewModel = options.metastoreViewModel;
 
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(false);
+    self.loadingTables = ko.observable(false);
+    self.loadingAnalysis = ko.observable(false);
+    self.loadingComment = ko.observable(false);
+    self.loadingTableComments = ko.observable(false);
+    self.loadingTablePopularity = ko.observable(false);
+
     self.tables = ko.observableArray();
+
+    self.loading = ko.pureComputed(function () {
+      return self.loadingTables() || self.loadingAnalysis();
+    });
+
+    self.refreshing = ko.pureComputed(function () {
+      return self.loadingTables() || self.loadingAnalysis() || self.loadingComment() || self.loadingTableComments() ||
+        self.loadingTablePopularity();
+    });
 
     self.comment = ko.observable();
 
@@ -68,24 +82,24 @@ var MetastoreDatabase = (function () {
 
   MetastoreDatabase.prototype.reload = function () {
     var self = this;
-    if (!self.loading()) {
-      self.loading(true);
-      // Clear will publish when done
-      self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
-    }
+    // Clear will publish when done
+    self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
   };
 
   MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled) {
     var self = this;
 
-    self.loading(true);
 
     if (navigatorEnabled) {
-      self.catalogEntry.getNavigatorMeta().done(self.navigatorMeta);
+      self.loadingComment(true);
+      self.catalogEntry.getNavigatorMeta().done(self.navigatorMeta).always(function () {
+        self.loadingComment(false);
+      });
     }
 
     self.catalogEntry.getComment().done(self.comment);
 
+    self.loadingTables(true);
     self.catalogEntry.getChildren().done(function (tableEntries) {
       self.tables($.map(tableEntries, function (tableEntry) {
         return new MetastoreTable({
@@ -96,31 +110,39 @@ var MetastoreDatabase = (function () {
         });
       }));
       if (navigatorEnabled) {
+        self.loadingTableComments(true);
         self.catalogEntry.loadNavigatorMetaForChildren().done(function () {
           self.tables().forEach(function (table) {
             table.navigatorMeta(table.catalogEntry.navigatorMeta);
           })
+        }).always(function () {
+          self.loadingTableComments(false);
         })
       }
       if (optimizerEnabled) {
+        self.loadingTablePopularity(true);
         self.catalogEntry.loadNavOptPopularityForChildren().done(function () {
           self.tables().forEach(function (table) {
             table.optimizerStats(table.catalogEntry.navOptPopularity);
           })
-        });
+        }).always(function () {
+          self.loadingTablePopularity(false);
+        })
       }
       self.loaded(true);
     }).fail(function () {
       self.tables([]);
     }).always(function () {
-      self.loading(false);
+      self.loadingTables(false);
       if (callback) {
         callback();
       }
     });
 
-    self.catalogEntry.getAnalysis().done(self.stats);
-
+    self.loadingAnalysis(true);
+    self.catalogEntry.getAnalysis().done(self.stats).always(function () {
+      self.loadingAnalysis(false);
+    });
 
     self.apiHelper.setInTotalStorage('metastore', 'last.selected.database', self.name);
   };
@@ -205,7 +227,7 @@ var MetastoreTable = (function () {
     self.apiHelper = ApiHelper.getInstance();
 
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(true);
+    self.loading = ko.observable(false);
 
     self.sortDesc = ko.observable(true);
     self.filters = ko.observableArray([]);
@@ -268,6 +290,8 @@ var MetastoreTable = (function () {
       return;
     }
 
+    self.loading(true);
+
     self.metastoreTable.catalogEntry.getPartitions().done(function (partitions) {
       self.keys(partitions.partition_keys_json);
       self.values(partitions.partition_values_json);
@@ -293,7 +317,7 @@ var MetastoreTable = (function () {
     self.hasErrors = ko.observable(false);
     self.errorMessage = ko.observable();
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(true);
+    self.loading = ko.observable(false);
 
     self.preview = {
       headers: ko.observableArray(),
@@ -348,10 +372,11 @@ var MetastoreTable = (function () {
     self.relationshipsDetails = ko.observable();
 
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(false);
 
     self.loadingDetails = ko.observable(false);
     self.loadingColumns = ko.observable(false);
+    self.loadingQueries = ko.observable(false);
+    self.loadingComment = ko.observable(false);
 
     self.columns = ko.observableArray();
 
@@ -361,6 +386,15 @@ var MetastoreTable = (function () {
 
     self.partitions = new MetastoreTablePartitions({
       metastoreTable: self
+    });
+
+    self.loading = ko.pureComputed(function () {
+      return self.loadingDetails() || self.loadingColumns();
+    });
+
+    self.refreshing = ko.pureComputed(function () {
+      return self.loadingDetails() || self.loadingColumns() || self.loadingQueries() || self.loadingComment() ||
+        self.samples.loading() || self.partitions.loading();
     });
 
     self.partitionsCountLabel = ko.pureComputed(function () {
@@ -374,7 +408,6 @@ var MetastoreTable = (function () {
     self.refreshingTableStats = ko.observable(false);
     self.showAddTagName = ko.observable(false);
     self.addTagName = ko.observable('');
-    self.loadingQueries = ko.observable(true);
 
     self.comment = ko.observable();
     self.editingComment = ko.observable();
@@ -446,19 +479,19 @@ var MetastoreTable = (function () {
     };
 
     self.fetchDetails = function () {
-      self.loadingDetails(true);
 
+      self.loadingComment(true);
       self.database.catalogEntry.loadNavigatorMetaForChildren().done(function () {
         self.catalogEntry.getComment().done(self.comment);
+      }).always(function () {
+        self.loadingComment(false);
       });
 
+      self.loadingDetails(true);
       self.catalogEntry.getAnalysis().done(function (analysis) {
-        self.loadingDetails(false);
         self.tableDetails(analysis);
         self.tableStats(analysis.details.stats);
-        self.refreshingTableStats(false);
         self.loaded(true);
-        self.loading(false);
         if (analysis.partition_keys.length) {
           self.partitions.detailedKeys(analysis.partition_keys);
           self.partitions.load();
@@ -467,9 +500,10 @@ var MetastoreTable = (function () {
           self.partitions.loaded(true);
         }
       }).fail(function () {
-        self.refreshingTableStats(false);
-        self.loading(false);
+        self.partitions.loading(false);
+        self.partitions.loaded(true);
       }).always(function () {
+        self.refreshingTableStats(false);
         self.loadingDetails(false)
       });
 
@@ -507,13 +541,10 @@ var MetastoreTable = (function () {
 
   MetastoreTable.prototype.reload = function () {
     var self = this;
-    if (!self.loading()) {
-      self.loading(true);
-      self.samples.loaded(false);
-      self.partitions.loaded(false);
-      // Clear will publish when done
-      self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
-    }
+    self.samples.loaded(false);
+    self.partitions.loaded(false);
+    // Clear will publish when done
+    self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
   };
 
   MetastoreTable.prototype.showImportData = function () {
@@ -528,7 +559,6 @@ var MetastoreTable = (function () {
 
   MetastoreTable.prototype.load = function () {
     var self = this;
-    self.loading(true);
     self.fetchFields();
     self.fetchDetails();
     huePubSub.publish('metastore.loaded.table');
