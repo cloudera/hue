@@ -582,10 +582,14 @@
       self.contents = options.text;
       self.element.innerHTML = self.contents;
 
+      var linkRegex = /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/ig;
+
       self.renderContents = function (contents) {
         if (options.linkify) {
-          return hueUtils.deXSS(contents.replace(/((?:(?:[a-z]+:\/\/)|www\.)[a-z0-9_%\-]+(?:[.\/][a-z0-9_%\-]+)*)/ig, '<a href="$1" target="_blank">$1</a>'));
-        };
+          return hueUtils.deXSS(contents.replace(linkRegex, function (val) {
+            return '<a href="' + (val.toLowerCase().indexOf('www') === 0 ? 'http://' + val : val) + '" target="_blank">' + val + '</a>';
+          }));
+        }
         return hueUtils.deXSS(contents);
       };
 
