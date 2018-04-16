@@ -935,7 +935,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="html-resultset-widget">
   <!-- ko ifnot: $root.collection.template.isGridLayout() -->
-    <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+    <div data-bind="visible: $root.isToolbarVisible() || $root.isEditing()" style="margin-bottom: 20px">
       <ul class="nav nav-pills">
         <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
         <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
@@ -944,7 +944,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </ul>
     </div>
 
-    <!-- ko if: $root.isEditing() -->
+    <!-- ko if: $root.isToolbarVisible() || $root.isEditing() -->
       <div class="widget-section widget-editor-section">
         <div class="row-fluid">
           <div class="span9">
@@ -1156,7 +1156,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <th data-bind="with: $root.collection.getTemplateField($data, $parent.template.fields())" style="white-space: nowrap">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }"></span>
     <i class="fa fa-sort inactive-action margin-right-10 margin-left-5" data-bind="click: $root.collection.toggleSortColumnGridLayout, css: { 'blue': sort.direction() != null, 'fa-sort-down': sort.direction() == 'desc', 'fa-sort-up': sort.direction() == 'asc' }" title="${ _('Click to sort') }"></i>
-    <!-- ko if: $root.isEditing -->
+    <!-- ko if: $root.isToolbarVisible() || $root.isEditing() -->
       <!-- ko if: $index() > 0 -->
       <i class="fa fa-caret-left inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left', $parents[1].template); }" title="${ _('Move to the left') }"></i>
       <!-- /ko -->
@@ -3215,6 +3215,9 @@ var getDraggableOptions = function (options) {
           gridsterWidget: options.parent
         });
         $(this).data('startingScrollTop', $('.page-content').scrollTop());
+        if (options && options.start) {
+          options.start();
+        }
       },
       'drag': function (event, ui) {
         huePubSub.publish('dashboard.widget.drag', {
@@ -3232,6 +3235,9 @@ var getDraggableOptions = function (options) {
           widget: options.data,
           gridsterWidget: options.parent
         });
+        if (options && options.stop) {
+          options.stop();
+        }
       },
     };
     if (options.parent) { // extra options for an existing Gridster widget
@@ -4200,6 +4206,9 @@ $(document).ready(function () {
             }
           }
         }
+        if (existingWidget.widget && existingWidget.widget.widgetType() === 'html-resultset-widget') {
+          huePubSub.publish('gridster.clean.html.whitespace', existingWidget);
+        }
       });
     }
   }
@@ -4274,6 +4283,16 @@ $(document).ready(function () {
     tempDraggable = null;
   }, 'dashboard');
 
+  function removeInternalScroll(widget) {
+    var scrollDifference = widget.gridsterElement.scrollHeight - widget.gridsterElement.clientHeight;
+    if (scrollDifference > 0) { // avoid scrollbars inside the widget
+      widget.size_y(widget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
+      $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
+        huePubSub.publish('gridster.clean.whitespace');
+      });
+    }
+  }
+
   huePubSub.subscribe('gridster.clean.grid.whitespace', function (options) {
     var $gridsterWidget = $(options.event.target).parents('li.gs-w');
     var contentHeight = $gridsterWidget.find('.card-widget').height();
@@ -4289,14 +4308,7 @@ $(document).ready(function () {
         if (contentHeight !== $gridsterWidget.find('.card-widget').height()) {
           searchViewModel.gridItems().forEach(function (widget) {
             if (widget.widgetId() === parseInt($gridsterWidget.data('widgetid'))) {
-              var scrollDifference = widget.gridsterElement.scrollHeight - widget.gridsterElement.clientHeight;
-              if (scrollDifference > 0) { // avoid scrollbars inside the widget
-                widget.size_y(widget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
-                $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
-                  huePubSub.publish('gridster.clean.whitespace');
-                });
-              }
-
+              removeInternalScroll(widget);
               contentHeight = $(widget.gridsterElement).find('.card-widget').height();
               if (widget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
                 widget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
@@ -4317,6 +4329,8 @@ $(document).ready(function () {
 
     });
   });
+
+  huePubSub.subscribe('gridster.clean.html.whitespace', removeInternalScroll);
 
   huePubSub.subscribe('gridster.clean.whitespace', function () {
     if (searchViewModel.isGridster()) {
