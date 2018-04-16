@@ -2740,7 +2740,7 @@
       if (_enc.find("style").length > 0) {
         var parser = new less.Parser();
         $(_enc.find("style")).each(function (cnt, item) {
-          var _less = "#result-container {" + $(item).text() + "}";
+          var _less = ".result-container {" + $(item).text() + "}";
           try {
             parser.parse(_less, function (err, tree) {
               $(item).text(tree.toCSS());
