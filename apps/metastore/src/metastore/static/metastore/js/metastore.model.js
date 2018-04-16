@@ -365,6 +365,7 @@ var MetastoreTable = (function () {
 
     // TODO: Check if enough or if we need to fetch additional details
     self.isView = ko.observable(self.catalogEntry.isView());
+    self.viewSql = ko.observable();
 
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
@@ -377,6 +378,7 @@ var MetastoreTable = (function () {
     self.loadingColumns = ko.observable(false);
     self.loadingQueries = ko.observable(false);
     self.loadingComment = ko.observable(false);
+    self.loadingViewSql = ko.observable(false);
 
     self.columns = ko.observableArray();
 
@@ -394,7 +396,7 @@ var MetastoreTable = (function () {
 
     self.refreshing = ko.pureComputed(function () {
       return self.loadingDetails() || self.loadingColumns() || self.loadingQueries() || self.loadingComment() ||
-        self.samples.loading() || self.partitions.loading();
+        self.samples.loading() || self.partitions.loading() || self.loadingViewSql();
     });
 
     self.partitionsCountLabel = ko.pureComputed(function () {
@@ -479,13 +481,16 @@ var MetastoreTable = (function () {
     };
 
     self.fetchDetails = function () {
-
       self.loadingComment(true);
       self.database.catalogEntry.loadNavigatorMetaForChildren().done(function () {
         self.catalogEntry.getComment().done(self.comment);
       }).always(function () {
         self.loadingComment(false);
       });
+
+      if (self.catalogEntry.isView()) {
+        self.loadingViewSql(true);
+      }
 
       self.loadingDetails(true);
       self.catalogEntry.getAnalysis().done(function (analysis) {
@@ -499,9 +504,26 @@ var MetastoreTable = (function () {
           self.partitions.loading(false);
           self.partitions.loaded(true);
         }
+
+        var found = analysis.properties && analysis.properties.some(function (property) {
+          if (property.col_name.toLowerCase() === 'view original text:') {
+            ApiHelper.getInstance().formatSql({ statements: property.data_type }).done(function (formatResponse) {
+              self.viewSql(formatResponse.status === 0 ? formatResponse.formatted_statements : property.data_type)
+            }).fail(function () {
+              self.viewSql(property.data_type)
+            }).always(function () {
+              self.loadingViewSql(false);
+            })
+            return true;
+          }
+        });
+        if (!found) {
+          self.loadingViewSql(false);
+        }
       }).fail(function () {
         self.partitions.loading(false);
         self.partitions.loaded(true);
+        self.loadingViewSql(false);
       }).always(function () {
         self.refreshingTableStats(false);
         self.loadingDetails(false)
