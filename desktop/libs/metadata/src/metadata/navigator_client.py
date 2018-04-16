@@ -350,7 +350,6 @@ class NavigatorApi(object):
 
       query_filters = {
         'sourceType': source_type,
-        'type': type,
         'originalName': name,
         'deleted': 'false'
       }
@@ -359,6 +358,10 @@ class NavigatorApi(object):
         query_filters[key] = value
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
+      filter_query = '%(type)s AND %(filter_query)s' % {
+        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala does not always say that a table is actually a view
+        'filter_query': filter_query
+      }
 
       source_ids = get_cluster_source_ids(self)
       if source_ids:
