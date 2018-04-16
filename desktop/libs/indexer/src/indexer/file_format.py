@@ -46,7 +46,7 @@ def get_format_types():
       SyslogFormat,
       HueLogFormat,
       #RubyLogFormat,
-      #ParquetFormat
+      ParquetFormat
     ])
 
   return formats

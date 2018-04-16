@@ -101,13 +101,17 @@ def guess_format(request):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
 
     stream = request.fs.open(path)
-    format_ = indexer.guess_format({
-      "file": {
-        "stream": stream,
-        "name": path
-      }
-    })
-    _convert_format(format_)
+    if detect_parquet(stream):
+      format_ = {"type": "parquet", "fieldSeparator": "", "hasHeader": False, "quoteChar": "", "recordSeparator": ""}
+    else:
+      stream.seek(0)
+      format_ = indexer.guess_format({
+        "file": {
+          "stream": stream,
+          "name": path
+        }
+      })
+      _convert_format(format_)
   elif file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
     try:
