@@ -27,6 +27,12 @@ function queryBuilderSearchLayout(vm, isQueryBuilder) {
   huePubSub.publish('dashboard.set.layout');
 }
 
+function textSearchLayout(vm, isQueryBuilder) {
+  vm.isQueryBuilder(!!isQueryBuilder);
+  loadSearchLayout(vm, vm.initial.textSearchLayout);
+  $(document).trigger("magicSearchLayout");
+  huePubSub.publish('dashboard.set.layout');
+}
 
 function loadSearchLayout(viewModel, json_layout) {
   var _columns = [];
@@ -1752,6 +1758,7 @@ var NewTemplate = function (vm, initial) {
   self.engines = ko.mapping.fromJS(initial.engines);
   self.layout = initial.layout;
   self.qbLayout = initial.qb_layout;
+  self.textSearchLayout = initial.text_search_layout;
   self.inited = ko.observable(self.collections().length > 0); // No collection if not a new dashboard
 
   self.init = function() {

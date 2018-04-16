@@ -66,6 +66,17 @@ QUERY_BUILDER_LAYOUT = [
   }
 ]
 
+TEXT_SEARCH_LAYOUT = [
+     {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
+     {"size":10,"rows":[{"widgets":[
+         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
+          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
+                        {"widgets":[
+         {"size":12,"name":"Grid Results","widgetType":"html-resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
+          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+        "drops":["temp"],"klass":"card card-home card-column span10"},
+]
+
 
 def index(request, is_mobile=False):
   hue_collections = DashboardController(request.user).get_search_collections()
@@ -103,6 +114,7 @@ def index(request, is_mobile=False):
         'collections': [],
         'layout': DEFAULT_LAYOUT,
         'qb_layout': QUERY_BUILDER_LAYOUT,
+        'text_search_layout': TEXT_SEARCH_LAYOUT,
         'is_latest': _get_latest(),
         'engines': get_engines(request.user)
     }),
@@ -135,6 +147,7 @@ def new_search(request):
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
           'qb_layout': QUERY_BUILDER_LAYOUT,
+          'text_search_layout': TEXT_SEARCH_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }
@@ -147,6 +160,7 @@ def new_search(request):
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
           'qb_layout': QUERY_BUILDER_LAYOUT,
+          'text_search_layout': TEXT_SEARCH_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }),
@@ -186,6 +200,7 @@ def browse(request, name, is_mobile=False):
           "drops":["temp"],"klass":"card card-home card-column span10"}
       ],
       'qb_layout': QUERY_BUILDER_LAYOUT,
+      'text_search_layout': TEXT_SEARCH_LAYOUT,
       'is_latest': _get_latest(),
       'engines': get_engines(request.user)
     }),

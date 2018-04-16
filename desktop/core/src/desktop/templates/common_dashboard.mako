@@ -70,7 +70,7 @@
         <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-superscript"></i></div>
       </div>
     </a>
-    <a href="javascript: queryBuilderSearchLayout(searchViewModel, true)" title="${ _('Search: retrieve and display records of data') }" onmouseover="searchViewModel.previewColumns('search')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: textSearchLayout(searchViewModel, true)" title="${ _('Search: retrieve and display records of data') }" onmouseover="searchViewModel.previewColumns('search')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-search"></i></div>
       </div>
@@ -124,7 +124,7 @@
   <!-- /ko -->
 
 
-  <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
+  <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css: {'with-top-margin': isEditing()}">
     <div class="container-fluid">
 
       <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
