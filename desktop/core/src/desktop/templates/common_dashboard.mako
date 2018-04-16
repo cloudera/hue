@@ -25,7 +25,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
+  from dashboard.conf import HAS_REPORT_ENABLED, USE_GRIDSTER
   from desktop.views import _ko
 %>
 
@@ -59,25 +59,23 @@
         <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
       </div>
     </a>
-    % else:
-    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Explore with multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
-      <div class="layout-container">
-        <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
-      </div>
-    </a>
-    % endif
-    % if HAS_QUERY_BUILDER_ENABLED.get():
-    <a href="javascript: queryBuilderSearchLayout(searchViewModel, true)" title="${ _('Query Builder to slice and dice dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
-      <div class="layout-container">
-        <div class="layout-box" style="width: 100px;"><i class="fa fa-superscript"></i></div>
-      </div>
-    </a>
-    % endif
     <a href="javascript: fullLayout(searchViewModel)" title="${ _('Empty dashboard that can be used as a starting point') }" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
       </div>
     </a>
+    % else:
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Analytical: compute and calculate metrics') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
+      <div class="layout-container">
+        <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-superscript"></i></div>
+      </div>
+    </a>
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel, true)" title="${ _('Search: retrieve and display records of data') }" onmouseover="searchViewModel.previewColumns('search')" onmouseout="searchViewModel.previewColumns('')">
+      <div class="layout-container">
+        <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-search"></i></div>
+      </div>
+    </a>
+    % endif
   </div>
   %endif
 
@@ -153,28 +151,26 @@
       <div class="row-fluid" data-bind="visible: previewColumns() == 'dashboard'">
         <div class="span12">
           <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
-            <i class="fa fa-filter"></i>
-          </div>
-          <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
-            <i class="fa fa-area-chart" style="padding-top: 10px"></i>
-          </div>
-          <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
-            <i class="fa fa-table" style="font-size: 120px"></i><br/>
-            <div style="font-size: 80px; padding-top: 20px">${ _('Explore') }</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row-fluid" data-bind="visible: previewColumns() == 'qbuilder'">
-        <div class="span12">
-          <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
             <i class="fa fa-square"></i>
             <i class="fa fa-square" style="margin-left: 20px"></i>
             <i class="fa fa-superscript" style="margin-left: 20px"></i>
           </div>
           <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
             <i class="fa fa-table" style="font-size: 120px"></i><br/>
-            <div style="font-size: 80px; padding-top: 20px">${ _('Query Builder') }</div>
+            <div style="font-size: 80px; padding-top: 20px">${ _('Analytical') }</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row-fluid" data-bind="visible: previewColumns() == 'search'">
+        <div class="span2 preview-row" style="font-size: 80px;">
+          <i class="fa fa-sort-amount-asc" style="padding-top: 40px"></i>
+          <i class="fa fa-sort-amount-asc" style="padding-top: 90px"></i>
+        </div>
+        <div class="span10">
+          <div class="preview-row" style="font-size: 80px; ">
+            <i class="fa fa-bars" style="font-size: 120px; padding-top: 100px"></i><br/>
+            <div style="font-size: 80px; padding-top: 20px">${ _('Search') }</div>
           </div>
         </div>
       </div>

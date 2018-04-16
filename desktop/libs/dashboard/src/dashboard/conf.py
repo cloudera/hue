@@ -44,13 +44,6 @@ HAS_SQL_ENABLED = Config(
   type=coerce_bool
 )
 
-HAS_QUERY_BUILDER_ENABLED = Config(
-  key="has_query_builder_enabled",
-  help=_t("Activate the Query Builder (beta)."),
-  default=False,
-  type=coerce_bool
-)
-
 HAS_REPORT_ENABLED = Config(
   key="has_report_enabled",
   help=_t("Activate the static report layout (beta)."),
