@@ -64,6 +64,13 @@ urlpatterns += patterns('metadata.optimizer_api',
 )
 
 
+# Manager API
+urlpatterns += patterns('metadata.manager_api',
+  url(r'^api/manager/hello/?$', 'hello', name='hello'),
+)
+
+
+
 # Workload Analytics API
 urlpatterns += patterns('metadata.workload_analytics_api',
   url(r'^api/workload_analytics/get_operation_execution_details/?$', 'get_operation_execution_details', name='get_operation_execution_details'),

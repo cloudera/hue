@@ -301,6 +301,98 @@ NAVIGATOR = ConfigSection(
 )
 
 
+MANAGER = ConfigSection(
+  key='manager',
+  help=_t("""Configuration options for Manager API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to API.'),
+      default=None),
+ 
+    AUTH_CM_USERNAME=Config(
+      key="navmetadataserver_cmdb_user",
+      help=_t("Username of the CM user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_CM_PASSWORD=Config(
+      key="navmetadataserver_cmdb_password",
+      help=_t("CM password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_cm_password),
+    AUTH_CM_PASSWORD_SCRIPT=Config(
+      key="navmetadataserver_cmdb_password_script",
+      help=_t("Execute this script to produce the CM password. This will be used when the plain password is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    AUTH_LDAP_USERNAME=Config(
+      key="navmetadataserver_ldap_user",
+      help=_t("Username of the LDAP user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_LDAP_PASSWORD=Config(
+      key="navmetadataserver_ldap_password",
+      help=_t("LDAP password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_ldap_password),
+    AUTH_LDAP_PASSWORD_SCRIPT=Config(
+      key="navmetadataserver_ldap_password_script",
+      help=_t("Execute this script to produce the LDAP password. This will be used when the plain password is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    AUTH_SAML_USERNAME=Config(
+      key="navmetadataserver_saml_user",
+      help=_t("Username of the SAML user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_SAML_PASSWORD=Config(
+      key="navmetadataserver_saml_password",
+      help=_t("SAML password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_saml_password),
+    AUTH_SAML_PASSWORD_SCRIPT=Config(
+      key="navmetadataserver_saml_password_script",
+      help=_t("Execute this script to produce the SAML password. This will be used when the plain password  is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    CONF_DIR = Config(
+      key='conf_dir',
+      help=_t('Navigator configuration directory, where navigator.client.properties is located.'),
+      dynamic_default=default_navigator_config_dir
+    ),
+    APPLY_SENTRY_PERMISSIONS = Config(
+      key="apply_sentry_permissions",
+      help=_t("Perform Sentry privilege filtering. Default to true automatically if the cluster is secure."),
+      dynamic_default=get_security_default,
+      type=coerce_bool
+    ),
+    FETCH_SIZE_SEARCH = Config(
+      key="fetch_size_search",
+      help=_t("Max number of items to fetch in one call in object search."),
+      default=450,
+      type=int
+    ),
+    FETCH_SIZE_SEARCH_INTERACTIVE = Config(
+      key="fetch_size_search_interactive",
+      help=_t("Max number of items to fetch in one call in object search autocomplete."),
+      default=450,
+      type=int
+    ),
+
+    ENABLE_FILE_SEARCH = Config(
+      key="enable_file_search",
+      help=_t("Enable to search HDFS, S3 files."),
+      type=coerce_bool,
+      default=False
+    )
+  )
+)
+
+
+
 def test_metadata_configurations(user):
   from libsentry.conf import is_enabled
 
