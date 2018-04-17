@@ -28,6 +28,37 @@
           <input data-bind="value: query"/>
           <a class="btn" data-bind="click: search">Search</a>
         </div>
+
+        <div class="row-fluid">
+          <div class="span2">
+            Facets
+
+            <!-- ko foreach: $root.resultFacets() -->
+              <div data-bind="text: name"></div>
+              <ul>
+                <!-- ko foreach: values -->
+                  <li>
+                    <span data-bind="text: name"></span>
+                    <span data-bind="text: value"></span>
+                  </li>
+                <!-- /ko -->
+              </ul>
+            <!-- /ko -->
+          </div>
+          <div class="span10">
+            Results
+
+            <!-- ko foreach: $root.resultResults() -->
+              <div>
+                <i class="fa fa-info"></i>
+                <span data-bind="text: type"></span>
+                <span data-bind="text: hue_name"></span>
+                <span data-bind="text: description"></span>
+              </div>
+            <!-- /ko -->
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -41,7 +72,26 @@
       var self = this;
       self.apiHelper = ApiHelper.getInstance();
 
-      self.query = ko.observable("cust");
+      self.query = ko.observable("");
+
+      self.result = ko.observable("");
+
+      self.resultFacets = ko.pureComputed(function() {
+        var facets = [];
+        if (self.result()) {
+          $.each(self.result().facets, function(key, values) {
+            var facetValues = []
+            $.each(values, function(key, value) {
+              facetValues.push({name: key, value: value});
+            });
+            facets.push({name: key, values: facetValues});
+          });
+        }
+        return facets;
+      });
+      self.resultResults = ko.pureComputed(function() {
+        return self.result() ? self.result().results : [];
+      });
     };
 
     CatalogViewModel.prototype.search = function () {
@@ -50,7 +100,7 @@
         query: self.query(),
         facets: ['type', 'owner', 'tags', 'lastModified']
       }).done(function (response) {
-        console.log(response);
+        self.result(ko.mapping.fromJS(response));
       }).fail(function (errorResponse) {
         console.log(errorResponse);
       })
