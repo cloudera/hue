@@ -927,7 +927,7 @@ class HiveServerClient:
     with mc_pool.reserve(True) as cache:
       guid = base64.encodestring(operation_handle.operationId.guid)
       session_guid = cache.get(guid)
-      cache.delete(session_guid)
+      if session_guid: cache.delete(session_guid)
       cache.delete(guid)
       LOG.debug('cancel_operation: Removed session_guid %s from busy session. Operation handle guid %s' % (session_guid, guid))
 
@@ -936,6 +936,15 @@ class HiveServerClient:
 
   def close_operation(self, operation_handle):
     req = TCloseOperationReq(operationHandle=operation_handle)
+
+    # session is not busy anymore when it's canceled
+    with mc_pool.reserve(True) as cache:
+      guid = base64.encodestring(operation_handle.operationId.guid)
+      session_guid = cache.get(guid)
+      if session_guid: cache.delete(session_guid)
+      cache.delete(guid)
+      LOG.debug('close_operation: Removed session_guid %s from busy session. Operation handle guid %s' % (session_guid, guid))
+
     return self.call(self._client.CloseOperation, req)
 
 
@@ -1255,7 +1264,7 @@ class HiveServerClientCompatible(object):
       with mc_pool.reserve(True) as cache:
         guid = base64.encodestring(operationHandle.operationId.guid)
         session_guid = cache.get(guid)
-        cache.delete(session_guid)
+        if session_guid: cache.delete(session_guid)
         cache.delete(guid)
         LOG.debug('get_log: Removed session_guid %s from busy session. Operation handle guid %s' % (session_guid, guid))
 
