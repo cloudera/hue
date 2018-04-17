@@ -40,7 +40,7 @@ from desktop.views import _ko
           rows: 6,
           save: saveComment,
           inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
-          multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'editable-inline-action' }
+          multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandActionClass: 'editable-inline-action' }
         }">${ _('Add a description...') }</div>
       </div>
     <!-- /ko -->

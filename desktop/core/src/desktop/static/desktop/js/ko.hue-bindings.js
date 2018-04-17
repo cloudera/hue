@@ -568,6 +568,7 @@
       self.overflowHeight = options.overflowHeight;
       self.expandable = options.expandable;
       self.expandClass = options.expandClass;
+      self.expandActionClass = options.expandActionClass;
       self.overflowing = options.overflowing;
 
       self.onActionRender = options.onActionRender;
@@ -576,7 +577,7 @@
       self.lastKnownOffsetWidth;
       self.isOverflowing;
 
-      self.expanded = false;
+      self.expanded = options.expanded || ko.observable(false);
       self.updateOverflowHeight();
 
       self.contents = options.text;
@@ -601,8 +602,8 @@
     MultiLineEllipsisHandler.prototype.updateOverflowHeight = function () {
       var self = this;
       if (self.overflowHeight) {
-        self.$element.css('max-height', self.expanded ? '' : self.overflowHeight);
-        self.$element.css('overflow', self.expanded ? '' : 'hidden');
+        self.$element.css('max-height', self.expanded() ? '' : self.overflowHeight);
+        self.$element.css('overflow', self.expanded() ? '' : 'hidden');
       }
     };
 
@@ -638,20 +639,27 @@
       var textElement = $('<span>').appendTo(self.$element)[0];
       if (self.expandable) {
         textElement.innerHTML = self.renderContents ? self.renderContents(self.contents) : self.contents;
-        if (self.expanded || checkOverflow(self.element)) {
+        if (self.expanded() || checkOverflow(self.element)) {
           self.$element.append('&nbsp;');
-          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>');
-          if (self.expandClass) {
-            $expandLink.addClass(self.expandClass);
+          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded() ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>');
+          if (self.expandActionClass) {
+            $expandLink.addClass(self.expandActionClass);
           }
           $expandLink.appendTo(self.$element);
           $expandLink.add(textElement).click(function (e) {
-            self.expanded = !self.expanded;
+            self.expanded(!self.expanded());
+            console.log(self.expanded());
             self.updateOverflowHeight();
-            if (self.expanded) {
+            if (self.expanded()) {
+              if (self.expandClass) {
+                self.$element.addClass(self.expandClass);
+              }
               self.refresh();
               self.pause();
             } else {
+              if (self.expandClass) {
+                self.$element.removeClass(self.expandClass);
+              }
               self.resume();
             }
           })
@@ -705,11 +713,21 @@
     after: ['text', 'value'],
     init: function (element, valueAccessor) { },
     update: function (element, valueAccessor) {
+      var options = {};
+      if (valueAccessor && ko.isObservable(valueAccessor())) {
+        options.overflowing = valueAccessor();
+      } else if (valueAccessor) {
+        options = valueAccessor() || {};
+      }
       var multiLineEllipsisHandler = new MultiLineEllipsisHandler({
         element: element,
         text: element.textContent,
-        overflowing: valueAccessor(),
-        linkify: true
+        overflowing: options.overflowing,
+        linkify: true,
+        expandable: options.expandable,
+        expanded: options.expanded,
+        expandActionClass: options.expandActionClass,
+        expandClass: options.expandClass
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function() {

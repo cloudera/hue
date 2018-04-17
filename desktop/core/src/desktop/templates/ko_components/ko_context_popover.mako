@@ -333,25 +333,26 @@ from metadata.conf import has_navigator
       <div class="context-popover-flex-fill" data-bind="with: catalogEntry">
         <div class="context-popover-inner-content">
           <!-- ko if: $parent.comment() -->
-          <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis, text: $parent.comment"></div>
+          <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis: { expanded: $parent.commentExpanded, expandable: true, expandClass: 'context-popover-comment-expanded' }, text: $parent.comment"></div>
           <!-- /ko -->
 
-          %if has_navigator(user):
-            <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
-            <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true, overflowEllipsis: true } }"></div>
+          <!-- ko ifnot: $parent.commentExpanded -->
+            %if has_navigator(user):
+              <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
+              <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true, overflowEllipsis: true } }"></div>
+              <!-- /ko -->
+            %endif
+
+            <!-- ko if: isView() && $parent.viewSql() -->
+            <a href="javascript:void(0);" style="text-align: right; margin-bottom: 5px;" data-bind="toggle: $parent.viewSqlVisible, text: $parent.viewSqlVisible() ? '${ _ko('Show columns')}' : '${ _ko('Show view SQL')}'"></a>
             <!-- /ko -->
-          %endif
 
-          <!-- ko if: isView() && $parent.viewSql() -->
-          <a href="javascript:void(0);" style="text-align: right; margin-bottom: 5px;" data-bind="toggle: $parent.viewSqlVisible, text: $parent.viewSqlVisible() ? '${ _ko('Show columns')}' : '${ _ko('Show view SQL')}'"></a>
-          <!-- /ko -->
-
-          <!-- ko if: $parent.viewSqlVisible -->
-          <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, formatted: true, dialect: getSourceType() }">
-          </div>
-          <!-- /ko -->
-          <!-- ko ifnot: $parent.viewSqlVisible -->
-          <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } } --><!-- /ko -->
+            <!-- ko if: $parent.viewSqlVisible -->
+            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, formatted: true, dialect: getSourceType() }"></div>
+            <!-- /ko -->
+            <!-- ko ifnot: $parent.viewSqlVisible -->
+            <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } } --><!-- /ko -->
+            <!-- /ko -->
           <!-- /ko -->
         </div>
       </div>
@@ -410,6 +411,7 @@ from metadata.conf import has_navigator
 
         self.analysis = ko.observable();
         self.comment = ko.observable();
+        self.commentExpanded = ko.observable(false);
         self.viewSql = ko.observable();
         self.viewSqlVisible = ko.observable(false);
 

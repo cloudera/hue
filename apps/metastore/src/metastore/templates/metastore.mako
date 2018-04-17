@@ -402,7 +402,7 @@ ${ components.menubar(is_embeddable) }
         inputclass: 'hue-table-browser-desc-input',
         rows: 6,
         inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
-        multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandClass: 'editable-inline-action' }
+        multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandActionClass: 'editable-inline-action' }
       }">
       ${ _('Add a description...') }</div>
   </div>
@@ -428,7 +428,7 @@ ${ components.menubar(is_embeddable) }
         emptytext: '${ _ko('No description available') }',
         rows: 8,
         inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
-        multiLineEllipsis: { overflowHeight: '120px', expandable: true, expandClass: 'editable-inline-action', inlineEditAction: true },
+        multiLineEllipsis: { overflowHeight: '120px', expandable: true, expandActionClass: 'editable-inline-action', inlineEditAction: true },
       }" class="inline-block">
         ${ _('Add a description...') }
       </div>

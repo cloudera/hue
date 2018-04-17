@@ -135,7 +135,7 @@
               text: value,
               overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
               expandable: editableOptions.multiLineEllipsis,
-              expandClass: editableOptions.multiLineEllipsis.expandClass,
+              expandActionClass: editableOptions.multiLineEllipsis.expandActionClass,
               linkify: true,
               onActionRender: onActionRender
             });
