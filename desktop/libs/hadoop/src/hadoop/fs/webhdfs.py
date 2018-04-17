@@ -605,45 +605,45 @@ class WebHdfs(Hdfs):
 
 
   def remove_acl_entries(self, path, aclspec):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'REMOVEACLENTRIES'
-      params['aclspec'] = aclspec
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'REMOVEACLENTRIES'
+    params['aclspec'] = aclspec
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def remove_default_acl(self, path):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'REMOVEDEFAULTACL'
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'REMOVEDEFAULTACL'
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def remove_acl(self, path):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'REMOVEACL'
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'REMOVEACL'
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def set_acl(self, path, aclspec):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'SETACL'
-      params['aclspec'] = aclspec
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'SETACL'
+    params['aclspec'] = aclspec
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def get_acl_status(self, path):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'GETACLSTATUS'
-      headers = self._getheaders()
-      return self._root.get(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'GETACLSTATUS'
+    headers = self._getheaders()
+    return self._root.get(path, params, headers=headers)
 
 
   def check_access(self, path, aclspec='rw-'):

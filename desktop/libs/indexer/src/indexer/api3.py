@@ -99,6 +99,12 @@ def guess_format(request):
     indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(path):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
+      parent_path = request.fs.parent_path(file_format["path"])
+      if request.fs.stats(parent_path)["mode"] & 0700 != 0700:
+        print 'not good ' + parent_path
+      if is_enabled():
+        # If Sentry, check if has URI permission?
+        pass
 
     stream = request.fs.open(path)
     if detect_parquet(stream):
