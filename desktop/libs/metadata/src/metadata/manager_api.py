@@ -32,24 +32,13 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import force_unicode, smart_unicode
+from desktop.lib.i18n import force_unicode
 
 from metadata.conf import has_navigator
 from metadata.navigator_client import NavigatorApiException
 
 
 LOG = logging.getLogger(__name__)
-
-
-class ManagerApiException(Exception):
-  def __init__(self, message=None):
-    self.message = message or _('No error message, please check the logs.')
-
-  def __str__(self):
-    return str(self.message)
-
-  def __unicode__(self):
-    return smart_unicode(self.message)
 
 
 def error_handler(view_fn):

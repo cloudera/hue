@@ -80,7 +80,8 @@ class EnvelopeIndexer(object):
     properties = {
       "brokers": "self-service-analytics-1.gce.cloudera.com:9092,self-service-analytics-2.gce.cloudera.com:9092,self-service-analytics-3.gce.cloudera.com:9092",
       "kudu_master": "self-service-analytics-1.gce.cloudera.com:7051",
-      "output_table": "impala::default.traffic_conditions"
+      "output_table": "impala::default.traffic_conditions",
+      "topics": "traffic"
     }
 
     return """
@@ -97,7 +98,7 @@ steps {
         input {
             type = kafka
             brokers = "%(brokers)s"
-            topics = traffic
+            topics = %(topics)s
             encoding = string
             translator {
                 type = delimited

@@ -22,14 +22,24 @@ from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.http_client import RestException, HttpClient
-
-from metadata.conf import MANAGER
 from desktop.lib.rest.resource import Resource
-from metadata.manager_api import ManagerApiException
+from desktop.lib.i18n import smart_unicode
+from metadata.conf import MANAGER
 
 
 LOG = logging.getLogger(__name__)
 VERSION = 'v19'
+
+
+class ManagerApiException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
 
 
 class ManagerApi(object):
@@ -63,5 +73,27 @@ class ManagerApi(object):
       LOG.info(params)
       return self._root.get('tools/echo', params=params)
     except RestException, e:
-      LOG.error('Failed to search for entities with search query')
+      raise ManagerApiException(e)
+
+
+  def get_kafka_brokers(self, cluster_name=None):
+    try:
+      clusters = self._root.get('clusters/')['items']
+
+      if len(clusters) > 1:
+        cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name]
+      else:
+        cluster = clusters[0]
+
+      services = self._root.get('clusters/%(name)s/services' % cluster)['items']
+      kafka_service = [service for service in services if service['type'] == 'KAFKA'][0]
+
+      kafka_roles = self._root.get('clusters/%(name)s/services/%(kafka_service)s/roles' % {'name': cluster['name'], 'kafka_service': kafka_service['name']})['items']
+      kafka_broker_hostids = [broker_hostid['hostRef']['hostId'] for broker_hostid in kafka_roles if  broker_hostid['type'] == 'KAFKA_BROKER']
+
+      hosts = self._root.get('hosts')['items']
+      kafka_brokers_hosts = [host['hostname'] + ':9092' for host in hosts if host['hostId'] in kafka_broker_hostids]
+
+      return ','.join(kafka_brokers_hosts)
+    except RestException, e:
       raise ManagerApiException(e)
