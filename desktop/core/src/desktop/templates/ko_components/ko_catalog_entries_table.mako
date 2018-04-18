@@ -395,10 +395,11 @@ from desktop.views import _ko
                 sampleEnrichedEntry.showContextPopover(sampleEnrichedEntry, event);
               }
             };
-            var onRowClick = function (sampleEnrichedEntry, event) {;
+            var onRowClick = function (sampleEnrichedEntry, event) {
               if (self.selectedEntries && $(event.target).is('td')) {
                $(event.currentTarget).find('.hue-checkbox').trigger('click');
               }
+              return true;
             };
             var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
               var entries = $.map(childEntries, function (entry, index) { return new SampleEnrichedEntry(index, entry, onClick, onRowClick) });
