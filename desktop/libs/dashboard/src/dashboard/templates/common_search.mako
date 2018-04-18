@@ -4199,7 +4199,7 @@ $(document).ready(function () {
             }
           }
         }
-        if (existingWidget.widget && existingWidget.widget.widgetType() === 'html-resultset-widget') {
+        if (existingWidget.widget && existingWidget.widget.widgetType && existingWidget.widget.widgetType() === 'html-resultset-widget') {
           huePubSub.publish('gridster.clean.html.whitespace', existingWidget);
         }
       });
