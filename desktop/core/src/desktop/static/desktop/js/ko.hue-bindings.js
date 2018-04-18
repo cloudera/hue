@@ -641,7 +641,7 @@
         textElement.innerHTML = self.renderContents ? self.renderContents(self.contents) : self.contents;
         if (self.expanded() || checkOverflow(self.element)) {
           self.$element.append('&nbsp;');
-          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded() ? 'fa-angle-double-up' : 'fa-angle-double-down') + '"></i></a>');
+          var $expandLink = $('<a href="javascript:void(0);"><i class="fa fa-fw ' + (self.expanded() ? 'fa-chevron-up' : 'fa-chevron-down') + '"></i></a>');
           if (self.expandActionClass) {
             $expandLink.addClass(self.expandActionClass);
           }
