@@ -78,22 +78,47 @@ class ManagerApi(object):
 
   def get_kafka_brokers(self, cluster_name=None):
     try:
-      clusters = self._root.get('clusters/')['items']
-
-      if len(clusters) > 1:
-        cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name]
-      else:
-        cluster = clusters[0]
-
+      cluster = self._get_services(cluster_name)
       services = self._root.get('clusters/%(name)s/services' % cluster)['items']
-      kafka_service = [service for service in services if service['type'] == 'KAFKA'][0]
 
-      kafka_roles = self._root.get('clusters/%(name)s/services/%(kafka_service)s/roles' % {'name': cluster['name'], 'kafka_service': kafka_service['name']})['items']
-      kafka_broker_hostids = [broker_hostid['hostRef']['hostId'] for broker_hostid in kafka_roles if  broker_hostid['type'] == 'KAFKA_BROKER']
+      service = [service for service in services if service['type'] == 'KAFKA'][0]
+      broker_hosts = self._get_roles(cluster['name'], service['name'], 'KAFKA_BROKER')
+      broker_hosts_ids = [broker_host['hostRef']['hostId'] for broker_host in broker_hosts]
 
       hosts = self._root.get('hosts')['items']
-      kafka_brokers_hosts = [host['hostname'] + ':9092' for host in hosts if host['hostId'] in kafka_broker_hostids]
+      brokers_hosts = [host['hostname'] + ':9092' for host in hosts if host['hostId'] in broker_hosts_ids]
 
-      return ','.join(kafka_brokers_hosts)
+      return ','.join(brokers_hosts)
     except RestException, e:
       raise ManagerApiException(e)
+
+
+  def get_kudu_master(self, cluster_name=None):
+    try:
+      cluster = self._get_services(cluster_name)
+      services = self._root.get('clusters/%(name)s/services' % cluster)['items']
+
+      service = [service for service in services if service['type'] == 'KUDU'][0]
+      master = self._get_roles(cluster['name'], service['name'], 'KUDU_MASTER')[0]
+
+      master_host = self._root.get('hosts/%(hostId)s' % master['hostRef'])
+
+      return master_host['hostname']
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def _get_services(self, cluster_name=None):
+    clusters = self._root.get('clusters/')['items']
+
+    if cluster_name is not None:
+      cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name]
+    else:
+      cluster = clusters[0]
+
+    return cluster
+
+
+  def _get_roles(self, cluster_name, service_name, role_type):
+    roles = self._root.get('clusters/%(cluster_name)s/services/%(service_name)s/roles' % {'cluster_name': cluster_name, 'service_name': service_name})['items']
+    return [role for role in roles if role['type'] == role_type]
