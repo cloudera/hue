@@ -735,7 +735,9 @@ var EditorViewModel = (function() {
       newVal.forEach(function (item, index) {
         var variable = self.variables()[index];
         variable.name(item.name);
-        variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
+        setTimeout(function(){
+          variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
+        });
         variable.meta = ko.mapping.fromJS(item.meta, {}, variable.meta);
         variable.sample(self.variableValues[item.name] ? self.variableValues[item.name].sample : []);
         variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type || 'text' : 'text');
