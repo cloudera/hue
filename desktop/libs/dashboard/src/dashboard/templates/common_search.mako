@@ -4561,7 +4561,7 @@ $(document).ready(function () {
     if (searchViewModel.isGridster() && (!event || (event && !$(event.target).parents('.edit-dimensions').length))) {
       searchViewModel.collection.facets().forEach(function (facet) {
         facet.isAdding(false);
-        if (facet.properties && facet.properties.facets()) {
+        if (facet.properties && facet.properties.facets && facet.properties.facets()) {
           facet.properties.facets().forEach(function (dimension) {
             dimension.isEditing(false);
           });
