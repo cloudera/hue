@@ -1022,7 +1022,7 @@ var DataCatalog = (function () {
       var self = this;
       return HAS_NAVIGATOR
         && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')
-        && self.isDatabase() || self.isTableOrView() || self.isColumn();
+        && (self.isDatabase() || self.isTableOrView() || self.isColumn());
     };
 
     /**
@@ -2027,6 +2027,11 @@ var DataCatalog = (function () {
       }
 
       var deferred = $.Deferred();
+
+      if (!HAS_NAVIGATOR) {
+        return deferred.reject().promise();
+      }
+
       self.allNavigatorTagsPromise = deferred.promise();
 
       var reloadAllTags = function () {

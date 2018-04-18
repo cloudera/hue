@@ -457,7 +457,7 @@ from desktop.views import _ko
           self.updateCategories(HUE_DOC_CATEGORY, categories);
         }));
 
-        if (!docOnly) {
+        if (!docOnly && HAS_NAVIGATOR) {
           var clearNavTimeout = window.setTimeout(function () {
             self.updateCategories(NAV_CATEGORY, []);
           }, 300);
