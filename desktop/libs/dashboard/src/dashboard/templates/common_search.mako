@@ -3925,10 +3925,15 @@ $(document).ready(function () {
       start: function (event, ui, $widget) {
         $widget.find('.card-widget').css('opacity', '.6');
         isDraggingOrResizingWidgets = true;
+        huePubSub.publish('gridster.resize.start', $widget);
+      },
+      resize: function (event, ui, $widget, aa) {
+        huePubSub.publish('gridster.resize', $widget);
       },
       stop: function (event, ui, $widget) {
         huePubSub.publish('resize.plotly.chart');
         huePubSub.publish('gridster.clean.whitespace');
+        huePubSub.publish('gridster.resize.stop');
         $widget.find('.card-widget').height($widget.height()).css('opacity', '1');
         isDraggingOrResizingWidgets = false;
       },
@@ -4471,7 +4476,15 @@ $(document).ready(function () {
 
   }, 'dashboard');
 
-  function autoResizeSiblings(gridElement, skipRemoveFromGrid) {
+  var tempResize = {
+    widget: null,
+    sibling: null,
+    previousWidgetSize: 0,
+    previousSiblingSize: 0,
+    previousSiblingCol: 0
+  }
+
+  function autoResizeSiblings(gridElement, skipRemoveFromGrid, countGridElement) {
     // resize the siblings to the max of the avail space
     var siblings = [];
     searchViewModel.gridItems().forEach(function (siblingWidget) {
@@ -4482,14 +4495,41 @@ $(document).ready(function () {
     siblings.sort(function (a, b) {
       return a.col() > b.col()
     });
-    var optimalWidgetWidth = Math.floor(12 / siblings.length);
-    for (var i = 1; i <= siblings.length; i++) {
-      var widget = siblings[i - 1];
-      $gridster.resize_widget($(widget.gridsterElement), optimalWidgetWidth, widget.size_y());
-      widget.size_x(optimalWidgetWidth);
-      var newCol = ((i - 1) * optimalWidgetWidth) + 1;
-      $gridster.move_widget($(widget.gridsterElement), newCol, widget.row());
-      widget.col(newCol);
+    if (countGridElement) {
+      // resize just the first sibling to the right
+      siblings = siblings.filter(function (a) {
+        return a.col() > gridElement.col();
+      });
+
+      if (siblings.length) {
+        var widget = siblings[0];
+        if (!tempResize.previousSiblingCol) {
+          tempResize.previousSiblingCol = widget.col();
+          tempResize.previousSiblingSize = widget.size_x();
+        }
+        var previewSize = $('.resize-preview-holder').attr('data-sizex');
+        if (previewSize) {
+          var newCol = tempResize.previousSiblingCol - (tempResize.previousWidgetSize - parseInt(previewSize));
+          var newWidth = tempResize.previousSiblingSize + (tempResize.previousWidgetSize - parseInt(previewSize));
+          if (newCol < 12 && newWidth >= 1) {
+            $gridster.move_widget($(widget.gridsterElement), newCol, widget.row());
+            widget.col(newCol);
+            $gridster.resize_widget($(widget.gridsterElement), newWidth, widget.size_y());
+            widget.size_x(newWidth);
+          }
+        }
+      }
+    }
+    else {
+      var optimalWidgetWidth = Math.floor(12 / siblings.length);
+      for (var i = 1; i <= siblings.length; i++) {
+        var widget = siblings[i - 1];
+        $gridster.resize_widget($(widget.gridsterElement), optimalWidgetWidth, widget.size_y());
+        widget.size_x(optimalWidgetWidth);
+        var newCol = ((i - 1) * optimalWidgetWidth) + 1;
+        $gridster.move_widget($(widget.gridsterElement), newCol, widget.row());
+        widget.col(newCol);
+      }
     }
     if (!skipRemoveFromGrid) {
       searchViewModel.gridItems.remove(gridElement);
@@ -4497,7 +4537,25 @@ $(document).ready(function () {
     huePubSub.publish('gridster.clean.whitespace');
   }
 
-  huePubSub.subscribe('gridster.remove', autoResizeSiblings, 'dashboard')
+  huePubSub.subscribe('gridster.remove', autoResizeSiblings, 'dashboard');
+
+  huePubSub.subscribe('gridster.resize.start', function ($widget) {
+    searchViewModel.gridItems().forEach(function (item) {
+      if (item.widgetId() === parseInt($widget.attr('data-widgetid'))) {
+        tempResize.widget = item;
+        tempResize.previousWidgetSize = item.size_x();
+      }
+    });
+  }, 'dashboard');
+
+  huePubSub.subscribe('gridster.resize', function () {
+    autoResizeSiblings(tempResize.widget, true, true);
+  }, 'dashboard');
+
+  huePubSub.subscribe('gridster.resize.stop', function () {
+    tempResize.previousSiblingCol = null;
+    tempResize.previousSiblingSize = null;
+  }, 'dashboard');
 
   huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
     if (searchViewModel.isGridster()) {
