@@ -2167,9 +2167,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="metric-form">
-  <pre data-bind="text: ko.toJSON($data, null, 2)">
-
-  </pre>
     <!-- ko if: typeof isEditing !== 'undefined' && isEditing() -->
     <div>
       <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
