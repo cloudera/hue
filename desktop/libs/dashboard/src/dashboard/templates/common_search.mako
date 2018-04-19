@@ -4178,7 +4178,7 @@ $(document).ready(function () {
       var touched = [];
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var siblings = [];
-        if (touched.indexOf(existingWidget.widgetId()) === -1) {
+        if (existingWidget.widgetId && touched.indexOf(existingWidget.widgetId()) === -1) {
           touched.push(existingWidget.widgetId());
           var biggestSize = existingWidget.size_y();
           searchViewModel.gridItems().forEach(function (siblingWidget) {
