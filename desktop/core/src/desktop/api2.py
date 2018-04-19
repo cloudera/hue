@@ -44,7 +44,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
-  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER, get_cluster_config
+  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
 
 
 LOG = logging.getLogger(__name__)
@@ -69,10 +69,6 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_config(request):
-  if request.POST.get(USER_PREFERENCE_CLUSTER):
-    set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST.get(USER_PREFERENCE_CLUSTER))
-
-
   config = get_cluster_config(request.user)
   config['status'] = 0
 

@@ -1479,18 +1479,14 @@ def get_clusters():
       (i, {
         'name': i,
         'type': cluster_config[i].TYPE.get(),
-        'interfaces': [{'name': i, 'type': cluster_config[i].TYPE.get(), 'interface': interface} for interface in cluster_config[i].INTERFACES.get()]
+        'interfaces': [
+            {'name': i, 'type': cluster_config[i].TYPE.get(), 'interface': interface}
+            for interface in cluster_config[i].INTERFACES.get()
+        ]
       }) for i in cluster_config]
     )
   else:
-    if IS_EMBEDDED.get():
-      clusters = OrderedDict([('Default', {'name': 'Analytic DB', 'type': 'analyticdb', 'interfaces': []})])
-    else:
-      clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
-
-  if 'Data Eng' in clusters:
-    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
-    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
+    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
 
   return clusters
 
