@@ -1758,7 +1758,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div>
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
-      <div class="pull-right" style="margin-top: 40px">
+      <div class="pull-right">
 
       <!-- ko if: properties.isDate -->
         <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
@@ -3771,12 +3771,16 @@ function resizeFieldsListCallback() {
 
 var resizeTimeout = -1;
 function resizeFieldsListThrottled() {
-  window.clearTimeout(resizeTimeout);
-  resizeTimeout = window.setTimeout(resizeFieldsListCallback, 200);
+  if (!searchViewModel.isGridster()) {
+    window.clearTimeout(resizeTimeout);
+    resizeTimeout = window.setTimeout(resizeFieldsListCallback, 200);
+  }
 }
 
 function resizeFieldsList() {
-  resizeFieldsListCallback();
+  if (!searchViewModel.isGridster()) {
+    resizeFieldsListCallback();
+  }
 }
 
 function toggleDocDetails(doc) {
@@ -4689,6 +4693,24 @@ $(document).ready(function () {
     $(document).trigger("refreshCodemirror");
     $(this).parent().siblings().removeClass("active");
     $(this).parent().addClass("active");
+  });
+
+  $(document).on('dblclick', 'li.gs-w', function (event) {
+    var $gridsterWidget = $(event.target).parents('li.gs-w');
+
+    searchViewModel.gridItems().forEach(function (widget) {
+      if (widget.widgetId() === parseInt($gridsterWidget.data('widgetid'))) {
+        removeInternalScroll(widget);
+        var contentHeight = $(widget.gridsterElement).find('.card-widget').height();
+        if (widget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
+          widget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
+          $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
+            huePubSub.publish('gridster.clean.whitespace');
+            equalizeWidgetsHeights();
+          });
+        }
+      }
+    });
   });
 
   $('.dashboard-container').on('click', function (e) {
