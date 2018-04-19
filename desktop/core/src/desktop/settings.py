@@ -202,7 +202,15 @@ INSTALLED_APPS = [
 
     # App that keeps track of failed logins.
     'axes',
+    'webpack_loader',
 ]
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'desktop/js/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
+    }
+}
 
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')

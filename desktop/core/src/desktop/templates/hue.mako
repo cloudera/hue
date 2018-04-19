@@ -26,6 +26,8 @@
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
+
+  from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
@@ -444,7 +446,8 @@ ${ hueIcons.symbols() }
 
 ${ commonshare() | n,unicode }
 
-<script src="${ static('desktop/js/hue-bundle.js') }"></script>
+
+${ render_bundle('hue') | n,unicode }
 % if IS_EMBEDDED.get():
 <script src="${ static('desktop/ext/js/page.js') }"></script>
 % endif
