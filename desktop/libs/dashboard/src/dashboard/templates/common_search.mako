@@ -2167,6 +2167,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="metric-form">
+  <pre data-bind="text: ko.toJSON($data, null, 2)">
+
+  </pre>
     <!-- ko if: typeof isEditing !== 'undefined' && isEditing() -->
     <div>
       <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
@@ -4281,6 +4284,21 @@ $(document).ready(function () {
     tempDraggable = null;
   }, 'dashboard');
 
+  huePubSub.subscribe('gridster.empty.add', function (options) {
+    var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+    var widgetClone = ko.mapping.toJS(options.widget);
+    widgetClone.id = UUID();
+    selectedWidget = new Widget(widgetClone);
+    fakeRow.addWidget(selectedWidget);
+    selectedGridster = options.target;
+    addFacetDemiModalFieldPreview({
+      'name': function () {
+        return selectedGridster.tempFieldName
+      }
+    });
+    tempDraggable = null;
+  }, 'dashboard');
+
   function removeInternalScroll(widget) {
     var scrollDifference = widget.gridsterElement.scrollHeight - widget.gridsterElement.clientHeight;
     if (scrollDifference > 0) { // avoid scrollbars inside the widget
@@ -4453,8 +4471,8 @@ $(document).ready(function () {
                 size_x: dimensions.sizex,
                 size_y: tempDraggable.gridsterHeight(),
                 widget: null,
+                tempFieldName: null,
                 callback: function (el) {
-                  showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
                   tempDraggable = null;
                 }
               })
@@ -4469,6 +4487,7 @@ $(document).ready(function () {
               size_x: dimensions.sizex,
               size_y: 6,
               widget: null,
+              tempFieldName: null,
               callback: function (el) {
                 showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
               }

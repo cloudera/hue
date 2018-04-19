@@ -71,7 +71,8 @@ function loadDashboardLayout(viewModel, gridster_layout) {
         row: parseInt(item.row),
         size_x: parseInt(item.size_x),
         size_y: parseInt(item.size_y),
-        widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null
+        widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null,
+        tempFieldName: null,
       }));
   });
 }

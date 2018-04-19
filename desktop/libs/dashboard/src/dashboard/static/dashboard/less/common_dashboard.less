@@ -556,6 +556,18 @@
     }
   }
 
+  .empty-gridster-widget {
+    .edit-dimensions {
+      opacity: 1;
+      .action-icon, .dimensions-badge-container-add {
+        opacity: 1;
+      }
+      .dimensions-badge-container-add {
+        float: left;
+      }
+    }
+  }
+
   .metric-form {
     position: absolute;
     z-index: 10;
@@ -567,6 +579,15 @@
     .selectize-control {
       margin-top: 4px;
       margin-right: 20px;
+    }
+  }
+
+  .empty-gridster-widget {
+    .metric-form {
+      .hue-no-box-shadow;
+      .selectize-control {
+        margin-right: auto;
+      }
     }
   }
 
