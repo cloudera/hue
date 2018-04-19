@@ -111,9 +111,7 @@ steps {
         deriver {
             type = sql
             query.literal = \"""
-                SELECT UNIX_TIMESTAMP() * 1000 as_of_time, ROUND(AVG(number_of_vehicles), 2) avg_num_veh,
-                MIN(number_of_vehicles) min_num_veh, MAX(number_of_vehicles) max_num_veh,
-                MIN(measurement_time) first_meas_time, MAX(measurement_time) last_meas_time FROM traffic\"""
+                SELECT measurement_time, number_of_vehicles FROM traffic\"""
         }
         planner {
             type = upsert
@@ -129,7 +127,8 @@ steps {
 """ % properties
 
 
-"""application {
+  def generate_config_parquet(self, properties):
+    return """application {
   name = Filesystem Example
   executors = 1
 }

@@ -1291,6 +1291,7 @@ ${ assist.assistPanel() }
         self.rdbmsMode('customRdbms');
         if (val == 'kafka') {
           wizard.guessFormat();
+          wizard.destination.tableFormat('kudu');
         }
       });
       self.inputFormatsAll = ko.observableArray([
@@ -1769,16 +1770,22 @@ ${ assist.assistPanel() }
       self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
 
-      self.tableFormats = ko.observableArray([
-          {'value': 'text', 'name': 'Text'},
-          {'value': 'parquet', 'name': 'Parquet'},
-          {'value': 'kudu', 'name': 'Kudu'},
-          {'value': 'csv', 'name': 'Csv'},
-          {'value': 'avro', 'name': 'Avro'},
-          {'value': 'json', 'name': 'Json'},
-          {'value': 'regexp', 'name': 'Regexp'},
-          {'value': 'orc', 'name': 'ORC'},
-      ]);
+      self.tableFormats = ko.pureComputed(function() {
+        if (wizard.source.inputFormat() == 'kafka') {
+          return [{'value': 'kudu', 'name': 'Kudu'}];
+        } else {
+          return [
+            {'value': 'text', 'name': 'Text'},
+            {'value': 'parquet', 'name': 'Parquet'},
+            {'value': 'kudu', 'name': 'Kudu'},
+            {'value': 'csv', 'name': 'Csv'},
+            {'value': 'avro', 'name': 'Avro'},
+            {'value': 'json', 'name': 'Json'},
+            {'value': 'regexp', 'name': 'Regexp'},
+            {'value': 'orc', 'name': 'ORC'},
+          ]
+        }
+      });
 
       self.partitionColumns = ko.observableArray();
       self.kuduPartitionColumns = ko.observableArray();
