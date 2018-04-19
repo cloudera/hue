@@ -4942,10 +4942,10 @@ $(document).ready(function () {
       }
       else if (searchViewModel.lastDraggedMeta() && searchViewModel.lastDraggedMeta().type === 'sql' && searchViewModel.lastDraggedMeta().column && searchViewModel.collection.template.availableWidgetFieldsNames().indexOf(searchViewModel.lastDraggedMeta().column) > -1) {
         if (searchViewModel.collection.supportAnalytics()) {
-          selectedWidget = searchViewModel.draggableTextFacet();
+          selectedWidget = searchViewModel.draggableBucket();
         }
         else {
-          selectedWidget = searchViewModel.draggableFacet();
+          selectedWidget = searchViewModel.draggableBar();
         }
         var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
         var widgetClone = ko.mapping.toJS(selectedWidget);
