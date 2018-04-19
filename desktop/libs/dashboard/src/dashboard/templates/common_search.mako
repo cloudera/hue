@@ -4425,6 +4425,9 @@ $(document).ready(function () {
           }
 
           if (tempDraggableGridsterWidget) {
+            if (dimensions.row !== tempDraggableGridsterWidget.row()) {
+              autoResizeSiblings(tempDraggableGridsterWidget, true);
+            }
             $gridster.move_widget($(tempDraggableGridsterWidget.gridsterElement), -100, -100, resizeAndMoveSiblings); // temporarily move it off grid
           }
           else {
