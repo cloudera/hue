@@ -187,6 +187,10 @@ from django.utils.translation import ugettext as _
             var keysAfterEdit = {};
             var modifiedCustomMetadata = {};
 
+            if (!navigatorMeta.properties) {
+              navigatorMeta.properties = {};
+            }
+
             self.editProperties().forEach(function (property) {
               if (navigatorMeta.properties[property.key()] !== property.value()) {
                 modifiedCustomMetadata[property.key()] = property.value();
