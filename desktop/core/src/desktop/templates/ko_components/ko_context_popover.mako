@@ -1090,7 +1090,7 @@ from metadata.conf import has_navigator
 
           var detectMoveInterval = window.setInterval(function () {
             currentSourceOffset = $source.offset();
-            if (currentSourceOffset.left !== originalSourceOffset.left || currentSourceOffset.top !== originalSourceOffset.top) {
+            if (currentSourceOffset.top !== originalSourceOffset.top) {
               hidePopover();
             }
           }, 200);
