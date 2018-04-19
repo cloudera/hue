@@ -134,7 +134,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster() && !$root.isQueryBuilder() -->
       <div class="btn-group">
-        <a class="btn draggable-plus-button move-cursor" title="${ _('Click or drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: draggableBar(), options: getDraggableOptions({ data: draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+        <a class="btn draggable-plus-button move-cursor" title="${ _('Click or drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
           <i class="fa fa-plus"></i>
         </a>
       </div>
@@ -269,7 +269,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="fa fa-superscript" style="font-size: 110%"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
                     options: getDraggableOptions({ data: draggableFacet() }) }"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
@@ -285,7 +285,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
                     options: getDraggableOptions({ data: draggablePie() }) }"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
@@ -301,7 +301,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="fa fa-pie-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(),
+    <div data-bind="visible: !$root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart,
                     options: getDraggableOptions({ data: draggableBar() }) }"
@@ -319,7 +319,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="fa fa-bar-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(),
+    <div data-bind="visible: !$root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
                     options: getDraggableOptions({ data: draggableLine() }) }"
@@ -328,7 +328,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
+    <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree(), isEnabled: true,
                     options: getDraggableOptions({ data: draggableTree() }) }"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
@@ -346,7 +346,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
          </a>
     </div>
     % endif
-    <div data-bind="visible: ! $root.collection.supportAnalytics(),
+    <div data-bind="visible: !$root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableHeatmap(), isEnabled: true,
                     options: getDraggableOptions({ data: draggableHeatmap() }) }"
@@ -355,7 +355,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="fa fa-th"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
+    <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
                     options: getDraggableOptions({ data: draggableHistogram() }) }"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
@@ -371,7 +371,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
                        <i class="fa fa-line-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
+    <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableMap,
                     options: getDraggableOptions({ data: draggableMap() }) }"
          title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
@@ -639,7 +639,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: $index() < $parent.properties.limit() -->
-                <!-- ko if: ! $data.selected -->
+                <!-- ko if: !$data.selected -->
                   <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                   <div class="hellip">
                     <a class="pointer" dir="ltr" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
@@ -761,7 +761,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div data-bind="foreach: $parent.countsFiltered" class="facet-count">
             <div class="trigger-exclude">
                 <!-- ko if: $index() < $parent.properties.limit() -->
-                  <!-- ko if: ! $data.selected -->
+                  <!-- ko if: !$data.selected -->
                     <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                     <div class="hellip">
                       <a class="pointer" dir="ltr" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
@@ -1054,7 +1054,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </tbody>
       </table>
 
-      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
+      <div class="widget-spinner" data-bind="visible: !$root.hasRetrievedResults()">
         <i class="fa fa-spinner fa-spin"></i>
       </div>
     </div>
@@ -1084,16 +1084,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div class="document-details pull-left">
       <table class="table table-condensed">
         <tbody data-bind="foreach: details">
-          <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
+          <tr data-bind="css: {'readonly': !$parent.showEdit()}">
              <th class="grid-th" data-bind="text: key"></th>
              <td width="100%">
                <!-- ko if: typeof value() == 'string' && value().match(/^https?:\/\//i) -->
                <a data-bind="attr: { href: escapeOutput(value()) }" target="_blank">
-                 <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+                 <span data-bind="text: value, visible: !$parent.showEdit()"></span>
                </a>
                <!-- /ko -->
                <!-- ko ifnot: typeof value() == 'string' && value().match(/^https?:\/\//i) -->
-                 <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+                 <span data-bind="text: value, visible: !$parent.showEdit()"></span>
                <!-- /ko -->
                <input data-bind="value: value, visible: $parent.showEdit, valueUpdate: 'afterkeydown',
                click: function(detail, e){
@@ -1520,7 +1520,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </div>
     </span>
 
-      <div class="widget-spinner" data-bind="visible: ! $parent.hasRetrievedResults() || ! $parent.response().response">
+      <div class="widget-spinner" data-bind="visible: !$parent.hasRetrievedResults() || !$parent.response().response">
         <i class="fa fa-spinner fa-spin"></i>
       </div>
 
@@ -2301,7 +2301,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="content">
         <strong>${_('selected')}</strong>
         <span data-bind="foreach: $data.filter">
-          <span class="label label-info" style="margin-left: 4px" data-bind="visible: ! $data.exclude(), html: prettifyDate($data.value()), attr: {'title': $data.value()}"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="visible: !$data.exclude(), html: prettifyDate($data.value()), attr: {'title': $data.value()}"></span>
         </span>
         <br/>
         <strong>${_('excluded')}</strong>
@@ -2331,7 +2331,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <!-- /ko -->
 
             <!-- ko if: $parent.type() == 'range-up' -->
-              <strong data-bind="visible: ! $parent.is_up()">${ _('Until') }</strong>
+              <strong data-bind="visible: !$parent.is_up()">${ _('Until') }</strong>
               <span data-bind="html: prettifyDate($data.from()), attr: {'title': $data.from()}"></span>
               <strong data-bind="visible: $parent.is_up()"> & Up</strong>
             <!-- /ko -->
@@ -2430,7 +2430,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
     </div>
 
-    <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
+    <div class="margin-bottom-10" data-bind="visible: !$root.isEditing()">
       <div data-bind="with: $root.collection.getFacetById($parent.id())">
         <!-- ko if: $data.properties.facets().length == 1 -->
           <div class="margin-bottom-10">
@@ -2490,7 +2490,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </span>
       </div>
 
-      <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
+      <div class="margin-bottom-10" data-bind="visible: !$root.isEditing()">
         <!-- ko if: $data.properties.facets().length == 2 -->
           <div class="margin-bottom-10">
             <span data-bind="text: $data.properties.facets()[1].field"></span>
@@ -2554,8 +2554,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
           <i class="fa fa-spinner fa-spin"></i>
         </div>
-        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
-        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table table-condensed">
+        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: !$parent.isLoading() && $data.data().length > 0" class="table table-condensed">
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td data-bind="text: val.value"></td>
@@ -2579,9 +2579,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
           <i class="fa fa-spinner fa-spin"></i>
         </div>
-        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
-        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
-        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table table-condensed">
+        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
+        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: !$parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table table-condensed">
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td style="vertical-align: top"><strong data-bind="text: key"></strong></td>
