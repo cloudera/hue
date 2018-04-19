@@ -323,17 +323,20 @@ ${ assist.assistPanel() }
           <!-- /ko -->
 
           <!-- ko if: createWizard.source.inputFormat() == 'kafka' -->
-            ## Service
+            ##<div class="control-group">
+            ##  <label for="rdbmsHostname" class="control-label"><div>${ _('Brokers') }</div>
+            ##    <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaBrokers" placeholder="${ _('Enter a csv list of brokers, e.g.brokers1:9092,brokers2:9092') }">
+            ##  </label>
+            ##</div>
 
             <div class="control-group">
-              <label for="rdbmsHostname" class="control-label"><div>${ _('Brokers') }</div>
-                <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaBrokers" placeholder="${ _('Enter a csv list of brokers, e.g.brokers1:9092,brokers2:9092') }">
-              </label>
-            </div>
-
-            <div class="control-group">
-              <label for="rdbmsHostname" class="control-label"><div>${ _('Topic') }</div>
-                <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }">
+              <label class="control-label"><div>${ _('Topics') }</div>
+                ##<input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaTopics">
+                <select data-bind="options: createWizard.source.kafkaTopics,
+                       value: createWizard.source.kafkaSelectedTopics,
+                       optionsCaption: 'Choose...'"
+                       placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
+                ##<select data-bind="selectize: createWizard.source.kafkaTopics, value: createWizard.source.kafkaSelectedTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
               </label>
             </div>
           <!-- /ko -->
@@ -1286,6 +1289,9 @@ ${ assist.assistPanel() }
         self.path('');
         resizeElements();
         self.rdbmsMode('customRdbms');
+        if (val == 'kafka') {
+          wizard.guessFormat();
+        }
       });
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
@@ -1294,7 +1300,7 @@ ${ assist.assistPanel() }
           {'value': 'rdbms', 'name': 'External Database'},
           % endif
           % if ENABLE_KAFKA.get():
-          {'value': 'kafka', 'name': 'Kafka Stream'},
+          {'value': 'kafka', 'name': 'Internal Stream'},
           % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
@@ -1490,9 +1496,10 @@ ${ assist.assistPanel() }
       self.draggedQuery = ko.observable();
 
       // Kafka
-      self.kafkaBrokers = ko.observable('brokers1:9092,brokers2:9092');
-      self.kafkaTopics = ko.observable('');
-      self.kafkaTopics.subscribe(function(newValue) {
+      self.kafkaBrokers = ko.observable('brokers1:9092,brokers2:9092'); // Unused
+      self.kafkaTopics = ko.observable([]);
+      self.kafkaSelectedTopics = ko.observable('');
+      self.kafkaSelectedTopics.subscribe(function(newValue) {
         if (newValue) {
           viewModel.createWizard.guessFieldTypes();
         }
@@ -1528,7 +1535,7 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'manual') {
           return true;
         } else if (self.inputFormat() == 'kafka') {
-          return self.kafkaBrokers().length > 0 && self.kafkaTopics().length > 0;
+          return self.kafkaBrokers().length > 0 && self.kafkaSelectedTopics().length > 0;
         } else if (self.inputFormat() == 'rdbms') {
           return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.rdbmsAllTablesSelected());
         }
@@ -1949,6 +1956,9 @@ ${ assist.assistPanel() }
           } else {
             var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
             self.source.format(newFormat);
+            if (self.source.inputFormat() == 'kafka') {
+              self.source.kafkaTopics(resp['topics']);
+            }
             self.guessFieldTypes();
           }
 

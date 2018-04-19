@@ -29,6 +29,9 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
 from librdbms.server import dbms as rdbms
+from libsentry.conf import is_enabled
+from metadata.kafka_client import KafkaApi
+from metadata.manager_client import ManagerApi
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
 from notebook.models import make_notebook, MockedDjangoRequest, escape_rows
@@ -117,6 +120,8 @@ def guess_format(request):
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
   elif file_format['inputFormat'] == 'rdbms':
     format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
+  elif file_format['inputFormat'] == 'kafka':
+    format_ = {'type': 'csv', 'topics': KafkaApi().topics()}
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -422,8 +427,16 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
     input_path = '${nameNode}%s' % file_format["path"]
   else:
     input_path = None
+    
+    manager = ManagerApi()
 
-  morphline = indexer.generate_config()
+    properties = {
+      "brokers": manager.get_kafka_brokers(),
+      "kudu_master": manager.get_kudu_master(),
+      "output_table": "impala::%s" % collection_name,
+      "topics": file_format['kafkaSelectedTopics']
+    }
+
+  morphline = indexer.generate_config(properties)
 
   return indexer.run(request, collection_name, morphline, input_path, start_time=start_time, lib_path=lib_path)
-

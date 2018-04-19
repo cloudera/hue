@@ -76,14 +76,7 @@ class EnvelopeIndexer(object):
     return task.execute(request, batch=True)
 
 
-  def generate_config(self):
-    properties = {
-      "brokers": "self-service-analytics-1.gce.cloudera.com:9092,self-service-analytics-2.gce.cloudera.com:9092,self-service-analytics-3.gce.cloudera.com:9092",
-      "kudu_master": "self-service-analytics-1.gce.cloudera.com:7051",
-      "output_table": "impala::default.traffic_conditions",
-      "topics": "traffic"
-    }
-
+  def generate_config(self, properties):
     return """
 application {
     name = Traffic analysis

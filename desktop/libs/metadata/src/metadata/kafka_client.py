@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -24,7 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.lib.i18n import smart_unicode
-from metadata.conf import MANAGER
+from metadata.conf import KAFKA
 
 
 LOG = logging.getLogger(__name__)
@@ -47,26 +48,16 @@ class KafkaApi(object):
   """
 
   def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
-    self._api_url = '%s/%s' % (MANAGER.API_URL.get().strip('/'))
-    # localhost:8082/topics
-    
-    self._username = 'hue' #get_navigator_auth_username()
-    self._password = 'hue' #get_navigator_auth_password()
+    self._api_url = KAFKA.API_URL.get().strip('/')
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
-
-    if security_enabled:
-      self._client.set_kerberos_auth()
-    else:
-      self._client.set_basic_auth(self._username, self._password)
-
-    self._client.set_verify(ssl_cert_ca_verify)
     self._root = Resource(self._client)
 
 
   def topics(self):
     try:
-      return self._root.get('topics')
+      response = self._root.get('topics')
+      return json.loads(response)
     except RestException, e:
       raise KafkaApiException(e)

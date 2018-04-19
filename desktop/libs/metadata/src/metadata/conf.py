@@ -392,6 +392,17 @@ MANAGER = ConfigSection(
 )
 
 
+KAFKA = ConfigSection(
+  key='kafka',
+  help=_t("""Configuration options for Kafka API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to API.'),
+      default=None),
+  )
+)
+
 
 def test_metadata_configurations(user):
   from libsentry.conf import is_enabled
