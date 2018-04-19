@@ -59,7 +59,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import Settings, hue_version, _get_apps, UserPreferences, Cluster
+from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
 
 
@@ -73,7 +73,6 @@ def is_alive(request):
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
   current_app, other_apps, apps_list = _get_apps(request.user, '')
-  default_cluster_index, default_cluster_interface = Cluster(request.user).get_list_interface_indexes()
   clusters = get_clusters().values()
 
   return render('hue.mako', request, {
@@ -91,10 +90,7 @@ def hue(request):
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'banner_message': get_banner_message(request),
     'user_preferences': dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user)),
-    'cluster': clusters[0]['type'] if clusters else None,
-    'clusters_config_json': json.dumps(clusters),
-    'default_cluster_index': default_cluster_index,
-    'default_cluster_interface': default_cluster_interface
+    'cluster': clusters[0]['type'] if clusters else None
   })
 
 

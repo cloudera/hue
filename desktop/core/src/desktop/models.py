@@ -65,8 +65,6 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
 HUE_VERSION = None
 
-USER_PREFERENCE_CLUSTER = 'cluster'
-
 
 def uuid_default():
   return str(uuid.uuid4())
@@ -1558,7 +1556,6 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
-DATAENG = 'dataeng'
 ANALYTIC_DB = 'analyticdb'
 
 
@@ -1654,9 +1651,8 @@ class ClusterConfig():
     interpreters = []
 
     _interpreters = get_ordered_interpreters(self.user)
-    if self.cluster_type == DATAENG:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'mapreduce')]
-    elif self.cluster_type == ANALYTIC_DB:
+
+    if self.cluster_type == ANALYTIC_DB:
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
 
     for interpreter in _interpreters:
@@ -1670,7 +1666,7 @@ class ClusterConfig():
         'is_sql': interpreter['is_sql']
       })
 
-    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if SHOW_NOTEBOOKS.get() and self.cluster_type != ANALYTIC_DB:
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
@@ -1701,7 +1697,7 @@ class ClusterConfig():
   def _get_dashboard(self):
     interpreters = get_engines(self.user)
 
-    if interpreters and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if interpreters and self.cluster_type != ANALYTIC_DB:
       _interpreters = [{
           'type': interpreter['type'],
           'displayName': interpreter['type'].title(),
@@ -1735,7 +1731,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if 'filebrowser' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1771,7 +1767,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if 'search' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1781,29 +1777,20 @@ class ClusterConfig():
       })
 
     if 'jobbrowser' in self.apps:
-      if self.cluster_type == DATAENG:
+      from hadoop.cluster import get_default_yarncluster # Circular loop
+
+      title =  _('Jobs') if self.cluster_type != ANALYTIC_DB else _('Queries')
+
+      if get_default_yarncluster():
         interpreters.append({
-          'type': 'dataeng',
-          'displayName': _('Jobs'),
-          'buttonName': _('Jobs'),
-          'tooltip': _('Jobs'),
+          'type': 'yarn',
+          'displayName': title,
+          'buttonName': title,
+          'tooltip': title,
           'page': '/jobbrowser/'
         })
-      else:
-        from hadoop.cluster import get_default_yarncluster # Circular loop
 
-        title =  _('Jobs') if self.cluster_type != ANALYTIC_DB else _('Queries')
-
-        if get_default_yarncluster():
-          interpreters.append({
-            'type': 'yarn',
-            'displayName': title,
-            'buttonName': title,
-            'tooltip': title,
-            'page': '/jobbrowser/'
-          })
-
-    if has_kafka() and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if has_kafka() and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'kafka',
         'displayName': _('Streams'),
@@ -1812,7 +1799,7 @@ class ClusterConfig():
         'page': '/kafka/'
       })
 
-    if 'hbase' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if 'hbase' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1821,7 +1808,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if 'security' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1830,7 +1817,7 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if 'sqoop' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'sqoop',
         'displayName': _('Sqoop'),
@@ -1914,45 +1901,14 @@ class Cluster():
 
   def __init__(self, user):
     self.user = user
-    self.default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
     self.data = {}
 
-    if IS_EMBEDDED.get():
+    if IS_EMBEDDED.get(): # ANALYTIC_DB
       self.data = get_clusters()['Default']
     elif self.default_cluster:
       clusters = get_clusters()
       cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
       self.data = cluster_name and clusters.get(cluster_name) and clusters[cluster_name] or None
-
-  def get_type(self):
-    return self.data and self.data['type'] or 'ini'
-
-  def get_interface(self):
-    return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('interface')
-
-  def get_id(self):
-    return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('id')
-
-  def get_list_interface_indexes(self):
-    default_cluster_index = 0
-    default_cluster_interface = ''
-
-    clusters = get_clusters()
-    default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
-
-    if clusters and default_cluster:
-      if len(clusters) == 1:
-        default_cluster = clusters.values()[0]
-        default_cluster_index = 0
-        default_cluster_interface = ANALYTIC_DB
-      else:
-        default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
-        default_cluster_name = default_cluster_json.get('name')
-
-        default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
-        default_cluster_interface = default_cluster_json.get('interface', '')
-
-    return default_cluster_index, default_cluster_interface
 
 
 def _get_apps(user, section=None):
