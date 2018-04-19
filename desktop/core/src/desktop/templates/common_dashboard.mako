@@ -65,14 +65,14 @@
       </div>
     </a>
     % else:
-    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Analytical: compute and calculate metrics') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
-        <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-superscript"></i></div>
+        <div class="layout-box" style="width: 100px; margin-left: 4px; padding-top:20px">${ _("Analytics") }</div>
       </div>
     </a>
-    <a href="javascript: textSearchLayout(searchViewModel, true)" title="${ _('Search: retrieve and display records of data') }" onmouseover="searchViewModel.previewColumns('search')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: textSearchLayout(searchViewModel, true)" onmouseover="searchViewModel.previewColumns('search')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
-        <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-search"></i></div>
+        <div class="layout-box" style="width: 100px; margin-left: 4px; padding-top:20px">${ _("Search") }</div>
       </div>
     </a>
     % endif
@@ -157,20 +157,18 @@
           </div>
           <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
             <i class="fa fa-table" style="font-size: 120px"></i><br/>
-            <div style="font-size: 80px; padding-top: 20px">${ _('Analytical') }</div>
+            <div style="font-size: 40px; padding-top: 20px">${ _('Compute and calculate metrics') }</div>
           </div>
         </div>
       </div>
 
       <div class="row-fluid" data-bind="visible: previewColumns() == 'search'">
         <div class="span2 preview-row" style="font-size: 80px;">
-          <i class="fa fa-sort-amount-asc" style="padding-top: 40px"></i>
-          <i class="fa fa-sort-amount-asc" style="padding-top: 90px"></i>
         </div>
         <div class="span10">
           <div class="preview-row" style="font-size: 80px; ">
-            <i class="fa fa-bars" style="font-size: 120px; padding-top: 100px"></i><br/>
-            <div style="font-size: 80px; padding-top: 20px">${ _('Search') }</div>
+            <i class="fa fa-search" style="font-size: 120px; padding-top: 100px"></i><br/>
+            <div style="font-size: 40px; padding-top: 20px">${ _('Retrieve and display records of data') }</div>
           </div>
         </div>
       </div>
