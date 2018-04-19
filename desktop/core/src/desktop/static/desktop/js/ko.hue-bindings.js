@@ -672,6 +672,10 @@
         self.onActionRender(self.$element, checkOverflow(self.element));
       }
 
+      if (self.expanded()) {
+        return;
+      }
+
       self.isOverflowing = false;
 
       while (checkOverflow(self.element)) {
