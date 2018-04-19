@@ -3913,6 +3913,7 @@ $(document).ready(function () {
       resizeFieldsList();
     }, 200);
     huePubSub.publish('dashboard.window.resize');
+    huePubSub.publish('gridster.remove.scrollbars');
   });
 
   var isDraggingOrResizingWidgets = false;
@@ -4304,14 +4305,22 @@ $(document).ready(function () {
   }, 'dashboard');
 
   function removeInternalScroll(widget) {
-    var scrollDifference = widget.gridsterElement.scrollHeight - widget.gridsterElement.clientHeight;
-    if (scrollDifference > 0) { // avoid scrollbars inside the widget
-      widget.size_y(widget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
-      $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
-        huePubSub.publish('gridster.clean.whitespace');
-      });
+    if (widget && widget.gridsterElement) {
+      var scrollDifference = widget.gridsterElement.scrollHeight - widget.gridsterElement.clientHeight;
+      if (scrollDifference > 0) { // avoid scrollbars inside the widget
+        widget.size_y(widget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
+        $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
+          huePubSub.publish('gridster.clean.whitespace');
+        });
+      }
     }
   }
+
+  huePubSub.subscribe('gridster.remove.scrollbars', function () {
+    searchViewModel.gridItems().forEach(function (widget) {
+      removeInternalScroll(widget);
+    });
+  }, 'dashboard');
 
   huePubSub.subscribe('gridster.clean.grid.whitespace', function (options) {
     var $gridsterWidget = $(options.event.target).parents('li.gs-w');
