@@ -323,12 +323,6 @@ ${ assist.assistPanel() }
           <!-- /ko -->
 
           <!-- ko if: createWizard.source.inputFormat() == 'kafka' -->
-            ##<div class="control-group">
-            ##  <label for="rdbmsHostname" class="control-label"><div>${ _('Brokers') }</div>
-            ##    <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaBrokers" placeholder="${ _('Enter a csv list of brokers, e.g.brokers1:9092,brokers2:9092') }">
-            ##  </label>
-            ##</div>
-
             <div class="control-group">
               <label class="control-label"><div>${ _('Topics') }</div>
                 ##<input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaTopics">
@@ -339,6 +333,38 @@ ${ assist.assistPanel() }
                 ##<select data-bind="selectize: createWizard.source.kafkaTopics, value: createWizard.source.kafkaSelectedTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
               </label>
             </div>
+          <!-- /ko -->
+
+          <!-- ko if: createWizard.source.inputFormat() == 'streams' -->
+            <div class="control-group">
+              <label class="control-label"><div>${ _('List') }</div>
+                <select data-bind="selectize: createWizard.source.publicStreams, value: createWizard.source.publicStreamsSelection" placeholder="${ _('The list of streams to consume, e.g. SFDC, Jiras...') }"></select>
+              </label>
+            </div>
+
+            <!-- ko if: createWizard.source.publicStreamsSelection() == 'SFDC' -->
+              <div class="control-group">
+                <label class="control-label"><div>${ _('Username') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.publicStreamsUsername">
+                </label>
+  
+                <label class="control-label"><div>${ _('Password') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.publicStreamsPassword">
+                </label>
+  
+                <label class="control-label"><div>${ _('Token') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.publicStreamsToken">
+                </label>
+  
+                <label class="control-label"><div>${ _('Username') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.publicStreamsEndpointUrl">
+                </label>
+
+                <label class="control-label"><div>${ _('Object') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.publicStreamsObject">
+                </label>
+              </div>
+            <!-- /ko -->
           <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -1302,6 +1328,7 @@ ${ assist.assistPanel() }
           % endif
           % if ENABLE_KAFKA.get():
           {'value': 'kafka', 'name': 'Internal Stream'},
+          {'value': 'streams', 'name': 'External Stream'},
           % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
@@ -1497,7 +1524,6 @@ ${ assist.assistPanel() }
       self.draggedQuery = ko.observable();
 
       // Kafka
-      self.kafkaBrokers = ko.observable('brokers1:9092,brokers2:9092'); // Unused
       self.kafkaTopics = ko.observable([]);
       self.kafkaSelectedTopics = ko.observable('');
       self.kafkaSelectedTopics.subscribe(function(newValue) {
@@ -1505,6 +1531,19 @@ ${ assist.assistPanel() }
           viewModel.createWizard.guessFieldTypes();
         }
       });
+
+      // Public streams
+      self.publicStreams = ko.observable([
+        'SFDC',
+        'Jira'
+      ]);
+      self.publicStreamsSelection = ko.observable('');
+      self.publicStreamsUsername = ko.observable('');
+      self.publicStreamsPassword = ko.observable('');
+      self.publicStreamsToken = ko.observable('');
+      self.publicStreamsEndpointUrl = ko.observable('');
+      self.publicStreamsObject = ko.observable('');
+
 
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
@@ -1536,7 +1575,15 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'manual') {
           return true;
         } else if (self.inputFormat() == 'kafka') {
-          return self.kafkaBrokers().length > 0 && self.kafkaSelectedTopics().length > 0;
+          return self.kafkaSelectedTopics().length > 0;
+        } else if (self.inputFormat() == 'streams') {
+          return self.publicStreamsSelection() == 'SFDC' ? (
+              self.publicStreamsUsername().length > 0
+              && self.publicStreamsPassword().length > 0
+              && self.publicStreamsToken().length > 0
+              && self.publicStreamsEndpointUrl().length > 0
+              && self.publicStreamsObject().length > 0
+          ) : false;
         } else if (self.inputFormat() == 'rdbms') {
           return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.rdbmsAllTablesSelected());
         }
