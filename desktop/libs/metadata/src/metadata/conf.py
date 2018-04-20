@@ -65,6 +65,10 @@ def has_navigator(user):
       and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
+def has_kafka():
+  return bool(KAFKA.API_URL.get())
+
+
 def get_security_default():
   '''Get default security value from Hadoop'''
   from hadoop import cluster # Avoid dependencies conflicts

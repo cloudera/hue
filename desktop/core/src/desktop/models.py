@@ -44,6 +44,7 @@ from settings import HUE_DESKTOP_VERSION
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, has_adls_access
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
+from metadata.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
@@ -1791,6 +1792,15 @@ class ClusterConfig():
             'tooltip': title,
             'page': '/jobbrowser/'
           })
+
+    if has_kafka() and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+      interpreters.append({
+        'type': 'kafka',
+        'displayName': _('Streams'),
+        'buttonName': _('Browse'),
+        'tooltip': _('Kafka'),
+        'page': '/kafka/'
+      })
 
     if 'hbase' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({

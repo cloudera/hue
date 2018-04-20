@@ -1898,6 +1898,22 @@ from desktop.views import _ko
                 });
               }
 
+              if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('kafka') != -1) {
+                var kafkaPanel = new AssistInnerPanel({
+                  panelData: new AssistDbPanel($.extend({
+                    apiHelper: self.apiHelper,
+                    i18n: i18nCollections,
+                    isSolr: true
+                  }, params.sql)),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("Streams") }',
+                  type: 'solr',
+                  icon: 'fa-sitemap',
+                  minHeight: 75
+                });
+                panels.push(kafkaPanel);
+              }
+
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
                 panels.push(new AssistInnerPanel({
                   panelData: new AssistHBasePanel({
