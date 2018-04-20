@@ -75,28 +75,18 @@ def auth_error_handler(view_fn):
 class S3FileSystem(object):
   def __init__(self, s3_connection):
     self._s3_connection = s3_connection
-    self._bucket_cache = None
     self._filebrowser_action = PERMISSION_ACTION_S3
 
-  def _init_bucket_cache(self):
-    if self._bucket_cache is None:
-      try:
-        buckets = self._s3_connection.get_all_buckets()
-      except S3FileSystemException, e:
-        raise e
-      except S3ResponseError, e:
-        raise S3FileSystemException(_('Failed to initialize bucket cache: %s') % e.reason)
-      except Exception, e:
-        raise S3FileSystemException(_('Failed to initialize bucket cache: %s') % e)
-      self._bucket_cache = {}
-      for bucket in buckets:
-        self._bucket_cache[bucket.name] = bucket
-
   def _get_bucket(self, name):
-    self._init_bucket_cache()
-    if name not in self._bucket_cache:
-      self._bucket_cache[name] = self._s3_connection.get_bucket(name)
-    return self._bucket_cache[name]
+    try:
+      return self._s3_connection.get_bucket(name)
+    except S3FileSystemException, e:
+      raise e
+    except S3ResponseError, e:
+      raise S3FileSystemException(_('Failed to retrieve bucket: %s') % e.reason)
+    except Exception, e:
+      raise S3FileSystemException(_('Failed to retrieve bucket: %s') % e)
+
 
   def _get_or_create_bucket(self, name):
     try:
@@ -112,7 +102,6 @@ class S3FileSystem(object):
         if self._get_location():
           kwargs['location'] = self._get_location()
         bucket = self._create_bucket(name, **kwargs)
-        self._bucket_cache[name] = bucket
       elif e.status == 400:
         raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
       else:
@@ -138,8 +127,6 @@ class S3FileSystem(object):
       for key in bucket.list():
         key.delete()
       self._s3_connection.delete_bucket(name)
-      # Remove bucket from bucket cache
-      self._bucket_cache.pop(name)
       LOG.info('Successfully deleted bucket name "%s" and all its contents.' % name)
     except S3ResponseError, e:
       if e.status == 403:
@@ -285,8 +272,14 @@ class S3FileSystem(object):
       raise NotImplementedError(_("Option `glob` is not implemented"))
 
     if s3.is_root(path):
-      self._init_bucket_cache()
-      return sorted([S3Stat.from_bucket(b) for b in self._bucket_cache.values()], key=lambda x: x.name)
+      try:
+        return sorted([S3Stat.from_bucket(b) for b in self._s3_connection.get_all_buckets()], key=lambda x: x.name)
+      except S3FileSystemException, e:
+        raise e
+      except S3ResponseError, e:
+        raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
+      except Exception, e:
+        raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e)
 
     bucket_name, prefix = s3.parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
