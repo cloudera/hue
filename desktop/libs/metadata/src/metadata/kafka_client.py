@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.lib.i18n import smart_unicode
+
 from metadata.conf import KAFKA
 
 
