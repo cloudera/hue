@@ -2404,6 +2404,35 @@
     }
   };
 
+  ko.bindingHandlers.contextPopover = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var options = valueAccessor();
+      ko.bindingHandlers.click.init(element, function () {
+        return function () {
+          DataCatalog.getEntry({ sourceType: options.sourceType, path: options.path }).done(function (entry) {
+            var $source = $(element);
+            var offset = $source.offset();
+            huePubSub.publish('context.popover.show', {
+              data: {
+                type: 'catalogEntry',
+                catalogEntry: entry
+              },
+              showInAssistEnabled: true,
+              orientation: options.orientation || 'right',
+              source: {
+                element: element,
+                left: offset.left,
+                top: offset.top,
+                right: offset.left + $source.width(),
+                bottom: offset.top + $source.height()
+              }
+            });
+          });
+        }
+      }, allBindings, viewModel, bindingContext);
+    }
+  };
+
   ko.bindingHandlers.aceResizer = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
