@@ -504,8 +504,17 @@ def edit_coordinator(request):
   if USE_NEW_EDITOR.get():
     scheduled_uuid = coordinator.data['properties']['workflow'] or coordinator.data['properties']['document']
     if scheduled_uuid:
-      document = Document2.objects.get(uuid=scheduled_uuid)
-      if not document.can_read(request.user):
+      try:
+        document = Document2.objects.get(uuid=scheduled_uuid)
+      except Document2.DoesNotExist as e:
+        document = None
+        coordinator.data['properties']['workflow'] = ''
+        LOG.warn("Workflow with uuid %s doesn't exist: %s" % (scheduled_uuid, e))
+
+      if document and document.is_trashed:
+        raise PopupException(_('Your workflow %s has been trashed!') % (document.name if document.name else ''))
+
+      if document and not document.can_read(request.user):
         raise PopupException(_('You don\'t have access to the workflow or document of this coordinator.'))
   else:
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])

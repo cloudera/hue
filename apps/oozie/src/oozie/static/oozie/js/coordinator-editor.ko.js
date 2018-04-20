@@ -84,10 +84,14 @@ var CoordinatorEditorViewModel = (function () {
     }
 
     self.refreshParameters = function() {
+      if (!self.properties.workflow()) { return; }
+
       $.get("/oozie/editor/workflow/parameters/", {
         "uuid": self.properties.workflow(),
         "document": self.properties.document(),
       }, function (data) {
+        if (data.status < 0) { return; }
+
         self.workflowParameters(data.parameters);
 
         // Remove Uncommon params
