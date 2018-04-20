@@ -39,7 +39,7 @@ from django.utils.translation import ugettext as _
 
         <div class="card-body">
           <a class="pointer" data-bind="visible: ! coordinator.properties.workflow(), click: showChooseWorkflow">${ _('Choose a workflow...') }</a>
-          <!-- ko if: coordinator.properties.workflow -->
+          <!-- ko if: getWorkflowById(coordinator.properties.workflow()) -->
             <!-- ko if: isEditing -->
             <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
 
