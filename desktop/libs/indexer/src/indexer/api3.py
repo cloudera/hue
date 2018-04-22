@@ -44,6 +44,7 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
+from metadata.conf import has_kafka
 
 
 LOG = logging.getLogger(__name__)
@@ -121,7 +122,13 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'rdbms':
     format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
   elif file_format['inputFormat'] == 'kafka':
-    format_ = {'type': 'csv', 'topics': KafkaApi().topics()}
+    if has_kafka():
+      topics = KafkaApi().topics()
+    else:
+      manager = ManagerApi()
+      broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
+      topics = manager.get_kafka_topics(broker_host).keys()
+    format_ = {'type': 'csv', 'topics': topics}
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -427,7 +434,7 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
     input_path = '${nameNode}%s' % file_format["path"]
   else:
     input_path = None
-    
+
     manager = ManagerApi()
 
     properties = {
