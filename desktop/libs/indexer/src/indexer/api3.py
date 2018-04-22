@@ -30,7 +30,6 @@ from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
 from librdbms.server import dbms as rdbms
 from libsentry.conf import is_enabled
-from metadata.kafka_client import KafkaApi
 from metadata.manager_client import ManagerApi
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -44,7 +43,7 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
-from metadata.conf import has_kafka
+from metadata.kafka_api import get_topics
 
 
 LOG = logging.getLogger(__name__)
@@ -122,13 +121,7 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'rdbms':
     format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
   elif file_format['inputFormat'] == 'kafka':
-    if has_kafka():
-      topics = KafkaApi().topics()
-    else:
-      manager = ManagerApi()
-      broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
-      topics = manager.get_kafka_topics(broker_host).keys()
-    format_ = {'type': 'csv', 'topics': topics}
+    format_ = {'type': 'csv', 'topics': get_topics()}
 
   format_['status'] = 0
   return JsonResponse(format_)

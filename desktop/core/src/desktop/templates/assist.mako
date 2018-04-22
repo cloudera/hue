@@ -808,11 +808,11 @@ from desktop.views import _ko
   <script type="text/html" id="assist-databases-template">
     <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading() }">
       <div class="assist-inner-header">
-        <!-- ko ifnot: sourceType === 'solr' -->
+        <!-- ko ifnot: sourceType === 'solr' || sourceType === 'kafka' -->
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: sourceType === 'solr' -->
+        <!-- ko if: sourceType === 'solr' || sourceType === 'kafka'-->
         ${_('Sources')}
         <!-- /ko -->
       </div>
@@ -854,11 +854,14 @@ from desktop.views import _ko
   <script type="text/html" id="assist-tables-template">
     <div class="assist-flex-header">
       <div class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
-        <!-- ko ifnot: sourceType === 'solr' -->
-        ${_('Tables')}
+        <!-- ko ifnot: sourceType === 'solr' || sourceType === 'kafka' -->
+          ${_('Tables')}
         <!-- /ko -->
         <!-- ko if: sourceType === 'solr' -->
-        <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Indexes')}</div>
+          <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Indexes')}</div>
+        <!-- /ko -->
+        <!-- ko if: sourceType === 'kafka' -->
+          ${_('Topics')}
         <!-- /ko -->
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
@@ -1083,6 +1086,11 @@ from desktop.views import _ko
             options.sourceTypes = [{
               type: 'solr',
               name: 'solr'
+            }];
+          } else if (options.isKafka) {
+            options.sourceTypes = [{
+              type: 'kafka',
+              name: 'kafka'
             }];
           } else {
             % for interpreter in get_ordered_interpreters(request.user):
@@ -1903,7 +1911,7 @@ from desktop.views import _ko
                   panelData: new AssistDbPanel($.extend({
                     apiHelper: self.apiHelper,
                     i18n: i18nCollections,
-                    isSolr: true
+                    isKafka: true
                   }, params.sql)),
                   apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
@@ -2229,7 +2237,10 @@ from desktop.views import _ko
             <!-- ko if: isSolr -->
             ${ _('Indexes') }
             <!-- /ko -->
-            <!-- ko ifnot: isSolr  -->
+            <!-- ko if: isKafka -->
+            ${ _('Streams') }
+            <!-- /ko -->
+            <!-- ko ifnot: isSolr || isKafka  -->
             ${ _('Tables') }
             <!-- ko if: statementCount() > 1 -->
             <div class="statement-count">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>

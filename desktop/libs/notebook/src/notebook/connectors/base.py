@@ -245,6 +245,14 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
+    elif snippet['type'] == 'kafka':
+      interpreter = [{
+        'name': 'kafka',
+        'type': 'kafka',
+        'interface': 'kafka',
+        'options': {},
+        'is_sql': False
+      }]      
     elif snippet['type'] == 'solr':
       interpreter = [{
         'name': 'solr',
@@ -292,6 +300,9 @@ def get_api(request, snippet):
   elif interface == 'hbase':
     from notebook.connectors.hbase import HBaseApi
     return HBaseApi(request.user)
+  elif interface == 'kafka':
+    from notebook.connectors.kafka import KafkaApi
+    return KafkaApi(request.user)
   elif interface == 'pig':
     return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4
   else:

@@ -90,6 +90,7 @@ class ManagerApi(object):
 
       return ','.join(brokers_hosts)
     except RestException, e:
+      return 'hue.com:9092'
       raise ManagerApiException(e)
 
 

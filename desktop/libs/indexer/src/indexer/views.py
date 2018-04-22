@@ -53,6 +53,16 @@ def indexes(request, index=''):
   })
 
 
+def topics(request, index=''):
+  if not request.user.has_hue_permission(action="access", app='search'):
+    raise PopupException(_('Missing permission.'), error_code=403)
+
+  return render('topics.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False),
+    'index': index
+  })
+
+
 def indexer(request):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)

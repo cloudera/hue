@@ -69,7 +69,11 @@ urlpatterns += patterns('metadata.manager_api',
   url(r'^api/manager/hello/?$', 'hello', name='hello'),
 )
 
-
+# Kafka API
+urlpatterns += patterns('metadata.kafka_api',
+  url(r'^api/topics/list/$', 'list_topics', name='list_topics'),
+  url(r'^api/topic/list/$', 'list_topic', name='list_topic'),
+)
 
 # Workload Analytics API
 urlpatterns += patterns('metadata.workload_analytics_api',

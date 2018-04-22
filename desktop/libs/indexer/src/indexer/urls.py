@@ -40,6 +40,13 @@ else:
     url(r'^indexes/$', 'indexes', name='indexes'),
   )
 
+# Kafka
+urlpatterns += patterns('indexer.views',
+    url(r'^topics/$', 'topics', name='topics'),
+    url(r'^topics/(?P<index>[^/]+)/?$', 'topics', name='topics'),
+)
+
+
 urlpatterns += patterns('indexer.solr_api',
   # V2
   url(r'^api/aliases/create/$', 'create_alias', name='create_alias'),
