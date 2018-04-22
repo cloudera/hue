@@ -58,16 +58,16 @@ ${ assist.assistPanel() }
   <h1>
     <!-- ko with: index() -->
     <div class="inline-block pull-right">
-      <a class="inactive-action" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Search the index')}" href="javascript:void(0)">
-        <i class="fa fa-search fa-fw"></i>
+      <a class="btn btn-default" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Query in a Dashboard')}" href="javascript:void(0)">
+        <i class="fa fa-search fa-fw"></i> ${_('Query')}
       </a>
 
-      <a class="inactive-action" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Add Data')}">
-        <i class="fa fa-upload fa-fw"></i>
+      <a class="btn btn-default" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Add data to the index')}">
+        <i class="fa fa-upload fa-fw"></i> ${_('Index')}
       </a>
 
-      <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }">
-        <i class="fa fa-times fa-fw"></i>
+      <a class="btn btn-default" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }" title="${_('Delete the index')}">
+        <i class="fa fa-times fa-fw"></i> ${_('Delete')}
       </a>
     </div>
     <!-- /ko -->
