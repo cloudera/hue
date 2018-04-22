@@ -132,7 +132,7 @@ class NavigatorApi(object):
     self.__headers = {}
     self.__params = ()
 
-    self._fillup_properties()
+    #self._fillup_properties() # Disabled currently
 
 
   def _get_types_from_sources(self, sources):
