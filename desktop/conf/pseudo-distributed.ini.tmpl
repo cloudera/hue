@@ -103,8 +103,9 @@
   # Number of threads used by the CherryPy web server
   ## cherrypy_server_threads=50
 
-  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
-  ## sasl_max_buffer=2 * 1024 * 1024
+  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication,
+  # default value is 2097152 (2 MB), which equals to (2 * 1024 * 1024)
+  ## sasl_max_buffer=2097152
 
   # Filename of SSL Certificate
   ## ssl_certificate=
