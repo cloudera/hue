@@ -53,16 +53,6 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/html" id="context-popover-hdfs-details">
-    <div class="context-popover-flex-fill" data-bind="with: details">
-      <div style="padding: 8px">
-        <div style="margin: 10px 10px 18px 10px;">
-          <div data-bind="hdfsTree: { isS3: $data.path.indexOf('s3a://') === 0, path: $data.path, selectedPath: $parent.selectedPath }"></div>
-        </div>
-      </div>
-    </div>
-  </script>
-
   <script type="text/html" id="context-popover-collection-stats-details">
     <div class="context-popover-flex-fill">
       <div style="padding: 8px">
@@ -382,6 +372,84 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+
+  <script type="text/html" id="context-storage-entry-title">
+    <div class="hue-popover-title">
+      <i class="hue-popover-title-icon fa muted" data-bind="css: storageEntry() && storageEntry().definition.type === 'dir' ? 'fa-folder-o' : 'fa-file-o'"></i>
+      <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs">
+        <!-- ko ifnot: isActive --><div><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a><!-- ko if: $index() > 0 -->/<!-- /ko --></div><!-- /ko -->
+        <!-- ko if: isActive -->
+        <div>
+          <span data-bind="text: name"></span>
+        </div>
+        <!-- /ko -->
+      </span>
+      <div class="hue-popover-title-actions">
+        <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
+##         <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
+##         <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="context-storage-entry-contents">
+    <div class="context-popover-content" data-bind="with: storageEntry">
+      <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko --></div>
+      <!-- ko ifnot: loading -->
+        <!-- ko if: hasErrors -->
+        <div class="context-popover-flex-fill">
+          <div class="alert" data-bind="text: errorText"></div>
+        </div>
+        <!-- /ko -->
+        <!-- ko ifnot: hasErrors -->
+          <div class="context-popover-flex-fill storage-entry-container" data-bind="fetchMore: { fetchMore: fetchMore.bind($data), hasMore: hasMorePages, loadingMore: loadingMore.bind($data) }">
+            <!-- ko if: definition.type === 'dir' -->
+            <table class="table table-condensed table-nowrap">
+              <thead>
+                <tr>
+                  <th width="1%"></th>
+                  <th>${ _('Name') }</th>
+                  <th>${ _('Size') }</th>
+                  <th>${ _('Permissions') }</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- ko if: $parent.storageEntry().parent -->
+                <tr>
+                  <td><i class="fa fa-folder-o"></i></td>
+                  <td><a href="javascript: void(0);" data-bind="click: function () { $parent.storageEntry($parent.storageEntry().parent) }">..</a></td>
+                  <td data-bind="text: $parent.storageEntry().definition.humansize"></td>
+                  <td data-bind="text: $parent.storageEntry().definition.rwx"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko foreach: entries -->
+                <tr>
+                  <td><i class="fa" data-bind="css: definition.type === 'dir' ? 'fa-folder-o' : 'fa-file-o'"></i></td>
+                  <td><a href="javascript: void(0);" data-bind="click: function () { $parents[1].storageEntry($data) }, text: definition.name"></a></td>
+                  <td data-bind="text: definition.humansize"></td>
+                  <td data-bind="text: definition.rwx"></td>
+                </tr>
+                <!-- /ko -->
+              </tbody>
+            </table>
+            <!-- /ko -->
+            <!-- ko if: definition.type !== 'dir' -->
+            <div data-bind="with: preview">
+              <!-- ko if: view && view.contents -->
+              <pre data-bind="text: view.contents"></pre>
+              <!-- /ko -->
+              <!-- ko if: view && !view.contents -->
+              <div class="empty-file-contents">${ _('Empty file...') }</div>
+              <!-- /ko -->
+            </div>
+            <!-- /ko -->
+          </div>
+        <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="global-search-context">
     <!-- ko if: isCatalogEntry -->
     <!-- ko with: contents -->
@@ -646,48 +714,46 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('details');
       }
 
-      function HdfsContextTabs(data) {
+      var StorageContext = function (options) {
         var self = this;
 
-        self.disposals = [];
+        self.popover = options.popover;
 
-        // TODO: Update Ace token with selected path
-        self.data = ko.observable({
-          details: data,
-          loading: ko.observable(false),
-          hasErrors: ko.observable(false),
-          selectedPath: ko.observable(data.path)
+        self.storageEntry = ko.observable();
+
+        self.loading = ko.pureComputed(function () {
+          return self.storageEntry() && self.storageEntry().loading();
         });
 
-        var showInFileBrowserPubSub = huePubSub.subscribe('context.popover.open.in.file.browser', function () {
-          window.open((data.path.indexOf('/') === 0 ? '/filebrowser/#' : '/filebrowser/#/') + data.path, '_blank');
+        self.storageEntry.subscribe(function (newVal) {
+          if (!newVal.loaded && !newVal.loading()) {
+            if (newVal.definition.type === 'dir') {
+              newVal.open(true);
+            } else {
+              newVal.loadPreview();
+            }
+          }
         });
 
-        self.disposals.push(function () {
-          showInFileBrowserPubSub.remove();
-        });
+        self.storageEntry(options.storageEntry);
 
-        var replaceInEditorPubSub = huePubSub.subscribe('context.popover.replace.in.editor', function () {
-          huePubSub.publish('ace.replace', {
-            location: data.location,
-            text: self.data().selectedPath()
-          });
-        });
-        self.disposals.push(function () {
-          replaceInEditorPubSub.remove();
-        });
+        self.breadCrumbs = ko.pureComputed(function () {
+          var result = [];
+          var currentEntry = self.storageEntry();
+          do {
+            result.unshift({
+              name: currentEntry.definition.name,
+              isActive: currentEntry === self.storageEntry(),
+              storageEntry: currentEntry,
+              makeActive: function () {
+                self.storageEntry(this.storageEntry);
+              }
+            });
 
-        self.tabs = [
-          { id: 'details', label: '${ _("Details") }', template: 'context-popover-hdfs-details', templateData: self.data }
-        ];
-        self.activeTab = ko.observable('details');
-      }
-
-      HdfsContextTabs.prototype.dispose = function () {
-        var self = this;
-        while (self.disposals.length) {
-          self.disposals.pop()();
-        }
+            currentEntry = currentEntry.parent;
+          } while (currentEntry);
+          return result;
+        });
       };
 
       function FunctionContextTabs(data, sourceType) {
@@ -1152,7 +1218,7 @@ from metadata.conf import has_navigator
 
         self.isComplex = params.data.type === 'complex';
         self.isFunction = params.data.type === 'function';
-        self.isHdfs = params.data.type === 'hdfs';
+        self.isStorageEntry = params.data.type === 'storageEntry';
         self.isAsterisk = params.data.type === 'asterisk';
         self.isDocument = params.data.type.toLowerCase() === 'hue';
         self.isCollection = params.data.type === 'collection';
@@ -1167,11 +1233,11 @@ from metadata.conf import has_navigator
                 && (self.isDocument || self.isCollection || self.isCatalogEntry);
         self.openInDashboardEnabled = self.isCatalogEntry && params.data.catalogEntry.path.length <= 2;
         self.openInTableBrowserEnabled = self.isCatalogEntry && params.data.catalogEntry.path.length <= 2;
-        self.replaceEditorContentEnabled = self.isHdfs;
-        self.openInFileBrowserEnabled = self.isHdfs;
+        self.replaceEditorContentEnabled = self.isStorageEntry;
+        self.openInFileBrowserEnabled = self.isStorageEntry;
         self.expandColumnsEnabled = self.isAsterisk;
 
-        self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs && !self.isCatalogEntry;
+        self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isStorageEntry && !self.isCatalogEntry;
 
         if (self.isCatalogEntry) {
           self.contents = new DataCatalogContext({ popover: self, catalogEntry: params.data.catalogEntry });
@@ -1181,10 +1247,10 @@ from metadata.conf import has_navigator
           self.contents = new FunctionContextTabs(self.data, self.sourceType);
           self.title = self.data.function;
           self.iconClass = 'fa-superscript';
-        } else if (self.isHdfs) {
-          self.contents = new HdfsContextTabs(self.data);
-          self.title = self.data.path;
-          self.iconClass = 'fa-folder-o';
+        } else if (self.isStorageEntry) {
+          self.contents = new StorageContext({ popover: self, storageEntry: params.data.storageEntry });
+          self.titleTemplate = 'context-storage-entry-title';
+          self.contentsTemplate = 'context-storage-entry-contents';
         } else if (self.isAsterisk) {
           self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.defaultDatabase);
           self.title = '*';
@@ -1313,7 +1379,7 @@ from metadata.conf import has_navigator
         self.close = params.globalSearch.close.bind(params.globalSearch);
 
         // These are currently not in the global search results
-        self.isHdfs = false;
+        self.isStorageEntry = false;
         self.isAsterisk = false;
         self.isComplex = false;
         self.isFunction = false;
@@ -1321,8 +1387,8 @@ from metadata.conf import has_navigator
         self.showInAssistEnabled = !self.isHueApp;
         self.openInDashboardEnabled = false;
         self.openInTableBrowserEnabled = false;
-        self.replaceEditorContentEnabled = self.isHdfs;
-        self.openInFileBrowserEnabled = self.isHdfs;
+        self.replaceEditorContentEnabled = self.isStorageEntry;
+        self.openInFileBrowserEnabled = self.isStorageEntry;
         self.expandColumnsEnabled = self.isAsterisk;
         self.closeDisabled = true; // Global search has it's own close
 

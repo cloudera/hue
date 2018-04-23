@@ -65,6 +65,7 @@ var AssistStorageEntry = (function () {
     self.path += self.definition.name;
     self.currentPage = 1;
     self.hasMorePages = true;
+    self.preview = ko.observable();
 
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
@@ -79,12 +80,17 @@ var AssistStorageEntry = (function () {
     self.loaded = false;
     self.loading = ko.observable(false);
     self.loadingMore = ko.observable(false);
+    self.errorText = ko.observable();
     self.hasErrors = ko.observable(false);
     self.open = ko.observable(false);
 
     self.open.subscribe(function(newValue) {
-      if (newValue && self.entries().length == 0) {
-        self.loadEntries();
+      if (newValue && self.entries().length === 0) {
+        if (self.definition.type === 'dir') {
+          self.loadEntries();
+        } else {
+          self.loadPreview();
+        }
       }
     });
 
@@ -96,6 +102,23 @@ var AssistStorageEntry = (function () {
   AssistStorageEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, self);
+  };
+
+  AssistStorageEntry.prototype.loadPreview = function () {
+    var self = this;
+    self.loading(true);
+    ApiHelper.getInstance().fetchStoragePreview({
+      path: self.getHierarchy(),
+      type: self.type,
+      silenceErrors: true
+    }).done(function (data) {
+      self.preview(data);
+    }).fail(function (errorText) {
+      self.hasErrors(true);
+      self.errorText(errorText);
+    }).always(function () {
+      self.loading(false);
+    })
   };
 
   AssistStorageEntry.prototype.loadEntries = function(callback) {
@@ -126,8 +149,9 @@ var AssistStorageEntry = (function () {
       }
     };
 
-    var errorCallback = function () {
+    var errorCallback = function (errorText) {
       self.hasErrors(true);
+      self.errorText(errorText);
       self.loading(false);
       if (callback) {
         callback();
@@ -162,7 +186,7 @@ var AssistStorageEntry = (function () {
     var findNextAndLoadDeep = function () {
 
       var foundEntry = $.grep(self.entries(), function (entry) {
-        return entry.definition.name === nextName && entry.definition.type === 'dir';
+        return entry.definition.name === nextName;
       });
       var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
 
@@ -260,6 +284,27 @@ var AssistStorageEntry = (function () {
         if (errorCallback) {
           errorCallback();
         }
+      }
+    });
+  };
+
+  AssistStorageEntry.prototype.showContextPopover = function (entry, event) {
+    var $source = $(event.target);
+    var offset = $source.offset();
+
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: 'storageEntry',
+        storageEntry: entry
+      },
+      pinEnabled: true,
+      orientation: 'right',
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 3,
+        right: offset.left + $source.width() + 3,
+        bottom: offset.top + $source.height() - 3
       }
     });
   };

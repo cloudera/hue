@@ -546,14 +546,14 @@
       });
     });
 
-    describe('HDFS paths', function () {
+    describe('File paths', function () {
       it('should report locations for "LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla; |"', function () {
         assertLocations({
           dialect: 'hive',
           beforeCursor: 'LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla;',
           expectedLocations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 70 } },
-            { type: 'hdfs', location: {first_line: 1, last_line: 1, first_column: 25, last_column: 44}, path: '/some/path/file.ble' },
+            { type: 'file', location: {first_line: 1, last_line: 1, first_column: 25, last_column: 44}, path: '/some/path/file.ble' },
             { type: 'table', location: {first_line: 1, last_line: 1, first_column: 67, last_column: 70}, identifierChain: [{name: 'bla'}] }
           ]
         });
@@ -565,7 +565,7 @@
           beforeCursor: 'CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\';',
           expectedLocations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 47 } },
-            { type: 'hdfs', location: {first_line: 1, last_line: 1, first_column: 37, last_column: 46}, path: '/bla/bla/' }
+            { type: 'file', location: {first_line: 1, last_line: 1, first_column: 37, last_column: 46}, path: '/bla/bla/' }
           ]
         });
       });

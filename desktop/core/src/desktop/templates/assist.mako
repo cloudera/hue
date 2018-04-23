@@ -340,19 +340,6 @@ from desktop.views import _ko
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="s3-details-content">
-    <!-- ko with: definition -->
-    <div class="assist-details-wrap">
-      <div><div class="assist-details-header">${ _('Size') }</div><div class="assist-details-value" data-bind="text: humansize"></div></div>
-      <div><div class="assist-details-header">${ _('Permissions') }</div><div class="assist-details-value" data-bind="text: rwx"></div></div>
-    </div>
-    <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="s3-details-title">
-    <span data-bind="text: definition.name"></span>
-  </script>
-
   <script type="text/html" id="assist-s3-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
@@ -387,7 +374,7 @@ from desktop.views import _ko
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
-              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 's3-details-content', titleTemplate: 's3-details-title', minWidth: '320px' }">
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
               </a>
             </div>
@@ -476,24 +463,6 @@ from desktop.views import _ko
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="hdfs-details-content">
-    <!-- ko with: definition -->
-    <div class="assist-details-wrap">
-      <div><div class="assist-details-header">${ _('Size') }</div><div class="assist-details-value" data-bind="text: humansize"></div></div>
-      <!-- ko with: stats -->
-      <div><div class="assist-details-header">${ _('User') }</div><div class="assist-details-value" data-bind="text: user"></div></div>
-      <div><div class="assist-details-header">${ _('Group') }</div><div class="assist-details-value" data-bind="text: group"></div></div>
-      <!-- /ko -->
-      <div><div class="assist-details-header">${ _('Permissions') }</div><div class="assist-details-value" data-bind="text: rwx"></div></div>
-      <div><div class="assist-details-header">${ _('Date') }</div><div class="assist-details-value" data-bind="text: mtime"></div></div>
-    </div>
-    <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="hdfs-details-title">
-    <span data-bind="text: definition.name"></span>
-  </script>
-
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
@@ -552,7 +521,7 @@ from desktop.views import _ko
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
-              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
               </a>
             </div>
@@ -610,7 +579,7 @@ from desktop.views import _ko
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-adls-scrollable', fetchMore: $data.fetchMore.bind($data) }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-adls-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
-              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
               </a>
             </div>

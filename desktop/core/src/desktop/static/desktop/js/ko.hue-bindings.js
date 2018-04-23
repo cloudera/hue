@@ -170,6 +170,27 @@
     }
   };
 
+  ko.bindingHandlers.fetchMore = {
+    init: function (element, valueAccessor) {
+      var options = valueAccessor();
+      var $element = $(element);
+
+      var throttle = -1;
+      $element.on('scroll.fetchMore', function () {
+        window.clearTimeout(throttle);
+        throttle = window.setTimeout(function () {
+          if ((element.scrollTop + $element.innerHeight() >= element.scrollHeight - 10) && ko.unwrap(options.hasMore) && !ko.unwrap(options.loadingMore)) {
+            options.fetchMore();
+          }
+        }, 100);
+      });
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        $element.off('scroll.fetchMore');
+      });
+    }
+  };
+
   ko.bindingHandlers.autocomplete = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
@@ -5116,13 +5137,42 @@
                 });
               } else if (token.parseLocation && !token.notFound) {
                 // Asterisk, function etc.
-                huePubSub.publish('context.popover.show', {
-                  data: token.parseLocation,
-                  sourceType: snippet.type(),
-                  defaultDatabase: snippet.database(),
-                  pinEnabled: true,
-                  source: source
-                });
+                if (token.parseLocation.type === 'file') {
+                  var typeMatch = token.parseLocation.path.match(/^([^:]+):\/(\/.*)\/?/i);
+                  var type = typeMatch ? typeMatch[1] : 'hdfs';
+                  type.replace(/s3.*/i, 's3');
+                  var rootEntry = new AssistStorageEntry({
+                    type: type.toLowerCase(),
+                    definition: {
+                      name: '/',
+                      type: 'dir'
+                    },
+                    parent: null,
+                    apiHelper: ApiHelper.getInstance()
+                  });
+
+                  var path = (typeMatch ? typeMatch[2] : token.parseLocation.path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+
+                  rootEntry.loadDeep(path, function (entry) {
+                    entry.open(true);
+                    huePubSub.publish('context.popover.show', {
+                      data: {
+                        type: 'storageEntry',
+                        storageEntry: entry
+                      },
+                      pinEnabled: true,
+                      source: source
+                    });
+                  });
+                } else {
+                  huePubSub.publish('context.popover.show', {
+                    data: token.parseLocation,
+                    sourceType: snippet.type(),
+                    defaultDatabase: snippet.database(),
+                    pinEnabled: true,
+                    source: source
+                  });
+                }
               } else if (token.syntaxError) {
                 huePubSub.publish('sql.syntax.dropdown.show', {
                   snippet: snippet,

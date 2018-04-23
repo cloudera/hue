@@ -498,6 +498,48 @@ var ApiHelper = (function () {
     });
   };
 
+
+  /**
+   *
+   * @param {Object} options
+   * @param {string[]} options.path
+   * @param {string} options.type - 's3', 'adls' or 'hdfs'
+   * @param {number} [options.offset]
+   * @param {number} [options.length]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.fetchStoragePreview = function (options) {
+    var self = this;
+    var url;
+    if (options.type === 's3') {
+      url = S3_API_PREFIX;
+    } else if (options.type === 'adls') {
+      url = ADLS_API_PREFIX;
+    } else {
+      url = HDFS_API_PREFIX;
+    }
+
+    url += options.path.join('/') + '?compression=none&mode=text';
+    url += '&offset=' + (options.offset || 0);
+    url += '&length=' + (options.length || 118784);
+
+    var deferred = $.Deferred();
+    $.ajax({
+      dataType: "json",
+      url: url,
+      success: function (data) {
+        if (self.successResponseIsError(data)) {
+          deferred.reject(self.assistErrorCallback(options)(data))
+        } else {
+          deferred.resolve(data);
+        }
+      },
+      fail: deferred.reject
+    });
+
+    return deferred.promise();
+  };
+
   /**
    * @param {Object} options
    * @param {Function} options.successCallback

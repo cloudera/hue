@@ -1479,9 +1479,9 @@ var SqlParseSupport = (function () {
       parser.yy.locations.push(location)
     };
 
-    parser.addHdfsLocation = function (location, path) {
+    parser.addFileLocation = function (location, path) {
       parser.yy.locations.push({
-        type: 'hdfs',
+        type: 'file',
         location: adjustLocationForCursor(location),
         path: path
       });
@@ -1856,7 +1856,7 @@ var SqlParseSupport = (function () {
     'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords',
     'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',
     'suggestColumns', 'suggestGroupBys', 'suggestIdentifiers', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
-    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addColumnAliasLocation', 'addTableAliasLocation',
+    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addFileLocation', 'addDatabaseLocation', 'addColumnAliasLocation', 'addTableAliasLocation',
     'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addVariableLocation', 'addColumnLocation', 'addCteAliasLocation', 'addUnknownLocation',
     'addColRefToVariableIfExists', 'suggestDatabases', 'suggestHdfs', 'suggestValues'];
 
