@@ -431,6 +431,7 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
     manager = ManagerApi()
 
     properties = {
+      "inputFormat": file_format['inputFormat'],
       "brokers": manager.get_kafka_brokers(),
       "kudu_master": manager.get_kudu_master(),
       "output_table": "impala::%s" % collection_name,

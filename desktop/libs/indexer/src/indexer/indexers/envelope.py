@@ -77,6 +77,59 @@ class EnvelopeIndexer(object):
 
 
   def generate_config(self, properties):
+    if properties['inputFormat'] == 'kafka':
+      input = """            type = kafka
+              brokers = "%(brokers)s"
+              topics = %(topics)s
+              encoding = string
+              translator {
+                  type = delimited
+                  delimiter = ","
+                  field.names = [measurement_time,number_of_vehicles]
+                  field.types = [long,int]
+              }
+              window {
+                  enabled = true
+                  milliseconds = 60000
+              }
+      """ % properties
+    else: # File
+      input = """      type = filesystem
+      path = example-input.json
+      format = json
+      """ % properties
+      
+    if properties['ouputFormat'] == 'file':
+      # parquet, 
+      output = """    dependencies = [inputdata]
+    deriver {
+      type = sql
+      query.literal = "SELECT * FROM inputdata"
+    }
+    planner = {
+      type = overwrite
+    }
+    output = {
+      type = filesystem
+      path = example-output
+      format = csv
+    }"""
+    else: # Table
+      output = """        dependencies = [inputdata]
+        deriver {
+            type = sql
+            query.literal = \"""
+                SELECT measurement_time, number_of_vehicles FROM inputdata\"""
+        }
+        planner {
+            type = upsert
+        }
+        output {
+            type = kudu
+            connection = "%(kudu_master)s"
+            table.name = "%(output_table)s"
+        }""" % properties
+      
     return """
 application {
     name = Traffic analysis
@@ -87,75 +140,15 @@ application {
 }
 
 steps {
-    traffic {
+    inputdata {
         input {
-            type = kafka
-            brokers = "%(brokers)s"
-            topics = %(topics)s
-            encoding = string
-            translator {
-                type = delimited
-                delimiter = ","
-                field.names = [measurement_time,number_of_vehicles]
-                field.types = [long,int]
-            }
-            window {
-                enabled = true
-                milliseconds = 60000
-            }
+            %(input)s
         }
     }
 
-    trafficwindow {
-        dependencies = [traffic]
-        deriver {
-            type = sql
-            query.literal = \"""
-                SELECT measurement_time, number_of_vehicles FROM traffic\"""
-        }
-        planner {
-            type = upsert
-        }
-        output {
-            type = kudu
-            connection = "%(kudu_master)s"
-            table.name = "%(output_table)s"
-        }
+    outputdata {
+        %(output)s
     }
 }
 
-""" % properties
-
-
-  def generate_config_parquet(self, properties):
-    return """application {
-  name = Filesystem Example
-  executors = 1
-}
-steps {
-  fsInput {
-    input {
-      type = filesystem
-      // Be sure to load this file into HDFS first!
-      path = example-input.json
-      format = json
-    }
-  }
-  fsProcess {
-    dependencies = [fsInput]
-    deriver {
-      type = sql
-      query.literal = "SELECT foo FROM fsInput"
-    }
-    planner = {
-      type = overwrite
-    }
-    output = {
-      type = filesystem
-      // The output directory
-      path = example-output
-      format = parquet
-    }
-  }
-}
-"""
+""" % {'input': input, 'output': output}

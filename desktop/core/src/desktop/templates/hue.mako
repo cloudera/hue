@@ -407,6 +407,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_home" class="embeddable"></div>
       <div id="embeddable_catalog" class="embeddable"></div>
       <div id="embeddable_indexer" class="embeddable"></div>
+      <div id="embeddable_kafka" class="embeddable"></div>
       <div id="embeddable_importer" class="embeddable"></div>
       <div id="embeddable_collections" class="embeddable"></div>
       <div id="embeddable_indexes" class="embeddable"></div>
@@ -644,6 +645,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         home: { url: '/home*', title: '${_('Home')}' },
         catalog: { url: '/catalog', title: '${_('Catalog')}' },
         indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
+        kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
         collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
         % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
@@ -683,7 +685,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       };
 
       var SKIP_CACHE = [
-          'home', 'catalog', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
+          'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
@@ -1186,6 +1188,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }},
           { url: '/home*', app: 'home' },
           { url: '/catalog', app: 'catalog' },
+          { url: '/kafka/', app: 'kafka' },
+          { url: '/indexer/topics/*', app: 'kafka' },
           { url: '/indexer/indexes/*', app: 'indexes' },
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },

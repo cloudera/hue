@@ -58,7 +58,7 @@ ${ assist.assistPanel() }
   <h1>
     <!-- ko with: index() -->
     <div class="inline-block pull-right">
-      <a class="btn btn-default" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Inport stream data into a table or file')}">
+      <a class="btn btn-default" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/kafka/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Inport stream data into a table or file')}">
         <i class="fa fa-download fa-fw"></i> ${_('Consume')}
       </a>
 
@@ -91,7 +91,7 @@ ${ assist.assistPanel() }
           <ul class="nav">
             <li class="app-header">
               <a href="/${app_name}">
-                ${ _('Index Browser') }
+                ${ _('Kafka Browser') }
               </a>
             </li>
           </ul>
@@ -153,7 +153,7 @@ ${ assist.assistPanel() }
               </%def>
 
               <%def name="creation()">
-                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/'">
+                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/kafka'">
                   <i class="fa fa-plus-circle"></i> ${ _('Create') }
                 </a>
               </%def>
@@ -242,6 +242,9 @@ ${ assist.assistPanel() }
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Partitions')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')} (<span data-bind="text: sample().length"></span>)</a></li>
+    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">
+      ${_('Permissions')} (<span data-bind="text: sample().length"></span>)</a>
+    </li>    
   </ul>
 
   <div class="tab-content" style="border: none; overflow: hidden">
