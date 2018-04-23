@@ -98,7 +98,7 @@ class AccessInfo(dict):
 
   def log(self, level, msg=None, start_time=None):
     is_instrumentation = desktop.conf.INSTRUMENTATION.get()
-    self['duration'] = ' returned in %dms' % ((time.time() - start_time) * 1000) if start_time is not None and is_instrumentation else ''
+    self['duration'] = ' returned in %dms' % ((time.time() - start_time) * 1000) if start_time is not None else ''
     self['memory'] = ' (mem: %dmb)' % self.memory_usage_resource() if is_instrumentation else ''
 
     if msg is not None:
