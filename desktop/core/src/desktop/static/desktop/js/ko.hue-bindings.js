@@ -648,7 +648,6 @@
           $expandLink.appendTo(self.$element);
           $expandLink.add(textElement).click(function (e) {
             self.expanded(!self.expanded());
-            console.log(self.expanded());
             self.updateOverflowHeight();
             if (self.expanded()) {
               if (self.expandClass) {
@@ -672,28 +671,26 @@
         self.onActionRender(self.$element, checkOverflow(self.element));
       }
 
-      if (self.expanded()) {
-        return;
-      }
-
       self.isOverflowing = false;
 
-      while (checkOverflow(self.element)) {
-        self.isOverflowing = true;
-        var contents = $(textElement).contents();
-        var lastContent = contents[contents.length - 1];
-        // Check for text node
-        if (lastContent.nodeType === 3 ) {
-          var lastSpaceIndex = lastContent.textContent.regexLastIndexOf(/\s\S+/);
-          if (lastSpaceIndex !== -1) {
-            lastContent.replaceWith(document.createTextNode(lastContent.textContent.substring(0, lastSpaceIndex) + '...'));
-          } else if (contents.length > 1) {
-            textElement.removeChild(lastContent);
-          } else {
-            break;
+      if (!self.expanded()) {
+        while (checkOverflow(self.element)) {
+          self.isOverflowing = true;
+          var contents = $(textElement).contents();
+          var lastContent = contents[contents.length - 1];
+          // Check for text node
+          if (lastContent.nodeType === 3 ) {
+            var lastSpaceIndex = lastContent.textContent.regexLastIndexOf(/\s\S+/);
+            if (lastSpaceIndex !== -1) {
+              lastContent.replaceWith(document.createTextNode(lastContent.textContent.substring(0, lastSpaceIndex) + '...'));
+            } else if (contents.length > 1) {
+              textElement.removeChild(lastContent);
+            } else {
+              break;
+            }
+          } else if (contents.length > 1) { // Remove any elements like links
+            textElement.removeChild(lastContent)
           }
-        } else if (contents.length > 1) { // Remove any elements like links
-          textElement.removeChild(lastContent)
         }
       }
 
