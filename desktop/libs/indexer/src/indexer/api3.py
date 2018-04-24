@@ -425,19 +425,30 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % file_format["path"]
+  elif file_format['inputFormat'] == 'streams':
+    properties = {
+      'publicStreamsSelection': file_format['publicStreamsSelection'],
+      'publicStreamsUsername': file_format['publicStreamsUsername'],
+      'publicStreamsPassword': file_format['publicStreamsPassword'],
+      'publicStreamsToken': file_format['publicStreamsToken'],
+      'publicStreamsEndpointUrl': file_format['publicStreamsEndpointUrl'],
+      'publicStreamsObject': file_format['publicStreamsObject'],
+    }
+    input_path = None
   else:
     input_path = None
 
     manager = ManagerApi()
 
     properties = {
-      "inputFormat": file_format['inputFormat'],
       "brokers": manager.get_kafka_brokers(),
       "kudu_master": manager.get_kudu_master(),
       "output_table": "impala::%s" % collection_name,
       "topics": file_format['kafkaSelectedTopics']
     }
 
+  properties["inputFormat"] = file_format['inputFormat']
+  properties["app_name"] = 'Data Ingest'
   morphline = indexer.generate_config(properties)
 
   return indexer.run(request, collection_name, morphline, input_path, start_time=start_time, lib_path=lib_path)

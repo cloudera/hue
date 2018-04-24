@@ -93,6 +93,20 @@ class EnvelopeIndexer(object):
                   milliseconds = 60000
               }
       """ % properties
+    elif properties['inputFormat'] == 'streams':
+      if properties['publicStreamsSelection'] == 'SFDC':
+        input = """      type = sfdc
+        mode = fetch-all
+        sobject = %(publicStreamsObject)s
+        sfdc: {
+          partner: {
+            username = "%(publicStreamsUsername)s"
+            password = "%(publicStreamsPassword)s"
+            token = "%(publicStreamsToken)s"
+            auth-endpoint = "%(publicStreamsEndpointUrl)s"
+          }
+        }
+  """
     else: # File
       input = """      type = filesystem
       path = example-input.json
@@ -132,7 +146,7 @@ class EnvelopeIndexer(object):
       
     return """
 application {
-    name = Traffic analysis
+    name = %(app_name)s
     batch.milliseconds = 5000
     executors = 1
     executor.cores = 1
