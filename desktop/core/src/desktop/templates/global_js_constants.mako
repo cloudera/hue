@@ -189,6 +189,8 @@
 
   window.LOGGED_USERNAME = '${ user.username }';
 
+  window.USER_HOME_DIR = '${ user.get_home_directory() }';
+
   var userGroups = [];
   % for group in user.groups.all():
     userGroups.push('${ group }');

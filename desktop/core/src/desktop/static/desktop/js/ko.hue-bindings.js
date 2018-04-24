@@ -2446,31 +2446,16 @@
       var options = valueAccessor();
       ko.bindingHandlers.click.init(element, function () {
         return function () {
-          var typeMatch = options.path.match(/^([^:]+):\/(\/.*)\/?/i);
-          var type = typeMatch ? typeMatch[1] : (options.type || 'hdfs');
-          type.replace(/s3.*/i, 's3');
 
-          var rootEntry = new AssistStorageEntry({
-            type: type.toLowerCase(),
-            definition: {
-              name: '/',
-              type: 'dir'
-            },
-            parent: null,
-            apiHelper: ApiHelper.getInstance()
-          });
+          AssistStorageEntry.getEntry(options.path, options.type).done(function (entry) {
+            var $source = $(element);
+            var offset = $source.offset();
 
-          var path = (typeMatch ? typeMatch[2] : options.path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+            if (options.offset) {
+              offset.top += options.offset.top || 0;
+              offset.left += options.offset.left || 0;
+            }
 
-          var $source = $(element);
-          var offset = $source.offset();
-
-          if (options.offset) {
-            offset.top += options.offset.top || 0;
-            offset.left += options.offset.left || 0;
-          }
-
-          rootEntry.loadDeep(path, function (entry) {
             entry.open(true);
             huePubSub.publish('context.popover.show', {
               data: {
@@ -2486,7 +2471,8 @@
                 bottom: offset.top + $source.height()
               }
             });
-          });
+
+          })
         };
       }, allBindings, viewModel, bindingContext);
     }
@@ -5232,22 +5218,7 @@
               } else if (token.parseLocation && !token.notFound) {
                 // Asterisk, function etc.
                 if (token.parseLocation.type === 'file') {
-                  var typeMatch = token.parseLocation.path.match(/^([^:]+):\/(\/.*)\/?/i);
-                  var type = typeMatch ? typeMatch[1] : 'hdfs';
-                  type.replace(/s3.*/i, 's3');
-                  var rootEntry = new AssistStorageEntry({
-                    type: type.toLowerCase(),
-                    definition: {
-                      name: '/',
-                      type: 'dir'
-                    },
-                    parent: null,
-                    apiHelper: ApiHelper.getInstance()
-                  });
-
-                  var path = (typeMatch ? typeMatch[2] : token.parseLocation.path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
-
-                  rootEntry.loadDeep(path, function (entry) {
+                  AssistStorageEntry.getEntry(token.parseLocation.path).done(function (entry) {
                     entry.open(true);
                     huePubSub.publish('context.popover.show', {
                       data: {

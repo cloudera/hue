@@ -385,8 +385,7 @@ from metadata.conf import has_navigator
       </span>
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
-##         <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
-##         <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Go Home') }" data-bind="visible: !loading(), click: goHome"><i class="fa fa-fw fa-home"></i></a>
         <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
       </div>
     </div>
@@ -772,6 +771,11 @@ from metadata.conf import has_navigator
         huePubSub.publish('open.link', entry.definition.url);
         huePubSub.publish('context.popover.hide');
         huePubSub.publish('global.search.close');
+      };
+
+      StorageContext.prototype.goHome = function () {
+        var self = this;
+        AssistStorageEntry.getEntry(USER_HOME_DIR, self.storageEntry().type).done(self.storageEntry)
       };
 
       function FunctionContextTabs(data, sourceType) {

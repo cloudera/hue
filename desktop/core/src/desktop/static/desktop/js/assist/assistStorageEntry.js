@@ -325,5 +325,36 @@ var AssistStorageEntry = (function () {
     huePubSub.publish('open.in.importer', this.definition.path);
   };
 
+  /**
+   * Helper function to create an assistStorageEntry. It will load the entries starting from the root up until the
+   * path or stop when a part is not found.
+   *
+   * @param {string} path - The path, can include the type i.e. '/tmp' or 's3:/tmp'.
+   * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
+   * @return {Promise}
+   */
+  AssistStorageEntry.getEntry = function (path, type) {
+    var deferred = $.Deferred();
+    var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
+    var type = typeMatch ? typeMatch[1] : (type || 'hdfs');
+    type.replace(/s3.*/i, 's3');
+
+    var rootEntry = new AssistStorageEntry({
+      type: type.toLowerCase(),
+      definition: {
+        name: '/',
+        type: 'dir'
+      },
+      parent: null,
+      apiHelper: ApiHelper.getInstance()
+    });
+
+    var path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+
+    rootEntry.loadDeep(path, deferred.resolve);
+
+    return deferred.promise();
+  };
+
   return AssistStorageEntry;
 })();
