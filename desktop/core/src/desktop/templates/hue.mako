@@ -224,7 +224,7 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-middle">
 
-        <!-- ko if: cluster.clusters().length > 1 && cluster.clusters()[0].type() != ANALYTIC_DB -->
+        <!-- ko if: cluster.clusters().length > 1 && cluster.clusters()[0].type() != "analyticdbs" -->
         <div class="btn-group pull-right" style="display: none;" data-bind="visible: cluster.clusters().length > 1">
           <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">

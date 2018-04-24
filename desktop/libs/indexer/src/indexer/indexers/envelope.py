@@ -94,16 +94,16 @@ class EnvelopeIndexer(object):
               }
       """ % properties
     elif properties['inputFormat'] == 'streams':
-      if properties['publicStreamsSelection'] == 'SFDC':
+      if properties['streamSelection'] == 'SFDC':
         input = """      type = sfdc
         mode = fetch-all
-        sobject = %(publicStreamsObject)s
+        sobject = %(streamObject)s
         sfdc: {
           partner: {
-            username = "%(publicStreamsUsername)s"
-            password = "%(publicStreamsPassword)s"
-            token = "%(publicStreamsToken)s"
-            auth-endpoint = "%(publicStreamsEndpointUrl)s"
+            username = "%(streamUsername)s"
+            password = "%(streamPassword)s"
+            token = "%(streamToken)s"
+            auth-endpoint = "%(streamEndpointUrl)s"
           }
         }
   """
