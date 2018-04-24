@@ -2422,7 +2422,96 @@
     }
   };
 
-  ko.bindingHandlers.contextPopover = {
+  /**
+   * Show the Context Popover for files (HDFS, S3, ADLS, ...) when the bound element is clicked.
+   *
+   * Parameters:
+   *
+   * {string} path - the path (can include type, i.e. 'hdfs://tmp'
+   * {string} [type] - Optional type, 'hdfs', 's3' etc. Default 'hdfs'.
+   * {string} [orientation] - 'top', 'right', 'bottom', 'left'. Default 'right';
+   * {Object} [offset] - Optional offset from the element
+   * {number} [offset.top] - Offset in pixels
+   * {number} [offset.left] - Offset in pixels
+   *
+   * Examples:
+   *
+   * data-bind="storageContextPopover: { path: '/tmp/banana.csv' }"
+   * data-bind="storageContextPopover: { path: 's3:/tmp/banana.csv', orientation: 'bottom', offset: { top: 5 } }"
+   *
+   * @type {{init: ko.bindingHandlers.storageContextPopover.init}}
+   */
+  ko.bindingHandlers.storageContextPopover = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var options = valueAccessor();
+      ko.bindingHandlers.click.init(element, function () {
+        return function () {
+          var typeMatch = options.path.match(/^([^:]+):\/(\/.*)\/?/i);
+          var type = typeMatch ? typeMatch[1] : (options.type || 'hdfs');
+          type.replace(/s3.*/i, 's3');
+
+          var rootEntry = new AssistStorageEntry({
+            type: type.toLowerCase(),
+            definition: {
+              name: '/',
+              type: 'dir'
+            },
+            parent: null,
+            apiHelper: ApiHelper.getInstance()
+          });
+
+          var path = (typeMatch ? typeMatch[2] : options.path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+
+          var $source = $(element);
+          var offset = $source.offset();
+
+          if (options.offset) {
+            offset.top += options.offset.top || 0;
+            offset.left += options.offset.left || 0;
+          }
+
+          rootEntry.loadDeep(path, function (entry) {
+            entry.open(true);
+            huePubSub.publish('context.popover.show', {
+              data: {
+                type: 'storageEntry',
+                storageEntry: entry
+              },
+              orientation: options.orientation || 'right',
+              source: {
+                element: element,
+                left: offset.left,
+                top: offset.top,
+                right: offset.left + $source.width(),
+                bottom: offset.top + $source.height()
+              }
+            });
+          });
+        };
+      }, allBindings, viewModel, bindingContext);
+    }
+  };
+
+  /**
+   * Show the Context Popover for SQL or Solr entities when the bound element is clicked.
+   *
+   * Parameters:
+   *
+   * {string} path - the path, i.e. 'default.customers' or ['default', 'customers'
+   * {string} sourceType - 'impala', 'hive' etc.
+   * {string} [orientation] - 'top', 'right', 'bottom', 'left'. Default 'right'
+   * {Object} [offset] - Optional offset from the element
+   * {number} [offset.top] - Offset in pixels
+   * {number} [offset.left] - Offset in pixels
+   *
+   * Examples:
+   *
+   * data-bind="sqlContextPopover: { sourceType: 'impala', path: 'default.customers' }"
+   * data-bind="sqlContextPopover: { sourceType: 'hive', path: 'default', orientation: 'bottom', offset: { top: 5 } }"
+   *
+   * @type {{init: ko.bindingHandlers.sqlContextPopover.init}}
+   */
+  ko.bindingHandlers.sqlContextPopover = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
       ko.bindingHandlers.click.init(element, function () {
@@ -2430,6 +2519,11 @@
           DataCatalog.getEntry({ sourceType: options.sourceType, path: options.path }).done(function (entry) {
             var $source = $(element);
             var offset = $source.offset();
+            if (options.offset) {
+              offset.top += options.offset.top || 0;
+              offset.left += options.offset.left || 0;
+            }
+
             huePubSub.publish('context.popover.show', {
               data: {
                 type: 'catalogEntry',
