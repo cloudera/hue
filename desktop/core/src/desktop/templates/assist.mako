@@ -86,7 +86,7 @@ from desktop.views import _ko
   <script type="text/html" id="sql-context-items">
     <!-- ko if: typeof catalogEntry !== 'undefined' -->
       <!-- ko if: sourceType === 'solr' -->
-        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
         <!-- ko if: catalogEntry.isTableOrView() -->
         <li><a href="javascript:void(0);" data-bind="click: openInIndexer"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
         <li>
@@ -97,7 +97,7 @@ from desktop.views import _ko
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko ifnot: sourceType === 'solr' -->
-        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
         <!-- ko if: !catalogEntry.isDatabase() && $currentApp() === 'editor' -->
         <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
         <!-- /ko -->
@@ -172,6 +172,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hdfs-context-items">
+    <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw" data-bind="css: {'fa-folder-open-o': definition.type === 'dir', 'fa-file-text-o': definition.type === 'file'}"></i> ${ _('Open in Browser') }</a></li>
     <!-- ko if: IS_HUE_4 && definition.type === 'file' -->
     <li><a href="javascript:void(0);" data-bind="click: openInImporter"><!-- ko template: { name: 'app-icon-template', data: { icon: 'importer' } } --><!-- /ko --> ${ _('Open in Importer') }</a></li>
@@ -186,7 +187,7 @@ from desktop.views import _ko
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-folder-open-o"></i> ${ _('Open folder') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition().type !== 'directory' -->
-    <li><a href="javascript: void(0);" data-bind="click: function(data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: function(data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${ _('Open document') }</a></li>
     <li><a href="javascript: void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data); activeEntry().getSelectedDocsWithDependents(); activeEntry().showDeleteConfirmation(); }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Delete document') }</a></li>
     <!-- /ko -->
@@ -372,9 +373,9 @@ from desktop.views import _ko
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, visibleOnHover: { override: contextPopoverVisible, 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
-              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover">
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover, css: { 'blue': contextPopoverVisible }">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
               </a>
             </div>
@@ -519,9 +520,9 @@ from desktop.views import _ko
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, visibleOnHover: { override: contextPopoverVisible, 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
-              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover">
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover, css: { 'blue': contextPopoverVisible }">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
               </a>
             </div>
@@ -577,9 +578,9 @@ from desktop.views import _ko
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-adls-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-adls-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-adls-scrollable' }, visibleOnHover: { override: contextPopoverVisible, 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
-              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover">
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover, css: { 'blue': contextPopoverVisible }">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
               </a>
             </div>

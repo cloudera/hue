@@ -372,7 +372,6 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-
   <script type="text/html" id="context-storage-entry-title">
     <div class="hue-popover-title">
       <i class="hue-popover-title-icon fa muted" data-bind="css: storageEntry() && storageEntry().definition.type === 'dir' ? 'fa-folder-o' : 'fa-file-o'"></i>
@@ -395,58 +394,71 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="context-storage-entry-contents">
     <div class="context-popover-content" data-bind="with: storageEntry">
-      <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko --></div>
-      <!-- ko ifnot: loading -->
-        <!-- ko if: hasErrors -->
-        <div class="context-popover-flex-fill">
-          <div class="alert" data-bind="text: errorText"></div>
-        </div>
-        <!-- /ko -->
-        <!-- ko ifnot: hasErrors -->
-          <div class="context-popover-flex-fill storage-entry-container" data-bind="fetchMore: { fetchMore: fetchMore.bind($data), hasMore: hasMorePages, loadingMore: loadingMore.bind($data) }">
-            <!-- ko if: definition.type === 'dir' -->
-            <table class="table table-condensed table-nowrap">
-              <thead>
-                <tr>
-                  <th width="1%"></th>
-                  <th>${ _('Name') }</th>
-                  <th>${ _('Size') }</th>
-                  <th>${ _('Permissions') }</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- ko if: $parent.storageEntry().parent -->
-                <tr>
-                  <td><i class="fa fa-folder-o"></i></td>
-                  <td><a href="javascript: void(0);" data-bind="click: function () { $parent.storageEntry($parent.storageEntry().parent) }">..</a></td>
-                  <td data-bind="text: $parent.storageEntry().definition.humansize"></td>
-                  <td data-bind="text: $parent.storageEntry().definition.rwx"></td>
-                </tr>
-                <!-- /ko -->
-                <!-- ko foreach: entries -->
-                <tr>
-                  <td><i class="fa" data-bind="css: definition.type === 'dir' ? 'fa-folder-o' : 'fa-file-o'"></i></td>
-                  <td><a href="javascript: void(0);" data-bind="click: function () { $parents[1].storageEntry($data) }, text: definition.name"></a></td>
-                  <td data-bind="text: definition.humansize"></td>
-                  <td data-bind="text: definition.rwx"></td>
-                </tr>
-                <!-- /ko -->
-              </tbody>
-            </table>
-            <!-- /ko -->
-            <!-- ko if: definition.type !== 'dir' -->
-            <div data-bind="with: preview">
-              <!-- ko if: view && view.contents -->
-              <pre data-bind="text: view.contents"></pre>
-              <!-- /ko -->
-              <!-- ko if: view && !view.contents -->
-              <div class="empty-file-contents">${ _('Empty file...') }</div>
-              <!-- /ko -->
-            </div>
-            <!-- /ko -->
-          </div>
-        <!-- /ko -->
+      <!-- ko if: !loading() && hasErrors() -->
+      <div class="context-popover-flex-fill">
+        <div class="alert" data-bind="text: errorText"></div>
+      </div>
       <!-- /ko -->
+
+      <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko --></div>
+
+      <!-- ko if: !loading() && !hasErrors() -->
+      <!-- ko if: definition.type === 'dir' -->
+      <div class="context-popover-flex-fill storage-entry-container" data-bind="fetchMore: { fetchMore: fetchMore.bind($data), hasMore: hasMorePages, loadingMore: loadingMore.bind($data) }">
+        <table class="table table-condensed table-nowrap">
+          <thead>
+            <tr>
+              <th width="1%"></th>
+              <th>${ _('Name') }</th>
+              <th>${ _('Size') }</th>
+              <th>${ _('Permissions') }</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ko if: $parent.storageEntry().parent -->
+            <tr>
+              <td><i class="fa fa-folder-o"></i></td>
+              <td><a href="javascript: void(0);" data-bind="click: function () { $parent.storageEntry($parent.storageEntry().parent) }">..</a></td>
+              <td data-bind="text: $parent.storageEntry().definition.humansize"></td>
+              <td data-bind="text: $parent.storageEntry().definition.rwx"></td>
+            </tr>
+            <!-- /ko -->
+            <!-- ko foreach: entries -->
+            <tr>
+              <td><i class="fa" data-bind="css: definition.type === 'dir' ? 'fa-folder-o' : 'fa-file-o'"></i></td>
+              <td><a href="javascript: void(0);" data-bind="click: function () { $parents[1].storageEntry($data) }, text: definition.name"></a></td>
+              <td data-bind="text: definition.humansize"></td>
+              <td data-bind="text: definition.rwx"></td>
+            </tr>
+            <!-- /ko -->
+          </tbody>
+        </table>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: definition.type !== 'dir' -->
+      <div class="context-popover-flex-header"><div class="context-popover-header">${ _('Preview') }</div></div>
+      <div class="context-popover-flex-fill storage-entry-container">
+        <div data-bind="with: preview">
+          <!-- ko if: view && view.contents -->
+          <pre data-bind="text: view.contents"></pre>
+          <!-- /ko -->
+          <!-- ko if: view && !view.contents -->
+          <div class="empty-file-contents">${ _('Empty file...') }</div>
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+
+      <div class="context-popover-flex-bottom-links">
+        <div class="context-popover-link-row">
+          <!-- ko ifnot: loading -->
+          <a class="inactive-action pointer" data-bind="click: $parent.openInFileBrowser">
+            <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
+          </a>
+          <!-- /ko -->
+        </div>
+      </div>
     </div>
   </script>
 
@@ -754,6 +766,12 @@ from metadata.conf import has_navigator
           } while (currentEntry);
           return result;
         });
+      };
+
+      StorageContext.prototype.openInFileBrowser = function (entry) {
+        huePubSub.publish('open.link', entry.definition.url);
+        huePubSub.publish('context.popover.hide');
+        huePubSub.publish('global.search.close');
       };
 
       function FunctionContextTabs(data, sourceType) {

@@ -66,6 +66,7 @@ var AssistStorageEntry = (function () {
     self.currentPage = 1;
     self.hasMorePages = true;
     self.preview = ko.observable();
+    self.contextPopoverVisible = ko.observable(false);
 
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
@@ -288,9 +289,16 @@ var AssistStorageEntry = (function () {
     });
   };
 
-  AssistStorageEntry.prototype.showContextPopover = function (entry, event) {
+  AssistStorageEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
     var $source = $(event.target);
     var offset = $source.offset();
+    entry.contextPopoverVisible(true);
+
+    if (positionAdjustment) {
+      offset.left += positionAdjustment.left;
+      offset.top += positionAdjustment.top;
+    }
+
 
     huePubSub.publish('context.popover.show', {
       data: {
@@ -306,6 +314,10 @@ var AssistStorageEntry = (function () {
         right: offset.left + $source.width() + 3,
         bottom: offset.top + $source.height() - 3
       }
+    });
+
+    huePubSub.subscribeOnce('context.popover.hidden', function () {
+      entry.contextPopoverVisible(false);
     });
   };
 
