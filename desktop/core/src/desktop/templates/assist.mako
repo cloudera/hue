@@ -2237,10 +2237,7 @@ from desktop.views import _ko
             <!-- ko if: isSolr -->
             ${ _('Indexes') }
             <!-- /ko -->
-            <!-- ko if: isKafka -->
-            ${ _('Streams') }
-            <!-- /ko -->
-            <!-- ko ifnot: isSolr || isKafka  -->
+            <!-- ko ifnot: isSolr -->
             ${ _('Tables') }
             <!-- ko if: statementCount() > 1 -->
             <div class="statement-count">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>

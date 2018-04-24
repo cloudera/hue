@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from notebook.models import make_notebook
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -78,24 +79,24 @@ class EnvelopeIndexer(object):
 
   def generate_config(self, properties):
     if properties['inputFormat'] == 'kafka':
-      input = """            type = kafka
+#               translator {
+#                   type = delimited
+#                   delimiter = ","
+#                   field.names = [measurement_time,number_of_vehicles]
+#                   field.types = [long,int]
+#               }
+      input = """type = kafka
               brokers = "%(brokers)s"
               topics = %(topics)s
               encoding = string
-              translator {
-                  type = delimited
-                  delimiter = ","
-                  field.names = [measurement_time,number_of_vehicles]
-                  field.types = [long,int]
-              }
               window {
                   enabled = true
                   milliseconds = 60000
               }
       """ % properties
-    elif properties['inputFormat'] == 'streams':
-      if properties['streamSelection'] == 'SFDC':
-        input = """      type = sfdc
+    elif properties['inputFormat'] == 'stream':
+      if properties['streamSelection'] == 'sfdc':
+        input = """type = sfdc
         mode = fetch-all
         sobject = %(streamObject)s
         sfdc: {
@@ -107,30 +108,27 @@ class EnvelopeIndexer(object):
           }
         }
   """
-    else: # File
-      input = """      type = filesystem
-      path = example-input.json
-      format = json
+    elif properties['inputFormat'] == 'file':
+      input = """type = filesystem
+      path = %(path)s
+      format = %(format)s
       """ % properties
-      # header = false
-      
+    else:
+      raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
+
     if properties['ouputFormat'] == 'file':
-      # parquet, 
-      output = """    dependencies = [inputdata]
-    deriver {
-      type = sql
-      query.literal = "SELECT * FROM inputdata"
-    }
+      output = """dependencies = [inputdata]
     planner = {
       type = overwrite
     }
     output = {
       type = filesystem
-      path = example-output
-      format = csv
-    }"""
-    else: # Table
-      output = """        dependencies = [inputdata]
+      path = %(path)s
+      format = %(format)s
+      header = true
+    }""" % properties
+    elif properties['ouputFormat'] == 'table':
+      output = """dependencies = [inputdata]
         deriver {
             type = sql
             query.literal = \"""
@@ -144,6 +142,8 @@ class EnvelopeIndexer(object):
             connection = "%(kudu_master)s"
             table.name = "%(output_table)s"
         }""" % properties
+    else:
+      raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
       
     return """
 application {

@@ -420,6 +420,7 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
   indexer = EnvelopeIndexer(request.user, request.fs)
 
   lib_path = '/tmp/envelope-0.5.0.jar'
+  input_path = None
 
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
@@ -427,30 +428,37 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % file_format["path"]
-  elif file_format['inputFormat'] == 'streams':
     properties = {
-      'streamSelection': file_format['streamSelection'],
-      'streamUsername': file_format['streamUsername'],
-      'streamPassword': file_format['streamPassword'],
-      'streamToken': file_format['streamToken'],
-      'streamEndpointUrl': file_format['streamEndpointUrl'],
-      'streamObject': file_format['streamObject'],
+      'format': 'json'
     }
-    input_path = None
-  else:
-    input_path = None
+  elif file_format['inputFormat'] == 'stream':
+    if file_format['streamSelection'] == 'sfdc':
+      properties = {
+        'streamSelection': file_format['streamSelection'],
+        'streamUsername': file_format['streamUsername'],
+        'streamPassword': file_format['streamPassword'],
+        'streamToken': file_format['streamToken'],
+        'streamEndpointUrl': file_format['streamEndpointUrl'],
+        'streamObject': file_format['streamObject'],
+      }
+    elif file_format['streamSelection'] == 'kafka':
+      manager = ManagerApi()
+      properties = {
+        "brokers": manager.get_kafka_brokers(),
+        "output_table": "impala::%s" % collection_name,
+        "topics": file_format['kafkaSelectedTopics']
+      }
 
-    manager = ManagerApi()
-
-    properties = {
-      "brokers": manager.get_kafka_brokers(),
-      "kudu_master": manager.get_kudu_master(),
-      "output_table": "impala::%s" % collection_name,
-      "topics": file_format['kafkaSelectedTopics']
-    }
+    if file_format['outputFormat'] == 'table':
+      properties["output_table"] = "impala::%s" % collection_name
+      properties["kudu_master"] = manager.get_kudu_master()
+    elif file_format['inputFormat'] == 'file':
+      properties['path'] = file_format["path"]
+      properties['format'] = file_format['tableFormat'] # or csv
 
   properties["inputFormat"] = file_format['inputFormat']
   properties["app_name"] = 'Data Ingest'
+
   morphline = indexer.generate_config(properties)
 
   return indexer.run(request, collection_name, morphline, input_path, start_time=start_time, lib_path=lib_path)
