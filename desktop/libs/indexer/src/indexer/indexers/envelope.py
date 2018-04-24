@@ -112,6 +112,7 @@ class EnvelopeIndexer(object):
       path = example-input.json
       format = json
       """ % properties
+      # header = false
       
     if properties['ouputFormat'] == 'file':
       # parquet, 
@@ -165,4 +166,4 @@ steps {
     }
 }
 
-""" % {'input': input, 'output': output}
+""" % {'input': input, 'output': output, 'app_name': properties['app_name']}
