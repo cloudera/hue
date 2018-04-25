@@ -99,7 +99,7 @@
           ], [
             {
               name: 'backcolor',
-              label: "<div style='display:inline-block;margin:3px;margin-top:8px;width:15px;height:12px;background-color:#0000ff;'></div> <span class='caret'></span>",
+              label: "<div style='display:inline-block;margin:3px;margin-top:4px;width:15px;height:12px;background-color:#0B7FAD;'></div> <span class='caret'></span>",
               title: 'Select background color',
               classname: 'toolbar_bgcolor dropdown-toggle',
               dropdown: true
@@ -129,7 +129,7 @@
           ], [
             {
               name: 'createlink',
-              label: '@',
+              label: "<i style='margin-top:2px;' class='fa fa-external-link'></i>",
               title: 'Link to a web page (Ctrl+L)',
               userinput: "yes",
               classname: 'toolbar_link'

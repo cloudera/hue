@@ -1977,8 +1977,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         gridsterHeight: gridsterHeight,
         id: UUID(),
         name: name,
-        widgetType: type
+        widgetType: type,
+        isEditing: false
       });
+
       self.draggableWidgets[type] = w;
       return w;
     }

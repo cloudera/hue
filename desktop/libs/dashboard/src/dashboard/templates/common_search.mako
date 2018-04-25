@@ -928,29 +928,31 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="html-resultset-widget">
   <!-- ko ifnot: $root.collection.template.isGridLayout() -->
-    <div data-bind="visible: $root.isToolbarVisible() || $root.isEditing()" style="margin-bottom: 20px">
-      <ul class="nav nav-pills">
-        <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
-        <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Sorting')}</a></li>
-      </ul>
-    </div>
+    <!-- ko if: isEditing() -->
+    <div class="metric-form html-form">
+      <a href="javascript:void(0)" data-bind="toggle: isEditing" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
+      <div style="margin-bottom: 20px">
+        <ul class="nav nav-pills">
+          <li class="active"><a href="javascript: void(0)" class="widget-editor-pill">${_('Editor')}</a></li>
+          <li><a href="javascript: void(0)" class="widget-html-pill">${_('HTML')}</a></li>
+          <li><a href="javascript: void(0)" class="widget-css-pill">${_('CSS & JS')}</a></li>
+          <li><a href="javascript: void(0)" class="widget-settings-pill">${_('Sorting')}</a></li>
+        </ul>
+      </div>
 
-    <!-- ko if: $root.isToolbarVisible() || $root.isEditing() -->
       <div class="widget-section widget-editor-section">
         <div class="row-fluid">
           <div class="span9">
             <div data-bind="freshereditor: {data: $root.collection.template.template}"></div>
           </div>
           <div class="span3">
-            <h5 class="editor-title">${_('Available Fields')}</h5>
+            <div class="editor-title">${_('Available Fields')}</div>
             <select data-bind="options: $root.collection.fields, optionsText: 'name', value: $root.collection.template.selectedVisualField" class="input-large chosen-select"></select>
-            <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFieldToVisual">
+            <button title="${ _('Click on this button to add the field') }" class="btn btn-mini plus-btn" data-bind="click: $root.collection.template.addFieldToVisual">
               <i class="fa fa-plus"></i>
             </button>
 
-            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h5>
+            <div class="editor-title margin-top-30">${_('Available Functions')}</div>
             <select id="visualFunctions" data-bind="value: $root.collection.template.selectedVisualFunction" class="input-large chosen-select">
               <option title="${ _('Formats date or timestamp in DD-MM-YYYY') }" value="{{#date}} {{/date}}">{{#date}}</option>
               <option title="${ _('Formats date or timestamp in HH:mm:ss') }" value="{{#time}} {{/time}}">{{#time}}</option>
@@ -965,7 +967,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
               <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
             </select>
-            <button title="${ _('Click on this button to add the function') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFunctionToVisual">
+            <button title="${ _('Click on this button to add the function') }" class="btn btn-mini plus-btn" data-bind="click: $root.collection.template.addFunctionToVisual">
               <i class="fa fa-plus"></i>
             </button>
             <p class="muted" style="margin-top: 10px"></p>
@@ -978,13 +980,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html', stripScript: true }" data-template="true"></textarea>
           </div>
           <div class="span3">
-            <h5 class="editor-title">${_('Available Fields')}</h5>
+            <div class="editor-title">${_('Available Fields')}</div>
             <select data-bind="options: $root.collection.fields, optionsText: 'name', value: $root.collection.template.selectedSourceField" class="input-medium chosen-select"></select>
             <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.template.addFieldToSource">
               <i class="fa fa-plus"></i>
             </button>
 
-            <h5 class="editor-title" style="margin-top: 30px">${_('Available Functions')}</h5>
+            <div class="editor-title" style="margin-top: 30px">${_('Available Functions')}</div>
             <select id="sourceFunctions" data-bind="value: $root.collection.template.selectedSourceFunction" class="input-medium chosen-select">
               <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
               <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
@@ -1018,13 +1020,23 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </div>
         <br/>
       </div>
+    </div>
     <!-- /ko -->
 
     <div class="result-main" style="overflow-x: auto">
+      <div class="edit-dimensions" style="float: right">
+        <div class="badge dimensions-badge-container dimensions-badge-container-add">
+          <div class="action-icon" data-bind="click: function(){ isEditing(true);}"><i class="fa fa-pencil"></i> ${ _('Edit template') }</div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
         <br/>
         ${ _('Your search did not match any documents.') }
       </div>
+
+
 
       <!-- ko if: $root.response().response && $root.results().length > 0 -->
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
@@ -4483,6 +4495,9 @@ $(document).ready(function () {
                 widget: null,
                 tempFieldName: null,
                 callback: function (el) {
+                  if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(tempDraggable.widgetType()) > -1) {
+                    showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+                  }
                   tempDraggable = null;
                 }
               })
