@@ -4191,6 +4191,7 @@ $(document).ready(function () {
 
   function equalizeWidgetsHeights() {
     if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
+      huePubSub.publish('gridster.remove.scrollbars');
       // widgets on the same row should have the same height
       var touched = [];
       searchViewModel.gridItems().forEach(function (existingWidget) {
