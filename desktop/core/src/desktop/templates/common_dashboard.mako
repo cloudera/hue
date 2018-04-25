@@ -67,12 +67,12 @@
     % else:
     <a href="javascript: queryBuilderSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
-        <div class="layout-box" style="width: 100px; margin-left: 4px; padding-top:20px">${ _("Analytics") }</div>
+        <div class="layout-box layout-box-text">${ _("Analytics") }</div>
       </div>
     </a>
     <a href="javascript: textSearchLayout(searchViewModel, true)" onmouseover="searchViewModel.previewColumns('search')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
-        <div class="layout-box" style="width: 100px; margin-left: 4px; padding-top:20px">${ _("Search") }</div>
+        <div class="layout-box layout-box-text">${ _("Search") }</div>
       </div>
     </a>
     % endif
