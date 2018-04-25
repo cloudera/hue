@@ -157,7 +157,7 @@
           </div>
           <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
             <i class="fa fa-table" style="font-size: 120px"></i><br/>
-            <div style="font-size: 40px; padding-top: 20px">${ _('Compute and calculate metrics') }</div>
+            <div style="font-size: 40px; padding-top: 20px; line-height: 48px">${ _('Compute and calculate metrics') }</div>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@
         <div class="span10">
           <div class="preview-row" style="font-size: 80px; ">
             <i class="fa fa-search" style="font-size: 120px; padding-top: 100px"></i><br/>
-            <div style="font-size: 40px; padding-top: 20px">${ _('Retrieve and display records of data') }</div>
+            <div style="font-size: 40px; padding-top: 20px; line-height: 48px">${ _('Retrieve and display records of data') }</div>
           </div>
         </div>
       </div>

@@ -67,14 +67,14 @@ QUERY_BUILDER_LAYOUT = [
 ]
 
 TEXT_SEARCH_LAYOUT = [
-     {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-     {"size":10,"rows":[{"widgets":[
+     {"size":3,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span3"},
+     {"size":9,"rows":[{"widgets":[
          {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
           "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
                         {"widgets":[
          {"size":12,"name":"Grid Results","widgetType":"html-resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
           "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-        "drops":["temp"],"klass":"card card-home card-column span10"},
+        "drops":["temp"],"klass":"card card-home card-column span9"},
 ]
 
 

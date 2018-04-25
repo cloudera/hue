@@ -3415,9 +3415,9 @@ function togglePresentation(value) {};
           wasRightPanelVisible = viewModel.isRightPanelVisible();
 
           if (wasResultFullScreenMode) {
-            huePubSub.publish('side.panels.hide', true);
+            huePubSub.publish('both.assists.hide', true);
           } else {
-            huePubSub.publish('side.panel.right.hide', true);
+            huePubSub.publish('right.assist.hide', true);
           }
 
           viewModel.assistWithoutStorage(true);
@@ -3438,7 +3438,7 @@ function togglePresentation(value) {};
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
           hideFixedHeaders();
-          huePubSub.publish('side.panels.show', true);
+          huePubSub.publish('both.assists.show', true);
           viewModel.assistWithoutStorage(true);
           viewModel.isLeftPanelVisible(wasLeftPanelVisible);
           viewModel.isRightPanelVisible(wasRightPanelVisible);

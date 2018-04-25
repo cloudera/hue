@@ -1425,7 +1425,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.publish('get.current.app.view.model');
 
         var previousVisibilityValues = {};
-        huePubSub.subscribe('side.panels.hide', function(withoutStorage){
+        huePubSub.subscribe('both.assists.hide', function(withoutStorage){
           previousVisibilityValues = {
             left: self.leftAssistVisible(),
             right: self.rightAssistVisible()
@@ -1438,7 +1438,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
 
-        huePubSub.subscribe('side.panel.right.hide', function(withoutStorage){
+        huePubSub.subscribe('both.assists.show', function(withoutStorage){
+          self.assistWithoutStorage(withoutStorage);
+          self.leftAssistVisible(previousVisibilityValues.left);
+          self.rightAssistVisible(previousVisibilityValues.right);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
+        });
+
+        huePubSub.subscribe('right.assist.hide', function(withoutStorage){
           previousVisibilityValues = {
             left: self.leftAssistVisible(),
             right: self.rightAssistVisible()
@@ -1450,20 +1459,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
 
-        huePubSub.subscribe('side.panels.show', function(withoutStorage){
-          self.assistWithoutStorage(withoutStorage);
-          self.leftAssistVisible(previousVisibilityValues.left);
-          self.rightAssistVisible(previousVisibilityValues.right);
-          window.setTimeout(function(){
-            self.assistWithoutStorage(false);
-          }, 0);
+        huePubSub.subscribe('right.assist.show', function () {
+          if (!self.rightAssistVisible()) {
+            self.rightAssistVisible(true);
+          }
         });
 
         huePubSub.subscribe('left.assist.show', function () {
           if (!self.leftAssistVisible()) {
             self.leftAssistVisible(true);
           }
-        })
+        });
+
       }
 
       var sidePanelViewModel = new SidePanelViewModel();
