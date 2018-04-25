@@ -30,15 +30,23 @@ from metadata.conf import has_navigator
   <script type="text/html" id="context-popover-footer">
     <div class="context-popover-flex-bottom-links">
       <div class="context-popover-link-row">
-        <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled, click: function() { huePubSub.publish('context.popover.show.in.assist') }">
+        <a href="javascript: void(0);" class="inactive-action" data-bind="visible: showInAssistEnabled, publish: 'context.popover.show.in.assist'">
           <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
         </a>
-        <a class="inactive-action pointer" data-bind="visible: replaceEditorContentEnabled, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
+        <a href="javascript: void(0);" class="inactive-action" data-bind="visible: replaceEditorContentEnabled, publish: 'context.popover.replace.in.editor'">
           <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
         </a>
-        <a class="inactive-action pointer" data-bind="visible: openInFileBrowserEnabled, click: function() { huePubSub.publish('context.popover.open.in.file.browser') }">
+        <a href="javascript: void(0);" class="inactive-action" data-bind="visible: openInFileBrowserEnabled, publish: 'context.popover.open.in.file.browser'">
           <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
         </a>
+
+        <!-- ko if: isDocument -->
+        <!-- ko with: contents -->
+        <a href="javascript: void(0);" class="inactive-action" data-bind="click: open">
+          <i style="font-size: 11px;" title="${ _("Open...") }" class="fa fa-file-o"></i> ${ _("Open") }
+        </a>
+        <!-- /ko -->
+        <!-- /ko -->
         <!-- ko if: expandColumnsEnabled -->
         <!-- ko with: contents.data -->
         <!-- ko if: selectedColumns().length > 0 -->
@@ -834,6 +842,12 @@ from metadata.conf import has_navigator
         self.disposals.push(function () {
           showInAssistPubSub.remove();
         })
+      }
+
+      DocumentContext.prototype.open = function (entry) {
+        huePubSub.publish('open.link', entry.details.link);
+        huePubSub.publish('context.popover.hide');
+        huePubSub.publish('global.search.close');
       }
 
       DocumentContext.prototype.dispose = function () {
