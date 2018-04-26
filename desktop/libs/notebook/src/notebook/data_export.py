@@ -27,14 +27,14 @@ LOG = logging.getLogger(__name__)
 DL_FORMATS = [ 'csv', 'xls' ]
 
 
-def download(api, session, cell, format):
+def download(api, session, cell, format, user_agent=None):
   if format not in DL_FORMATS:
     LOG.error('Unknown download format "%s"' % format)
     return
 
   content_generator = SparkDataAdapter(api, session, cell)
   generator = export_csvxls.create_generator(content_generator, format)
-  return export_csvxls.make_response(generator, format, 'script_result')
+  return export_csvxls.make_response(generator, format, 'script_result', user_agent=user_agent)
 
 
 def SparkDataAdapter(api, session, cell):
