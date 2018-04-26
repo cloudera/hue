@@ -25,15 +25,18 @@ import subprocess
 import threading
 import time
 
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_false
 
+from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
+from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
 from hadoop.mini_cluster import write_config
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import OOZIE_URL
+from oozie.conf import REMOTE_SAMPLE_DIR
 
 
 _oozie_lock = threading.Lock()
@@ -254,3 +257,43 @@ class TestMiniOozie(OozieServerProvider):
       assert_true(self.cluster.fs.exists('/user/oozie/share/lib'))
     else:
       assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))
+
+class TestOozieWorkspace(object):
+  requires_hadoop = True
+
+  def setUp(self):
+    self.cluster = pseudo_hdfs4.shared_cluster()
+    self.cli = make_logged_in_client(username='admin', is_superuser=True)
+    grant_access('admin', 'admin', 'filebrowser')
+    self.cluster.fs.setuser('admin')
+
+  def test_workspace_has_enough_permissions(self):
+    reset = REMOTE_SAMPLE_DIR.set_for_testing('/tmp/oozie_test_workspace_has_enough_permissions')
+    try:
+      resp = self.cli.get('/desktop/debug/check_config')
+      assert_false('The permissions of workspace' in resp.content, resp)
+
+      self.cluster.fs.mkdir(REMOTE_SAMPLE_DIR.get())
+      assert_equal(oct(040755), oct(self.cluster.fs.stats(REMOTE_SAMPLE_DIR.get())["mode"]))
+      resp = self.cli.get('/desktop/debug/check_config')
+      assert_true('The permissions of workspace' in resp.content, resp)
+
+      permissions_dict = {
+          'group_read': True, 'other_execute': True, 'user_write': True, 'user_execute': True,
+          'sticky': False, 'user_read': True, 'other_read': True, 'other_write': True,
+          'group_write': False, 'group_execute': True
+      }
+
+      kwargs = {'path': [REMOTE_SAMPLE_DIR.get()]}
+      kwargs.update(permissions_dict)
+
+      # Add write permission to Others
+      response = self.cli.post("/filebrowser/chmod", kwargs)
+      assert_equal(oct(040757), oct(self.cluster.fs.stats(REMOTE_SAMPLE_DIR.get())["mode"]))
+
+      resp = self.cli.get('/desktop/debug/check_config')
+      assert_false('The permissions of workspace' in resp.content, resp)
+
+    finally:
+      self.cluster.fs.rmdir(REMOTE_SAMPLE_DIR.get(), skip_trash=True)
+      reset()
