@@ -166,14 +166,11 @@ from desktop.views import _ko
           <td class="name-column" data-bind="attr: { 'title': catalogEntry.name + ' - ${ _ko("Click for more details") }' }">
             <a href="javascript: void(0);" data-bind="click: onClick">
               <span data-bind="text: catalogEntry.name"></span>
-              <!-- ko if: catalogEntry.isPrimaryKey() -->
-              &nbsp;<i title="${ _("Primary Key") }"class="fa fa-key"></i>
-              <!-- /ko -->
-              <!-- ko if: catalogEntry.isPartitionKey() -->
-              &nbsp;<i title="${ _("Partition Key") }"class="fa fa-key"></i>
+              <!-- ko if: isKey -->
+              &nbsp;<i class="fa fa-key" data-bind="tooltip: { title: keyText, html: true }"></i>
               <!-- /ko -->
               <!-- ko if: popularity -->
-              &nbsp;<i data-bind="attr: { 'title': '${ _ko("Popularity") }: ' + popularity() + '%' }" class="fa fa-star-o"></i>
+              &nbsp;<i data-bind="tooltip: { title: '${ _ko("Popularity") }: ' + popularity() + '%' }" class="fa fa-star-o"></i>
               <!-- /ko -->
             </a>
           </td>
@@ -232,6 +229,29 @@ from desktop.views import _ko
         self.onClick = onClick;
         self.onRowClick = onRowClick;
         self.comment = self.catalogEntry.getCommentObservable();
+        self.joinColumns = ko.observableArray();
+
+        self.isKey = ko.pureComputed(function () {
+          return self.catalogEntry.isPrimaryKey() || self.catalogEntry.isPartitionKey || self.joinColumns().length;
+        });
+
+        self.keyText = ko.pureComputed(function () {
+          var keys = [];
+          if (self.catalogEntry.isPrimaryKey()) {
+            keys.push('${ _("Primary key") }')
+          }
+          if (self.catalogEntry.isPartitionKey()) {
+            keys.push('${ _("Partition key") }')
+          }
+          if (self.joinColumns().length) {
+            var key = self.joinColumns().length > 1 ? '${ _("Foreign keys") }:' : '${ _("Foreign key") }:';
+            self.joinColumns().forEach(function (joinCol) {
+              key += '<br/>' + joinCol;
+            });
+            keys.push(key);
+          }
+          return keys.join('<br/>');
+        })
       }
 
       SampleEnrichedEntry.prototype.showContextPopover = function (entry, event) {
@@ -401,15 +421,49 @@ from desktop.views import _ko
               }
               return true;
             };
+
+            var entriesAddedDeferred = $.Deferred();
             var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
               var entries = $.map(childEntries, function (entry, index) { return new SampleEnrichedEntry(index, entry, onClick, onRowClick) });
               entries.sort(entrySort);
               self.entries(entries);
+              entriesAddedDeferred.resolve(entries);
             }).fail(function () {
               self.hasErrors(true);
+              entriesAddedDeferred.reject();
             }).always(function () {
               self.loading(false);
             });
+
+            if (self.catalogEntry.isTableOrView()) {
+              var joinsPromise = self.catalogEntry.getTopJoins().done(function (topJoins) {
+                if (topJoins && topJoins.values && topJoins.values.length) {
+                  entriesAddedDeferred.done(function (entries) {
+                    var entriesIndex = {};
+                    entries.forEach(function (entry) {
+                      entriesIndex[entry.catalogEntry.path.join('.').toLowerCase()] = { joinColumnIndex: {}, entry: entry };
+                    });
+                    topJoins.values.forEach(function (topJoin) {
+                      topJoin.joinCols.forEach(function (topJoinCols) {
+                        if (topJoinCols.columns.length === 2) {
+                          if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
+                            entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[topJoinCols.columns[1].toLowerCase()] = topJoinCols.columns[1]
+                          } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
+                            entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[topJoinCols.columns[0].toLowerCase()] = topJoinCols.columns[0]
+                          }
+                        }
+                      })
+                    });
+                    Object.keys(entriesIndex).forEach(function (key) {
+                      if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
+                        entriesIndex[key].entry.joinColumns(Object.keys(entriesIndex[key].joinColumnIndex));
+                      }
+                    })
+                  })
+                }
+              });
+              self.cancellablePromises.push(joinsPromise);
+            }
 
             var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
               self.loadingNav(false);

@@ -370,7 +370,6 @@ var MetastoreTable = (function () {
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
     self.topJoins = ko.observable();
-    self.foreignJoinCols = ko.observable();
     self.navigatorMeta = ko.observable();
     self.relationshipsDetails = ko.observable();
 
@@ -498,7 +497,6 @@ var MetastoreTable = (function () {
       self.catalogEntry.getTopJoins().done(function (topJoins) {
         if (topJoins && topJoins.values) {
           var joins = [];
-          var foreignJoinCols = {};
           var ownQidLower = self.catalogEntry.path.join('.').toLowerCase();
           var ownNameLower = self.catalogEntry.name.toLowerCase();
           var ownDbNameLower = self.database.catalogEntry.name.toLowerCase();
@@ -551,7 +549,6 @@ var MetastoreTable = (function () {
                       } else {
                         joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target] = cleanCols;
                         join.joinCols.push(cleanCols);
-                        foreignJoinCols[cleanCols.source] = { target: cleanCols.target, path: cleanCols.targetPath };
                       }
                     }
                   })
@@ -572,7 +569,6 @@ var MetastoreTable = (function () {
           joins.sort(function (a, b) {
             return b.queryCount - a.queryCount;
           });
-          self.foreignJoinCols(foreignJoinCols);
           self.topJoins(joins);
         }
       }).always(function () {
@@ -727,7 +723,6 @@ var MetastoreColumn = (function () {
 
     self.favourite = ko.observable(false);
     self.popularity = ko.observable();
-
     self.comment = ko.observable();
 
     self.comment.subscribe(function (newValue) {

@@ -3145,7 +3145,7 @@
 
       if (options.title) {
         var title = ko.unwrap(options.title); // Not always an observable
-        if (typeof title === 'string') {
+        if (typeof title === 'string' && !options.html) {
           options.title = escapeOutput(title);
         }
       }
