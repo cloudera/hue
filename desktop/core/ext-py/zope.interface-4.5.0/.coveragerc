@@ -1,0 +1,11 @@
+[run]
+branch = True
+source = zope.interface
+
+[report]
+show_missing = true
+exclude_lines =
+    pragma: no cover
+    class I[A-Z]\w+\((Interface|I[A-Z].*)\):
+    raise NotImplementedError
+    self\.fail

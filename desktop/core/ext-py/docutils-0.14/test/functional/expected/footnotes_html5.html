@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Test footnote and citation rendering</title>
+<link rel="stylesheet" href="../input/data/minimal.css" type="text/css" />
+<link rel="stylesheet" href="../input/data/plain.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="test-footnote-and-citation-rendering">
+<h1 class="title">Test footnote and citation rendering</h1>
+
+<p>Paragraphs may contain footnote references (manually numbered<a class="footnote-reference superscript" href="#id7" id="id1">1</a>, anonymous auto-numbered<a class="footnote-reference superscript" href="#id11" id="id2">3</a>, labeled auto-numbered<a class="footnote-reference superscript" href="#label" id="id3">2</a>, or
+symbolic<a class="footnote-reference superscript" href="#id12" id="id4">*</a>) or citation references (<a class="citation-reference" href="#cit2002" id="id5">[CIT2002]</a>, <a class="citation-reference" href="#du2015" id="id6">[DU2015]</a>).</p>
+<dl class="footnote superscript">
+<dt class="label" id="id7"><span class="superscript">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id8">2</a>)</span></dt>
+<dd><p>A footnote contains body elements, consistently indented by at
+least 3 spaces.</p>
+<p>This is the footnote's second paragraph.</p>
+</dd>
+<dt class="label" id="label"><span class="superscript">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id9">2</a>)</span></dt>
+<dd><p>Footnotes may be numbered, either manually (as in<a class="footnote-reference superscript" href="#id7" id="id8">1</a>) or
+automatically using a &quot;#&quot;-prefixed label.  This footnote has a
+label so it can be referred to from multiple places, both as a
+footnote reference (<a class="footnote-reference superscript" href="#label" id="id9">2</a>) and as a <a class="reference internal" href="#label">hyperlink reference</a>.</p>
+</dd>
+<dt class="label" id="id11"><span class="superscript"><a class="fn-backref" href="#id2">3</a></span></dt>
+<dd><p>This footnote is numbered automatically and anonymously using a
+label of &quot;#&quot; only.</p>
+<p>This is the second paragraph.</p>
+<p>And this is the third paragraph.</p>
+</dd>
+<dt class="label" id="id12"><span class="superscript"><a class="fn-backref" href="#id4">*</a></span></dt>
+<dd><p>Footnotes may also use symbols, specified with a &quot;*&quot; label.
+Here's a reference to the next footnote:<a class="footnote-reference superscript" href="#id14" id="id13">†</a>.</p>
+</dd>
+<dt class="label" id="id14"><span class="superscript"><a class="fn-backref" href="#id13">†</a></span></dt>
+<dd><p>This footnote shows the next symbol in the sequence.</p>
+</dd>
+<dt class="label" id="id15"><span class="superscript">4</span></dt>
+<dd><p>Here's an unreferenced footnote, with a reference to a
+nonexistent footnote:<a class="footnote-reference superscript" href="#id18" id="id16">5</a>.</p>
+</dd>
+</dl>
+<div class="section" id="citations">
+<h1>Citations</h1>
+<dl class="citation">
+<dt class="label" id="cit2002"><span class="brackets">CIT2002</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id17">2</a>)</span></dt>
+<dd><p>Citations are text-labeled footnotes. They may be
+rendered separately and differently from footnotes.</p>
+</dd>
+<dt class="label" id="du2015"><span class="brackets"><a class="fn-backref" href="#id6">DU2015</a></span></dt>
+<dd><p><cite>Example document</cite>, Hometown: 2015.</p>
+</dd>
+</dl>
+<p>Here's a reference to the above, <a class="citation-reference" href="#cit2002" id="id17">[CIT2002]</a>.</p>
+<dl class="footnote superscript">
+<dt class="label" id="id18"><span class="superscript"><a class="fn-backref" href="#id16">5</a></span></dt>
+<dd><p>this footnote is missing in the standard example document.</p>
+</dd>
+</dl>
+</div>
+</div>
+</body>
+</html>

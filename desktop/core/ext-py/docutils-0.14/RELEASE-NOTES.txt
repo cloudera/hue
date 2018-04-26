@@ -1,0 +1,665 @@
+.. -*- coding: utf-8 -*-
+
+========================
+ Docutils Release Notes
+========================
+
+:Contact: grubert@users.sourceforge.net
+:Maintainer: docutils-develop@lists.sourceforge.net
+:Date: $Date: 2017-08-03 11:01:16 +0200 (Do, 03 Aug 2017) $
+:Revision: $Revision: 8147 $
+:Web site: http://docutils.sourceforge.net/
+:Copyright: This document has been placed in the public domain.
+
+
+This document summarizes the major changes in recent and upcoming releases.
+For a more detailed list of changes, please see the `Docutils History`_.
+
+.. _Docutils History: HISTORY.html
+
+.. contents::
+
+Future changes
+==============
+
+* Drop support for Python 2.4, 2.5, 3.1, and 3.2 immediately after the 0.14
+  release.
+
+* Remove the `handle_io_errors` option from io.FileInput/Output.
+  Used by Sphinx up to version 1.3.1, fixed in 1.3.2 (Nov 29, 2015).
+
+* The default HTML writer "html" with frontend ``rst2html.py`` may change
+  from "html4css1" to "html5".
+
+  Use `get_writer_by_name('html')` or the rst2html.py_ front end, if you
+  want the output to be up-to-date automatically.
+
+  Use a specific writer name or front end, if you depend on stability of the
+  generated HTML code, e.g. because you use a custom style sheet or
+  post-processing that may break otherwise.
+
+.. _rst2html.py: docs/user/tools.html#rst2html-py
+
+
+Release 0.14 (2017-08-03)
+=========================
+
+As rc2.
+
+* docutils/docs/ref/docutils.dtd:
+
+  - Enable validation of Docutils XML documents against the DTD:
+
+* docutils/parsers/rst/:
+
+  - Added functionality: escaped whitespace in URI contexts.
+  - Consistent handling of all whitespace characters in inline markup
+    recognition. (May break documents that relied on some whitespace
+    characters (NBSP, ...) *not* to be recognized as whitespace.)
+
+* docutils/utils/smartquotes.py:
+
+  - Update quote definitions for et, fi, fr, ro, sv, tr, uk.
+  - Add quote definitions for hr, hsb, hu, lv, sh, sl, sr.
+  - Differentiate apostrophe from closing single quote (if possible).
+  - Add command line interface for stand-alone use (requires 2.7).
+
+* docutils/writers/_html_base:
+
+  - Provide default title in metadata.
+  - The MathJax CDN shut down on April 30, 2017. For security reasons, we
+    don't use a third party public installation as default but warn
+    if `math-output` is set to MathJax without specifying a URL.
+    See math-output_ for details.
+
+* docutils/writers/html4css1:
+
+  - Respect automatic table column sizing.
+
+* docutils/writers/latex2e/__init__.py
+
+  - Handle class arguments for block-level elements by wrapping them
+    in a "DUclass" environment. This replaces the special handling for
+    "epigraph" and "topic" elements.
+
+* docutils/writers/odf_odt:
+
+  - Language option sets ODF document's default language
+  - Image width, scale, ... set image size in generated ODF.
+
+* tools/
+
+  - New front-end ``rst2html4.py``.
+
+
+Release 0.13.1 (2016-12-09)
+===========================
+
+* docutils/writers/html5_polyglot
+
+  - New HTML writer generating `HTML 5`_.
+
+  .. _HTML 5: http://www.w3.org/TR/html5/
+
+* tools/
+
+  - New front-end ``rst2html5.py``.
+
+* languages: persian/farsi (fa) and latvian (la) mappings.
+
+* change default base url for :rfc: to http://tools.ietf.org/html/
+
+* tables accept widths, a list and align
+
+* latex2e: Fix admonition width, remove deprecated options,
+  better tablewidth auto, ...
+
+* rst.el: The problem with ``electric-indent-mode`` has been fixed.
+
+
+Release 0.12 (2014-07-06)
+=========================
+
+Small changes only, release current state
+
+
+Release 0.11 (2013-07-22)
+=========================
+
+* General
+
+  - Apply [ 2714873 ] Fix for the overwritting of document attributes.
+  - Support embedded aliases within hyperlink references.
+  - Fix [ 228 ] try local import of docutils components (reader, writer, parser,
+    language module) before global search.
+
+* docutils/parsers/rst/directives/tables.py
+
+  - Fix [ 210 ] Python 3.3 checks CVS syntax only if "strict" is True.
+
+* docutils/writers/html4css1/__init__.py
+  - Fix [ 3600051 ] for tables in a list, table cells are not compacted.
+  - New setting `stylesheet_dirs` (see above).
+
+    Now, it is easy to add a custom stylesheet to Docutils' default
+    stylesheet with, e.g., ``--stylesheet_path='html4css1.css, mystyle.css'``
+
+    Changed behaviour of the default settings:
+      if there is a file ``html4css1.css`` in the working directory of the
+      process at launch, it is used instead of the one provided by Docutils
+      in the writer source directory.
+
+  - New default for math-output_: ``HTML math.css``.
+  - Avoid repeated class declarations in html4css1 writer
+    (modified version of patch [ 104 ]).
+
+.. _math-output: docs/user/config.html#math-output
+
+* docutils/writers/latex2e/__init__.py
+
+  - Drop the simple algorithm replacing straight double quotes with
+    English typographic ones.
+    Activate the SmartQuotes_ transform if you want this feature.
+  - New setting `stylesheet_dirs`: Comma-separated list of directories
+    where stylesheets are found. Used by `stylesheet_path` when expanding
+    relative path arguments.
+
+.. _SmartQuotes: docs/user/config.html#smart-quotes
+
+* docutils/writers/manpage.py
+
+  - Fix [3607063] handle lines starting with a period.
+  - Fix option separating comma was bold (thanks to Bill Morris).
+
+Release 0.10 (2012-12-16)
+=========================
+
+.. Note::
+
+   Docutils 0.9.x is the last version supporting Python 2.3.
+
+   Docutils 0.10 is compatible with Python versions from 2.4 to 3.2
+   (cf. `Python 3 compatibility`_).
+
+* General:
+
+  - SmartQuotes transform for typographic quotes and dashes.
+
+  - ``docutils/math``, ``docutils/error_reporting.py``, and
+    ``docutils/urischemes.py`` moved to the utils package.
+    Code importing these modules needs to adapt, e.g.::
+
+      try:
+          import docutils.math as math
+      except ImportError:
+          import docutils.utils.math as math
+
+  - enhanced math and error handling.
+
+* docutils/io.py
+
+  - FileInput/FileOutput: no system-exit on IOError.
+    The `handle_io_errors` option is ignored.
+
+.. _Python 3 compatibility: README.html#python-3-compatibility
+
+* docutils/writers/html4css1/__init__.py
+
+  - Use ``<code>`` tag for inline "code",
+    do not drop nested inline nodes (syntax highlight tokens).
+  - Customizable MathJax URL (based on patch by Dmitry Shachnev).
+  - No line break after opening inline math tag.
+
+* docutils/writers/latex2e/__init__.py, docutils/writers/xetex/__init__.py
+
+  - Fix section numbering by LaTeX.
+
+* docutils/writers/s5_html/__init__.py
+
+  - Fix [ 3556388 ] Mathjax does not work with rst2s5.
+
+
+Release 0.9.1 (2012-06-17)
+==========================
+
+* General:
+
+  Several fixes for Python 3 usage.
+
+* docutils/setup.py
+
+  - Fix [ 3527842 ]. Under Python 3, converted tests and tools were
+    installed in the PYTHONPATH. Converted tests are now
+    stored in ``docutils/test3/``, tools no longer need conversion.
+
+    If you installed one of Docutils versions 0.7 ... 0.9 with
+    ``setup.py install`` under Python 3, remove the spurious
+    ``test/`` and ``tools/`` directories in the site library root.
+
+
+Release 0.9 (2012-05-02)
+=========================
+
+* General:
+
+  - reStructuredText "code" role and directive with syntax highlighting
+    by Pygments_.
+  - "code" option of the "include" directive.
+
+  .. _Pygments: http://pygments.org/
+
+  - Fix [ 3402314 ] allow non-ASCII whitespace, punctuation
+    characters and "international" quotes around inline markup.
+
+  - Fix handling of missing stylesheets.
+
+* setup.py
+
+  - Fix [ 2971827 ] and [ 3442827 ]
+    extras/roman.py moved to docutils/utils/roman.py
+
+* docutils/utils.py -> docutils/utils/__init__.py
+
+  - docutils.utils is now a package (providing a place for sub-modules)
+
+* docutils/writers/html4css1/__init__.py
+
+  - change default for `math-output` setting to MathJax
+
+* docutils/writers/latex2e/__init__.py
+
+  - Support the `abbreviation` and `acronym` standard roles.
+  - Record only files required to generate the LaTeX source as dependencies.
+  - Use ``\setcounter{secnumdepth}{0}`` instead of ``*``-versions
+    when suppressing LaTeX section numbering.
+
+
+Release 0.8.1 (2011-08-30)
+==========================
+
+* General:
+
+  - Fix [ 3364658 ] (Change last file with Apache license to BSD-2-Clause)
+    and [ 3395920 ] (correct copyright info for rst.el).
+
+* docutils/writers/latex2e/__init__.py
+
+  - Clean up Babel language setting. Restores Sphinx compatibility.
+
+
+Release 0.8 (2011-07-07)
+========================
+
+* COPYING:
+
+  - Some additions to the Docutils core are released under the 2-Clause BSD
+    license.
+
+* General:
+
+  - Handle language codes according to `BCP 47`_.
+  - If the specified langauage is not supported by Docutils,
+    warn and fall back to English.
+  - Math support: reStructuredText "math" role and directive,
+    ``math`` and ``math_block`` doctree elements.
+  - Orphaned "python" reader and "newlatex2e" writer moved to the sandbox.
+
+  .. _BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+
+* reStructuredText:
+
+  - most directives now support a "name" option that attaches a
+    reference name. So you can write ::
+
+      .. figure:: image.png
+         :name: figure name
+
+    as a short form of ::
+
+      .. _figure name:
+
+      .. figure:: image.png
+
+Internationalization:
+
+* Added lithuanian mappings.
+
+Components:
+
+* HTML writer:
+
+  - New setting "math-output" with support for HTML, MathML, and LaTeX.
+
+* LaTeX2e writer:
+
+  - Convert image URI to a local file path.
+  - Apply [ 3148141 ] fix multicolumn support when a colspanning cell
+    has more than one paragraph (Wolfgang Scherer).
+
+* XeTeX writer:
+
+  - New writer generating LaTeX code for compiling with ``xelatex``.
+
+    XeTeX uses unicode and modern font technologies.
+
+* and fixes and enhancements here and there.
+
+
+Release 0.7 (2010-07-07)
+========================
+
+Components:
+
+* HTML writer:
+
+  - Support SVG and SWF images (thanks to Stefan Rank).
+  - Generate valid XHTML for centered images with targets.
+    Use CSS classes instead of "align" tags for image alignment.
+
+* LaTeX2e writer:
+
+  - Use the ``\url`` command for URLs (breaks long URLs instead of writing
+    into the margin).
+  - Preserve runs of spaces in 'inline literals'.
+  - Deprecate ``figure_footnotes`` setting.
+  - Rename ``use_latex_footnotes`` setting to `docutils_footnotes`__.
+  - New ``latex_preamble`` setting.
+  - Use PDF standard fonts (Times/Helvetica/Courier) as default.
+  - `hyperref` package called with ``unicode`` option (see the
+    `hyperref config tips`__ for how to override).
+  - Drop the special `output_encoding`__ default ("latin-1").
+    The Docutils wide default (usually "UTF-8") is used instead.
+
+__ docs/user/config.html#docutils-footnotes
+__ docs/user/latex.html#hyperlinks
+__ docs/user/latex.html#output-encoding
+
+* manpage writer:
+
+  - Titles level 1, that is ``.SH``, always uppercase.
+  - Apply patch from mg: literal text should be bold in man-pages.
+
+General:
+
+* io.FileInput opens files as text files with universal newline support
+  (mode "rU", configurable with the new optional argument "mode").
+
+* setup.py:
+
+  - Python 3 support: copy test/ and tools/ to the build-dir
+    and convert Python sources with 2to3.
+
+
+Release 0.6 (2009-10-11)
+========================
+
+.. Note::
+
+   Docutils 0.5 is the last version supporting Python 2.2.
+
+   Docutils 0.6 is compatible with Python versions from 2.3 up to 2.6
+   and convertible to 3.1 code.
+
+.. note::
+
+   The "newlatex" writer is orphaned.
+
+   The recommended way to generate PDF output is to use either the
+   LaTeX2e writer or one of the alternatives listed at
+   http://docutils.sourceforge.net/docs/user/links.html#pdf.
+
+* reStructuredText:
+
+  - Allow length units for all length specifications.
+  - Allow percent sign in "scale" argument of "figure" and "image" directives.
+  - Bugfix: The "figalign" argument of a figure now works as intended
+    (aligning the figure not its contents).
+  - Align images with class "align-[right|center|left]"
+    (allows setting the alignment of an image in a figure).
+  - Hard tabs in literal inclusions are replaced by spaces. This is
+    configurable via the new "tab-width" option of the "include" directive
+    (a negative tab-width prevents tab expansion).
+
+* HTML writer:
+
+  - ``--stylesheet`` and ``--stylesheet-path`` options now support a comma
+    separated list of stylesheets.
+
+* LaTeX2e writer:
+
+  - New defaults:
+    - font-encoding: "T1" (formerly implicitely set by 'ae').
+    - use-latex-toc: true (ToC with page numbers).
+    - use-latex-footnotes: true (no mixup with figures).
+    - Float placement defaults to "here definitely" (configurable).
+    - Align of image in a figure defaults to 'center'.
+    - Use class defaults for page margins ('typearea' now optional).
+  - Support LaTeX packages as ``--stylesheet`` arguments.
+  - Use ``bp`` for lengths without unit or unit ``pt``,
+    do not convert ``px`` to ``pt``.
+  - Do not use 'ae' and 'aeguill' packages if font-encoding is set to ''.
+  - Set sub- and superscript role argument as text not math.
+  - Support custom roles based on standard roles.
+  - Load packages and define macros only if required in the document.
+  - All Docutils specific LaTeX macros are prefixed with ``DU``.
+  - Better conformance to Docutils specifications with "use_latex_toc".
+  - If 'sectnum_xform' is False, the 'sectnum' directive triggers
+    section numbering by LaTeX.
+  - Use default font in admonitions and sidebar.
+  - Typeset generic topic as "quote with title".
+  - Use template (file and configuration option).
+  - Render doctest blocks as literal blocks (indented).
+
+* ODT writer:
+
+  - moved from sandbox to Doctutils core.
+
+* manpage writer:
+
+  - moved from sandbox to Doctutils core.
+
+
+Release 0.5 (2008-06-25)
+========================
+
+Components:
+
+* HTML writer.
+
+  - Dropped all ``name`` attributes of ``a`` elements (``id`` is
+    universally supported now).
+
+* LaTeX2e writer:
+
+  - Better bibTeX citation support.
+  - Add ``--literal-block-env``
+
+* PEP writer:
+
+  - Changed to support new python.org website structure and
+    pep2pyramid.py.
+
+reStructuredText:
+
+* Changed the directive API to a new object-oriented system.
+  (Compatibility for the old, functional-style directive interface is
+  retained.)  See the updated `Creating reStructuredText Directives`__
+  how-to.
+
+  __ docs/howto/rst-directives.html
+
+* Allow ``+`` and ``:`` in reference names requested for citations.
+
+Documentation:
+
+* Added `Deploying Docutils Securely`__
+
+  __ docs/howto/security.txt
+
+Internationalization:
+
+* Added hebrew mappings.
+
+General:
+
+* Configuration files are now assumed and required to be
+  UTF-8-encoded.
+
+* Added docutils/writers/html4css1/template.txt.
+
+* Enhance emacs support.
+
+
+Release 0.4 (2006-01-09)
+========================
+
+.. Note::
+
+   Docutils 0.4.x is the last version that will support Python 2.1.
+   Docutils 0.5 will *not* be compatible with Python 2.1; Python 2.2
+   or later will be required.
+
+   Docutils 0.4.x is the last version that will make compromises in
+   its HTML output for Netscape Navigator 4.  Docutils 0.5 will
+   require more up-to-date browsers (the exact definition is to be
+   determined).
+
+Components:
+
+* Added an `S5/HTML writer`__ and the rst2s5.py__ front end:
+  multi-platform, multi-browser HTML slide shows.
+
+  __ docs/user/slide-shows.html
+  __ docs/user/tools.html#rst2s5-py
+
+* The newlatex2e writer is nearing completion.
+
+* Added a DocTree reader, ``publish_doctree`` and
+  ``publish_from_doctree`` convenience functions, for document tree
+  extraction and reprocessing.
+
+reStructuredText:
+
+* Added directives: "container__" (generic block-level container),
+  "default-role__" (role used for \`backtick\` syntax), "title__"
+  (document title metadata), and "date__" (generate the current local
+  date, for substitution definitions).
+
+  __ docs/ref/rst/directives.html#container
+  __ docs/ref/rst/directives.html#default-role
+  __ docs/ref/rst/directives.html#title
+  __ docs/ref/rst/directives.html#date
+
+* Length units are now supported for image__ sizes.
+
+  __ docs/ref/rst/directives.html#image
+
+* Added `standard definition files`__ for special characters etc.
+
+  __ docs/ref/rst/definitions.html
+
+Internationalization:
+
+* Added Japanese and Simplified Chinese language mappings, and support
+  for double-width CJK-characters in tables and section titles.
+
+Documentation:
+
+* Added a `guide for distributors`__ (package maintainers) and a
+  `guide for developers`__.
+
+  __ docs/dev/distributing.html
+  __ docs/dev/hacking.html
+
+General:
+
+* Added significant `Emacs support for reST`__.
+
+  __ docs/user/emacs.html
+
+* Added a `--strip-comments`__ option.
+
+  __ docs/user/config.html#strip-comments
+
+* `--embed-stylesheet`__ is now the default for the HTML writer
+  (rather than --link-stylesheet).
+
+  __ docs/user/config.html#embed-stylesheet
+
+
+Release 0.3.9 (2005-05-26)
+==========================
+
+* Added "file_insertion_enabled__" and "raw_enabled__" settings.
+
+  __ docs/user/config.html#file-insertion-enabled
+  __ docs/user/config.html#raw-enabled
+
+* Added `auto-enumerated lists`__.
+
+  __ docs/ref/rst/restructuredtext.html#enumerated-lists
+
+* Added `"header" and "footer"`__ directives.
+
+  __ docs/ref/rst/directives.html#document-header-footer
+
+* Added "list-table__" directive.
+
+  __ docs/ref/rst/directives.html#list-table
+
+* Added support for `section subtitles`__.
+
+  __ docs/user/config.html#sectsubtitle-xform
+
+* Added "field_name_limit__" and "option_limit__" settings to HTML writer.
+
+  __ docs/user/config.html#field-name-limit
+  __ docs/user/config.html#option-limit
+
+* Added "cloak_email_addresses__" setting to HTML writer.
+
+  __ docs/user/config.html#cloak-email-addresses
+
+* UTF-8 BOMs are now removed from the input stream.
+
+
+Release 0.3.7 (2004-12-24)
+==========================
+
+* A special "`line block`__" syntax has been added.  (Also see the
+  `quick reference`__.)
+
+  __ docs/ref/rst/restructuredtext.html#line-blocks
+  __ docs/user/rst/quickref.html#line-blocks
+
+* Empty sections are now allowed.
+
+* A "raw__" role has been added.
+
+  __ docs/ref/rst/roles.html#raw
+
+* The LaTeX writer now escapes consecutive dashes (like "--" or "---")
+  so that they are no longer transformed by LaTeX to en or em dashes.
+  (Please see the FAQ__ for how to represent such dashes.)
+
+  __ FAQ.html#how-can-i-represent-esoteric-characters-e-g-character-entities-in-a-document
+
+* A `dependency recorder`__ has been added.
+
+  __ docs/user/config.html#record-dependencies
+
+* A directive has been added for `compound paragraphs`__.
+
+  __ docs/ref/rst/directives.html#compound-paragraph
+
+
+Release 0.3.5 (2004-07-29)
+==========================
+
+* Improved, extended and reorganized the documentation__.
+
+  __ docs/index.html
+
+* Added "csv-table__" directive.
+
+  __ docs/ref/rst/directives.html#csv-table

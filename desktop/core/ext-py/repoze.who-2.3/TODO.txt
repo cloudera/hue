@@ -1,0 +1,29 @@
+repoze.who TODOs
+================
+
+Features
+--------
+
+- [X} Config file parser.
+
+- [_] Allow the ZODB plugin to connect read-only.
+
+- [X] Add a ``RedirectorPlugin``, similar to
+      ``plugins.form.RedirectingFormPlugin``, but which *only* implements
+      the ``IChallenger`` interface.
+
+- [_] Deprecate the form plugins.
+
+
+Documentation
+-------------
+
+- [_] Middleware use case as tutorial:  bug tracker + ``REMOTE_USER``
+
+- [_] Middleware use case as tutorial:  wiki + ``repoze.who.identity``
+
+- [_] API use case as tutorial:  wiki w/ login and logout views
+
+- [_] API use case as tutorial:  multiple apps w/ SSO
+
+- [_] Hybrid use case as tutorial:  multiple apps w/ SSO, one OTS
