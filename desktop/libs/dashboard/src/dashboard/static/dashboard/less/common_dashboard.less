@@ -545,6 +545,9 @@
     .move-dimension {
       cursor: move;
     }
+    &.is-editing {
+      opacity: 1 !important;
+    }
     &:hover {
       .action-icon {
         opacity: 1;
@@ -586,6 +589,10 @@
     margin-left: -5px;
     .selectize-control {
       margin-top: 4px;
+      margin-right: 20px;
+    }
+    .context-popover-icon {
+      margin-left: -20px;
       margin-right: 20px;
     }
   }

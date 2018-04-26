@@ -878,6 +878,7 @@ var Collection = function (vm, collection) {
       }));
     }
 
+    facet.isEditing = ko.observable(false);
     facet.isAdding = ko.observable(false);
 
     if (facet.properties.facets) { // Sub facet

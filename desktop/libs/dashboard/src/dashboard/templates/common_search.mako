@@ -593,9 +593,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- /ko -->
 
   <!-- ko if: !$parents[1].isLoading() || widgetType() == 'hit-widget' -->
-  <div class="edit-dimensions">
+  <div class="edit-dimensions" data-bind="css: { 'is-editing': isEditing }">
     <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', handle: '.move-dimension', tolerance: 'pointer'}}" class="inline-block">
-      <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }, click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }" title="${ _('Edit') }">
+      <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }, click: function(){ $parent.isEditing(true); $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }" title="${ _('Edit') }">
         <span data-bind="text: getPrettyMetric($data)"></span>
         <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: { 'title': field }"></span>
         <!-- ko if: aggregate.function() != 'field' && aggregate.metrics && $parent.widgetType() != 'hit-widget' -->
@@ -610,7 +610,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </div>
     </div>
     <div class="badge dimensions-badge-container dimensions-badge-container-add" data-bind="css: { 'is-adding': isAdding }, visible: properties.facets().length < 15 && widgetType() != 'hit-widget'">
-      <div class="action-icon" data-bind="click: function(){ isAdding(true); properties.facets().forEach(function(f){ f.isEditing(false); });  }"><i class="fa fa-plus"></i> ${ _('Add') }</div>
+      <div class="action-icon" data-bind="click: function(){ isEditing(true); isAdding(true); properties.facets().forEach(function(f){ f.isEditing(false); });  }"><i class="fa fa-plus"></i> ${ _('Add') }</div>
       <!-- ko if: isAdding -->
         <div class="metric-form" data-bind="template: { name: 'metric-form', data: properties.facets_form }"></div>
       <!-- /ko -->
@@ -2181,6 +2181,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <script type="text/html" id="metric-form">
     <!-- ko if: typeof isEditing !== 'undefined' && isEditing() -->
     <div>
+
       <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
       <a href="javascript:void(0)" data-bind="toggle: isEditing" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
       <!-- /ko -->
@@ -2196,6 +2197,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
       <!-- ko if: $data.function() != 'formula' -->
       <select data-bind="selectize: facetFieldsNames, value: $parent.field, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
+        <!-- ko if: $parent.field -->
+        <a class="inactive-action context-popover-icon" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + $parent.field()  }">
+          <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
+        </a>
+        <!-- /ko -->
       <!-- /ko -->
 
       <div class="clearfix"></div>
@@ -4667,6 +4673,7 @@ $(document).ready(function () {
     if (searchViewModel.isGridster() && (!event || (event && !$(event.target).parents('.edit-dimensions').length))) {
       searchViewModel.collection.facets().forEach(function (facet) {
         facet.isAdding(false);
+        facet.isEditing(false);
         if (facet.properties && facet.properties.facets && facet.properties.facets()) {
           facet.properties.facets().forEach(function (dimension) {
             dimension.isEditing(false);
