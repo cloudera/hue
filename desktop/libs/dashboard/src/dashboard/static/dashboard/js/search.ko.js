@@ -1876,6 +1876,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     self.isGridster(false);
   }
 
+  self.showPlusButtonHint = ko.observable(collection_json.layout.length === 0);
+
   self.build = function () {
     self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
     self.isNested = ko.observable(false);

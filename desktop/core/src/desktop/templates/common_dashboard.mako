@@ -106,20 +106,20 @@
 </%def>
 
 <%def name="layout_skeleton(suffix='')">
-  <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
+  <div class="initial-hint empty-dashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
     <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
+    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" />
   </div>
 
-  <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
+  <div class="initial-hint empty-dashboard-editing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
     <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" alt="${ _('Hint arrow') }" />
+    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" class="flip-horizontal" />
   </div>
 
   <!-- ko if: $root.isGridster -->
-  <div id="emptyDashboardEditing" data-bind="visible: $root.gridItems().length === 0 && columns().length > 0">
-    <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Drag any of the top widgets inside your dashboard')}</div>
-    <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
+  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint">
+    <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Drag the plus button into your dashboard')}</div>
+    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" />
   </div>
   <!-- /ko -->
 
@@ -179,7 +179,7 @@
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
   <!-- ko if: $root.isGridster -->
-    <div class="gridster">
+    <div class="gridster" data-bind="style: { 'opacity': $root.showPlusButtonHint() ? '.3' : '1' }">
       <!-- ko if: typeof gridItems !== 'undefined' -->
       <ul class="unstyled" data-bind="css: { 'is-adding': $root.isToolbarVisible }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
@@ -271,7 +271,7 @@
 
 <script type="text/html" id="row-template${ suffix }">
   <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
-    <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px" alt="${ _('Hint arrow') }"/>
+    <img src="${ static('desktop/art/hint_arrow.svg') }" style="float:left; margin-right: 10px" alt="${ _('Hint arrow') }" class="flip-both"/>
     <div style="float: left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
     <div class="clearfix"></div>
   </div>

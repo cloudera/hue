@@ -134,7 +134,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster() && !$root.isQueryBuilder() -->
       <div class="btn-group">
-        <a class="btn draggable-plus-button move-cursor" title="${ _('Click or drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+        <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
           <i class="fa fa-plus"></i>
         </a>
       </div>
@@ -3226,6 +3226,9 @@ var getDraggableOptions = function (options) {
           gridsterWidget: options.parent
         });
         $(this).data('startingScrollTop', $('.page-content').scrollTop());
+        if (options.plusButton) {
+          searchViewModel.showPlusButtonHint(false);
+        }
         if (options && options.start) {
           options.start();
         }
