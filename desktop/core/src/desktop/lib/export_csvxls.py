@@ -29,6 +29,7 @@ import tablib
 
 from django.http import StreamingHttpResponse, HttpResponse
 from django.utils.encoding import smart_str
+from django.utils.http import urlquote
 from desktop.lib import i18n
 
 
@@ -110,7 +111,7 @@ def create_generator(content_generator, format, encoding=None):
     raise Exception("Unknown format: %s" % format)
 
 
-def make_response(generator, format, name, encoding=None):
+def make_response(generator, format, name, encoding=None, user_agent=None):
   """
   @param data An iterator of rows, where every row is a list of strings
   @param format Either "csv" or "xls"
@@ -135,6 +136,15 @@ def make_response(generator, format, name, encoding=None):
   else:
     raise Exception("Unknown format: %s" % format)
 
-  resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % (name, format)
+  try:
+    name = name.encode('ascii')
+    resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % (name, format)
+  except UnicodeEncodeError:
+    name = urlquote(name)
+    if user_agent is not None and 'Firefox' in user_agent:
+      # Preserving non-ASCII filename. See RFC https://tools.ietf.org/html/rfc6266#appendix-D, only FF works
+      resp['Content-Disposition'] = 'attachment; filename*="%s.%s"' % (name, format)
+    else:
+      resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % (name, format)
 
   return resp

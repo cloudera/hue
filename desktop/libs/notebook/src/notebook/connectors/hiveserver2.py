@@ -369,7 +369,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     try:
       db = self._get_db(snippet)
       handle = self._get_handle(snippet)
@@ -378,7 +378,7 @@ class HS2Api(Api):
 
       file_name = _get_snippet_name(notebook)
 
-      return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name)
+      return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name, user_agent=user_agent)
     except Exception, e:
       title = 'The query result cannot be downloaded.'
       LOG.exception(title)

@@ -312,7 +312,7 @@ class Api(object):
   def fetch_result_size(self, notebook, snippet):
     raise OperationNotSupported()
 
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     pass
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
