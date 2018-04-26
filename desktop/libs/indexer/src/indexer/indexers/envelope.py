@@ -78,24 +78,24 @@ class EnvelopeIndexer(object):
 
 
   def generate_config(self, properties):
-    if properties['inputFormat'] == 'kafka':
-#               translator {
-#                   type = delimited
-#                   delimiter = ","
-#                   field.names = [measurement_time,number_of_vehicles]
-#                   field.types = [long,int]
-#               }
-      input = """type = kafka
-              brokers = "%(brokers)s"
-              topics = %(topics)s
-              encoding = string
-              window {
-                  enabled = true
-                  milliseconds = 60000
-              }
-      """ % properties
-    elif properties['inputFormat'] == 'stream':
-      if properties['streamSelection'] == 'sfdc':
+    if properties['inputFormat'] == 'stream':
+      if properties['streamSelection'] == 'kafka':
+        input = """type = kafka
+                brokers = "%(brokers)s"
+                topics = %(topics)s
+                encoding = string
+                translator {
+                    type = %(kafkaFieldType)s
+                    delimiter = "%(kafkaFieldDelimiter)s"
+                    field.names = [%(kafkaFieldNames)s]
+                    field.types = [%(kafkaFieldTypes)s]
+                }
+                window {
+                    enabled = true
+                    milliseconds = 60000
+                }
+        """ % properties
+      elif properties['streamSelection'] == 'sfdc':
         input = """type = sfdc
         mode = fetch-all
         sobject = %(streamObject)s
@@ -108,6 +108,8 @@ class EnvelopeIndexer(object):
           }
         }
   """
+      else:
+        raise PopupException(_('Stream format of %(inputFormat)s not recognized: %(streamSelection)s') % properties)
     elif properties['inputFormat'] == 'file':
       input = """type = filesystem
       path = %(path)s
@@ -115,6 +117,7 @@ class EnvelopeIndexer(object):
       """ % properties
     else:
       raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
+
 
     if properties['ouputFormat'] == 'file':
       output = """dependencies = [inputdata]

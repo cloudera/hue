@@ -340,15 +340,41 @@ ${ assist.assistPanel() }
 
                 <br/>
 
-##                <span data-bind="visible: createWizard.source.kafkaSelectedTopics">
-##          <label class="control-label"><div>${ _('Field names') }</div>
-##                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
-##                </label>
+                <div class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
+                  <label class="control-label"><div>${ _('Schema') }</div>
+                    <label class="checkbox inline-block">
+                      <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Manual')}
+                    </label>
+                    <label class="checkbox inline-block">
+                      <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Guess')}
+                    </label>
+                  </label>
 
-##                <label class="control-label"><div>${ _('Field types') }</div>
-##                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }">
-##                </label>
-##              </span>
+                  <label class="control-label" data-bind="visible: createWizard.source.kafkaSchemaManual() == 'manual'">
+                  ##<label class="control-label"><div>${ _('Encoding') }</div>
+                  ##  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldType">
+                  ##</label>
+                  <label class="control-label"><div>${ _('Type') }</div>
+                    <select class="input-small" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
+                  </label>
+                  <label class="control-label"><div>${ _('Delimiter') }</div>
+                    <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
+                  </label>
+
+                  <label class="control-label"><div>${ _('Field names') }</div>
+                    <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
+                  </label>
+                  <label class="control-label"><div>${ _('Field types') }</div>
+                    <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
+                  </label>
+                </label>
+
+                <div class="control-group" data-bind="visible: createWizard.source.hasStreamSelected">
+                  <button class="btn" data-bind="click: createWizard.source.streamCheckConnection">
+                    ${_('Test')}
+                  </button>
+                </div>
+                </div>
               </div>
             <!-- /ko -->
 
@@ -366,21 +392,17 @@ ${ assist.assistPanel() }
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamToken">
                 </label>
 
-                <label class="control-label"><div>${ _('Username') }</div>
+                <label class="control-label"><div>${ _('End point URL') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamEndpointUrl">
                 </label>
+
+                <br/>
 
                 <label class="control-label"><div>${ _('Object') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamObject">
                 </label>
               </div>
             <!-- /ko -->
-
-            <div class="control-group" data-bind="visible: createWizard.source.hasStreamSelected">
-              <button class="btn" data-bind="click: createWizard.source.streamCheckConnection">
-                ${_('Test')}
-              </button>
-            </div>
           <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -1377,6 +1399,7 @@ ${ assist.assistPanel() }
       self.isObjectStore.subscribe(function(newVal) {
         wizard.destination.useDefaultLocation(!newVal);
       });
+
       // Rdbms
       self.rdbmsMode = ko.observable('customRdbms');
       self.rdbmsMode.subscribe(function (val) {
@@ -1512,6 +1535,7 @@ ${ assist.assistPanel() }
           }
         });
       };
+
       // Table
       self.table = ko.observable('');
       self.tableName = ko.computed(function() {
@@ -1552,7 +1576,8 @@ ${ assist.assistPanel() }
           viewModel.createWizard.guessFieldTypes();
         }
       });
-      self.kafkaFieldType = ko.observable('delimited'); // delimited, bytearray
+      self.kafkaSchemaManual = ko.observable('manual');
+      self.kafkaFieldType = ko.observable('delimited');
       self.kafkaFieldDelimiter = ko.observable(',');
       self.kafkaFieldNames = ko.observable('');
       self.kafkaFieldTypes = ko.observable('');
@@ -1566,6 +1591,14 @@ ${ assist.assistPanel() }
       self.hasStreamSelected = ko.pureComputed(function() {
         return (self.streamSelection() == 'kafka' && self.kafkaSelectedTopics()) ||
            (self.streamSelection() == 'sfdc')
+      });
+      self.hasStreamSelected.subscribe(function(newValue) {
+        if (newValue) {
+          wizard.guessFormat();
+          if (newValue == 'kafka') {
+            wizard.destination.tableFormat('kudu');
+          }
+        }
       });
       self.streamCheckConnection = function() {
         $.post("${ url('indexer:get_db_component') }", {
@@ -1732,7 +1765,7 @@ ${ assist.assistPanel() }
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
-          if (format.value == 'file' && ['manual', 'rdbms', 'kafka'].indexOf(wizard.source.inputFormat()) == -1) {
+          if (format.value == 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
           else if (format.value == 'index' && ['file', 'query', 'table'].indexOf(wizard.source.inputFormat()) == -1) {
