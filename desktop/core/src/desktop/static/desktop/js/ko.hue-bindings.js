@@ -6253,6 +6253,7 @@
       };
 
       var renderThrottle = -1;
+      var preloadGhostThrottle = -1;
       var lastScrollTop = -1;
       var onScroll = function () {
         if (startIndex > incrementLimit && Math.abs(lastScrollTop - $container.scrollTop()) < (incrementLimit * options.minHeight)) {
@@ -6261,6 +6262,15 @@
         lastScrollTop = $container.scrollTop();
 
         setStartAndEndFromScrollTop();
+
+        // adds a preload ghost image just on scroll and removes it 200ms after the scroll stops
+        if (options.usePreloadBackground) {
+          $wrapper.addClass('assist-preloader-ghost');
+          clearTimeout(preloadGhostThrottle);
+          preloadGhostThrottle = setTimeout(function () {
+            $wrapper.removeClass('assist-preloader-ghost');
+          }, 200);
+        }
 
         clearTimeout(renderThrottle);
         var startDiff = Math.abs($parentFVOwnerElement.data('startIndex') - startIndex);
