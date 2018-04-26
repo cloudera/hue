@@ -117,7 +117,7 @@
   </div>
 
   <!-- ko if: $root.isGridster -->
-  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint">
+  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint() && !$root.isQueryBuilder()">
     <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Drag the plus button into your dashboard')}</div>
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" />
   </div>
@@ -179,7 +179,7 @@
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
   <!-- ko if: $root.isGridster -->
-    <div class="gridster" data-bind="style: { 'opacity': $root.showPlusButtonHint() ? '.3' : '1' }">
+    <div class="gridster" data-bind="style: { 'opacity': $root.showPlusButtonHint() && !$root.isQueryBuilder() ? '.3' : '1' }">
       <!-- ko if: typeof gridItems !== 'undefined' -->
       <ul class="unstyled" data-bind="css: { 'is-adding': $root.isToolbarVisible }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
