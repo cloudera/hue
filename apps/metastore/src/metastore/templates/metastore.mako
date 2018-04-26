@@ -845,88 +845,39 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="metastore-joins-tab">
-  <table data-bind="visible: $data.length > 0" class="table table-condensed">
+<script type="text/html" id="metastore-relationships-tab">
+  <!-- ko hueSpinner: { spin: loadingTopJoins, inline: true } --><!-- /ko -->
+  <table data-bind="visible: !loadingTopJoins()" class="table table-condensed">
     <thead>
     <tr>
-      <th width="10%">${ _('Id') }</th>
-      <th width="10%">${ _('Popularity') }</th>
-      <th width="30%">${ _('Table Name') }</th>
-      <th>${ _('Join Column') }</th>
-      <th width="10%">${ _('Join counts') }</th>
+      <th>${ _('Table') }</th>
+      <th>${ _('Foreign keys') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: $data, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200}">
+    <tbody>
+    <!-- ko if: topJoins().length === 0 -->
     <tr>
-      <td data-bind="text: tableEid"></td>
-      <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: { 'title': joinpercent() }">
-        <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
-      </td>
-      <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().catalogEntry.name + '/' + tableName() }"></a></td>
-      <td class="pointer"><code data-bind="text: joinColumns, click: $root.scrollToColumn"></code></td>
-      <td data-bind="text: numJoins"></td>
+      <td colspan="2" style="font-style: italic;">${ _('No related tables found.') }</td>
     </tr>
+    <!-- /ko -->
+    <!-- ko foreach: topJoins -->
+    <tr>
+      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
+      <td>
+        <table class="metastore-join-column-table">
+          <tbody data-bind="foreach: joinCols">
+          <tr>
+            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
+            <td class="metastore-join-arrow"><i class="fa fa-long-arrow-right"></i></td>
+            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
+          </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <!-- /ko -->
     </tbody>
   </table>
-</script>
-
-<script type="text/html" id="metastore-relationships-tab">
-  <h4>${ _('Inputs') }</h4>
-  <div class="row-fluid">
-             <!-- ko foreach: inputs -->
-               <div data-bind="text: $data"></div>
-    <!-- /ko -->
-    <!-- ko if: inputs().length == 0 -->
-    ${ _('Not inputs') }
-    <!-- /ko -->
-          </div>
-
-  <br/>
-
-  <h4>${ _('Targets') }</h4>
-  <div class="row-fluid">
-           <!-- ko foreach: targets -->
-             <div data-bind="text: $data"></div>
-    <!-- /ko -->
-    <!-- ko if: targets().length == 0 -->
-    ${ _('Not targets') }
-    <!-- /ko -->
-          </div>
-
-  <br/>
-
-  <h4>${ _('Source query') }</h4>
-  <div class="row-fluid">
-            <!-- ko if: source_query().length > 0 -->
-              <code data-bind="text: source_query"></code>
-    <!-- /ko -->
-    <!-- ko if: source_query().length == 0 -->
-    ${ _('No source query') }
-    <!-- /ko -->
-          </div>
-
-  <br/>
-
-  <h4>${ _('Target queries') }</h4>
-  <div class="row-fluid">
-            <!-- ko foreach: target_queries -->
-              <div>
-                <code data-bind="text: $data"></code>
-              </div>
-    <!-- /ko -->
-    <!-- ko if: target_queries().length == 0 -->
-    ${ _('Not target queries') }
-    <!-- /ko -->
-          </div>
-
-  <br/>
-
-  <h4>${ _('Lineage') }</h4>
-  <div class="row-fluid">
-    <button class="btn toolbarBtn" title="${_('Open in Navigator ')}" data-bind="click: function () { window.open($root.navigatorUrl() + '?view=detailsView&id=' + id() + '&b=rFlCX&tab=lineage', '_blank'); }">
-      <i class="fa fa-skyatlas"></i> ${_('View in Navigator')}
-    </button>
-  </div>
 </script>
 
 <script type="text/html" id="metastore-describe-table">
@@ -939,30 +890,34 @@ ${ components.menubar(is_embeddable) }
 
   <ul class="nav nav-tabs nav-tabs-border margin-top-10">
     <li data-bind="css: { 'active': $root.currentTab() === 'overview' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('overview'); }">${_('Overview')}</a></li>
-    <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-      <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a></li>
-    <!-- /ko -->
-    <li data-bind="css: { 'active': $root.currentTab() === 'sample' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('sample'); }">${_('Sample')} (<span data-bind="text: samples.rows().length"></span>)</a></li>
-##     <!-- ko if: $root.optimizerEnabled() -->
+    <!-- ko if: $root.optimizerEnabled() -->
+      <li data-bind="css: { 'active': $root.currentTab() === 'relationships' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('relationships'); }">${_('Relationships')}</a></li>
 ##       <!-- ko if: $root.database().table().optimizerDetails() -->
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'permissions' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('permissions'); }">${_('Permissions')}</a></li>
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'queries' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'joins' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
 ##       <!-- /ko -->
 ##       <!-- ko if: $root.database().table().relationshipsDetails() -->
-##       <li data-bind="css: { 'active': $root.currentTab() === 'relationships' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('relationships'); }">${_('Relationships')} (<span data-bind="text: $root.database().table().relationshipsDetails().inputs().length + $root.database().table().relationshipsDetails().targets().length"></span>)</a></li>
 ##       <!-- /ko -->
-##     <!-- /ko -->
-    <!-- ko if: catalogEntry.isView() -->
-    <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('viewSql'); }">${ _('View SQL') }</a></li>
     <!-- /ko -->
-    <li data-bind="css: { 'active' : $root.currentTab() === 'details' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('details'); }">${ _('Details') }</a></li>
+    <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
+      <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a></li>
+    <!-- /ko -->
+    <li data-bind="css: { 'active': $root.currentTab() === 'sample' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('sample'); }">${_('Sample')} (<span data-bind="text: samples.rows().length"></span>)</a></li>
+    <!-- ko if: catalogEntry.isView() -->
+    <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('viewSql'); }">${ _('View SQL') }</a></li>
+    <!-- /ko -->
+    <li data-bind="css: { 'active' : $root.currentTab() === 'details' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('details'); }">${ _('Details') }</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
     <div>
       <!-- ko if: $root.currentTab() === 'overview' -->
         <!-- ko template: 'metastore-overview-tab' --><!-- /ko -->
+      <!-- /ko -->
+
+      <!-- ko if: $root.currentTab() === 'relationships' -->
+      <!-- ko template: { name: 'metastore-relationships-tab' } --><!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: $root.currentTab() === 'partitions' -->
@@ -979,14 +934,6 @@ ${ components.menubar(is_embeddable) }
 
       <!-- ko if: $root.optimizerEnabled() && $root.currentTab() === 'queries' -->
         <!-- ko template: { name: 'metastore-queries-tab', data: $root.database().table() } --><!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: $root.optimizerEnabled() && $root.currentTab() === 'joins' -->
-        <!-- ko template: { name: 'metastore-joins-tab', data: $root.database().table().optimizerDetails().joinTables } --><!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: $root.currentTab() === 'relationships' && $root.database().table().relationshipsDetails() -->
-        <!-- ko template: { name: 'metastore-relationships-tab', data: $root.database().table().relationshipsDetails() } --><!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: $root.currentTab() === 'viewSql' -->

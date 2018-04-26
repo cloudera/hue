@@ -369,6 +369,8 @@ var MetastoreTable = (function () {
 
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
+    self.topJoins = ko.observable();
+    self.foreignJoinCols = ko.observable();
     self.navigatorMeta = ko.observable();
     self.relationshipsDetails = ko.observable();
 
@@ -379,6 +381,7 @@ var MetastoreTable = (function () {
     self.loadingQueries = ko.observable(false);
     self.loadingComment = ko.observable(false);
     self.loadingViewSql = ko.observable(false);
+    self.loadingTopJoins = ko.observable(false);
 
     self.columns = ko.observableArray();
 
@@ -396,7 +399,7 @@ var MetastoreTable = (function () {
 
     self.refreshing = ko.pureComputed(function () {
       return self.loadingDetails() || self.loadingColumns() || self.loadingQueries() || self.loadingComment() ||
-        self.samples.loading() || self.partitions.loading() || self.loadingViewSql();
+        self.samples.loading() || self.partitions.loading() || self.loadingViewSql() || self.loadingTopJoins();
     });
 
     self.partitionsCountLabel = ko.pureComputed(function () {
@@ -492,6 +495,90 @@ var MetastoreTable = (function () {
         self.loadingViewSql(true);
       }
 
+      self.catalogEntry.getTopJoins().done(function (topJoins) {
+        if (topJoins && topJoins.values) {
+          var joins = [];
+          var foreignJoinCols = {};
+          var ownQidLower = self.catalogEntry.path.join('.').toLowerCase();
+          var ownNameLower = self.catalogEntry.name.toLowerCase();
+          var ownDbNameLower = self.database.catalogEntry.name.toLowerCase();
+
+          var joinIndex = {};
+          var joinColsIndex = {};
+          topJoins.values.forEach(function (topJoin) {
+            if (topJoin.tables.length === 2) {
+              topJoin.tables.forEach(function (table) {
+                var tableLower = table.toLowerCase();
+                if (tableLower !== ownQidLower && tableLower !== ownNameLower) {
+                  var name = tableLower.indexOf(ownDbNameLower + '.') === 0 ? table.substring(ownDbNameLower.length + 1) : table;
+                  if (!joinIndex[name]) {
+                    joinIndex[name] = {
+                      tableName: name,
+                      tablePath: table.split('.'),
+                      joinCols: [],
+                      queryCount: 0
+                    }
+                  }
+                  var join = joinIndex[name];
+                  join.queryCount += topJoin.totalQueryCount;
+
+                  topJoin.joinCols.forEach(function (joinCol) {
+                    var cleanCols = {
+                      queryCount: topJoin.totalQueryCount
+                    };
+                    if (joinCol.columns.length === 2) {
+                      joinCol.columns.forEach(function (col) {
+                        var colLower = col.toLowerCase();
+                        if (colLower.indexOf(ownQidLower + '.') === 0) {
+                          cleanCols.source = colLower.substring(ownQidLower.length + 1);
+                          cleanCols.sourcePath = col.split('.');
+                        } else if (colLower.indexOf(ownNameLower + '.') === 0) {
+                          cleanCols.source = colLower.substring(ownNameLower.length + 1);
+                          cleanCols.sourcePath = col.split('.');
+                          cleanCols.sourcePath.unshift(ownDbNameLower);
+                        } else if (colLower.indexOf(ownDbNameLower + '.') === 0) {
+                          cleanCols.target = colLower.substring(ownDbNameLower.length + 1);
+                          cleanCols.targetPath = col.split('.');
+                        } else {
+                          cleanCols.target = col;
+                          cleanCols.targetPath = col.split('.');
+                        }
+                      })
+                    }
+                    if (cleanCols.source && cleanCols.target) {
+                      if (joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target]) {
+                        joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target].queryCount += topJoin.totalQueryCount;
+                      } else {
+                        joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target] = cleanCols;
+                        join.joinCols.push(cleanCols);
+                        foreignJoinCols[cleanCols.source] = { target: cleanCols.target, path: cleanCols.targetPath };
+                      }
+                    }
+                  })
+                }
+              });
+            }
+          });
+
+          Object.keys(joinIndex).forEach(function (key) {
+            var join = joinIndex[key];
+            if (join.joinCols.length) {
+              join.joinCols.sort(function (a, b) {
+                return b.queryCount - a.queryCount;
+              });
+              joins.push(join);
+            }
+          });
+          joins.sort(function (a, b) {
+            return b.queryCount - a.queryCount;
+          });
+          self.foreignJoinCols(foreignJoinCols);
+          self.topJoins(joins);
+        }
+      }).always(function () {
+        self.loadingTopJoins(false);
+      });
+
       self.loadingDetails(true);
       self.catalogEntry.getAnalysis().done(function (analysis) {
         self.tableDetails(analysis);
@@ -513,7 +600,7 @@ var MetastoreTable = (function () {
               self.viewSql(property.data_type)
             }).always(function () {
               self.loadingViewSql(false);
-            })
+            });
             return true;
           }
         });
