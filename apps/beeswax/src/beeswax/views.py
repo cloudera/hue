@@ -369,7 +369,7 @@ def massage_query_history_for_json(app_name, query_history):
   }
 
 
-def download(request, id, format):
+def download(request, id, format, user_agent=None):
   if not ENABLE_DOWNLOAD.get():
     return serve_403_error(request)
 
@@ -378,7 +378,7 @@ def download(request, id, format):
     db = dbms.get(request.user, query_history.get_query_server_config())
     LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
 
-    return data_export.download(query_history.get_handle(), format, db)
+    return data_export.download(query_history.get_handle(), format, db, user_agent=user_agent)
   except Exception, e:
     if not hasattr(e, 'message') or not e.message:
       message = e

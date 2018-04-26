@@ -299,7 +299,7 @@ def download(request):
       resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % ('query_result', file_format)
       return resp
     else:
-      return export_download(response, file_format, collection)
+      return export_download(response, file_format, collection, user_agent=request.META.get('HTTP_USER_AGENT'))
   except Exception, e:
     raise PopupException(_("Could not download search results: %s") % e)
 

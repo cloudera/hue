@@ -129,7 +129,7 @@ class SolrApi(Api):
     return 'No logs'
 
 
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     raise PopupException('Downloading is not supported yet')
 
 
