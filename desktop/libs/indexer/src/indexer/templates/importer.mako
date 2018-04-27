@@ -355,10 +355,10 @@ ${ assist.assistPanel() }
                   ##  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldType">
                   ##</label>
                   <label class="control-label"><div>${ _('Type') }</div>
-                    <select class="input-small" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
+                    <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
                   </label>
                   <label class="control-label"><div>${ _('Delimiter') }</div>
-                    <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
+                    <input type="text" class="input-xsmall" data-bind="value: createWizard.source.kafkaFieldDelimiter">
                   </label>
 
                   <label class="control-label"><div>${ _('Field names') }</div>
@@ -1570,17 +1570,25 @@ ${ assist.assistPanel() }
       self.streamSelection = ko.observable(self.publicStreams()[0]['value']);
 
       self.kafkaTopics = ko.observableArray();
-      self.kafkaSelectedTopics = ko.observable('');
+      self.kafkaSelectedTopics = ko.observable(''); // Currently designed just for one
       self.kafkaSelectedTopics.subscribe(function(newValue) {
         if (newValue) {
           viewModel.createWizard.guessFieldTypes();
+          self.kafkaFieldNames($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
+          self.kafkaFieldTypes($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
         }
       });
       self.kafkaSchemaManual = ko.observable('manual');
       self.kafkaFieldType = ko.observable('delimited');
       self.kafkaFieldDelimiter = ko.observable(',');
       self.kafkaFieldNames = ko.observable('');
+      self.kafkaFieldNames.subscribe(function(newValue) {
+        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldNames', newValue);
+      });
       self.kafkaFieldTypes = ko.observable('');
+      self.kafkaFieldTypes.subscribe(function(newValue) {
+        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue)
+      });
       self.kafkaFieldSchemaPath = ko.observable('');
 
       self.streamUsername = ko.observable('');

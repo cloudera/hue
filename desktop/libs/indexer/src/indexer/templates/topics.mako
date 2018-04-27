@@ -328,10 +328,10 @@ ${ assist.assistPanel() }
         <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: 'delimited'"></select>
       </label>
       <label class="control-label"><div>${ _('Field names') }</div>
-        <input type="text" class="input-xxlarge" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
+        <input type="text" class="input-xxlarge" data-bind="value: kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
       </label>
       <label class="control-label"><div>${ _('Field types') }</div>
-        <input type="text" class="input-xxlarge" placeholder="${ _('The list of field typs, e.g. string,int') }">
+        <input type="text" class="input-xxlarge" data-bind="value: kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
       </label>
     </div>
   </div>
@@ -484,6 +484,17 @@ ${ assist.assistPanel() }
           });
         }
         return returned;
+      });
+
+      // Should come from Kafka Schema or ZooKeeper
+      var userPrefix = 'pai';
+      self.kafkaFieldNames = ko.observable($.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldNames'));
+      self.kafkaFieldNames.subscribe(function(newValue) {
+        $.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldNames', newValue);
+      });
+      self.kafkaFieldTypes = ko.observable($.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes'));
+      self.kafkaFieldTypes.subscribe(function(newValue) {
+        $.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes', newValue)
       });
 
       self.sample = ko.observableArray();
