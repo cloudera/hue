@@ -117,7 +117,7 @@
   </div>
 
   <!-- ko if: $root.isGridster -->
-  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint() && !$root.isQueryBuilder()">
+  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint()">
     <div style="float:left; padding-top: 120px; margin-right: -30px; text-align: center; width: 280px">${_('Drag the top plus button or any field from the right assistant into your dashboard')}</div>
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px" />
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px; margin-left: 80px; position: absolute; transform: rotate(33deg);" />
@@ -180,7 +180,7 @@
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
   <!-- ko if: $root.isGridster -->
-    <div class="gridster" data-bind="style: { 'opacity': $root.showPlusButtonHint() && !$root.isQueryBuilder() ? '.3' : '1' }">
+    <div class="gridster" data-bind="style: { 'opacity': $root.showPlusButtonHint() ? '.3' : '1' }">
       <!-- ko if: typeof gridItems !== 'undefined' -->
       <ul class="unstyled" data-bind="css: { 'is-adding': $root.isToolbarVisible }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
@@ -211,10 +211,10 @@
 <script id="widget-template-gridster${ suffix }" type="text/html">
   <li>
     <!-- ko ifnot: widget -->
-    <div class="empty-gridster-widget card card-widget" data-bind="draggable: { data: $data, isEnabled: $root.isGridster() && !$root.isQueryBuilder(), options: getDraggableOptions({ data: $data, parent: $data }) }">
+    <div class="empty-gridster-widget card card-widget" data-bind="draggable: { data: $data, isEnabled: $root.isGridster(), options: getDraggableOptions({ data: $data, parent: $data }) }">
       <h2 class="card-heading simple" title="${ _('Drag to move') }">
         ${ _('Empty widget') }
-        <div class="inline pull-right margin-right-10" data-bind="visible: !$root.isQueryBuilder()">
+        <div class="inline pull-right margin-right-10">
           <a href="javascript:void(0)" class="remove-widget" data-bind="publish: { 'gridster.remove': $data }"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -302,7 +302,7 @@
 </script>
 
 <script type="text/html" id="widget-template${ suffix }">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: { data: $data, isEnabled: $root.isGridster() && !$root.isQueryBuilder(), options: getDraggableOptions({ data: $data, parent: $parent }) }, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: { data: $data, isEnabled: $root.isGridster(), options: getDraggableOptions({ data: $data, parent: $parent }) }, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
     <h2 class="card-heading simple" data-bind="attr: { title: $root.isGridster() ? '${ _ko('Drag to move') }' : '' }">
       <!-- ko ifnot: $root.isGridster -->
       <span data-bind="visible: $root.isEditing">
@@ -320,7 +320,7 @@
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }" title="${ _('Click to change the widget title') }"></span>
       <!-- /ko -->
-      <div class="inline pull-right margin-right-10" data-bind="visible: !$root.isQueryBuilder()">
+      <div class="inline pull-right margin-right-10">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>

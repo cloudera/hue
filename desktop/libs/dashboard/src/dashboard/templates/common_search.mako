@@ -132,7 +132,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     </div>
 
     <div class="search-bar-operations">
-      <!-- ko if: $root.isGridster() && !$root.isQueryBuilder() -->
+      <!-- ko if: $root.isGridster() -->
       <div class="btn-group">
         <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
           <i class="fa fa-plus"></i>
@@ -4268,21 +4268,17 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribe('dashboard.widget.drag', function (options) {
-    if (!searchViewModel.isQueryBuilder()) {
-      movePreviewHolder(options);
-    }
+    movePreviewHolder(options);
   }, 'dashboard');
 
   huePubSub.subscribe('draggable.text.drag', function (options) {
-    if (searchViewModel.isGridster() && !searchViewModel.isQueryBuilder()) {
+    if (searchViewModel.isGridster()) {
       movePreviewHolder(options);
     }
   }, 'dashboard');
 
   huePubSub.subscribe('dashboard.gridster.widget.drag', function (options) {
-    if (!searchViewModel.isQueryBuilder()) {
-      movePreviewHolder(options);
-    }
+    movePreviewHolder(options);
   }, 'dashboard');
 
   huePubSub.subscribe('draggable.text.meta', function (options) {
@@ -4297,9 +4293,6 @@ $(document).ready(function () {
 
   huePubSub.subscribeOnce('gridster.added.widget', function () {
     $(window).trigger('resize');
-    if (searchViewModel.isQueryBuilder()) {
-      $gridster.disable_resize();
-    }
   });
 
   huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
@@ -4795,7 +4788,7 @@ $(document).ready(function () {
   $('#searchComponents .dashboard').droppable({
     accept: '.draggable-widget, .draggableText, .card-widget, .draggable-plus-button',
     drop: function( event, ui ) {
-      if (searchViewModel.isGridster() && !searchViewModel.isQueryBuilder()) {
+      if (searchViewModel.isGridster()) {
         huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
       }
     }

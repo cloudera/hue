@@ -25,7 +25,6 @@ function queryBuilderSearchLayout(vm, isQueryBuilder) {
   loadSearchLayout(vm, vm.initial.qbLayout);
   $(document).trigger("magicSearchLayout");
   huePubSub.publish('dashboard.set.layout');
-  huePubSub.publish('right.assist.show', true);
 }
 
 function textSearchLayout(vm, isQueryBuilder) {
@@ -33,7 +32,6 @@ function textSearchLayout(vm, isQueryBuilder) {
   loadSearchLayout(vm, vm.initial.textSearchLayout);
   $(document).trigger("magicSearchLayout");
   huePubSub.publish('dashboard.set.layout');
-  huePubSub.publish('right.assist.hide', true);
 }
 
 function loadSearchLayout(viewModel, json_layout) {
