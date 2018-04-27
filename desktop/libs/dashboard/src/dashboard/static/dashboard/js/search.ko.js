@@ -63,17 +63,16 @@ function loadSearchLayout(viewModel, json_layout) {
   viewModel.columns(_columns);
 }
 
-function loadDashboardLayout(viewModel, gridster_layout) {
+function loadDashboardLayout(vm, gridster_layout) {
   $.each(gridster_layout, function(index, item) {
-    viewModel.gridItems.push(
-      ko.mapping.fromJS({
-        col: parseInt(item.col),
-        row: parseInt(item.row),
-        size_x: parseInt(item.size_x),
-        size_y: parseInt(item.size_y),
-        widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null,
-        tempFieldName: null,
-      }));
+    vm.gridItems.push(ko.mapping.fromJS({
+      col: parseInt(item.col),
+      row: parseInt(item.row),
+      size_x: parseInt(item.size_x),
+      size_y: parseInt(item.size_y),
+      widget: item.widget ? vm.getWidgetById(item.widget.id) : null,
+      emptyProperties: new EmptyGridsterWidget(vm),
+    }));
   });
 }
 
@@ -104,7 +103,8 @@ function layoutToGridster(vm) {
           row: parseInt(startingRow),
           size_x: parseInt(column.size()),
           size_y: parseInt(emptyWidgetHeight),
-          widget: null
+          widget: null,
+          emptyProperties: new EmptyGridsterWidget(vm),
         }));
         startingRow += emptyWidgetHeight;
       }
@@ -114,6 +114,25 @@ function layoutToGridster(vm) {
 
   return layout;
 }
+
+var EmptyGridsterWidget = function (vm) {
+  var self = this;
+
+  self.isAdding = ko.observable(true);
+  self.fieldName = ko.observable();
+  self.fieldViz = ko.observable(ko.HUE_CHARTS.TYPES.BARCHART);
+  self.fieldSort = ko.observable('desc');
+  self.fieldOperation = ko.observable();
+  self.fieldOperations = ko.pureComputed(function () {
+    return HIT_OPTIONS;
+  });
+
+  self.availableSorts = ['desc', 'asc', 'default'];
+  self.loopThroughSorts = function () {
+    self.availableSorts.push(self.availableSorts.shift());
+    self.fieldSort(self.availableSorts[0]);
+  }
+};
 
 var Query = function (vm, query) {
   var self = this;
@@ -1065,7 +1084,7 @@ var Collection = function (vm, collection) {
 
           self._addObservablesToFacet(facet, vm); // Top widget
           self.facets.push(facet);
-
+          huePubSub.publish('search.facet.added', facet);
           vm.search();
         } else {
           $(document).trigger("error", data.message);
