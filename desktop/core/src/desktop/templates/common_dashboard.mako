@@ -182,7 +182,7 @@
   <!-- ko if: $root.isGridster -->
     <div class="gridster" data-bind="click: function(){ showPlusButtonHint(false); }">
       <!-- ko if: typeof gridItems !== 'undefined' -->
-      <ul class="unstyled" data-bind="css: { 'is-adding': $root.isToolbarVisible }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
+      <ul class="unstyled is-adding" data-bind="gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
     </div>
   <!-- /ko -->

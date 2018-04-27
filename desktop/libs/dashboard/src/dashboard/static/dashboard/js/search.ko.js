@@ -2080,7 +2080,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
     self.init = function (callback) {
       self.isEditing(self.columns().length == 0);
-      self.isToolbarVisible(self.isEditing());
+      if (!self.isGridster() || !self.collection.supportAnalytics()) {
+        self.isToolbarVisible(self.isEditing());
+      }
       self.initial.init();
       self.collection.syncFields();
       if (self.collection.engine() == 'solr') {

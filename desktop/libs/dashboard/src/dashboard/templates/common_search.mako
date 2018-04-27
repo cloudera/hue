@@ -134,7 +134,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster() -->
       <div class="btn-group">
-        <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+        <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, css: {'btn': true }">
           <i class="fa fa-plus"></i>
         </a>
       </div>
@@ -1161,7 +1161,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <th data-bind="with: $root.collection.getTemplateField($data, $parent.template.fields())" style="white-space: nowrap">
     <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }"></span>
     <i class="fa fa-sort inactive-action margin-right-10 margin-left-5" data-bind="click: $root.collection.toggleSortColumnGridLayout, css: { 'blue': sort.direction() != null, 'fa-sort-down': sort.direction() == 'desc', 'fa-sort-up': sort.direction() == 'asc' }" title="${ _('Click to sort') }"></i>
-    <!-- ko if: $root.isToolbarVisible() || $root.isEditing() -->
+    <!-- ko if: $root.isGridster() || $root.isEditing() -->
       <!-- ko if: $index() > 0 -->
       <i class="fa fa-caret-left inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left', $parents[1].template); }" title="${ _('Move to the left') }"></i>
       <!-- /ko -->
