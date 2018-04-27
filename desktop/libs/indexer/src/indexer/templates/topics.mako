@@ -243,8 +243,8 @@ ${ assist.assistPanel() }
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Partitions')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')} (<span data-bind="text: sample().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">
-      ${_('Permissions')} (<span data-bind="text: sample().length"></span>)</a>
-    </li>    
+      ${_('Permissions')} (2)</a>
+    </li>
   </ul>
 
   <div class="tab-content" style="border: none; overflow: hidden">
@@ -262,12 +262,31 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="index-sample">
-      <!-- ko if: sample() && sample().length > 0 -->
-        <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
-      <!-- /ko -->
-      <!-- ko if: !sample() || sample().length === 0 -->
-        <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
-      <!-- /ko -->
+      <div class="acl-panel-content" style="height: 988px;">
+        <div class="acl-block-title">
+          <i class="fa fa-cube muted"></i> <a class="pointer"><span>finance</span></a>
+        </div>
+        <div>
+          <div class="acl-block acl-block-airy">
+            <span class="muted" title="3 months ago">TOPIC</span>
+            <span>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+            </span>
+            <br>
+            server=<span>server1</span>
+            <i class="fa fa-long-arrow-right"></i> action=READ
+          </div>
+
+          <div class="acl-block acl-block-airy">
+            <span class="muted" title="3 months ago">TOPIC</span>
+            <span>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+            </span>
+            <br>
+            server=server1
+            <i class="fa fa-long-arrow-right"></i> action=<span>WRITE</span>
+          </div>
+        </div>
     </div>
   </div>
 </script>
@@ -302,10 +321,18 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="indexes-index-properties">
-  <h4>${ _('Properties') }</h4>
+  <h4>${ _('Schema') }</h4>
   <div class="row-fluid">
-    <div title="${ _('isInternal') }">
-      ## <span data-bind="text: isInternal"></span>
+    <div>
+      <label class="control-label"><div>${ _('Type') }</div>
+        <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: 'delimited'"></select>
+      </label>
+      <label class="control-label"><div>${ _('Field names') }</div>
+        <input type="text" class="input-xxlarge" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
+      </label>
+      <label class="control-label"><div>${ _('Field types') }</div>
+        <input type="text" class="input-xxlarge" placeholder="${ _('The list of field typs, e.g. string,int') }">
+      </label>
     </div>
   </div>
   <br>
