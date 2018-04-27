@@ -2181,7 +2181,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <script type="text/html" id="metric-form">
     <!-- ko if: typeof isEditing !== 'undefined' && isEditing() -->
     <div>
-
       <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
       <a href="javascript:void(0)" data-bind="toggle: isEditing" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
       <!-- /ko -->
@@ -2189,7 +2188,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <a href="javascript:void(0)" data-bind="toggle: $parents[0].isAdding" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
       <!-- /ko -->
       <!-- ko with: aggregate -->
-      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: $parents[1].widgetType() != 'hit-widget' && (typeof $index != 'undefined' && $index() == 0)" class="input-small"></select>
+      <select data-bind="selectize: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: $parents[1].widgetType() != 'hit-widget' && (typeof $index != 'undefined' && $index() == 0)" class="input-small"></select>
 
       <!-- ko if: $data.function() == 'percentile' -->
       <input type="number" class="input-mini" data-bind="value: percentile"/>
@@ -4315,11 +4314,20 @@ $(document).ready(function () {
     selectedWidget = new Widget(widgetClone);
     fakeRow.addWidget(selectedWidget);
     selectedGridster = options.target;
+    huePubSub.subscribeOnce('search.facet.added', function (facet) {
+      facet.template.chartSettings.chartType(selectedGridster.emptyProperties.fieldViz());
+      var form = facet.properties.facets()[0];
+      if (form) {
+        form.aggregate.function(selectedGridster.emptyProperties.fieldOperation());
+        form.sort(selectedGridster.emptyProperties.fieldSort());
+      }
+    }, 'dashboard');
     addFacetDemiModalFieldPreview({
       'name': function () {
-        return selectedGridster.tempFieldName
+        return selectedGridster.emptyProperties.fieldName
       }
     });
+
     tempDraggable = null;
   }, 'dashboard');
 
@@ -4503,7 +4511,7 @@ $(document).ready(function () {
                 size_x: dimensions.sizex,
                 size_y: tempDraggable.gridsterHeight(),
                 widget: null,
-                tempFieldName: null,
+                emptyProperties: new EmptyGridsterWidget(searchViewModel),
                 callback: function (el) {
                   if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(tempDraggable.widgetType()) > -1) {
                     showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
@@ -4522,7 +4530,7 @@ $(document).ready(function () {
               size_x: dimensions.sizex,
               size_y: 6,
               widget: null,
-              tempFieldName: null,
+              emptyProperties: new EmptyGridsterWidget(searchViewModel),
               callback: function (el) {
                 showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
               }
