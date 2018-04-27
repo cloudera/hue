@@ -118,8 +118,9 @@
 
   <!-- ko if: $root.isGridster -->
   <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint() && !$root.isQueryBuilder()">
-    <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Drag the plus button into your dashboard')}</div>
-    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" />
+    <div style="float:left; padding-top: 120px; margin-right: -30px; text-align: center; width: 280px">${_('Drag the top plus button or any field from the right assistant into your dashboard')}</div>
+    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px" />
+    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px; margin-left: 80px; position: absolute; transform: rotate(33deg);" />
   </div>
   <!-- /ko -->
 

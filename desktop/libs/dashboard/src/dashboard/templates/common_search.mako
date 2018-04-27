@@ -4287,6 +4287,7 @@ $(document).ready(function () {
 
   huePubSub.subscribe('draggable.text.meta', function (options) {
     if (searchViewModel.isGridster()) {
+      searchViewModel.showPlusButtonHint(false);
       isDraggingOrResizingWidgets = true;
       setPreviousWidgetSizes();
       skipRestoreOnStop = false;
