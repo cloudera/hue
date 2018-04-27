@@ -219,24 +219,109 @@
         </div>
       </h2>
       <div class="empty-content" data-bind="droppable: { data: function(w) { huePubSub.publish('gridster.empty.drop', { widget: w, target: $data }); }, options: { greedy:true, hoverClass: 'droppable-hover', drop: function(){ huePubSub.publish('gridster.added.widget'); } }}, css: { 'query-builder': $root.isQueryBuilder }">
-
+        <!-- ko with: emptyProperties -->
         <div class="edit-dimensions">
           <div class="badge dimensions-badge-container dimensions-badge-container-add is-adding">
-            <div class="metric-form">
-                <select data-bind="selectize: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), value: $data.tempFieldName, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
-                <a data-bind="click: function() { huePubSub.publish('gridster.empty.add', { widget: $root.draggableBucket(), target: $data }); }" class="pull-right margin-top-10" href="javascript:void(0)">
+            <div class="action-icon" data-bind="click: function(){ isAdding(true); }"><i class="fa fa-plus"></i> ${ _('Add') }</div>
+            <div class="metric-form empty-widget-form" data-bind="visible: isAdding">
+                <a href="javascript:void(0)" data-bind="toggle: isAdding" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
+                <select data-bind="selectize: fieldOperations, optionsText: 'label', optionsValue: 'value', value: fieldOperation" class="input-small"></select>
+                <select data-bind="selectize: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), value: fieldName, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
+                <!-- ko if: fieldName -->
+                <a class="inactive-action context-popover-icon" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + fieldName()  }">
+                  <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
+                </a>
+                <!-- /ko -->
+
+                <div class="clearfix"></div>
+                <br>
+
+                <div class="facet-field-cnt">
+                  <span class="facet-field-label facet-field-label-fixed-width">${ _('Visualization') }</span>
+                  <div class="dropdown inline-block">
+                    <a class="dropdown-toggle" href="javascript: void(0)" data-toggle="dropdown" title="${ _('Change widget visualization') }">
+                      <!-- ko switch: fieldViz -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.COUNTER --><i class="fa fa-superscript fa-fw"></i> ${_('Counter')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.GRADIENTMAP --><i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.MAP --><i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
+                      <!-- /ko -->
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.COUNTER); }">
+                          <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TEXTSELECT); }">
+                          <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.BARCHART); }">
+                          <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                          <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TIMELINECHART); }">
+                          <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                          <i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)"
+                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.MAP); }">
+                          <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="facet-field-cnt">
+                  <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
+                  <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: loopThroughSorts">
+                    <i class="fa fa-fw" data-bind="css: { 'fa-caret-down': fieldSort() == 'desc', 'fa-caret-up': fieldSort() == 'asc', 'fa-sort': fieldSort() == 'default' }"></i>
+                    <span data-bind="visible: fieldSort() == 'desc'">${_('descending')}</span>
+                    <span data-bind="visible: fieldSort() == 'asc'">${_('ascending')}</span>
+                    <span data-bind="visible: fieldSort() == 'default'">${_('default')}</span>
+                  </a>
+                </div>
+
+
+                <a data-bind="visible: fieldName(), click: function() { huePubSub.publish('gridster.empty.add', { widget: $root.draggableBucket(), target: $parent }); }" class="pull-right margin-top-10" href="javascript:void(0)">
                   <i class="fa fa-plus"></i> ${ _('Add') }
                 </a>
+                <div class="pull-right margin-top-10 muted" data-bind="visible: !fieldName()">
+                  <i class="fa fa-plus"></i> ${ _('Add') }
+                </div>
             </div>
           </div>
         </div>
+        <!-- /ko -->
       </div>
-    <div class="clearfix"></div>
-  </div>
-
-      </div>
+      <div class="clearfix"></div>
     </div>
-    <!-- /ko -->
+  <!-- /ko -->
   <!-- ko with: widget -->
     <div data-bind="template: 'widget-template${ suffix }', css: { 'query-builder': $root.isQueryBuilder }"></div>
     <div class="clearfix"></div>
