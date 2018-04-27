@@ -123,7 +123,7 @@ def guess_format(request):
     format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
-      format_ = {'type': 'csv', 'topics': get_topics()}
+      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()}
     elif file_format['streamSelection'] == 'sfdc':
       stream = StringIO.StringIO()
       stream.write("""AccountId,Amount,CampaignId,CloseDate,CreatedById,CreatedDate,CurrentGenerators__c,DeliveryInstallationStatus__c,Description,ExpectedRevenue,Fiscal,FiscalQuarter,FiscalYear,ForecastCategory,ForecastCategoryName,HasOpenActivity,HasOpportunityLineItem,HasOverdueTask,Id,IsClosed,IsDeleted,IsPrivate,IsWon,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,LeadSource,MainCompetitors__c,Name,NextStep,OrderNumber__c,OwnerId,Pricebook2Id,Probability,StageName,SystemModstamp,TotalOpportunityQuantity,TrackingNumber__c,Type
@@ -223,28 +223,40 @@ def guess_field_types(request):
         ]
     }
   elif file_format['inputFormat'] == 'stream':
+    # Note: mocked here, should come from SFDC or Kafka API or sampling job
     if file_format['streamSelection'] == 'kafka':
-      format_ = {"sample": [["0", "US", "This tremendous 100% varietal wine hails from Oakville and was aged over three years in oak. Juicy red-cherry fruit and a compelling hint of caramel greet the palate, framed by elegant, fine tannins and a subtle minty tone in the background. Balanced and rewarding from start to finish, it has years ahead of it to develop further nuance. Enjoy 2022\u20132030.", "Martha's Vineyard", "96", "235.0", "California", "Napa Valley", "Napa", "Cabernet Sauvignon", "Heitz"], ["1", "Spain", "Ripe aromas of fig, blackberry and cassis are softened and sweetened by a slathering of oaky chocolate and vanilla. This is full, layered, intense and cushioned on the palate, with rich flavors of chocolaty black fruits and baking spices. A toasty, everlasting finish is heady but ideally balanced. Drink through 2023.", "Carodorum Selecci\u00f3n Especial Reserva", "96", "110.0", "Northern Spain", "Toro", "", "Tinta de Toro", "Bodega Carmen Rodr\u00edguez"], ["2", "US", "Mac Watson honors the memory of a wine once made by his mother in this tremendously delicious, balanced and complex botrytised white. Dark gold in color, it layers toasted hazelnut, pear compote and orange peel flavors, reveling in the succulence of its 122 g/L of residual sugar.", "Special Selected Late Harvest", "96", "90.0", "California", "Knights Valley", "Sonoma", "Sauvignon Blanc", "Macauley"], ["3", "US", "This spent 20 months in 30% new French oak, and incorporates fruit from Ponzi's Aurora, Abetina and Madrona vineyards, among others. Aromatic, dense and toasty, it deftly blends aromas and flavors of toast, cigar box, blackberry, black cherry, coffee and graphite. Tannins are polished to a fine sheen, and frame a finish loaded with dark chocolate and espresso. Drink now through 2032.", "Reserve", "96", "65.0", "Oregon", "Willamette Valley", "Willamette Valley", "Pinot Noir", "Ponzi"], ["4", "France", "This is the top wine from La B\u00e9gude, named after the highest point in the vineyard at 1200 feet. It has structure, density and considerable acidity that is still calming down. With 18 months in wood, the wine has developing an extra richness and concentration. Produced by the Tari family, formerly of Ch\u00e2teau Giscours in Margaux, it is a wine made for aging. Drink from 2020.", "La Br\u00fblade", "95", "66.0", "Provence", "Bandol", "", "Provence red blend", "Domaine de la B\u00e9gude"]], "columns": [{"operations": [], "comment": "", "nested": [], "name": "id", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "long", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "country", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "description", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "text_general", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "designation", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "points", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "long", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "price", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "double", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "province", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "region_1", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "region_2", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "variety", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "winery", "level": 0, "keyType": "string", "required": False, "precision": 10, "keep": True, "isPartition": False, "length": 100, "partitionValue": "", "multiValued": False, "unique": False, "type": "string", "showProperties": False, "scale": 0}]}
+      data = """%(kafkaFieldNames)s
+%(data)s""" % {
+        'kafkaFieldNames': file_format['kafkaFieldNames'],
+        'data': '\n'.join([','.join(['...'] * len(file_format['kafkaFieldTypes'].split(',')))] * 5)
+      }
     elif file_format['streamSelection'] == 'sfdc':
-      # Note: mocked here, should come from SFDC API or sampling job
-      stream = StringIO.StringIO()
-      stream.write("""AccountId,Amount,CampaignId,CloseDate,CreatedById,CreatedDate,CurrentGenerators__c,DeliveryInstallationStatus__c,Description,ExpectedRevenue,Fiscal,FiscalQuarter,FiscalYear,ForecastCategory,ForecastCategoryName,HasOpenActivity,HasOpportunityLineItem,HasOverdueTask,Id,IsClosed,IsDeleted,IsPrivate,IsWon,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,LeadSource,MainCompetitors__c,Name,NextStep,OrderNumber__c,OwnerId,Pricebook2Id,Probability,StageName,SystemModstamp,TotalOpportunityQuantity,TrackingNumber__c,Type
+      data = """AccountId,Amount,CampaignId,CloseDate,CreatedById,CreatedDate,CurrentGenerators__c,DeliveryInstallationStatus__c,Description,ExpectedRevenue,Fiscal,FiscalQuarter,FiscalYear,ForecastCategory,ForecastCategoryName,HasOpenActivity,HasOpportunityLineItem,HasOverdueTask,Id,IsClosed,IsDeleted,IsPrivate,IsWon,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,LeadSource,MainCompetitors__c,Name,NextStep,OrderNumber__c,OwnerId,Pricebook2Id,Probability,StageName,SystemModstamp,TotalOpportunityQuantity,TrackingNumber__c,Type
 0014600000Ctb1UAAR,30000.0,,1489968000000,005460000012t2xAAA,1490625405000,,In progress,,30000.0,2015 2,2,2015,Closed,Closed,false,false,false,00646000003Ymn1AAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,,GenePoint SLA,,546512,005460000012t2xAAA,,100.0,Closed Won,1490625405000,,,Existing Customer - Upgrade
 0014600000Ctb1NAAR,17000.0,,1486080000000,005460000012t2xAAA,1490625405000,,,,1700.0,2017 1,1,2017,Pipeline,Pipeline,false,false,false,00646000003YmmoAAC,false,false,false,false,,005460000012t2xAAA,1491321348000,,,Purchased List,Honda,Dickenson Mobile Generators,,,005460000012t2xAAA,,10.0,Qualification,1491389012000,,,New Customer
 0014600000Ctb1PAAR,915000.0,,1488326400000,005460000012t2xAAA,1490625405000,John Deere,Completed,,915000.0,2015 2,2,2015,Closed,Closed,false,false,false,00646000003Ymn7AAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,"John Deere, Mitsubishi, Hawkpower",United Oil Refinery Generators,,744343,005460000012t2xAAA,,100.0,Closed Won,1491389012000,,830150301360,New Customer
 0014600000Ctb1UAAR,85000.0,,1485302400000,005460000012t2xAAA,1490625405000,Honda,Completed,,85000.0,2015 1,1,2015,Closed,Closed,false,false,false,00646000003YmmrAAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,Honda,GenePoint Standby Generator,,908676,005460000012t2xAAA,,100.0,Closed Won,1490625405000,,830150301420,New Customer
-0014600000Ctb1MAAR,100000.0,,1485734400000,005460000012t2xAAA,1490625405000,,,,10000.0,2015 1,1,2015,Pipeline,Pipeline,false,false,false,00646000003YmmyAAC,false,false,false,false,,005460000012t2xAAA,1490625405000,,,Phone Inquiry,,Pyramid Emergency Generators,,,005460000012t2xAAA,,10.0,Prospecting,1490625405000,,,""")
+0014600000Ctb1MAAR,100000.0,,1485734400000,005460000012t2xAAA,1490625405000,,,,10000.0,2015 1,1,2015,Pipeline,Pipeline,false,false,false,00646000003YmmyAAC,false,false,false,false,,005460000012t2xAAA,1490625405000,,,Phone Inquiry,,Pyramid Emergency Generators,,,005460000012t2xAAA,,10.0,Prospecting,1490625405000,,,"""
 
-      _convert_format(file_format["format"], inverse=True)
+    stream = StringIO.StringIO()
+    stream.write(data)
 
-      indexer = MorphlineIndexer(request.user, request.fs)
-      format_ = indexer.guess_field_types({
-        "file": {
-            "stream": stream,
-            "name": file_format['path']
-          },
-        "format": file_format['format']
-      })
+    _convert_format(file_format["format"], inverse=True)
+
+    indexer = MorphlineIndexer(request.user, request.fs)
+    format_ = indexer.guess_field_types({
+      "file": {
+          "stream": stream,
+          "name": file_format['path']
+        },
+      "format": file_format['format']
+    })
+
+    if file_format['streamSelection'] == 'kafka':
+      type_mapping = dict(zip(file_format['kafkaFieldNames'].split(','), file_format['kafkaFieldTypes'].split(',')))
+      for col in format_['columns']:
+        col['keyType'] = type_mapping[col['name']]
+        col['type'] = type_mapping[col['name']]
 
   return JsonResponse(format_)
 

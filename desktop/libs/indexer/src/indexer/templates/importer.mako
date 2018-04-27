@@ -358,7 +358,7 @@ ${ assist.assistPanel() }
                     <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
                   </label>
                   <label class="control-label"><div>${ _('Delimiter') }</div>
-                    <input type="text" class="input-xsmall" data-bind="value: createWizard.source.kafkaFieldDelimiter">
+                    <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
                   </label>
 
                   <label class="control-label"><div>${ _('Field names') }</div>
@@ -1360,17 +1360,17 @@ ${ assist.assistPanel() }
       });
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
-          {'value': 'manual', 'name': 'Manually'},
-          % if ENABLE_SQOOP.get():
-          {'value': 'rdbms', 'name': 'External Database'},
-          % endif
           % if ENABLE_KAFKA.get():
           {'value': 'stream', 'name': 'Stream'},
+          % endif
+          % if ENABLE_SQOOP.get():
+          {'value': 'rdbms', 'name': 'External Database'},
           % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           ##{'value': 'table', 'name': 'Table'},
           % endif
+          {'value': 'manual', 'name': 'Manually'}
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([
