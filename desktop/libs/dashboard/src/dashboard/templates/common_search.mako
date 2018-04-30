@@ -1522,7 +1522,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $parent.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $parent.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn, attr: {'title': name() + ' (' + type() + ')'}" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'" style="position:absolute; left: 168px; background-color: #FFF"></i>
+            <a class="inactive-action context-popover-icon" style="position: absolute; left: 168px; background-color: #FFF" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + name()  }">
+              <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
+            </a>
           </div>
         </div>
       </div>
