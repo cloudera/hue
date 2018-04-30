@@ -56,7 +56,7 @@ def query_and_fetch(db, statement, n=None):
 
 class Jdbc():
 
-  def __init__(self, driver_name, url, username, password):
+  def __init__(self, driver_name, url, username, password, impersonation_property=None, impersonation_user=None):
     if 'py4j' not in sys.modules:
       raise Exception('Required py4j module is not imported.')
 
@@ -70,6 +70,9 @@ class Jdbc():
     self.db_url = url
     self.username = username
     self.password = password
+
+    if impersonation_property and impersonation_user:
+      self.db_url += ";{}={};".format(impersonation_property, impersonation_user)
 
     self.conn = None
 

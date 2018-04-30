@@ -63,7 +63,8 @@ class JdbcApi(Api):
       self.db = API_CACHE[self.cache_key]
     elif 'password' in self.options:
       username = self.options.get('user') or user.username
-      self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], username, self.options['password'])
+      impersonation_property = self.options.get('impersonation_property')
+      self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], username, self.options['password'], impersonation_property=impersonation_property, impersonation_user=user.username)
 
   def create_session(self, lang=None, properties=None):
     global API_CACHE
