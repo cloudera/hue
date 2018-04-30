@@ -291,8 +291,8 @@ def importer_submit(request):
   elif source['inputFormat'] == 'rdbms':
     if destination['outputFormat'] in ('file', 'table', 'hbase'):
       job_handle = run_sqoop(request, source, destination, start_time)
-  elif source['inputFormat'] == 'kafka':
-    job_handle = _envelope_job(request, source, destination['name'], start_time=start_time, lib_path=destination['indexerJobLibPath'])
+  elif source['inputFormat'] == 'stream':
+    job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
@@ -465,10 +465,11 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
 
 
-def _envelope_job(request, file_format, collection_name, start_time=None, lib_path=None):
+def _envelope_job(request, file_format, destination, start_time=None, lib_path=None):
+  collection_name = destination['name']
   indexer = EnvelopeIndexer(request.user, request.fs)
 
-  lib_path = '/tmp/envelope-0.5.0.jar'
+  lib_path = lib_path or '/tmp/envelope-0.5.0.jar'
   input_path = None
 
   if file_format['inputFormat'] == 'table':
@@ -497,25 +498,28 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
         "output_table": "impala::%s" % collection_name,
         "topics": file_format['kafkaSelectedTopics'],
         "kafkaFieldType": file_format['kafkaFieldType'],
-        "kafkaFieldNames": ','.join(file_format['kafkaFieldNames']),
-        "kafkaFieldTypes": ','.join(file_format['kafkaFieldTypes'])
+        "kafkaFieldDelimiter": file_format['kafkaFieldDelimiter'],
+        "kafkaFieldNames": file_format['kafkaFieldNames'],
+        "kafkaFieldTypes": file_format['kafkaFieldTypes']
       }
 
-    if file_format['outputFormat'] == 'table':
-      if file_format['isTargetExisting']:
+    if destination['outputFormat'] == 'table':
+      if destination['isTargetExisting']:
         # Todo: check if format matches
         pass
       else:
-        sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
-        pass
+        sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).get_str()
+        print sql
       properties["output_table"] = "impala::%s" % collection_name
       properties["kudu_master"] = manager.get_kudu_master()
-    elif file_format['inputFormat'] == 'file':
+    elif destination['outputFormat'] == 'file':
       properties['path'] = file_format["path"]
       properties['format'] = file_format['tableFormat'] # or csv
 
-  properties["inputFormat"] = file_format['inputFormat']
   properties["app_name"] = 'Data Ingest'
+  properties["inputFormat"] = file_format['inputFormat']
+  properties["ouputFormat"] = destination['ouputFormat']
+  properties["streamSelection"] = file_format["streamSelection"]
 
   morphline = indexer.generate_config(properties)
 
