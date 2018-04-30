@@ -502,6 +502,12 @@ def _envelope_job(request, file_format, collection_name, start_time=None, lib_pa
       }
 
     if file_format['outputFormat'] == 'table':
+      if file_format['isTargetExisting']:
+        # Todo: check if format matches
+        pass
+      else:
+        sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+        pass
       properties["output_table"] = "impala::%s" % collection_name
       properties["kudu_master"] = manager.get_kudu_master()
     elif file_format['inputFormat'] == 'file':

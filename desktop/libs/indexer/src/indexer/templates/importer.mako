@@ -1587,10 +1587,12 @@ ${ assist.assistPanel() }
       self.kafkaFieldNames = ko.observable('');
       self.kafkaFieldNames.subscribe(function(newValue) {
         $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldNames', newValue);
+        viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldTypes = ko.observable('');
       self.kafkaFieldTypes.subscribe(function(newValue) {
         $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue)
+        viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldSchemaPath = ko.observable('');
 
