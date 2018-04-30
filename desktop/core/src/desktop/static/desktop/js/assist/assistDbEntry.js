@@ -21,8 +21,6 @@ var AssistDbEntry = (function () {
    * @param {AssistDbSource} assistDbSource
    * @param {Object} filter
    * @param {function} filter.querySpec (observable)
-   * @param {function} filter.showViews (observable)
-   * @param {function} filter.showTables (observable)
    * @param {Object} i18n
    * @param {string} i18n.errorLoadingTablePreview
    * @param {Object} navigationSettings
@@ -40,7 +38,6 @@ var AssistDbEntry = (function () {
     self.sourceType = assistDbSource.sourceType;
     self.invalidateOnRefresh =  assistDbSource.invalidateOnRefresh;
     self.sortFunctions = assistDbSource.sortFunctions;
-    self.isSearchVisible = assistDbSource.isSearchVisible;
     self.activeSort = assistDbSource.activeSort;
 
     self.expandable = self.catalogEntry.hasPossibleChildren();
@@ -73,20 +70,16 @@ var AssistDbEntry = (function () {
 
     self.filteredEntries = ko.pureComputed(function () {
       var facets = self.filter.querySpec().facets;
-      var tableAndViewFilterMatch = !self.catalogEntry.isDatabase() || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews());
       var facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
       // Only text match on tables/views or columns if flag is set
       var textMatch = (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
 
-      if (tableAndViewFilterMatch && facetMatch && textMatch) {
+      if (facetMatch && textMatch) {
         return self.entries();
       }
 
       return self.entries().filter(function (entry) {
         var match = true;
-        if (!tableAndViewFilterMatch) {
-          match = entry.catalogEntry.isTable() && self.filter.showTables() || entry.catalogEntry.isView() && self.filter.showViews();
-        }
 
         if (match && !facetMatch) {
           if (entry.catalogEntry.isField()) {
@@ -217,11 +210,6 @@ var AssistDbEntry = (function () {
     huePubSub.subscribeOnce('context.popover.hidden', function () {
       self.statsVisible(false);
     });
-  };
-
-  AssistDbEntry.prototype.toggleSearch = function () {
-    var self = this;
-    self.isSearchVisible(!self.isSearchVisible());
   };
 
   AssistDbEntry.prototype.triggerRefresh = function () {

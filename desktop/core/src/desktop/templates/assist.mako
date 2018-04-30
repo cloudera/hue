@@ -217,7 +217,7 @@ from desktop.views import _ko
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} }">
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': catalogEntry.isView() && !navigationSettings.rightAssist, 'fa-table': catalogEntry.isTable() && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
-        <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(navigationSettings.rightAssist), css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+        <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(navigationSettings.rightAssist), css: { 'highlight': highlight }"></span>
       </a>
       <div class="center assist-spinner" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
@@ -236,7 +236,7 @@ from desktop.views import _ko
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey()  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey()  --> <i class="fa fa-key"></i><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -258,7 +258,7 @@ from desktop.views import _ko
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -773,9 +773,6 @@ from desktop.views import _ko
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      <!-- ko if: (typeof isSource === 'undefined' || !isSource) && sourceType !== 'solr' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
-      <!-- /ko -->
       % if hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <!-- ko if: typeof databaseName !== 'undefined' -->
@@ -865,43 +862,6 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
-    </div>
-    <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
-      <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
-      <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
-      <!-- ko if: $parent.activeSort -->
-      <a class="assist-sort inactive-action inactive-action-dark" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
-        <!-- ko if: $parent.activeSort() === 'creation' -->
-        <i class="pointer fa fa-sort" title="${_('Sort')}"></i>
-        <!-- /ko -->
-        <!-- ko if: $parent.activeSort() === 'popular' -->
-        <i class="pointer fa fa-star-o" title="${_('Sort')}"></i>
-        <!-- /ko -->
-        <!-- ko if: $parent.activeSort() === 'alpha' -->
-        <i class="pointer fa fa-sort-alpha-asc" title="${_('Sort')}"></i>
-        <!-- /ko -->
-        ${_('Sort')}
-      </a>
-      <ul class="dropdown-menu" style="top: initial; left: inherit; position: fixed; z-index:10000;">
-        <li>
-          <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
-            <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }">
-            <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }
-          </a>
-        </li>
-        <!-- ko if: HAS_OPTIMIZER -->
-        <li>
-          <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }">
-            <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }
-          </a>
-        </li>
-        <!-- /ko -->
-      </ul>
-      <!-- /ko -->
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
       <div class="assist-filter">
@@ -2453,9 +2413,7 @@ from desktop.views import _ko
             query: '',
             facets: {},
             text: []
-          }).extend({ rateLimit: 300 }),
-          showViews: ko.observable(true).extend({ rateLimit: 300 }),
-          showTables: ko.observable(true).extend({ rateLimit: 300 })
+          }).extend({ rateLimit: 300 })
         };
 
         self.filteredTables = AssistantUtils.getFilteredTablesPureComputed(self);

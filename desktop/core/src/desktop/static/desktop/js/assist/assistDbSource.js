@@ -55,7 +55,6 @@ var AssistDbSource = (function () {
 
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
-    self.isSearchVisible = ko.observable(false);
     self.sortFunctions = sortFunctions;
 
     self.highlight = ko.observable(false);
@@ -189,9 +188,7 @@ var AssistDbSource = (function () {
     self.dbIndex = {};
 
     var nestedFilter = {
-      querySpec: ko.observable({}).extend({ rateLimit: 300 }),
-      showTables: ko.observable(true).extend({ rateLimit: 300 }),
-      showViews: ko.observable(true).extend({ rateLimit: 300 })
+      querySpec: ko.observable({}).extend({ rateLimit: 300 })
     };
 
     self.setDatabase = function (databaseName) {
@@ -346,11 +343,6 @@ var AssistDbSource = (function () {
     } else {
       findDatabase();
     }
-  };
-
-  AssistDbSource.prototype.toggleSearch = function () {
-    var self = this;
-    self.isSearchVisible(!self.isSearchVisible());
   };
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
