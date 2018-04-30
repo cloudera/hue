@@ -841,7 +841,7 @@ ${ assist.assistPanel() }
 
                   <!-- ko if: $parent.outputFormat() == 'index' -->
                     <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
-                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
+                    <div data-bind="template: { name: 'index-field-template', data: $data }, css: { 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
                 </form>
@@ -860,7 +860,7 @@ ${ assist.assistPanel() }
                 <!-- /ko -->
 
                 <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
-                  <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
+                  <div data-bind="template: { name: 'index-field-template', data: $data }, css: { 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
                 <!-- /ko -->
               </form>
 
@@ -973,6 +973,9 @@ ${ assist.assistPanel() }
 
       <span data-bind="visible: showProperties">
         <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
+        <label class="checkbox" data-bind="visible: $root.createWizard.destination.tableFormat() == 'kudu'">
+         <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
+        </label>
       </span>
     </span>
 

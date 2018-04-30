@@ -170,7 +170,7 @@ class SQLIndexer(object):
     if load_data and table_format in ('parquet', 'kudu'):
       file_format = table_format
       if table_format == 'kudu':
-        columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]
+        columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys and col['keep']]]
         extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
         PARTITION BY HASH PARTITIONS 16
         STORED AS %(file_format)s
