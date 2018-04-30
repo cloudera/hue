@@ -107,18 +107,18 @@
 
 <%def name="layout_skeleton(suffix='')">
   <div class="initial-hint empty-dashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
-    <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
+    <div class="initial-hint-text">${ _('Click on the pencil to get started with your dashboard!') }</div>
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" />
   </div>
 
   <div class="initial-hint empty-dashboard-editing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
-    <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
+    <div class="initial-hint-text">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" class="flip-horizontal" />
   </div>
 
   <!-- ko if: $root.isGridster -->
-  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint()">
-    <div style="float:left; padding-top: 120px; margin-right: -30px; text-align: center; width: 280px">${_('Drag the top plus button or any field from the right assistant into your dashboard')}</div>
+  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint(), click: function(){ showPlusButtonHint(false); }">
+    <div class="initial-hint-text">${_('Drag the top plus button or any field from the right assistant into your dashboard')}</div>
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px" />
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px; margin-left: 80px; position: absolute; transform: rotate(33deg);" />
   </div>
@@ -180,7 +180,7 @@
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
   <!-- ko if: $root.isGridster -->
-    <div class="gridster" data-bind="style: { 'opacity': $root.showPlusButtonHint() ? '.3' : '1' }">
+    <div class="gridster" data-bind="click: function(){ showPlusButtonHint(false); }">
       <!-- ko if: typeof gridItems !== 'undefined' -->
       <ul class="unstyled" data-bind="css: { 'is-adding': $root.isToolbarVisible }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
