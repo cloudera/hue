@@ -451,7 +451,7 @@ ${ workflow.render() }
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
         <td>
           <!-- ko if: type() == '' -->
-          <input type="text" class="filechooser-input" style="width:80%" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: value, filechooserOptions: globalFilechooserOptions, attr: { placeholder: help_text }">
+          <input type="text" class="filechooser-input" style="width: 75%" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: value, filechooserOptions: globalFilechooserOptions, attr: { placeholder: help_text }">
           <!-- /ko -->
           <!-- ko if: type() == 'text' -->
           <input type="text" data-bind="value: value, valueUpdate:'afterkeydown', attr: { placeholder: help_text }" class="input-xlarge"/>

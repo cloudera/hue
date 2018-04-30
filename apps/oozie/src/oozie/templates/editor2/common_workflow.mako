@@ -626,7 +626,7 @@
    <!-- /ko -->
 
    <!-- ko if: ! with_label -->
-     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path" title="${ _('Open') }">
+     <a data-bind="storageContextPopover: { path: ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path, offset: { right: 5 }, orientation: 'left' }" title="${ _('Preview') }" href="javascript: void(0);">
        <i class="fa fa-external-link-square"></i>
      </a>
    <!-- /ko -->
@@ -669,7 +669,7 @@
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
-    <a data-bind="hueLink: '/filebrowser/view=' + $data.path.split('=', 2)[1]" title="${ _('Open') }">
+    <a data-bind="storageContextPopover: { path: $data.path.split('=', 2)[1], offset: { right: 5 }, orientation: 'left' }" title="${ _('Preview') }" href="javascript: void(0);">
       <i class="fa fa-external-link-square"></i>
     </a>
   <!-- /ko -->
