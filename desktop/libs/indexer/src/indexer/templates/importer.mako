@@ -1606,6 +1606,13 @@ ${ assist.assistPanel() }
           if (newValue == 'kafka') {
             wizard.destination.tableFormat('kudu');
           }
+          if (wizard.destination.outputFormat() == 'table') {
+            if (self.streamSelection() == 'kafka') {
+              wizard.destination.name(self.kafkaSelectedTopics());
+            } else {
+              wizard.destination.name(self.streamSelection());
+            }
+          }
         }
       });
       self.streamCheckConnection = function() {
