@@ -232,7 +232,7 @@ from desktop.views import _ko
         self.joinColumns = ko.observableArray();
 
         self.isKey = ko.pureComputed(function () {
-          return self.catalogEntry.isPrimaryKey() || self.catalogEntry.isPartitionKey || self.joinColumns().length;
+          return self.catalogEntry.isPrimaryKey() || self.catalogEntry.isPartitionKey() || self.joinColumns().length;
         });
 
         self.keyText = ko.pureComputed(function () {
