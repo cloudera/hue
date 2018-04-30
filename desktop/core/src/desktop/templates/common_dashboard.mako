@@ -320,9 +320,11 @@
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }" title="${ _('Click to change the widget title') }"></span>
       <!-- /ko -->
+      <!-- ko if: $root.isGridster() && widgetType() !== 'resultset-widget' && widgetType() !== 'filter-widget' -->
       <div class="inline pull-right margin-right-10">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
+      <!-- /ko -->
     </h2>
     <div class="card-body" style="padding: 5px;">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
