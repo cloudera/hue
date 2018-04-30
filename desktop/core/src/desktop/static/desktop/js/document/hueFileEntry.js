@@ -116,7 +116,8 @@ var HueFileEntry = (function () {
           var entryType = entry.definition().type;
           return (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory')
             && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
-            (HUE_I18n.documentType[entryType] && HUE_I18n.documentType[entryType].toLowerCase().indexOf(filter) !== -1));
+            (HUE_I18n.documentType[entryType] && HUE_I18n.documentType[entryType].toLowerCase().indexOf(filter) !== -1) ||
+            entry.definition().description.toLowerCase().indexOf(filter) !== -1);
         })
       }
       return self.entries();
