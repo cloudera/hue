@@ -107,6 +107,44 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 % endif
 
+
+<script type="text/html" id="apps-list${ SUFFIX }">
+  <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container">
+    <thead>
+    <tr>
+      <th width="1%" class="vertical-align-middle">
+        <div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div>
+      </th>
+      <th width="15%">${_('Id')}</th>
+      <th width="20%">${_('Name')}</th>
+      <th width="6%">${_('User')}</th>
+      <th width="6%">${_('Type')}</th>
+      <th width="5%">${_('Status')}</th>
+      <th width="3%">${_('Progress')}</th>
+      <th width="5%">${_('Group')}</th>
+      <th width="10%" data-bind="text: $root.interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
+      <th width="6%">${_('Duration')}</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: apps">
+      <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+        <td data-bind="click: function() {}, clickBubble: false">
+          <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
+        </td>
+        <td data-bind="text: id"></td>
+        <td data-bind="text: name"></td>
+        <td data-bind="text: user"></td>
+        <td data-bind="text: type"></td>
+        <td data-bind="text: status"></td>
+        <td data-bind="text: $root.formatProgress(progress)"></td>
+        <td data-bind="text: queue"></td>
+        <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
+        <td data-bind="text: duration().toHHMMSS()"></td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
@@ -193,38 +231,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </ul>
                 <!-- /ko -->
                 <!-- ko ifnot: $root.isMini -->
-                <table id="jobsTable" class="datatables table table-condensed status-border-container">
-                  <thead>
-                  <tr>
-                    <th width="1%" class="vertical-align-middle"><div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
-                    <th width="15%">${_('Id')}</th>
-                    <th width="20%">${_('Name')}</th>
-                    <th width="6%">${_('User')}</th>
-                    <th width="6%">${_('Type')}</th>
-                    <th width="5%">${_('Status')}</th>
-                    <th width="3%">${_('Progress')}</th>
-                    <th width="5%">${_('Group')}</th>
-                    <th width="10%" data-bind="text: interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
-                    <th width="6%">${_('Duration')}</th>
-                  </tr>
-                  </thead>
-                  <tbody data-bind="foreach: jobs.apps">
-                    <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
-                      <td data-bind="click: function() {}, clickBubble: false">
-                        <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
-                      </td>
-                      <td data-bind="text: id"></td>
-                      <td data-bind="text: name"></td>
-                      <td data-bind="text: user"></td>
-                      <td data-bind="text: type"></td>
-                      <td data-bind="text: status"></td>
-                      <td data-bind="text: $root.formatProgress(progress)"></td>
-                      <td data-bind="text: queue"></td>
-                      <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
-                      <td data-bind="text: duration().toHHMMSS()"></td>
-                    </tr>
-                  </tbody>
-                </table>
+                  ${ _('Running') }
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: {apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+
+                  ${ _('Completed') }
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: {apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
                 <!-- /ko -->
               <!-- /ko -->
             </div>
@@ -2374,6 +2385,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.apps = ko.observableArray().extend({ rateLimit: 50 });
+      self.runningApps = ko.pureComputed(function() {
+        return $.grep(self.apps(), function(app) {
+          return app.isRunning();
+        });
+      });
+      self.finishedApps = ko.pureComputed(function() {
+        return $.grep(self.apps(), function(app) {
+          return !app.isRunning();
+        });
+      });
       self.totalApps = ko.observable(null);
       self.isCoordinator = ko.observable(false);
 
