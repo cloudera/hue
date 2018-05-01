@@ -117,7 +117,7 @@
   </div>
 
   <!-- ko if: $root.isGridster -->
-  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint(), click: function(){ showPlusButtonHint(false); }">
+  <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint() && !showPlusButtonHintShownOnce(), click: function(){ showPlusButtonHint(false); }">
     <div class="initial-hint-text">${_('Drag the top plus button or any field from the right assistant into your dashboard')}</div>
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px" />
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px; margin-left: 80px; position: absolute; transform: rotate(33deg);" />
@@ -231,6 +231,9 @@
                 <a class="inactive-action context-popover-icon" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + fieldName()  }">
                   <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
                 </a>
+                <!-- /ko -->
+                <!-- ko ifnot: fieldName  -->
+                  <i class="fa fa-fw fa-emtpy"/>
                 <!-- /ko -->
 
                 <div class="clearfix"></div>
