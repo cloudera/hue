@@ -2443,10 +2443,9 @@
    */
   ko.bindingHandlers.storageContextPopover = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-      var options = valueAccessor();
       ko.bindingHandlers.click.init(element, function () {
         return function () {
-
+          var options = valueAccessor();
           AssistStorageEntry.getEntry(options.path, options.type).done(function (entry) {
             var $source = $(element);
             var offset = $source.offset();
@@ -2499,9 +2498,9 @@
    */
   ko.bindingHandlers.sqlContextPopover = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-      var options = valueAccessor();
       ko.bindingHandlers.click.init(element, function () {
         return function () {
+          var options = valueAccessor();
           DataCatalog.getEntry({ sourceType: options.sourceType, path: options.path }).done(function (entry) {
             var $source = $(element);
             var offset = $source.offset();
