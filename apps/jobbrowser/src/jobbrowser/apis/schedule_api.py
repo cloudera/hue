@@ -43,6 +43,8 @@ class ScheduleApi(Api):
     oozie_api = get_oozie(self.user)
     kwargs = {'cnt': hasattr(OOZIE_JOBS_COUNT, 'get') and OOZIE_JOBS_COUNT.get(), 'filters': []}
 
+    filters.pop('time')
+
     _filter_oozie_jobs(self.user, filters, kwargs)
 
     jobs = oozie_api.get_coordinators(**kwargs)
