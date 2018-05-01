@@ -194,16 +194,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
 
               <!-- ko ifnot: $root.isMini -->
-              ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
-              <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
-                <option value="days">${_('days')}</option>
-                <option value="hours">${_('hours')}</option>
-                <option value="minutes">${_('minutes')}</option>
-              </select>
+              <!-- ko if: $root.interface() !== 'schedules' && $root.interface() !== 'bundles' -->
+                ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
+                <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
+                  <option value="days">${_('days')}</option>
+                  <option value="hours">${_('hours')}</option>
+                  <option value="minutes">${_('minutes')}</option>
+                </select>
 
-              <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
-                <i class="fa fa-refresh"></i>
-              </a>
+                <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
+                  <i class="fa fa-refresh"></i>
+                </a>
+              <!-- /ko -->
 
               <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
               <!-- /ko -->
