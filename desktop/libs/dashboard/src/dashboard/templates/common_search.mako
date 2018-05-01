@@ -4329,6 +4329,24 @@ $(document).ready(function () {
     }
   }
 
+  function normalizeWidgetHeight(options) {
+    var $gridsterWidget = options.target ? $(options.target).parents('li.gs-w') : options;
+
+    searchViewModel.gridItems().forEach(function (widget) {
+      if (widget.widgetId() === parseInt($gridsterWidget.data('widgetid'))) {
+        removeInternalScroll(widget);
+        var contentHeight = $(widget.gridsterElement).find('.card-widget').height();
+        if (widget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
+          widget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
+          $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
+            huePubSub.publish('gridster.clean.whitespace');
+            equalizeWidgetsHeights();
+          });
+        }
+      }
+    });
+  }
+
   huePubSub.subscribe('gridster.remove.scrollbars', function () {
     searchViewModel.gridItems().forEach(function (widget) {
       removeInternalScroll(widget);
@@ -4422,7 +4440,7 @@ $(document).ready(function () {
       widget.col(col);
       widget.row(newRow);
       $gridster.move_widget($(widget.gridsterElement), col, newRow, function () {
-        huePubSub.publish('gridster.clean.whitespace');
+        normalizeWidgetHeight($(widget.gridsterElement));
       });
     }
 
@@ -4721,23 +4739,7 @@ $(document).ready(function () {
     $(this).parent().addClass("active");
   });
 
-  $(document).on('dblclick', 'li.gs-w', function (event) {
-    var $gridsterWidget = $(event.target).parents('li.gs-w');
-
-    searchViewModel.gridItems().forEach(function (widget) {
-      if (widget.widgetId() === parseInt($gridsterWidget.data('widgetid'))) {
-        removeInternalScroll(widget);
-        var contentHeight = $(widget.gridsterElement).find('.card-widget').height();
-        if (widget.gridsterElement.clientHeight - contentHeight > (WIDGET_BASE_HEIGHT + 10)) {
-          widget.size_y(Math.ceil(contentHeight / (WIDGET_BASE_HEIGHT + 10)));
-          $gridster.resize_widget($(widget.gridsterElement), widget.size_x(), widget.size_y(), function () {
-            huePubSub.publish('gridster.clean.whitespace');
-            equalizeWidgetsHeights();
-          });
-        }
-      }
-    });
-  });
+  $(document).on('dblclick', 'li.gs-w', normalizeWidgetHeight);
 
   $('.dashboard-container').on('click', function (e) {
     huePubSub.publish('dashboard.hide.dimensions', e);
