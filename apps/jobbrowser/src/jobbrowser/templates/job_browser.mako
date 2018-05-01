@@ -1377,7 +1377,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+
+    <div data-bind="css: { 'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         %if not is_mini:
@@ -1385,13 +1386,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         %endif
         <li><a href="#workflow-page-metadata${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Properties') }</a></li>
         <li><a class="jb-logs-link" href="#workflow-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#workflow-page-tasks${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li class="${ 'active' if is_mini else ''}"><a href="#workflow-page-tasks${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a href="#workflow-page-xml${ SUFFIX }" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml${ SUFFIX }\']').tab('show'); }">${ _('XML') }</a></li>
         <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
 
       <div class="clearfix"></div>
-
 
       <div class="tab-content">
         %if not is_mini:
@@ -1402,7 +1402,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="workflow-page-tasks${ SUFFIX }">
+        <div class="tab-pane ${ 'active' if is_mini else ''}" id="workflow-page-tasks${ SUFFIX }">
           <table id="actionsTable" class="datatables table table-condensed">
             <thead>
             <tr>
