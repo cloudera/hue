@@ -26,9 +26,14 @@ def test_generate_from_kafka_to_file_csv():
   properties = {
     'app_name': 'Ingest',
 
-    'inputFormat': 'kafka',
+    'inputFormat': 'stream',
+    'streamSelection': 'kafka',
     'brokers': 'broker:9092',
     'topics': 'kafkaTopic',
+    'kafkaFieldType': 'delimited',
+    'kafkaFieldDelimiter': ',',
+    'kafkaFieldNames': 'id,name',
+    'kafkaFieldTypes': 'int,string',
 
     'ouputFormat': 'file',
     'path': '/tmp/output',
@@ -37,39 +42,88 @@ def test_generate_from_kafka_to_file_csv():
 
   config = EnvelopeIndexer(username='test').generate_config(properties)
 
-  assert_true('''application {
-    name = Ingest
-    batch.milliseconds = 5000
-    executors = 1
-    executor.cores = 1
-    executor.memory = 1G
-}
-
-steps {
+  assert_true('''steps {
     inputdata {
         input {
-              type = kafka
-              brokers = "broker:9092"
-              topics = kafkaTopic
-              encoding = string
-              window {
-                  enabled = true
-                  milliseconds = 30000
-              }
-
+            type = kafka
+                brokers = "broker:9092"
+                topics = kafkaTopic
+                encoding = string
+                translator {
+                    type = delimited
+                    delimiter = ","
+                    field.names = [id,name]
+                    field.types = [int,string]
+                }
+                window {
+                    enabled = true
+                    milliseconds = 60000
+                }
+        
         }
     }
 
     outputdata {
-    dependencies = [inputdata]
-    planner = {
-      type = overwrite
+        dependencies = [inputdata]
+        planner = {
+          type = overwrite
+        }
+        output = {
+          type = filesystem
+          path = /tmp/output
+          format = csv
+          header = true
+        }
     }
-    output = {
-      type = filesystem
-      path = %(path)s
-      format = %(format)s
-      header = true
+}
+''' in  config, config)
+
+
+def test_generate_from_stream_sfdc_to_hive_table():
+  properties = {
+    'app_name': 'Ingest',
+
+    'inputFormat': 'stream',    
+    'streamSelection': 'sfdc',
+    'streamUsername': 'test',
+    'streamPassword': 'test',
+    'streamToken': 'token',
+    'streamEndpointUrl': 'http://sfdc/api',
+    'streamObject': 'Opportunities',
+
+    'ouputFormat': 'table',
+    'output_table': 'sfdc',
+    'format': 'text'
+  }
+
+  config = EnvelopeIndexer(username='test').generate_config(properties)
+
+  assert_true('''steps {
+    inputdata {
+        input {
+            type = sfdc
+            mode = fetch-all
+            sobject = %(streamObject)s
+            sfdc: {
+              partner: {
+                username = "%(streamUsername)s"
+                password = "%(streamPassword)s"
+                token = "%(streamToken)s"
+                auth-endpoint = "%(streamEndpointUrl)s"
+              }
+            }
+  
+        }
     }
+
+    outputdata {
+        dependencies = [inputdata]
+          planner {
+              type = append
+          }
+          output {
+              type = hive
+              table.name = "sfdc"
+          }
     }
 }''' in  config, config)

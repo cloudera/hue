@@ -510,8 +510,12 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
       else:
         sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).get_str()
         print sql
-      properties["output_table"] = "impala::%s" % collection_name
-      properties["kudu_master"] = manager.get_kudu_master()
+      if file_format['inputFormat'] == 'stream':
+        properties["output_table"] = "impala::%s" % collection_name
+        properties["kudu_master"] = manager.get_kudu_master()
+      else:
+        properties['output_table'] = collection_name
+
     elif destination['outputFormat'] == 'file':
       properties['path'] = file_format["path"]
       properties['format'] = file_format['tableFormat'] # or csv

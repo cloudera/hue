@@ -1364,9 +1364,13 @@ ${ assist.assistPanel() }
         self.path('');
         resizeElements();
         self.rdbmsMode('customRdbms');
-        if (val == 'stream' && self.streamSelection() == 'kafka') {
-          wizard.guessFormat();
-          wizard.destination.tableFormat('kudu');
+        if (val == 'stream') {
+          if (self.streamSelection() == 'kafka') {
+            wizard.guessFormat();
+            wizard.destination.tableFormat('kudu');
+          } else {
+            wizard.destination.tableFormat('text');
+          }
         }
       });
       self.inputFormatsAll = ko.observableArray([

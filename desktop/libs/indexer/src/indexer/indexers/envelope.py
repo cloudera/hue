@@ -97,16 +97,16 @@ class EnvelopeIndexer(object):
         """ % properties
       elif properties['streamSelection'] == 'sfdc':
         input = """type = sfdc
-        mode = fetch-all
-        sobject = %(streamObject)s
-        sfdc: {
-          partner: {
-            username = "%(streamUsername)s"
-            password = "%(streamPassword)s"
-            token = "%(streamToken)s"
-            auth-endpoint = "%(streamEndpointUrl)s"
-          }
-        }
+            mode = fetch-all
+            sobject = %(streamObject)s
+            sfdc: {
+              partner: {
+                username = "%(streamUsername)s"
+                password = "%(streamPassword)s"
+                token = "%(streamToken)s"
+                auth-endpoint = "%(streamEndpointUrl)s"
+              }
+            }
   """
       else:
         raise PopupException(_('Stream format of %(inputFormat)s not recognized: %(streamSelection)s') % properties)
@@ -121,30 +121,40 @@ class EnvelopeIndexer(object):
 
     if properties['ouputFormat'] == 'file':
       output = """dependencies = [inputdata]
-    planner = {
-      type = overwrite
-    }
-    output = {
-      type = filesystem
-      path = %(path)s
-      format = %(format)s
-      header = true
-    }""" % properties
-    elif properties['ouputFormat'] == 'table':
-      output = """dependencies = [inputdata]
-        deriver {
-            type = sql
-            query.literal = \"""
-                SELECT measurement_time, number_of_vehicles FROM inputdata\"""
+        planner = {
+          type = overwrite
         }
-        planner {
-            type = upsert
-        }
-        output {
-            type = kudu
-            connection = "%(kudu_master)s"
-            table.name = "%(output_table)s"
+        output = {
+          type = filesystem
+          path = %(path)s
+          format = %(format)s
+          header = true
         }""" % properties
+    elif properties['ouputFormat'] == 'table':
+      if properties['inputFormat'] == 'stream' and properties['streamSelection'] == 'kafka':
+        output = """dependencies = [inputdata]
+          deriver {
+              type = sql
+              query.literal = \"""
+                  SELECT measurement_time, number_of_vehicles FROM inputdata\"""
+          }
+          planner {
+              type = upsert
+          }
+          output {
+              type = kudu
+              connection = "%(kudu_master)s"
+              table.name = "%(output_table)s"
+          }""" % properties
+      else:
+        output = """dependencies = [inputdata]
+          planner {
+              type = append
+          }
+          output {
+              type = hive
+              table.name = "%(output_table)s"
+          }""" % properties
     else:
       raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
       
