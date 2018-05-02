@@ -51,7 +51,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
     </div>
   </form>
 %else:
-<div class="search-bar" data-bind="visible: !$root.isPlayerMode(), dockable: { scrollable: '.page-content', jumpCorrection: 0, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 50 }">
+<div class="search-bar" data-bind="visible: !$root.isPlayerMode(), dockable: { scrollable: '.page-content', jumpCorrection: 0, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 50 }, event: { mouseover: function(){ if (columns().length && isGridster()) { showPlusButtonHint(true); } } }">
   <div class="search-bar-header">
     <div class="search-bar-logo">
       <div class="app-header">
@@ -170,7 +170,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       % endif
 
       <div class="dropdown pull-right margin-left-10">
-        <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+        <a class="btn" data-toggle="dropdown" href="javascript: void(0)" data-bind="click: function() { showPlusButtonHint(false); }">
           <i class="fa fa-fw fa-ellipsis-v"></i>
         </a>
         <ul class="dropdown-menu">
@@ -4459,6 +4459,8 @@ $(document).ready(function () {
     }
 
     if (searchViewModel.columns().length > 0) {
+
+      searchViewModel.showPlusButtonHint(false);
 
       if (typeof dimensions.overlap !== 'undefined') {
         if (dimensions.overlap === 'N') {
