@@ -19,6 +19,7 @@ import json
 import logging
 
 import sqlparse
+import urllib
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -633,7 +634,7 @@ def export_result(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   data_format = json.loads(request.POST.get('format', 'hdfs-file'))
-  destination = json.loads(request.POST.get('destination', ''))
+  destination = urllib.unquote(json.loads(request.POST.get('destination', '')))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
   start_time = json.loads(request.POST.get('start_time', '-1'))

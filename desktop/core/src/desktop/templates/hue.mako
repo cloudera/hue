@@ -999,6 +999,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               baseURL += (baseURL.indexOf('?') > -1 ? '&' : '?') + self.currentQueryString();
               self.currentQueryString(null);
             }
+            baseURL = encodeURI(baseURL);
             $.ajax({
               url: baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
               beforeSend: function (xhr) {

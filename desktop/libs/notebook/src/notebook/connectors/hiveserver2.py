@@ -501,7 +501,7 @@ class HS2Api(Api):
 
     upload(target_file, handle, self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes)
 
-    return '/filebrowser/view=%s' % target_file
+    return '/filebrowser/view=%s' % urllib.quote(urllib.quote(target_file.encode('utf-8'))) # Quote twice, because of issue in the routing on client
 
 
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
@@ -557,7 +557,7 @@ DROP TABLE IF EXISTS `%(table)s`;
       'location': self.request.fs.netnormpath(destination),
       'hql': query.hql_query
     }
-    success_url = '/filebrowser/view=%s' % destination
+    success_url = '/filebrowser/view=%s' % urllib.quote(destination.encode('utf-8'))
 
     return hql, success_url
 

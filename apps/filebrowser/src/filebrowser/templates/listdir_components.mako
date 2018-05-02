@@ -828,7 +828,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       return {
         name: file.name,
         path: file.path,
-        url: file.url,
+        url: encodeURI(file.url),
         type: file.type,
         permissions: file.rwx,
         mode: file.mode,
@@ -1351,7 +1351,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("#renameFileName").text(self.selectedFile().path);
 
-        $("#newNameInput").val(self.selectedFile().name);
+        $("#newNameInput").val(encodeURI(self.selectedFile().name));
 
         $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
@@ -2071,7 +2071,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           catch (exc) {
           }
           var options = {
-            url: '/filebrowser/upload/file?dest=' + ops.path,
+            url: '/filebrowser/upload/file?dest=' + encodeURI(ops.path),
             paramName: 'hdfs_file',
             params: {
               dest: ops.path
@@ -2105,7 +2105,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 newDest = ops.path + '/' + file.fullPath.substr(0, file.fullPath.length - file.name.length);
               }
               this.options.params.dest = newDest;
-              this.options.url = '/filebrowser/upload/file?dest=' + newDest;
+              this.options.url = '/filebrowser/upload/file?dest=' + encodeURI(newDest);
             },
             uploadprogress: function (file, progress) {
               $('[data-dz-name]').each(function (cnt, item) {

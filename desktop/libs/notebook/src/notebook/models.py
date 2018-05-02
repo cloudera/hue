@@ -19,6 +19,7 @@ import json
 import logging
 import math
 import numbers
+import urllib
 import uuid
 
 from django.utils.html import escape
@@ -102,7 +103,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': on_success_url,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8')) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,

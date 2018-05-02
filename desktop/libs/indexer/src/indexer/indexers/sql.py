@@ -15,6 +15,7 @@
 # limitations under the License.import logging
 
 import logging
+import urllib
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -55,9 +56,9 @@ class SQLIndexer(object):
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    source_path = source['path']
+    source_path = urllib.unquote(source['path'])
     external = not destination['useDefaultLocation']
-    external_path = destination['nonDefaultLocation']
+    external_path = urllib.unquote(destination['nonDefaultLocation'])
 
     load_data = destination['importData']
     skip_header = destination['hasHeader']

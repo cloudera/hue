@@ -23,16 +23,16 @@ urlpatterns = patterns('filebrowser.views',
   url(r'^$', 'index', name='index'),
 
   # Catch-all for viewing a file (display) or a directory (listdir)
-  url(r'^view=(?P<path>.*)$', 'view', name='view'),
+  url(r'^view=(?P<path>[\s\S.]*)$', 'view', name='view'),
 
-  url(r'^listdir=(?P<path>.*)$', 'listdir', name='listdir'),
-  url(r'^display=(?P<path>.*)$', 'display', name='display'),
-  url(r'^stat=(?P<path>.*)$', 'stat', name='stat'),
-  url(r'^content_summary=(?P<path>.*)$', 'content_summary', name='content_summary'),
-  url(r'^download=(?P<path>.*)$', 'download', name='download'),
+  url(r'^listdir=(?P<path>[\s\S.]*)$', 'listdir', name='listdir'),
+  url(r'^display=(?P<path>[\s\S.]*)$', 'display', name='display'),
+  url(r'^stat=(?P<path>[\s\S.]*)$', 'stat', name='stat'),
+  url(r'^content_summary=(?P<path>[\s\S.]*)$', 'content_summary', name='content_summary'),
+  url(r'^download=(?P<path>[\s\S.]*)$', 'download', name='download'),
   url(r'^status$', 'status', name='status'),
-  url(r'^home_relative_view=(?P<path>.*)$', 'home_relative_view', name='home_relative_view'),
-  url(r'^edit=(?P<path>.*)$', 'edit', name='edit'),
+  url(r'^home_relative_view=(?P<path>[\s\S.]*)$', 'home_relative_view', name='home_relative_view'),
+  url(r'^edit=(?P<path>[\s\S.]*)$', 'edit', name='edit'),
 
   # POST operations
   url(r'^save$', 'save_file'),

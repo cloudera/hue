@@ -63,6 +63,7 @@ var AssistStorageEntry = (function () {
       }
     }
     self.path += self.definition.name;
+    self.path = encodeURI(self.path);
     self.currentPage = 1;
     self.hasMorePages = true;
     self.preview = ko.observable();
@@ -136,6 +137,7 @@ var AssistStorageEntry = (function () {
         return file.name !== '.' && file.name !== '..';
       });
       self.entries($.map(filteredFiles, function (file) {
+        file.url = encodeURI(file.url);
         return new AssistStorageEntry({
           type: self.type,
           definition: file,
