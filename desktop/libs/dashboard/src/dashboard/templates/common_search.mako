@@ -2669,11 +2669,10 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.collection.template.filteredModalFields().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
         <li data-bind="visibleOnHover: { 'selector': '.entity-field-picker' }">
-          <a class="entity-field-picker inactive-action" href="javascript:void(0);" data-bind="click: $root.collection.showContextPopover" style="opacity: 0">
-            <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
-          </a>
-          <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': type()}, click: addFacetDemiModalFieldPreview"></span>
-          </span>
+            <span class="badge badge-info" data-bind="text: name(), attr: {'title': type()}, click: addFacetDemiModalFieldPreview"></span>
+            <a class="entity-field-picker inactive-action margin-right-10" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + name()  }" style="margin-left: 2px;">
+              <i class="fa fa-info" title="${_('Show Details')}"/>
+            </a>
         </li>
       </ul>
       <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 250px; margin-right: 50px; height: 42px;line-height: 42px">
