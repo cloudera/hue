@@ -79,6 +79,7 @@
   </div>
   %endif
 
+  % if not USE_NEW_ADD_METHOD.get():
   <!-- ko if: columns().length > 0 && isToolbarVisible -->
   <div data-bind="dockable: { scrollable: '.page-content', jumpCorrection: 50, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "128px" or "100px" }', triggerAdjust: 50 }">
     %if hasattr(caller, "results"):
@@ -100,6 +101,7 @@
     %endif
   </div>
   <!-- /ko -->
+  % endif
   <div class="clearfix"></div>
 </div>
 
