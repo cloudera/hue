@@ -361,6 +361,8 @@ ${ assist.assistPanel() }
                     <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
                   </label>
 
+                  <br/>
+
                   <label class="control-label"><div>${ _('Field names') }</div>
                     <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
                   </label>
@@ -509,8 +511,14 @@ ${ assist.assistPanel() }
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
             </span>
-            <span class="help-inline muted" data-bind="visible: ! $parent.createWizard.isValidDestination()">
-              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Empty name or invalid characters') }
+            <span class="help-inline muted" data-bind="visible: !$parent.createWizard.isValidDestination()">
+              <i class="fa fa-warning" style="color: #c09853"></i>
+              <!-- ko if: name() -->
+                ${ _('Invalid characters') }
+              <!-- /ko -->
+              <!-- ko if: !name() -->
+                ${ _('Empty name') }
+              <!-- /ko -->
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
