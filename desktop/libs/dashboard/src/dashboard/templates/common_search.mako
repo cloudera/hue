@@ -4282,6 +4282,10 @@ $(document).ready(function () {
     }
   }, 'dashboard');
 
+  huePubSub.subscribe('draggable.text.stopped', function (options) {
+    isDraggingOrResizingWidgets = false;
+  }, 'dashboard');
+
   huePubSub.subscribe('dashboard.gridster.widget.drag', function (options) {
     movePreviewHolder(options);
   }, 'dashboard');
