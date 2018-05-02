@@ -115,8 +115,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <th width="1%" class="vertical-align-middle">
         <div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div>
       </th>
-      <th width="15%">${_('Id')}</th>
-      <th width="20%">${_('Name')}</th>
+      <th width="20%">${_('Name')}</th>      
       <th width="6%">${_('User')}</th>
       <th width="6%">${_('Type')}</th>
       <th width="5%">${_('Status')}</th>
@@ -124,14 +123,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <th width="5%">${_('Group')}</th>
       <th width="10%" data-bind="text: $root.interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
       <th width="6%">${_('Duration')}</th>
+      <th width="15%">${_('Id')}</th>
     </tr>
     </thead>
     <tbody data-bind="foreach: apps">
       <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
         <td data-bind="click: function() {}, clickBubble: false">
           <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
-        </td>
-        <td data-bind="text: id"></td>
+        </td>        
         <td data-bind="text: name"></td>
         <td data-bind="text: user"></td>
         <td data-bind="text: type"></td>
@@ -140,10 +139,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <td data-bind="text: queue"></td>
         <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
         <td data-bind="text: duration().toHHMMSS()"></td>
+        <td data-bind="text: id"></td>
       </tr>
     </tbody>
   </table>
 </script>
+
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
