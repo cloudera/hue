@@ -25,7 +25,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_REPORT_ENABLED, USE_GRIDSTER
+  from dashboard.conf import HAS_REPORT_ENABLED, USE_GRIDSTER, USE_NEW_ADD_METHOD
   from desktop.views import _ko
 %>
 
@@ -116,6 +116,7 @@
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" class="flip-horizontal" />
   </div>
 
+  % if USE_NEW_ADD_METHOD.get():
   <!-- ko if: $root.isGridster -->
   <div class="initial-hint empty-dashboard-plus" data-bind="fadeVisible: columns().length > 0 && showPlusButtonHint(), click: function(){ showPlusButtonHint(false); }">
     <div class="initial-hint-text">${_('Drag the top plus button or any field from the right assistant into your dashboard')}</div>
@@ -123,6 +124,7 @@
     <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" style="width: 90px; margin-left: 80px; position: absolute; transform: rotate(33deg);" />
   </div>
   <!-- /ko -->
+  % endif
 
 
   <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css: {'with-top-margin': isEditing()}">

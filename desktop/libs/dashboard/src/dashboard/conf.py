@@ -58,6 +58,13 @@ USE_GRIDSTER = Config(
   type=coerce_bool
 )
 
+USE_NEW_ADD_METHOD = Config(
+  key="use_new_add_method",
+  help=_t("Activate the simplified drag in the dashboard."),
+  default=False,
+  type=coerce_bool
+)
+
 HAS_WIDGET_FILTER = Config(
   key="has_widget_filter",
   help=_t("Activate the widget filter and comparison (beta)."),

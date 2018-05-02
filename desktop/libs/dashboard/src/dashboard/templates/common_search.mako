@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 
-from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, HAS_TREE_WIDGET
+from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, HAS_TREE_WIDGET
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -134,9 +134,15 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster() -->
       <div class="btn-group">
+        % if USE_NEW_ADD_METHOD.get():
         <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
           <i class="fa fa-plus"></i>
         </a>
+        % else:
+        <a class="btn" title="${ _('Toggle the widget toolbar') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+          <i class="fa fa-plus"></i>
+        </a>
+        % endif:
       </div>
       <!-- /ko -->
       <!-- ko ifnot: $root.isGridster -->
@@ -3839,7 +3845,7 @@ function newSearch() {
 }
 
 function loadSearch(collection, query, initial) {
-  searchViewModel = new SearchViewModel(collection, query, initial, ${ USE_GRIDSTER.get() and 'true' or 'false' });
+  searchViewModel = new SearchViewModel(collection, query, initial, ${ USE_GRIDSTER.get() and 'true' or 'false' }, ${ USE_NEW_ADD_METHOD.get() and 'true' or 'false' });
   ko.applyBindings(searchViewModel, $('#searchComponents')[0]);
 
   searchViewModel.timelineChartTypes = ko.observableArray([

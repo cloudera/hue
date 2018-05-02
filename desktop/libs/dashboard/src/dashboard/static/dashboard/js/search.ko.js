@@ -1860,7 +1860,8 @@ var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
 
-var SearchViewModel = function (collection_json, query_json, initial_json, has_gridster_enabled) {
+var SearchViewModel = function (collection_json, query_json, initial_json, has_gridster_enabled, has_new_add_method) {
+
   var self = this;
 
   self.collectionJson = collection_json;
@@ -1868,6 +1869,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
   self.initialJson = initial_json;
 
   self.isGridster = ko.observable(!!has_gridster_enabled && (collection_json.layout.length === 0 || (collection_json.layout.length && collection_json.gridItems.length)));
+  self.hasNewAdd = ko.observable(!!has_new_add_method);
   self.isQueryBuilder = ko.observable(false);
 
   if ($.totalStorage('hue.enable.gridster') === false) {
