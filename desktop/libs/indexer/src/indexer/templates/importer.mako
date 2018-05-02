@@ -1619,13 +1619,6 @@ ${ assist.assistPanel() }
           if (newValue == 'kafka') {
             wizard.destination.tableFormat('kudu');
           }
-          if (wizard.destination.outputFormat() == 'table') {
-            if (self.streamSelection() == 'kafka') {
-              wizard.destination.name(self.kafkaSelectedTopics());
-            } else {
-              wizard.destination.name(self.streamSelection());
-            }
-          }
         }
       });
       self.streamCheckConnection = function() {
@@ -1816,11 +1809,17 @@ ${ assist.assistPanel() }
       self.defaultName = ko.computed(function() {
         var name = ''
 
-        if (wizard.source.inputFormat() == 'file') {
+        if (wizard.source.inputFormat() == 'file' || wizard.source.inputFormat() == 'stream') {
           if (self.outputFormat() == 'table') {
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
 
-            if (wizard.source.path()) {
+            if (wizard.source.inputFormat() == 'stream') {
+              if (wizard.source.streamSelection() == 'kafka') {
+                name += '.' + wizard.source.kafkaSelectedTopics();
+              } else {
+                name += '.' + wizard.source.streamSelection();
+              }
+            } else if (wizard.source.path()) {
               name += '.' + wizard.source.path().split('/').pop().split('.')[0];
             }
           } else { // Index
@@ -1905,7 +1904,7 @@ ${ assist.assistPanel() }
         return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
       });
       self.databaseName = ko.computed(function() {
-        return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : (self.name() !== '' ? self.name() : 'default');
+        return self.outputFormat() == 'database' ? self.name() : (self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default');
       });
       self.tableFormat = ko.observable('text');
       self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
