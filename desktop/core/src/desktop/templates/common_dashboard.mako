@@ -221,6 +221,7 @@
         </div>
       </h2>
       <div class="empty-content" data-bind="droppable: { data: function(w) { huePubSub.publish('gridster.empty.drop', { widget: w, target: $data }); }, options: { greedy:true, hoverClass: 'droppable-hover', drop: function(){ huePubSub.publish('gridster.added.widget'); } }}, css: { 'query-builder': $root.isQueryBuilder }">
+        % if USE_NEW_ADD_METHOD.get():
         <!-- ko with: emptyProperties -->
         <div class="edit-dimensions">
           <div class="badge dimensions-badge-container dimensions-badge-container-add is-adding">
@@ -320,6 +321,7 @@
           </div>
         </div>
         <!-- /ko -->
+        % endif
       </div>
       <div class="clearfix"></div>
     </div>

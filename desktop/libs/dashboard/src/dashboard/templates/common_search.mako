@@ -4531,7 +4531,7 @@ $(document).ready(function () {
                 widget: null,
                 emptyProperties: new EmptyGridsterWidget(searchViewModel),
                 callback: function (el) {
-                  if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(tempDraggable.widgetType()) > -1) {
+                  if (!searchViewModel.hasNewAdd() || (searchViewModel.hasNewAdd() &&  ["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(tempDraggable.widgetType()) > -1)) {
                     showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
                   }
                   tempDraggable = null;
