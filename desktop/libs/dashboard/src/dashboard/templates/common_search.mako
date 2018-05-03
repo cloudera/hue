@@ -3793,10 +3793,8 @@ function resizeFieldsListCallback() {
 
 var resizeTimeout = -1;
 function resizeFieldsListThrottled() {
-  if (!searchViewModel.isGridster()) {
-    window.clearTimeout(resizeTimeout);
-    resizeTimeout = window.setTimeout(resizeFieldsListCallback, 200);
-  }
+  window.clearTimeout(resizeTimeout);
+  resizeTimeout = window.setTimeout(resizeFieldsListCallback, 200);
 }
 
 function resizeFieldsList() {
