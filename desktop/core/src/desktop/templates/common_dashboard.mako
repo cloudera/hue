@@ -223,7 +223,7 @@
           <a href="javascript:void(0)" class="remove-widget" data-bind="publish: { 'gridster.remove': $data }"><i class="fa fa-times"></i></a>
         </div>
       </h2>
-      <div class="empty-content" data-bind="droppable: { data: function(w) { huePubSub.publish('gridster.empty.drop', { widget: w, target: $data }); }, options: { greedy:true, hoverClass: 'droppable-hover', drop: function(){ huePubSub.publish('gridster.added.widget'); } }}, css: { 'query-builder': $root.isQueryBuilder }">
+      <div class="empty-content" data-bind="droppable: { data: function(w) { huePubSub.publish('gridster.empty.drop', { widget: w, target: $data }); }, options: { disabled: $root.hasNewAdd(), greedy: true, hoverClass: 'droppable-hover', drop: function(){ huePubSub.publish('gridster.added.widget'); } }}, css: { 'query-builder': $root.isQueryBuilder }">
         % if USE_NEW_ADD_METHOD.get():
         <!-- ko with: emptyProperties -->
         <div class="edit-dimensions">
