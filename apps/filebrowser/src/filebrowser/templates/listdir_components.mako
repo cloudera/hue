@@ -2256,6 +2256,18 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
+        var isMoveOnSelf = false;
+        $(viewModel.selectedFiles()).each(function (index, file) {
+          if (file.path == $('#moveDestination').val()) {
+            isMoveOnSelf = true;
+            return false;
+          }
+        });
+        if(isMoveOnSelf){
+          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          $('#moveDestination').val('');
+          return false;
+        }
         return true;
       });
 

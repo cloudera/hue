@@ -1164,6 +1164,8 @@ def move(request):
     params = ['src_path']
     def bulk_move(*args, **kwargs):
         for arg in args:
+            if arg['src_path'] == arg['dest_path']:
+                raise PopupException(_('Source path and destination path cannot be same'))
             request.fs.rename(urllib.unquote(arg['src_path']), urllib.unquote(arg['dest_path']))
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
