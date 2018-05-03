@@ -149,6 +149,8 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(SUB_PATH2_2))
     assert_true(self.cluster.fs.exists(SUB_PATH2_3))
 
+    response = self.c.post('/filebrowser/move', dict(src_path=[SUB_PATH1_2, SUB_PATH1_3], dest_path=SUB_PATH1_2))
+    assert_equal(500, response.status_code)
 
   def test_copy(self):
     prefix = self.cluster.fs_prefix + '/test-copy'
