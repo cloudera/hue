@@ -231,7 +231,11 @@ ${layout.menubar(section='users')}
           % if is_embeddable:
           $usersComponents.find('.sync-ldap form').ajaxForm({
             dataType:  'json',
+            beforeSend: function (xhr) {
+              $usersComponents.find('input[type="submit"]').attr('disabled','disabled');
+            },
             success: function(data) {
+              $usersComponents.find('input[type="submit"]').removeAttr("disabled");
               if (data && data.status == -1) {
                 renderUseradminErrors(data.errors);
               }
@@ -240,6 +244,9 @@ ${layout.menubar(section='users')}
                 $.jHueNotify.info("${ _('The users and groups were updated correctly.') }")
                 $usersComponents.find(".sync-ldap").modal("hide");
               }
+            },
+            error: function(data) {
+              $usersComponents.find('input[type="submit"]').removeAttr("disabled");
             }
           });
           % endif
