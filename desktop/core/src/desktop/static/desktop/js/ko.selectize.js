@@ -76,6 +76,10 @@ ko.bindingHandlers.selectize = {
       }
     }
 
+    if (!options.hasOwnProperty('dropdownParent')) {
+      options.dropdownParent = 'body';
+    }
+
     var $select = $(element).selectize(options)[0].selectize;
 
     if (typeof allBindingsAccessor.get('value') == 'function') {
