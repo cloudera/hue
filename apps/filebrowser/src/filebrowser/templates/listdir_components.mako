@@ -636,7 +636,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !$root.isS3()}"></a></strong>
+        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !isBucket()}"></a></strong>
         <!-- /ko -->
       </td>
       <td>
@@ -841,7 +841,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           replication: file.stats.replication
         },
         isBucket: ko.pureComputed(function(){
-          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1
+          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1
         }),
         selected: ko.observable(file.highlighted && viewModel.isArchive(file.name) || false),
         highlighted: ko.observable(file.highlighted || false),
@@ -1329,7 +1329,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.searchQuery("");
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
           updateHash(stripHashes(file.path));
-        } else {   
+        } else {
           %if is_embeddable:
           huePubSub.publish('open.link', file.url);
           %else:
@@ -1422,6 +1422,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             error: function(xhr){
               $.jHueNotify.error(xhr.responseText);
               resetPrimaryButtonsStatus();
+              $('#moveDestination').val('');
             }
           });
 
@@ -1455,6 +1456,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
         else {
           $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          $('#moveDestination').val('');
         }
       };
 
