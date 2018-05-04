@@ -1793,7 +1793,7 @@ ${ assist.assistPanel() }
           if (format.value == 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
-          else if (format.value == 'index' && ['file', 'query', 'table', 'stream'].indexOf(wizard.source.inputFormat()) == -1) {
+          else if (format.value == 'index' && ['file', 'query', 'table', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
           if (format.value == 'hbase' && wizard.source.inputFormat() != 'rdbms') {

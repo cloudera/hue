@@ -356,6 +356,8 @@ def _small_indexing(user, fs, client, source, destination, index_name):
       fetch_handle = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over) # Assumes handle still live
       rows = searcher.update_data_from_hive(index_name, columns, fetch_handle=fetch_handle, indexing_options=kwargs)
       # TODO if rows == MAX_ROWS truncation warning
+    elif source['inputFormat'] == 'manual':
+      pass # No need to do anything
     else:
       response = client.index(name=index_name, data=data, **kwargs)
       errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
