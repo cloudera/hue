@@ -53,8 +53,8 @@ def get_api(user):
 
 class JobServerApi(object):
 
-  def __init__(self, oozie_url):
-    self._url = posixpath.join(oozie_url)
+  def __init__(self, livy_url):
+    self._url = posixpath.join(livy_url)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = SECURITY_ENABLED.get()
