@@ -164,7 +164,6 @@ class EnvelopeIndexer(object):
             type = solr
             connection = "%(connection)s"
             collection.name = "%(collectionName)s"
-        }
         }""" % properties
     else:
       raise PopupException(_('Output format not recognized: %(ouputFormat)s') % properties)

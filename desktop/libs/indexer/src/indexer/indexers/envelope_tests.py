@@ -143,7 +143,7 @@ def test_generate_from_stream_kafka_to_solr_index():
     'kafkaFieldTypes': 'int,string',
 
     'ouputFormat': 'index',
-    'connection': 'http://self-service-analytics.hue.com:8983/solr/',
+    'connection': 'http://hue.com:8983/solr/',
     'collectionName': 'traffic'
   }
 
@@ -177,9 +177,8 @@ def test_generate_from_stream_kafka_to_solr_index():
         }
         output {
             type = solr
-            connection = "http://self-service-analytics.hue.com:8983/solr/"
+            connection = "http://hue.com:8983/solr/"
             collection.name = "traffic"
-        }
         }
     }
 }''' in  config, config)
