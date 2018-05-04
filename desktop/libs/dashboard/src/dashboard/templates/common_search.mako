@@ -2687,16 +2687,27 @@ ${ dashboard.layout_skeleton(suffix='search') }
               </div>
             </div>
 
-            <!-- ko if: $root.collection.engine() == 'solr' -->
+            ## Potentially useful for regular search and not analytic search
+            ##<!-- ko if: $root.collection.engine() == 'solr' -->
+            ##<div class="control-group">
+            ##  <label class="control-label">${ _('Autocomplete') }</label>
+            ##  <div class="controls">
+            ##    <label class="checkbox" style="padding-top:0">
+            ##      <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled">
+            ##      <span data-bind="visible: $root.collection.suggest.enabled">
+            ##        ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="textInput: $root.collection.suggest.dictionary, tagsNotAllowed" placeholder="${ _('Dictionary name or blank for default') }">
+            ##      </span>
+            ##    </label>
+            ##  </div>
+            ##</div>
             <div class="control-group">
-              <label class="control-label">${ _('Autocomplete') }</label>
+              <label class="control-label">
+                ${ _('Auto-refresh') }
+              </label>
               <div class="controls">
-                <label class="checkbox" style="padding-top:0">
-                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled">
-                  <span data-bind="visible: $root.collection.suggest.enabled">
-                    ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="textInput: $root.collection.suggest.dictionary, tagsNotAllowed" placeholder="${ _('Dictionary name or blank for default') }">
-                  </span>
-                </label>
+              <label class="checkbox inline-block">
+                <input type="checkbox" data-bind="checked: $root.collection.autorefresh"/> ${ _('every') } <input type="number" class="input-mini" data-bind="textInput: $root.collection.autorefreshSeconds, enable: $root.collection.autorefresh"/> ${ _('seconds') }
+              </label>
               </div>
             </div>
             <!-- ko if: $root.collection.supportAnalytics -->
@@ -2872,22 +2883,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
                   <input type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:ss[Z]'}" />
                 </div>
               </div>
-              <!-- ko if: collection.timeFilter.type() == 'rolling' -->
-              <div class="control-group">
-                <div class="controls">
-                  <label class="checkbox inline-block">
-                    <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="textInput: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
-                  </label>
-                </div>
-              </div>
-              <!-- /ko -->
             </span>
-
-            <!-- ko if: $root.availableDateFields().length == 0 -->
-              <label class="checkbox inline-block">
-                <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="textInput: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
-              </label>
-            <!-- /ko -->
           </fieldset>
         </form>
 
