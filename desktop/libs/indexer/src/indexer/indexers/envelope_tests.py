@@ -103,13 +103,13 @@ def test_generate_from_stream_sfdc_to_hive_table():
         input {
             type = sfdc
             mode = fetch-all
-            sobject = %(streamObject)s
+            sobject = Opportunities
             sfdc: {
               partner: {
-                username = "%(streamUsername)s"
-                password = "%(streamPassword)s"
-                token = "%(streamToken)s"
-                auth-endpoint = "%(streamEndpointUrl)s"
+                username = "test"
+                password = "test"
+                token = "token"
+                auth-endpoint = "http://sfdc/api"
               }
             }
   
@@ -125,5 +125,61 @@ def test_generate_from_stream_sfdc_to_hive_table():
               type = hive
               table.name = "sfdc"
           }
+    }
+}''' in  config, config)
+  
+
+def test_generate_from_stream_kafka_to_solr_index():
+  properties = {
+    'app_name': 'Ingest',
+
+    'inputFormat': 'stream',
+    'streamSelection': 'kafka',
+    'brokers': 'broker:9092',
+    'topics': 'kafkaTopic',
+    'kafkaFieldType': 'delimited',
+    'kafkaFieldDelimiter': ',',
+    'kafkaFieldNames': 'id,name',
+    'kafkaFieldTypes': 'int,string',
+
+    'ouputFormat': 'index',
+    'connection': 'http://self-service-analytics.hue.com:8983/solr/',
+    'collectionName': 'traffic'
+  }
+
+  config = EnvelopeIndexer(username='test').generate_config(properties)
+
+  assert_true('''steps {
+    inputdata {
+        input {
+            type = kafka
+                brokers = "broker:9092"
+                topics = kafkaTopic
+                encoding = string
+                translator {
+                    type = delimited
+                    delimiter = ","
+                    field.names = [id,name]
+                    field.types = [int,string]
+                }
+                window {
+                    enabled = true
+                    milliseconds = 60000
+                }
+        
+        }
+    }
+
+    outputdata {
+        dependencies = [inputdata]
+        planner {
+            type = upstert
+        }
+        output {
+            type = solr
+            connection = "http://self-service-analytics.hue.com:8983/solr/"
+            collection.name = "traffic"
+        }
+        }
     }
 }''' in  config, config)

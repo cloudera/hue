@@ -331,7 +331,7 @@ ${ assist.assistPanel() }
             <!-- ko if: createWizard.source.streamSelection() == 'kafka' -->
               <div class="control-group">
                 <label class="control-label"><div>${ _('Topics') }</div>
-                  <select data-bind="options: createWizard.source.kafkaTopics,
+                  <select class="input-xxlarge" data-bind="options: createWizard.source.kafkaTopics,
                          value: createWizard.source.kafkaSelectedTopics,
                          optionsCaption: 'Choose...'"
                          placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
@@ -1793,7 +1793,7 @@ ${ assist.assistPanel() }
           if (format.value == 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
-          else if (format.value == 'index' && ['file', 'query', 'table'].indexOf(wizard.source.inputFormat()) == -1) {
+          else if (format.value == 'index' && ['file', 'query', 'table', 'stream'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
           if (format.value == 'hbase' && wizard.source.inputFormat() != 'rdbms') {

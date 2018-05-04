@@ -107,7 +107,7 @@ class EnvelopeIndexer(object):
                 auth-endpoint = "%(streamEndpointUrl)s"
               }
             }
-  """
+  """ % properties
       else:
         raise PopupException(_('Stream format of %(inputFormat)s not recognized: %(streamSelection)s') % properties)
     elif properties['inputFormat'] == 'file':
@@ -155,8 +155,19 @@ class EnvelopeIndexer(object):
               type = hive
               table.name = "%(output_table)s"
           }""" % properties
+    elif properties['ouputFormat'] == 'index':
+      output = """dependencies = [inputdata]
+        planner {
+            type = upstert
+        }
+        output {
+            type = solr
+            connection = "%(connection)s"
+            collection.name = "%(collectionName)s"
+        }
+        }""" % properties
     else:
-      raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
+      raise PopupException(_('Output format not recognized: %(ouputFormat)s') % properties)
       
     return """
 application {

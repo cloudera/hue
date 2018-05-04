@@ -519,6 +519,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
     elif destination['outputFormat'] == 'file':
       properties['path'] = file_format["path"]
       properties['format'] = file_format['tableFormat'] # or csv
+      
 
   properties["app_name"] = 'Data Ingest'
   properties["inputFormat"] = file_format['inputFormat']
