@@ -35,7 +35,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
-from metadata.conf import has_navigator, has_kafka
+from metadata.conf import has_navigator, has_kafka_api
 from metadata.navigator_client import NavigatorApiException
 
 
@@ -91,16 +91,16 @@ def list_topic(request):
 
 
 def get_topics():
-  if has_kafka():
+  if has_kafka_api():
     return KafkaApi().topics()
   else:
     manager = ManagerApi()
     broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
-    return manager.get_kafka_topics(broker_host).keys()
+    return [name for name in manager.get_kafka_topics(broker_host).keys() if not name.startswith('__')]
 
 
 def get_topic(name):
-  if has_kafka() and False:
+  if has_kafka_api():
     pass
   else:
     manager = ManagerApi()

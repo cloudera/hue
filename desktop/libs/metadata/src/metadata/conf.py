@@ -66,6 +66,9 @@ def has_navigator(user):
 
 
 def has_kafka():
+  return KAFKA.IS_ENABLED.get()
+
+def has_kafka_api():
   return bool(KAFKA.API_URL.get())
 
 
@@ -398,11 +401,17 @@ MANAGER = ConfigSection(
 
 KAFKA = ConfigSection(
   key='kafka',
-  help=_t("""Configuration options for Kafka API"""),
+  help=_t("""Configuration options for Kafka management"""),
   members=dict(
+    IS_ENABLED = Config(
+      key="is_enabled",
+      help=_t("Enable the Kafka integration."),
+      type=coerce_bool,
+      default=False
+    ),
     API_URL=Config(
       key='api_url',
-      help=_t('Base URL to API.'),
+      help=_t('Base URL of Kafka REST API.'),
       default=None),
   )
 )

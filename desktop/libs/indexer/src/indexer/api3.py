@@ -237,8 +237,8 @@ def guess_field_types(request):
     if file_format['streamSelection'] == 'kafka':
       data = """%(kafkaFieldNames)s
 %(data)s""" % {
-        'kafkaFieldNames': file_format['kafkaFieldNames'],
-        'data': '\n'.join([','.join(['...'] * len(file_format['kafkaFieldTypes'].split(',')))] * 5)
+        'kafkaFieldNames': file_format.get('kafkaFieldNames', ''),
+        'data': '\n'.join([','.join(['...'] * len(file_format.get('kafkaFieldTypes', '').split(',')))] * 5)
       }
     elif file_format['streamSelection'] == 'sfdc':
       data = """AccountId,Amount,CampaignId,CloseDate,CreatedById,CreatedDate,CurrentGenerators__c,DeliveryInstallationStatus__c,Description,ExpectedRevenue,Fiscal,FiscalQuarter,FiscalYear,ForecastCategory,ForecastCategoryName,HasOpenActivity,HasOpportunityLineItem,HasOverdueTask,Id,IsClosed,IsDeleted,IsPrivate,IsWon,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,LeadSource,MainCompetitors__c,Name,NextStep,OrderNumber__c,OwnerId,Pricebook2Id,Probability,StageName,SystemModstamp,TotalOpportunityQuantity,TrackingNumber__c,Type

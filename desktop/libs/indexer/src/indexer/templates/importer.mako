@@ -231,7 +231,7 @@ ${ assist.assistPanel() }
               <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
-              <a data-bind="hueLink: '/filebrowser/view=' + createWizard.source.path()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
+              <a data-bind="storageContextPopover: { path: createWizard.source.path(), offset: { right: 5 } }" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
