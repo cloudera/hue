@@ -115,7 +115,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <th width="1%" class="vertical-align-middle">
         <div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div>
       </th>
-      <th width="20%">${_('Name')}</th>      
+      <th width="20%">${_('Name')}</th>
       <th width="6%">${_('User')}</th>
       <th width="6%">${_('Type')}</th>
       <th width="5%">${_('Status')}</th>
@@ -130,7 +130,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
         <td data-bind="click: function() {}, clickBubble: false">
           <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
-        </td>        
+        </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: user"></td>
         <td data-bind="text: type"></td>
@@ -1333,8 +1333,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
-              <span data-bind="text: name"></span>
+            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
             </a>
           </li>
           <!-- /ko -->
@@ -1544,8 +1544,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
-              <span data-bind="text: name"></span>
+            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
             </a>
           </li>
           <!-- /ko -->
@@ -1670,8 +1670,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
-              <span data-bind="text: name"></span>
+            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
             </a>
           </li>
           <!-- /ko -->
