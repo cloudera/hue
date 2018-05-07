@@ -165,7 +165,18 @@ ${ assist.assistPanel() }
           </div>
           <div class="caption">
             <!-- ko if: createWizard.source.inputFormat() != 'manual' -->
-            ${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span> <span data-bind="text: createWizard.source.path"></span>
+              ${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span>
+              <!-- ko if: createWizard.source.inputFormat() == 'file' -->
+                <span data-bind="text: createWizard.source.path"></span>
+              <!-- /ko -->
+              <!-- ko if: createWizard.source.inputFormat() == 'stream' -->
+                <!-- ko if: createWizard.source.streamSelection() == 'kafka' -->
+                  <span data-bind="text: createWizard.source.kafkaSelectedTopics"></span>
+                <!-- /ko -->
+                <!-- ko if: createWizard.source.streamSelection() != 'kafka' -->
+                  <span data-bind="text: createWizard.source.streamSelection"></span>
+                <!-- /ko -->
+              <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: createWizard.source.inputFormat() == 'manual' -->
             ${ _('No source data') }
