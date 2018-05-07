@@ -187,6 +187,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
                 <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
                 <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
+                <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
                 <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                 <!-- ko case: 'text' -->Text<!-- /ko -->
                 <!-- ko case: $default -->SQL<!-- /ko -->
@@ -2850,6 +2851,12 @@ function togglePresentation(value) {};
           sqlDialect: true
         },
         solr: {
+          placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
+          aceMode: 'ace/mode/mysql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        kafkasql: {
           placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
           aceMode: 'ace/mode/mysql',
           snippetIcon: 'fa-database',

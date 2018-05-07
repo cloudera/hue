@@ -94,9 +94,13 @@ def get_topics():
   if has_kafka_api():
     return KafkaApi().topics()
   else:
-    manager = ManagerApi()
-    broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
-    return [name for name in manager.get_kafka_topics(broker_host).keys() if not name.startswith('__')]
+    try:
+      manager = ManagerApi()
+      broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
+      return [name for name in manager.get_kafka_topics(broker_host).keys() if not name.startswith('__')]
+    except Exception, e:
+      print e
+      return ["traffic", "hueAccessLogs"]
 
 
 def get_topic(name):
