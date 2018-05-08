@@ -16,6 +16,7 @@
 from __future__ import absolute_import
 
 import logging
+import os
 import re
 
 import boto.utils
@@ -180,8 +181,15 @@ def is_enabled():
 
 
 def has_iam_metadata():
-  metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
-  return 'iam' in metadata
+  try:
+    # To avoid unnecessary network call, check if Hue is running on EC2 instance
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
+    if os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3] == 'ec2':
+      metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
+      return 'iam' in metadata
+  except Exception, e:
+    LOG.exception("Encountered error when checking IAM metadata: %s" % e)
+  return False
 
 
 def has_s3_access(user):
