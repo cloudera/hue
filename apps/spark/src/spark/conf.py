@@ -29,11 +29,18 @@ LOG = logging.getLogger(__name__)
 
 
 # Livy
+LIVY_SERVER_URL = Config(
+  key="livy_server_url",
+  help=_t("The Livy Server URL."),
+  default="")
+
+# Deprecated
 LIVY_SERVER_HOST = Config(
   key="livy_server_host",
   help=_t("Host address of the Livy Server."),
   default="localhost")
 
+# Deprecated
 LIVY_SERVER_PORT = Config(
   key="livy_server_port",
   help=_t("Port of the Livy Server."),
@@ -64,7 +71,11 @@ SQL_SERVER_PORT = Config(
 
 
 def get_livy_server_url():
-  return 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
+  url = LIVY_SERVER_URL.get()
+  if not url:
+    # backward compatibility
+    url = 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
+  return url
 
 def get_spark_status(user):
   from spark.job_server_api import get_api
