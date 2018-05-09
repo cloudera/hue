@@ -34,11 +34,13 @@ LIVY_SERVER_URL = Config(
   help=_t("The Livy Server URL."),
   default="")
 
+# Deprecated
 LIVY_SERVER_HOST = Config(
   key="livy_server_host",
   help=_t("Host address of the Livy Server."),
   default="localhost")
 
+# Deprecated
 LIVY_SERVER_PORT = Config(
   key="livy_server_port",
   help=_t("Port of the Livy Server."),
