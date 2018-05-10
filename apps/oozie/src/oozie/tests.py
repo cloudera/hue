@@ -3830,6 +3830,13 @@ class TestUtils(OozieMockBase):
     assert_equal('${output}', smart_path('${output}', {'output': '${path}'}))
     assert_equal('${output_dir}', smart_path('${output_dir}', {'output': '/path/out', 'output_dir': 'hdfs://nn/path/out'}))
 
+    assert_equal('${nameNode}/user/${wf:user()}/out', smart_path(' out', {'output': '/path/out'}))
+    assert_equal('${nameNode}/user/${wf:user()}/out', smart_path('  out  ', {'output': '/path/out'}))
+    assert_equal('hdfs://nn${output}', smart_path(' hdfs://nn${output}', {'output': '/path/out'}))
+    assert_equal('hdfs://nn${output}', smart_path(' hdfs://nn${output}  ', {'output': '/path/out'}))
+    assert_equal('${output}', smart_path('${output}', None))
+
+
   def test_contains_symlink(self):
     assert_false(contains_symlink('out', {'output': '/path/out'}))
     assert_true(contains_symlink('out#out', {'output': '/path/out'}))

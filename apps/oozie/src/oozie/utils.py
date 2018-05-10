@@ -107,6 +107,7 @@ def smart_path(path, mapping=None, is_coordinator=False):
   if mapping is None:
     mapping = {}
 
+  path = path.strip()
   if not path.startswith('$') and not path.startswith('/') and not urlparse.urlsplit(path).scheme:
     path = '/user/%(username)s/%(path)s' % {
         'username': '${coord:user()}' if is_coordinator else '${wf:user()}',
