@@ -18,6 +18,7 @@
 import chardet
 import json
 import logging
+import urllib
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -78,15 +79,16 @@ def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
+    path = urllib.unquote(file_format["path"])
     indexer = MorphlineIndexer(request.user, request.fs)
-    if not request.fs.isfile(file_format["path"]):
+    if not request.fs.isfile(path):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
 
-    stream = request.fs.open(file_format["path"])
+    stream = request.fs.open(path)
     format_ = indexer.guess_format({
       "file": {
         "stream": stream,
-        "name": file_format['path']
+        "name": path
       }
     })
     _convert_format(format_)
@@ -124,7 +126,8 @@ def guess_field_types(request):
 
   if file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
-    stream = request.fs.open(file_format["path"])
+    path = urllib.unquote(file_format["path"])
+    stream = request.fs.open(path)
     encoding = chardet.detect(stream.read(10000)).get('encoding')
     stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
@@ -132,7 +135,7 @@ def guess_field_types(request):
     format_ = indexer.guess_field_types({
       "file": {
           "stream": stream,
-          "name": file_format['path']
+          "name": path
         },
       "format": file_format['format']
     })
@@ -207,7 +210,9 @@ def importer_submit(request):
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
   if source['inputFormat'] == 'file':
-    source['path'] = request.fs.netnormpath(source['path']) if source['path'] else source['path']
+    if source['path']:
+      path = urllib.unquote(source['path'])
+      source['path'] = request.fs.netnormpath(path)
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
@@ -250,7 +255,8 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   errors = []
 
   if source['inputFormat'] not in ('manual', 'table', 'query_handle'):
-    stats = fs.stats(source["path"])
+    path = urllib.unquote(source["path"])
+    stats = fs.stats(path)
     if stats.size > MAX_UPLOAD_SIZE:
       raise PopupException(_('File size is too large to handle!'))
 
@@ -292,7 +298,8 @@ def _small_indexing(user, fs, client, source, destination, index_name):
     )
 
   if source['inputFormat'] == 'file':
-    data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
+    path = urllib.unquote(source["path"])
+    data = fs.read(path, 0, MAX_UPLOAD_SIZE)
 
   if client.is_solr_six_or_more():
     kwargs['processor'] = 'tolerant'
@@ -387,7 +394,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'file':
-    input_path = '${nameNode}%s' % file_format["path"]
+    input_path = '${nameNode}%s' % urllib.unquote(file_format["path"])
   else:
     input_path = None
 
