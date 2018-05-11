@@ -1005,6 +1005,10 @@
     if (fHideStacked) {
       fHideStacked.call(_chart);
     }
+    var fTooltips = _chart.tooltips;
+    if (fTooltips) {
+      fTooltips.call(_chart, _hideStacked);
+    }
     if (_chart.selectBars) {
       var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
       var bHasSelection = false;
@@ -1077,6 +1081,21 @@
         if (typeof options.onClick != "undefined") {
           huePubSub.publish('charts.state', { updating: true });
           options.onClick(d.point);
+        }
+      });
+      _chart.multibar.dispatch.on('elementMouseover.tooltip', function(e) {
+        var _hideStacked = options.hideStacked !== null ? typeof options.hideStacked === 'function' ? options.hideStacked() : options.hideStacked : false;
+        if (!_hideStacked) {
+          $('a[href=\'#nv-detail-mouseover\']').tab('show');
+          var values = _chart.tooltipContent()((e.list || [e]).map(function (e) {
+            var x = _chart.multibar.x()(e.point, e.pointIndex),
+            y = _chart.multibar.y()(e.point, e.pointIndex);
+            return {x: x, y: y, key: e.series.key};
+          }));
+          var content = values.map(function (value) {
+            return '<p><b>' + hueUtils.htmlEncode(value.key) + '</b>: ' +  hueUtils.htmlEncode(value.y) + '</p>';
+          }).join("") + '<h3>' + hueUtils.htmlEncode(values[0] && values[0].x) + '</h3>';
+          $('#nv-detail-mouseover .tab-pane-content').html(content);
         }
       });
       _chart.onStateChange(options.onStateChange);
