@@ -402,7 +402,7 @@ nv.models.multiBarWithBrushChart = function() {
           g.select('.nv-x.nv-axis').transition()
               .call(xAxis);
 
-          var xTicks = g.select('.nv-x.nv-axis > g').selectAll('g');
+          var xTicks = g.selectAll('.nv-x.nv-axis g.tick');
 
           xTicks
               .selectAll('line, text')
@@ -758,6 +758,7 @@ nv.models.multiBarWithBrushChart = function() {
   chart.legend = legend;
   chart.xAxis = xAxis;
   chart.yAxis = yAxis;
+  chart.xScale = multibar.xScale;
   chart.LABELS = LABELS;
 
   d3v3.rebind(chart, multibar, 'x', 'y', 'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'clipEdge',

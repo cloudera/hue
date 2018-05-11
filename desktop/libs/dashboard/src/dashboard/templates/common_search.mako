@@ -1259,6 +1259,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div style="position: relative;">
       <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), enableSelection: true, field: field, label: label(), transformer: timelineChartDataTransformer,
         type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
+        hideSelection: true,
+        hideStacked: hideStacked,
         fqs: $root.query.fqs,
         onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); $root.collection.getFacetById($parent.id()).properties.enableSelection(state.selectionEnabled); },
@@ -1336,6 +1338,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div style="position: relative;">
     <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
       fqs: $root.query.fqs,
+      enableSelection: true,
+      hideSelection: true,
+      hideStacked: hideStacked,
       transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
       onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
       onClick: function(d) {
@@ -1821,6 +1826,37 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- /ko -->
 </script>
 
+
+<script type="text/html" id="line-widget">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <i class="fa fa-spinner fa-spin"></i>
+  </div>
+
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
+    </div>
+    <div class="clearfix"></div>
+    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
+      <span class="facet-field-label">${ _('Zoom') }</span>
+      <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+    </div>
+    <div style="position: relative;">
+    <div data-bind="lineChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, field: field, label: label(),
+      transformer: lineChartDataTransformer,
+      onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}"
+    />
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="pie-widget">
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
@@ -2031,8 +2067,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'stack' -->
+        <div style="position: relative;">
         <div data-bind="barChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(),
           isPivot: true,
+          enableSelection: true,
+          hideSelection: true,
           fqs: $root.query.fqs,
           transformer: pivotChartDataTransformer,
           onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
@@ -2041,6 +2080,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           },
           onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); }}"
         />
+        </div>
       <div class="clearfix"></div>
       <!-- /ko -->
     </div>

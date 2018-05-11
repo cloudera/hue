@@ -1640,8 +1640,6 @@ var Collection = function (vm, collection) {
     var facet = self.getFacetById(data.widget_id);
 
     if (facet.properties.isDate()) {
-      facet.properties.start(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
-      facet.properties.end(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
       facet.properties.min(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
       facet.properties.max(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
     }
