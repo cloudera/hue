@@ -50,6 +50,7 @@ nv.models.multiBarWithBrushChart = function() {
     , tooltips = true
     , tooltip = null
     , minTickWidth = 60
+    , tooltipContent = null
     , tooltipSingle = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -107,14 +108,14 @@ nv.models.multiBarWithBrushChart = function() {
 
   var showTooltip = function(e, offsetElement) {
     var values;
-    if (!tooltip) {
+    if (!tooltipContent) {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(multibar.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex));
         return {x: x, y: y, key: e.series.key};
       });
     } else {
-      values = tooltip((e.list || [e]).map(function (e) {
+      values = tooltipContent((e.list || [e]).map(function (e) {
         var x = multibar.x()(e.point, e.pointIndex),
         y = multibar.y()(e.point, e.pointIndex);
         return {x: x, y: y, key: e.series.key};
@@ -222,6 +223,11 @@ nv.models.multiBarWithBrushChart = function() {
       gEnter.append('g').attr('class', 'nv-x nv-axis');
       gEnter.append('g').attr('class', 'nv-y nv-axis');
       gEnter.append('g').attr('class', 'nv-barsWrap');
+      gEnter.append('g').attr('class', 'nv-mouseover')
+      .append('line')
+      .attr('stroke-dasharray', '5, 5')
+      .style('stroke', 'rgba(0,0,0,0.5)')
+      .style('stroke-width', '1');
       // We put the legend in an another SVG to support scrolling
       var legendDiv = d3.select(container.node().parentNode).select('div');
       var legendSvg = legendDiv.select('svg').size() === 0 ? legendDiv.append('svg') : legendDiv.select('svg');
@@ -251,10 +257,25 @@ nv.models.multiBarWithBrushChart = function() {
             .datum(data)
             .call(legend)
           .selectAll('text')
+          .text(function (d) {
+            return d.key && d.key.substring(0, 15)
+          })
           .append('title')
           .text(function(d){
             return d.key;
           });
+          legendG.selectAll('g.nv-series')
+          .append('text')
+          .text(function (d, i) {
+            return d.values[0].y;
+          })
+          .attr('dx', 125)
+          .attr('dy', '.32em')
+          .attr('text-anchor', 'end')
+          .append('title')
+          .text(function (d, i) {
+            return d.values[0].y;
+          })
         }
         catch (e){}
       }
@@ -516,7 +537,7 @@ nv.models.multiBarWithBrushChart = function() {
       });
 
       dispatch.on('tooltipShow', function(e) {
-        if (tooltips) showTooltip(e, that.parentNode)
+        showTooltip(e, that.parentNode)
       });
 
       // Update chart from a state object passed to event handler
@@ -646,6 +667,13 @@ nv.models.multiBarWithBrushChart = function() {
             return fGetNumericValue(getX(rect)) === fGetNumericValue(getX(d)) && d.series === rect.series;
           });
         });
+        var mouse_x = d3v3.mouse(this)[0];
+        container.select('g.nv-mouseover line')
+        .attr('x1', mouse_x)
+        .attr('y1', 0)
+        .attr('x2', mouse_x)
+        .attr('y2', availableHeight);
+
         // If there's rectangle with the hover class that are not the target, remove the class and dispatch mouseout
         var others = container.selectAll('g.nv-wrap.nv-multiBarWithLegend rect.hover').filter(function(rect) {
           return !el || !el.some(function(d) {
@@ -862,8 +890,8 @@ nv.models.multiBarWithBrushChart = function() {
   };
 
   chart.tooltipContent = function(_) {
-    if (!arguments.length) return tooltip;
-    tooltip = _;
+    if (!arguments.length) return tooltipContent;
+    tooltipContent = _;
     return chart;
   };
 
