@@ -196,6 +196,15 @@ class OozieApi(object):
     return self._root.get('job/%s' % (jobid,), params)
 
 
+  def get_job_graph(self, jobid, format='svg'):
+    params = self._get_params()
+    params['show'] = 'graph'
+    params['show-kill'] = 'true'
+    params['format'] = format
+    svg_data = self._root.get('job/%s' % (jobid,), params)
+    return svg_data
+
+
   def get_job_status(self, jobid):
     params = self._get_params()
     params['show'] = 'status'

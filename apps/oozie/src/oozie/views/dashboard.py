@@ -395,6 +395,11 @@ def list_oozie_workflow(request, job_id):
     }
     return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
 
+  if request.GET.get('format') == 'svg':
+    oozie_api = get_oozie(request.user, api_version="v2")
+    svg_data = oozie_api.get_job_graph(job_id)
+    return HttpResponse(svg_data)
+
   if request.GET.get('graph'):
     return render('dashboard/list_oozie_workflow_graph.mako', request, {
       'oozie_workflow': oozie_workflow,
