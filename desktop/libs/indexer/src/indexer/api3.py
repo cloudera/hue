@@ -23,6 +23,7 @@ import StringIO
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from simple_salesforce.api import Salesforce
 
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
@@ -135,22 +136,12 @@ def guess_format(request):
     if file_format['streamSelection'] == 'kafka':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()}
     elif file_format['streamSelection'] == 'sfdc':
-      stream = StringIO.StringIO()
-      stream.write("""AccountId,Amount,CampaignId,CloseDate,CreatedById,CreatedDate,CurrentGenerators__c,DeliveryInstallationStatus__c,Description,ExpectedRevenue,Fiscal,FiscalQuarter,FiscalYear,ForecastCategory,ForecastCategoryName,HasOpenActivity,HasOpportunityLineItem,HasOverdueTask,Id,IsClosed,IsDeleted,IsPrivate,IsWon,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,LeadSource,MainCompetitors__c,Name,NextStep,OrderNumber__c,OwnerId,Pricebook2Id,Probability,StageName,SystemModstamp,TotalOpportunityQuantity,TrackingNumber__c,Type
-0014600000Ctb1UAAR,30000.0,,1489968000000,005460000012t2xAAA,1490625405000,,In progress,,30000.0,2015 2,2,2015,Closed,Closed,false,false,false,00646000003Ymn1AAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,,GenePoint SLA,,546512,005460000012t2xAAA,,100.0,Closed Won,1490625405000,,,Existing Customer - Upgrade
-0014600000Ctb1NAAR,17000.0,,1486080000000,005460000012t2xAAA,1490625405000,,,,1700.0,2017 1,1,2017,Pipeline,Pipeline,false,false,false,00646000003YmmoAAC,false,false,false,false,,005460000012t2xAAA,1491321348000,,,Purchased List,Honda,Dickenson Mobile Generators,,,005460000012t2xAAA,,10.0,Qualification,1491389012000,,,New Customer
-0014600000Ctb1PAAR,915000.0,,1488326400000,005460000012t2xAAA,1490625405000,John Deere,Completed,,915000.0,2015 2,2,2015,Closed,Closed,false,false,false,00646000003Ymn7AAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,"John Deere, Mitsubishi, Hawkpower",United Oil Refinery Generators,,744343,005460000012t2xAAA,,100.0,Closed Won,1491389012000,,830150301360,New Customer
-0014600000Ctb1UAAR,85000.0,,1485302400000,005460000012t2xAAA,1490625405000,Honda,Completed,,85000.0,2015 1,1,2015,Closed,Closed,false,false,false,00646000003YmmrAAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,Honda,GenePoint Standby Generator,,908676,005460000012t2xAAA,,100.0,Closed Won,1490625405000,,830150301420,New Customer
-0014600000Ctb1MAAR,100000.0,,1485734400000,005460000012t2xAAA,1490625405000,,,,10000.0,2015 1,1,2015,Pipeline,Pipeline,false,false,false,00646000003YmmyAAC,false,false,false,false,,005460000012t2xAAA,1490625405000,,,Phone Inquiry,,Pyramid Emergency Generators,,,005460000012t2xAAA,,10.0,Prospecting,1490625405000,,,""")
-
-      indexer = MorphlineIndexer(request.user, request.fs)
-      format_ = indexer.guess_format({
-        "file": {
-          "stream": stream,
-          "name": file_format['path']
-        }
-      })
-      _convert_format(format_)
+      sf = Salesforce(
+          username=file_format['streamUsername'],
+          password=file_format['streamPassword'],
+          security_token=file_format['streamToken']
+      )
+      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -240,33 +231,44 @@ def guess_field_types(request):
         'kafkaFieldNames': file_format.get('kafkaFieldNames', ''),
         'data': '\n'.join([','.join(['...'] * len(file_format.get('kafkaFieldTypes', '').split(',')))] * 5)
       }
-    elif file_format['streamSelection'] == 'sfdc':
-      data = """AccountId,Amount,CampaignId,CloseDate,CreatedById,CreatedDate,CurrentGenerators__c,DeliveryInstallationStatus__c,Description,ExpectedRevenue,Fiscal,FiscalQuarter,FiscalYear,ForecastCategory,ForecastCategoryName,HasOpenActivity,HasOpportunityLineItem,HasOverdueTask,Id,IsClosed,IsDeleted,IsPrivate,IsWon,LastActivityDate,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,LeadSource,MainCompetitors__c,Name,NextStep,OrderNumber__c,OwnerId,Pricebook2Id,Probability,StageName,SystemModstamp,TotalOpportunityQuantity,TrackingNumber__c,Type
-0014600000Ctb1UAAR,30000.0,,1489968000000,005460000012t2xAAA,1490625405000,,In progress,,30000.0,2015 2,2,2015,Closed,Closed,false,false,false,00646000003Ymn1AAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,,GenePoint SLA,,546512,005460000012t2xAAA,,100.0,Closed Won,1490625405000,,,Existing Customer - Upgrade
-0014600000Ctb1NAAR,17000.0,,1486080000000,005460000012t2xAAA,1490625405000,,,,1700.0,2017 1,1,2017,Pipeline,Pipeline,false,false,false,00646000003YmmoAAC,false,false,false,false,,005460000012t2xAAA,1491321348000,,,Purchased List,Honda,Dickenson Mobile Generators,,,005460000012t2xAAA,,10.0,Qualification,1491389012000,,,New Customer
-0014600000Ctb1PAAR,915000.0,,1488326400000,005460000012t2xAAA,1490625405000,John Deere,Completed,,915000.0,2015 2,2,2015,Closed,Closed,false,false,false,00646000003Ymn7AAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,"John Deere, Mitsubishi, Hawkpower",United Oil Refinery Generators,,744343,005460000012t2xAAA,,100.0,Closed Won,1491389012000,,830150301360,New Customer
-0014600000Ctb1UAAR,85000.0,,1485302400000,005460000012t2xAAA,1490625405000,Honda,Completed,,85000.0,2015 1,1,2015,Closed,Closed,false,false,false,00646000003YmmrAAC,true,false,false,true,,005460000012t2xAAA,1490625405000,,,Partner,Honda,GenePoint Standby Generator,,908676,005460000012t2xAAA,,100.0,Closed Won,1490625405000,,830150301420,New Customer
-0014600000Ctb1MAAR,100000.0,,1485734400000,005460000012t2xAAA,1490625405000,,,,10000.0,2015 1,1,2015,Pipeline,Pipeline,false,false,false,00646000003YmmyAAC,false,false,false,false,,005460000012t2xAAA,1490625405000,,,Phone Inquiry,,Pyramid Emergency Generators,,,005460000012t2xAAA,,10.0,Prospecting,1490625405000,,,"""
+      stream = StringIO.StringIO()
+      stream.write(data)
 
-    stream = StringIO.StringIO()
-    stream.write(data)
+      _convert_format(file_format["format"], inverse=True)
 
-    _convert_format(file_format["format"], inverse=True)
+      indexer = MorphlineIndexer(request.user, request.fs)
+      format_ = indexer.guess_field_types({
+        "file": {
+            "stream": stream,
+            "name": file_format['path']
+          },
+        "format": file_format['format']
+      })
 
-    indexer = MorphlineIndexer(request.user, request.fs)
-    format_ = indexer.guess_field_types({
-      "file": {
-          "stream": stream,
-          "name": file_format['path']
-        },
-      "format": file_format['format']
-    })
-
-    if file_format['streamSelection'] == 'kafka':
       type_mapping = dict(zip(file_format['kafkaFieldNames'].split(','), file_format['kafkaFieldTypes'].split(',')))
       for col in format_['columns']:
         col['keyType'] = type_mapping[col['name']]
         col['type'] = type_mapping[col['name']]
+    elif file_format['streamSelection'] == 'sfdc':
+      sf = Salesforce(
+          username=file_format['streamUsername'],
+          password=file_format['streamPassword'],
+          security_token=file_format['streamToken']
+      )
+      table_metadata = [{
+          'name': column['name'],
+          'type': column['type']
+        } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
+      ]
+      query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
+      print query
+      format_ = {
+        "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in table_metadata
+        ]
+       }
 
   return JsonResponse(format_)
 

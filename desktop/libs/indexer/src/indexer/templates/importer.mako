@@ -394,7 +394,7 @@ ${ assist.assistPanel() }
             <!-- ko if: createWizard.source.streamSelection() == 'sfdc' -->
               <div class="control-group">
                 <label class="control-label"><div>${ _('Username') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamUsername">
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamUsername" placeholder="user@company.com">
                 </label>
 
                 <label class="control-label"><div>${ _('Password') }</div>
@@ -402,7 +402,7 @@ ${ assist.assistPanel() }
                 </label>
 
                 <label class="control-label"><div>${ _('Token') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamToken">
+                  <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.streamToken">
                 </label>
 
                 <label class="control-label"><div>${ _('End point URL') }</div>
@@ -410,10 +410,14 @@ ${ assist.assistPanel() }
                 </label>
 
                 <br/>
-
+                <!-- ko if: createWizard.source.streamUsername() && createWizard.source.streamPassword() && createWizard.source.streamToken() -->
                 <label class="control-label"><div>${ _('Object') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamObject">
+                  <select class="input-xxlarge" data-bind="options: createWizard.source.streamObjects,
+                         value: createWizard.source.streamObject,
+                         optionsCaption: 'Choose...'"
+                         placeholder="${ _('The SFDC object to import, e.g. Account, Opportunity') }"></select>
                 </label>
+                <!-- /ko -->
               </div>
             <!-- /ko -->
           <!-- /ko -->
@@ -1622,11 +1626,17 @@ ${ assist.assistPanel() }
       self.streamUsername = ko.observable('');
       self.streamPassword = ko.observable('');
       self.streamToken = ko.observable('');
-      self.streamEndpointUrl = ko.observable('');
+      self.streamToken.subscribe(function(newVal) {
+        if (newVal) {
+          wizard.guessFormat(); // Todo
+        }
+      });
+      self.streamEndpointUrl = ko.observable('https://login.salesforce.com/services/Soap/u/42.0');
+      self.streamObjects = ko.observableArray();
       self.streamObject = ko.observable('');
       self.hasStreamSelected = ko.pureComputed(function() {
         return (self.streamSelection() == 'kafka' && self.kafkaSelectedTopics()) ||
-           (self.streamSelection() == 'sfdc')
+           (self.streamSelection() == 'sfdc' && self.streamObject())
       });
       self.hasStreamSelected.subscribe(function(newValue) {
         if (newValue) {
@@ -1688,7 +1698,7 @@ ${ assist.assistPanel() }
                 self.streamPassword().length > 0 &&
                 self.streamToken().length > 0 &&
                 self.streamEndpointUrl().length > 0 &&
-                self.streamObject().length > 0
+                self.streamObject()
               ;
           }
         } else if (self.inputFormat() == 'rdbms') {
@@ -1832,7 +1842,7 @@ ${ assist.assistPanel() }
               if (wizard.source.streamSelection() == 'kafka') {
                 name += '.' + wizard.source.kafkaSelectedTopics();
               } else {
-                name += '.' + wizard.source.streamSelection();
+                name += '.' + wizard.source.streamObject();
               }
             } else if (wizard.source.path()) {
               name += '.' + wizard.source.path().split('/').pop().split('.')[0];
@@ -2118,10 +2128,17 @@ ${ assist.assistPanel() }
           } else {
             var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
             self.source.format(newFormat);
-            if (self.source.inputFormat() == 'stream' && self.source.streamSelection() == 'kafka') {
-              self.source.kafkaTopics(resp['topics']);
+            if (self.source.inputFormat() == 'stream') {
+              if (self.source.streamSelection() == 'kafka') {
+                self.source.kafkaTopics(resp['topics']);
+              } else if (self.source.streamSelection() == 'sfdc') {
+                self.source.streamObjects(resp['objects']);
+              }
             }
-            self.guessFieldTypes();
+    
+            if (self.source.inputFormat() != 'stream' || self.source.streamSelection() != 'sfdc') {
+              self.guessFieldTypes();
+            }
           }
 
           self.isGuessingFormat(false);
