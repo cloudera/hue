@@ -73,7 +73,8 @@ Checked-in third party dependencies
 |Y|requests|2.10.0|ASL2|https://github.com/kennethreitz/requests/|
 |Y|rsa|3.4.2|ASL2||
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
-|Y|simplejson|  | ||
+|Y|simplejson|  |MIT|3.15|
+|Y|simple salesforce|0.74.2|MIT|http://pypi.python.org/pypi/simple-salesforce|
 |Y|Six|1.9.0|MIT|http://pypi.python.org/pypi/six/1.9.0|
 |Y|South|1.0.2|Apache|http://south.aeracode.org/|
 |Y|sqlparse|0.2.0|BSD|https://github.com/andialbrecht/sqlparse|
