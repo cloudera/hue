@@ -254,6 +254,9 @@ class SolrApi(object):
       ('hl.fragsize', 1000),
     )
 
+    if query.get('timezone'):
+      params += (('TZ', query.get('timezone')),)
+
     if collection['template']['fieldsSelected']:
       fields = []
       for field in collection['template']['fieldsSelected']:

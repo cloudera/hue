@@ -146,6 +146,7 @@ var Query = function (vm, query) {
   });
   self.fqs = ko.mapping.fromJS(query.fqs);
   self.start = ko.mapping.fromJS(query.start);
+  self.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
