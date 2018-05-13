@@ -23,6 +23,7 @@ from django.utils.translation import ugettext as _
 
 from notebook.models import make_notebook
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.conf import DISABLE_HUE_3
 
 
 LOG = logging.getLogger(__name__)
@@ -36,22 +37,22 @@ class EnvelopeIndexer(object):
     self.username = username
 
 
-  def _upload_workspace(self, morphline):
+  def _upload_workspace(self, envelope):
     from oozie.models2 import Job
 
     hdfs_workspace_path = Job.get_workspace(self.username)
-    hdfs_morphline_path = os.path.join(hdfs_workspace_path, "envelope.conf")
+    hdfs_envelope_path = os.path.join(hdfs_workspace_path, "envelope.conf")
 
     # Create workspace on hdfs
     self.fs.do_as_user(self.username, self.fs.mkdir, hdfs_workspace_path)
 
-    self.fs.do_as_user(self.username, self.fs.create, hdfs_morphline_path, data=morphline)
+    self.fs.do_as_user(self.username, self.fs.create, hdfs_envelope_path, data=envelope)
 
     return hdfs_workspace_path
 
 
-  def run(self, request, collection_name, morphline, input_path, start_time=None, lib_path=None):
-    workspace_path = self._upload_workspace(morphline)
+  def run(self, request, collection_name, envelope, input_path, start_time=None, lib_path=None):
+    workspace_path = self._upload_workspace(envelope)
 
     task = make_notebook(
       name=_('Indexing into %s') % collection_name,
@@ -63,16 +64,32 @@ class EnvelopeIndexer(object):
       last_executed=start_time
     )
 
-    task.add_spark_snippet(
-      clazz=None,
-      jars=lib_path,
-      arguments=[
-          u'envelope.conf'
-      ],
-      files=[
-          {u'path': u'%s/envelope.conf' % workspace_path, u'type': u'file'}
-      ]
-    )
+    if not DISABLE_HUE_3.get(): # CDH5
+      shell_command_name = "pipeline.sh"
+      shell_command = """#!/bin/bash
+
+SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
+      hdfs_shell_cmd_path = os.path.join(workspace_path, shell_command_name)
+      self.fs.do_as_user(self.username, self.fs.create, hdfs_shell_cmd_path, data=shell_command)
+      task.add_shell_snippet(
+        shell_command=shell_command_name,
+        files=[
+            {u'value': u'%s/envelope.conf' % workspace_path},
+            {u'value': hdfs_shell_cmd_path},
+            {u'value': lib_path, }
+        ]
+      )
+    else:
+      task.add_spark_snippet(
+        clazz=None,
+        jars=lib_path,
+        arguments=[
+            u'envelope.conf'
+        ],
+        files=[
+            {u'path': u'%s/envelope.conf' % workspace_path, u'type': u'file'}
+        ]
+      )
 
     return task.execute(request, batch=True)
 
@@ -167,7 +184,7 @@ class EnvelopeIndexer(object):
         }""" % properties
     else:
       raise PopupException(_('Output format not recognized: %(ouputFormat)s') % properties)
-      
+
     return """
 application {
     name = %(app_name)s

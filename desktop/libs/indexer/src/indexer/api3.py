@@ -449,7 +449,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
   collection_name = destination['name']
   indexer = EnvelopeIndexer(request.user, request.fs)
 
-  lib_path = lib_path or '/tmp/envelope-0.5.0.jar'
+  lib_path = '/tmp/envelope-0.5.0.jar'
   input_path = None
 
   if file_format['inputFormat'] == 'table':
@@ -490,7 +490,8 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
       else:
         sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).get_str()
         print sql
-      if file_format['inputFormat'] == 'stream':
+      if destination['tableFormat'] == 'kudu':
+        manager = ManagerApi()
         properties["output_table"] = "impala::%s" % collection_name
         properties["kudu_master"] = manager.get_kudu_master()
       else:
@@ -514,9 +515,9 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
   properties["ouputFormat"] = destination['ouputFormat']
   properties["streamSelection"] = file_format["streamSelection"]
 
-  morphline = indexer.generate_config(properties)
+  envelope = indexer.generate_config(properties)
 
-  return indexer.run(request, collection_name, morphline, input_path, start_time=start_time, lib_path=lib_path)
+  return indexer.run(request, collection_name, envelope, input_path, start_time=start_time, lib_path=lib_path)
 
 
 def _create_solr_collection(user, fs, client, destination, index_name, kwargs):

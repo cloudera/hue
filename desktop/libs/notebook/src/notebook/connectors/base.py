@@ -173,8 +173,17 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
-  def add_shell_snippet(self, shell_command, arguments, archives, files, env_var, last_executed):
+  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None):
     _data = json.loads(self.data)
+
+    if arguments is None:
+      arguments = []
+    if archives is None:
+      archives = []
+    if files is None:
+      files = []
+    if env_var is None:
+      env_var = []
 
     _data['snippets'].append(self._make_snippet({
         u'type': u'shell',
@@ -252,7 +261,7 @@ def get_api(request, snippet):
         'interface': 'kafka',
         'options': {},
         'is_sql': False
-      }]      
+      }]
     elif snippet['type'] == 'solr':
       interpreter = [{
         'name': 'solr',

@@ -1634,13 +1634,18 @@ ${ assist.assistPanel() }
       self.streamEndpointUrl = ko.observable('https://login.salesforce.com/services/Soap/u/42.0');
       self.streamObjects = ko.observableArray();
       self.streamObject = ko.observable('');
+      self.streamObject.subscribe(function(newValue) {
+        if (newValue) {
+          wizard.guessFieldTypes();
+        }
+      });
       self.hasStreamSelected = ko.pureComputed(function() {
         return (self.streamSelection() == 'kafka' && self.kafkaSelectedTopics()) ||
            (self.streamSelection() == 'sfdc' && self.streamObject())
       });
       self.hasStreamSelected.subscribe(function(newValue) {
         if (newValue) {
-          wizard.guessFormat();
+          wizard.guessFormat(); 
           if (newValue == 'kafka') {
             wizard.destination.tableFormat('kudu');
           }
