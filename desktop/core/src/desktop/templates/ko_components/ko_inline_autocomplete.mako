@@ -62,12 +62,6 @@ from desktop.views import _ko
       var getSortedFacets = function (facetIndex) {
         var result = Object.keys(facetIndex);
         result.sort(function (a, b) {
-          if (facetIndex[a] > facetIndex[b]) {
-            return -1;
-          }
-          if (facetIndex[b] > facetIndex[a]) {
-            return 1;
-          }
           return a.localeCompare(b);
         });
         return result;
@@ -280,7 +274,7 @@ from desktop.views import _ko
         var querySpec = { query: self.searchInput() };
 
         if (self.lastParseResult.facets) {
-          var knownFacetValues = ko.unwrap(self.knownFacetValues);
+          var knownFacetValues = typeof self.knownFacetValues === 'function' ? self.knownFacetValues() : self.knownFacetValues;
           var cleanFacets = {};
           Object.keys(self.lastParseResult.facets).forEach(function (facet) {
             if (!knownFacetValues[facet]) {
@@ -380,7 +374,7 @@ from desktop.views import _ko
         }
 
         if (self.lastParseResult.suggestFacetValues) {
-          var facetValues = ko.unwrap(self.knownFacetValues);
+          var facetValues = typeof self.knownFacetValues === 'function' ? self.knownFacetValues() : self.knownFacetValues;
           if (facetValues && facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]) {
             var matchedFacets = facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()];
             getSortedFacets(matchedFacets).forEach(function (value) {

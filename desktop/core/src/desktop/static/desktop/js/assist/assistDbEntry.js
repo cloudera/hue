@@ -147,6 +147,35 @@ var AssistDbEntry = (function () {
     }
   };
 
+  AssistDbEntry.prototype.knownFacetValues = function () {
+    var self = this;
+    var types = {};
+    if (self.parent === null) { // Only find facets on the DB level
+      self.entries().forEach(function (tableEntry) {
+        if (self.assistDbSource.sourceType !== 'solr') {
+          if (tableEntry.catalogEntry.isTable()) {
+            types.table =  types.table ? types.table + 1 : 1;
+          } else if (tableEntry.catalogEntry.isView()) {
+            types.view =  types.view ? types.view + 1 : 1;
+          }
+        }
+        if (tableEntry.open()) {
+          tableEntry.entries().forEach(function (colEntry) {
+            if (!types[colEntry.catalogEntry.getType()]) {
+              types[colEntry.catalogEntry.getType()] = 1;
+            } else {
+              types[colEntry.catalogEntry.getType()]++;
+            }
+          })
+        }
+      });
+    }
+    if (Object.keys(types).length) {
+      return { type: types }
+    }
+    return {};
+  };
+
   AssistDbEntry.prototype.getDatabaseName = function () {
     return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isDatabase() });
   };

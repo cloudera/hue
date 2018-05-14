@@ -870,7 +870,7 @@ from desktop.views import _ko
           params: {
             querySpec: filter.querySpec,
             facets: ['type'],
-            knownFacetValues: sourceType === 'solr' ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES,
+            knownFacetValues: knownFacetValues.bind($data),
             autocompleteFromEntries: autocompleteFromEntries
           }
         } --><!-- /ko -->
