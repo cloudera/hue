@@ -29,6 +29,7 @@ from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
+from useradmin.views import ensure_home_directory
 from oozie.models2 import Node
 from oozie.tests import OozieMockBase
 
@@ -48,6 +49,7 @@ def test_copy_files():
   try:
     c = make_logged_in_client()
     user = User.objects.get(username='test')
+    ensure_home_directory(cluster.fs, user)
 
     prefix = '/tmp/test_copy_files'
 

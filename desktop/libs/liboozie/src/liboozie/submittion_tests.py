@@ -24,10 +24,12 @@ from nose.tools import assert_equal, assert_true, assert_not_equal
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
-from liboozie.submittion import Submission
-from oozie.tests import OozieMockBase
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
+from oozie.tests import OozieMockBase
+from useradmin.views import ensure_home_directory
+
+from liboozie.submittion import Submission
 
 
 LOG = logging.getLogger(__name__)
@@ -40,6 +42,7 @@ def test_copy_files():
   try:
     c = make_logged_in_client()
     user = User.objects.get(username='test')
+    ensure_home_directory(cluster.fs, user)
 
     prefix = '/tmp/test_copy_files'
 
