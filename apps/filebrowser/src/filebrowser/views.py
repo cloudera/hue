@@ -334,7 +334,7 @@ def parse_breadcrumbs(path):
       if url and not url.endswith('/'):
         url += '/'
       url += part
-      breadcrumbs.append({'url': urllib.quote(url.encode('utf-8')), 'label': part})
+      breadcrumbs.append({'url': urllib.quote(url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''), 'label': part})
     return breadcrumbs
 
 
@@ -358,11 +358,11 @@ def listdir(request, path):
     breadcrumbs = parse_breadcrumbs(path)
 
     data = {
-        'path': urllib.quote(path.encode('utf-8')),
+        'path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'file_filter': file_filter,
         'breadcrumbs': breadcrumbs,
-        'current_dir_path': urllib.quote(path.encode('utf-8')),
-        'current_request_path': urllib.quote(request.path.encode('utf-8')),
+        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
         'cwd_set': True,
         'is_superuser': request.user.username == request.fs.superuser,
@@ -490,9 +490,9 @@ def listdir_paged(request, path):
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
-        'path': urllib.quote(path.encode('utf-8')),
+        'path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'breadcrumbs': breadcrumbs,
-        'current_request_path': urllib.quote(request.path.encode('utf-8')),
+        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_trash_enabled': is_trash_enabled,
         'files': page.object_list if page else [],
         'page': _massage_page(page) if page else {},
@@ -502,7 +502,7 @@ def listdir_paged(request, path):
         # The following should probably be deprecated
         'cwd_set': True,
         'file_filter': 'any',
-        'current_dir_path': urllib.quote(path.encode('utf-8')),
+        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_fs_superuser': is_fs_superuser,
         'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
@@ -535,7 +535,7 @@ def _massage_stats(request, stats):
     path = stats['path']
     normalized = request.fs.normpath(path)
     return {
-        'path': urllib.quote(normalized.encode('utf-8')),
+        'path': urllib.quote(normalized.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'name': stats['name'],
         'stats': stats.to_json_dict(),
         'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p') if stats['mtime'] else '',
@@ -1141,7 +1141,7 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(request.fs.join(urllib.unquote(path), name))
+        request.fs.create(request.fs.join(urllib.unquote(path), urllib.unquote(name)))
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
@@ -1307,7 +1307,7 @@ def _upload_file(request):
             raise PopupException(msg)
 
         response.update({
-          'path': urllib.quote(filepath.encode('utf-8')),
+          'path': urllib.quote(filepath.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
           'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
           'next': request.GET.get("next")
         })

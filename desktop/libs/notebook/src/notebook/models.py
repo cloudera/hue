@@ -103,7 +103,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8')) if on_success_url else None,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'') if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
