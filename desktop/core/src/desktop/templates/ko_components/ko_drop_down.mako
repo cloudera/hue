@@ -99,7 +99,7 @@ from desktop.views import _ko
                 $nextActive = $currentActive.prev().addClass('active');
               }
               if (onSelected) {
-                onSelected($nextActive && $nextActive.length ? ko.dataFor($nextActive.prev()[0]) : undefined);
+                onSelected($nextActive && $nextActive.length ? ko.dataFor($nextActive[0]) : undefined);
               }
             } else if (e.keyCode === 40) {
               // down
