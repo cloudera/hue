@@ -134,8 +134,15 @@ from desktop.views import _ko
           var visibleSub = dropDownVisible.subscribe(function (newValue) {
             if (newValue) {
               $(keyUpTarget).on('keyup.hueDropDown', keyUp);
+              $(keyUpTarget).on('keydown.hueDropDown', function (e) {
+                // This prevents the cursor from moving left or right on up and down
+                if (e.keyCode === 38 || e.keyCode === 40) {
+                  e.preventDefault();
+                }
+              })
             } else {
               $(keyUpTarget).off('keyup.hueDropDown');
+              $(keyUpTarget).off('keydown.hueDropDown');
             }
           });
 
