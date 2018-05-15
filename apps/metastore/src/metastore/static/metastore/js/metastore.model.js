@@ -369,7 +369,7 @@ var MetastoreTable = (function () {
 
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
-    self.topJoins = ko.observable();
+    self.topJoins = ko.observableArray();
     self.navigatorMeta = ko.observable();
     self.relationshipsDetails = ko.observable();
 
@@ -528,10 +528,10 @@ var MetastoreTable = (function () {
                       joinCol.columns.forEach(function (col) {
                         var colLower = col.toLowerCase();
                         if (colLower.indexOf(ownQidLower + '.') === 0) {
-                          cleanCols.source = colLower.substring(ownQidLower.length + 1);
+                          cleanCols.source = colLower.substring(ownDbNameLower.length + 1);
                           cleanCols.sourcePath = col.split('.');
                         } else if (colLower.indexOf(ownNameLower + '.') === 0) {
-                          cleanCols.source = colLower.substring(ownNameLower.length + 1);
+                          cleanCols.source = colLower;
                           cleanCols.sourcePath = col.split('.');
                           cleanCols.sourcePath.unshift(ownDbNameLower);
                         } else if (colLower.indexOf(ownDbNameLower + '.') === 0) {
