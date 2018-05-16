@@ -1,0 +1,246 @@
+# Chinese (China) translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:88
+msgid "Configuration options for Optimizer API"
+msgstr "优化器 API 的配置选项"
+
+#: src/metadata/conf.py:92
+msgid "Hostname to Optimizer API or compatible service."
+msgstr "优化器 API 或兼容服务的主机名。"
+
+#: src/metadata/conf.py:97
+msgid "The name of the key of the service."
+msgstr "服务的密钥名称。"
+
+#: src/metadata/conf.py:102
+msgid "The private part of the key associated with the auth_key."
+msgstr "与 auth_key 关联的密钥的私钥部分。"
+
+#: src/metadata/conf.py:107
+msgid ""
+"Execute this script to produce the auth_key secret. This will be used "
+"when `auth_key_secret` is not set."
+msgstr ""
+"执行此脚本以生成 auth_key 密钥。如果未设置“auth_key_secret”，"
+"则会使用此密钥。"
+
+#: src/metadata/conf.py:113
+msgid ""
+"The name of the workload where queries are uploaded and optimizations are"
+" calculated from. Automatically guessed from auth_key and cluster_id if "
+"not specified."
+msgstr ""
+"用于上传查询和计算优化的工作负载名称。"
+"如果未指定，"
+"则根据 auth_key 和 cluster_id 自动猜测。"
+
+#: src/metadata/conf.py:118
+msgid ""
+"The name of the cluster used to determine the tenant id when this one is "
+"not specified. Defaults to the cluster Id or 'default'."
+msgstr ""
+"如果未指定租户 ID，则为用于确定租户 ID 的群集名称。"
+"默认为群集 ID 或“default”。"
+
+#: src/metadata/conf.py:124 src/metadata/conf.py:277
+msgid ""
+"Perform Sentry privilege filtering. Default to true automatically if the "
+"cluster is secure."
+msgstr ""
+"执行 Sentry 权限筛选。如果"
+"群集是安全的，则自动默认为 true。"
+
+#: src/metadata/conf.py:131
+msgid ""
+"The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
+"to 0 to disable the cache."
+msgstr ""
+"用于 assist/autocomplete/ 等调用的缓存 TTL（以毫秒为单位）。设置为 "
+"0 将禁用缓存。"
+
+#: src/metadata/conf.py:135
+msgid ""
+"Automatically upload queries after their execution in order to improve "
+"recommendations."
+msgstr ""
+"执行后自动上传查询"
+"以改进建议。"
+
+#: src/metadata/conf.py:141
+msgid ""
+"Automatically upload queried tables DDL in order to improve "
+"recommendations."
+msgstr ""
+"自动上传查询到的表 DDL"
+"以改进建议。"
+
+#: src/metadata/conf.py:147
+msgid ""
+"Automatically upload queried tables and columns stats in order to improve"
+" recommendations."
+msgstr ""
+"自动上传查询到的表和列统计数据"
+"以改进建议。"
+
+#: src/metadata/conf.py:153
+msgid ""
+"Allow admins to upload the last N executed queries in the quick start "
+"wizard. Use 0 to disable."
+msgstr ""
+"允许管理员在快速启动向导中上传已执行的 N 个查询。"
+"使用 0 可禁用。"
+
+#: src/metadata/conf.py:211
+msgid "Configuration options for Navigator API"
+msgstr "Navigator API 的配置选项"
+
+#: src/metadata/conf.py:215
+msgid "Base URL to Navigator API."
+msgstr "Navigator API 的基本 URL。"
+
+#: src/metadata/conf.py:219
+msgid "Which authentication to use: CM or external via LDAP or SAML."
+msgstr "要使用哪种身份验证方法：CM 还是通过 LDAP 或 SAML 进行外部身份验证。"
+
+#: src/metadata/conf.py:224
+msgid "Username of the CM user used for authentication."
+msgstr "用于身份验证的 CM 用户的用户名。"
+
+#: src/metadata/conf.py:228
+msgid "CM password of the user used for authentication."
+msgstr "用于身份验证的用户的 CM 密码。"
+
+#: src/metadata/conf.py:233
+msgid ""
+"Execute this script to produce the CM password. This will be used when "
+"the plain password is not set."
+msgstr ""
+"执行此脚本以生成 CM 密码。如果未设置明文密码，"
+"则会使用此密码。"
+
+#: src/metadata/conf.py:240
+msgid "Username of the LDAP user used for authentication."
+msgstr "用于身份验证的 LDAP 用户的用户名。"
+
+#: src/metadata/conf.py:244
+msgid "LDAP password of the user used for authentication."
+msgstr "用于身份验证的用户的 LDAP 密码。"
+
+#: src/metadata/conf.py:249
+msgid ""
+"Execute this script to produce the LDAP password. This will be used when "
+"the plain password is not set."
+msgstr ""
+"执行此脚本以生成 LDAP 密码。如果未设置明文密码，"
+"则会使用此密码。"
+
+#: src/metadata/conf.py:256
+msgid "Username of the SAML user used for authentication."
+msgstr "用于身份验证的 SAML 用户的用户名。"
+
+#: src/metadata/conf.py:260
+msgid "SAML password of the user used for authentication."
+msgstr "用于身份验证的用户的 SAML 密码。"
+
+#: src/metadata/conf.py:265
+msgid ""
+"Execute this script to produce the SAML password. This will be used when "
+"the plain password  is not set."
+msgstr ""
+"执行此脚本以生成 SAML 密码。如果未设置明文密码，"
+"则会使用此密码。"
+
+#: src/metadata/conf.py:272
+msgid ""
+"Navigator configuration directory, where navigator.client.properties is "
+"located."
+msgstr ""
+"navigator.client.properties 所在的 Navigator "
+"配置目录。"
+
+#: src/metadata/conf.py:283
+msgid "Max number of items to fetch in one call in object search."
+msgstr "在对象搜索中一次调用可获取的最大项数。"
+
+#: src/metadata/conf.py:289
+msgid "Max number of items to fetch in one call in object search autocomplete."
+msgstr "在对象搜索自动完成中一次调用可获取的最大项数。"
+
+#: src/metadata/conf.py:296
+msgid "Enable to search HDFS, S3 files."
+msgstr "启用以搜索 HDFS、S3 文件。"
+
+#: src/metadata/navigator_api.py:422 src/metadata/navigator_api.py:448
+msgid ""
+"add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
+"empty list of tags"
+msgstr "add_tags 需要一个 'id' 参数和 'tags' 参数，即，标记的非空列表"
+
+#: src/metadata/navigator_api.py:475
+msgid ""
+"update_properties requires an 'id' parameter and 'properties' or "
+"'metadata' parameters that are non-empty dicts"
+msgstr ""
+"update_properties 需要“id”参数以及“properties”或"
+"“metadata”参数，并且这些参数为非空目录"
+
+#: src/metadata/navigator_api.py:501
+msgid ""
+"update_properties requires an 'id' parameter and 'keys' parameter that is"
+" a non-empty list"
+msgstr "update_properties 需要一个 'id' 参数和 'keys' 参数，即，非空列表"
+
+#: src/metadata/navigator_client.py:81 src/metadata/navigator_client.py:92
+#: src/metadata/navigator_client.py:103 src/metadata/optimizer_client.py:51
+msgid "No error message, please check the logs."
+msgstr "无错误消息，请检查日志。"
+
+#: src/metadata/navigator_client.py:225 src/metadata/navigator_client.py:300
+msgid "Failed to authenticate."
+msgstr "身份验证失败。"
+
+#: src/metadata/optimizer_api.py:351
+msgid "Query history upload requires Admin privileges or feature is disabled."
+msgstr "查询历史记录上传需要管理员权限或此功能处于禁用状态。"
+
+#: src/metadata/optimizer_api.py:376
+msgid "Skipped as task query"
+msgstr "已作为任务查询跳过"
+
+#: src/metadata/optimizer_api.py:378
+msgid "Skipped"
+msgstr "已跳过"
+
+#: src/metadata/optimizer_client.py:176
+msgid "Error while accessing Optimizer"
+msgstr "访问优化器时出错"
+
+#: src/metadata/optimizer_client.py:235
+msgid "Call not supported"
+msgstr "不支持调用"
+
+#: src/metadata/optimizer_client.py:406
+#, python-format
+msgid "Could not get tenant id from cluster id %s: %s"
+msgstr "无法从集群 ID %s 获取租户 ID：%s"
+
+#: src/metadata/workload_analytics_client.py:39
+msgid "Error accessing"
+msgstr "访问时出错"

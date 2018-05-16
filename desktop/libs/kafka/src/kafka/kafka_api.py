@@ -19,9 +19,6 @@
 import json
 import logging
 
-from metadata.manager_client import ManagerApi
-from metadata.kafka_client import KafkaApi
-
 try:
   from collections import OrderedDict
 except ImportError:
@@ -34,9 +31,10 @@ from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
+from metadata.manager_client import ManagerApi
 
-from metadata.conf import has_navigator, has_kafka_api
-from metadata.navigator_client import NavigatorApiException
+from kafka.conf import has_kafka_api
+from kafka.kafka_client import KafkaApi, KafkaApiException
 
 
 LOG = logging.getLogger(__name__)
@@ -50,11 +48,8 @@ def error_handler(view_fn):
     }
 
     try:
-      if has_navigator(args[0].user): # TODO
-        return view_fn(*args, **kwargs)
-      else:
-        raise NavigatorApiException('Navigator API is not configured.')
-    except NavigatorApiException, e:
+      return view_fn(*args, **kwargs)
+    except KafkaApiException, e:
       try:
         response['message'] = json.loads(e.message)
       except Exception:

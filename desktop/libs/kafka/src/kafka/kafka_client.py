@@ -26,7 +26,7 @@ from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.lib.i18n import smart_unicode
 
-from metadata.conf import KAFKA
+from kafka.conf import KAFKA
 
 
 LOG = logging.getLogger(__name__)

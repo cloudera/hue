@@ -1,0 +1,246 @@
+# Korean translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:88
+msgid "Configuration options for Optimizer API"
+msgstr "Optimizer API에 대한 구성 옵션"
+
+#: src/metadata/conf.py:92
+msgid "Hostname to Optimizer API or compatible service."
+msgstr "Optimizer API 또는 호환되는 서비스의 호스트 이름입니다."
+
+#: src/metadata/conf.py:97
+msgid "The name of the key of the service."
+msgstr "서비스 키의 이름입니다."
+
+#: src/metadata/conf.py:102
+msgid "The private part of the key associated with the auth_key."
+msgstr "auth_key와 연결된 키의 비공개 부분입니다."
+
+#: src/metadata/conf.py:107
+msgid ""
+"Execute this script to produce the auth_key secret. This will be used "
+"when `auth_key_secret` is not set."
+msgstr ""
+"auth_key 암호를 생성하려면 이 스크립트를 실행하십시오. "
+"이 암호는 `auth_key_secret`가 설정되지 않은 경우에 사용됩니다."
+
+#: src/metadata/conf.py:113
+msgid ""
+"The name of the workload where queries are uploaded and optimizations are"
+" calculated from. Automatically guessed from auth_key and cluster_id if "
+"not specified."
+msgstr ""
+"쿼리가 업로드되고 최적화 계산에 사용된 워크로드의 이름입니다."
+" 이름이 지정되지 않은 경우 auth_key 및 cluster_id를 기반으로 자동으로 추측됩니다."
+""
+
+#: src/metadata/conf.py:118
+msgid ""
+"The name of the cluster used to determine the tenant id when this one is "
+"not specified. Defaults to the cluster Id or 'default'."
+msgstr ""
+"테넌트 ID가 지정되지 않은 경우 테넌트 ID를 결정하는 데 사용되는 클러스터 이름입니다. "
+"클러스터 ID 또는 'default'가 기본값으로 설정됩니다."
+
+#: src/metadata/conf.py:124 src/metadata/conf.py:277
+msgid ""
+"Perform Sentry privilege filtering. Default to true automatically if the "
+"cluster is secure."
+msgstr ""
+"Sentry 권한 필터링을 수행합니다. 클러스터에 보안이 적용되는 경우 기본값은 자동으로 "
+"true입니다."
+
+#: src/metadata/conf.py:131
+msgid ""
+"The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
+"to 0 to disable the cache."
+msgstr ""
+"지원, 자동 완성 등의 호출에 대한 캐시 TTL(밀리초)입니다. 캐시를 해제하려면 "
+"0으로 설정합니다."
+
+#: src/metadata/conf.py:135
+msgid ""
+"Automatically upload queries after their execution in order to improve "
+"recommendations."
+msgstr ""
+"권장사항 향상을 위해 쿼리가 실행된 후 자동으로 "
+"업로드됩니다."
+
+#: src/metadata/conf.py:141
+msgid ""
+"Automatically upload queried tables DDL in order to improve "
+"recommendations."
+msgstr ""
+"권장사항 향상을 위해 쿼리된 DDL 테이블이 자동으로 "
+"업로드됩니다."
+
+#: src/metadata/conf.py:147
+msgid ""
+"Automatically upload queried tables and columns stats in order to improve"
+" recommendations."
+msgstr ""
+"권장사항 향상을 위해 쿼리된 테이블 및 열 상태가 자동으로 "
+"업로드됩니다."
+
+#: src/metadata/conf.py:153
+msgid ""
+"Allow admins to upload the last N executed queries in the quick start "
+"wizard. Use 0 to disable."
+msgstr ""
+"빠른 시작 마법사에서 마지막으로 실행된 N개 쿼리를 관리자가 업로드할 수 있도록 "
+"허용합니다. 해제하려면 0을 사용하십시오."
+
+#: src/metadata/conf.py:211
+msgid "Configuration options for Navigator API"
+msgstr "Navigator API에 대한 구성 옵션"
+
+#: src/metadata/conf.py:215
+msgid "Base URL to Navigator API."
+msgstr "Navigator API에 대한 기본 URL."
+
+#: src/metadata/conf.py:219
+msgid "Which authentication to use: CM or external via LDAP or SAML."
+msgstr "사용할 인증입니다. 이는 CM 또는 LDAP/SAML을 통한 외부 인증 중 하나입니다."
+
+#: src/metadata/conf.py:224
+msgid "Username of the CM user used for authentication."
+msgstr "인증에 사용된 CM 사용자의 사용자 이름입니다."
+
+#: src/metadata/conf.py:228
+msgid "CM password of the user used for authentication."
+msgstr "인증에 사용된 사용자의 CM 암호입니다."
+
+#: src/metadata/conf.py:233
+msgid ""
+"Execute this script to produce the CM password. This will be used when "
+"the plain password is not set."
+msgstr ""
+"CM 암호를 생성하려면 이 스크립트를 실행하십시오. 이 암호는 일반 암호가 "
+"설정되지 않은 경우에 사용됩니다."
+
+#: src/metadata/conf.py:240
+msgid "Username of the LDAP user used for authentication."
+msgstr "인증에 사용된 LDAP 사용자의 사용자 이름입니다."
+
+#: src/metadata/conf.py:244
+msgid "LDAP password of the user used for authentication."
+msgstr "인증에 사용된 사용자의 LDAP 암호입니다."
+
+#: src/metadata/conf.py:249
+msgid ""
+"Execute this script to produce the LDAP password. This will be used when "
+"the plain password is not set."
+msgstr ""
+"LDAP 암호를 생성하려면 이 스크립트를 실행하십시오. 이 암호는 일반 암호가 "
+"설정되지 않은 경우에 사용됩니다."
+
+#: src/metadata/conf.py:256
+msgid "Username of the SAML user used for authentication."
+msgstr "인증에 사용된 SAML 사용자의 사용자 이름입니다."
+
+#: src/metadata/conf.py:260
+msgid "SAML password of the user used for authentication."
+msgstr "인증에 사용된 사용자의 SAML 암호입니다."
+
+#: src/metadata/conf.py:265
+msgid ""
+"Execute this script to produce the SAML password. This will be used when "
+"the plain password  is not set."
+msgstr ""
+"SAML 암호를 생성하려면 이 스크립트를 실행하십시오. 이 암호는 일반 암호가 "
+"설정되지 않은 경우에 사용됩니다."
+
+#: src/metadata/conf.py:272
+msgid ""
+"Navigator configuration directory, where navigator.client.properties is "
+"located."
+msgstr ""
+"Navigator 구성 디렉토리이며 navigator.client.properties가 위치하는 "
+"곳입니다."
+
+#: src/metadata/conf.py:283
+msgid "Max number of items to fetch in one call in object search."
+msgstr "개체 검색의 한 호출에서 가져올 최대 항목 수입니다."
+
+#: src/metadata/conf.py:289
+msgid "Max number of items to fetch in one call in object search autocomplete."
+msgstr "개체 검색 자동 완성의 한 호출에서 가져올 최대 항목 수입니다."
+
+#: src/metadata/conf.py:296
+msgid "Enable to search HDFS, S3 files."
+msgstr "HDFS, S3 파일 검색을 설정합니다."
+
+#: src/metadata/navigator_api.py:422 src/metadata/navigator_api.py:448
+msgid ""
+"add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
+"empty list of tags"
+msgstr "add_tags에는 빈 태그 목록이 아닌 'id' 매개변수 및 'tags' 매개변수가 필요함"
+
+#: src/metadata/navigator_api.py:475
+msgid ""
+"update_properties requires an 'id' parameter and 'properties' or "
+"'metadata' parameters that are non-empty dicts"
+msgstr ""
+"update_properties에는 빈 사전이 아닌 'id' 매개 변수 및 'properties' 또는 "
+"'metadata' 매개 변수가 필요함"
+
+#: src/metadata/navigator_api.py:501
+msgid ""
+"update_properties requires an 'id' parameter and 'keys' parameter that is"
+" a non-empty list"
+msgstr "update_properties에는 빈 목록이 아닌 'id' 매개변수 및 'keys' 매개변수가 필요함"
+
+#: src/metadata/navigator_client.py:81 src/metadata/navigator_client.py:92
+#: src/metadata/navigator_client.py:103 src/metadata/optimizer_client.py:51
+msgid "No error message, please check the logs."
+msgstr "오류 메시지가 없습니다. 로그를 확인하십시오."
+
+#: src/metadata/navigator_client.py:225 src/metadata/navigator_client.py:300
+msgid "Failed to authenticate."
+msgstr "인증하지 못했습니다."
+
+#: src/metadata/optimizer_api.py:351
+msgid "Query history upload requires Admin privileges or feature is disabled."
+msgstr "쿼리 기록을 업로드하려면 관리자 권한이 있어야 합니다. 그렇지 않으면 기능이 해제됩니다."
+
+#: src/metadata/optimizer_api.py:376
+msgid "Skipped as task query"
+msgstr "작업 쿼리여서 건너뜀"
+
+#: src/metadata/optimizer_api.py:378
+msgid "Skipped"
+msgstr "건너뜀"
+
+#: src/metadata/optimizer_client.py:176
+msgid "Error while accessing Optimizer"
+msgstr "Optimizer에 액세스하는 중 오류 발생"
+
+#: src/metadata/optimizer_client.py:235
+msgid "Call not supported"
+msgstr "지원되지 않는 호출"
+
+#: src/metadata/optimizer_client.py:406
+#, python-format
+msgid "Could not get tenant id from cluster id %s: %s"
+msgstr "클러스터 ID %s에서 테넌트 ID를 가져올 수 없음: %s"
+
+#: src/metadata/workload_analytics_client.py:39
+msgid "Error accessing"
+msgstr "액세스 오류"

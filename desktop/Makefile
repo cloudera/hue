@@ -54,7 +54,8 @@ APPS := core \
 	libs/libzookeeper \
 	libs/metadata \
 	libs/notebook \
-	libs/dashboard
+	libs/dashboard \
+        libs/kafka
 
 .PHONY: default
 default:: hue syncdb

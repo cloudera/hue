@@ -344,7 +344,7 @@ ${ assist.assistPanel() }
                 <label class="control-label"><div>${ _('Topics') }</div>
                   <select class="input-xxlarge" data-bind="options: createWizard.source.kafkaTopics,
                          value: createWizard.source.kafkaSelectedTopics,
-                         optionsCaption: 'Choose...'"
+                         optionsCaption: '${ _("Choose...") }'"
                          placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
                   ## <select data-bind="selectize: createWizard.source.kafkaTopics, value: createWizard.source.kafkaSelectedTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
                 </label>
@@ -414,7 +414,7 @@ ${ assist.assistPanel() }
                 <label class="control-label"><div>${ _('Object') }</div>
                   <select class="input-xxlarge" data-bind="options: createWizard.source.streamObjects,
                          value: createWizard.source.streamObject,
-                         optionsCaption: 'Choose...'"
+                         optionsCaption: '${ _("Choose...") }'"
                          placeholder="${ _('The SFDC object to import, e.g. Account, Opportunity') }"></select>
                 </label>
                 <!-- /ko -->
@@ -556,7 +556,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
-                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
                   <i class="fa fa-sliders fa-padding-top"></i>
                 </a>
               </label>
@@ -721,7 +721,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
-                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
                   <i class="fa fa-sliders fa-padding-top"></i>
                 </a>
               </label>
@@ -785,7 +785,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group">
             <label class="control-label"><div>${ _('Extras') }</div>
-              <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+              <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
                 <i class="fa fa-sliders fa-padding-top"></i>
               </a>
             </label>
@@ -1645,7 +1645,7 @@ ${ assist.assistPanel() }
       });
       self.hasStreamSelected.subscribe(function(newValue) {
         if (newValue) {
-          wizard.guessFormat(); 
+          wizard.guessFormat();
           if (newValue == 'kafka') {
             wizard.destination.tableFormat('kudu');
           }
@@ -2140,7 +2140,7 @@ ${ assist.assistPanel() }
                 self.source.streamObjects(resp['objects']);
               }
             }
-    
+
             if (self.source.inputFormat() != 'stream' || self.source.streamSelection() != 'sfdc') {
               self.guessFieldTypes();
             }

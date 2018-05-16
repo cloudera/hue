@@ -24,7 +24,8 @@ from django.utils.translation import ugettext as _
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.lib.i18n import smart_unicode
-from metadata.conf import MANAGER
+
+from metadata.conf import MANAGER, get_navigator_auth_username, get_navigator_auth_password
 
 
 LOG = logging.getLogger(__name__)
@@ -49,8 +50,8 @@ class ManagerApi(object):
 
   def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
     self._api_url = '%s/%s' % (MANAGER.API_URL.get().strip('/'), VERSION)
-    self._username = 'hue' #get_navigator_auth_username()
-    self._password = 'hue' #get_navigator_auth_password()
+    self._username = get_navigator_auth_username()
+    self._password = get_navigator_auth_password()
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
@@ -112,11 +113,11 @@ class ManagerApi(object):
     try:
       client = HttpClient('http://%s:24042' % broker_host, logger=LOG)
       root = Resource(client)
-      
+
       return root.get('/api/topics')
     except RestException, e:
       raise ManagerApiException(e)
-    
+
 
   def _get_services(self, cluster_name=None):
     clusters = self._root.get('clusters/')['items']

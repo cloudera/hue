@@ -747,7 +747,7 @@ ${ assist.assistPanel() }
 
       self.fetchIndexes = function (callback) {
         self.isLoading(true);
-        $.post("${ url('metadata:list_topics') }", {}, function (data) {
+        $.post("${ url('kafka:list_topics') }", {}, function (data) {
           if (data.status == 0) {
             var indexes = []
             data.topics.forEach(function (index) {
@@ -766,7 +766,7 @@ ${ assist.assistPanel() }
         }).always(function () {
           self.isLoading(false);
         });
-        hueAnalytics.log('indexes', 'list_indexes');
+        hueAnalytics.log('kafka', 'list_topics');
       };
 
       self.getIndexByName = function (name) {
@@ -780,7 +780,7 @@ ${ assist.assistPanel() }
       }
 
       self.fetchIndex = function (index) {
-        $.post("${ url('metadata:list_topic') }", {
+        $.post("${ url('kafka:list_topic') }", {
           name: index.name()
         }, function (data) {
           if (data.status == 0) {
@@ -795,7 +795,7 @@ ${ assist.assistPanel() }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
         });
-        hueAnalytics.log('indexes', 'list_index');
+        hueAnalytics.log('kafka', 'list_topic');
       };
 
       self.deleteIndexes = function () {

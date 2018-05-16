@@ -30,6 +30,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
+from kafka.kafka_api import get_topics
 from librdbms.server import dbms as rdbms
 from libsentry.conf import is_enabled
 from metadata.manager_client import ManagerApi
@@ -45,7 +46,6 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
-from metadata.kafka_api import get_topics
 
 
 LOG = logging.getLogger(__name__)
