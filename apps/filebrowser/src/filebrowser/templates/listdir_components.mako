@@ -790,6 +790,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     }
 
     var updateHash = function (hash) {
+      hash = encodeURI(hash);
       %if not is_embeddable:
       window.location.hash = hash;
       %else:
@@ -1339,11 +1340,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.editFile = function () {
-        window.location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser.views.edit', path='')}" + encodeURI(self.selectedFile().path);
       };
 
       self.downloadFile = function () {
-        window.location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser.views.download', path='')}" + encodeURI(self.selectedFile().path);
       };
 
       self.renameFile = function () {
@@ -1351,7 +1352,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("#renameFileName").text(self.selectedFile().path);
 
-        $("#newNameInput").val(encodeURI(self.selectedFile().name));
+        $("#newNameInput").val(self.selectedFile().name);
 
         $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 

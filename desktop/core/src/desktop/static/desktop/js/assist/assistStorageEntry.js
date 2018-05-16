@@ -63,7 +63,6 @@ var AssistStorageEntry = (function () {
       }
     }
     self.path += self.definition.name;
-    self.path = encodeURI(self.path);
     self.currentPage = 1;
     self.hasMorePages = true;
     self.preview = ko.observable();

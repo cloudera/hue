@@ -358,7 +358,7 @@ def listdir(request, path):
     breadcrumbs = parse_breadcrumbs(path)
 
     data = {
-        'path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'path': path,
         'file_filter': file_filter,
         'breadcrumbs': breadcrumbs,
         'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
@@ -490,7 +490,7 @@ def listdir_paged(request, path):
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
-        'path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'path': path,
         'breadcrumbs': breadcrumbs,
         'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_trash_enabled': is_trash_enabled,
@@ -535,7 +535,7 @@ def _massage_stats(request, stats):
     path = stats['path']
     normalized = request.fs.normpath(path)
     return {
-        'path': urllib.quote(normalized.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'path': normalized,
         'name': stats['name'],
         'stats': stats.to_json_dict(),
         'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p') if stats['mtime'] else '',
@@ -1307,7 +1307,7 @@ def _upload_file(request):
             raise PopupException(msg)
 
         response.update({
-          'path': urllib.quote(filepath.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+          'path': filepath,
           'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
           'next': request.GET.get("next")
         })
