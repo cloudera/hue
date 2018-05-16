@@ -14,15 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from datetime import datetime, timedelta
 
 from desktop.lib.metrics import global_registry
+
+LOG = logging.getLogger(__name__)
 
 def active_users():
   from useradmin.models import UserProfile
   try:
     count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1)).count()
   except:
+    LOG.exception('Could not get active_users')
     count = 0
   return count
 

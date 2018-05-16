@@ -18,8 +18,6 @@
 set -e
 set -x
 
-sudo yum install -y cyrus-sasl-devel cyrus-sasl cyrus-sasl-plain cyrus-sasl-lib
-
 # CDH3b3 requires tight umask setting.
 umask 0022
 

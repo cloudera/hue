@@ -526,7 +526,6 @@ class TestUserAdmin(BaseUserAdminTests):
 
 
   def test_user_admin(self):
-    #FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
     FUNNY_NAME = 'أحمد@cloudera.com'
     FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
 

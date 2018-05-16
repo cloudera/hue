@@ -1575,6 +1575,7 @@ class TestEditor(OozieMockBase):
 
 
   def test_clone_coordinator(self):
+    #@TODO@ Prakash fix this test
     raise SkipTest
     coord = create_coordinator(self.wf, self.c, self.user)
     coordinator_count = Document.objects.available_docs(Coordinator, self.user).count()
@@ -2066,6 +2067,7 @@ class TestEditorBundle(OozieMockBase):
 
 
   def test_clone_bundle(self):
+    #@TODO@ Prakash fix this test
     raise SkipTest
     bundle = create_bundle(self.c, self.user)
     bundle_count = Document.objects.available_docs(Bundle, self.user).count()

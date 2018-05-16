@@ -106,8 +106,6 @@ class TestDjangoUtil(object):
         return "foo"
     assert_equal('"foo"', django_util.encode_json(Foo()))
     assert_equal('["foo", "foo"]', django_util.encode_json([Foo(), Foo()]))
-    #assert_equal('{"pk": null, "model": "TEST_APP.testmodel", "fields": {"last_modified": null, "my_str": "foo", "my_int": 3}}',
-    #    django_util.encode_json(TestModel(my_int=3, my_str="foo")))
     assert_equal('{"model": "TEST_APP.testmodel", "pk": null, "fields": {"my_int": 3, "my_str": "foo", "last_modified": null}}',
         django_util.encode_json(TestModel(my_int=3, my_str="foo")))
 

@@ -147,6 +147,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(n_trashed, Document.objects.trashed_docs(Workflow, self.user).count())
 
   def test_clone_design(self):
+    #@TODO@ Prakash fix this test
     raise SkipTest
     n_available = Document.objects.available_docs(Workflow, self.user).count()
 

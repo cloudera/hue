@@ -19,6 +19,7 @@ from django.conf.urls import url
 from metadata import navigator_api as metadata_navigator_api
 from metadata import optimizer_api as metadata_optimizer_api
 from metadata import workload_analytics_api as metadata_workload_analytics_api
+from metadata import manager_api as metadata_manager_api
 
 # Navigator API
 urlpatterns = [
@@ -61,9 +62,9 @@ urlpatterns += [
 
 
 # Manager API
-urlpatterns += patterns('metadata.manager_api',
-  url(r'^api/manager/hello/?$', 'hello', name='hello'),
-)
+urlpatterns += [
+  url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='hello'),
+]
 
 # Workload Analytics API
 urlpatterns += [

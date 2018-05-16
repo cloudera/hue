@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from kafka import kafka_api as kafka_kafka_api
 
-
-urlpatterns = patterns('kafka.kafka_api',
-  url(r'^api/topics/list/$', 'list_topics', name='list_topics'),
-  url(r'^api/topic/list/$', 'list_topic', name='list_topic'),
-)
+urlpatterns = [
+  url(r'^api/topics/list/$', kafka_kafka_api.list_topics, name='list_topics'),
+  url(r'^api/topic/list/$', kafka_kafka_api.list_topic, name='list_topic'),
+]

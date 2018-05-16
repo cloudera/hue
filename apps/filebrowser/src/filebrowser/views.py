@@ -608,7 +608,7 @@ def display(request, path):
     # display inline files just if it's not an ajax request
     if not request.is_ajax():
       if _can_inline_display(path):
-        return redirect(reverse('filebrowser.views.download', args=[path]) + '?disposition=inline')
+        return redirect(reverse('filebrowser_views_download', args=[path]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()

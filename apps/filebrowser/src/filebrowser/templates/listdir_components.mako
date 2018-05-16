@@ -1340,11 +1340,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.editFile = function () {
-        window.location.href = "${url('filebrowser.views.edit', path='')}" + encodeURI(self.selectedFile().path);
+        window.location.href = "${url('filebrowser_views_edit', path='')}" + encodeURI(self.selectedFile().path);
       };
 
       self.downloadFile = function () {
-        window.location.href = "${url('filebrowser.views.download', path='')}" + encodeURI(self.selectedFile().path);
+        window.location.href = "${url('filebrowser_views_download', path='')}" + encodeURI(self.selectedFile().path);
       };
 
       self.renameFile = function () {

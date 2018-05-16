@@ -369,7 +369,7 @@ ${ fb_components.menubar() }
     }
 
     self.downloadFile = function () {
-      location.href = "${url('filebrowser.views.download', path=path_enc)}";
+      location.href = "${url('filebrowser_views_download', path=path_enc)}";
     };
 
     self.pageChanged = function () {

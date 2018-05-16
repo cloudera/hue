@@ -492,6 +492,7 @@ for x in sys.stdin:
 
 
   def test_parameterization(self):
+    #@TODO@ Prakash fix this test
     raise SkipTest
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False, database=self.db_name)
     content = json.loads(response.content)
@@ -691,6 +692,7 @@ for x in sys.stdin:
 
 
   def test_multiple_statements_with_params(self):
+    #@TODO@ Prakash fix this test
     raise SkipTest
     hql = """
       select ${x} from test;
@@ -871,6 +873,7 @@ for x in sys.stdin:
 
 
   def test_designs(self):
+    #@TODO@ Prakash fix this test
     raise SkipTest
     if is_live_cluster():
       raise SkipTest('HUE-2902: Skipping because test is not reentrant')

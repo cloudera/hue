@@ -30,7 +30,7 @@ urlpatterns = [
   url(r'^display=(?P<path>.*)$', filebrowser_views.display, name='display'),
   url(r'^stat=(?P<path>.*)$', filebrowser_views.stat, name='stat'),
   url(r'^content_summary=(?P<path>.*)$', filebrowser_views.content_summary, name='content_summary'),
-  url(r'^download=(?P<path>.*)$', filebrowser_views.download, name='filebrowser.views.download'),
+  url(r'^download=(?P<path>.*)$', filebrowser_views.download, name='filebrowser_views_download'),
   url(r'^status$', filebrowser_views.status, name='status'),
   url(r'^home_relative_view=(?P<path>.*)$', filebrowser_views.home_relative_view, name='home_relative_view'),
   url(r'^edit=(?P<path>.*)$', filebrowser_views.edit, name='filebrowser_views_edit'),

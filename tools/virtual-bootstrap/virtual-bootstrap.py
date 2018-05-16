@@ -134,10 +134,10 @@ elif majver == 3:
     # Some extra modules are needed for Python 3, but different ones
     # for different versions.
     REQUIRED_MODULES.extend([
-    	'_abcoll', 'warnings', 'linecache', 'abc', 'io', '_weakrefset',
-    	'copyreg', 'tempfile', 'random', '__future__', 'collections',
-    	'keyword', 'tarfile', 'shutil', 'struct', 'copy', 'tokenize',
-    	'token', 'functools', 'heapq', 'bisect', 'weakref', 'reprlib'
+        '_abcoll', 'warnings', 'linecache', 'abc', 'io', '_weakrefset',
+        'copyreg', 'tempfile', 'random', '__future__', 'collections',
+        'keyword', 'tarfile', 'shutil', 'struct', 'copy', 'tokenize',
+        'token', 'functools', 'heapq', 'bisect', 'weakref', 'reprlib'
     ])
     if minver >= 2:
         REQUIRED_FILES[-1] = 'config-%s' % majver
@@ -146,8 +146,8 @@ elif majver == 3:
         platdir = sysconfig.get_config_var('PLATDIR')
         REQUIRED_FILES.append(platdir)
         REQUIRED_MODULES.extend([
-        	'base64', '_dummy_thread', 'hashlib', 'hmac',
-        	'imp', 'importlib', 'rlcompleter'
+            'base64', '_dummy_thread', 'hashlib', 'hmac',
+            'imp', 'importlib', 'rlcompleter'
         ])
     if minver >= 4:
         REQUIRED_MODULES.extend([

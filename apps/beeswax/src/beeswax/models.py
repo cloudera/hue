@@ -53,7 +53,6 @@ class QueryHistory(models.Model):
   """
   Holds metadata about all queries that have been executed.
   """
-  #STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
   class STATE(Enum):
     submitted = 0
     running = 1
