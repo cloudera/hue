@@ -191,9 +191,21 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-hdfs">
     <div class="autocompleter-details">
-      <div class="autocompleter-details-contents-inner">
-        <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
-        <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"></div>
+      <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner">
+          <!-- ko with: details -->
+          <div class="assist-details-wrap">
+            <div><div class="assist-details-header">${ _('Size') }</div><div class="assist-details-value" data-bind="text: humansize"></div></div>
+            <!-- ko with: stats -->
+            <div><div class="assist-details-header">${ _('User') }</div><div class="assist-details-value" data-bind="text: user"></div></div>
+            <div><div class="assist-details-header">${ _('Group') }</div><div class="assist-details-value" data-bind="text: group"></div></div>
+            <!-- /ko -->
+            <div><div class="assist-details-header">${ _('Permissions') }</div><div class="assist-details-value" data-bind="text: rwx"></div></div>
+            <div><div class="assist-details-header">${ _('Date') }</div><div class="assist-details-value" data-bind="text: mtime"></div></div>
+          </div>
+          <!-- /ko -->
+        </div>
       </div>
     </div>
   </script>
