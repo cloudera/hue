@@ -33,13 +33,6 @@ from metadata.conf import has_navigator
         <a href="javascript: void(0);" class="inactive-action" data-bind="visible: showInAssistEnabled, publish: 'context.popover.show.in.assist'">
           <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
         </a>
-        <a href="javascript: void(0);" class="inactive-action" data-bind="visible: replaceEditorContentEnabled, publish: 'context.popover.replace.in.editor'">
-          <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
-        </a>
-        <a href="javascript: void(0);" class="inactive-action" data-bind="visible: openInFileBrowserEnabled, publish: 'context.popover.open.in.file.browser'">
-          <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
-        </a>
-
         <!-- ko if: isDocument -->
         <!-- ko with: contents -->
         <a href="javascript: void(0);" class="inactive-action" data-bind="click: open">
@@ -463,6 +456,11 @@ from metadata.conf import has_navigator
           <a class="inactive-action pointer" data-bind="click: $parent.openInFileBrowser">
             <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
           </a>
+          <!-- ko if: typeof $parent.editorLocation !== 'undefined' -->
+          <a class="inactive-action pointer" data-bind="click: function () { $parent.replaceInEditor($data, $parent) }">
+            <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
+          </a>
+          <!-- /ko -->
           <!-- /ko -->
         </div>
       </div>
@@ -737,8 +735,8 @@ from metadata.conf import has_navigator
         var self = this;
 
         self.popover = options.popover;
-
         self.storageEntry = ko.observable();
+        self.editorLocation = options.editorLocation;
 
         self.loading = ko.pureComputed(function () {
           return self.storageEntry() && self.storageEntry().loading();
@@ -779,6 +777,14 @@ from metadata.conf import has_navigator
         huePubSub.publish('open.link', entry.definition.url);
         huePubSub.publish('context.popover.hide');
         huePubSub.publish('global.search.close');
+      };
+
+      StorageContext.prototype.replaceInEditor = function (entry, storageContext) {
+        huePubSub.publish('ace.replace', {
+          location: storageContext.editorLocation,
+          text: entry.path
+        });
+        huePubSub.publish('context.popover.hide');
       };
 
       StorageContext.prototype.goHome = function () {
@@ -1269,8 +1275,6 @@ from metadata.conf import has_navigator
                 && (self.isDocument || self.isCollection || self.isCatalogEntry);
         self.openInDashboardEnabled = self.isCatalogEntry && params.data.catalogEntry.path.length <= 2;
         self.openInTableBrowserEnabled = self.isCatalogEntry && params.data.catalogEntry.path.length <= 2;
-        self.replaceEditorContentEnabled = self.isStorageEntry;
-        self.openInFileBrowserEnabled = self.isStorageEntry;
         self.expandColumnsEnabled = self.isAsterisk;
 
         self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isStorageEntry && !self.isCatalogEntry;
@@ -1284,7 +1288,7 @@ from metadata.conf import has_navigator
           self.title = self.data.function;
           self.iconClass = 'fa-superscript';
         } else if (self.isStorageEntry) {
-          self.contents = new StorageContext({ popover: self, storageEntry: params.data.storageEntry });
+          self.contents = new StorageContext({ popover: self, storageEntry: params.data.storageEntry, editorLocation: params.data.editorLocation });
           self.titleTemplate = 'context-storage-entry-title';
           self.contentsTemplate = 'context-storage-entry-contents';
         } else if (self.isAsterisk) {
@@ -1423,8 +1427,6 @@ from metadata.conf import has_navigator
         self.showInAssistEnabled = !self.isHueApp;
         self.openInDashboardEnabled = false;
         self.openInTableBrowserEnabled = false;
-        self.replaceEditorContentEnabled = self.isStorageEntry;
-        self.openInFileBrowserEnabled = self.isStorageEntry;
         self.expandColumnsEnabled = self.isAsterisk;
         self.closeDisabled = true; // Global search has it's own close
 

@@ -3165,26 +3165,27 @@
   };
 
   ko.bindingHandlers.chosen = {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
-          var $element = $(element);
-          var options = ko.unwrap(valueAccessor());
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+      var $element = $(element);
+      var options = ko.unwrap(valueAccessor());
 
-          if (typeof options === 'object')
-              $element.chosen(options);
-          else
-              $element.chosen();
-
-          ['options', 'selectedOptions', 'value'].forEach(function(propName){
-              if (allBindings.has(propName)){
-                  var prop = allBindings.get(propName);
-                  if (ko.isObservable(prop)){
-                      prop.subscribe(function(){
-                          $element.trigger('chosen:updated');
-                      });
-                  }
-              }
-          });
+      if (typeof options === 'object') {
+        $element.chosen(options);
+      } else {
+        $element.chosen();
       }
+
+      ['options', 'selectedOptions', 'value'].forEach(function(propName){
+        if (allBindings.has(propName)){
+          var prop = allBindings.get(propName);
+          if (ko.isObservable(prop)) {
+            prop.subscribe(function(){
+              $element.trigger('chosen:updated');
+            });
+          }
+        }
+      });
+    }
   };
 
   ko.bindingHandlers.tooltip = {
@@ -5279,7 +5280,8 @@
                     huePubSub.publish('context.popover.show', {
                       data: {
                         type: 'storageEntry',
-                        storageEntry: entry
+                        storageEntry: entry,
+                        editorLocation: token.parseLocation.location
                       },
                       pinEnabled: true,
                       source: source
