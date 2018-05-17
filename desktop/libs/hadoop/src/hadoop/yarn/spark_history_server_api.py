@@ -160,6 +160,7 @@ class SparkHistoryServerApi(object):
     return log
 
   def get_executors_loglinks(self, job):
+    executor = None
     if job.metrics and 'executors' in job.metrics and job.metrics['executors']:
       executors = [executor for executor in job.metrics['executors'] if executor[0] == 'driver']  # look up driver executor
       if not executors:
