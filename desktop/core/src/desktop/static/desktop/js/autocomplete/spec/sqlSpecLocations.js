@@ -953,6 +953,24 @@
 
       describe('variable references', function () {
 
+        it('should variable location for "select a as b from tbl where b = ${var_name=10}; |"', function() {
+          assertLocations({
+            dialect: 'impala',
+            beforeCursor: 'select a as b from tbl where b = ${var_name=10}; ',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 48 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 } },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'a' }], qualified: false, alias: 'b', tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              { type: 'alias', source: 'column', alias: 'b', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 14 }, parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'tbl' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 24, last_column: 48 } },
+              { type: 'alias', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 31 }, source: 'column', alias: 'b', parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 48 }, value: '${var_name=10}', colRef: { identifierChain: [{ name: 'a' }], tables: [{ identifierChain: [{ name: 'tbl' }] }] } },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 48, last_column: 48 } }
+            ]
+          });
+        });
+
         it('should variable location for "select * from tbl where col = ${var_name=10}; |"', function() {
           assertLocations({
             beforeCursor: 'select * from tbl where col = ${var_name=10}; ',

@@ -1504,13 +1504,23 @@ var SqlParseSupport = (function () {
     };
 
     parser.addColumnAliasLocation = function (location, alias, parentLocation) {
-      parser.yy.locations.push({
+      var aliasLocation = {
         type: 'alias',
         source: 'column',
         alias: alias,
         location: adjustLocationForCursor(location),
         parentLocation: adjustLocationForCursor(parentLocation)
-      });
+      };
+      if (parser.yy.locations.length && parser.yy.locations[parser.yy.locations.length - 1].type === 'column') {
+        var closestColumn = parser.yy.locations[parser.yy.locations.length - 1];
+        if (closestColumn.location.first_line === aliasLocation.parentLocation.first_line &&
+          closestColumn.location.last_line === aliasLocation.parentLocation.last_line &&
+          closestColumn.location.first_column === aliasLocation.parentLocation.first_column &&
+          closestColumn.location.last_column === aliasLocation.parentLocation.last_column) {
+          parser.yy.locations[parser.yy.locations.length - 1].alias = alias;
+        }
+      }
+      parser.yy.locations.push(aliasLocation);
     };
 
     parser.addTableAliasLocation = function (location, alias, identifierChain) {
@@ -1601,6 +1611,16 @@ var SqlParseSupport = (function () {
     parser.addColRefToVariableIfExists = function (left, right) {
       if (left && left.columnReference && left.columnReference.length && right && right.columnReference && right.columnReference.length && parser.yy.locations.length > 1) {
         var addColRefToVariableLocation = function (variableValue, colRef) {
+          // See if colref is actually an alias
+          if (colRef.length === 1 && colRef[0].name) {
+            parser.yy.locations.some(function (location) {
+              if (location.type === 'column' && location.alias === colRef[0].name) {
+                colRef = location.identifierChain;
+                return true;
+              }
+            });
+          }
+
           for (var i = parser.yy.locations.length - 1; i > 0; i--) {
             var location = parser.yy.locations[i];
             if (location.type === 'variable' && location.value === variableValue) {
