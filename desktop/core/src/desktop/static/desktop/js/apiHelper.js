@@ -358,7 +358,7 @@ var ApiHelper = (function () {
             } else {
               errorMessage = errorResponse.responseText;
             }
-          } catch(err) {
+          } catch (err) {
             errorMessage = errorResponse.responseText;
           }
         } else if (typeof errorResponse.message !== 'undefined' && errorResponse.message !== null) {
@@ -374,7 +374,9 @@ var ApiHelper = (function () {
 
       if (!options || !options.silenceErrors) {
         hueUtils.logError(errorResponse);
-        $(document).trigger("error", errorMessage);
+        if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
+          $(document).trigger("error", errorMessage);
+        }
       }
 
       if (options && options.errorCallback) {
