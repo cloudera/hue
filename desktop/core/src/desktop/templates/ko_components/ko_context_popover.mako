@@ -403,6 +403,15 @@ from metadata.conf import has_navigator
       <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko --></div>
 
       <!-- ko if: !loading() && !hasErrors() -->
+      <!-- ko with: definition -->
+      <div class="context-popover-flex-attributes">
+          <div class="context-popover-attribute"><div>${ _('Size') }</div><div data-bind="text: humansize"></div></div>
+          <!-- ko with: stats -->
+          <div class="context-popover-attribute"><div>${ _('Owner') }</div><div data-bind="text: user"></div></div>
+          <!-- /ko -->
+          <div class="context-popover-attribute"><div>${ _('Permissions') }</div><div data-bind="text: rwx"></div></div>
+      </div>
+      <!-- /ko -->
       <!-- ko if: definition.type === 'dir' -->
       <div class="context-popover-flex-fill storage-entry-container" data-bind="fetchMore: { fetchMore: fetchMore.bind($data), hasMore: hasMorePages, loadingMore: loadingMore.bind($data) }">
         <table class="table table-condensed table-nowrap">
