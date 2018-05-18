@@ -2278,7 +2278,9 @@ from desktop.views import _ko
             <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${ _ko('Error loading index details.') }' : '${ _ko('Error loading table details.') }'}">
               <span class="assist-entry">
                 <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
-                <span data-bind="text: catalogEntry.getDisplayName()"></span>
+                <!-- ko with: catalogEntry -->
+                <span data-bind="text: getDisplayName()"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
+                <!-- /ko -->
               </span>
             </li>
             <!-- /ko -->
@@ -2611,7 +2613,43 @@ from desktop.views import _ko
                             getType: function () { return 'table' },
                             hasPossibleChildren: function () { return true; },
                             getSourceMeta: function () { return $.Deferred().resolve({ notFound: true }).promise() },
-                            getDisplayName: function () { return dbEntry.catalogEntry.name + '.' + tableName }
+                            getDisplayName: function () { return dbEntry.catalogEntry.name + '.' + tableName },
+                            reloading: ko.observable(false),
+                            reload: function () {
+                              var self = this;
+                              if (self.reloading()) {
+                                return;
+                              }
+                              self.reloading(true);
+                              huePubSub.subscribeOnce('data.catalog.entry.refreshed', function (data) {
+                                data.entry.getSourceMeta({ silenceErrors: true }).always(function () {
+                                  self.reloading(false)
+                                })
+                              });
+                              DataCatalog.getEntry({ sourceType: activeLocations.type, path: []}).done(function (sourceEntry) {
+                                sourceEntry.getChildren().done(function (dbEntries) {
+                                  var clearPromise;
+                                   // Clear the database first if it exists without cascade
+                                  var hasDb = dbEntries.some(function (dbEntry) {
+                                    if (dbEntry.name.toLowerCase() === self.path[0].toLowerCase()) {
+                                      clearPromise = dbEntry.clear('invalidate', false);
+                                      return true;
+                                    }
+                                  });
+                                  if (!hasDb) {
+                                    // If the database is missing clear the source without cascade
+                                    clearPromise = sourceEntry.clear('invalidate', false);
+                                  }
+                                  clearPromise.fail(function () {
+                                    self.reloading(false);
+                                  });
+                                }).fail(function () {
+                                  self.reloading(false);
+                                })
+                              }).fail(function () {
+                                self.reloading(false);
+                              });
+                            }
                           },
                           dbEntry,
                           assistDbSource,
