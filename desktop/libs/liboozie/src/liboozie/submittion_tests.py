@@ -44,7 +44,7 @@ def test_copy_files():
     prefix = '/tmp/test_copy_files'
 
     if cluster.fs.exists(prefix):
-      cluster.fs.rmtree(prefix)
+      cluster.fs.rmtree(prefix, skip_trash=True) # admin user might not have a home directory
 
     # Jars in various locations
     deployment_dir = '%s/workspace' % prefix
@@ -118,7 +118,7 @@ def test_copy_files():
 
   finally:
     try:
-      cluster.fs.rmtree(prefix)
+      cluster.fs.rmtree(prefix, skip_trash=True)
     except:
       LOG.exception('failed to remove %s' % prefix)
 
