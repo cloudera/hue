@@ -819,5 +819,5 @@ def _get_statement_from_file(user, fs, snippet):
   script_path = snippet['statementPath']
   if script_path:
     script_path = script_path.replace('hdfs://', '')
-    if fs.do_as_user(user, fs.exists, script_path):
+    if fs.do_as_user(user, fs.isfile, script_path):
       return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)
