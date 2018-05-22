@@ -364,6 +364,7 @@ def new_facet(request):
     widget_type = request.POST.get('widget_type')
     window_size = request.POST.get('window_size')
 
+
     result['message'] = ''
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type, window_size)
     result['status'] = 0
