@@ -626,24 +626,30 @@ except ImportError, e:
               <div>${ _('A comment is text that is not executed. It can be of two types:')}</div>
               <ul class="nav help-list-spacing margin-top-10">
                 <li>
-                <b>${ _('Single Line')}</b>
-                <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                  value: ko.observable('${ _('-- Comment')}'),
-                  lines: 1,
-                  mode: 'impala',
-                  aceOptions: {
-                    readOnly: true
-                  }}}" class="margin-top-10 margin-bottom-20"></div>
+                  <b>${ _('Single Line') }</b>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('-- Comment')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
                 <li>
-                <b>${ _('Multi Line')}</b>
-                <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                  value: ko.observable('${ _('/* Multi Line\\n  Comment */')}'),
-                  lines: 2,
-                  mode: 'impala',
-                  aceOptions: {
-                    readOnly: true
-                  }}}" class="margin-top-10 margin-bottom-20"></div>
+                  <b>${ _('Multi Line') }</b>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('/* Multi Line\\n  Comment */')}'),
+                    lines: 2,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
+                </li>
+                <li>
+                  <b>${ _('Tip') }</b>
+                  <div>
+                    ${ _('Use ') } <span class="muted">CTRL + ?</span> ${ _('or') } <span class="muted">Cmd + ?</span> ${ _('to comment/uncomment the selection.') }
+                  </div>
                 </li>
               </ul>
             </div>
