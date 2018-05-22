@@ -163,6 +163,7 @@ class RdbmsApi(Api):
     if sample_data:
       response['status'] = 0
       response['headers'] = sample_data.columns
+      response['full_headers'] = sample_data.columns_description
       response['rows'] = list(sample_data.rows())
     else:
       response['message'] = _('Failed to get sample data.')
