@@ -49,6 +49,7 @@ nv.models.multiBarWithBrushChart = function() {
     , rotateLabels = 0
     , tooltips = true
     , tooltip = null
+    , minTickWidth = 60
     , tooltipSingle = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -76,6 +77,7 @@ nv.models.multiBarWithBrushChart = function() {
     , stackedHidden = false
     , onSelectRange = null
     , onStateChange = null
+    , onLegendChange = null
     , onChartUpdate = null
     , selectBars = null
     ;
@@ -140,6 +142,9 @@ nv.models.multiBarWithBrushChart = function() {
           availableHeight = (height || parseInt(container.style('height')) || 400)
                              - margin.top - margin.bottom;
 
+      chart.recommendedTicks = function() {
+        return Math.floor(availableWidth / minTickWidth);
+      };
       chart.update = function() {
         container
             .transition()
@@ -392,9 +397,12 @@ nv.models.multiBarWithBrushChart = function() {
       // Setup Axes
 
       if (showXAxis) {
+          function tickSkip () {
+            return Math.ceil(minTickWidth / xAxis.rangeBand());
+          }
           xAxis
             .scale(x)
-            .ticks( availableChartWidth / 100 )
+            .tickValues(x.domain().filter(function(d, i) { return reduceXTicks && !(i % tickSkip()); }))
             .tickSize(-availableHeight, 0);
 
           g.select('.nv-x.nv-axis')
@@ -437,15 +445,6 @@ nv.models.multiBarWithBrushChart = function() {
                     return getTranslate(0, (i === 0 || totalInBetweenTicks % 2 !== 0) ? staggerDown : staggerUp);
                 });
           }
-
-          if (reduceXTicks)
-            xTicks
-              .filter(function(d,i) {
-                  return i % Math.ceil(data[0].values.length / (availableChartWidth / 100)) !== 0;
-                })
-              .selectAll('text, line')
-              .style('opacity', 0);
-
           if(rotateLabels)
             xTicks
               .selectAll('.tick text')
@@ -479,6 +478,9 @@ nv.models.multiBarWithBrushChart = function() {
       legend.dispatch.on('stateChange', function(newState) {
         state = newState;
         dispatch.stateChange(state);
+        if (onLegendChange != null) {
+          onLegendChange(state);
+        }
         chart.update();
       });
 
@@ -562,13 +564,17 @@ nv.models.multiBarWithBrushChart = function() {
         _l = x.domain()[_l] != undefined ? _l : 0;
         var _from = x.domain()[_l];
 
-        for(_j=0; extent[1] > (_leftEdges[_j] + _width) * 1.01; _j++) {}
-        var _to = x.domain()[_j + 1] != undefined ? x.domain()[_j + 1]: new Date(9999,11,31)
+        for(_j=0; extent[1] > (_leftEdges[_j] + _width); _j++) {}
+        var _to = x.domain()[_j + 1] != undefined ? x.domain()[_j + 1]: filteredData[0].values[filteredData[0].values.length - 1].x_end;
         var range  = [x.range()[_l], x.range()[_j + 1] != undefined ? x.range()[_j + 1] : x.range()[_j] + _width];
         brush.extent(chart.brushExtent = range);
         g.select('.nv-x.nv-brush').call(brush);
         if (onSelectRange != null){
-          onSelectRange(_from, _to);
+          if (_from > _to) {
+            onSelectRange(_to, _from);
+          } else {
+            onSelectRange(_from, _to);
+          }
         }
       }
       function getElByMouse (coords, filterSeries) {
@@ -610,15 +616,17 @@ nv.models.multiBarWithBrushChart = function() {
         }
         var _l, _j;
         var isDescending = _leftEdges[0] < _leftEdges[1];
+        if (!isDescending) {
+          selection = [Math.max(selection[0], selection[1]), Math.min(selection[0], selection[1])]
+        }
         if (isDescending) {
-          for(_l= 0; selection[0] > _leftEdges[_l]; _l++) {}
+          for(_l= 0; selection[0] >= _leftEdges[_l]; _l++) {}
         } else {
           for(_l= _leftEdges.length - 1; selection[0] > _leftEdges[_l]; _l--) {}
         }
 
-        _l = x.range()[_l] != undefined ? _l : 0;
+        _l = x.range()[_l + (isDescending ? -1 : 0)] != undefined ? _l + (isDescending ? -1 : 0) : isDescending ? _leftEdges.length - 1 : 0;
         var _fromRange = x.range()[_l] != undefined ? x.range()[_l] : 0;
-        var _from = x.domain()[_l] != undefined ? x.domain()[_l] : 0;
 
         if (isDescending) {
           for(_j = 0; selection[1] > _leftEdges[_j]; _j++) {}
@@ -626,10 +634,8 @@ nv.models.multiBarWithBrushChart = function() {
           for(_j = _leftEdges.length - 1; selection[1] > _leftEdges[_j]; _j--) {}
         }
         var _toRange = x.range()[_j] != undefined ? x.range()[_j] : x.range()[_leftEdges.length - 1] + _width;
-        var _to = x.domain()[_j] != undefined ? x.domain()[_j]: new Date(9999,11,31); // TODO: Fix for non time data
         return {
-          range: [_fromRange, _toRange],
-          domain: [_from, _to]
+          range: [_fromRange, _fromRange === _toRange ? _fromRange + x.rangeBand() : _toRange]
         };
       }
       function onMouseMove () {
@@ -929,9 +935,21 @@ nv.models.multiBarWithBrushChart = function() {
     return chart;
   };
 
+  chart.onLegendChange = function(_) {
+    if (!arguments.length) return onLegendChange;
+    onLegendChange = _;
+    return chart;
+  };
+
   chart.onChartUpdate = function(_) {
     if (!arguments.length) return onChartUpdate;
     onChartUpdate = _;
+    return chart;
+  };
+
+  chart.minTickWidth = function() {
+    if (!arguments.length) return minTickWidth;
+    minTickWidth = _;
     return chart;
   };
 

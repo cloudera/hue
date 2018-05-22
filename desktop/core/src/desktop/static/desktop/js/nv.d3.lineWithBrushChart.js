@@ -73,6 +73,7 @@ nv.models.lineWithBrushChart = function() {
     , selectionHidden = false
     , onSelectRange = null
     , onStateChange = null
+    , onLegendChange = null
     , onChartUpdate = null
     ;
 
@@ -399,6 +400,9 @@ nv.models.lineWithBrushChart = function() {
       legend.dispatch.on('stateChange', function(newState) {
           state = newState;
           dispatch.stateChange(state);
+          if (onLegendChange) {
+            onLegendChange(state);
+          }
           chart.update();
       });
 
@@ -850,6 +854,12 @@ nv.models.lineWithBrushChart = function() {
   chart.onStateChange = function(_) {
     if (!arguments.length) return onStateChange;
     onStateChange = _;
+    return chart;
+  };
+
+  chart.onLegendChange = function(_) {
+    if (!arguments.length) return onLegendChange;
+    onLegendChange = _;
     return chart;
   };
 
