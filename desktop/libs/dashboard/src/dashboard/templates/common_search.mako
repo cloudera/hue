@@ -1245,12 +1245,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
                        optionsValue: 'value',
                        value: properties.timelineChartType">
         </select>&nbsp;
-        <span class="facet-field-label">${ _('Interval') }</span>
-        <select class="input-small" data-bind="options: $root.intervalOptions,
-                       optionsText: 'label',
-                       optionsValue: 'value',
-                       value: properties.gap">
-        </select>&nbsp;
       </span>
       <span class="facet-field-label">${ _('Zoom') }</span>
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
@@ -1264,7 +1258,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
         type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
         hideSelection: true,
         hideStacked: hideStacked,
+        selectedSerie: selectedSerie,
         fqs: $root.query.fqs,
+        slot: $root.collection.getFacetById($parent.id()).properties.slot,
         onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); $root.collection.getFacetById($parent.id()).properties.enableSelection(state.selectionEnabled); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
@@ -1300,12 +1296,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
                        optionsText: 'label',
                        optionsValue: 'value',
                        value: properties.timelineChartType">
-        </select>&nbsp;
-        <span class="facet-field-label">${ _('Interval') }</span>
-        <select class="input-small" data-bind="options: $root.intervalOptions,
-                       optionsText: 'label',
-                       optionsValue: 'value',
-                       value: properties.facets()[0].gap">
         </select>&nbsp;
       </span>
     </div>
@@ -1344,6 +1334,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       enableSelection: true,
       hideSelection: true,
       hideStacked: hideStacked,
+      slot: $root.collection.getFacetById($parent.id()).properties.slot,
       transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
       onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
       onClick: function(d) {
@@ -1610,12 +1601,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <!-- ko with: $parent -->
 
           <!-- ko if: dimension() == 1 -->
-            <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
+            <div data-bind="barChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
               fqs: $root.query.fqs,
               enableSelection: true,
               hideSelection: true,
               hideStacked: hideStacked,
-              transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
+              slot: $root.collection.getFacetById($parent.id()).properties.slot,
+              transformer: barChartDataTransformer2,
               onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
               onClick: function(d) {
                 if (d.obj.field != undefined) {
@@ -1642,7 +1634,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
               enableSelection: true,
               hideSelection: true,
               hideStacked: hideStacked,
+              slot: $root.collection.getFacetById($parent.id()).properties.slot,
               transformer: pivotChartDataTransformer,
+              onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
               onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
               onClick: function(d) {
                 $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
@@ -1660,6 +1654,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
             enableSelection: true,
             hideSelection: true,
             hideStacked: hideStacked,
+            selectedSerie: selectedSerie,
+            slot: $root.collection.getFacetById($parent.id()).properties.facets()[0].slot,
             onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
             onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
             onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
@@ -1691,6 +1687,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
             enableSelection: true,
             hideSelection: true,
             hideStacked: hideStacked,
+            selectedSerie: selectedSerie,
+            slot: $root.collection.getFacetById($parent.id()).properties.slot,
             onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
             onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
             onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
@@ -1807,17 +1805,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </select>
       </div>
       <!-- /ko -->
-      <!-- ko if: properties.isDate -->
-        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-          <span class="facet-field-label">${ _('Interval') }</span>
-          <select class="input-small" data-bind="options: $root.intervalOptions,
-                         optionsText: 'label',
-                         optionsValue: 'value',
-                         value: properties.facets()[0].gap">
-          </select>
-        </div>
-      <!-- /ko -->
-
       </div>
       <div class="clearfix"></div>
     </div>
@@ -2076,7 +2063,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
           enableSelection: true,
           hideSelection: true,
           fqs: $root.query.fqs,
+          slot: $root.collection.getFacetById($parent.id()).properties.slot,
           transformer: pivotChartDataTransformer,
+          onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
           onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
@@ -3404,12 +3393,19 @@ function _barChartDataTransformer(rawDatum, isUp) {
     key: rawDatum.label,
     values: _data
   });
+  _data.sort(function (a, b) {
+    return a.x - b.x;
+  });
 
   return _datum;
 }
 
 function barChartDataTransformer(rawDatum) {
   return _barChartDataTransformer(rawDatum, false);
+}
+
+function barChartDataTransformer2(rawDatum) {
+  return _timelineChartDataTransformer(rawDatum, false);
 }
 
 function barChartRangeUpDataTransformer(rawDatum) {
@@ -3495,6 +3491,11 @@ function pivotChartDataTransformer(rawDatum) {
     });
   });
 
+  _categories.forEach(function (category) {
+    category.values.sort(function (a, b) {
+      return a.x - b.x;
+    });
+  });
   return _categories;
 }
 
@@ -3528,24 +3529,42 @@ function lineChartDataTransformer(rawDatum) {
   return _datum;
 }
 
-function timelineChartDataTransformer(rawDatum) {
+function timelineChartDataTransformer (rawDatum) {
+  return _timelineChartDataTransformer(rawDatum, true);
+}
+
+function _timelineChartDataTransformer(rawDatum, isDate) {
   var _datum = [];
   var _data = [];
 
+  function getValue (value) {
+    return isDate ? new Date(moment(value).valueOf()) : value
+  }
+  function getNumericValue(value) {
+    return value && value.getTime ? value.getTime() : value;
+  }
+
   $(rawDatum.counts).each(function (cnt, item) {
+    item.widget_id = rawDatum.widget_id;
     _data.push({
       series: 0,
-      x: new Date(moment(item.from ? item.from : item.value).valueOf()), // When started from a non timeline widget
-      x_end: item.to && new Date(moment(item.to).valueOf()),
-      y: item.from ? item.value : item.count,
+      x: getValue(item.from ? item.from : item.value), // When started from a non timeline widget
+      x_end: item.to && getValue(item.to),
+      y: item.from !== undefined ? item.value : item.count,
       obj: item
     });
   });
 
-  _datum.push({
-    key: rawDatum.label,
-    values: _data
-  });
+  if (_data.length) {
+    _datum.push({
+      key: rawDatum.label,
+      values: _data
+    });
+
+    _data.sort(function (a, b) {
+      return a.x - b.x;
+    });
+  }
 
   // In Solr, all series might not have values on all data point. If a value is 0 or if it's been filtered by the limit option, solr does not return a value.
   // Unfortunately, this causes the following issues in the chart:
@@ -3556,7 +3575,7 @@ function timelineChartDataTransformer(rawDatum) {
   //Preprocess to obtain all the x values.
   var values = rawDatum.extraSeries.reduce(function (values, serie) {
     serie.counts.reduce(function (values, item) {
-      var x = new Date(moment(item.from ? item.from : item.value).valueOf()).getTime();
+      var x = getNumericValue(getValue(item.from ? item.from : item.value));
       if (!values[x]) {
         values[x] = {};
       }
@@ -3568,7 +3587,10 @@ function timelineChartDataTransformer(rawDatum) {
 
 
   // If multi query
-  var keys = Object.keys(values).sort();
+  var keys = Object.keys(values);
+  if (isDate) {
+    keys.sort();
+  }
   $(rawDatum.extraSeries).each(function (cnt, serie) {
     if (cnt == 0) {
       _datum = [];
@@ -3578,22 +3600,24 @@ function timelineChartDataTransformer(rawDatum) {
     $(keys).each(function (cnt, key) {
       if (values[key][serie.label]) {
         var item = values[key][serie.label];
+        item.widget_id = rawDatum.widget_id;
         _data.push({
           series: cnt + 1,
-          x: new Date(moment(item.from ? item.from : item.value).valueOf()), // When started from a non timeline widget
-          x_end: item.to && new Date(moment(item.to).valueOf()),
-          y: item.from ? item.value : item.count,
+          x: getValue(item.from ? item.from : item.value), // When started from a non timeline widget
+          x_end: item.to && getValue(item.to),
+          y: item.from !== undefined ? item.value : item.count,
           obj: item
         });
       } else {
         var keys = Object.keys(values[key]);
         var item = keys[0] && values[key][keys[0]];
+        item.widget_id = rawDatum.widget_id;
         var copy = JSON.parse(JSON.stringify(item));
         copy.value = 0;
         _data.push({
           series: cnt + 1,
-          x: new Date(moment(item.from ? item.from : item.value).valueOf()),
-          x_end: item.to && new Date(moment(item.to).valueOf()),
+          x: getValue(item.from ? item.from : item.value),
+          x_end: item.to && getValue(item.to),
           y: copy.value,
           obj: copy
         });

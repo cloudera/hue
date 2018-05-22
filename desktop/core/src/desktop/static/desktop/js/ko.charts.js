@@ -15,7 +15,20 @@
 // limitations under the License.
 
 (function () {
-
+  var MS = 1,
+  SECOND_MS = 1000 * MS,
+  MINUTE_MS = SECOND_MS * 60,
+  HOUR_MS = MINUTE_MS * 60,
+  DAY_MS = HOUR_MS * 24,
+  WEEK_MS = DAY_MS * 7,
+  MONTH_MS = DAY_MS * 30.5,
+  YEAR_MS = DAY_MS * 365;
+  TIME_INTERVALS = [{ms: SECOND_MS * 1, coeff: 1, unit: 'SECONDS'}, {ms: SECOND_MS * 2, coeff: 2, unit: 'SECONDS'}, {ms: SECOND_MS * 5, coeff: 5, unit: 'SECONDS'}, {ms: SECOND_MS * 10, coeff: 10, unit: 'SECONDS'}, {ms: SECOND_MS * 15, coeff: 15, unit: 'SECONDS'}, {ms: SECOND_MS * 30, coeff: 30, unit: 'SECONDS'},
+  {ms: MINUTE_MS * 1, coeff: 1, unit: 'MINUTES'}, {ms: MINUTE_MS * 2, coeff: 2, unit: 'MINUTES'}, {ms: MINUTE_MS * 5, coeff: 5, unit: 'MINUTES'}, {ms: MINUTE_MS * 10, coeff: 10, unit: 'MINUTES'}, {ms: MINUTE_MS * 15, coeff: 15, unit: 'MINUTES'}, {ms: MINUTE_MS * 30, coeff: 30, unit: 'MINUTES'},
+  {ms: HOUR_MS * 1, coeff: 1, unit: 'HOURS'}, {ms: HOUR_MS * 2, coeff: 2, unit: 'HOURS'}, {ms: HOUR_MS * 4, coeff: 4, unit: 'HOURS'}, {ms: HOUR_MS * 6, coeff:6, unit: 'HOURS'}, {ms: HOUR_MS * 8, coeff: 8, unit: 'HOURS'}, {ms: HOUR_MS * 12, coeff: 12, unit: 'HOURS'},
+  {ms: DAY_MS * 1, coeff: 1, unit: 'DAYS'}, {ms: DAY_MS * 2, coeff: 2, unit: 'MONTHS'}, {ms: WEEK_MS * 1, coeff: 7, unit: 'DAYS'}, {ms: WEEK_MS * 2, coeff: 14, unit: 'DAYS'},
+  {ms: MONTH_MS * 1, coeff: 1, unit: 'MONTHS'}, {ms: MONTH_MS * 2, coeff: 2, unit: 'MONTHS'}, {ms: MONTH_MS * 3, coeff: 3, unit: 'MONTHS'}, {ms: MONTH_MS * 6, coeff: 6, unit: 'MONTHS'},
+  {ms: YEAR_MS * 1, coeff: 1, unit: 'YEARS'}];
   ko.HUE_CHARTS = {
     TYPES: {
       COUNTER: "counter",
@@ -201,13 +214,17 @@
         }
        if (numeric(_datum)) {
           _chart.xAxis.showMaxMin(false).tickFormat(d3v3.format(",0f"));
-          _chart.multibar.barColor(null);
+          if (_chart.multibar) {
+            _chart.multibar.barColor(null);
+          }
         } else {
           _chart.xAxis.tickFormat(function(s){ return s; });
-          if (!_isPivot) {
-            _chart.multibar.barColor(nv.utils.defaultColor());
-          } else {
-            _chart.multibar.barColor(null);
+          if (_chart.multibar) {
+            if (!_isPivot) {
+              _chart.multibar.barColor(nv.utils.defaultColor());
+            } else {
+              _chart.multibar.barColor(null);
+            }
           }
         }
         window.setTimeout(function () {
@@ -225,7 +242,21 @@
       }
     }
   };
-
+  function getInterval(domainMs, maxSlots) {
+    var biggestInterval = TIME_INTERVALS[TIME_INTERVALS.length-1];
+    var biggestIntervalIsTooSmall = domainMs / biggestInterval.ms > maxSlots;
+    if (biggestIntervalIsTooSmall) {
+      var coeff = Math.ceil(domainMs / maxSlots);
+      return "+" + coeff + "YEARS";
+    }
+    for (var i = TIME_INTERVALS.length - 2; i >= 0; i--) {
+      var slots = domainMs / TIME_INTERVALS[i].ms;
+      if (slots > maxSlots) {
+        return "+" + TIME_INTERVALS[i + 1].coeff + TIME_INTERVALS[i + 1].unit;
+      }
+    }
+    return "+" + TIME_INTERVALS[0].coeff + TIME_INTERVALS[0].unit;
+  }
   ko.bindingHandlers.timelineChart = {
     init: function (element, valueAccessor) {
       if (valueAccessor().type && valueAccessor().type() == "line"){
@@ -673,28 +704,14 @@
     }
   };
   function multi(xAxis) {
-    var previous = new Date(9999,11,31);
+    var previous = null;
     var minDiff = 5.1;
-    var s = 1000,
-    m = s * 60,
-    h = m * 60,
-    day = h * 24,
-    mn = day * 30.5,
-    y = day * 365;
     return d3v3.time.format.utc.multi([
-      ["%L %Y-%m-%dT%H:%M:%S", function(d) {
-        var domain = xAxis.domain();
-        var domainDiff = domain[domain.length - 1] - domain[0];
-        var result = previous >= d && domainDiff < s * minDiff;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
       ["%S %Y-%m-%dT%H:%M", function(d) {
         var domain = xAxis.domain();
-        var domainDiff = domain[domain.length - 1] - domain[0];
-        var result = previous >= d && domainDiff < m * minDiff;
+        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
+        var isFirst = d == domain[0];
+        var result = isFirst && domainDiff < MINUTE_MS * minDiff;
         if (result) {
           previous = d;
         }
@@ -702,8 +719,9 @@
       }],
       ["%H:%M %Y-%m-%d", function(d) {
         var domain = xAxis.domain();
-        var domainDiff = domain[domain.length - 1] - domain[0];
-        var result = previous >= d && domainDiff < h * minDiff;
+        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
+        var isFirst = d == domain[0];
+        var result = isFirst && domainDiff < HOUR_MS * minDiff;
         if (result) {
           previous = d;
         }
@@ -711,8 +729,9 @@
       }],
       ["%H:%M %Y-%m-%d", function(d) {
         var domain = xAxis.domain();
-        var domainDiff = domain[domain.length - 1] - domain[0];
-        var result = previous >= d && domainDiff < day * minDiff;
+        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
+        var isFirst = d == domain[0];
+        var result = isFirst && domainDiff < DAY_MS * minDiff;
         if (result) {
           previous = d;
         }
@@ -720,8 +739,9 @@
       }],
       ["%d %Y-%m", function(d) {
         var domain = xAxis.domain();
-        var domainDiff = domain[domain.length - 1] - domain[0];
-        var result = previous >= d && domainDiff < mn * minDiff;
+        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
+        var isFirst = d == domain[0];
+        var result = isFirst && domainDiff < MONTH_MS * minDiff;
         if (result) {
           previous = d;
         }
@@ -729,8 +749,9 @@
       }],
       ["%m %Y", function(d) {
         var domain = xAxis.domain();
-        var domainDiff = domain[domain.length - 1] - domain[0];
-        var result = previous >= d && domainDiff < y * minDiff;
+        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
+        var isFirst = d == domain[0];
+        var result = isFirst && domainDiff < YEAR_MS * minDiff;
         if (result) {
           previous = d;
         }
@@ -738,91 +759,81 @@
       }],
       ["%Y", function(d) {
         var test = xAxis;
-        var result = previous > d;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%L %H:%M:%S", function(d) {
-        var result = moment(previous).utc().seconds() !== moment(d).utc().seconds() && d - previous < s;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%L", function(d) {
-        var result = moment(previous).utc().milliseconds() !== moment(d).utc().milliseconds();
+        var domain = xAxis.domain();
+        var isFirst = d == domain[0];
+        var result = isFirst;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%S %H:%M", function(d) {
-        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes() && d - previous < m;
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes() && previousDiff < MINUTE_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%S", function(d) {
-        var result = moment(previous).utc().seconds() !== moment(d).utc().seconds();
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().seconds() !== moment(d).utc().seconds() && previousDiff < MINUTE_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%H:%M %Y-%m-%d", function(d) {
-        var result = moment(previous).utc().date() !== moment(d).utc().date() && d - previous < h;
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().date() !== moment(d).utc().date() && previousDiff < WEEK_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%H:%M", function(d) {
-        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes();
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%H:%M %Y-%m-%d", function(d) {
-        var result = moment(previous).utc().date() !== moment(d).utc().date() && d - previous < day;
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes() && previousDiff < WEEK_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%H:%M", function(d) {
-        var result = moment(previous).utc().hours() !== moment(d).utc().hours();
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().hours() !== moment(d).utc().hours() && previousDiff < WEEK_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%d %Y-%m", function(d) {
-        var result = moment(previous).utc().months() !== moment(d).utc().months() && d - previous < mn;
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().months() !== moment(d).utc().months() && previousDiff < MONTH_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%d", function(d) {
-        var result = moment(previous).utc().date() !== moment(d).utc().date();
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().date() !== moment(d).utc().date() && previousDiff < MONTH_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%m %Y", function(d) {
-        var result = moment(previous).utc().years() !== moment(d).utc().years() && d - previous < y;
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().years() !== moment(d).utc().years() && previousDiff < YEAR_MS;
         if (result) {
           previous = d;
         }
         return result;
       }],
       ["%m", function(d) {
-        var result = moment(previous).utc().months() !== moment(d).utc().months();
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().months() !== moment(d).utc().months() && previousDiff < YEAR_MS;
         if (result) {
           previous = d;
         }
@@ -860,6 +871,16 @@
           huePubSub.publish('charts.state', { updating: true });
           options.onSelectRange($.isNumeric(from) && isTimeline ? new Date(moment(from).valueOf()) : parseInt(from), $.isNumeric(to) && isTimeline ? new Date(moment(to).valueOf()) : parseInt(to)); // FIXME when using pdouble we should not parseInt.
         });
+        if (options.selectedSerie) {
+          _chart.onLegendChange(function (state) {
+            var selectedSerie = options.selectedSerie();
+            var _datum = d3v3.select($(element).find("svg")[0]).datum();
+            for (var i = 0; i < state.disabled.length; i++) {
+              selectedSerie[_datum[i].key] = !state.disabled[i];
+            }
+            options.selectedSerie(selectedSerie);
+          });
+        }
         _chart.xAxis.showMaxMin(false);
         if (isTimeline){
           _chart.xScale(d3v3.time.scale.utc());
@@ -922,8 +943,10 @@
   }
 
   function addLegend(element) {
-    d3v3.select($(element)[0])
-      .append("div")
+    var $el = d3v3.select($(element)[0]);
+    var $div = $el.select('div');
+    if (!$div.size()) {
+      $el.append("div")
         .style("position", "absolute")
         .style("overflow", "auto")
         .style("top", "20px")
@@ -931,6 +954,9 @@
         .style("width", "175px")
         .style("height", "calc(100% - 20px)")
       .append("svg");
+    } else {
+      $div.append("svg");
+    }
   }
   function numeric(_datum) {
     for (var j = 0; j < _datum.length; j++) {
@@ -943,6 +969,25 @@
     return true;
   }
   function handleSelection(_chart, _options, _datum) {
+    var i;
+    var serieEnabled = {};
+    if (_options.selectedSerie) {
+      var selectedSerie = _options.selectedSerie();
+      var enabledCount = 0;
+      for (i = 0; i < _datum.length; i++) {
+        if (!selectedSerie[_datum[i].key]) {
+          _datum[i].disabled = true;
+        } else {
+          enabledCount++;
+        }
+      }
+      if (enabledCount === 0) {
+        for (i = 0; i < Math.min(5, _datum.length); i++) {
+          _datum[i].disabled = false;
+          selectedSerie[_datum[i].key] = true;
+        }
+      }
+    }
     var _isPivot = _options.isPivot != null ? _options.isPivot : false;
     var _hideSelection = typeof _options.hideSelection !== 'undefined' ? typeof _options.hideSelection === 'function' ? _options.hideSelection() : _options.hideSelection : false;
     var _enableSelection = typeof _options.enableSelection !== 'undefined' ? typeof _options.enableSelection === 'function' ? _options.enableSelection() : _options.enableSelection : true;
@@ -1035,6 +1080,16 @@
         }
       });
       _chart.onStateChange(options.onStateChange);
+      if (options.selectedSerie) {
+        _chart.onLegendChange(function (state) {
+          var selectedSerie = options.selectedSerie();
+          var _datum = d3v3.select($(element).find("svg")[0]).datum();
+          for (var i = 0; i < state.disabled.length; i++) {
+            selectedSerie[_datum[i].key] = !state.disabled[i];
+          }
+          options.selectedSerie(selectedSerie);
+        });
+      }
       _chart.multibar.hideable(true);
       _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
       if (isTimeline) {
@@ -1060,10 +1115,11 @@
       else {
         if (numeric(_datum)) {
           _chart.xAxis.showMaxMin(false).tickFormat(d3v3.format(",0f"));
+          _chart.staggerLabels(false);
         } else if (!_isPivot) {
           _chart.multibar.barColor(nv.utils.defaultColor());
+          _chart.staggerLabels(true);
         }
-        _chart.staggerLabels(true);
       }
       if ($(element).width() < 300 && typeof _chart.showLegend != "undefined") {
         _chart.showLegend(false);
@@ -1088,6 +1144,9 @@
             _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
               insertLinebreaks(_chart, d, this);
             });
+          }
+          if (options.slot && _chart.recommendedTicks) {
+            options.slot(_chart.recommendedTicks());
           }
         }).call(_chart);
 

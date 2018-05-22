@@ -1137,6 +1137,7 @@ var Collection = function (vm, collection) {
         "id": facet_json.widget_id,
         "label": facet_json.name,
         "field": facet_json.name,
+        'window_size': $(window).width() - 600, // TODO: Find a better way to get facet width.
         "widget_type": facet_json.widgetType
       }, function (data) {
         if (data.status == 0) {
@@ -1167,7 +1168,7 @@ var Collection = function (vm, collection) {
       });
       facet.properties.facets_form.field = null;
       facet.properties.facets_form.limit = 5;
-      facet.properties.facets_form.mincount = 1;
+      facet.properties.facets_form.mincount = 0;
       facet.properties.facets_form.aggregate = 'count';
     } else {
       if (typeof facet.properties.facets_form.field != 'undefined') {
@@ -1179,7 +1180,7 @@ var Collection = function (vm, collection) {
         });
         facet.properties.facets_form.field(null);
         facet.properties.facets_form.limit(5);
-        facet.properties.facets_form.mincount(1);
+        facet.properties.facets_form.mincount(0);
         facet.properties.facets_form.aggregate ? facet.properties.facets_form.aggregate('count') : '';
       }
     }
@@ -1217,7 +1218,7 @@ var Collection = function (vm, collection) {
 
     facet.properties.facets_form.field(null);
     facet.properties.facets_form.limit(5);
-    facet.properties.facets_form.mincount(1);
+    facet.properties.facets_form.mincount(0);
     facet.properties.facets_form.sort('desc');
 
     facet.properties.facets_form.aggregate.formula('');
@@ -2555,6 +2556,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         facet.hideStacked = ko.computed(function () {
           return !facet.extraSeries() || !facet.extraSeries().length;
         });
+        facet.selectedSerie = ko.observable({});
         facet.resultHash(_hash);
         facet.filterHash(_filterHash);
         facet.has_data(true);
