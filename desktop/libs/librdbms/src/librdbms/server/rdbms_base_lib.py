@@ -30,7 +30,6 @@ class BaseRDBMSDataTable(object):
     else:
       self.columns_description = [{'name': col} for col in columns]
       self.columns = columns
-    self.columns_description = columns
     self.next = None
     self.startRowOffset = 0
     self.fetchSize = 1000
