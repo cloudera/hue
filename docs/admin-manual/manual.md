@@ -39,7 +39,7 @@ Hue employs some Python modules which use native code and requires
 certain development libraries be installed on your system. To install from the
 tarball, you'll need these library development packages and tools installed on your system:
 
-* Python 2.6.5 - 2.7
+* Python 2.7
 
 ### Ubuntu
 

@@ -270,9 +270,9 @@ namespace. See ``apps/about/src/about/urls.py`` for an example.
 ### Software
 
 Developing for the Hue SDK has similar requirements to running
-Hue itself.  We require python (2.6 to 2.7), Django (1.6 included
-with our distribution), Hadoop (Apache Hadoop 2+), Java (Sun Java 1.8),
-and Browser (latest Chrome, Firefox or IE9+).
+Hue itself.  We require Python 2.7, Django (1.11 included
+with our distribution), Hadoop (Apache Hadoop 2+), Java (Java 1.8),
+and Browser (latest Chrome, Firefox or IE10+).
 
 ### Recommended Reading / Important Technologies
 
