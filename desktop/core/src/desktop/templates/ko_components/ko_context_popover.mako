@@ -405,11 +405,17 @@ from metadata.conf import has_navigator
       <!-- ko if: !loading() && !hasErrors() -->
       <!-- ko with: definition -->
       <div class="context-popover-flex-attributes">
+          <!-- ko if: typeof humansize !== 'undefined' -->
           <div class="context-popover-attribute"><div>${ _('Size') }</div><div data-bind="text: humansize"></div></div>
+          <!-- /ko -->
+          <!-- ko if: typeof stats !== 'undefined' -->
           <!-- ko with: stats -->
           <div class="context-popover-attribute"><div>${ _('Owner') }</div><div data-bind="text: user"></div></div>
           <!-- /ko -->
+          <!-- /ko -->
+          <!-- ko if: typeof rwx !== 'undefined' -->
           <div class="context-popover-attribute"><div>${ _('Permissions') }</div><div data-bind="text: rwx"></div></div>
+          <!-- /ko -->
       </div>
       <!-- /ko -->
       <!-- ko if: definition.type === 'dir' -->
