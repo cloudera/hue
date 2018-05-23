@@ -1238,6 +1238,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div class="clearfix"></div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
+      <div data-bind="visible: canZoomIn() || canReset()" class="inline-block">
+        <span class="facet-field-label">${ _('Zoom') }</span>
+        <i class="fa fa-search-minus"></i>
+      </div>
+      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
+        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
+      </div>
+      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
+        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
+      </div>
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Chart Type') }</span>
         <select class="input-small" data-bind="options: $root.timelineChartTypes,
@@ -1246,8 +1256,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
                        value: properties.timelineChartType">
         </select>&nbsp;
       </span>
-      <span class="facet-field-label">${ _('Zoom') }</span>
-      <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
       <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
       <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
@@ -1287,8 +1295,15 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
+      <div data-bind="visible: canZoomIn() || canReset()" class="inline-block">
+        <span class="facet-field-label">${ _('Zoom') }</span>
+        <i class="fa fa-search-minus"></i>
+      </div>
+      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
+        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
+      </div>
       <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
-        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"></i> ${ _('reset') }</a>
+        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
       </div>
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Chart Type') }</span>
@@ -1792,8 +1807,15 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div>
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
       <div class="pull-right">
+        <div data-bind="visible: canZoomIn() || canReset()" class="inline-block">
+        <span class="facet-field-label">${ _('Zoom') }</span>
+      <i class="fa fa-search-minus"></i>
+      </div>
+      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
+        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
+      </div>
       <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
-        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"></i> ${ _('reset') }</a>
+        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
       </div>
       <!-- ko if: properties.canRange -->
       <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">

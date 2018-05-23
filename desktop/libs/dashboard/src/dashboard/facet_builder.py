@@ -96,8 +96,8 @@ def _get_interval(domain_ms, SLOTS):
   biggest_interval = TIME_INTERVALS[len(TIME_INTERVALS) - 1]
   biggest_interval_is_too_small = domain_ms / biggest_interval['ms'] > SLOTS
   if biggest_interval_is_too_small:
-    coeff = ceil(domain_ms / SLOTS)
-    return '+' + coeff + 'YEARS'
+    coeff = min(ceil(domain_ms / SLOTS), 100) # If we go over 100 years, something has gone wrong.
+    return '+' + str(coeff) + 'YEARS'
 
   for i in range(len(TIME_INTERVALS) - 2, 0, -1):
     slots = domain_ms / TIME_INTERVALS[i]['ms']
