@@ -238,6 +238,6 @@ for x in static_patterns:
   logging.debug("Static pattern: %s" % (x,))
 
 if settings.DEBUG:
-  urlpatterns += patterns('',
+  urlpatterns += [
     url(r'^__debug__/', include(debug_toolbar.urls)),
-  )
+  ]
