@@ -36,7 +36,7 @@ from django.contrib import admin
 from django.views.static import serve
 
 from desktop import appmanager
-from desktop.conf import METRICS, USE_NEW_EDITOR
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL
 
 from desktop.auth import views as desktop_auth_views
 from desktop import views as desktop_views
@@ -237,7 +237,7 @@ for x in app_urls_patterns:
 for x in static_patterns:
   logging.debug("Static pattern: %s" % (x,))
 
-if settings.DEBUG:
+if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
   urlpatterns += [
     url(r'^__debug__/', include(debug_toolbar.urls)),
   ]
