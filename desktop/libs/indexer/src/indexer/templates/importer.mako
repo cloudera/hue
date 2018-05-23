@@ -852,8 +852,30 @@ ${ assist.assistPanel() }
 
         <!-- ko if: ['table', 'index', 'hbase'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
-            <h4 class="show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h4>
+            <h4>
+              <!-- ko if: useFieldEditor -->
+              <a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">${_('Fields')} /</a> ${_('Editor')}
+              <!-- /ko -->
+              <!-- ko ifnot: useFieldEditor -->
+              ${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a> <!-- ko if: fieldEditorEnabled --><a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">/ ${_('Editor')}</a><!-- /ko -->
+              <!-- /ko -->
+            </h4>
             <div class="card-body no-margin-top columns-form">
+              <!-- ko if: useFieldEditor -->
+              <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                  value: fieldEditorValue,
+                  placeHolder: '${ _ko('Example: SELECT a, b FROM c') }',
+                  autocomplete: { type: 'hiveQuery' },
+                  lines: 5,
+                  aceOptions: {
+                    minLines: 10,
+                    maxLines: 25
+                  },
+                  database: fieldEditorDatabase,
+                  mode: 'hive'
+                }}"></div>
+              <!-- /ko -->
+              <!-- ko ifnot: useFieldEditor -->
               <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
                 <form class="form-inline inline-table" data-bind="foreach: columns">
                   <!-- ko if: $parent.outputFormat() == 'table' -->
@@ -888,6 +910,7 @@ ${ assist.assistPanel() }
               </form>
 
               <div class="clearfix"></div>
+              <!-- /ko -->
               <!-- /ko -->
             </div>
           </div>
@@ -1941,7 +1964,7 @@ ${ assist.assistPanel() }
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
 
       self.tableFormats = ko.pureComputed(function() {
-        if (wizard.source.inputFormat() == 'kafka') {
+        if (wizard.source.inputFormat() === 'kafka') {
           return [{'value': 'kudu', 'name': 'Kudu'}];
         } else {
           return [
@@ -1961,6 +1984,16 @@ ${ assist.assistPanel() }
       self.kuduPartitionColumns = ko.observableArray();
       self.primaryKeys = ko.observableArray();
       self.primaryKeyObjects = ko.observableArray();
+
+      self.useFieldEditor = ko.observable(false);
+      // TODO: Figure out the database to use for field editor autocomplete
+      self.fieldEditorDatabase = ko.observable('default');
+      // TODO: Do something with the editor value
+      self.fieldEditorValue = ko.observable();
+      self.fieldEditorEnabled = ko.pureComputed(function () {
+        // TODO: Decide when the editor should be enabled
+        return false; // Disabled for now
+      });
 
       self.importData = ko.observable(true);
       self.useDefaultLocation = ko.observable(true);

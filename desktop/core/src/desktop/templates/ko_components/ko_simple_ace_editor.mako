@@ -812,12 +812,7 @@ from desktop.views import _ko
                 return sourceType;
               },
               database: function () {
-                if (params.autocomplete.support.collection.name()) {
-                  var path = params.autocomplete.support.collection.name().split('.');
-                  return path.length > 1 ? path[0] : 'default';
-                } else {
-                  return 'default';
-                }
+                return params.database && params.database() ? params.database() : 'default';
               },
               positionStatement: function () {
                 return {
@@ -825,8 +820,8 @@ from desktop.views import _ko
                 }
               }
             },
-            fixedPrefix: sourceType !== 'solr' ? function() { return 'SELECT * FROM ' + params.autocomplete.support.collection.name() + ' WHERE '; } : undefined,
-            fixedPostfix: sourceType !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined, // By adding group by it will limit it to the filter suggestions
+            fixedPrefix: params.fixedPrefix,
+            fixedPostfix: params.fixedPostfix,
             support: params.autocomplete.support
           };
 

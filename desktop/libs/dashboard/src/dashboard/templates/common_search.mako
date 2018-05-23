@@ -103,6 +103,9 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
               placeHolder: $root.collection.engine() === 'solr' ? '${ _ko('Example: field:value, or press CTRL + space') }' : '${ _ko('Example: col = value, or press CTRL + space') }',
               autocomplete: { type: $root.collection.engine() + 'Query', support: { collection: $root.collection } },
               mode: $root.collection.engine(),
+              fixedPrefix: $root.collection.engine() !== 'solr' ? function() { return 'SELECT * FROM ' +  $root.collection.name() + ' WHERE '; } : undefined,
+              fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
+              database: function () { return $root.collection.name().split('.')[0] },
               singleLine: true }
             }"></div>
 ##             <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
@@ -2136,6 +2139,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
         placeHolder: $root.collection.engine() === 'solr' ? '${ _ko('Example: field:value, or press CTRL + space') }' : '${ _ko('Example: col = value, or press CTRL + space') }',
         autocomplete: { type: $root.collection.engine() + 'Query', support: { collection: $root.collection } },
         mode: $root.collection.engine(),
+        fixedPrefix: $root.collection.engine() !== 'solr' ? function() { return 'SELECT * FROM ' +  $root.collection.name() + ' WHERE '; } : undefined,
+        fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
+        database: function () { return $root.collection.name().split('.')[0] },
         singleLine: true }
       }"></div>
     </span>
