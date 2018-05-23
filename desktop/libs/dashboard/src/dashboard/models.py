@@ -601,7 +601,7 @@ def augment_solr_response(response, collection, query):
                                  name,
                                  selected_values.get(facet['id'], []),
                                  counts,
-                                 datetime.datetime(datetime.MAXYEAR, 12, 31, 23, 59, 59, 0, dateutil.tz.tzoffset('Z', 0)) if facet['properties'].get('isDate') else 1,
+                                 facet['properties']['max'],
                                  collection_facet['properties']['facets'][0],
                                  collection_facet=collection_facet)
           else:
@@ -630,7 +630,7 @@ def augment_solr_response(response, collection, query):
                                _name,
                                selected_values.get(facet['id'], []),
                                val,
-                               datetime.datetime(datetime.MAXYEAR, 12, 31, 23, 59, 59, 0, dateutil.tz.tzoffset('Z', 0)) if facet['properties'].get('isDate') else 1,
+                               facet['properties']['max'],
                                collection_facet['properties']['facets'][0])
               extraSeries.append({'counts': _c, 'label': _name})
             counts = []

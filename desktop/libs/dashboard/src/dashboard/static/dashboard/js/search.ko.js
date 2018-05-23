@@ -908,20 +908,34 @@ var Collection = function (vm, collection) {
         self._addObservablesToNestedFacet(facet, nestedFacet, vm, index);
       });
     }
-
-    facet.canReset = ko.computed(function () {
-      var _fq = (function() {
-        var _fq, fqs = vm.query && vm.query.fqs();
-        for (var i = 0; fqs && i < fqs.length; i++) {
-          var fq = fqs[i];
-          if (fq.id() == facet.id()) {
-            _fq = fq;
-            break;
-          }
+    function getFq () {
+      var _fq, fqs = vm.query && vm.query.fqs();
+      for (var i = 0; fqs && i < fqs.length; i++) {
+        var fq = fqs[i];
+        if (fq.id() == facet.id()) {
+          _fq = fq;
+          break;
         }
-        return _fq;
-      })();
-      return _fq && _fq.filter().length;
+      }
+      return _fq;
+    }
+    facet.canReset = ko.computed(function () {
+      var _fq = getFq();
+      function isNotInitial () {
+        if (!facet.properties.canRange()) {
+          return false;
+        }
+        if (facet.properties.facets) {
+          return facet.properties.facets()[0].start() !== facet.properties.initial_start() || facet.properties.facets()[0].end() !== facet.properties.initial_end();
+        } else {
+          return facet.properties.start() !== facet.properties.initial_start() || facet.properties.end() !== facet.properties.initial_end();
+        }
+      }
+      return _fq && _fq.filter().length || isNotInitial();
+    });
+    facet.canZoomIn = ko.computed(function () {
+      var _fq = getFq();
+      return facet.properties.canRange() && _fq && _fq.filter().length;
     });
   }
 
@@ -1640,11 +1654,6 @@ var Collection = function (vm, collection) {
   self.selectTimelineFacet = function (data) {
     var facet = self.getFacetById(data.widget_id);
 
-    if (facet.properties.isDate()) {
-      facet.properties.min(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
-      facet.properties.max(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
-    }
-
     vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
 
     $.ajax({
@@ -1670,11 +1679,6 @@ var Collection = function (vm, collection) {
     var facet = self.getFacetById(data.widget_id);
     var nestedFacet = facet.properties.facets()[0];
 
-    if (nestedFacet.isDate()) {
-      nestedFacet.min(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
-      nestedFacet.max(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
-    }
-
     vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
 
     $.ajax({
@@ -1696,21 +1700,56 @@ var Collection = function (vm, collection) {
     vm.search();
   }
 
+  self.rangeZoomIn = function (facet_json) {
+    var facet_id = ko.mapping.toJS(facet_json).id;
+    var facet = self.getFacetById(facet_id);
+    var fqs = vm.query.fqs();
+    var fq;
+    for (var i = 0; i < fqs.length; i++) {
+      if (fqs[i].id() == facet_id) {
+        fq = fqs[i];
+      }
+    }
+    if (!fq || !fq.properties()[0].from) {
+      return;
+    }
+    var properties;
+    if (facet_json.type() == 'nested') {
+      facet = facet.properties.facets()[0];
+      properties = facet;
+    } else {
+      properties = facet.properties;
+    }
+    if (facet.isDate && facet.isDate()) {
+      properties.start(moment(fq.properties()[0].from()).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+      properties.end(moment(fq.properties()[0].to()).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+    } else {
+      properties.start(fq.properties()[0].from());
+      properties.end(fq.properties()[0].to());
+    }
+
+    vm.search();
+  };
+
   self.rangeZoomOut = function (facet_json) {
     var facet_id = ko.mapping.toJS(facet_json).id;
     var facet = self.getFacetById(facet_id);
 
     vm.query.removeFilter(ko.mapping.fromJS({'id': facet_id}));
-    if (facet.properties.gap() != null) { // Bar, line charts don't have gap
+    if (facet.properties.canRange()) {
       facet.properties.gap(facet.properties.initial_gap());
-    }
-    if (facet.properties.initial_start() != null) { // Bar and line charts
       facet.properties.start(facet.properties.initial_start());
       facet.properties.end(facet.properties.initial_end());
       facet.properties.min(facet.properties.initial_start());
       facet.properties.max(facet.properties.initial_end());
+      if (facet.properties.facets) {
+        var nestedFacet = facet.properties.facets()[0];
+        nestedFacet.start(facet.properties.initial_start());
+        nestedFacet.end(facet.properties.initial_end());
+        nestedFacet.min(facet.properties.initial_start());
+        nestedFacet.max(facet.properties.initial_end());
+      }
     }
-
     vm.search();
   }
 
