@@ -18,13 +18,12 @@
 from __future__ import absolute_import
 
 import logging
-import json
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
-from metadata.kafka_api import get_topics
+from kafka.kafka_api import get_topics
 
 from notebook.connectors.base import Api, QueryError
 
