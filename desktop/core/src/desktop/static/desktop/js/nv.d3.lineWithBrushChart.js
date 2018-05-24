@@ -347,7 +347,12 @@ nv.models.lineWithBrushChart = function() {
           .on('brushend', onBrushEnd);
         if (chart.brushDomain) {
           var brushExtent = [fGetNumericValue(chart.brushDomain[0]), fGetNumericValue(chart.brushDomain[1])];
-          brush.extent(brushExtent);
+          var isWholeDomain =  xAxis.scale()(chart.brushDomain[0]) < 10 && xAxis.scale()(chart.brushDomain[1]) >= xAxis.range()[1];
+          if (!isWholeDomain) { // If brush is the whole domain, don't display brush
+            brush.extent(brushExtent);
+          } else {
+            brush.clear();
+          }
         } else {
           brush.clear();
         }
