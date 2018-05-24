@@ -371,16 +371,21 @@ def copy_document(request):
   if not uuid:
     raise PopupException(_('copy_document requires uuid'))
 
+
+  # Document2 and Document model objects are linked and both are saved when saving
   document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+  # Document model object
+  document1 = document.doc.get()
 
   if document.type == 'directory':
     raise PopupException(_('Directory copy is not supported'))
 
-
   name = document.name + '-copy'
 
-  # Make the copy of the new Document
+  # Make the copy of the Document2 model object
   copy_document = document.copy(name=name, owner=request.user)
+  # Make the copy of Document model object too
+  document1.copy(content_object=copy_document, name=name, owner=request.user)
 
   # Import workspace for all oozie jobs
   if document.type == 'oozie-workflow2' or document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
