@@ -11,7 +11,7 @@
     "pk": 1100713,
     "model": "pig.pigscript",
     "fields": {
-      "data": "{\"job_id\": null, \"parameters\": [], \"script\": \"data = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);\\n\\n\\nupper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);\\n\\n\\nSTORE upper_case INTO '$output' ;\\n\", \"properties\": [], \"hadoopProperties\": [], \"resources\": [], \"name\": \"UpperText (example)\"}"
+      "data": "{\"job_id\": null, \"parameters\": [], \"script\": \"REGISTER hdfs:///user/hue/pig/examples/piggybank.jar;\\n\\ndata = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);\\n\\n\\nupper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);\\n\\n\\nSTORE upper_case INTO '$output' ;\\n\", \"properties\": [], \"hadoopProperties\": [], \"resources\": [], \"name\": \"UpperText (example)\"}"
     }
   }
 ]

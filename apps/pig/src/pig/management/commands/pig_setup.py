@@ -49,12 +49,14 @@ class Command(BaseCommand):
       LOG.info("Sample pig editor script already installed.")
       doc2 = Document2.objects.get(owner=sample_user, name=name, type='query-pig', is_history=False)
     else:
-      statement = """data = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);
+      statement = """REGISTER hdfs://{}/piggybank.jar;
+
+data = LOAD '{}/data/midsummer.txt' as (text:CHARARRAY);
 
 upper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);
 
 STORE upper_case INTO '$output';
-"""
+""".format(REMOTE_SAMPLE_DIR.get(), REMOTE_SAMPLE_DIR.get())
       snippet_properties = {
         'hadoopProperties': [],
         'parameters': [],

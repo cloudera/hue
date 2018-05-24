@@ -27,9 +27,9 @@ from pig.settings import NICE_NAME
 
 
 LOCAL_SAMPLE_DIR = Config(
-  key="local_data_dir",
+  key="local_sample_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "examples"),
-  help=_t("Location on local filesystem where the examples are stored."),
+  help=_t("Path to directory with piggybank.jar on local filesystem."),
   private=True)
 
 REMOTE_SAMPLE_DIR = Config(
