@@ -371,8 +371,12 @@ nv.models.multiBarWithBrushChart = function() {
           .on('brushstart', onBrushStart)
           .on('brushend', onBrushEnd);
         if (chart.brushDomain) {
-          var brushExtent = fromSelection(chart.brushDomain).range;
-          brush.extent(brushExtent);
+          var selection = fromSelection(chart.brushDomain);
+          if (!selection.isWholeDomain) { // If brush is the whole domain, don't display brush
+            brush.extent(fromSelection(chart.brushDomain).range);
+          } else {
+            brush.clear();
+          }
         } else {
           brush.clear();
         }
@@ -662,7 +666,8 @@ nv.models.multiBarWithBrushChart = function() {
         }
         var _toRange = x.range()[_j] != undefined ? x.range()[_j] : x.range()[_leftEdges.length - 1] + _width;
         return {
-          range: [_fromRange, _fromRange === _toRange ? _fromRange + x.rangeBand() : _toRange]
+          range: [_fromRange, _fromRange === _toRange ? _fromRange + x.rangeBand() : _toRange],
+          isWholeDomain: selection[0] <= _leftEdges[0] && selection[1] >= _leftEdges[_leftEdges.length - 1]
         };
       }
       function onMouseMove () {
