@@ -71,7 +71,7 @@
       width: 100%;
     }
     .text-input {
-      padding: 0 10px 2px 19px;
+      padding: 1px 10px 1px 19px;
       border: 1px solid @cui-gray-400;
       border-radius: 4px;
       margin-bottom: 20px;
@@ -80,6 +80,13 @@
       -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
       transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+
+      input:focus {
+        border-color: initial !important;
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+      }
     }
     .text-input.error {
       border-color: #D0021B;
