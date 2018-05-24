@@ -47,6 +47,11 @@ nv.models.lineWithBrushChart = function() {
     , useInteractiveGuideline = false
     , tooltips = true
     , tooltip = null
+    , displayValuesInLegend = true
+    , tooltipSimple = function(value) {
+      return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
+        '<p>' + hueUtils.htmlEncode(value.x) + '</p>';
+    }
     , tooltipSingle = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -100,19 +105,20 @@ nv.models.lineWithBrushChart = function() {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(lines.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex));
-        return {x: x, y: y, key: e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
       });
     } else {
       values = tooltip((e.list || [e]).map(function (e) {
         var x = lines.x()(e.point, e.pointIndex),
         y = lines.y()(e.point, e.pointIndex);
-        return {x: x, y: y, key: e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
       }));
     }
 
+
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
-        content = values.length > 1 && tooltipMultiple(values) || tooltipSingle(values[0]);
+        content = displayValuesInLegend ? tooltipSimple(values[0]) : values.length > 1 && tooltipMultiple(values) || tooltipSingle(values[0]);
 
     nv.tooltip.show([left, top], content, null, null, offsetElement);
   };
@@ -218,7 +224,7 @@ nv.models.lineWithBrushChart = function() {
       // Legend
 
       if (showLegend) {
-        legend.width(legendWidth);
+        legend.width(legendWidth / 2);
         legend.height(availableHeight);
         legend.rightAlign(false);
         legend.margin({top: 5, right: 0, left: 10, bottom: 0});
@@ -228,10 +234,30 @@ nv.models.lineWithBrushChart = function() {
             .datum(data)
             .call(legend)
           .selectAll('text')
+          .text(function (d) {
+            var addEllipsis = d.key && d.key.length > 12;
+            return d.key && d.key.substring(0, 12) + (addEllipsis ? '...' : '');
+          })
           .append('title')
           .text(function(d){
             return d.key;
           });
+          if (displayValuesInLegend) {
+            legendG.selectAll('g.nv-series')
+            .append('text')
+            .classed('nv-series-value', true)
+            .text(function (d, i) {
+              return '';
+            })
+            .attr('dx', 125)
+            .attr('dy', '.32em')
+            .attr('text-anchor', 'end')
+            .append('title')
+            .classed('nv-series-value', true)
+            .text(function (d, i) {
+              return '';
+            });
+          }
         }
         catch (e){}
       }
@@ -567,6 +593,7 @@ nv.models.lineWithBrushChart = function() {
             if (!distances[diff]) {
               distances[diff] = [];
             }
+            filteredData[j].values[i].seriesKey = filteredData[j].key;
             distances[diff].push(filteredData[j].values[i]);
             if (diff < min) {
               min = diff;
@@ -583,6 +610,32 @@ nv.models.lineWithBrushChart = function() {
             return fGetNumericValue(getX(rect)) === fGetNumericValue(getX(d)) && d.series === rect.series;
           });
         });
+
+        if (el && el.length && displayValuesInLegend) {
+          var legendG = legendSvg.select('.nvd3.nv-wrap.nv-legendWrap');
+          var elBySerie = el.reduce(function (elBySerie, el) {
+            elBySerie[el.seriesKey] = el;
+            return elBySerie;
+          }, {});
+          legendG.selectAll('g.nv-series text.nv-series-value')
+          .text(function (d, i) {
+            if (elBySerie[d.key]) {
+              var value = yAxis.tickFormat()(d.values[elBySerie[d.key].index].y)+'';
+              var addEllipsis = value.length > 5;
+              return value && (addEllipsis ? '...' : '') + value.substring(value.length - 5);
+            } else {
+              return '';
+            }
+          })
+          .append('title')
+          .text(function (d, i) {
+            if (elBySerie[d.key]) {
+              return yAxis.tickFormat()(d.values[elBySerie[d.key].index].y);
+            } else {
+              return '';
+            }
+          });
+        }
         // If there's rectangle with the hover class that are not the target, remove the class and dispatch mouseout
         var others = container.selectAll('g.nv-wrap.nv-lineChart circle.hover').filter(function(rect) {
           return !el || !el.some(function(d) {

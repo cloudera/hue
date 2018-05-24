@@ -1238,17 +1238,17 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div class="clearfix"></div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
-      <div data-bind="visible: canZoomIn() || canReset()" class="inline-block">
-        <span class="facet-field-label">${ _('Zoom') }</span>
-        <i class="fa fa-search-minus"></i>
-      </div>
-      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
-        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
-      </div>
-      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
-        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
-      </div>
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
+        <div data-bind="visible: canZoomIn() || canReset()" class="inline-block">
+          <span class="facet-field-label">${ _('Zoom') }</span>
+          <i class="fa fa-search-minus"></i>
+        </div>
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
+          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
+        </div>
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
+          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
+        </div>
         <span class="facet-field-label">${ _('Chart Type') }</span>
         <select class="input-small" data-bind="options: $root.timelineChartTypes,
                        optionsText: 'label',
@@ -1808,25 +1808,25 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
       <div class="pull-right">
         <div data-bind="visible: canZoomIn() || canReset()" class="inline-block">
-        <span class="facet-field-label">${ _('Zoom') }</span>
-      <i class="fa fa-search-minus"></i>
-      </div>
-      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
-        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
-      </div>
-      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
-        <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
-      </div>
-      <!-- ko if: properties.canRange -->
-      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-        <span class="facet-field-label">${ _('Chart Type') }</span>
-        <select class="input-small" data-bind="options: $root.timelineChartTypes,
-                     optionsText: 'label',
-                     optionsValue: 'value',
-                     value: properties.timelineChartType">
-        </select>
-      </div>
-      <!-- /ko -->
+          <span class="facet-field-label">${ _('Zoom') }</span>
+          <i class="fa fa-search-minus"></i>
+        </div>
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canZoomIn">
+          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomIn">${ _('to selection') }</a>
+        </div>
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px" data-bind="visible: canReset">
+          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut">${ _('reset') }</a>
+        </div>
+        <!-- ko if: properties.canRange -->
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Chart Type') }</span>
+          <select class="input-small" data-bind="options: $root.timelineChartTypes,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.timelineChartType">
+          </select>
+        </div>
+        <!-- /ko -->
       </div>
       <div class="clearfix"></div>
     </div>
@@ -3387,6 +3387,7 @@ function _barChartDataTransformer(rawDatum, isUp) {
       if (isUp){
         _data.push({
           series: 0,
+          index: cnt,
           x: item.from + (item.is_up ? ' & ${ _('Up') }' : ' & ${ _('Less') }'),
           y: item.value,
           obj: item
@@ -3395,6 +3396,7 @@ function _barChartDataTransformer(rawDatum, isUp) {
       else {
         _data.push({
           series: 0,
+          index: cnt,
           x: item.from,
           x_end: item.to,
           y: item.value,
@@ -3405,6 +3407,7 @@ function _barChartDataTransformer(rawDatum, isUp) {
     else {
       _data.push({
         series: 0,
+        index: cnt,
         x: item.value,
         y: item.count,
         obj: item
@@ -3507,6 +3510,7 @@ function pivotChartDataTransformer(rawDatum) {
 
     _category.values.push({
       series: 0,
+      index: _category.values.length,
       x: item.cat,
       y: item.count,
       obj: item
@@ -3570,6 +3574,7 @@ function _timelineChartDataTransformer(rawDatum, isDate) {
     item.widget_id = rawDatum.widget_id;
     _data.push({
       series: 0,
+      index: cnt,
       x: getValue(item.from ? item.from : item.value), // When started from a non timeline widget
       x_end: item.to && getValue(item.to),
       y: item.from !== undefined ? item.value : item.count,
@@ -3613,8 +3618,8 @@ function _timelineChartDataTransformer(rawDatum, isDate) {
   if (isDate) {
     keys.sort();
   }
-  $(rawDatum.extraSeries).each(function (cnt, serie) {
-    if (cnt == 0) {
+  $(rawDatum.extraSeries).each(function (serieIndex, serie) {
+    if (serieIndex == 0) {
       _datum = [];
     }
     var _data = [];
@@ -3624,7 +3629,8 @@ function _timelineChartDataTransformer(rawDatum, isDate) {
         var item = values[key][serie.label];
         item.widget_id = rawDatum.widget_id;
         _data.push({
-          series: cnt + 1,
+          series: serieIndex,
+          index: _data.length,
           x: getValue(item.from ? item.from : item.value), // When started from a non timeline widget
           x_end: item.to && getValue(item.to),
           y: item.from !== undefined ? item.value : item.count,
@@ -3637,7 +3643,8 @@ function _timelineChartDataTransformer(rawDatum, isDate) {
         var copy = JSON.parse(JSON.stringify(item));
         copy.value = 0;
         _data.push({
-          series: cnt + 1,
+          series: serieIndex,
+          index: _data.length,
           x: getValue(item.from ? item.from : item.value),
           x_end: item.to && getValue(item.to),
           y: copy.value,

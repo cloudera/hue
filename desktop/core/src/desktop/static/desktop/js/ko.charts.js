@@ -703,14 +703,15 @@
       }
     }
   };
-  function multi(xAxis) {
-    var previous = null;
+  function multi(xAxis, _chart) {
+    var previous = new Date(9999,11,31);
     var minDiff = 5.1;
     return d3v3.time.format.utc.multi([
       ["%S %Y-%m-%dT%H:%M", function(d) {
         var domain = xAxis.domain();
+        var chart = _chart;
         var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = d == domain[0];
+        var isFirst = previous > d || d == domain[0];
         var result = isFirst && domainDiff < MINUTE_MS * minDiff;
         if (result) {
           previous = d;
@@ -720,7 +721,7 @@
       ["%H:%M %Y-%m-%d", function(d) {
         var domain = xAxis.domain();
         var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = d == domain[0];
+        var isFirst = previous > d || d == domain[0];
         var result = isFirst && domainDiff < HOUR_MS * minDiff;
         if (result) {
           previous = d;
@@ -730,7 +731,7 @@
       ["%H:%M %Y-%m-%d", function(d) {
         var domain = xAxis.domain();
         var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = d == domain[0];
+        var isFirst = previous > d || d == domain[0];
         var result = isFirst && domainDiff < DAY_MS * minDiff;
         if (result) {
           previous = d;
@@ -740,7 +741,7 @@
       ["%d %Y-%m", function(d) {
         var domain = xAxis.domain();
         var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = d == domain[0];
+        var isFirst = previous > d || d == domain[0];
         var result = isFirst && domainDiff < MONTH_MS * minDiff;
         if (result) {
           previous = d;
@@ -750,7 +751,7 @@
       ["%m %Y", function(d) {
         var domain = xAxis.domain();
         var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = d == domain[0];
+        var isFirst = previous > d || d == domain[0];
         var result = isFirst && domainDiff < YEAR_MS * minDiff;
         if (result) {
           previous = d;
@@ -760,7 +761,7 @@
       ["%Y", function(d) {
         var test = xAxis;
         var domain = xAxis.domain();
-        var isFirst = d == domain[0];
+        var isFirst = previous > d || d == domain[0];
         var result = isFirst;
         if (result) {
           previous = d;
@@ -839,7 +840,8 @@
         }
         return result;
       }],
-      ["%Y", function() {
+      ["%Y", function(d) {
+        previous = d;
         return true;
       }]
     ]);
@@ -891,7 +893,7 @@
               return {x: x, y: y, key: value.key};
             });
           });
-          _chart.xAxis.tickFormat(multi(_chart.xAxis));
+          _chart.xAxis.tickFormat(multi(_chart.xAxis, _chart));
           _chart.onChartUpdate(function () {
             _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
               insertLinebreaks(_chart, d, this);
@@ -899,8 +901,7 @@
           });
         }
 
-        _chart.yAxis
-            .tickFormat(d3v3.format(",0f"));
+        _chart.yAxis.tickFormat(d3v3.format("s"));
         handleSelection(_chart, options, _datum);
         var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).insert("svg", ":first-child");
         if ($(element).find("svg").length < 2) {
@@ -1005,10 +1006,6 @@
     if (fHideStacked) {
       fHideStacked.call(_chart);
     }
-    var fTooltips = _chart.tooltips;
-    if (fTooltips) {
-      fTooltips.call(_chart, _hideStacked);
-    }
     if (_chart.selectBars) {
       var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
       var bHasSelection = false;
@@ -1081,21 +1078,6 @@
         if (typeof options.onClick != "undefined") {
           huePubSub.publish('charts.state', { updating: true });
           options.onClick(d.point);
-        }
-      });
-      _chart.multibar.dispatch.on('elementMouseover.tooltip', function(e) {
-        var _hideStacked = options.hideStacked !== null ? typeof options.hideStacked === 'function' ? options.hideStacked() : options.hideStacked : false;
-        if (!_hideStacked) {
-          $('a[href=\'#nv-detail-mouseover\']').tab('show');
-          var values = _chart.tooltipContent()((e.list || [e]).map(function (e) {
-            var x = _chart.multibar.x()(e.point, e.pointIndex),
-            y = _chart.multibar.y()(e.point, e.pointIndex);
-            return {x: x, y: y, key: e.series.key};
-          }));
-          var content = values.map(function (value) {
-            return '<p><b>' + hueUtils.htmlEncode(value.key) + '</b>: ' +  hueUtils.htmlEncode(value.y) + '</p>';
-          }).join("") + '<h3>' + hueUtils.htmlEncode(values[0] && values[0].x) + '</h3>';
-          $('#nv-detail-mouseover .tab-pane-content').html(content);
         }
       });
       _chart.onStateChange(options.onStateChange);

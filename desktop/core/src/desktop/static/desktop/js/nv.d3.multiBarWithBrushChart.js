@@ -50,7 +50,12 @@ nv.models.multiBarWithBrushChart = function() {
     , tooltips = true
     , tooltip = null
     , minTickWidth = 60
+    , displayValuesInLegend = true
     , tooltipContent = null
+    , tooltipSimple = function(value) {
+      return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
+        '<p>' + hueUtils.htmlEncode(value.x) + '</p>';
+    }
     , tooltipSingle = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -112,19 +117,20 @@ nv.models.multiBarWithBrushChart = function() {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(multibar.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex));
-        return {x: x, y: y, key: e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
       });
     } else {
       values = tooltipContent((e.list || [e]).map(function (e) {
         var x = multibar.x()(e.point, e.pointIndex),
         y = multibar.y()(e.point, e.pointIndex);
-        return {x: x, y: y, key: e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
       }));
     }
 
+
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
-        content = values.length > 1 && tooltipMultiple(values) || tooltipSingle(values[0]);
+        content = displayValuesInLegend ? tooltipSimple(values[0]) : values.length > 1 && tooltipMultiple(values) || tooltipSingle(values[0]);
 
     nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
@@ -223,11 +229,6 @@ nv.models.multiBarWithBrushChart = function() {
       gEnter.append('g').attr('class', 'nv-x nv-axis');
       gEnter.append('g').attr('class', 'nv-y nv-axis');
       gEnter.append('g').attr('class', 'nv-barsWrap');
-      gEnter.append('g').attr('class', 'nv-mouseover')
-      .append('line')
-      .attr('stroke-dasharray', '5, 5')
-      .style('stroke', 'rgba(0,0,0,0.5)')
-      .style('stroke-width', '1');
       // We put the legend in an another SVG to support scrolling
       var legendDiv = d3.select(container.node().parentNode).select('div');
       var legendSvg = legendDiv.select('svg').size() === 0 ? legendDiv.append('svg') : legendDiv.select('svg');
@@ -243,7 +244,7 @@ nv.models.multiBarWithBrushChart = function() {
       // Legend
 
       if (showLegend) {
-        legend.width(legendWidth);
+        legend.width(legendWidth / 2);
         legend.height(availableHeight);
         legend.rightAlign(false);
         legend.margin({top: 5, right: 0, left: 10, bottom: 0});
@@ -258,24 +259,29 @@ nv.models.multiBarWithBrushChart = function() {
             .call(legend)
           .selectAll('text')
           .text(function (d) {
-            return d.key && d.key.substring(0, 15)
+            var value = d.key && d.key + '';
+            var addEllipsis = value && value.length > 12;
+            return value && value.substring(0, 12) + (addEllipsis ? '...' : '');
           })
           .append('title')
           .text(function(d){
             return d.key;
           });
-          legendG.selectAll('g.nv-series')
-          .append('text')
-          .text(function (d, i) {
-            return d.values[0].y;
-          })
-          .attr('dx', 125)
-          .attr('dy', '.32em')
-          .attr('text-anchor', 'end')
-          .append('title')
-          .text(function (d, i) {
-            return d.values[0].y;
-          })
+          if (displayValuesInLegend) {
+            legendG.selectAll('g.nv-series')
+            .append('text')
+              .classed('nv-series-value', true)
+              .text(function (d, i) {
+                return '';
+              })
+              .attr('dx', 125)
+              .attr('dy', '.32em')
+              .attr('text-anchor', 'end')
+            .append('title')
+              .text(function (d, i) {
+                return '';
+            });
+          }
         }
         catch (e){}
       }
@@ -667,12 +673,32 @@ nv.models.multiBarWithBrushChart = function() {
             return fGetNumericValue(getX(rect)) === fGetNumericValue(getX(d)) && d.series === rect.series;
           });
         });
-        var mouse_x = d3v3.mouse(this)[0];
-        container.select('g.nv-mouseover line')
-        .attr('x1', mouse_x)
-        .attr('y1', 0)
-        .attr('x2', mouse_x)
-        .attr('y2', availableHeight);
+
+        if (el && el.length && displayValuesInLegend) {
+          var legendG = legendSvg.select('.nvd3.nv-wrap.nv-legendWrap');
+          var elBySerie = el.reduce(function (elBySerie, el) {
+            elBySerie[el.seriesKey] = el;
+            return elBySerie;
+          }, {});
+          legendG.selectAll('g.nv-series text.nv-series-value')
+          .text(function (d, i) {
+            if (elBySerie[d.key]) {
+              var value = yAxis.tickFormat()(d.values[elBySerie[d.key].index].y)+'';
+              var addEllipsis = value.length > 5;
+              return value && (addEllipsis ? '...' : '') + value.substring(value.length - 5);
+            } else {
+              return '';
+            }
+          })
+          .append('title')
+          .text(function (d, i) {
+            if (elBySerie[d.key]) {
+              return yAxis.tickFormat()(d.values[elBySerie[d.key].index].y);
+            } else {
+              return '';
+            }
+          });
+        }
 
         // If there's rectangle with the hover class that are not the target, remove the class and dispatch mouseout
         var others = container.selectAll('g.nv-wrap.nv-multiBarWithLegend rect.hover').filter(function(rect) {
@@ -704,13 +730,14 @@ nv.models.multiBarWithBrushChart = function() {
                 maxi = i;
               }
             });
+            var width = x.rangeBand();
             d3v3.select(target[0][maxi])
             .each(function(d, i){
               multibar.dispatch.elementMouseover({
                 value: getY(d),
                 point: d,
                 series: filteredData[d.series],
-                pos: [x(getX(d)) + (x.rangeBand() * (multibar.stacked() ? data.length / 2 : d.series + .5) / data.length), y(getY(d) + (multibar.stacked() ? d.y0 : 0))],  // TODO: Figure out why the value appears to be shifted
+                pos: [x(getX(d)) + width * 0.5, y(getY(d) + (multibar.stacked() ? d.y0 : 0))],
                 pointIndex: i,
                 seriesIndex: d.series,
                 list: el.map(function (d) {
@@ -718,7 +745,7 @@ nv.models.multiBarWithBrushChart = function() {
                     value: getY(d),
                     point: d,
                     series: data[d.series],
-                    pos: [x(getX(d)) + (x.rangeBand() * (multibar.stacked() ? data.length / 2 : d.series + .5) / data.length), y(getY(d) + (multibar.stacked() ? d.y0 : 0))],  // TODO: Figure out why the value appears to be shifted
+                    pos: [x(getX(d)) + width * 0.5, y(getY(d) + (multibar.stacked() ? d.y0 : 0))],
                     pointIndex: -1,
                     seriesIndex: d.series,
                   };
@@ -738,7 +765,7 @@ nv.models.multiBarWithBrushChart = function() {
               value: getY(d,i),
               point: d,
               series: data[d.series],
-              pointIndex: i,
+              pointIndex: d.index,
               seriesIndex: d.series,
               e: d3v3.event
             });
