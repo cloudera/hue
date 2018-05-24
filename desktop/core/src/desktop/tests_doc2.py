@@ -30,7 +30,7 @@ from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2
+from desktop.models import Directory, Document2, Document
 from notebook.models import import_saved_beeswax_query
 
 from beeswax.models import SavedQuery
@@ -178,6 +178,8 @@ class TestDocument2(object):
 
     workflow_doc = Document2.objects.create(name='Copy Test', type='oozie-workflow2', owner=self.user, data={},
                                             parent_directory=self.home_dir)
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name,
+                          description=workflow_doc.description, extra='workflow2')
 
     workflow = Workflow(user=self.user)
     workflow.update_name('Copy Test')
