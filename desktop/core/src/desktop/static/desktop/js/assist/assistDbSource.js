@@ -348,7 +348,7 @@ var AssistDbSource = (function () {
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
     var self = this;
     if (self.catalogEntry) {
-      self.catalogEntry.clear(self.invalidateOnRefresh());
+      self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh() });
     }
   };
 

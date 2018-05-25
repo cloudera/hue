@@ -1119,7 +1119,7 @@ from desktop.views import _ko
 
         huePubSub.subscribe('assist.collections.refresh', function() {
           DataCatalog.getEntry({ sourceType: 'solr', path: [] }).done(function (entry) {
-            entry.clear('cache', true);
+            entry.clearCache({ cascade: true });
           });
         });
 
@@ -2632,13 +2632,13 @@ from desktop.views import _ko
                                    // Clear the database first if it exists without cascade
                                   var hasDb = dbEntries.some(function (dbEntry) {
                                     if (dbEntry.name.toLowerCase() === self.path[0].toLowerCase()) {
-                                      clearPromise = dbEntry.clear('invalidate', false);
+                                      clearPromise = dbEntry.clearCache({ invalidate: 'invalidate', cascade: false });
                                       return true;
                                     }
                                   });
                                   if (!hasDb) {
                                     // If the database is missing clear the source without cascade
-                                    clearPromise = sourceEntry.clear('invalidate', false);
+                                    clearPromise = sourceEntry.clearCache({ invalidate: 'invalidate', cascade: false });
                                   }
                                   clearPromise.fail(function () {
                                     self.reloading(false);

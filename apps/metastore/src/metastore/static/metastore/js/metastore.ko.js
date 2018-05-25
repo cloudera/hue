@@ -201,7 +201,7 @@ var MetastoreViewModel = (function () {
     if (!self.reloading() && self.catalogEntry()) {
       self.reloading(true);
       // Clear will publish when done
-      self.catalogEntry().clear(self.catalogEntry().getSourceType() === 'impala' ? 'invalidate' : 'cache');
+      self.catalogEntry().clearCache({ invalidate: self.catalogEntry().getSourceType() === 'impala' ? 'invalidate' : 'cache' });
     }
   };
 
@@ -255,7 +255,7 @@ var MetastoreViewModel = (function () {
             self.loadingTable(false);
             self.database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
-            self.database().catalogEntry.clear('invalidate').done(function () {
+            self.database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
               self.database().load(function () {
                 setTableAfterLoad(false);
               });
@@ -298,7 +298,7 @@ var MetastoreViewModel = (function () {
       if (foundDatabases.length === 1) {
         self.setDatabase(foundDatabases[0], callback);
       } else if (clearCacheOnMissing) {
-        self.catalogEntry().clear('invalidate').done(function () {
+        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
           self.loadDatabases().done(function () {
             whenLoaded(false)
           })

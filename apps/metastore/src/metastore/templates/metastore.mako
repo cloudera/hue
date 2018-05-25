@@ -1233,7 +1233,7 @@ ${ components.menubar(is_embeddable) }
 
       if (location.getParameter('refresh') === 'true') {
         DataCatalog.getEntry({ sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
-          huePubSub.publish('data.catalog.refresh.entry', { invalidate: sourceType() === 'impala' ? 'invalidate' : 'cache', catalogEntry: entry });
+          entry.clearCache({ invalidate: sourceType() === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
           hueUtils.replaceURL('?');
         });
       }
