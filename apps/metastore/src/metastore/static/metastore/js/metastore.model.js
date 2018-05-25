@@ -83,7 +83,7 @@ var MetastoreDatabase = (function () {
   MetastoreDatabase.prototype.reload = function () {
     var self = this;
     // Clear will publish when done
-    self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
+    self.catalogEntry.clearCache({ invalidate: self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache' });
   };
 
   MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled) {
@@ -649,7 +649,7 @@ var MetastoreTable = (function () {
     self.samples.loaded(false);
     self.partitions.loaded(false);
     // Clear will publish when done
-    self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
+    self.catalogEntry.clearCache({ invalidate: self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache' });
   };
 
   MetastoreTable.prototype.showImportData = function () {

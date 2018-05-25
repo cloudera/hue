@@ -243,7 +243,7 @@ var AssistDbEntry = (function () {
 
   AssistDbEntry.prototype.triggerRefresh = function () {
     var self = this;
-    self.catalogEntry.clear(self.invalidateOnRefresh(), true);
+    self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh(), cascade: true });
   };
 
   AssistDbEntry.prototype.highlightInside = function (path) {

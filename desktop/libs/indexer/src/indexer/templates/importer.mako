@@ -2315,13 +2315,13 @@ ${ assist.assistPanel() }
                       if (match) {
                         var db = match[1];
                         DataCatalog.getEntry({ sourceType: snippet.type(), path: [ db ]}).done(function (dbEntry) {
-                          dbEntry.clear('invalidate').done(function () {
+                          dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });
                       } else {
                         DataCatalog.getEntry({ sourceType: snippet.type(), path: []}).done(function (sourceEntry) {
-                          sourceEntry.clear().done(function () {
+                          sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });

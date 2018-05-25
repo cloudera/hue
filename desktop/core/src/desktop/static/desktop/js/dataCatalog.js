@@ -656,18 +656,21 @@ var DataCatalog = (function () {
     /**
      * Resets the entry and clears the cache
      *
-     * @param {string} [invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
-     * @param {boolean} [cascade] - Default false, only used when the entry is for the source
+     * @param {Object} options
+     * @param {string} [options.invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
+     * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
+     * @param {boolean [options.silenceErrors] - Default false
      * @return {CancellablePromise}
      */
-    DataCatalogEntry.prototype.clear = function (invalidate, cascade) {
+    DataCatalogEntry.prototype.clearCache = function (options) {
       var self = this;
 
-      var invalidatePromise;
-
-      if (!invalidate) {
-        invalidate = 'cache';
+      if (!options) {
+        options = {}
       }
+
+      var invalidatePromise;
+      var invalidate = options.invalidate || 'cache';
 
       if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
         if (self.dataCatalog.invalidatePromise) {
@@ -676,7 +679,8 @@ var DataCatalog = (function () {
           invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
             sourceType: self.getSourceType(),
             invalidate: invalidate,
-            path: self.path
+            path: self.path,
+            silenceErrors: options.silenceErrors
           });
           self.dataCatalog.invalidatePromise = invalidatePromise;
           invalidatePromise.always(function () {
@@ -692,15 +696,15 @@ var DataCatalog = (function () {
       }
 
       self.reset();
-      var saveDeferred = cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
+      var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
 
       var clearPromise = $.when(invalidatePromise, saveDeferred);
 
       clearPromise.always(function () {
-        huePubSub.publish('data.catalog.entry.refreshed', { entry: self, cascade: cascade });
+        huePubSub.publish('data.catalog.entry.refreshed', { entry: self, cascade: !!options.cascade });
       });
 
-      return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
+      return new CancellablePromise(clearPromise, undefined, [ invalidatePromise ]);
     };
 
     /**
@@ -2104,14 +2108,6 @@ var DataCatalog = (function () {
     var getCatalog = function (sourceType) {
       return sourceBoundCatalogs[sourceType] || (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType));
     };
-
-    huePubSub.subscribe('data.catalog.refresh.entry', function (options) {
-      options.catalogEntry.clear(options.invalidate).always(function () {
-        if (options.callback) {
-          options.callback();
-        }
-      });
-    });
 
     return {
 

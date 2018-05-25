@@ -908,7 +908,7 @@ var EditorViewModel = (function() {
         }
         ignoreNextAssistDatabaseUpdate = true;
         DataCatalog.getEntry({ sourceType: self.type(), path: path }).done(function (entry) {
-          entry.clear('invalidate', true);
+          entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
         });
       });
     }, 0);
