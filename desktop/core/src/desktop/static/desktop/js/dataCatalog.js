@@ -18,7 +18,7 @@ var DataCatalog = (function () {
 
   var STORAGE_POSTFIX = LOGGED_USERNAME; // TODO: Add flag for embedded mode
 
-  var DATA_CATALOG_VERSION = 3;
+  var DATA_CATALOG_VERSION = 4;
 
   var cacheEnabled = true;
 
@@ -122,18 +122,22 @@ var DataCatalog = (function () {
     /**
      * Clears the data catalog and cache for the given path and any children thereof.
      *
+     * @param {string} clusterId - The cluster ID
      * @param {string[]} rootPath - The path to clear
      */
-    DataCatalog.prototype.clearStorageCascade = function (rootPath) {
+    DataCatalog.prototype.clearStorageCascade = function (clusterId, rootPath) {
       var self = this;
       var deferred = $.Deferred();
-      if (rootPath.length === 0) {
+      if (rootPath.length === 0 && !clusterId) {
         self.entries = {};
         self.store.clear().then(deferred.resolve).catch(deferred.reject);
         return deferred.promise();
       }
 
-      var keyPrefix = rootPath.join('.');
+      var keyPrefix = clusterId;
+      if (rootPath.length) {
+        keyPrefix += '_' +  rootPath.join('.');
+      }
       Object.keys(self.entries).forEach(function (key) {
         if (key.indexOf(keyPrefix) === 0) {
           delete self.entries[key];
@@ -169,7 +173,13 @@ var DataCatalog = (function () {
         return $.Deferred().resolve().promise();
       }
       var deferred = $.Deferred();
-      self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
+
+      var identifier = dataCatalogEntry.clusterId;
+      if (dataCatalogEntry.path.length) {
+        identifier += '_' + dataCatalogEntry.path.join('.');
+      }
+
+      self.store.setItem(identifier, {
         version: DATA_CATALOG_VERSION,
         definition: dataCatalogEntry.definition,
         sourceMeta: dataCatalogEntry.sourceMeta,
@@ -180,6 +190,7 @@ var DataCatalog = (function () {
         navOptMeta:  dataCatalogEntry.navOptMeta,
         navOptPopularity: dataCatalogEntry.navOptPopularity,
       }).then(deferred.resolve).catch(deferred.reject);
+
       return deferred.promise();
     };
 
@@ -319,25 +330,29 @@ var DataCatalog = (function () {
 
     /**
      * @param {Object} options
+     * @param {string} [options.clusterId] - Default: DEFAULT_CLUSTER_ID
      * @param {string|string[]} options.path
      * @return {DataCatalogEntry}
      */
     DataCatalog.prototype.getKnownEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
+      identifier = (options.clusterId || DEFAULT_CLUSTER_ID) + (identifier ? '_' + identifier : '');
       return self.entries[identifier];
     };
 
     /**
      * @param {Object} options
      * @param {string|string[]} options.path
+     * @param {string} [options.clusterId] - Default: DEFAULT_CLUSTER_ID
      * @param {Object} [options.definition] - The initial definition if not already set on the entry
-     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.cachedOnly] - Default: false
      * @return {Promise}
      */
     DataCatalog.prototype.getEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
+      identifier = (options.clusterId || DEFAULT_CLUSTER_ID) + (identifier ? '_' + identifier : '');
       if (self.entries[identifier]) {
         return self.entries[identifier];
       }
@@ -346,11 +361,11 @@ var DataCatalog = (function () {
       self.entries[identifier] = deferred.promise();
 
       if (!cacheEnabled) {
-        deferred.resolve(new DataCatalogEntry(self, options.path, options.definition)).promise();
+        deferred.resolve(new DataCatalogEntry({ dataCatalog: self, clusterId: options.clusterId, path: options.path, definition: options.definition })).promise();
       } else {
         self.store.getItem(identifier).then(function (storeEntry) {
           var definition = storeEntry ? storeEntry.definition : options.definition;
-          var entry = new DataCatalogEntry(self, options.path, definition);
+          var entry = new DataCatalogEntry({ dataCatalog: self, clusterId: options.clusterId, path: options.path, definition: definition });
           if (storeEntry) {
             mergeEntry(entry, storeEntry);
           } else if (!options.cachedOnly && options.definition) {
@@ -359,7 +374,7 @@ var DataCatalog = (function () {
           deferred.resolve(entry);
         }).catch(function (error) {
           console.warn(error);
-          var entry = new DataCatalogEntry(self, options.path, options.definition);
+          var entry = new DataCatalogEntry({ dataCatalog: self, clusterId: options.clusterId, path: options.path, definition: options.definition });
           if (!options.cachedOnly && options.definition) {
             entry.saveLater();
           }
@@ -395,27 +410,31 @@ var DataCatalog = (function () {
     /**
      * Creates an identifier for the given paths with duplicates removed
      *
+     * @param {string} clusterId
      * @param {string[][]} paths
      * @return {string}
      */
-    var createMultiTableIdentifier = function (paths) {
+    var createMultiTableIdentifier = function (clusterId, paths) {
       var pathSet = {};
       paths.forEach(function (path) {
         pathSet[path.join('.')] = true;
       });
       var uniquePaths = Object.keys(pathSet);
       uniquePaths.sort();
-      return uniquePaths.join(',');
+      return clusterId + '_' + uniquePaths.join(',');
     };
 
     /**
-     * @param {string[][]} paths
+     *
+     * @param {Object} options
+     * @param {string} [options.clusterId] - Default: DEFAULT_CLUSTER_ID
+     * @param {string[][]} options.paths
      *
      * @return {Promise}
      */
-    DataCatalog.prototype.getMultiTableEntry = function (paths) {
+    DataCatalog.prototype.getMultiTableEntry = function (options) {
       var self = this;
-      var identifier = createMultiTableIdentifier(paths);
+      var identifier = createMultiTableIdentifier(options.clusterId || DEFAULT_CLUSTER_ID, options.paths);
       if (self.multiTableEntries[identifier]) {
         return self.multiTableEntries[identifier];
       }
@@ -424,17 +443,17 @@ var DataCatalog = (function () {
       self.multiTableEntries[identifier] = deferred.promise();
 
       if (!cacheEnabled) {
-        deferred.resolve(new MultiTableEntry(identifier, self, paths)).promise();
+        deferred.resolve(new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths })).promise();
       } else {
         self.multiTableStore.getItem(identifier).then(function (storeEntry) {
-          var entry = new MultiTableEntry(identifier, self, paths);
+          var entry = new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths });
           if (storeEntry) {
             mergeMultiTableEntry(entry, storeEntry);
           }
           deferred.resolve(entry);
         }).catch(function (error) {
           console.warn(error);
-          deferred.resolve(new MultiTableEntry(identifier, self, paths));
+          deferred.resolve(new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths }));
         })
       }
 
@@ -570,20 +589,23 @@ var DataCatalog = (function () {
     };
 
     /**
-     * @param {DataCatalog} dataCatalog
-     * @param {string|string[]} path
-     * @param {Object} definition - Initial known metadata on creation (normally comes from the parent entry)
+     * @param {DataCatalog} options.dataCatalog
+     * @param {string|string[]} options.path
+     * @param {string} [options.clusterId] - Default: DEFAULT_CLUSTER_ID
+     * @param {Object} options.definition - Initial known metadata on creation (normally comes from the parent entry)
      *
      * @constructor
      */
-    function DataCatalogEntry(dataCatalog, path, definition) {
+    function DataCatalogEntry(options) {
       var self = this;
 
-      self.dataCatalog = dataCatalog;
-      self.path = typeof path === 'string' && path ? path.split('.') : path || [];
-      self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
+      // TODO: Make clusterId mandatory once implemented throughout
+      self.clusterId = options.clusterId || DEFAULT_CLUSTER_ID;
+      self.dataCatalog = options.dataCatalog;
+      self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
+      self.name = self.path.length ? self.path[self.path.length - 1] : options.dataCatalog.sourceType;
 
-      self.definition = definition;
+      self.definition = options.definition;
 
       if (!self.definition) {
         if (self.path.length === 0) {
@@ -696,7 +718,7 @@ var DataCatalog = (function () {
       }
 
       self.reset();
-      var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
+      var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.clusterId, self.path) : self.save();
 
       var clearPromise = $.when(invalidatePromise, saveDeferred);
 
@@ -1779,7 +1801,7 @@ var DataCatalog = (function () {
         return deferred.reject();
       }
       var cancellablePromises = [];
-      catalogEntry.dataCatalog.getMultiTableEntry([ catalogEntry.path ]).done(function (multiTableEntry) {
+      catalogEntry.dataCatalog.getMultiTableEntry({ clusterId: catalogEntry.clusterId, paths: [ catalogEntry.path ] }).done(function (multiTableEntry) {
         cancellablePromises.push(multiTableEntry[functionName](options).done(deferred.resolve).fail(deferred.reject));
       }).fail(deferred.reject);
       return new CancellablePromise(deferred, undefined, cancellablePromises);
@@ -1838,11 +1860,19 @@ var DataCatalog = (function () {
 
   var MultiTableEntry = (function () {
 
-    var MultiTableEntry = function (identifier, dataCatalog, paths) {
+    /**
+     *
+     * @param {Object} options
+     * @param {string} options.identifier
+     * @param {DataCatalog} options.dataCatalog
+     * @param {string[][]} options.paths
+     * @constructor
+     */
+    var MultiTableEntry = function (options) {
       var self = this;
-      self.identifier = identifier;
-      self.dataCatalog = dataCatalog;
-      self.paths = paths;
+      self.identifier = options.identifier;
+      self.dataCatalog = options.dataCatalog;
+      self.paths = options.paths;
 
       self.topAggs = undefined;
       self.topAggsPromise = undefined;
@@ -2090,7 +2120,7 @@ var DataCatalog = (function () {
           self.store.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
         });
       }
-    }
+    };
 
     return GeneralDataCatalog;
   })();
@@ -2115,6 +2145,7 @@ var DataCatalog = (function () {
        * @param {Object} options
        * @param {string} options.sourceType
        * @param {string|string[]} options.path
+       * @param {string} [options.clusterId] - Optional cluster ID default: DEFAULT_CLUSTER_ID
        * @param {Object} [options.definition] - Optional initial definition
        *
        * @return {Promise}
@@ -2126,12 +2157,13 @@ var DataCatalog = (function () {
       /**
        * @param {Object} options
        * @param {string} options.sourceType
+       * @param {string} [options.clusterId] - Default: DEFAULT_CLUSTER_ID
        * @param {string[][]} options.paths
        *
        * @return {Promise}
        */
       getMultiTableEntry: function (options) {
-        return getCatalog(options.sourceType).getMultiTableEntry(options.paths);
+        return getCatalog(options.sourceType).getMultiTableEntry(options);
       },
 
       /**
@@ -2140,6 +2172,7 @@ var DataCatalog = (function () {
        *
        * @param {Object} options
        * @param {string} options.sourceType
+       * @param {string} [options.clusterId]- Default: DEFAULT_CLUSTER_ID
        * @param {string|string[]} options.path
        * @param {Object} [options.definition] - Optional initial definition of the parent entry
        * @param {boolean} [options.silenceErrors]

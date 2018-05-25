@@ -205,4 +205,6 @@
       'decimal': -1, 'float': -1, 'int': -1, 'map': -1, 'real': -1, 'smallint': -1, 'string': -1, 'struct': -1,
       'timestamp': -1, 'tinyint': -1, 'varchar': -1 }
   };
+
+  window.DEFAULT_CLUSTER_ID = window.DEFAULT_CLUSTER_ID || 'defaultCluster';
 })();
