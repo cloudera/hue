@@ -545,7 +545,7 @@ from metadata.conf import has_navigator
 
       DataCatalogContext.prototype.refresh = function () {
         var self = this;
-        self.catalogEntry().clear('invalidate', true).always(self.load.bind(self));
+        self.catalogEntry().clearCache({ invalidate: 'invalidate', cascade: true }).always(self.load.bind(self));
       };
 
       DataCatalogContext.prototype.load = function () {
