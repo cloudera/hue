@@ -338,7 +338,8 @@ var AssistStorageEntry = (function () {
     var deferred = $.Deferred();
     var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
     var type = typeMatch ? typeMatch[1] : (type || 'hdfs');
-    type.replace(/s3.*/i, 's3');
+    type = type.replace(/s3.*/i, 's3');
+    type = type.replace(/adl.*/i, 'adls');
 
     var rootEntry = new AssistStorageEntry({
       type: type.toLowerCase(),
