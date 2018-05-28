@@ -410,7 +410,9 @@ from metadata.conf import has_navigator
           <!-- /ko -->
           <!-- ko if: typeof stats !== 'undefined' -->
           <!-- ko with: stats -->
+          <!-- ko if: user -->
           <div class="context-popover-attribute"><div>${ _('Owner') }</div><div data-bind="text: user"></div></div>
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: typeof rwx !== 'undefined' -->
