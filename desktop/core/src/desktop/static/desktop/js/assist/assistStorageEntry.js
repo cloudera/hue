@@ -45,6 +45,7 @@ var AssistStorageEntry = (function () {
    * @param {string} options.definition.name
    * @param {string} options.definition.type (file, dir)
    * @param {string} options.type - The storage type ('adls', 'hdfs', 's3')
+   * @param {string} [options.originalType] - The original storage type ('adl', 's3a')
    * @param {AssistStorageEntry} options.parent
    * @param {ApiHelper} options.apiHelper
    * @constructor
@@ -52,6 +53,7 @@ var AssistStorageEntry = (function () {
   function AssistStorageEntry (options) {
     var self = this;
     self.type = options.type;
+    self.originalType = options.originalType;
     self.definition = options.definition;
     self.apiHelper = options.apiHelper;
     self.parent = options.parent;
@@ -339,10 +341,11 @@ var AssistStorageEntry = (function () {
     var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
     var type = typeMatch ? typeMatch[1] : (type || 'hdfs');
     type = type.replace(/s3.*/i, 's3');
-    type = type.replace(/adl.*/i, 'adls');
+    type = type.replace(/adl.*/i, 'adls')
 
     var rootEntry = new AssistStorageEntry({
       type: type.toLowerCase(),
+      originalType: typeMatch && typeMatch[1],
       definition: {
         name: '/',
         type: 'dir'

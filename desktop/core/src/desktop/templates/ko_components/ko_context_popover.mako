@@ -797,9 +797,10 @@ from metadata.conf import has_navigator
       };
 
       StorageContext.prototype.replaceInEditor = function (entry, storageContext) {
+        var text = entry.originalType ? entry.originalType + ':/' + entry.path : entry.path;
         huePubSub.publish('ace.replace', {
           location: storageContext.editorLocation,
-          text: entry.path
+          text: text
         });
         huePubSub.publish('context.popover.hide');
       };
