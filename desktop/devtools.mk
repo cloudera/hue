@@ -26,7 +26,6 @@ DEVTOOLS += \
 	nosetty[0.4] \
 	werkzeug[0.14.1] \
 	windmill[1.6] \
-	pylint[1.7.1] \
         astroid[1.5.3] \
         isort[4.2.5] \
         six[1.10.0]
