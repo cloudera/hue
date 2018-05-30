@@ -386,8 +386,10 @@ from desktop.views import _ko
                 if (matchedFacets[value] !== -1) {
                   label += ' (' + matchedFacets[value] + ')';
                 }
-                facetSuggestions.push({ label: label, value: fullValue });
-                newSuggestions.push(fullValue);
+                if (matchedFacets[value] !== 0) {
+                  facetSuggestions.push({ label: label, value: fullValue });
+                  newSuggestions.push(fullValue);
+                }
               }
             });
           }
