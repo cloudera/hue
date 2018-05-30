@@ -268,7 +268,11 @@ class NavigatorApi(object):
             if name == 'type': # Make sure type value still makes sense for the source
               term = '%s:%s' % (name, val.upper())
               fq_type = entity_types
-            filterQueries.append(term)
+            if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
+              # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
+              query.append('up_' + term)
+            else:
+              filterQueries.append(term)
 
       filterQueries.append('deleted:false')
 
