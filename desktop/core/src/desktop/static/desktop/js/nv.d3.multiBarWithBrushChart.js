@@ -85,6 +85,7 @@ nv.models.multiBarWithBrushChart = function() {
     , onStateChange = null
     , onLegendChange = null
     , onChartUpdate = null
+    , selectedBars = null
     , selectBars = null
     ;
 
@@ -358,6 +359,9 @@ nv.models.multiBarWithBrushChart = function() {
         .on('mousemove', onMouseMove)
         .on('mouseout', onMouseOut)
         .on('click', onClick);
+      }
+      if (selectBars && selectedBars) {
+        selectBars(selectedBars);
       }
 
 
@@ -1020,6 +1024,7 @@ nv.models.multiBarWithBrushChart = function() {
     } else {
       chart.brushDomain = null;
     }
+    selectedBars = args;
     if (selectBars) {
       selectBars(args);
     }
