@@ -330,7 +330,7 @@ from metadata.conf import has_navigator
           <!-- ko ifnot: $parent.commentExpanded -->
             %if has_navigator(user):
               <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
-              <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true, overflowEllipsis: true } }"></div>
+              <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
             %endif
 
