@@ -3815,7 +3815,7 @@ function multiSerieDataTransformer(rawDatum) {
 }
 
 
-function multiSerieDataTransformerGrid(rawDatum) {
+function multiSerieDataTransformerGrid(rawDatum, isTimeline) {
   var _datum = [];
 
   var chartX = searchViewModel.collection.template.chartSettings.chartX();
@@ -3829,7 +3829,7 @@ function multiSerieDataTransformerGrid(rawDatum) {
         if (item.item[chartX] && item.item[col]) {
           _data.push({
             series: _plottedSerie,
-            x: item.item[chartX](),
+            x: isTimeline && new Date(item.item[chartX]()) || item.item[chartX](),
             y: item.item[col](),
             obj: item.item
           });

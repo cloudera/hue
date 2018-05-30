@@ -290,7 +290,7 @@
         }
         $(element).data("type", valueAccessor().type());
       }
-      var _datum = _options.transformer(_options.datum);
+      var _datum = _options.transformer(_options.datum, true);
       var _chart = $(element).data("chart");
       if (_chart) {
         window.setTimeout(function () {
@@ -1048,7 +1048,7 @@
   }
 
   function barChartBuilder(element, options, isTimeline) {
-    var _datum = options.transformer(options.datum);
+    var _datum = options.transformer(options.datum, isTimeline);
     $(element).height(300);
 
     var _isPivot = options.isPivot != null ? options.isPivot : false;
