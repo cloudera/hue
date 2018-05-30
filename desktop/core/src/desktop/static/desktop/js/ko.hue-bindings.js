@@ -7206,6 +7206,11 @@
       $.extend(options, value);
 
       $(element).addClass('dropzone');
+      
+      $(element).on('click', function (e) {
+        e.stopPropagation();
+      });
+
       new Dropzone(element, options);
     }
   };
