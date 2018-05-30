@@ -342,8 +342,6 @@ def listdir(request, path):
     Implements directory listing (or index).
 
     Intended to be called via view().
-
-    TODO: Remove?
     """
     if not request.fs.isdir(path):
         raise PopupException(_("Not a directory: %(path)s") % {'path': path})
