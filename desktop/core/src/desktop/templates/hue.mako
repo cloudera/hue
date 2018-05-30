@@ -1551,6 +1551,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.subscribe('hue.new.default.app', function () {
           huePubSub.publish('cluster.config.refresh.config');
         });
+      }
 
       var topNavViewModel = new TopNavViewModel(onePageViewModel);
       % if not IS_EMBEDDED.get():

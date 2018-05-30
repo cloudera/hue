@@ -1901,14 +1901,10 @@ class Cluster():
 
   def __init__(self, user):
     self.user = user
-    self.data = {}
+    self.data = get_clusters()['Default']
 
-    if IS_EMBEDDED.get(): # ANALYTIC_DB
-      self.data = get_clusters()['Default']
-    elif self.default_cluster:
-      clusters = get_clusters()
-      cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
-      self.data = cluster_name and clusters.get(cluster_name) and clusters[cluster_name] or None
+  def get_type(self):
+    return self.data['type']
 
 
 def _get_apps(user, section=None):
