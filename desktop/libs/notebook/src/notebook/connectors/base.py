@@ -276,13 +276,11 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = Cluster(request.user)
-  if cluster and cluster.get_type() == 'dataeng':
-    interface = 'dataeng'
+  cluster = json.loads(request.POST.get('cluster', '""'))
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request)
+    return HS2Api(user=request.user, request=request, cluster=cluster)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
@@ -330,10 +328,11 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
+    self.cluster = cluster
 
   def create_session(self, lang, properties=None):
     return {

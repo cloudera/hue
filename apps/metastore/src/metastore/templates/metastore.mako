@@ -1005,6 +1005,7 @@ ${ components.menubar(is_embeddable) }
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- ko if: !table() -->
+              <select data-bind="selectize: contexts, value: context" class="input-medium"></select>
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the database')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- /ko -->

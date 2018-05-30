@@ -1293,8 +1293,9 @@ var ApiHelper = (function () {
         notebook: {},
         snippet: ko.mapping.toJSON({
           type: sourceType,
-          source: isQuery ? 'query' : 'data'
-        })
+          source: isQuery ? 'query' : 'data',
+        }),
+        cluster: ko.mapping.toJSON(window.context || '')
       },
       timeout: options.timeout
     }).success(function (data) {
@@ -1389,6 +1390,10 @@ var ApiHelper = (function () {
       if (options.path.length > 2) {
         url += '/stats/' + options.path.slice(2).join('/');
       }
+    }
+
+    if (window.context) {
+      url += '/' + window.context;
     }
 
     var request = self.simpleGet(url, {

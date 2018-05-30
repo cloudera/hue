@@ -1477,37 +1477,41 @@ def get_clusters():
     cluster_config = CLUSTERS.get()
     clusters = OrderedDict([
       (i, {
-        'name': i,
+        'id': i,
+        'name': cluster_config[i].NAME.get() or i,
         'type': cluster_config[i].TYPE.get(),
-        'interfaces': [
-            {'name': i, 'type': cluster_config[i].TYPE.get(), 'interface': interface}
-            for interface in cluster_config[i].INTERFACES.get()
-        ]
-      }) for i in cluster_config]
-    )
+        'server_host': cluster_config[i].SERVER_HOST.get()
+      }) for i in cluster_config
+    ])
   else:
-    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
+    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini'})])
 
   return clusters
 
 
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
-  help="One entry for each additional cluster Hue can interact with.",
+  help="One entry for each additional remote cluster Hue can interact with.",
   each=ConfigSection(
-    help=_("Name of the cluster to show to the user."),
+    help=_("Id of the cluster."),
     members=dict(
-      TYPE=Config(
-          "type",
-          help=_("Type of cluster, e.g. local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
-          default='local',
+      NAME=Config(
+          "name",
+          help=_("Nice name of the cluster to show to the user. Same as id if not specified."),
+          default=None,
           type=str,
       ),
-      INTERFACES=Config(
-          "interfaces",
-          help=_("List of cluster instances of the cluster (optional)."),
-          default=[],
-          type=coerce_csv,
+      TYPE=Config(
+          "type",
+          help=_("Type of cluster, e.g. direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          default='direct',
+          type=str,
+      ),
+      SERVER_HOST=Config(
+          "server_host",
+          help=_("The host service to contact."),
+          default=None,
+          type=str,
       ),
     )
   )
