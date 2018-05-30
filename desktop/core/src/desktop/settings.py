@@ -230,6 +230,14 @@ TEMPLATES = [
       'loaders': GTEMPLATE_LOADERS,
     },
   },
+  {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [
+      get_desktop_root("core/templates/debug_toolbar"),
+    ],
+    'NAME': 'django',
+    'APP_DIRS': True,
+  },
 ]
 
 # Desktop doesn't use an auth profile module, because
@@ -553,7 +561,8 @@ def show_toolbar(request):
 
 if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
   idx = MIDDLEWARE_CLASSES.index('desktop.middleware.ClusterMiddleware')
-  MIDDLEWARE_CLASSES.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
+  MIDDLEWARE_CLASSES.insert(idx + 1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+  MIDDLEWARE_CLASSES.insert(idx + 2, 'debug_panel.middleware.DebugPanelMiddleware')
 
   INSTALLED_APPS += (
       'debug_toolbar',
