@@ -35,6 +35,13 @@ var MetastoreDatabase = (function () {
     self.loadingTableComments = ko.observable(false);
     self.loadingTablePopularity = ko.observable(false);
 
+
+    self.contexts = ko.observableArray(['Default', 'nightlyc6', 'selfserviceanalytics']);
+    self.context = ko.observable('Default');
+    self.context.subscribe(function(newVal) {
+      window.context = newVal;
+    });
+
     self.tables = ko.observableArray();
 
     self.loading = ko.pureComputed(function () {

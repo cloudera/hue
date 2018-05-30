@@ -45,6 +45,7 @@ from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
+from desktop.conf import get_clusters
 
 
 LOG = logging.getLogger(__name__)
@@ -73,6 +74,40 @@ def get_config(request):
   config['status'] = 0
 
   return JsonResponse(config)
+
+
+@api_error_handler
+def get_context(request, app, engine):
+  context = {}
+
+  if app == 'editor':
+    if engine == 'hive':
+      context['editor'] = {
+        'hive': {
+          'computes': [
+            {
+              'id': cluster['id'],
+              'name': cluster['name']
+            } for cluster in get_clusters().values()
+          ]
+        }
+      }
+  elif app == 'browser':
+    if engine == 'hive':
+      context['browser'] = {
+        'hive': {
+          'namespaces': [
+            {
+              'id': cluster['id'],
+              'name': cluster['name']
+            } for cluster in get_clusters().values()
+          ]
+        }
+      }
+
+  context['status'] = 0
+
+  return JsonResponse(context)
 
 
 @api_error_handler

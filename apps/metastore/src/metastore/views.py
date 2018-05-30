@@ -36,7 +36,6 @@ from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from desktop.lib.view_util import location_to_url
-from urlparse import urlparse
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 from notebook.connectors.base import Notebook, QueryError
 from notebook.models import make_notebook
@@ -158,10 +157,10 @@ def alter_database(request, database):
   return JsonResponse(response)
 
 
-def get_database_metadata(request, database):
+def get_database_metadata(request, database, cluster=None):
   response = {'status': -1, 'data': ''}
   source_type = request.POST.get('source_type', 'hive')
-  db = _get_db(user=request.user, source_type=source_type)
+  db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
     db_metadata = db.get_database(database)
@@ -265,9 +264,9 @@ def get_table_metadata(request, database, table):
   return JsonResponse(response)
 
 
-def describe_table(request, database, table):
+def describe_table(request, database, table, cluster=None):
   app_name = get_app_name(request)
-  db = _get_db(user=request.user)
+  db = _get_db(user=request.user, cluster=cluster)
 
   try:
     table = db.get_table(database, table)
@@ -659,7 +658,7 @@ def has_write_access(user):
 
 
 
-def _get_db(user, source_type=None):
+def _get_db(user, source_type=None, cluster=None):
   if source_type is None:
     cluster_config = get_cluster_config(user)
     if FORCE_HS2_METADATA.get() and cluster_config['app_config'].get('editor') and 'hive' in cluster_config['app_config'].get('editor')['interpreter_names']:
@@ -667,7 +666,9 @@ def _get_db(user, source_type=None):
     else:
       source_type = cluster_config['default_sql_interpreter']
 
-  query_server = get_query_server_config(name=source_type if source_type != 'hive' else 'beeswax')
+  name = source_type if source_type != 'hive' else 'beeswax'
+
+  query_server = get_query_server_config(name=name, cluster=cluster)
   return dbms.get(user, query_server)
 
 

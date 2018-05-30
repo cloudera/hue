@@ -126,7 +126,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
 
       if table.is_impala_only: # Expand Kudu columns information
         query_server = get_query_server_config('impala')
-        db = dbms.get(db.client.user, query_server)
+        db = dbms.get(db.client.user, query_server, cluster=db.cluster)
 
         col_options = db.get_table_describe(database, table.name)
         extra_col_options = dict([(col[0], dict(zip(col_options.cols(), col))) for col in col_options.rows()])
@@ -861,10 +861,10 @@ def close_session(request, session_id):
 
 
 # Proxy API for Metastore App
-def describe_table(request, database, table):
+def describe_table(request, database, table, cluster=None):
   try:
-    from metastore.views import describe_table
-    return describe_table(request, database, table)
+    from metastore.views import describe_table as metastore_describe_table
+    return metastore_describe_table(request, database, table, cluster=cluster)
   except Exception, e:
     LOG.exception('Describe table failed')
     raise PopupException(_('Problem accessing table metadata'), detail=e)
