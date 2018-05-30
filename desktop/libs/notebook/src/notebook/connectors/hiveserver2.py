@@ -444,7 +444,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    db = self._get_db(snippet)
+    db = self._get_db(snippet, cluster=self.cluster)
     query = None
 
     if snippet.get('query'):
@@ -764,7 +764,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
 
-  def _get_db(self, snippet, async=False):
+  def _get_db(self, snippet, async=False, cluster=None):
     if not async and snippet['type'] == 'hive':
       name = 'beeswax'
     elif snippet['type'] == 'hive':
@@ -774,7 +774,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     else:
       name = 'sparksql'
 
-    return dbms.get(self.user, query_server=get_query_server_config(name=name))
+    return dbms.get(self.user, query_server=get_query_server_config(name=name, cluster=cluster))
 
 
   def _parse_job_counters(self, job_id):
