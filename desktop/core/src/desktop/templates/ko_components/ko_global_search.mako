@@ -465,7 +465,7 @@ from desktop.views import _ko
           var navQuery = querySpec.query;
           // Add * in front of each term unless already there
           querySpec.text.forEach(function (textPart) {
-            if (textPart.indexOf('*') === -1 && navQuery.indexOf('*' + textPart) === -1) {
+            if (textPart.indexOf('*') === -1 && navQuery.indexOf('*' + textPart) === -1 && textPart.indexOf(':') === -1) {
               navQuery = navQuery.replace(textPart, '*' + textPart);
             }
           });
