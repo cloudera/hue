@@ -1306,7 +1306,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 self.currentContextParams(ctx.params);
                 self.currentQueryString(ctx.querystring);
                 self.loadApp('${ other.display_name }', true)
-              }}
+              }},
             % endfor
           % endif
         ];
