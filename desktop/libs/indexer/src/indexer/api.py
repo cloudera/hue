@@ -24,7 +24,6 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from search.models import Collection
 
 from indexer.controller import CollectionManagerController
 from indexer.solr_client import SolrClient
