@@ -586,7 +586,7 @@ def augment_solr_response(response, collection, query):
           if len(collection_facet['properties']['facets']) == 1 or len(collection_facet['properties']['facets']) == 2 and collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count':
             column = 'count'
             if len(collection_facet['properties']['facets']) == 2:
-              agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
+              agg_keys = _get_agg_keys(counts) if counts else []
               legend = agg_keys[0].split(':', 2)[1]
               column = agg_keys[0]
             else:
@@ -606,7 +606,7 @@ def augment_solr_response(response, collection, query):
                                  collection_facet=collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
-            agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')] if counts else []
+            agg_keys = _get_agg_keys(counts) if counts else []
             agg_keys.sort(key=lambda a: a[4:])
 
             if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
@@ -638,7 +638,7 @@ def augment_solr_response(response, collection, query):
           facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
 
           column = 'count'
-          agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+          agg_keys = _get_agg_keys(counts) if counts else []
           agg_keys.sort(key=lambda a: a[4:])
 
           if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
@@ -652,7 +652,7 @@ def augment_solr_response(response, collection, query):
           dimension = 1
 
           column = 'count'
-          agg_keys = counts and [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
+          agg_keys = _get_agg_keys(counts) if counts else []
           if len(collection_facet['properties']['facets']) == 2 and agg_keys:
             column = agg_keys[0]
           else:
@@ -666,7 +666,7 @@ def augment_solr_response(response, collection, query):
         else:
           # Dimension 2 with analytics or 1 with N aggregates
           dimension = 2
-          agg_keys = counts and [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+          agg_keys = _get_agg_keys(counts) if counts else []
           agg_keys.sort(key=lambda a: a[4:])
 
           if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
@@ -706,6 +706,12 @@ def augment_solr_response(response, collection, query):
 
   return augmented
 
+def _get_agg_keys(counts):
+  for count in counts:
+    keys = [key for key, value in count.items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+    if keys:
+      return keys
+  return []
 
 def augment_response(collection, query, response):
   # HTML escaping
