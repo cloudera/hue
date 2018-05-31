@@ -80,6 +80,8 @@ def get_config(request):
 def get_context(request, app, engine):
   context = {}
 
+  clusters = get_clusters(request.user).values()
+
   if app == 'editor':
     if engine == 'hive':
       context['editor'] = {
@@ -88,7 +90,7 @@ def get_context(request, app, engine):
             {
               'id': cluster['id'],
               'name': cluster['name']
-            } for cluster in get_clusters().values()
+            } for cluster in clusters
           ]
         }
       }
@@ -100,7 +102,7 @@ def get_context(request, app, engine):
             {
               'id': cluster['id'],
               'name': cluster['name']
-            } for cluster in get_clusters().values()
+            } for cluster in clusters
           ]
         }
       }
