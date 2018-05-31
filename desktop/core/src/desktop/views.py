@@ -73,7 +73,7 @@ def is_alive(request):
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
   current_app, other_apps, apps_list = _get_apps(request.user, '')
-  clusters = get_clusters().values()
+  clusters = get_clusters(request.user).values()
 
   return render('hue.mako', request, {
     'apps': apps,

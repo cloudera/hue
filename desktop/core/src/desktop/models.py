@@ -49,7 +49,7 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters
+from desktop.conf import get_clusters, CLUSTER_ID
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1912,8 +1912,8 @@ class Cluster():
 
   def __init__(self, user):
     self.user = user
-    self.clusters = get_clusters()
-    self.data = self.clusters['Default']
+    self.clusters = get_clusters(user)
+    self.data = self.clusters[CLUSTER_ID.get()]
 
   def get_type(self):
     return self.data['type']
