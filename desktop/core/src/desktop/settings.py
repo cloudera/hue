@@ -449,6 +449,15 @@ if OPENID_AUTHENTICATION:
   LOGIN_URL = '/openid/login'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# OpenId Connect
+OPENIDC_AUTHENTICATION = 'oidc_auth.auth.OpenIDConnectBackend' in AUTHENTICATION_BACKENDS   # <-------
+if OPENID_AUTHENTICATION:
+  from libopenid.openid_settings import *
+  INSTALLED_APPS.append('oidc_auth')
+  LOGIN_URL = 'oidc-login'
+  LOGIN_REDIRECT_URL = '/'
+  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 # OAuth
 OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
 if OAUTH_AUTHENTICATION:

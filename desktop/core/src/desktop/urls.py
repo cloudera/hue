@@ -203,6 +203,10 @@ if settings.SAML_AUTHENTICATION:
 if settings.OPENID_AUTHENTICATION:
     static_patterns.append(url(r'^openid/', include('libopenid.urls')))
 
+# OpenId Connect specific
+if settings.OPENIDC_AUTHENTICATION:
+    static_patterns.append(url(r'oidc/', include('oidc_auth.urls')))
+
 if settings.OAUTH_AUTHENTICATION:
   static_patterns.append(url(r'^oauth/', include('liboauth.urls')))
 

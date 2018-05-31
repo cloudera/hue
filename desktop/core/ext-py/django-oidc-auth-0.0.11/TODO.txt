@@ -1,0 +1,18 @@
+- add Tox to test agains multiple python & django versions
+- shoult it have a dummy views/urls/views file, for testing purposes?
+- setup logger
+- this lib expects only RS256... THIS IS BAD!
+- override gen_nonce method from settings (is it necessary?)
+- check Nonce.generate to only retry up to a maximum (5?)
+- add DYNAMIC REGISTRATION later
+- change Nonce.hash to Nonce.state
+- add "?next=" to Nonce, to remember where the user should be redirected
+- verify uniqueness of email, preferred_username, etc.
+- find a way to subscribe email, profile, username, etc. (maybe custom?)
+- check for INtegrityError on OpenIDUser+userModel
+- add ability to insert custom verifying methods (really?)
+- record id_token_signing_alg_values_supported in OpenIDProvider,
+and make #signing_keys return the proper keyset (RS256, HS256, etc)
+
+
+- change oidc_settings.CLIENT_ID to provider.client_id(secret)
