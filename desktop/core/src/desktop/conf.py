@@ -1585,21 +1585,33 @@ DISABLE_HUE_3 = Config( # To remove in Hue 5
 )
 
 
-def get_clusters():
-  if CLUSTERS.get():
-    cluster_config = CLUSTERS.get()
-    clusters = OrderedDict([
-      (i, {
-        'id': i,
-        'name': cluster_config[i].NAME.get() or i,
-        'type': cluster_config[i].TYPE.get(),
-        'server_host': cluster_config[i].SERVER_HOST.get()
-      }) for i in cluster_config
-    ])
-  else:
-    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini'})])
+def get_clusters(user):
+  # Get additional remote multi clusters
+  cluster_config = CLUSTERS.get()
+  clusters = [
+    (i, {
+      'id': i,
+      'name': cluster_config[i].NAME.get() or i,
+      'type': cluster_config[i].TYPE.get(),
+      'server_host': cluster_config[i].SERVER_HOST.get()
+    }) for i in cluster_config
+  ]
 
-  return clusters
+  # Get core standalone config if there
+  apps = appmanager.get_apps_dict(user)
+  if 'beeswax' in apps:
+    from beeswax.conf import HIVE_SERVER_HOST
+    clusters.insert(0,
+      (CLUSTER_ID.get(), {
+        'id': CLUSTER_ID.get(),
+        'name': CLUSTER_ID.get(),
+        'type': 'single',
+        'server_host': HIVE_SERVER_HOST.get()
+        }
+      )
+    )
+
+  return OrderedDict(clusters)
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1616,7 +1628,7 @@ CLUSTERS = UnspecifiedConfigSection(
       ),
       TYPE=Config(
           "type",
-          help=_("Type of cluster, e.g. direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
           default='direct',
           type=str,
       ),
