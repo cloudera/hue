@@ -377,7 +377,7 @@ var EditorViewModel = (function() {
 
         var sourceContextDeferred = $.Deferred();
         if (!self.sourceContext()) {
-          contextHelper.getSourceContexts().done(function (sourceContexts) {
+          ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: self.type() }).done(function (sourceContexts) {
             // TODO: Context selection for the notebook
             self.sourceContext(sourceContexts[0]);
             sourceContextDeferred.resolve();

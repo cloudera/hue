@@ -2050,7 +2050,8 @@ ${ assist.assistPanel() }
 
       self.activeSourceContext = ko.observable();
 
-      contextHelper.getSourceContexts().done(function (sourceContexts) {
+      // TODO: sourceType?
+      ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'hive' }).done(function (sourceContexts) {
         // TODO: Context selection for create wizard
         self.activeSourceContext(sourceContexts[0]);
       });

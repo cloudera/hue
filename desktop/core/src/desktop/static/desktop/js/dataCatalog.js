@@ -66,6 +66,7 @@ var DataCatalog = (function () {
   var fetchAndSave = function (apiHelperFunction, attributeName, entry, apiOptions) {
     return ApiHelper.getInstance()[apiHelperFunction]({
       sourceType: entry.dataCatalog.sourceType,
+      sourceContext: entry.sourceContext,
       path: entry.path, // Set for DataCatalogEntry
       paths: entry.paths, // Set for MultiTableEntry
       silenceErrors: apiOptions && apiOptions.silenceErrors,
@@ -137,7 +138,7 @@ var DataCatalog = (function () {
         return deferred.reject().promise();
       }
 
-      var keyPrefix = sourceContext.name;
+      var keyPrefix = sourceContext.id;
       if (rootPath.length) {
         keyPrefix += '_' +  rootPath.join('.');
       }
@@ -177,7 +178,7 @@ var DataCatalog = (function () {
       }
       var deferred = $.Deferred();
 
-      var identifier = dataCatalogEntry.sourceContext.name;
+      var identifier = dataCatalogEntry.sourceContext.id;
       if (dataCatalogEntry.path.length) {
         identifier += '_' + dataCatalogEntry.path.join('.');
       }
@@ -341,7 +342,7 @@ var DataCatalog = (function () {
     DataCatalog.prototype.getKnownEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = options.sourceContext.name + (identifier ? '_' + identifier : '');
+      identifier = options.sourceContext.id + (identifier ? '_' + identifier : '');
       return self.entries[identifier];
     };
 
@@ -356,7 +357,7 @@ var DataCatalog = (function () {
     DataCatalog.prototype.getEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = options.sourceContext.name + (identifier ? '_' + identifier : '');
+      identifier = options.sourceContext.id + (identifier ? '_' + identifier : '');
       if (self.entries[identifier]) {
         return self.entries[identifier];
       }
@@ -425,7 +426,7 @@ var DataCatalog = (function () {
       });
       var uniquePaths = Object.keys(pathSet);
       uniquePaths.sort();
-      return sourceContext.name + '_' + uniquePaths.join(',');
+      return sourceContext.id + '_' + uniquePaths.join(',');
     };
 
     /**
