@@ -38,6 +38,7 @@ var AssistDbSource = (function () {
    * @param {Object} options
    * @param {Object} options.i18n
    * @param {string} options.type
+   * @param {Observable} options.activeSourceContext
    * @param {string} options.name
    * @param {Object} options.navigationSettings
    * @constructor
@@ -50,6 +51,7 @@ var AssistDbSource = (function () {
     self.navigationSettings = options.navigationSettings;
     self.apiHelper = ApiHelper.getInstance();
     self.sourceType = options.type;
+    self.activeSourceContext = options.activeSourceContext;
     self.name = options.name;
     self.catalogEntry;
 
@@ -222,7 +224,7 @@ var AssistDbSource = (function () {
       self.selectedDatabase(null);
       self.databases([]);
 
-      DataCatalog.getEntry({ sourceType: self.sourceType, path : [], definition: { type: 'source' }}).done(function (catalogEntry) {
+      DataCatalog.getEntry({ sourceType: self.sourceType, sourceContext: self.activeSourceContext(), path : [], definition: { type: 'source' } }).done(function (catalogEntry) {
         self.catalogEntry = catalogEntry;
         self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (databaseEntries) {
           self.dbIndex = {};

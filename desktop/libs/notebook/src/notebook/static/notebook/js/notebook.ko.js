@@ -358,6 +358,8 @@ var EditorViewModel = (function() {
 
     self.database = ko.observable();
     var previousDatabase = null;
+    self.sourceContext = ko.observable(snippet.sourceContext || vm.sourceContext);
+
     self.database.subscribe(function (newValue) {
       if (newValue !== null) {
         self.getApiHelper().setInTotalStorage('editor', 'last.selected.database', newValue);
@@ -372,15 +374,28 @@ var EditorViewModel = (function() {
 
     self.updateDatabases = function () {
       if (self.isSqlDialect()) {
-        DataCatalog.getEntry({ sourceType: self.type(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
-          sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
-            var databaseNames = [];
-            databaseEntries.forEach(function (databaseEntry) {
-              databaseNames.push(databaseEntry.name);
+
+        var sourceContextDeferred = $.Deferred();
+        if (!self.sourceContext()) {
+          contextHelper.getSourceContexts().done(function (sourceContexts) {
+            // TODO: Context selection for the notebook
+            self.sourceContext(sourceContexts[0]);
+            sourceContextDeferred.resolve();
+          });
+        } else {
+          sourceContextDeferred.resolve();
+        }
+        sourceContextDeferred.done(function () {
+          DataCatalog.getEntry({ sourceType: self.type(), sourceContext: self.sourceContext(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
+            sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
+              var databaseNames = [];
+              databaseEntries.forEach(function (databaseEntry) {
+                databaseNames.push(databaseEntry.name);
+              });
+              self.availableDatabases(databaseNames);
+            }).fail(function () {
+              self.availableDatabases([]);
             });
-            self.availableDatabases(databaseNames);
-          }).fail(function () {
-            self.availableDatabases([]);
           });
         });
       } else {
@@ -907,7 +922,7 @@ var EditorViewModel = (function() {
           }
         }
         ignoreNextAssistDatabaseUpdate = true;
-        DataCatalog.getEntry({ sourceType: self.type(), path: path }).done(function (entry) {
+        DataCatalog.getEntry({ sourceType: self.type(), sourceContext: self.sourceContext(), path: path }).done(function (entry) {
           entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
         });
       });

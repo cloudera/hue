@@ -63,9 +63,17 @@ var MetastoreViewModel = (function () {
 
     self.currentTab = ko.observable('');
 
+    self.activeSourceContext = ko.observable();
+    self.sourceContexts = ko.observableArray();
+
     self.database = ko.observable(null);
 
-    self.loadDatabases();
+    contextHelper.getSourceContexts().done(function (sourceContexts) {
+      // TODO: Context selection
+      self.sourceContexts(sourceContexts);
+      self.activeSourceContext(sourceContexts[0]);
+      self.loadDatabases();
+    });
 
     huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
       var refreshedEntry = details.entry;
@@ -221,7 +229,7 @@ var MetastoreViewModel = (function () {
       self.loadingDatabases(false);
     });
 
-    DataCatalog.getEntry({ sourceType: self.sourceType(), path: [], definition: { type: 'source' } }).done(function (entry) {
+    DataCatalog.getEntry({ sourceContext: self.activeSourceContext(), sourceType: self.sourceType(), path: [], definition: { type: 'source' } }).done(function (entry) {
       self.catalogEntry(entry);
       entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {
