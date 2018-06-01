@@ -52,6 +52,7 @@ var MetastoreViewModel = (function () {
     self.reloading = ko.observable(false);
     self.loadingDatabases = ko.observable(false);
     self.loadingTable = ko.observable(false);
+    self.lastLoadDatabasesPromise = null;
 
     self.loading = ko.pureComputed(function () {
       return self.loadingDatabases() || self.loadingTable() || self.reloading();
@@ -66,13 +67,17 @@ var MetastoreViewModel = (function () {
     self.activeSourceContext = ko.observable();
     self.sourceContexts = ko.observableArray();
 
+    self.activeSourceContext.subscribe(function () {
+      self.lastLoadDatabasesPromise = null;
+      self.loadDatabases()
+    });
+
     self.database = ko.observable(null);
 
     ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: self.sourceType() }).done(function (sourceContexts) {
       // TODO: Context selection
       self.sourceContexts(sourceContexts);
       self.activeSourceContext(sourceContexts[0]);
-      self.loadDatabases();
     });
 
     huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
@@ -200,9 +205,7 @@ var MetastoreViewModel = (function () {
         return true;
       }
     });
-  }
-
-  var lastLoadDatabasesPromise = null;
+  };
 
   MetastoreViewModel.prototype.reload = function () {
     var self = this;
@@ -216,12 +219,12 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadDatabases = function () {
     var self = this;
     if (self.loadingDatabases() && lastLoadDatabasesPromise) {
-      return lastLoadDatabasesPromise;
+      return self.lastLoadDatabasesPromise;
     }
 
     self.loadingDatabases(true);
     var deferred = $.Deferred();
-    lastLoadDatabasesPromise = deferred.promise();
+    self.lastLoadDatabasesPromise = deferred.promise();
 
     deferred.fail(function () {
       self.databases([]);
@@ -239,7 +242,7 @@ var MetastoreViewModel = (function () {
       }).fail(deferred.reject);
     });
 
-    return lastLoadDatabasesPromise;
+    return self.lastLoadDatabasesPromise;
   };
 
   MetastoreViewModel.prototype.loadTableDef = function (tableDef, callback) {
@@ -323,8 +326,8 @@ var MetastoreViewModel = (function () {
       }
     };
 
-    if (self.loadingDatabases() && lastLoadDatabasesPromise !== null) {
-      lastLoadDatabasesPromise.done(function () {
+    if (self.loadingDatabases() && self.lastLoadDatabasesPromise !== null) {
+      self.lastLoadDatabasesPromise.done(function () {
         whenLoaded(true);
       });
     } else {
