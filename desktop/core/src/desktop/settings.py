@@ -589,3 +589,30 @@ if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
           }
       }
   })
+
+
+MIDDLEWARE_CLASSES.insert('mozilla_django_oidc.middleware.SessionRefresh')
+
+# Add 'mozilla_django_oidc' to INSTALLED_APPS
+INSTALLED_APPS += (
+    'django.contrib.auth',
+    'mozilla_django_oidc',  # Load after auth
+    # ...
+)
+
+# Add 'mozilla_django_oidc' authentication backend
+AUTHENTICATION_BACKENDS = (
+    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+)
+
+# OIDC_RP_SIGN_ALGO =
+
+OIDC_OP_AUTHORIZATION_ENDPOINT = "<URL of the OIDC OP authorization endpoint>"
+OIDC_OP_TOKEN_ENDPOINT = "<URL of the OIDC OP token endpoint>"
+OIDC_OP_USER_ENDPOINT = "<URL of the OIDC OP userinfo endpoint>"
+
+LOGIN_REDIRECT_URL = "<URL path to redirect to after login>"
+LOGOUT_REDIRECT_URL = "<URL path to redirect to after logout>"
+
+OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = 15 * 60
+

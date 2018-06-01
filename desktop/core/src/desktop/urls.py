@@ -241,3 +241,7 @@ if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
   urlpatterns += [
     url(r'^__debug__/', include(debug_toolbar.urls)),
   ]
+
+urlpatterns += [
+  url(r'^oidc/', include('mozilla_django_oidc.urls')),
+]
