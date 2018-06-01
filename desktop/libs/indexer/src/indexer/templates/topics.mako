@@ -622,6 +622,13 @@ ${ assist.assistPanel() }
 
       self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/topics/';
 
+      self.activeSourceContext = ko.observable();
+
+      contextHelper.getSourceContexts().done(function (sourceContexts) {
+        // TODO: Context selection
+        self.activeSourceContext(sourceContexts[0]);
+      });
+
       self.assistAvailable = ko.observable(true);
       self.apiHelper = ApiHelper.getInstance();
       self.isHue4 = ko.observable(options.hue4);
@@ -822,6 +829,7 @@ ${ assist.assistPanel() }
         huePubSub.publish('context.popover.show', {
           data: {
             type: 'collection',
+            sourceContext: self.activeSourceContext(),
             identifierChain: [
               {}, // empty, needed by the context popover
               ko.mapping.toJS(self.index),

@@ -2048,6 +2048,13 @@ ${ assist.assistPanel() }
       var self = this;
       var guessFieldTypesXhr;
 
+      self.activeSourceContext = ko.observable();
+
+      contextHelper.getSourceContexts().done(function (sourceContexts) {
+        // TODO: Context selection for create wizard
+        self.activeSourceContext(sourceContexts[0]);
+      });
+
       self.fileType = ko.observable();
       self.fileType.subscribe(function (newType) {
         if (self.source.format()) {
@@ -2104,10 +2111,10 @@ ${ assist.assistPanel() }
       self.indexingStarted = ko.observable(false);
 
       self.isValidDestination = ko.pureComputed(function() {
-         return self.destination.name().length > 0 && (
-           (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
-           (['index'].indexOf(self.destination.outputFormat()) == -1 || /^[^\\/:]+$/.test(self.destination.name()))
-         );
+        return self.destination.name().length > 0 && (
+          (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
+          (['index'].indexOf(self.destination.outputFormat()) == -1 || /^[^\\/:]+$/.test(self.destination.name()))
+        );
       });
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
@@ -2314,13 +2321,13 @@ ${ assist.assistPanel() }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        DataCatalog.getEntry({ sourceType: snippet.type(), path: [ db ]}).done(function (dbEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), sourceContext: self.activeSourceContext(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });
                       } else {
-                        DataCatalog.getEntry({ sourceType: snippet.type(), path: []}).done(function (sourceEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), sourceContext: self.activeSourceContext(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })

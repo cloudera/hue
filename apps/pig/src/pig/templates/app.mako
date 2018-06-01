@@ -1020,9 +1020,11 @@ ${ commonshare() | n,unicode }
       var apiHelper = ApiHelper.getInstance({
         user: '${ user }'
       });
-
-      DataCatalog.getChildren({ sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
-        availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
+      contextHelper.getSourceContexts().done(function (sourceContexts) {
+        // TODO: Context selection
+        DataCatalog.getChildren({ sourceContext: sourceContexts[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
+          availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
+        });
       });
     % endif
 

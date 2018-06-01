@@ -647,6 +647,13 @@ ${ assist.assistPanel() }
 
       self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
 
+      self.activeSourceContext = ko.observable();
+
+      contextHelper.getSourceContexts().done(function (sourceContexts) {
+        // TODO: Context selection
+        self.activeSourceContext(sourceContexts[0]);
+      });
+
       self.assistAvailable = ko.observable(true);
       self.apiHelper = ApiHelper.getInstance();
       self.isHue4 = ko.observable(options.hue4);
@@ -802,7 +809,7 @@ ${ assist.assistPanel() }
           }
         });
         return found;
-      }
+      };
 
       self.fetchIndex = function (index) {
         $.post("${ url('indexer:list_index') }", {
@@ -847,6 +854,7 @@ ${ assist.assistPanel() }
 
         huePubSub.publish('context.popover.show', {
           data: {
+            sourceContext: self.activeSourceContext(),
             type: 'collection',
             identifierChain: [
               {}, // empty, needed by the context popover
