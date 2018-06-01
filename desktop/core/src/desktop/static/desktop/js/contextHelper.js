@@ -14,36 +14,105 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SourceContext = (function () {
-  function SourceContext(name) {
-    var self = this;
-    self.name = name;
-  }
+/**
+ * @typedef {Object} SourceContext
+ * @property {string} id
+ * @property {string} name
+ */
 
-  return SourceContext;
-})();
+var ContextCatalog = (function () {
 
-var contextHelper = (function () {
+  var CONTEXT_CATALOG_VERSION = 1;
 
-  function ContextHelper () {
-    var self = this;
-    self.sourceContexts = [];
+  var ContextCatalog = (function () {
+    function ContextCatalog() {
+      var self = this;
+      self.entries = {};
 
-    if (window.IS_EMBEDDED && window.embeddedSourceContext) {
-      self.sourceContexts.push(new SourceContext(window.embeddedSourceContext))
-    } else {
-      self.sourceContexts.push(new SourceContext('defaultNamespace')) // TODO: Drop when we fetch from backend
+      // TODO: Add caching
     }
-  }
 
-  ContextHelper.prototype.getSourceContexts = function () {
-    var self = this;
-    var deferred = $.Deferred();
+    ContextCatalog.prototype.getContextCatalogEntry = function (app) {
+      var self = this;
+      if (!self.entries[app]) {
+        self.entries[app] = new ContextCatalogEntry(app);
+      }
+      return self.entries[app];
+    };
 
-    deferred.resolve(self.sourceContexts);
+    return ContextCatalog;
+  })();
 
-    return deferred.promise();
-  };
 
-  return new ContextHelper(); // Singleton
+  var ContextCatalogEntry = (function () {
+    var ContextCatalogEntry = function (app) {
+      var self = this;
+      self.app = app;
+      self.reset();
+    };
+
+    ContextCatalogEntry.prototype.reset = function () {
+      var self = this;
+      self.sourceContexts = {}; // TODO: Cache this
+      self.sourceContextsPromises = {};
+    };
+
+    /**
+     *
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {boolean} [options.silenceErrors]
+     * @return {Promise}
+     */
+    ContextCatalogEntry.prototype.getSourceContexts = function (options) {
+      var self = this;
+
+      if (self.sourceContextsPromises[options.sourceType]) {
+        return self.sourceContextsPromises[options.sourceType];
+      }
+
+      var deferred = $.Deferred();
+      self.sourceContextsPromises[options.sourceType] = deferred.promise();
+
+      ApiHelper.getInstance().fetchSourceContexts(options).done(function (sourceContexts) {
+        if (sourceContexts[self.app] && sourceContexts[self.app][options.sourceType]) {
+          var context = sourceContexts[self.app][options.sourceType];
+          // TODO: For now we only care about namespaces.
+          if (context.namespaces) {
+            self.sourceContexts[self.sourceType] = context.namespaces;
+            deferred.resolve(self.sourceContexts[self.sourceType])
+            // TODO: save
+          } else {
+            deferred.reject();
+          }
+        } else {
+          deferred.reject();
+        }
+      });
+
+      return deferred.promise({ name: 'foo' });
+    };
+
+    return ContextCatalogEntry;
+  })();
+
+  return (function () {
+    var contextCatalog = new ContextCatalog();
+
+    return {
+      BROWSER_APP: 'browser',
+      EDITOR_APP: 'editor',
+
+      /**
+       * @param {Object} options
+       * @param {string} options.app
+       * @param {string} options.sourceType
+       * @param {boolean} [options.silenceErrors]
+       * @return {Promise}
+       */
+      getSourceContexts: function (options) {
+        return contextCatalog.getContextCatalogEntry(options.app).getSourceContexts(options);
+      }
+    }
+  })();
 })();

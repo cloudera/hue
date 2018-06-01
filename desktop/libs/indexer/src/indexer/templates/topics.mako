@@ -624,7 +624,7 @@ ${ assist.assistPanel() }
 
       self.activeSourceContext = ko.observable();
 
-      contextHelper.getSourceContexts().done(function (sourceContexts) {
+      ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'solr' }).done(function (sourceContexts) {
         // TODO: Context selection
         self.activeSourceContext(sourceContexts[0]);
       });

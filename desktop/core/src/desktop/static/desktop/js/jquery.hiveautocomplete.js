@@ -53,7 +53,7 @@
     if (self.options.activeSourceContext) {
       self.activeSourceContextDeferred.resolve(self.options.activeSourceContext);
     } else {
-      contextHelper.getSourceContexts().done(function (sourceContexts) {
+      ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'hive' }).done(function (sourceContexts) {
         // TODO: Context selection in caller
         self.activeSourceContextDeferred.resolve(sourceContexts[0]);
       })
