@@ -21,6 +21,7 @@ import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
+from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, validate_thrift_transport, coerce_bool
 
 
@@ -61,6 +62,13 @@ USE_DOAS = Config(
   key='use_doas',
   help=_t('Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties.'),
   default=False,
+  type=coerce_bool
+)
+
+SSL_CERT_CA_VERIFY = Config(
+  key="ssl_cert_ca_verify",
+  help=_t("Choose whether Hue should validate certificates received from the server."),
+  dynamic_default=default_ssl_validate,
   type=coerce_bool
 )
 
