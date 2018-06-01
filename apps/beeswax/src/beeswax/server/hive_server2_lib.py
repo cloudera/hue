@@ -482,6 +482,7 @@ class HiveServerClient:
   def __init__(self, query_server, user):
     self.query_server = query_server
     self.user = user
+    self.coordinator_host = ''
 
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
     LOG.info(
@@ -539,7 +540,8 @@ class HiveServerClient:
         certfile=certfile,
         validate=validate,
         transport_mode=query_server.get('transport_mode', 'socket'),
-        http_url=query_server.get('http_url', '')
+        http_url=query_server.get('http_url', ''),
+        coordinator_host=self.coordinator_host
     )
 
 
@@ -602,6 +604,7 @@ class HiveServerClient:
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
+    self.coordinator_host = self._client.get_coordinator_host()
 
     if res.status is not None and res.status.statusCode not in (TStatusCode.SUCCESS_STATUS,):
       if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
