@@ -31,7 +31,7 @@ from libsentry.test_privilege_checker import MockSentryApiV2
 
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_hue_server_name
-from metadata.navigator_client import NavigatorApi
+from metadata.catalog.navigator_client import NavigatorApi
 
 
 LOG = logging.getLogger(__name__)

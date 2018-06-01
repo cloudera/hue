@@ -16,24 +16,38 @@
 # limitations under the License.
 
 from django.conf.urls import url
-from metadata import navigator_api as metadata_navigator_api
+from metadata import catalog_api as metadata_catalog_api
 from metadata import optimizer_api as metadata_optimizer_api
 from metadata import workload_analytics_api as metadata_workload_analytics_api
 from metadata import manager_api as metadata_manager_api
 
-# Navigator API
+# Catalog
 urlpatterns = [
-  url(r'^api/navigator/search_entities/?$', metadata_navigator_api.search_entities, name='search_entities'),
-  url(r'^api/navigator/search_entities_interactive/?$', metadata_navigator_api.search_entities_interactive, name='search_entities_interactive'),
-  url(r'^api/navigator/find_entity/?$', metadata_navigator_api.find_entity, name='find_entity'),
-  url(r'^api/navigator/get_entity/?$', metadata_navigator_api.get_entity, name='get_entity'),
-  url(r'^api/navigator/add_tags/?$', metadata_navigator_api.add_tags, name='add_tags'),
-  url(r'^api/navigator/delete_tags/?$', metadata_navigator_api.delete_tags, name='delete_tags'),
-  url(r'^api/navigator/list_tags/?$', metadata_navigator_api.list_tags, name='list_tags'),
-  url(r'^api/navigator/suggest/?$', metadata_navigator_api.suggest, name='suggest'),
-  url(r'^api/navigator/update_properties/?$', metadata_navigator_api.update_properties, name='update_properties'),
-  url(r'^api/navigator/delete_metadata_properties/?$', metadata_navigator_api.delete_metadata_properties, name='delete_metadata_properties'),
-  url(r'^api/navigator/lineage/?$', metadata_navigator_api.get_lineage, name='get_lineage'),
+  url(r'^api/catalog/search_entities/?$', metadata_catalog_api.search_entities, name='search_entities'),
+  url(r'^api/catalog/search_entities_interactive/?$', metadata_catalog_api.search_entities_interactive, name='search_entities_interactive'),
+  url(r'^api/catalog/find_entity/?$', metadata_catalog_api.find_entity, name='find_entity'),
+  url(r'^api/catalog/get_entity/?$', metadata_catalog_api.get_entity, name='get_entity'),
+  url(r'^api/catalog/add_tags/?$', metadata_catalog_api.add_tags, name='add_tags'),
+  url(r'^api/catalog/delete_tags/?$', metadata_catalog_api.delete_tags, name='delete_tags'),
+  url(r'^api/catalog/list_tags/?$', metadata_catalog_api.list_tags, name='list_tags'),
+  url(r'^api/catalog/suggest/?$', metadata_catalog_api.suggest, name='suggest'),
+  url(r'^api/catalog/update_properties/?$', metadata_catalog_api.update_properties, name='update_properties'),
+  url(r'^api/catalog/delete_metadata_properties/?$', metadata_catalog_api.delete_metadata_properties, name='delete_metadata_properties'),
+  url(r'^api/catalog/lineage/?$', metadata_catalog_api.get_lineage, name='get_lineage'),
+]
+# Navigator API (deprecated, renamed to Catalog)
+urlpatterns += [
+  url(r'^api/navigator/search_entities/?$', metadata_catalog_api.search_entities, name='search_entities'),
+  url(r'^api/navigator/search_entities_interactive/?$', metadata_catalog_api.search_entities_interactive, name='search_entities_interactive'),
+  url(r'^api/navigator/find_entity/?$', metadata_catalog_api.find_entity, name='find_entity'),
+  url(r'^api/navigator/get_entity/?$', metadata_catalog_api.get_entity, name='get_entity'),
+  url(r'^api/navigator/add_tags/?$', metadata_catalog_api.add_tags, name='add_tags'),
+  url(r'^api/navigator/delete_tags/?$', metadata_catalog_api.delete_tags, name='delete_tags'),
+  url(r'^api/navigator/list_tags/?$', metadata_catalog_api.list_tags, name='list_tags'),
+  url(r'^api/navigator/suggest/?$', metadata_catalog_api.suggest, name='suggest'),
+  url(r'^api/navigator/update_properties/?$', metadata_catalog_api.update_properties, name='update_properties'),
+  url(r'^api/navigator/delete_metadata_properties/?$', metadata_catalog_api.delete_metadata_properties, name='delete_metadata_properties'),
+  url(r'^api/navigator/lineage/?$', metadata_catalog_api.get_lineage, name='get_lineage'),
 ]
 
 # Optimizer API
