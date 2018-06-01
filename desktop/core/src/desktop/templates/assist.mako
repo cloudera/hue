@@ -1126,7 +1126,8 @@ from desktop.views import _ko
           }
         };
 
-        contextHelper.getSourceContexts().done(function (sourceContexts) {
+        // TODO: Create AssistDbContext objects and replace AssistDbSource below
+        ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'hive' }).done(function (sourceContexts) {
           // TODO: Context selection
           self.activeSourceContext(sourceContexts[0]);
 

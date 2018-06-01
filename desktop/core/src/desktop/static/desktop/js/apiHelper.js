@@ -1273,6 +1273,7 @@ var ApiHelper = (function () {
   /**
    * @param {Object} options
    * @param {string} options.sourceType
+   * @param {string} options.sourceContext
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string[]} [options.path] - The path to fetch
@@ -1295,7 +1296,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: ko.mapping.toJSON(window.context || '')
+        cluster: options.sourceContext.id
       },
       timeout: options.timeout
     }).success(function (data) {
@@ -1944,6 +1945,12 @@ var ApiHelper = (function () {
     });
 
     return new CancellablePromise(deferred, request);
+  };
+
+  ApiHelper.prototype.fetchSourceContexts = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/' + options.app + '/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
   };
 
   ApiHelper.prototype.getClusterConfig = function (data) {
