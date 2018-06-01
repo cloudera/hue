@@ -25,7 +25,6 @@ from itertools import islice
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
-from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest import resource
 from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
 from desktop.lib.rest.http_client import RestException
@@ -35,8 +34,8 @@ from libsentry.privilege_checker import get_checker
 from libsentry.sentry_site import get_hive_sentry_provider
 
 from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
+from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 from metadata.metadata_sites import get_navigator_hue_server_name
-
 
 LOG = logging.getLogger(__name__)
 VERSION = 'v9'
@@ -78,40 +77,7 @@ def get_filesystem_host():
   return host
 
 
-class NavigatorApiException(Exception):
-  def __init__(self, message=None):
-    self.message = message or _('No error message, please check the logs.')
-
-  def __str__(self):
-    return str(self.message)
-
-  def __unicode__(self):
-    return smart_unicode(self.message)
-
-
-class EntityDoesNotExistException(Exception):
-  def __init__(self, message=None):
-    self.message = message or _('No error message, please check the logs.')
-
-  def __str__(self):
-    return str(self.message)
-
-  def __unicode__(self):
-    return smart_unicode(self.message)
-
-
-class NavigathorAuthException(Exception):
-  def __init__(self, message=None):
-    self.message = message or _('No error message, please check the logs.')
-
-  def __str__(self):
-    return str(self.message)
-
-  def __unicode__(self):
-    return smart_unicode(self.message)
-
-
-class NavigatorApi(object):
+class NavigatorApi(Api):
   """
   http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
@@ -119,11 +85,12 @@ class NavigatorApi(object):
   CATALOG_NAMESPACE = '__cloudera_internal_catalog_hue'
 
   def __init__(self, user=None):
+    super(NavigatorApi, self).__init__(user)
+
     self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
     self._username = get_navigator_auth_username()
     self._password = get_navigator_auth_password()
 
-    self.user = user
     # Navigator does not support Kerberos authentication while other components usually requires it
     self._client = UnsecureHttpClient(self._api_url, logger=LOG)
     self._client.set_basic_auth(self._username, self._password)
@@ -149,6 +116,170 @@ class NavigatorApi(object):
       default_entity_types  = ('DIRECTORY', 'S3BUCKET')
 
     return default_entity_types, entity_types
+
+
+  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
+    try:
+      pagination = {
+        'offset': offset,
+        'limit': NAVIGATOR.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
+      }
+
+      f = {
+          "outputFormat" : {
+            "type" : "dynamic"
+          },
+          "name" : {
+            "type" : "dynamic"
+          },
+          "lastModified" : {
+            "type" : "date"
+          },
+          "sourceType" : {
+            "type" : "dynamic"
+          },
+          "parentPath" : {
+            "type" : "dynamic"
+          },
+          "lastAccessed" : {
+            "type" : "date"
+          },
+          "type" : {
+            "type" : "dynamic"
+          },
+          "sourceId" : {
+            "type" : "dynamic"
+          },
+          "partitionColNames" : {
+            "type" : "dynamic"
+          },
+          "serDeName" : {
+            "type" : "dynamic"
+          },
+          "created" : {
+            "type" : "date"
+          },
+          "fileSystemPath" : {
+            "type" : "dynamic"
+          },
+          "compressed" : {
+            "type" : "bool"
+          },
+          "clusteredByColNames" : {
+            "type" : "dynamic"
+          },
+          "originalName" : {
+            "type" : "dynamic"
+          },
+          "owner" : {
+            "type" : "dynamic"
+          },
+          "extractorRunId" : {
+            "type" : "dynamic"
+          },
+          "userEntity" : {
+            "type" : "bool"
+          },
+          "sortByColNames" : {
+            "type" : "dynamic"
+          },
+          "inputFormat" : {
+            "type" : "dynamic"
+          },
+          "serDeLibName" : {
+            "type" : "dynamic"
+          },
+          "originalDescription" : {
+            "type" : "dynamic"
+          },
+          "lastModifiedBy" : {
+            "type" : "dynamic"
+          }
+        }
+
+      auto_field_facets = ["tags", "type"] + f.keys()
+      query_s = query_s.strip() + '*'
+
+      last_query_term = [term for term in query_s.split()][-1]
+
+      if last_query_term and last_query_term != '*':
+        last_query_term = last_query_term.rstrip('*')
+        (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
+        auto_field_facets = [f for f in auto_field_facets if f.startswith(fname)]
+
+      facetFields = facetFields or auto_field_facets[:5]
+
+      entity_types = []
+      fq_type = []
+      if filterQueries is None:
+        filterQueries = []
+
+      if sources:
+        default_entity_types, entity_types = self._get_types_from_sources(sources)
+
+        if 'sql' in sources or 'hive' in sources or 'impala' in sources:
+          fq_type = default_entity_types
+          filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
+        elif 'hdfs' in sources:
+          fq_type = entity_types
+        elif 's3' in sources:
+          fq_type = default_entity_types
+          filterQueries.append('sourceType:s3')
+
+        if query_s.strip().endswith('type:*'): # To list all available types
+          fq_type = entity_types
+
+      search_terms = [term for term in query_s.strip().split()] if query_s else []
+      query = []
+      for term in search_terms:
+        if ':' not in term:
+          query.append(self._get_boosted_term(term))
+        else:
+          name, val = term.split(':')
+          if val: # Allow to type non default types, e.g for SQL: type:FIEL*
+            if name == 'type': # Make sure type value still makes sense for the source
+              term = '%s:%s' % (name, val.upper())
+              fq_type = entity_types
+            if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
+              # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
+              query.append('up_' + term)
+            else:
+              filterQueries.append(term)
+
+      filterQueries.append('deleted:false')
+
+      body = {'query': ' '.join(query) or '*'}
+      if fq_type:
+        filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        body['query'] = source_ids + '(' + body['query'] + ')'
+
+      body['facetFields'] = facetFields or [] # Currently mandatory in API
+      if facetPrefix:
+        body['facetPrefix'] = facetPrefix
+      if facetRanges:
+        body['facetRanges'] = facetRanges
+      if filterQueries:
+        body['filterQueries'] = filterQueries
+      if firstClassEntitiesOnly:
+        body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
+
+      data = json.dumps(body)
+      LOG.info(data)
+      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+
+      response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
+
+      return response
+    except RestException, e:
+      LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
+
 
 
   def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
@@ -225,91 +356,13 @@ class NavigatorApi(object):
     except RestException, e:
       LOG.error('Failed to search for entities with search query: %s' % query_s)
       if e.code == 401:
-        raise NavigathorAuthException(_('Failed to authenticate.'))
+        raise CatalogAuthException(_('Failed to authenticate.'))
       else:
-        raise NavigatorApiException(e)
-
-
-  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
-    try:
-      pagination = {
-        'offset': offset,
-        'limit': NAVIGATOR.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
-      }
-
-      entity_types = []
-      fq_type = []
-      if filterQueries is None:
-        filterQueries = []
-
-      if sources:
-        default_entity_types, entity_types = self._get_types_from_sources(sources)
-
-        if 'sql' in sources or 'hive' in sources or 'impala' in sources:
-          fq_type = default_entity_types
-          filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
-        elif 'hdfs' in sources:
-          fq_type = entity_types
-        elif 's3' in sources:
-          fq_type = default_entity_types
-          filterQueries.append('sourceType:s3')
-
-        if query_s.strip().endswith('type:*'): # To list all available types
-          fq_type = entity_types
-
-      search_terms = [term for term in query_s.strip().split()] if query_s else []
-      query = []
-      for term in search_terms:
-        if ':' not in term:
-          query.append(self._get_boosted_term(term))
-        else:
-          name, val = term.split(':')
-          if val: # Allow to type non default types, e.g for SQL: type:FIEL*
-            if name == 'type': # Make sure type value still makes sense for the source
-              term = '%s:%s' % (name, val.upper())
-              fq_type = entity_types
-            if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
-              # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
-              query.append('up_' + term)
-            else:
-              filterQueries.append(term)
-
-      filterQueries.append('deleted:false')
-
-      body = {'query': ' '.join(query) or '*'}
-      if fq_type:
-        filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
-
-      source_ids = get_cluster_source_ids(self)
-      if source_ids:
-        body['query'] = source_ids + '(' + body['query'] + ')'
-
-      body['facetFields'] = facetFields or [] # Currently mandatory in API
-      if facetPrefix:
-        body['facetPrefix'] = facetPrefix
-      if facetRanges:
-        body['facetRanges'] = facetRanges
-      if filterQueries:
-        body['filterQueries'] = filterQueries
-      if firstClassEntitiesOnly:
-        body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
-
-      data = json.dumps(body)
-      LOG.info(data)
-      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-
-      response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
-
-      return response
-    except RestException, e:
-      LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
-      if e.code == 401:
-        raise NavigathorAuthException(_('Failed to authenticate.'))
-      else:
-        raise NavigatorApiException(e.message)
+        raise CatalogApiException(e)
 
 
   def _secure_results(self, results, checker=None):
+    # TODO: to move directly to Catalog API
     if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
       checker = get_checker(self.user, checker)
       action = 'SELECT'
@@ -341,7 +394,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def find_entity(self, source_type, type, name, **filters):
@@ -380,15 +433,15 @@ class NavigatorApi(object):
       response = self._root.get('entities', headers=self.__headers, params=params)
 
       if not response:
-        raise EntityDoesNotExistException('Could not find entity with query filters: %s' % str(query_filters))
+        raise CatalogEntityDoesNotExistException('Could not find entity with query filters: %s' % str(query_filters))
       elif len(response) > 1:
-        raise NavigatorApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
+        raise CatalogApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
 
       return response[0]
     except RestException, e:
       msg = 'Failed to find entity: %s' % str(e)
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def get_entity(self, entity_id):
@@ -401,7 +454,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def update_entity(self, entity, **metadata):
@@ -419,11 +472,12 @@ class NavigatorApi(object):
       }
       properties.update(metadata)
       data = json.dumps(properties)
+
       return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
     except RestException, e:
       msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def get_cluster_source_ids(self):
@@ -434,34 +488,6 @@ class NavigatorApi(object):
 
     LOG.info(params)
     return self._root.get('entities', headers=self.__headers, params=params)
-
-
-  def get_database(self, name):
-    return self.find_entity(source_type='HIVE', type='DATABASE', name=name)
-
-
-  def get_table(self, database_name, table_name, is_view=False):
-    parent_path = '\/%s' % database_name
-    return self.find_entity(source_type='HIVE', type='VIEW' if is_view else 'TABLE', name=table_name, parentPath=parent_path)
-
-
-  def get_field(self, database_name, table_name, field_name):
-    parent_path = '\/%s\/%s' % (database_name, table_name)
-    return self.find_entity(source_type='HIVE', type='FIELD', name=field_name, parentPath=parent_path)
-
-
-  def get_partition(self, database_name, table_name, partition_spec):
-    raise NotImplementedError
-
-
-  def get_directory(self, path):
-    dir_name, dir_path = self._clean_path(path)
-    return self.find_entity(source_type='HDFS', type='DIRECTORY', name=dir_name, fileSystemPath=dir_path)
-
-
-  def get_file(self, path):
-    file_name, file_path = self._clean_path(path)
-    return self.find_entity(source_type='HDFS', type='FILE', name=file_name, fileSystemPath=file_path)
 
 
   def add_tags(self, entity_id, tags):
@@ -518,7 +544,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def create_namespace(self, namespace, description=None):
@@ -528,7 +554,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to create namespace: %s' % namespace
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def get_namespace(self, namespace):
@@ -537,7 +563,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def create_namespace_property(self, namespace, properties):
@@ -547,7 +573,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def get_namespace_properties(self, namespace):
@@ -556,7 +582,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def map_namespace_property(self, clazz, properties):
@@ -566,7 +592,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def get_model_properties_mapping(self):
@@ -575,7 +601,7 @@ class NavigatorApi(object):
     except RestException, e:
       msg = 'Failed to get models properties mappings'
       LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      raise CatalogApiException(e.message)
 
 
   def _fillup_properties(self):

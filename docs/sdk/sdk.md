@@ -119,24 +119,11 @@ Here is an example on how the Job Browser can list:
 Here is an example on how the File Browser can list HDFS, S3 files and now [ADLS](https://issues.cloudera.org/browse/HUE-7248).
 
 
-# Hue shell
+# Hue CLI
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-
-# Metadata
-
-The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata).
-
-## Data Catalog
-
-Read more about [Search and Tagging here](https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/).
-
-## Optimization
-
-Read more about the [Query Assistant with Navigator Optimizer Integration
-](https://blog.cloudera.com/blog/2017/08/new-in-cloudera-enterprise-5-12-hue-4-interface-and-query-assistant/).
 
 # New application
 
@@ -983,12 +970,70 @@ How to create a new locale for an app::
 
 # API
 
-## Metadata
+## Metadata Catalog
+
+The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](http://gethue.com/improved-sql-exploration-in-hue-4-3/) and the [Query Assistant with Navigator Optimizer Integration](http://gethue.com/hue-4-sql-editor-improvements/).
+
+The backends is pluggable by providing alternative [client interfaces](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/catalog):
+
+* navigator (default)
+* dummy
+
+### Searching for entities
+
+<pre>
+     $.post("/metadata/api/catalog/search_entities_interactive/", {
+        query_s: ko.mapping.toJSON("*sample"),
+        sources: ko.mapping.toJSON(["sql", "hdfs", "s3"]),
+        field_facets: ko.mapping.toJSON([]),
+        limit: 10
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
+### Searching for entities with the dummy backend
+
+<pre>
+     $.post("/metadata/api/catalog/search_entities_interactive/", {
+        query_s: ko.mapping.toJSON("*sample"),
+        interface: "dummy"
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
+### Adding a tag with the dummy backend
+
+<pre>
+     $.post("/metadata/api/catalog/add_tags/", {
+        id: "22",
+        tags: ko.mapping.toJSON(["usage"]),
+        interface: "dummy"
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
 
 ### Deleting a key/value property
 
 <pre>
-     $.post("/metadata/api/navigator/delete_metadata_properties/", {
+     $.post("/metadata/api/catalog/delete_metadata_properties/", {
+        "id": "32",
+        "keys": ko.mapping.toJSON(["project", "steward"])
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
+### Deleting a key/value property
+
+<pre>
+     $.post("/metadata/api/catalog/delete_metadata_properties/", {
         "id": "32",
         "keys": ko.mapping.toJSON(["project", "steward"])
       }, function(data) {
@@ -1000,7 +1045,7 @@ How to create a new locale for an app::
 ### Getting the model mapping of custom metadata
 
 <pre>
-     $.get("/metadata/api/navigator/models/properties/mappings/", function(data) {
+     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
         console.log(ko.mapping.toJSON(data));
       });
 </pre>
@@ -1009,7 +1054,7 @@ How to create a new locale for an app::
 ### Getting a namespace
 
 <pre>
-     $.post("/metadata/api/navigator/namespace/", {
+     $.post("/metadata/api/catalog/namespace/", {
         namespace: 'huecatalog'
       }, function(data) {
         console.log(ko.mapping.toJSON(data));
@@ -1020,7 +1065,7 @@ How to create a new locale for an app::
 ### Creating a namespace
 
 <pre>
-     $.post("/metadata/api/navigator/namespace/create/", {
+     $.post("/metadata/api/catalog/namespace/create/", {
         "namespace": "huecatalog",
         "description": "my desc"
       }, function(data) {
@@ -1032,7 +1077,7 @@ How to create a new locale for an app::
 ### Creating a namespace property
 
 <pre>
-     $.post("/metadata/api/navigator/namespace/property/create/", {
+     $.post("/metadata/api/catalog/namespace/property/create/", {
         "namespace": "huecatalog",
         "properties": ko.mapping.toJSON({
           "name" : "relatedEntities2",
@@ -1052,7 +1097,7 @@ How to create a new locale for an app::
 ### Map a namespace property to a class entity
 
 <pre>
-     $.post("/metadata/api/navigator/namespace/property/map/", {
+     $.post("/metadata/api/catalog/namespace/property/map/", {
         "class": "hv_view",
         "properties": ko.mapping.toJSON([{
            namespace: "huecatalog",
@@ -1068,21 +1113,18 @@ How to create a new locale for an app::
 ## The short story
 
 Install the mini cluster (only once):
-```
-./tools/jenkins/jenkins.sh slow
-```
+
+    ./tools/jenkins/jenkins.sh slow
 
 Run all the tests:
-```
-build/env/bin/hue test all
-```
+
+    build/env/bin/hue test all
 
 Or just some parts of the tests, e.g.:
-```
-build/env/bin/hue test specific impala
-build/env/bin/hue test specific impala.tests:TestMockedImpala
-build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
-```
+
+    build/env/bin/hue test specific impala
+    build/env/bin/hue test specific impala.tests:TestMockedImpala
+    build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
 Jasmine tests (from your browser):
 
@@ -1105,26 +1147,34 @@ See apps/hello/src/hello/hello_test.py for an example.
 ### Helpful command-line tricks
 
 To run tests that do not depend on Hadoop, use:
-  build/env/bin/hue test fast
+
+    build/env/bin/hue test fast
 
 To run all tests, use:
-  build/env/bin/hue test all
+
+    build/env/bin/hue test all
 
 To run only tests of a particular app, use:
-  build/env/bin/hue test specific <app>
+
+    build/env/bin/hue test specific <app>
+
 E.g.
   build/env/bin/hue test specific filebrowser
 
 To run a specific test, use:
-  build/env/bin/hue test specific <test_func>
+
+    build/env/bin/hue test specific <test_func>
+
 E.g.
   build/env/bin/hue test specific useradmin.tests:test_user_admin
 
 Start up pdb on test failures:
-  build/env/bin/hue test <args> --pdb --pdb-failure -s
+
+    build/env/bin/hue test <args> --pdb --pdb-failure -s
 
 Point to an Impalad and trigger the Impala tests:
-  build/env/bin/hue test impala impalad-01.gethue.com
+
+    build/env/bin/hue test impala impalad-01.gethue.com
 
 
 ### Run the Jasmine tests
