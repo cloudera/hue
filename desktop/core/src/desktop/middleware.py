@@ -274,6 +274,10 @@ class LoginAndPermissionMiddleware(object):
     request.ts = time.time()
     request.view_func = view_func
     access_log_level = getattr(view_func, 'access_log_level', None)
+    # Prototype: skip loop for oidc
+    if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/']:
+      return None
+
     # First, skip views not requiring login
 
     # If the view has "opted out" of login required, skip
@@ -657,6 +661,9 @@ class EnsureSafeRedirectURLMiddleware(object):
         return response
 
       if is_safe_url(location, request.get_host()):
+        return response
+
+      if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/']:
         return response
 
       response = render("error.mako", request, {

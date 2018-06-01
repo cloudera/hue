@@ -44,6 +44,7 @@ from django_auth_ldap.config import LDAPSearch
 import desktop.conf
 from desktop import metrics
 from liboauth.metrics import oauth_authentication_time
+from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 
 from useradmin import ldap_access
 from useradmin.forms import validate_username
@@ -582,3 +583,18 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
     user = rewrite_user(user)
     return user
 
+
+class OIDCBackend(OIDCAuthenticationBackend):
+  def authenticate(self, **kwargs):
+    user = super(OIDCBackend, self).authenticate(**kwargs)
+    user = rewrite_user(user)
+    return user
+
+  def get_user(self, user_id):
+    user = super(OIDCBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
+
+  # def filter_users_by_claims(self, claims):
+
+  # def verify_claims(self, claims):

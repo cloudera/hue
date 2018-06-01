@@ -17,6 +17,7 @@
 <%!
   from desktop import conf
   from django.utils.translation import ugettext as _
+  from django.conf.urls import url
   from desktop.views import commonheader, commonfooter
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
   from desktop.conf import is_hue4
