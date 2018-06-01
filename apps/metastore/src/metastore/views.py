@@ -264,8 +264,10 @@ def get_table_metadata(request, database, table):
   return JsonResponse(response)
 
 
-def describe_table(request, database, table, cluster=None):
+def describe_table(request, database, table):
   app_name = get_app_name(request)
+  cluster = request.GET.get('cluster')
+
   db = _get_db(user=request.user, cluster=cluster)
 
   try:

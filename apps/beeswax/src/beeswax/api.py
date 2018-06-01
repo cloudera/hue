@@ -861,10 +861,10 @@ def close_session(request, session_id):
 
 
 # Proxy API for Metastore App
-def describe_table(request, database, table, cluster=None):
+def describe_table(request, database, table):
   try:
     from metastore.views import describe_table as metastore_describe_table
-    return metastore_describe_table(request, database, table, cluster=cluster)
+    return metastore_describe_table(request, database, table)
   except Exception, e:
     LOG.exception('Describe table failed')
     raise PopupException(_('Problem accessing table metadata'), detail=e)
