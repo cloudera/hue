@@ -35,7 +35,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
 from metadata.conf import has_navigator
-from metadata.navigator_client import NavigatorApiException
+from metadata.catalog.navigator_client import CatalogApiException
 
 
 LOG = logging.getLogger(__name__)
@@ -52,8 +52,8 @@ def error_handler(view_fn):
       if has_navigator(args[0].user): # TODO
         return view_fn(*args, **kwargs)
       else:
-        raise NavigatorApiException('Navigator API is not configured.')
-    except NavigatorApiException, e:
+        raise CatalogApiException('Navigator API is not configured.')
+    except CatalogApiException, e:
       try:
         response['message'] = json.loads(e.message)
       except Exception:

@@ -32,8 +32,8 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from metadata import conf
 from metadata.conf import has_navigator, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
-from metadata.navigator_api import _augment_highlighting
-from metadata.navigator_client import NavigatorApi
+from metadata.catalog_api import _augment_highlighting
+from metadata.catalog.navigator_client import NavigatorApi
 
 
 LOG = logging.getLogger(__name__)
