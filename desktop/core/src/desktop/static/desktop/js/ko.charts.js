@@ -707,12 +707,10 @@
     var previous = new Date(9999,11,31);
     var minDiff = 5.1;
     return d3v3.time.format.utc.multi([
-      ["%S %Y-%m-%dT%H:%M", function(d) {
+      ["%H:%M:%S %Y-%m-%d", function(d) {
         var domain = xAxis.domain();
-        var chart = _chart;
-        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = previous > d || d == domain[0];
-        var result = isFirst && domainDiff < MINUTE_MS * minDiff;
+        var isFirst = (previous > d || d == domain[0]) && moment(d).utc().seconds();
+        var result = isFirst;
         if (result) {
           previous = d;
         }
@@ -720,48 +718,7 @@
       }],
       ["%H:%M %Y-%m-%d", function(d) {
         var domain = xAxis.domain();
-        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = previous > d || d == domain[0];
-        var result = isFirst && domainDiff < HOUR_MS * minDiff;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%H:%M %Y-%m-%d", function(d) {
-        var domain = xAxis.domain();
-        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = previous > d || d == domain[0];
-        var result = isFirst && domainDiff < DAY_MS * minDiff;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%d %Y-%m", function(d) {
-        var domain = xAxis.domain();
-        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = previous > d || d == domain[0];
-        var result = isFirst && domainDiff < MONTH_MS * minDiff;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%m %Y", function(d) {
-        var domain = xAxis.domain();
-        var domainDiff = Math.abs(domain[domain.length - 1] - domain[0]);
-        var isFirst = previous > d || d == domain[0];
-        var result = isFirst && domainDiff < YEAR_MS * minDiff;
-        if (result) {
-          previous = d;
-        }
-        return result;
-      }],
-      ["%Y", function(d) {
-        var test = xAxis;
-        var domain = xAxis.domain();
-        var isFirst = previous > d || d == domain[0];
+        var isFirst = (previous > d || d == domain[0]);
         var result = isFirst;
         if (result) {
           previous = d;
@@ -784,6 +741,14 @@
         }
         return result;
       }],
+      ["%H:%M:%S %Y-%m-%d", function(d) {
+        var previousDiff = Math.abs(d - previous);
+        var result = moment(previous).utc().date() !== moment(d).utc().date() && previousDiff < WEEK_MS && moment(d).utc().seconds();
+        if (result) {
+          previous = d;
+        }
+        return result;
+      }],
       ["%H:%M %Y-%m-%d", function(d) {
         var previousDiff = Math.abs(d - previous);
         var result = moment(previous).utc().date() !== moment(d).utc().date() && previousDiff < WEEK_MS;
@@ -792,9 +757,9 @@
         }
         return result;
       }],
-      ["%H:%M", function(d) {
+      ["%H:%M:%S", function(d) {
         var previousDiff = Math.abs(d - previous);
-        var result = moment(previous).utc().minutes() !== moment(d).utc().minutes() && previousDiff < WEEK_MS;
+        var result = (moment(previous).utc().hours() !== moment(d).utc().hours() || moment(previous).utc().minutes() !== moment(d).utc().minutes()) && previousDiff < WEEK_MS && moment(d).utc().seconds();
         if (result) {
           previous = d;
         }
@@ -802,7 +767,7 @@
       }],
       ["%H:%M", function(d) {
         var previousDiff = Math.abs(d - previous);
-        var result = moment(previous).utc().hours() !== moment(d).utc().hours() && previousDiff < WEEK_MS;
+        var result = (moment(previous).utc().hours() !== moment(d).utc().hours() || moment(previous).utc().minutes() !== moment(d).utc().minutes()) && previousDiff < WEEK_MS;
         if (result) {
           previous = d;
         }

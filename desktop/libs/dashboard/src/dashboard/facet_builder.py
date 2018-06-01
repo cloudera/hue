@@ -37,36 +37,42 @@ MINUTE_MS = SECOND_MS * 60
 HOUR_MS = MINUTE_MS * 60
 DAY_MS = HOUR_MS * 24
 WEEK_MS = DAY_MS * 7
-MONTH_MS = DAY_MS * 30.5
+MONTH_MS = DAY_MS * 30
 YEAR_MS = DAY_MS * 365
 TIME_INTERVALS = [
-  {'ms': SECOND_MS * 1, 'coeff': '1', 'unit': 'SECONDS'},
-  {'ms': SECOND_MS * 2, 'coeff': '2', 'unit': 'SECONDS'},
-  {'ms': SECOND_MS * 5, 'coeff': '5', 'unit': 'SECONDS'},
-  {'ms': SECOND_MS * 10, 'coeff': '10', 'unit': 'SECONDS'},
-  {'ms': SECOND_MS * 15, 'coeff': '15', 'unit': 'SECONDS'},
-  {'ms': SECOND_MS * 30, 'coeff': '30', 'unit': 'SECONDS'},
-  {'ms': MINUTE_MS * 1, 'coeff': '1', 'unit': 'MINUTES'},
-  {'ms': MINUTE_MS * 2, 'coeff': '2', 'unit': 'MINUTES'},
-  {'ms': MINUTE_MS * 5, 'coeff': '5', 'unit': 'MINUTES'},
-  {'ms': MINUTE_MS * 10, 'coeff': '10', 'unit': 'MINUTES'},
-  {'ms': MINUTE_MS * 15, 'coeff': '15', 'unit': 'MINUTES'},
-  {'ms': MINUTE_MS * 30, 'coeff': '30', 'unit': 'MINUTES'},
-  {'ms': HOUR_MS * 1, 'coeff': '1', 'unit': 'HOURS'},
-  {'ms': HOUR_MS * 2, 'coeff': '2', 'unit': 'HOURS'},
-  {'ms': HOUR_MS * 4, 'coeff': '4', 'unit': 'HOURS'},
-  {'ms': HOUR_MS * 6, 'coeff': '6', 'unit': 'HOURS'},
-  {'ms': HOUR_MS * 8, 'coeff': '8', 'unit': 'HOURS'},
-  {'ms': HOUR_MS * 12, 'coeff': '12', 'unit': 'HOURS'},
-  {'ms': DAY_MS * 1, 'coeff': '1', 'unit': 'DAYS'},
-  {'ms': DAY_MS * 2, 'coeff': '2', 'unit': 'MONTHS'},
-  {'ms': WEEK_MS * 1, 'coeff': '7', 'unit': 'DAYS'},
-  {'ms': WEEK_MS * 2, 'coeff': '14', 'unit': 'DAYS'},
-  {'ms': MONTH_MS * 1, 'coeff': '1', 'unit': 'MONTHS'},
-  {'ms': MONTH_MS * 2, 'coeff': '2', 'unit': 'MONTHS'},
-  {'ms': MONTH_MS * 3, 'coeff': '3', 'unit': 'MONTHS'},
-  {'ms': MONTH_MS * 6, 'coeff': '6', 'unit': 'MONTHS'},
-  {'ms': YEAR_MS * 1, 'coeff': '1', 'unit': 'YEARS'}];
+  {'ms': SECOND_MS * 1, 'base_ms': SECOND_MS, 'coeff': '1', 'unit': 'SECONDS'},
+  {'ms': SECOND_MS * 2, 'base_ms': SECOND_MS, 'coeff': '2', 'unit': 'SECONDS'},
+  {'ms': SECOND_MS * 5, 'base_ms': SECOND_MS, 'coeff': '5', 'unit': 'SECONDS'},
+  {'ms': SECOND_MS * 10, 'base_ms': SECOND_MS, 'coeff': '10', 'unit': 'SECONDS'},
+  {'ms': SECOND_MS * 15, 'base_ms': SECOND_MS, 'coeff': '15', 'unit': 'SECONDS'},
+  {'ms': SECOND_MS * 30, 'base_ms': SECOND_MS, 'coeff': '30', 'unit': 'SECONDS'},
+  {'ms': MINUTE_MS * 1, 'base_ms': MINUTE_MS, 'coeff': '1', 'unit': 'MINUTES'},
+  {'ms': MINUTE_MS * 2, 'base_ms': MINUTE_MS, 'coeff': '2', 'unit': 'MINUTES'},
+  {'ms': MINUTE_MS * 5, 'base_ms': MINUTE_MS, 'coeff': '5', 'unit': 'MINUTES'},
+  {'ms': MINUTE_MS * 10, 'base_ms': MINUTE_MS, 'coeff': '10', 'unit': 'MINUTES'},
+  {'ms': MINUTE_MS * 15, 'base_ms': MINUTE_MS, 'coeff': '15', 'unit': 'MINUTES'},
+  {'ms': MINUTE_MS * 30, 'base_ms': MINUTE_MS, 'coeff': '30', 'unit': 'MINUTES'},
+  {'ms': HOUR_MS * 1, 'base_ms': HOUR_MS, 'coeff': '1', 'unit': 'HOURS'},
+  {'ms': HOUR_MS * 2, 'base_ms': HOUR_MS, 'coeff': '2', 'unit': 'HOURS'},
+  {'ms': HOUR_MS * 4, 'base_ms': HOUR_MS, 'coeff': '4', 'unit': 'HOURS'},
+  {'ms': HOUR_MS * 6, 'base_ms': HOUR_MS, 'coeff': '6', 'unit': 'HOURS'},
+  {'ms': HOUR_MS * 8, 'base_ms': HOUR_MS, 'coeff': '8', 'unit': 'HOURS'},
+  {'ms': HOUR_MS * 12, 'base_ms': HOUR_MS, 'coeff': '12', 'unit': 'HOURS'},
+  {'ms': DAY_MS * 1, 'base_ms': DAY_MS, 'coeff': '1', 'unit': 'DAYS'},
+  {'ms': DAY_MS * 2, 'base_ms': DAY_MS, 'coeff': '2', 'unit': 'DAYS'},
+  {'ms': WEEK_MS * 1, 'base_ms': DAY_MS, 'coeff': '7', 'unit': 'DAYS'},
+  {'ms': WEEK_MS * 2, 'base_ms': DAY_MS, 'coeff': '14', 'unit': 'DAYS'},
+  {'ms': MONTH_MS * 1, 'base_ms': MONTH_MS, 'coeff': '1', 'unit': 'MONTHS'},
+  {'ms': MONTH_MS * 2, 'base_ms': MONTH_MS, 'coeff': '2', 'unit': 'MONTHS'},
+  {'ms': MONTH_MS * 3, 'base_ms': MONTH_MS, 'coeff': '3', 'unit': 'MONTHS'},
+  {'ms': MONTH_MS * 6, 'base_ms': MONTH_MS, 'coeff': '6', 'unit': 'MONTHS'},
+  {'ms': YEAR_MS * 1, 'base_ms': YEAR_MS, 'coeff': '1', 'unit': 'YEARS'}];
+TIME_INTERVAL_SORTED = [{'key': 'microsecond', 'value': 0},
+                        {'key': 'second', 'value': 0},
+                        {'key': 'minute', 'value': 0},
+                        {'key': 'hour', 'value': 0},
+                        {'key': 'day', 'value': 1},
+                        {'key': 'month', 'value': 1}]
 TIME_INTERVALS_MS = {
   'SECONDS': SECOND_MS,
   'MINUTES': MINUTE_MS,
@@ -97,14 +103,17 @@ def _get_interval(domain_ms, SLOTS):
   biggest_interval_is_too_small = domain_ms / biggest_interval['ms'] > SLOTS
   if biggest_interval_is_too_small:
     coeff = min(ceil(domain_ms / SLOTS), 100) # If we go over 100 years, something has gone wrong.
-    return '+' + str(coeff) + 'YEARS'
+    return {'ms': YEAR_MS * coeff, 'base_ms': YEAR_MS, 'coeff': coeff, 'unit': 'YEARS'}
 
   for i in range(len(TIME_INTERVALS) - 2, 0, -1):
     slots = domain_ms / TIME_INTERVALS[i]['ms']
     if slots > SLOTS:
-      return '+' + TIME_INTERVALS[i + 1]['coeff'] + TIME_INTERVALS[i + 1]['unit']
+      return TIME_INTERVALS[i + 1]
 
-  return '+' + TIME_INTERVALS[0]['coeff'] + TIME_INTERVALS[0]['unit'];
+  return TIME_INTERVALS[0]
+
+def _format_interval(interval):
+  return '+' + interval['coeff'] + interval['unit']
 
 def _get_interval_duration(text):
   regex = re.search('.*-(\d*)(.*)', text)
@@ -114,6 +123,27 @@ def _get_interval_duration(text):
     if TIME_INTERVALS_MS[groups[1]]:
       return TIME_INTERVALS_MS[groups[1]] * int(groups[0])
   return 0
+
+def _clamp_date(interval, time):
+  gap_duration_lower = interval['unit'].lower()
+  gap_duration_lowers = gap_duration_lower[:-1]  # Removes 's'
+  for time_interval in TIME_INTERVAL_SORTED:
+    if time_interval['key'] != gap_duration_lowers:
+      kwargs = {time_interval['key']: time_interval['value']}
+      time = time.replace(**kwargs)
+    else:
+      break
+  return time
+
+def _get_next_interval(interval, start_time, do_at_least_once):
+  gap_duration_lower = interval['unit'].lower()
+  gap_duration_lowers = gap_duration_lower[:-1]  # Removes 's'
+  gap_duration = int(interval['coeff'])
+  time = start_time
+  while getattr(time, gap_duration_lowers) % gap_duration or (do_at_least_once and time == start_time): # Do while
+    kwargs = {gap_duration_lower: 1}
+    time = time + timedelta(milliseconds=interval['base_ms'])
+  return time
 
 def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=None, gap=None, SLOTS=0, window_size=None):
     if SLOTS == 0:
@@ -157,7 +187,9 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       is_date = True
       stats_min = stat_facet['min']
       stats_max = stat_facet['max']
+      start_was_none = False
       if start is None:
+        start_was_none = True
         start = stats_min
       start = re.sub('\.\d\d?\d?Z$', 'Z', start)
       try:
@@ -166,8 +198,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       except Exception, e:
         LOG.error('Bad date: %s' % e)
         start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-      start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
-      stats_min = min(stats_min, start)
+
       if end is None:
         end = stats_max
       end = re.sub('\.\d\d?\d?Z$', 'Z', end)
@@ -178,18 +209,28 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
         LOG.error('Bad date: %s' % e)
         end_ts = datetime.strptime('2050-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
       end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
-      stats_max = max(stats_max, end)
       domain_ms = (mktime(end_ts.timetuple()) - mktime(start_ts.timetuple())) * 1000
-
-      gap = _get_interval(domain_ms, SLOTS)
+      interval = _get_interval(domain_ms, SLOTS)
+      start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
+      gap = _format_interval(interval)
+      if start_was_none:
+        start_ts = _clamp_date(interval, start_ts)
+        start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
+        stats_max = end
+        stats_min = start
+      else:
+        start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
     elif stat_facet['max'] == 'NOW':
       is_date = True
       domain_ms = _get_interval_duration(stat_facet['min'])
-      start = stat_facet['min']
-      end = stat_facet['max']
-      stats_min = start
-      stats_max = end
-      gap = _get_interval(domain_ms, SLOTS)
+      interval = _get_interval(domain_ms, SLOTS)
+      gap = _format_interval(interval)
+      end_ts = datetime.utcnow()
+      end_ts_clamped = _clamp_date(interval, end_ts)
+      end_ts = _get_next_interval(interval, end_ts_clamped, end_ts_clamped != end_ts)
+      start_ts = end_ts - timedelta(milliseconds=domain_ms)
+      stats_max = end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
+      stats_min = start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     properties.update({
       'min': stats_min,
