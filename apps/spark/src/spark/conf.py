@@ -21,6 +21,7 @@ import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
+from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
 
@@ -68,6 +69,13 @@ SQL_SERVER_PORT = Config(
   help=_t("Port the SparkSQL server runs on."),
   default=10000,
   type=int)
+
+SSL_CERT_CA_VERIFY = Config(
+  key="ssl_cert_ca_verify",
+  help=_t("Choose whether Hue should validate certificates received from the server."),
+  dynamic_default=default_ssl_validate,
+  type=coerce_bool
+)
 
 
 def get_livy_server_url():
