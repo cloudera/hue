@@ -39,6 +39,7 @@ from desktop import appmanager
 from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL
 
 from desktop.auth import views as desktop_auth_views
+from desktop.settings import is_oidc_configured
 from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
@@ -240,4 +241,9 @@ for x in static_patterns:
 if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
   urlpatterns += [
     url(r'^__debug__/', include(debug_toolbar.urls)),
+  ]
+
+if is_oidc_configured():
+  urlpatterns += [
+    url(r'^oidc/', include('mozilla_django_oidc.urls')),
   ]
