@@ -2485,8 +2485,9 @@
    *
    * Parameters:
    *
-   * {string} path - the path, i.e. 'default.customers' or ['default', 'customers'
    * {string} sourceType - 'impala', 'hive' etc.
+   * {SourceContext} sourceContext
+   * {string} path - the path, i.e. 'default.customers' or ['default', 'customers'
    * {string} [orientation] - 'top', 'right', 'bottom', 'left'. Default 'right'
    * {Object} [offset] - Optional offset from the element
    * {number} [offset.top] - Offset in pixels
@@ -2494,8 +2495,8 @@
    *
    * Examples:
    *
-   * data-bind="sqlContextPopover: { sourceType: 'impala', path: 'default.customers' }"
-   * data-bind="sqlContextPopover: { sourceType: 'hive', path: 'default', orientation: 'bottom', offset: { top: 5 } }"
+   * data-bind="sqlContextPopover: { sourceType: 'impala', sourceContext: { name: 'mySourceContext' }, path: 'default.customers' }"
+   * data-bind="sqlContextPopover: { sourceType: 'hive', sourceContext: { name: 'mySourceContext' }, path: 'default', orientation: 'bottom', offset: { top: 5 } }"
    *
    * @type {{init: ko.bindingHandlers.sqlContextPopover.init}}
    */
@@ -2504,7 +2505,7 @@
       ko.bindingHandlers.click.init(element, function () {
         return function () {
           var options = valueAccessor();
-          DataCatalog.getEntry({ sourceType: options.sourceType, path: options.path }).done(function (entry) {
+          DataCatalog.getEntry({ sourceType: options.sourceType, sourceContext: options.sourceContext, path: options.path }).done(function (entry) {
             var $source = $(element);
             var offset = $source.offset();
             if (options.offset) {
@@ -4362,6 +4363,7 @@
       var deferred = $.Deferred();
       DataCatalog.getChildren({
         sourceType: self.snippet.type(),
+        sourceContext: self.snippet.sourceContext(),
         path: $.map(identifierChain, function (identifier) { return identifier.name }),
         silenceErrors: true,
         cachedOnly: true
@@ -4442,6 +4444,7 @@
             if (typeof nextTable.subQuery === 'undefined') {
               DataCatalog.getChildren({
                 sourceType: self.snippet.type(),
+                sourceContext: self.snippet.sourceContext(),
                 path: $.map(nextTable.identifierChain, function (identifier) { return identifier.name }),
                 cachedOnly: true,
                 silenceErrors: true
@@ -4625,6 +4628,7 @@
         lastKnownLocations = {
           id: self.editorId,
           type: self.snippet.type(),
+          sourceContext: self.snippet.sourceContext(),
           defaultDatabase: self.snippet.database(),
           locations: e.data.locations,
           editorChangeTime: e.data.editorChangeTime,
@@ -4728,6 +4732,7 @@
             id: self.snippet.id(),
             statementDetails: statementDetails,
             type: self.snippet.type(),
+            sourceContext: self.snippet.sourceContext(),
             defaultDatabase: self.snippet.database()
           });
         }
@@ -5140,6 +5145,7 @@
                         // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
                         DataCatalog.getEntry({
                           sourceType: snippet.type(),
+                          sourceContext: snippet.sourceContext(),
                           path: $.map(tableChain, function (identifier) { return identifier.name })
                         }).done(function (entry) {
                           entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
@@ -5294,6 +5300,7 @@
                   huePubSub.publish('context.popover.show', {
                     data: token.parseLocation,
                     sourceType: snippet.type(),
+                    sourceContext: snippet.sourceContext(),
                     defaultDatabase: snippet.database(),
                     pinEnabled: true,
                     source: source

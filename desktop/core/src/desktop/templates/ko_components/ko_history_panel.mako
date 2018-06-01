@@ -236,7 +236,7 @@ from desktop.views import _ko
                   }
 
                   if (notebook.onSuccessUrl() === 'assist.db.refresh') {
-                    DataCatalog.getEntry({ sourceType: snippet.type(), path: [] }).done(function (entry) {
+                    DataCatalog.getEntry({ sourceType: snippet.type(), sourceContext: snippet.sourceContext(), path: [] }).done(function (entry) {
                       entry.clearCache({ invalidate: 'cache', cascade: true, silenceErrors: true });
                     });
                   } else if (notebook.onSuccessUrl()) {

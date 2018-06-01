@@ -43,17 +43,20 @@
     };
 
   function Plugin(element, options) {
-    this.element = element;
-    this.options = $.extend({}, defaults, options);
-    this._defaults = defaults;
-    this._name = pluginName;
+    var self = this;
+    self.element = element;
+    self.options = $.extend({}, defaults, options);
+    self._defaults = defaults;
+    self._name = pluginName;
 
-    this.apiHelper = null;
-
-    if (typeof ApiHelper !== 'undefined' && this.options.apiHelperUser !== '') {
-      this.apiHelper = ApiHelper.getInstance({
-        user: this.options.apiHelperUser
-      });
+    self.activeSourceContextDeferred = $.Deferred();
+    if (self.options.activeSourceContext) {
+      self.activeSourceContextDeferred.resolve(self.options.activeSourceContext);
+    } else {
+      contextHelper.getSourceContexts().done(function (sourceContexts) {
+        // TODO: Context selection in caller
+        self.activeSourceContextDeferred.resolve(sourceContexts[0]);
+      })
     }
 
     this.init();
@@ -237,22 +240,28 @@
 
     self.getDatabases = function (callback) {
       var self = this;
-      DataCatalog.getChildren({ sourceType: self.options.apiHelperType, path: [] }).done(function (dbEntries) {
-        callback($.map(dbEntries, function (entry) { return entry.name }));
-      });
+      self.activeSourceContextDeferred.done(function (sourceContext) {
+        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, sourceContext: sourceContext, path: [] }).done(function (dbEntries) {
+          callback($.map(dbEntries, function (entry) { return entry.name }));
+        });
+      })
     };
 
     self.getTables = function (database, callback) {
       var self = this;
-      DataCatalog.getEntry({ sourceType: self.options.apiHelperType, path: [database] }).done(function (entry) {
-        entry.getSourceMeta().done(callback)
+      self.activeSourceContextDeferred.done(function (sourceContext) {
+        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, sourceContext: sourceContext, path: [ database ] }).done(function (entry) {
+          entry.getSourceMeta().done(callback)
+        });
       });
     };
 
     self.getColumns = function (database, table, callback) {
       var self = this;
-      DataCatalog.getEntry({ sourceType: self.options.apiHelperType, path: [database, table] }).done(function (entry) {
-        entry.getSourceMeta().done(callback)
+      self.activeSourceContextDeferred.done(function (sourceContext) {
+        DataCatalog.getEntry({sourceType: self.options.apiHelperType, sourceContext: sourceContext, path: [database, table]}).done(function (entry) {
+          entry.getSourceMeta().done(callback)
+        });
       });
     };
 
