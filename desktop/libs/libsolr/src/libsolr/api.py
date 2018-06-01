@@ -125,7 +125,7 @@ class SolrApi(object):
           }
 
           if facet['properties']['canRange'] or timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
-            keys.update(self._get_time_filter_query(timeFilter, facet))
+            keys.update(self._get_time_filter_query(timeFilter, facet, collection))
 
           params += (
              ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
@@ -145,7 +145,7 @@ class SolrApi(object):
         elif facet['type'] == 'nested':
           _f = {}
           if facet['properties']['facets']:
-            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter, can_range = facet['properties']['canRange'])
+            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter, collection, can_range = facet['properties']['canRange'])
 
           if facet['properties'].get('domain'):
             if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
@@ -273,7 +273,7 @@ class SolrApi(object):
     return self._get_json(response)
 
 
-  def _n_facet_dimension(self, widget, _f, facets, dim, timeFilter, can_range=None):
+  def _n_facet_dimension(self, widget, _f, facets, dim, timeFilter, collection, can_range=None):
     facet = facets[0]
     f_name = 'dim_%02d:%s' % (dim, facet['field'])
 
@@ -316,16 +316,16 @@ class SolrApi(object):
         # Only on dim 1 currently
         if can_range or (timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides'])): # or facet['widgetType'] != 'bucket-widget'):
           facet['widgetType'] = widget['widgetType']
-          _f[f_name].update(self._get_time_filter_query(timeFilter, facet))
+          _f[f_name].update(self._get_time_filter_query(timeFilter, facet, collection))
 
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
 
       if len(facets) > 1: # Get n+1 dimension
         if facets[1]['aggregate']['function'] == 'count':
-          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1, timeFilter)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1, timeFilter, collection)
         else:
-          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim, timeFilter)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim, timeFilter, collection)
     else:
       agg_function = self._get_aggregate_function(facet)
       _f['facet'] = {
@@ -336,7 +336,7 @@ class SolrApi(object):
           agg_function = self._get_aggregate_function(_f_agg)
           _f['facet']['agg_%02d_%02d:%s' % (dim, i, agg_function)] = agg_function
         else:
-          self._n_facet_dimension(widget, _f, facets[i:], dim + 1, timeFilter) # Get n+1 dimension
+          self._n_facet_dimension(widget, _f, facets[i:], dim + 1, timeFilter, collection) # Get n+1 dimension
           break
 
 
@@ -937,26 +937,45 @@ class SolrApi(object):
 
     return props
 
-  def _get_time_filter_query(self, timeFilter, facet):
+  def _get_time_filter_query(self, timeFilter, facet, collection):
     properties = facet.get('properties', facet)
-    if not timeFilter:
+    if not timeFilter and properties['slot'] != 0:
       props = {}
-      stat_facet = {'min': properties['start'], 'max': properties['end']}
-      _compute_range_facet(facet['widgetType'], stat_facet, props, stat_facet['min'], stat_facet['max'],
+      # If the start & end are equal to min/max, then we want to show the whole domain. Since min/max can change, we fetch latest values and update start/end
+      if properties['start'] == properties['min'] and properties['end'] == properties['max']:
+        stats_json = self.stats(collection['name'], [facet['field']])
+        stat_facet = stats_json['stats']['stats_fields'][facet['field']]
+        properties['start'] = None
+        properties['end'] = None
+      else: # The user has zoomed in. Only show that section.
+        stat_facet = {'min': properties['min'], 'max': properties['max']}
+      _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'],
                            SLOTS=properties['slot'])
       return {
+        'min': '%(min)s' % props,
+        'max': '%(max)s' % props,
+        'start': '%(start)s' % props,
+        'end': '%(end)s' % props,
         'gap': '%(gap)s' % props,  # add a 'auto'
       }
-    elif 'fixed' in timeFilter or properties['slot'] != 0:
+    elif timeFilter:
       props = {}
-      stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
-      _compute_range_facet(facet['widgetType'], stat_facet, props, stat_facet['min'], stat_facet['max'], SLOTS = properties['slot'])
-      gap = props['gap']
-      unit = re.split('\d+', gap)[1]
+
+      # If the start & end are equal to min/max, then we want to show the whole domain (either interval now-x or static)
+      # In that case use timeFilter values
+      if properties['start'] == properties['min'] and properties['end'] == properties['max']:
+        stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
+        properties['start'] = None
+        properties['end'] = None
+      else: # the user has zoomed in. Only show that section.
+        stat_facet = {'min': properties['min'], 'max': properties['max']}
+      _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS = properties['slot'])
       return {
-        'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': unit},
-        'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': unit},
-        'gap': '%(gap)s' % props, # add a 'auto'
+        'start': '%(start)s' % props,
+        'end': '%(end)s' % props,
+        'gap': '%(gap)s' % props,  # add a 'auto'
+        'min': '%(min)s' % props,
+        'max': '%(max)s' % props,
       }
     else:
       gap = timeFilter['gap'][facet['widgetType']]
