@@ -44,7 +44,7 @@ def get_submissions(request):
   }
   status = request.GET.get('status', 'submissions').split(',')
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     submissions = c.get_submissions()
     response['submissions'] = list_to_dict(submissions)
   except RestException, e:

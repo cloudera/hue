@@ -43,7 +43,7 @@ class SqoopClient(object):
   STATUS_GOOD = ('FINE', 'ACCEPTABLE')
   STATUS_BAD = ('UNACCEPTABLE', 'FAILURE_ON_SUBMIT')
 
-  def __init__(self, url, username, language='en'):
+  def __init__(self, url, username, language='en', ssl_cert_ca_verify=False):
     self._url = url
     self._client = HttpClient(self._url, logger=LOG)
     self._root = SqoopResource(self._client)
@@ -53,6 +53,8 @@ class SqoopClient(object):
     if has_sqoop_has_security():
       self._client.set_kerberos_auth()
     self._security_enabled = has_sqoop_has_security()
+
+    self._client.set_verify(ssl_cert_ca_verify)
 
   def __str__(self):
     return "SqoopClient at %s with security %s" % (self._url, self._security_enabled)
