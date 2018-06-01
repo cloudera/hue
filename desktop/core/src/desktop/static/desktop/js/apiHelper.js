@@ -1393,13 +1393,15 @@ var ApiHelper = (function () {
       }
     }
 
-    if (window.context) {
-      url += '/' + window.context;
+    var params = {
+      'format' : 'json'
     }
 
-    var request = self.simpleGet(url, {
-      'format' : 'json'
-    }, {
+    if (options.sourceContext && options.sourceContext.id) {
+      params['cluster'] = options.sourceContext.id;
+    }
+
+    var request = self.simpleGet(url, params, {
       silenceErrors: options.silenceErrors,
       successCallback: function (response) {
         if (options.path.length === 1) {
@@ -1947,9 +1949,9 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.fetchSourceContexts = function (options) {
+  ApiHelper.prototype.fetchSourceContexts = function (options) { // TODO rename
     var self = this;
-    var url = '/desktop/api2/context/' + options.app + '/' + options.sourceType;
+    var url = '/desktop/api2/context/namespaces/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 

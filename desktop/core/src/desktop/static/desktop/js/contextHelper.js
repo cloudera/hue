@@ -75,11 +75,11 @@ var ContextCatalog = (function () {
       self.sourceContextsPromises[options.sourceType] = deferred.promise();
 
       ApiHelper.getInstance().fetchSourceContexts(options).done(function (sourceContexts) {
-        if (sourceContexts[self.app] && sourceContexts[self.app][options.sourceType]) {
-          var context = sourceContexts[self.app][options.sourceType];
+        if (sourceContexts[options.sourceType]) {
+          var namespaces = sourceContexts[options.sourceType];
           // TODO: For now we only care about namespaces.
-          if (context.namespaces) {
-            self.sourceContexts[self.sourceType] = context.namespaces;
+          if (namespaces) {
+            self.sourceContexts[self.sourceType] = namespaces;
             deferred.resolve(self.sourceContexts[self.sourceType])
             // TODO: save
           } else {
@@ -90,7 +90,7 @@ var ContextCatalog = (function () {
         }
       });
 
-      return deferred.promise({ name: 'foo' });
+      return deferred.promise({ name: 'foo' }); // TODO
     };
 
     return ContextCatalogEntry;
