@@ -862,14 +862,14 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
     <!-- ko foreach: topJoins -->
     <tr>
-      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
+      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), sourceContext: parents[1].catalogEntry.sourceContext, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
       <td>
         <table class="metastore-join-column-table">
           <tbody data-bind="foreach: joinCols">
           <tr>
-            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), sourceContext: $parents[2].catalogEntry.sourceContext, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
             <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
-            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), sourceContext: $parents[2].catalogEntry.sourceContext, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
           </tr>
           </tbody>
         </table>
@@ -1005,7 +1005,7 @@ ${ components.menubar(is_embeddable) }
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- ko if: !table() -->
-              <select data-bind="selectize: contexts, value: context" class="input-medium"></select>
+              <select data-bind="selectize: $parent.sourceContexts, value: $parent.sourceContext" class="input-medium"></select>
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the database')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- /ko -->
@@ -1233,7 +1233,7 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        DataCatalog.getEntry({ sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
+        DataCatalog.getEntry({ sourceContext: viewModel.activeSourceContext(), sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
           entry.clearCache({ invalidate: sourceType() === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
           hueUtils.replaceURL('?');
         });

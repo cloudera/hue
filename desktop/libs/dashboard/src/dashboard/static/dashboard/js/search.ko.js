@@ -555,6 +555,13 @@ var Collection = function (vm, collection) {
   self.label = ko.mapping.fromJS(collection.label);
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
   self.suggest = ko.mapping.fromJS(collection.suggest);
+  self.activeSourceContext = ko.observable();
+
+  contextHelper.getSourceContexts().done(function (sourceContexts) {
+    // TODO: Context selection
+    self.activeSourceContext(sourceContexts[0]);
+  });
+
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
   self.engine.subscribe(function() {
     self.name(null);

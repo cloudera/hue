@@ -101,6 +101,7 @@ importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }');
         postMessage({
           id: msg.data.id,
           sourceType: msg.data.type,
+          sourceContext: msg.data.sourceContext,
           editorChangeTime: msg.data.statementDetails.editorChangeTime,
           locations: locations,
           activeStatementLocations: activeStatementLocations,

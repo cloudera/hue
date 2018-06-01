@@ -2227,7 +2227,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <!-- ko if: $data.function() != 'formula' -->
       <select data-bind="selectize: facetFieldsNames, value: $parent.field, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
         <!-- ko if: $parent.field -->
-        <a class="inactive-action context-popover-icon" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + $parent.field()  }">
+        <a class="inactive-action context-popover-icon" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', sourceContext: $root.collection.activeSourceContext(), path: 'default.' + $root.collection.name() + '.' + $parent.field()  }">
           <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
         </a>
         <!-- /ko -->
@@ -2694,7 +2694,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
         <li data-bind="visibleOnHover: { 'selector': '.entity-field-picker' }">
             <span class="badge badge-info" data-bind="text: name(), attr: {'title': type()}, click: addFacetDemiModalFieldPreview"></span>
-            <a class="entity-field-picker inactive-action margin-right-10" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', path: 'default.' + $root.collection.name() + '.' + name()  }" style="margin-left: 2px;">
+            <a class="entity-field-picker inactive-action margin-right-10" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', sourceContext: $root.collection.activeSourceContext(), path: 'default.' + $root.collection.name() + '.' + name()  }" style="margin-left: 2px;">
               <i class="fa fa-info" title="${_('Show Details')}"/>
             </a>
         </li>

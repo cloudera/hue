@@ -3255,7 +3255,7 @@ function togglePresentation(value) {};
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      var attachEntryResolver = function (location, sourceType) {
+      var attachEntryResolver = function (location, sourceType, sourceContext) {
         location.resolveCatalogEntry = function(options) {
           if (!options) {
             options = {};
@@ -3274,6 +3274,7 @@ function togglePresentation(value) {};
 
           var promise = SqlUtils.resolveCatalogEntry({
             sourceType: sourceType,
+            sourceContext: sourceContext,
             cancellable: options.cancellable,
             cachedOnly: options.cachedOnly,
             identifierChain: location.identifierChain || location.colRef.identifierChain,
@@ -3325,7 +3326,7 @@ function togglePresentation(value) {};
             } else {
               if (e.data.locations) {
                 e.data.locations.forEach(function (location) {
-                  attachEntryResolver(location, e.data.sourceType);
+                  attachEntryResolver(location, e.data.sourceType, e.data.sourceContext);
                 })
               }
               huePubSub.publish('ace.sql.location.worker.message', e);
@@ -3347,7 +3348,7 @@ function togglePresentation(value) {};
           if (event.data.locationWorkerResponse) {
             if (event.data.locationWorkerResponse.locations) {
               event.data.locationWorkerResponse.locations.forEach(function (location) {
-                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType);
+                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType, event.data.locationWorkerResponse.sourceContext);
               })
             }
             huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });

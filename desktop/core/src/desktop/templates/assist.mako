@@ -1078,6 +1078,7 @@ from desktop.views import _ko
         self.apiHelper = options.apiHelper;
         self.i18n = options.i18n;
         self.initialized = false;
+        self.initalizing = false;
 
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
@@ -1104,25 +1105,9 @@ from desktop.views import _ko
           }
         }
 
+        self.activeSourceContext = ko.observable();
         self.sources = ko.observableArray();
         self.sourceIndex = {};
-        $.each(options.sourceTypes, function (idx, sourceType) {
-          self.sourceIndex[sourceType.type] = new AssistDbSource({
-            apiHelper: self.apiHelper,
-            i18n: self.i18n,
-            type: sourceType.type,
-            name: sourceType.name,
-            navigationSettings: options.navigationSettings
-          });
-          self.sources.push(self.sourceIndex[sourceType.type]);
-        });
-
-        huePubSub.subscribe('assist.collections.refresh', function() {
-          DataCatalog.getEntry({ sourceType: 'solr', path: [] }).done(function (entry) {
-            entry.clearCache({ cascade: true });
-          });
-        });
-
         self.selectedSource = ko.observable(null);
 
         self.setDatabaseWhenLoaded = function (databaseName) {
@@ -1141,103 +1126,128 @@ from desktop.views import _ko
           }
         };
 
-        huePubSub.subscribe('assist.db.highlight', function (location) {
-          huePubSub.publish('left.assist.show');
-          if (location.sourceType === 'solr') {
-            huePubSub.publish('assist.show.solr');
-          }
-          else {
-            huePubSub.publish('assist.show.sql');
-          }
-          huePubSub.publish('context.popover.hide');
-          window.setTimeout(function () {
-            var foundSource;
-            $.each(self.sources(), function (idx, source) {
-              if (source.sourceType === location.sourceType) {
-                foundSource = source;
-                return false;
+        contextHelper.getSourceContexts().done(function (sourceContexts) {
+          // TODO: Context selection
+          self.activeSourceContext(sourceContexts[0]);
+
+          $.each(options.sourceTypes, function (idx, sourceType) {
+            self.sourceIndex[sourceType.type] = new AssistDbSource({
+              apiHelper: self.apiHelper,
+              i18n: self.i18n,
+              type: sourceType.type,
+              activeSourceContext: self.activeSourceContext,
+              name: sourceType.name,
+              navigationSettings: options.navigationSettings
+            });
+            self.sources.push(self.sourceIndex[sourceType.type]);
+          });
+
+          huePubSub.subscribe('assist.collections.refresh', function() {
+            if (self.activeSourceContext()) {
+              DataCatalog.getEntry({ sourceType: 'solr', sourceContext: self.activeSourceContext(), path: [] }).done(function (entry) {
+                entry.clearCache({ cascade: true });
+              });
+            }
+          });
+
+          huePubSub.subscribe('assist.db.highlight', function (location) {
+            huePubSub.publish('left.assist.show');
+            if (location.sourceType === 'solr') {
+              huePubSub.publish('assist.show.solr');
+            }
+            else {
+              huePubSub.publish('assist.show.sql');
+            }
+            huePubSub.publish('context.popover.hide');
+            window.setTimeout(function () {
+              var foundSource;
+              $.each(self.sources(), function (idx, source) {
+                if (source.sourceType === location.sourceType) {
+                  foundSource = source;
+                  return false;
+                }
+              });
+              if (foundSource) {
+                var whenLoaded = function () {
+                  if (self.selectedSource() !== foundSource) {
+                    self.selectedSource(foundSource);
+                  }
+                  foundSource.highlightInside(location.path);
+                };
+                if (foundSource.hasEntries()) {
+                  whenLoaded();
+                } else {
+                  foundSource.initDatabases(whenLoaded);
+                }
+              }
+            }, 0);
+          });
+
+          if (!options.isSolr) {
+            huePubSub.subscribe('assist.set.database', function (databaseDef) {
+              if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
+                return;
+              }
+              self.selectedSource(self.sourceIndex[databaseDef.source]);
+              self.setDatabaseWhenLoaded(databaseDef.name);
+            });
+
+            huePubSub.subscribe('assist.get.database', function (source) {
+              if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
+                huePubSub.publish('assist.database.set', {
+                  source: source,
+                  name: self.sourceIndex[source].selectedDatabase().databaseName
+                });
+              } else {
+                huePubSub.publish('assist.database.set', {
+                  source: source,
+                  name: 'default'
+                });
               }
             });
-            if (foundSource) {
-              var whenLoaded = function () {
-                if (self.selectedSource() !== foundSource) {
-                  self.selectedSource(foundSource);
-                }
-                foundSource.highlightInside(location.path);
-              };
-              if (foundSource.hasEntries()) {
-                whenLoaded();
+
+            huePubSub.subscribe('assist.get.database.callback',  function (options) {
+              if (self.sourceIndex[options.source] && self.sourceIndex[options.source].selectedDatabase()) {
+                options.callback({
+                  source: options.source,
+                  name: self.sourceIndex[options.source].selectedDatabase().databaseName
+                });
               } else {
-                foundSource.initDatabases(whenLoaded);
+                options.callback({
+                  source: options.source,
+                  name: 'default'
+                });
               }
-            }
-          }, 0);
-        });
+            });
 
-        if (!options.isSolr) {
-          huePubSub.subscribe('assist.set.database', function (databaseDef) {
-            if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
-              return;
-            }
-            self.selectedSource(self.sourceIndex[databaseDef.source]);
-            self.setDatabaseWhenLoaded(databaseDef.name);
-          });
+            huePubSub.subscribe('assist.get.source', function () {
+              huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
+            });
 
-          huePubSub.subscribe('assist.get.database', function (source) {
-            if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
-              huePubSub.publish('assist.database.set', {
-                source: source,
-                name: self.sourceIndex[source].selectedDatabase().databaseName
-              });
-            } else {
-              huePubSub.publish('assist.database.set', {
-                source: source,
-                name: 'default'
-              });
-            }
-          });
+            huePubSub.subscribe('assist.set.source', function (source) {
+              if (self.sourceIndex[source]) {
+                self.selectedSource(self.sourceIndex[source]);
+              }
+            });
 
-          huePubSub.subscribe('assist.get.database.callback',  function (options) {
-            if (self.sourceIndex[options.source] && self.sourceIndex[options.source].selectedDatabase()) {
-              options.callback({
-                source: options.source,
-                name: self.sourceIndex[options.source].selectedDatabase().databaseName
-              });
-            } else {
-              options.callback({
-                source: options.source,
-                name: 'default'
-              });
-            }
-          });
-
-          huePubSub.subscribe('assist.get.source', function () {
-            huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
-          });
-
-          huePubSub.subscribe('assist.set.source', function (source) {
-            if (self.sourceIndex[source]) {
-              self.selectedSource(self.sourceIndex[source]);
-            }
-          });
-
-          huePubSub.publish('assist.db.panel.ready');
-
-          huePubSub.subscribe('assist.is.db.panel.ready', function () {
             huePubSub.publish('assist.db.panel.ready');
-          });
 
-          self.selectedSource.subscribe(function (newSource) {
-            if (newSource) {
-              if (newSource.databases().length === 0) {
-                newSource.initDatabases();
+            huePubSub.subscribe('assist.is.db.panel.ready', function () {
+              huePubSub.publish('assist.db.panel.ready');
+            });
+
+            self.selectedSource.subscribe(function (newSource) {
+              if (newSource) {
+                if (newSource.databases().length === 0) {
+                  newSource.initDatabases();
+                }
+                self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
+              } else {
+                self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
               }
-              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
-            } else {
-              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
-            }
-          });
-        }
+            });
+          }
+        });
 
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
@@ -2520,6 +2530,7 @@ from desktop.views import _ko
             sources[activeLocations.type] = {
               assistDbSource: new AssistDbSource({
                 i18n: i18n,
+                activeSourceContext: ko.observable(activeLocations.sourceContext),
                 type: activeLocations.type,
                 name: activeLocations.type,
                 navigationSettings: navigationSettings
@@ -2571,6 +2582,7 @@ from desktop.views import _ko
                   } else {
                     DataCatalog.getEntry({
                       sourceType: activeLocations.type,
+                      sourceContext: activeLocations.sourceContext,
                       path: [ database ],
                       definition: { type: 'database' }
                     }).done(function (catalogEntry) {
@@ -2626,7 +2638,7 @@ from desktop.views import _ko
                                   self.reloading(false)
                                 })
                               });
-                              DataCatalog.getEntry({ sourceType: activeLocations.type, path: []}).done(function (sourceEntry) {
+                              DataCatalog.getEntry({ sourceType: activeLocations.type, sourceContext: activeLocations.sourceContext, path: [] }).done(function (sourceEntry) {
                                 sourceEntry.getChildren().done(function (dbEntries) {
                                   var clearPromise;
                                    // Clear the database first if it exists without cascade
@@ -2950,6 +2962,7 @@ from desktop.views import _ko
 
         self.disposals = [];
         self.isSolr = ko.observable(true);
+        self.activeSourceContext = ko.observable();
 
         self.filter = {
           querySpec: ko.observable({
@@ -2981,9 +2994,11 @@ from desktop.views import _ko
           if (!collectionName) {
             return;
           }
+          self.activeSourceContext(collection.activeSourceContext);
 
           var assistDbSource = new AssistDbSource({
             i18n : i18n,
+            activeSourceContext: collection.activeSourceContext,
             type: collection.engine(),
             name: collection.engine(),
             navigationSettings: navigationSettings
@@ -2995,12 +3010,14 @@ from desktop.views import _ko
 
           DataCatalog.getEntry({
             sourceType: sourceType,
+            sourceContext: collection.activeSourceContext,
             path: [ fakeParentName ],
             definition: { type: 'database' }
           }).done(function (fakeDbCatalogEntry) {
             var assistFakeDb = new AssistDbEntry(fakeDbCatalogEntry, null, assistDbSource, self.filter, i18n, navigationSettings);
             DataCatalog.getEntry({
               sourceType: sourceType,
+              sourceContext: collection.activeSourceContext,
               path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
               definition: { type: 'table' }
             }).done(function (collectionCatalogEntry) {

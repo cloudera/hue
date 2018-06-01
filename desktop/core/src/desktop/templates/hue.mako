@@ -111,10 +111,6 @@
   var originalClearableImgUrl = '${ static('desktop/art/clearField@2x.png') }';
   var clearableImgUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(originalClearableImgUrl) : originalClearableImgUrl;
   document.styleSheets[0].insertRule('.clearable { background: url(' + clearableImgUrl + ') no-repeat right -10px center; }');
-
-  if (window.embeddedClusterId) {
-    window.DEFAULT_CLUSTER_ID = window.embeddedClusterId;
-  }
 % endif
   </script>
 
@@ -126,6 +122,7 @@
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
+  <script src="${ static('desktop/js/contextHelper.js') }"></script>
 </head>
 
 <body>

@@ -25,6 +25,9 @@
           },
           database: function () {
             return 'default';
+          },
+          sourceContext: function () {
+            return 'defaultNamespace'
           }
         },
         editor: function () {
