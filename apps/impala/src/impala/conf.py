@@ -27,7 +27,7 @@ from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coe
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
 
-from impala.impala_flags import get_ssl_server_certificate, get_max_result_cache_size, is_impersonation_enabled
+from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled
 from impala.settings import NICE_NAME
 
 
@@ -84,15 +84,15 @@ QUERY_TIMEOUT_S = Config(
   help=_t("If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work"
           " (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."),
   type=int,
-  default=600
+  default=300
 )
 
 SESSION_TIMEOUT_S = Config(
   key="session_timeout_s",
   help=_t("If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work"
-          " (compute or send back results) for that session within SESSION_TIMEOUT_S seconds. Default: 30 min."),
+          " (compute or send back results) for that session within SESSION_TIMEOUT_S seconds. Default: 15 min."),
   type=int,
-  default=30 * 60
+  default=15 * 60
 )
 
 CONFIG_WHITELIST = Config(
