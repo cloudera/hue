@@ -21,7 +21,6 @@ from datetime import datetime,  timedelta
 
 from django.utils.translation import ugettext as _
 
-from desktop.models import Cluster, DATAENG
 from notebook.connectors.dataeng import DataEng, DATE_FORMAT
 
 from jobbrowser.apis.base_api import Api
@@ -91,11 +90,7 @@ class DataEngJobApi(Api):
       else:
         delta = timedelta(days=int(filters['time']['time_value']))
       kwargs['creation_date_after'] = (datetime.today() - delta).strftime(DATE_FORMAT)
-
-    # Could also come from filters
-    cluster = Cluster(self.user)
-    if cluster.get_type() == DATAENG:
-      kwargs['cluster_crn'] = cluster.get_id()
+    # Todo: filter on 'cluster_crn'
 
     api = DataEng(self.user)
 
