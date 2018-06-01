@@ -1296,7 +1296,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: options.sourceContext.id
+        cluster: '"' + options.sourceContext.id + '"'
       },
       timeout: options.timeout
     }).success(function (data) {

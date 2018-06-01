@@ -326,13 +326,16 @@ var MetastoreViewModel = (function () {
       }
     };
 
-    if (self.loadingDatabases() && self.lastLoadDatabasesPromise !== null) {
-      self.lastLoadDatabasesPromise.done(function () {
+    window.setTimeout(function () {
+      if (self.loadingDatabases() && self.lastLoadDatabasesPromise !== null) {
+        self.lastLoadDatabasesPromise.done(function () {
+          whenLoaded(true);
+        });
+      } else {
         whenLoaded(true);
-      });
-    } else {
-      whenLoaded(true);
-    }
+      }
+
+    }, 0);
   };
 
   MetastoreViewModel.prototype.loadURL = function () {

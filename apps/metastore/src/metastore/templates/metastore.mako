@@ -984,6 +984,17 @@ ${ components.menubar(is_embeddable) }
           <!-- ko ifnot: loading -->
           <h1>
             <div class="inline-block pull-right">
+              <!-- ko component: {
+                name: 'hue-drop-down',
+                params: {
+                  icon: 'fa-crosshairs',
+                  value: activeSourceContext,
+                  entries: sourceContexts,
+                  searchable: true,
+                  labelAttribute: 'name',
+                  linkTitle: 'Active context'
+                 }
+               } --><!-- /ko -->
               <!-- ko with: database -->
               <!-- ko with: table -->
               % if USE_NEW_EDITOR.get():
@@ -1005,7 +1016,6 @@ ${ components.menubar(is_embeddable) }
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- ko if: !table() -->
-              <select data-bind="selectize: $parent.sourceContexts, value: $parent.sourceContext" class="input-medium"></select>
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the database')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- /ko -->
