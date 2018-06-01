@@ -68,7 +68,7 @@ var MetastoreViewModel = (function () {
 
     self.database = ko.observable(null);
 
-    contextHelper.getSourceContexts().done(function (sourceContexts) {
+    ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: self.sourceType() }).done(function (sourceContexts) {
       // TODO: Context selection
       self.sourceContexts(sourceContexts);
       self.activeSourceContext(sourceContexts[0]);

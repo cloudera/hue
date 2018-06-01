@@ -558,7 +558,7 @@ var Collection = function (vm, collection) {
   self.suggest = ko.mapping.fromJS(collection.suggest);
   self.activeSourceContext = ko.observable();
 
-  contextHelper.getSourceContexts().done(function (sourceContexts) {
+  ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: collection.engine || 'solr' }).done(function (sourceContexts) {
     // TODO: Context selection
     self.activeSourceContext(sourceContexts[0]);
   });

@@ -1469,7 +1469,7 @@ from metadata.conf import has_navigator
         }
 
         if (self.isCatalogEntry) {
-          contextHelper.getSourceContexts().done(function (sourceContexts) {
+          ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: sourceType }).done(function (sourceContexts) {
             // TODO: Context selection for global search results?
             DataCatalog.getEntry({ sourceType: sourceType, sourceContext: sourceContexts[0], path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
               catalogEntry.navigatorMeta = params.data;
