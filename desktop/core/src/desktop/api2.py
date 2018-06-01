@@ -77,39 +77,39 @@ def get_config(request):
 
 
 @api_error_handler
-def get_context(request, app, engine):
-  context = {}
+def get_context_namespaces(request, interface):
+  namespaces = {}
 
   clusters = get_clusters(request.user).values()
 
-  if app == 'editor':
-    if engine == 'hive':
-      context['editor'] = {
-        'hive': {
-          'computes': [
-            {
-              'id': cluster['id'],
-              'name': cluster['name']
-            } for cluster in clusters
-          ]
-        }
-      }
-  elif app == 'browser':
-    if engine == 'hive':
-      context['browser'] = {
-        'hive': {
-          'namespaces': [
-            {
-              'id': cluster['id'],
-              'name': cluster['name']
-            } for cluster in clusters
-          ]
-        }
-      }
+  if interface == 'hive':
+    namespaces['hive'] = [{
+        'id': cluster['id'],
+        'name': cluster['name']
+      } for cluster in clusters
+    ]
 
-  context['status'] = 0
+  namespaces['status'] = 0
 
-  return JsonResponse(context)
+  return JsonResponse(namespaces)
+
+
+@api_error_handler
+def get_context_computes(request, interface):
+  computes = {}
+
+  clusters = get_clusters(request.user).values()
+
+  if interface == 'hive':
+    computes['hive'] = [{
+        'id': cluster['id'],
+        'name': cluster['name']
+      } for cluster in clusters
+    ]
+
+  computes['status'] = 0
+
+  return JsonResponse(computes)
 
 
 @api_error_handler
