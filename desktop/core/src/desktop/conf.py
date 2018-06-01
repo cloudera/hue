@@ -1265,6 +1265,96 @@ OAUTH = ConfigSection(
   )
 )
 
+OIDC = ConfigSection(
+  key='oidc',
+  help=_('Configuration options for OpenID Connect authentication'),
+  members=dict(
+    OIDC_RP_CLIENT_ID = Config(
+      key="oidc_rp_client_id",
+      help=_("The client ID as relay party set in OpenID provider."),
+      type=str,
+      default="XXXXXXXXXXXXXXXXXXXXX"
+    ),
+
+    OIDC_RP_CLIENT_SECRET = Config(
+      key="oidc_rp_client_secret",
+      help=_("The client secret as relay party set in OpenID provider."),
+      type=str,
+      default="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    ),
+
+    OIDC_OP_AUTHORIZATION_ENDPOINT = Config(
+      key="oidc_op_authorization_endpoint",
+      help=_("The OpenID provider authoriation endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/Cloudera/protocol/openid-connect/auth"
+    ),
+
+    OIDC_OP_TOKEN_ENDPOINT = Config(
+      key="oidc_op_token_endpoint",
+      help=_("The OpenID provider token endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/token"
+    ),
+
+    AUTHENTICATE_URL = Config(
+      key="authenticate_url",
+      help=_("The Authorize URL."),
+      type=str,
+      default="https://api.twitter.com/oauth/authorize"
+    ),
+
+    OIDC_OP_USER_ENDPOINT=Config(
+      key="oidc_op_user_endpoint",
+      help=_("The OpenID provider user info endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/userinfo"
+    ),
+
+    OIDC_RP_IDP_SIGN_KEY=Config(
+      key="oidc_rp_idp_sign_key",
+      help=_("The OpenID provider signing key in PEM or DER format."),
+      type=str,
+      default=None
+    ),
+
+    OIDC_OP_JWKS_ENDPOINT=Config(
+      key="oidc_op_jwks_endpoint",
+      help=_("The OpenID provider authoriation endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/Cloudera/protocol/openid-connect/certs"
+    ),
+
+    OIDC_VERIFY_SSL=Config(
+      key="oidc_verify_ssl",
+      help=_("Whether Hue as OpenID Connect client verify SSL cert."),
+      type=coerce_bool,
+      default=False
+    ),
+
+    LOGIN_REDIRECT_URL=Config(
+      key="login_redirect_url",
+      help=_("As relay party Hue URL path to redirect to after login."),
+      type=str,
+      default="https://localhost:8888/oidc/callback/"
+    ),
+
+    LOGOUT_REDIRECT_URL=Config(
+      key="logout_redirect_url",
+      help=_("The OpenID provider URL path to redirect to after logout."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/logout"
+    ),
+
+    LOGIN_REDIRECT_URL_FAILURE=Config(
+      key="login_redirect_url_failure",
+      help=_("As relay party Hue URL path to redirect to after login."),
+      type=str,
+      default="https://localhost:8888/hue/oidc_failed/"
+    ),
+
+  )
+)
 
 LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
   key="local_filesystems",
