@@ -37,7 +37,7 @@ def get_connector_or_exception(exception_class=PopupException):
   def inner(view_func):
     def decorate(request, connector_id, *args, **kwargs):
       try:
-        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         connector = c.get_connector(int(connector_id))
       except RestException, e:
         handle_rest_exception(e, _('Could not get connector.'))
@@ -50,7 +50,7 @@ def get_link_or_exception(exception_class=PopupException):
   def inner(view_func):
     def decorate(request, link_id, *args, **kwargs):
       try:
-        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         link = c.get_link(int(link_id))
       except RestException, e:
         handle_rest_exception(e, _('Could not get link.'))
@@ -63,7 +63,7 @@ def get_job_or_exception(exception_class=PopupException):
   def inner(view_func):
     def decorate(request, job_id, *args, **kwargs):
       try:
-        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         job = c.get_job(int(job_id))
       except RestException, e:
         handle_rest_exception(e, _('Could not get job.'))
@@ -76,7 +76,7 @@ def get_submission_or_exception(exception_class=PopupException):
   def inner(view_func):
     def decorate(request, submission_id, *args, **kwargs):
       try:
-        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+        c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         submission = c.get_submission(int(submission_id))
       except RestException, e:
         handle_rest_exception(e, _('Could not get submission.'))
