@@ -73,16 +73,18 @@ def hue_version():
   global HUE_VERSION
 
   if HUE_VERSION is None:
+    HUE_VERSION = HUE_DESKTOP_VERSION
+
     p = get_run_root('cloudera', 'cdh_version.properties')
     if os.path.exists(p):
-      HUE_VERSION = _version_from_properties(open(p))
-    else:
-      HUE_VERSION = HUE_DESKTOP_VERSION
+      build_version = _version_from_properties(open(p))
+      if build_version:
+        HUE_VERSION = '%s - %s' % (HUE_VERSION, build_version)
 
   return HUE_VERSION
 
 def _version_from_properties(f):
-  return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('version', HUE_DESKTOP_VERSION)
+  return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
 
 
 ###################################################################################################
