@@ -1737,17 +1737,12 @@ var Collection = function (vm, collection) {
 
     vm.query.removeFilter(ko.mapping.fromJS({'id': facet_id}));
     if (facet.properties.canRange()) {
-      facet.properties.gap(facet.properties.initial_gap());
-      facet.properties.start(facet.properties.initial_start());
-      facet.properties.end(facet.properties.initial_end());
-      facet.properties.min(facet.properties.initial_start());
-      facet.properties.max(facet.properties.initial_end());
+      facet.properties.start(facet.properties.min());
+      facet.properties.end(facet.properties.max());
       if (facet.properties.facets) {
         var nestedFacet = facet.properties.facets()[0];
-        nestedFacet.start(facet.properties.initial_start());
-        nestedFacet.end(facet.properties.initial_end());
-        nestedFacet.min(facet.properties.initial_start());
-        nestedFacet.max(facet.properties.initial_end());
+        nestedFacet.start(facet.properties.min());
+        nestedFacet.end(facet.properties.max());
       }
     }
     vm.search();
