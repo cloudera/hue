@@ -33,9 +33,9 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
 
+from metadata.catalog.base import get_api
+from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
 from metadata.conf import has_navigator, NAVIGATOR, has_navigator_file_search
-from metadata.navigator_client import NavigatorApi, NavigatorApiException, EntityDoesNotExistException,\
-  NavigathorAuthException
 
 
 LOG = logging.getLogger(__name__)
@@ -59,13 +59,13 @@ def error_handler(view_fn):
         raise MetadataApiException('Navigator API is not configured.')
     except Http404, e:
       raise e
-    except EntityDoesNotExistException, e:
+    except CatalogEntityDoesNotExistException, e:
       response['message'] = e.message
       status = 404
-    except NavigathorAuthException, e:
+    except CatalogAuthException, e:
       response['message'] = force_unicode(e.message)
       status = 403
-    except NavigatorApiException, e:
+    except CatalogApiException, e:
       try:
         response['message'] = json.loads(e.message)
       except Exception:
@@ -80,48 +80,11 @@ def error_handler(view_fn):
 
 
 @error_handler
-def search_entities(request):
-  """
-  For displaying results.
-  """
-  api = NavigatorApi(request.user)
-
-  query_s = json.loads(request.POST.get('query_s', ''))
-  query_s = smart_str(query_s)
-
-  offset = request.POST.get('offset', 0)
-  limit = int(request.POST.get('limit', 100))
-  raw_query = request.POST.get('raw_query', False)
-  sources = json.loads(request.POST.get('sources') or '[]')
-  if sources and not has_navigator_file_search(request.user):
-    sources = ['sql']
-
-  query_s = query_s.strip() or '*'
-
-  entities = api.search_entities(query_s, limit=limit, offset=offset, raw_query=raw_query, sources=sources)
-
-  if not raw_query:
-    _augment_highlighting(query_s, entities)
-
-  response = {
-    'entities': entities,
-    'count': len(entities),
-    'offset': offset,
-    'limit': limit,
-    'query_s': query_s,
-    'status': 0
-  }
-
-  return JsonResponse(response)
-
-
-@error_handler
 def search_entities_interactive(request):
   """
   For search autocomplete.
   """
-  api = NavigatorApi(request.user)
-
+  interface = request.POST.get('interface', 'navigator')
   query_s = json.loads(request.POST.get('query_s', ''))
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
@@ -129,96 +92,16 @@ def search_entities_interactive(request):
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
 
+  api = get_api(request=request, interface=interface)
+
   if sources and not has_navigator_file_search(request.user):
     sources = ['sql']
-
-  f = {
-      "outputFormat" : {
-        "type" : "dynamic"
-      },
-      "name" : {
-        "type" : "dynamic"
-      },
-      "lastModified" : {
-        "type" : "date"
-      },
-      "sourceType" : {
-        "type" : "dynamic"
-      },
-      "parentPath" : {
-        "type" : "dynamic"
-      },
-      "lastAccessed" : {
-        "type" : "date"
-      },
-      "type" : {
-        "type" : "dynamic"
-      },
-      "sourceId" : {
-        "type" : "dynamic"
-      },
-      "partitionColNames" : {
-        "type" : "dynamic"
-      },
-      "serDeName" : {
-        "type" : "dynamic"
-      },
-      "created" : {
-        "type" : "date"
-      },
-      "fileSystemPath" : {
-        "type" : "dynamic"
-      },
-      "compressed" : {
-        "type" : "bool"
-      },
-      "clusteredByColNames" : {
-        "type" : "dynamic"
-      },
-      "originalName" : {
-        "type" : "dynamic"
-      },
-      "owner" : {
-        "type" : "dynamic"
-      },
-      "extractorRunId" : {
-        "type" : "dynamic"
-      },
-      "userEntity" : {
-        "type" : "bool"
-      },
-      "sortByColNames" : {
-        "type" : "dynamic"
-      },
-      "inputFormat" : {
-        "type" : "dynamic"
-      },
-      "serDeLibName" : {
-        "type" : "dynamic"
-      },
-      "originalDescription" : {
-        "type" : "dynamic"
-      },
-      "lastModifiedBy" : {
-        "type" : "dynamic"
-      }
-    }
-
-  auto_field_facets = ["tags", "type"] + f.keys()
-  query_s = query_s.strip() + '*'
-
-  last_query_term = [term for term in query_s.split()][-1]
-
-  if last_query_term and last_query_term != '*':
-    last_query_term = last_query_term.rstrip('*')
-    (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
-    auto_field_facets = [f for f in auto_field_facets if f.startswith(fname)]
 
   response = api.search_entities_interactive(
       query_s=query_s,
       limit=limit,
       offset=offset,
-      facetFields=field_facets or auto_field_facets[:5],
+      facetFields=field_facets,
       facetPrefix=prefix,
       facetRanges=None,
       firstClassEntitiesOnly=None,
@@ -239,6 +122,44 @@ def search_entities_interactive(request):
   _augment_highlighting(query_s, response.get('results'))
 
   response['status'] = 0
+
+  return JsonResponse(response)
+
+
+#  Not used currently.
+@error_handler
+def search_entities(request):
+  """
+  For displaying results.
+  """
+  interface = request.POST.get('interface', 'navigator')
+  query_s = json.loads(request.POST.get('query_s', ''))
+  query_s = smart_str(query_s)
+
+  offset = request.POST.get('offset', 0)
+  limit = int(request.POST.get('limit', 100))
+  raw_query = request.POST.get('raw_query', False)
+  sources = json.loads(request.POST.get('sources') or '[]')
+  if sources and not has_navigator_file_search(request.user):
+    sources = ['sql']
+
+  query_s = query_s.strip() or '*'
+
+  api = get_api(request=request, interface=interface)
+
+  entities = api.search_entities(query_s, limit=limit, offset=offset, raw_query=raw_query, sources=sources)
+
+  if not raw_query:
+    _augment_highlighting(query_s, entities)
+
+  response = {
+    'entities': entities,
+    'count': len(entities),
+    'offset': offset,
+    'limit': limit,
+    'query_s': query_s,
+    'status': 0
+  }
 
   return JsonResponse(response)
 
@@ -301,11 +222,12 @@ def _highlight_tags(record, term):
 
 @error_handler
 def list_tags(request):
-  api = NavigatorApi(request.user)
-
+  interface = request.POST.get('interface', 'navigator')
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 25)
+
+  api = get_api(request=request, interface=interface)
 
   data = api.search_entities_interactive(facetFields=['tags'], facetPrefix=prefix, limit=limit, offset=offset)
 
@@ -321,13 +243,14 @@ def list_tags(request):
 def find_entity(request):
   response = {'status': -1}
 
-  api = NavigatorApi(request.user)
-
+  interface = request.GET.get('interface', 'navigator')
   entity_type = request.GET.get('type', '')
   database = request.GET.get('database', '')
   table = request.GET.get('table', '')
   name = request.GET.get('name', '')
   path = request.GET.get('path', '')
+
+  api = get_api(request=request, interface=interface)
 
   if not entity_type:
     raise MetadataApiException("find_entity requires a type value, e.g. - 'database', 'table', 'file'")
@@ -368,8 +291,10 @@ def find_entity(request):
 def suggest(request):
   response = {'status': -1}
 
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   prefix = request.POST.get('prefix')
+
+  api = get_api(request=request, interface=interface)
 
   suggest = api.suggest(prefix)
 
@@ -383,8 +308,10 @@ def suggest(request):
 def get_entity(request):
   response = {'status': -1}
 
-  api = NavigatorApi(request.user)
+  interface = request.GET.get('interface', 'navigator')
   entity_id = request.GET.get('id')
+
+  api = get_api(request=request, interface=interface)
 
   if not entity_id:
     raise MetadataApiException("get_entity requires an 'id' parameter")
@@ -400,9 +327,11 @@ def get_entity(request):
 @require_POST
 @error_handler
 def add_tags(request):
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   entity_id = json.loads(request.POST.get('id', '""'))
   tags = json.loads(request.POST.get('tags', "[]"))
+
+  api = get_api(request=request, interface=interface)
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
@@ -425,9 +354,11 @@ def add_tags(request):
 @require_POST
 @error_handler
 def delete_tags(request):
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   entity_id = json.loads(request.POST.get('id', '""'))
   tags = json.loads(request.POST.get('tags', '[]'))
+
+  api = get_api(request=request, interface=interface)
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
@@ -450,11 +381,13 @@ def delete_tags(request):
 @require_POST
 @error_handler
 def update_properties(request):
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   entity_id = json.loads(request.POST.get('id', '""'))
   properties = json.loads(request.POST.get('properties', '{}')) # Entity properties
   modified_custom_metadata = json.loads(request.POST.get('modifiedCustomMetadata', '{}')) # Aka "Custom Metadata"
   deleted_custom_metadata_keys = json.loads(request.POST.get('deletedCustomMetadataKeys', '[]'))
+
+  api = get_api(request=request, interface=interface)
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
@@ -481,9 +414,11 @@ def update_properties(request):
 def delete_metadata_properties(request):
   response = {'status': -1}
 
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   entity_id = json.loads(request.POST.get('id', '""'))
   keys = json.loads(request.POST.get('keys', '[]'))
+
+  api = get_api(request=request, interface=interface)
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
@@ -506,8 +441,10 @@ def delete_metadata_properties(request):
 def get_lineage(request):
   response = {'status': -1, 'inputs': [], 'source_query': '', 'target_queries': [], 'targets': []}
 
-  api = NavigatorApi(request.user)
+  interface = request.GET.get('interface', 'navigator')
   entity_id = request.GET.get('id')
+
+  api = get_api(request=request, interface=interface)
 
   if not entity_id:
     raise MetadataApiException("get_lineage requires an 'id' parameter")
@@ -536,9 +473,11 @@ def get_lineage(request):
 
 @error_handler
 def create_namespace(request):
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   namespace = request.POST.get('namespace')
   description = request.POST.get('description')
+
+  api = get_api(request=request, interface=interface)
 
   request.audit = {
     'allowed': request.user.has_hue_permission(action='write', app='metadata'),
@@ -553,8 +492,10 @@ def create_namespace(request):
 
 @error_handler
 def get_namespace(request):
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   namespace = request.POST.get('namespace')
+
+  api = get_api(request=request, interface=interface)
 
   namespace = api.get_namespace(namespace)
 
@@ -576,9 +517,11 @@ def create_namespace_property(request):
   "type" : "TEXT",
   "createdDate" : "2018-04-02T22:36:19.001Z"
 }"""
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   namespace = request.POST.get('namespace')
   properties = json.loads(request.POST.get('properties', '{}'))
+
+  api = get_api(request=request, interface=interface)
 
   namespace = api.create_namespace_property(namespace, properties)
 
@@ -592,9 +535,11 @@ def map_namespace_property(request):
   namespace: "huecatalog",
   name: "relatedEntities"
   }"""
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
   clazz = request.POST.get('class')
   properties = json.loads(request.POST.get('properties', '[]'))
+
+  api = get_api(request=request, interface=interface)
 
   namespace = api.map_namespace_property(clazz=clazz, properties=properties)
 
@@ -603,7 +548,9 @@ def map_namespace_property(request):
 
 @error_handler
 def get_model_properties_mapping(request):
-  api = NavigatorApi(request.user)
+  interface = request.POST.get('interface', 'navigator')
+
+  api = get_api(request=request, interface=interface)
 
   namespace = api.get_model_properties_mapping()
 
