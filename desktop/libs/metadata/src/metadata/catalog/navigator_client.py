@@ -508,6 +508,7 @@ class NavigatorApi(Api):
 
   def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
     entity = self.get_entity(entity_id)
+
     if modified_custom_metadata:
       properties['properties'] = entity['properties'] or {}
       properties['properties'].update(modified_custom_metadata)
