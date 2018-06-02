@@ -1005,6 +1005,19 @@ The backends is pluggable by providing alternative [client interfaces](https://g
 </pre>
 
 
+### Adding/updating a comment with the dummy backend
+
+<pre>
+     $.post("/metadata/api/catalog/update_properties/", {
+        id: "22",
+        properties: ko.mapping.toJSON({"description":"Adding a description"}),
+        interface: "dummy"
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
 ### Adding a tag with the dummy backend
 
 <pre>
