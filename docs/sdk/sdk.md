@@ -1005,6 +1005,20 @@ The backends is pluggable by providing alternative [client interfaces](https://g
 </pre>
 
 
+### Finding an entity in order to get its id
+
+<pre>
+     $.get("/metadata/api/navigator/find_entity", {
+        type: "table",
+        database: "default",
+        name: "sample_07",
+        interface: "dummy"
+      }, function(data) {
+        console.log(ko.mapping.toJSON(data));
+      });
+</pre>
+
+
 ### Adding/updating a comment with the dummy backend
 
 <pre>
