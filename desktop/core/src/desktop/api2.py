@@ -103,7 +103,8 @@ def get_context_computes(request, interface):
   if interface == 'hive':
     computes['hive'] = [{
         'id': cluster['id'],
-        'name': cluster['name']
+        'name': cluster['name'],
+        'namespace': cluster['id'] # Dummy
       } for cluster in clusters
     ]
 
