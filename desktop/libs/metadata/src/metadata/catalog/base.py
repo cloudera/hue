@@ -76,10 +76,12 @@ class Api(object):
   # To implement
 
   def search_entities_interactive(self, query_s=None, limit=100, **filters):
+    """For the top search"""
     return {}
 
 
   def find_entity(self, source_type, type, name, **filters):
+    """e.g. From a database and table name, retrieve the enity id"""
     return {}
 
 
@@ -96,6 +98,11 @@ class Api(object):
 
 
   def delete_tags(self, entity_id, tags):
+    return {}
+
+
+  def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
+    """For updating entity comments or other attributes"""
     return {}
 
   # Common APIs
