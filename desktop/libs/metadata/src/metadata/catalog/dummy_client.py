@@ -49,8 +49,16 @@ class DummyApi(Api):
 
 
   def add_tags(self, entity_id, tags):
-    return {}
+    # Return entity but not used currently
+    return {u'clusteredByColNames': None, u'customProperties': {}, u'owner': u'admin', u'serdeName': None, u'deleteTime': None, u'fileSystemPath': u'hdfs://self-service-analytics-1.gce.cloudera.com:8020/user/hive/warehouse/sample_07', u'sourceType': u'HIVE', u'serdeLibName': u'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe', u'lastModifiedBy': None, u'sortByColNames': None, u'partColNames': None, u'type': u'TABLE', u'internalType': u'hv_table', u'description': u'Job data', u'inputFormat': u'org.apache.hadoop.mapred.TextInputFormat', u'tags': [u'usage'], u'deleted': False, u'technicalProperties': None, u'userEntity': False, u'serdeProps': None, u'originalDescription': None, u'compressed': False, u'metaClassName': u'hv_table', u'properties': {u'__cloudera_internal__hueLink': u'http://self-service-analytics-1.gce.cloudera.com:8889/metastore/table/default/sample_07'}, u'identity': u'22', u'outputFormat': u'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat', u'firstClassParentId': None, u'name': None, u'extractorRunId': u'8##503', u'created': u'2018-03-30T17:14:42.000Z', u'sourceId': u'8', u'lastModified': None, u'packageName': u'nav', u'parentPath': u'/default', u'originalName': u'sample_07', u'lastAccessed': u'1970-01-01T00:00:00.000Z'}
 
 
   def delete_tags(self, entity_id, tags):
     return {}
+
+
+  def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
+    # For updating comments of table or columns
+    # Returning the entity but not used currently
+    return {u'clusteredByColNames': None, u'customProperties': {}, u'owner': u'admin', u'serdeName': None, u'deleteTime': None, u'fileSystemPath': u'hdfs://self-service-analytics-1.gce.cloudera.com:8020/user/hive/warehouse/sample_07', u'sourceType': u'HIVE', u'serdeLibName': u'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe', u'lastModifiedBy': None, u'sortByColNames': None, u'partColNames': None, u'type': u'TABLE', u'internalType': u'hv_table', u'description': u'Adding an description', u'inputFormat': u'org.apache.hadoop.mapred.TextInputFormat', u'tags': [u'usage'], u'deleted': False, u'technicalProperties': None, u'userEntity': False, u'serdeProps': None, u'originalDescription': None, u'compressed': False, u'metaClassName': u'hv_table', u'properties': {u'__cloudera_internal__hueLink': u'http://self-service-analytics-1.gce.cloudera.com:8889/metastore/table/default/sample_07'}, u'identity': u'22', u'outputFormat': u'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat', u'firstClassParentId': None, u'name': None, u'extractorRunId': u'8##503', u'created': u'2018-03-30T17:14:42.000Z', u'sourceId': u'8', u'lastModified': None, u'packageName': u'nav', u'parentPath': u'/default', u'originalName': u'sample_07', u'lastAccessed': u'1970-01-01T00:00:00.000Z'}
+
