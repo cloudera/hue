@@ -356,6 +356,9 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
+    self.computes = ko.observableArray(['default', 'nightlyc6', 'selfserviceanalytics']);
+    self.selectedCompute = ko.observable(typeof snippet.selectedCompute != "undefined" && snippet.selectedCompute != null ? snippet.selectedCompute : null);
+
     self.database = ko.observable();
     var previousDatabase = null;
     self.sourceContext = ko.observable(snippet.sourceContext || vm.sourceContext);
@@ -1128,6 +1131,7 @@ var EditorViewModel = (function() {
         properties: self.properties,
         result: self.result.getContext(),
         database: self.database,
+        selectedCompute: self.selectedCompute(),
         wasBatchExecuted: self.wasBatchExecuted()
       };
     };
