@@ -301,6 +301,9 @@ def importer_submit(request):
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
+  elif source['inputFormat'] == 'altus':
+    # BDR copy or DistCP + DDL + Sentry DDL copy
+    pass
   elif source['inputFormat'] == 'rdbms':
     if destination['outputFormat'] in ('file', 'table', 'hbase'):
       job_handle = run_sqoop(request, source, destination, start_time)

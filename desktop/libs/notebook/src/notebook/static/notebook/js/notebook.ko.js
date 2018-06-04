@@ -356,7 +356,7 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
-    self.avaiableNamespaces = ko.observableArray();
+    self.availableNamespaces = ko.observableArray();
     self.namespace = ko.observable();
     self.availableComputes = ko.observableArray();
     self.compute = ko.observable();
@@ -374,7 +374,7 @@ var EditorViewModel = (function() {
     });
 
     var namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (namespaces) {
-      self.avaiableNamespaces(namespaces);
+      self.availableNamespaces(namespaces);
       if (!snippet.namespace || !namespaces.some(function (namespace) {
         if (namespace.id === snippet.namespace.id) {
           self.namespace(namespace);
