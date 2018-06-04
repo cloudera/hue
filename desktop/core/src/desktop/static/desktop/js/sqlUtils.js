@@ -120,7 +120,7 @@ var SqlUtils = (function () {
    *
    * @param {Object} options
    * @param {String} options.sourceType
-   * @param {SourceContext} options.sourceContext
+   * @param {ContextNamespace} options.namespace
    * @param {Object[]} [options.identifierChain]
    * @param {Object[]} [options.tables]
    * @param {Object} [options.cancellable]
@@ -190,7 +190,7 @@ var SqlUtils = (function () {
 
       cancellablePromises.push(DataCatalog.getChildren({
         sourceType: options.sourceType,
-        sourceContext: options.sourceContext,
+        namespace: options.namespace,
         path: SqlUtils.identifierChainToPath(nextTable.identifierChain),
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
@@ -219,7 +219,7 @@ var SqlUtils = (function () {
     } else {
       DataCatalog.getEntry({
         sourceType: options.sourceType,
-        sourceContext: options.sourceContext,
+        namespace: options.namespace,
         path: [],
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,

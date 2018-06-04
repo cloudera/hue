@@ -26,8 +26,8 @@
           database: function () {
             return 'default';
           },
-          sourceContext: function () {
-            return 'defaultNamespace'
+          namespace: function () {
+            return { id: 'defaultNamespace' }
           }
         },
         editor: function () {

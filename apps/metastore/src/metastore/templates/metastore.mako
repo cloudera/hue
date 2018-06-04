@@ -862,14 +862,14 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
     <!-- ko foreach: topJoins -->
     <tr>
-      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), sourceContext: parents[1].catalogEntry.sourceContext, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
+      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), namespace: parents[1].catalogEntry.namespace, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
       <td>
         <table class="metastore-join-column-table">
           <tbody data-bind="foreach: joinCols">
           <tr>
-            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), sourceContext: $parents[2].catalogEntry.sourceContext, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
             <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
-            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), sourceContext: $parents[2].catalogEntry.sourceContext, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
           </tr>
           </tbody>
         </table>
@@ -988,8 +988,8 @@ ${ components.menubar(is_embeddable) }
                 name: 'hue-drop-down',
                 params: {
                   icon: 'fa-server',
-                  value: activeSourceContext,
-                  entries: sourceContexts,
+                  value: activeNamespace,
+                  entries: namespaces,
                   searchable: true,
                   labelAttribute: 'name',
                   linkTitle: 'Active context'
@@ -1243,7 +1243,7 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        DataCatalog.getEntry({ sourceContext: viewModel.activeSourceContext(), sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
+        DataCatalog.getEntry({ namespace: viewModel.activeNamespace(), sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
           entry.clearCache({ invalidate: sourceType() === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
           hueUtils.replaceURL('?');
         });

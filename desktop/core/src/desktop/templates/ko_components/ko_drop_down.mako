@@ -29,7 +29,7 @@ from desktop.views import _ko
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
       <!-- ko if: !noLabel && value -->
-      <span data-bind="text: typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
+      <span data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
       <!-- /ko -->
       <i class="fa fa-caret-down"></i>
     </a>
@@ -46,7 +46,7 @@ from desktop.views import _ko
           <li class="divider"></li>
           <!-- /ko -->
           <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-          <li><a href="javascript:void(0)" data-bind="text: typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { $parent.value($data); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { $parent.value($data); }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -56,7 +56,7 @@ from desktop.views import _ko
           <li class="divider"></li>
           <!-- /ko -->
           <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-          <li><a href="javascript:void(0)" data-bind="text: typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { $parent.value($data); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { $parent.value($data); }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -168,7 +168,7 @@ from desktop.views import _ko
         self.fixedPosition = !!params.fixedPosition;
 
         self.inputPlaceHolder = ko.pureComputed(function () {
-          return typeof self.value() === 'object' ? self.value()[self.labelAttribute] : self.value();
+          return self.value() && typeof self.value() === 'object' ? self.value()[self.labelAttribute] : self.value();
         });
 
         var closeOnOutsideClick = function (e) {

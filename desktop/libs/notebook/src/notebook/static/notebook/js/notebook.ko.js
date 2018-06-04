@@ -356,12 +356,36 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
-    self.computes = ko.observableArray(['default', 'nightlyc6', 'selfserviceanalytics']);
-    self.selectedCompute = ko.observable(typeof snippet.selectedCompute != "undefined" && snippet.selectedCompute != null ? snippet.selectedCompute : self.computes().length > 0 ? self.computes()[0] : null);
+    self.avaiableNamespaces = ko.observableArray();
+    self.namespace = ko.observable();
+    self.availableComputes = ko.observableArray();
+    self.compute = ko.observable();
+
+    var computesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
+      self.availableComputes(computes);
+      if (!snippet.compute || !computes.some(function (compute) {
+        if (compute.id === snippet.compute.id) {
+          self.compute(compute);
+          return true;
+        }
+      })) {
+        self.compute(computes[0]);
+      }
+    });
+
+    var namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (namespaces) {
+      self.avaiableNamespaces(namespaces);
+      if (!snippet.namespace || !namespaces.some(function (namespace) {
+        if (namespace.id === snippet.namespace.id) {
+          self.namespace(namespace);
+          return true;
+        }})) {
+        self.namespace(namespaces[0]);
+      }
+    });
 
     self.database = ko.observable();
     var previousDatabase = null;
-    self.sourceContext = ko.observable(snippet.sourceContext || vm.sourceContext);
 
     self.database.subscribe(function (newValue) {
       if (newValue !== null) {
@@ -378,18 +402,8 @@ var EditorViewModel = (function() {
     self.updateDatabases = function () {
       if (self.isSqlDialect()) {
 
-        var sourceContextDeferred = $.Deferred();
-        if (!self.sourceContext()) {
-          ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: self.type() }).done(function (sourceContexts) {
-            // TODO: Context selection for the notebook
-            self.sourceContext(sourceContexts[0]);
-            sourceContextDeferred.resolve();
-          });
-        } else {
-          sourceContextDeferred.resolve();
-        }
-        sourceContextDeferred.done(function () {
-          DataCatalog.getEntry({ sourceType: self.type(), sourceContext: self.sourceContext(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
+        $.when(computesPromise, namespacesPromise).done(function () {
+          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
             sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
               var databaseNames = [];
               databaseEntries.forEach(function (databaseEntry) {
@@ -498,8 +512,13 @@ var EditorViewModel = (function() {
     self.handleAssistSelection = function (databaseDef) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
-        self.database(databaseDef.name);
+      } else if (databaseDef.sourceType === self.type()) {
+        if (self.namespace() !== databaseDef.namespace) {
+          self.namespace(databaseDef.namespace)
+        }
+        if (self.database() !== databaseDef.name) {
+          self.database(databaseDef.name);
+        }
       }
     };
 
@@ -925,7 +944,7 @@ var EditorViewModel = (function() {
           }
         }
         ignoreNextAssistDatabaseUpdate = true;
-        DataCatalog.getEntry({ sourceType: self.type(), sourceContext: self.sourceContext(), path: path }).done(function (entry) {
+        DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), path: path }).done(function (entry) {
           entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
         });
       });
@@ -1131,7 +1150,7 @@ var EditorViewModel = (function() {
         properties: self.properties,
         result: self.result.getContext(),
         database: self.database,
-        selectedCompute: self.selectedCompute(),
+        compute: self.compute(),
         wasBatchExecuted: self.wasBatchExecuted()
       };
     };
@@ -2922,6 +2941,7 @@ var EditorViewModel = (function() {
         if (self.snippets().length === 1) {
           huePubSub.publish('assist.set.database', {
             source: self.snippets()[0].type(),
+            namespace: self.snippets()[0].namespace(),
             name: self.snippets()[0].database()
           });
         } else {
@@ -2929,6 +2949,7 @@ var EditorViewModel = (function() {
             if (snippets.length === 1) {
               huePubSub.publish('assist.set.database', {
                 source: self.snippets()[0].type(),
+                namespace: self.snippets()[0].namespace(),
                 name: self.snippets()[0].database()
               });
             }
