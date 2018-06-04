@@ -1250,8 +1250,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               <!-- ko if: type() == 'date' -->
               <input class="input-medium" type="text" data-bind="value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
               <!-- /ko -->
-              <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date') -->
-              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+              <!-- ko if: type() == 'checkbox' -->
+              <input class="input-medium" type="checkbox" data-bind="checked: value">
+              <!-- /ko -->
+              <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
+              <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
               <!-- /ko -->
             <!-- /ko -->
           <!-- /ko -->

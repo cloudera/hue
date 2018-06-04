@@ -725,6 +725,14 @@ except ImportError, e:
                       readOnly: true
                     }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
+                <span>${ _('For values that are not textual, omit the quotes.')}</span>
+                <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from boolean_table where boolean_column = ${boolean_column}')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
               </ul>
             </div>
           </div>

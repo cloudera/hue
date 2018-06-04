@@ -405,7 +405,10 @@ In addition, the displayed text for multi valued variables can be changed.
 <pre>
 select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
 </pre>
-
+For values that are not textual, omit the quotes.
+<pre>
+select * from boolean_table where boolean_column = ${boolean_column}
+</pre>
 ### Syntax checker
 
 A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.
