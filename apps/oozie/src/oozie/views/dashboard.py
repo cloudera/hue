@@ -639,7 +639,7 @@ def list_oozie_sla(request):
 
     job_name = request.POST.get('job_name')
 
-    if re.match('.*-oozie-oozi-[WCB]', job_name):
+    if re.match('.*-oozie-\w+-[WCB]', job_name):
       params['id'] = job_name
       params['parent_id'] = job_name
     else:

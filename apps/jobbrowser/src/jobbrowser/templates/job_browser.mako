@@ -2109,13 +2109,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if (/application_/.test(self.id()) || /job_/.test(self.id()) || /attempt_/.test(self.id())) {
           interface = 'jobs';
         }
-        if (/oozie-oozi-W/.test(self.id())) {
+        if (/oozie-\w+-W/.test(self.id())) {
           interface = 'workflows';
         }
-        else if (/oozie-oozi-C/.test(self.id())) {
+        else if (/oozie-\w+-C/.test(self.id())) {
           interface = 'schedules';
         }
-        else if (/oozie-oozi-B/.test(self.id())) {
+        else if (/oozie-\w+-B/.test(self.id())) {
           interface = 'bundles';
         }
         else if (/[a-z0-9]{8}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{12}/.test(self.id())) {
@@ -2152,15 +2152,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             if (/_executor_/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
             }
-            var oozieWorkflow = vm.job().name().match(/oozie:launcher:T=.+?:W=.+?:A=.+?:ID=(.+?-oozie-oozi-W)$/i);
+            var oozieWorkflow = vm.job().name().match(/oozie:launcher:T=.+?:W=.+?:A=.+?:ID=(.+?-oozie-\w+-W)$/i);
             if (oozieWorkflow) {
               crumbs.push({'id': oozieWorkflow[1], 'name': oozieWorkflow[1], 'type': 'workflow'});
             }
 
-            if (/-oozie-oozi-W@/.test(vm.job().id())) {
+            if (/-oozie-\w+-W@/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().properties['workflow_id'], 'type': 'workflow'});
             }
-            else if (/-oozie-oozi-W/.test(vm.job().id())) {
+            else if (/-oozie-\w+-W/.test(vm.job().id())) {
               if (vm.job().properties['bundle_id']()) {
                 crumbs.push({'id': vm.job().properties['bundle_id'](), 'name': vm.job().properties['bundle_id'](), 'type': 'bundle'});
               }
@@ -2168,7 +2168,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 crumbs.push({'id': vm.job().properties['coordinator_id'](), 'name': vm.job().properties['coordinator_id'](), 'type': 'schedule'});
               }
             }
-            else if (/-oozie-oozi-C/.test(vm.job().id())) {
+            else if (/-oozie-\w+-C/.test(vm.job().id())) {
               if (vm.job().properties['bundle_id']()) {
                 crumbs.push({'id': vm.job().properties['bundle_id'](), 'name': vm.job().properties['bundle_id'](), 'type': 'bundle'});
               }
