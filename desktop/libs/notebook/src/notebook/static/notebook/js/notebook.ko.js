@@ -357,7 +357,7 @@ var EditorViewModel = (function() {
     };
 
     self.computes = ko.observableArray(['default', 'nightlyc6', 'selfserviceanalytics']);
-    self.selectedCompute = ko.observable(typeof snippet.selectedCompute != "undefined" && snippet.selectedCompute != null ? snippet.selectedCompute : null);
+    self.selectedCompute = ko.observable(typeof snippet.selectedCompute != "undefined" && snippet.selectedCompute != null ? snippet.selectedCompute : self.computes().length > 0 ? self.computes()[0] : null);
 
     self.database = ko.observable();
     var previousDatabase = null;

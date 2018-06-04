@@ -36,6 +36,7 @@ from django.views.decorators.http import require_POST
 from metadata.conf import has_navigator
 from metadata.navigator_api import search_entities as metadata_search_entities, _highlight
 from metadata.navigator_api import search_entities_interactive as metadata_search_entities_interactive
+from notebook.connectors.altus import SdxApi, AnalyticDbApi
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
@@ -78,39 +79,68 @@ def get_config(request):
 
 @api_error_handler
 def get_context_namespaces(request, interface):
-  namespaces = {}
+  response = {}
+  namespaces = []
 
   clusters = get_clusters(request.user).values()
 
   if interface == 'hive':
-    namespaces['hive'] = [{
+    namespaces.extend([{
         'id': cluster['id'],
         'name': cluster['name']
-      } for cluster in clusters
-    ]
+      } for cluster in clusters if cluster.get('type') == 'direct' # and interfaces == 'hive'
+    ])
 
-  namespaces['status'] = 0
+    # From Altus SDX
+    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+      namespaces.extend([{"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:doc_test/b0a5c594-0e4f-4084-ab00-bde55b4ab03e", "name": "doc_test"}, {"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:mschumpert/be6ae3c5-1790-468c-be6e-0d61a47d066d", "name": "mschumpert"}, {"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:cca-altus2-ns/bffb9ade-cbf5-4b47-8ac0-3b67b5f2472d", "name": "cca-altus2-ns"}, {"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:cca-sdx-ns/ce4b569b-a8e1-459d-a12d-8ae671f2db4f", "name": "cca-sdx-ns"}, {"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:cca-altus1-ns/e0fb5b22-5cbc-445e-86f3-959e4aee2b66", "name": "cca-altus1-ns"}, {"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:victor-namespace/ea714d02-0bed-425e-a09b-556367e559b0", "name": "victor-namespace"}, {"status": "CREATED", "id": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:BP_Enterprise/ecd8a000-4671-4bd0-9b66-b939aabb5a76", "name": "BP_Enterprise"}])
+# Js error for some reason
+#       namespaces.extend([{
+#           'id': namespace.get('crn', 'None'),
+#           'name': namespace.get('namespaceName', 'Unknown'),
+#           'status': namespace.get('status'),
+#           # creationDate
+#         } for namespace in SdxApi(request.user).list_namespaces()]
+#       )
 
-  return JsonResponse(namespaces)
+  response[interface] = namespaces
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler
 def get_context_computes(request, interface):
-  computes = {}
+  response = {}
+  computes = []
 
   clusters = get_clusters(request.user).values()
 
   if interface == 'hive':
-    computes['hive'] = [{
+    computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
         'namespace': cluster['id'] # Dummy
       } for cluster in clusters
-    ]
+    ])
 
-  computes['status'] = 0
+    # From Altus
+    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+      computes.extend([{
+          'id': cluster.get('crn', 'None'),
+          'name': cluster.get('clusterName', 'Unknown'),
+          'status': cluster.get('status'),
+          # namespaceCrn
+          # environmentType
+          # secured
+          # cdhVersion
+        } for cluster in AnalyticDbApi(request.user).list_clusters()]
+      )
 
-  return JsonResponse(computes)
+  response[interface] = computes
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler
