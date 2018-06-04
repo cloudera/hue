@@ -959,6 +959,7 @@
     var _enableSelection = typeof _options.enableSelection !== 'undefined' ? typeof _options.enableSelection === 'function' ? _options.enableSelection() : _options.enableSelection : true;
     _enableSelection = _enableSelection && numeric(_datum);
     var _hideStacked = _options.hideStacked !== null ? typeof _options.hideStacked === 'function' ? _options.hideStacked() : _options.hideStacked : false;
+    var _displayValuesInLegend = _options.displayValuesInLegend !== null ? typeof _options.displayValuesInLegend === 'function' ? _options.displayValuesInLegend() : _options.displayValuesInLegend : false;
     var fHideSelection = _isPivot || _hideSelection ? _chart.hideSelection : _chart.showSelection;
     if (fHideSelection) {
       fHideSelection.call(_chart);
@@ -970,6 +971,10 @@
     var fHideStacked = _hideStacked ? _chart.hideStacked : _chart.showStacked;
     if (fHideStacked) {
       fHideStacked.call(_chart);
+    }
+    var fDisplayValuesInLegend = _displayValuesInLegend ? _chart.hideStacked : _chart.showStacked;
+    if (_chart.displayValuesInLegend) {
+      _chart.displayValuesInLegend(_displayValuesInLegend);
     }
     if (_chart.selectBars) {
       var _field = (typeof _options.field == "function") ? _options.field() : _options.field;

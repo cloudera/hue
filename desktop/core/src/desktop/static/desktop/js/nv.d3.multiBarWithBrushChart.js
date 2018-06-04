@@ -50,7 +50,7 @@ nv.models.multiBarWithBrushChart = function() {
     , tooltips = true
     , tooltip = null
     , minTickWidth = 60
-    , displayValuesInLegend = true
+    , displayValuesInLegend = false
     , tooltipContent = null
     , tooltipSimple = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
@@ -118,13 +118,13 @@ nv.models.multiBarWithBrushChart = function() {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(multibar.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex));
-        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
       });
     } else {
       values = tooltipContent((e.list || [e]).map(function (e) {
         var x = multibar.x()(e.point, e.pointIndex),
         y = multibar.y()(e.point, e.pointIndex);
-        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
       }));
     }
 
@@ -146,7 +146,7 @@ nv.models.multiBarWithBrushChart = function() {
 
       var availableWidth = (width  || parseInt(container.style('width')) || 960)
                              - margin.left - margin.right,
-          availableChartWidth = Math.max(availableWidth - legendWidth, 0),
+          availableChartWidth = Math.max(availableWidth - showLegend * legendWidth, 0),
           availableHeight = (height || parseInt(container.style('height')) || 400)
                              - margin.top - margin.bottom;
 
@@ -1028,6 +1028,12 @@ nv.models.multiBarWithBrushChart = function() {
     if (selectBars) {
       selectBars(args);
     }
+    return chart;
+  };
+
+  chart.displayValuesInLegend = function(_) {
+    if (!arguments.length) return displayValuesInLegend;
+    displayValuesInLegend = _;
     return chart;
   };
 
