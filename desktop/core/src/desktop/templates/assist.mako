@@ -299,23 +299,30 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-db-breadcrumb">
     <div class="assist-flex-header assist-breadcrumb">
-      <!-- ko if: selectedSource() && !selectedSource().selectedDatabase() && sources().length === 1 -->
-      <i class="fa fa-server assist-breadcrumb-text"></i>
-      <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
+      <!-- ko if: selectedSource() -->
+      <!-- ko if: selectedSource().selectedNamespace() -->
+      <!-- ko if: selectedSource().selectedNamespace().selectedDatabase() -->
+      <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
+        <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
+        <i class="fa fa-database assist-breadcrumb-text"></i>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')' }"></span>
+      </a>
       <!-- /ko -->
-      <!-- ko if: selectedSource() && !selectedSource().selectedDatabase() && sources().length > 1 -->
+      <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
+      <a data-bind="click: back">
+        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
+      </a>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko ifnot: selectedSource().selectedNamespace() -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
       <!-- /ko -->
-      <!-- ko if: selectedSource() && selectedSource().selectedDatabase() -->
-      <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedDatabase() }">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
-        <i class="fa fa-database assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
-      </a>
       <!-- /ko -->
     </div>
   </script>
@@ -324,10 +331,13 @@ from desktop.views import _ko
     <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
     <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
     <!-- ko with: selectedSource -->
-    <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-    <!-- ko with: selectedDatabase -->
-    <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
-    <!-- /ko -->
+      <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' } --><!-- /ko -->
+      <!-- ko with: selectedNamespace -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+        <!-- ko with: selectedDatabase -->
+          <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
+        <!-- /ko -->
+      <!-- /ko -->
     <!-- /ko -->
   </script>
 
@@ -747,6 +757,21 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-namespaces-template">
+    <div class="assist-flex-header">
+      <div class="assist-inner-header">
+        ${_('Namespaces')}
+      </div>
+    </div>
+    <div class="assist-flex-fill">
+      <ul class="assist-tables" data-bind="foreach: namespaces">
+        <li class="assist-table">
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
+        </li>
+      </ul>
+    </div>
+  </script>
+
   <script type="text/html" id="ask-for-invalidate-title">
     &nbsp;<a class="pull-right pointer close-popover inactive-action">&times;</a>
   </script>
@@ -1105,155 +1130,147 @@ from desktop.views import _ko
           }
         }
 
-        self.activeSourceContext = ko.observable();
         self.sources = ko.observableArray();
         self.sourceIndex = {};
         self.selectedSource = ko.observable(null);
 
-        self.setDatabaseWhenLoaded = function (databaseName) {
-          if (self.selectedSource().loaded()) {
-            self.selectedSource().setDatabase(databaseName);
-          } else {
-            var subscription = self.selectedSource().loaded.subscribe(function (newValue) {
-              if (newValue) {
-                self.selectedSource().setDatabase(databaseName);
-                subscription.dispose();
-              }
-            });
-            if (!self.selectedSource().loaded() && !self.selectedSource().loading()) {
-              self.selectedSource().initDatabases();
+        self.setDatabaseWhenLoaded = function (namespace, databaseName) {
+          self.selectedSource().whenLoaded(function () {
+            if (self.selectedSource().selectedNamespace() && self.selectedSource().selectedNamespace().namespace.id !== namespace.id) {
+              self.selectedSource().namespaces().some(function (otherNamespace) {
+                if (otherNamespace.namespace.id === namespace.id) {
+                  self.selectedSource().selectedNamespace(otherNamespace);
+                  return true;
+                }
+              })
             }
-          }
+
+            if (self.selectedSource().selectedNamespace()) {
+              self.selectedSource().selectedNamespace().whenLoaded(function () {
+                self.selectedSource().selectedNamespace().setDatabase(databaseName);
+              })
+            }
+          });
         };
 
-        // TODO: Create AssistDbContext objects and replace AssistDbSource below
-        ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'hive' }).done(function (sourceContexts) {
-          // TODO: Context selection
-          self.activeSourceContext(sourceContexts[0]);
-
-          $.each(options.sourceTypes, function (idx, sourceType) {
-            self.sourceIndex[sourceType.type] = new AssistDbSource({
-              apiHelper: self.apiHelper,
-              i18n: self.i18n,
-              type: sourceType.type,
-              activeSourceContext: self.activeSourceContext,
-              name: sourceType.name,
-              navigationSettings: options.navigationSettings
-            });
-            self.sources.push(self.sourceIndex[sourceType.type]);
+        options.sourceTypes.forEach(function (sourceType) {
+          self.sourceIndex[sourceType.type] = new AssistDbSource({
+            apiHelper: self.apiHelper,
+            i18n: self.i18n,
+            type: sourceType.type,
+            name: sourceType.name,
+            navigationSettings: options.navigationSettings
           });
-
-          huePubSub.subscribe('assist.collections.refresh', function() {
-            if (self.activeSourceContext()) {
-              DataCatalog.getEntry({ sourceType: 'solr', sourceContext: self.activeSourceContext(), path: [] }).done(function (entry) {
-                entry.clearCache({ cascade: true });
-              });
-            }
-          });
-
-          huePubSub.subscribe('assist.db.highlight', function (location) {
-            huePubSub.publish('left.assist.show');
-            if (location.sourceType === 'solr') {
-              huePubSub.publish('assist.show.solr');
-            }
-            else {
-              huePubSub.publish('assist.show.sql');
-            }
-            huePubSub.publish('context.popover.hide');
-            window.setTimeout(function () {
-              var foundSource;
-              $.each(self.sources(), function (idx, source) {
-                if (source.sourceType === location.sourceType) {
-                  foundSource = source;
-                  return false;
-                }
-              });
-              if (foundSource) {
-                var whenLoaded = function () {
-                  if (self.selectedSource() !== foundSource) {
-                    self.selectedSource(foundSource);
-                  }
-                  foundSource.highlightInside(location.path);
-                };
-                if (foundSource.hasEntries()) {
-                  whenLoaded();
-                } else {
-                  foundSource.initDatabases(whenLoaded);
-                }
-              }
-            }, 0);
-          });
-
-          if (!options.isSolr) {
-            huePubSub.subscribe('assist.set.database', function (databaseDef) {
-              if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
-                return;
-              }
-              self.selectedSource(self.sourceIndex[databaseDef.source]);
-              self.setDatabaseWhenLoaded(databaseDef.name);
-            });
-
-            huePubSub.subscribe('assist.get.database', function (source) {
-              if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
-                huePubSub.publish('assist.database.set', {
-                  source: source,
-                  name: self.sourceIndex[source].selectedDatabase().databaseName
-                });
-              } else {
-                huePubSub.publish('assist.database.set', {
-                  source: source,
-                  name: 'default'
-                });
-              }
-            });
-
-            huePubSub.subscribe('assist.get.database.callback',  function (options) {
-              if (self.sourceIndex[options.source] && self.sourceIndex[options.source].selectedDatabase()) {
-                options.callback({
-                  source: options.source,
-                  name: self.sourceIndex[options.source].selectedDatabase().databaseName
-                });
-              } else {
-                options.callback({
-                  source: options.source,
-                  name: 'default'
-                });
-              }
-            });
-
-            huePubSub.subscribe('assist.get.source', function () {
-              huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
-            });
-
-            huePubSub.subscribe('assist.set.source', function (source) {
-              if (self.sourceIndex[source]) {
-                self.selectedSource(self.sourceIndex[source]);
-              }
-            });
-
-            huePubSub.publish('assist.db.panel.ready');
-
-            huePubSub.subscribe('assist.is.db.panel.ready', function () {
-              huePubSub.publish('assist.db.panel.ready');
-            });
-
-            self.selectedSource.subscribe(function (newSource) {
-              if (newSource) {
-                if (newSource.databases().length === 0) {
-                  newSource.initDatabases();
-                }
-                self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
-              } else {
-                self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
-              }
-            });
-          }
+          self.sources.push(self.sourceIndex[sourceType.type]);
         });
+
+        huePubSub.subscribe('assist.collections.refresh', function() {
+          DataCatalog.getEntry({ sourceType: 'solr', namespace: self.sourceIndex['solr'].activeNamespace(), path: [] }).done(function (entry) {
+            entry.clearCache({ cascade: true });
+          });
+        });
+
+        huePubSub.subscribe('assist.db.highlight', function (location) {
+          huePubSub.publish('left.assist.show');
+          if (location.sourceType === 'solr') {
+            huePubSub.publish('assist.show.solr');
+          }
+          else {
+            huePubSub.publish('assist.show.sql');
+          }
+          huePubSub.publish('context.popover.hide');
+          window.setTimeout(function () {
+            var foundSource;
+            $.each(self.sources(), function (idx, source) {
+              if (source.sourceType === location.sourceType) {
+                foundSource = source;
+                return false;
+              }
+            });
+            if (foundSource) {
+              var whenLoaded = function () {
+                if (self.selectedSource() !== foundSource) {
+                  self.selectedSource(foundSource);
+                }
+                foundSource.highlightInside(location.path);
+              };
+              if (foundSource.hasEntries()) {
+                whenLoaded();
+              } else {
+                foundSource.initDatabases(whenLoaded);
+              }
+            }
+          }, 0);
+        });
+
+        if (!options.isSolr) {
+          huePubSub.subscribe('assist.set.database', function (databaseDef) {
+            if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
+              return;
+            }
+            self.selectedSource(self.sourceIndex[databaseDef.source]);
+            self.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
+          });
+
+          var getPubDb  = function (source) {
+            var result = {
+              source: source,
+              namespace: { id: 'default' },
+              name: 'default'
+            };
+
+            if (self.sourceIndex[source] && self.sourceIndex[source].selectedNamespace()) {
+              result.namespace = self.sourceIndex[source].selectedNamespace().namespace;
+              if (self.sourceIndex[source].selectedNamespace().selectedDatabase()) {
+                result.name = self.sourceIndex[source].selectedNamespace().selectedDatabase().databaseName;
+              }
+            }
+            return result;
+          };
+
+          huePubSub.subscribe('assist.get.database', function (source) {
+            huePubSub.publish('assist.database.set', getPubDb(source));
+          });
+
+          huePubSub.subscribe('assist.get.database.callback',  function (options) {
+            options.callback(getPubDb(options.source));
+          });
+
+          huePubSub.subscribe('assist.get.source', function () {
+            huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
+          });
+
+          huePubSub.subscribe('assist.set.source', function (source) {
+            if (self.sourceIndex[source]) {
+              self.selectedSource(self.sourceIndex[source]);
+            }
+          });
+
+          huePubSub.publish('assist.db.panel.ready');
+
+          huePubSub.subscribe('assist.is.db.panel.ready', function () {
+            huePubSub.publish('assist.db.panel.ready');
+          });
+
+          self.selectedSource.subscribe(function (newSource) {
+            if (newSource) {
+              if (newSource.namespaces().length === 0) {
+                newSource.loadNamespaces();
+              }
+              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
+            } else {
+              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
+            }
+          });
+        }
 
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
-            if (self.selectedSource().selectedDatabase()) {
-              return self.selectedSource().selectedDatabase().catalogEntry.name;
+            if (self.selectedSource().selectedNamespace()) {
+              if (self.selectedSource().selectedNamespace().selectedDatabase()) {
+                return self.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name
+              }
+              return self.selectedSource().selectedNamespace().name
             }
             return self.selectedSource().name;
           }
@@ -1263,10 +1280,16 @@ from desktop.views import _ko
 
       AssistDbPanel.prototype.back = function () {
         var self = this;
-        if (self.selectedSource() && self.selectedSource().selectedDatabase()) {
-          self.selectedSource().selectedDatabase(null)
-        } else if (self.selectedSource()) {
-          self.selectedSource(null);
+        if (self.selectedSource()) {
+          if (self.selectedSource() && self.selectedSource().selectedNamespace()) {
+            if (self.selectedSource().selectedNamespace().selectedDatabase()) {
+              self.selectedSource().selectedNamespace().selectedDatabase(null);
+            } else {
+              self.selectedSource().selectedNamespace(null)
+            }
+          } else {
+            self.selectedSource(null);
+          }
         }
       };
 
@@ -1277,16 +1300,13 @@ from desktop.views import _ko
         }
         if (self.options.isSolr) {
           self.selectedSource(self.sourceIndex['solr']);
-          self.setDatabaseWhenLoaded();
         } else {
           var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
           if (!self.selectedSource()) {
             if (self.options.activeSourceType) {
               self.selectedSource(self.sourceIndex[self.options.activeSourceType]);
-              self.setDatabaseWhenLoaded();
             } else if (storageSourceType && self.sourceIndex[storageSourceType]) {
               self.selectedSource(self.sourceIndex[storageSourceType]);
-              self.setDatabaseWhenLoaded();
             }
           }
         }
@@ -2531,7 +2551,7 @@ from desktop.views import _ko
             sources[activeLocations.type] = {
               assistDbSource: new AssistDbSource({
                 i18n: i18n,
-                activeSourceContext: ko.observable(activeLocations.sourceContext),
+                initialNamespace: activeLocations.namespace,
                 type: activeLocations.type,
                 name: activeLocations.type,
                 navigationSettings: navigationSettings
@@ -2583,7 +2603,7 @@ from desktop.views import _ko
                   } else {
                     DataCatalog.getEntry({
                       sourceType: activeLocations.type,
-                      sourceContext: activeLocations.sourceContext,
+                      namespace: activeLocations.namespace,
                       path: [ database ],
                       definition: { type: 'database' }
                     }).done(function (catalogEntry) {
@@ -2639,7 +2659,7 @@ from desktop.views import _ko
                                   self.reloading(false)
                                 })
                               });
-                              DataCatalog.getEntry({ sourceType: activeLocations.type, sourceContext: activeLocations.sourceContext, path: [] }).done(function (sourceEntry) {
+                              DataCatalog.getEntry({ sourceType: activeLocations.type, namespace: activeLocations.namespace, path: [] }).done(function (sourceEntry) {
                                 sourceEntry.getChildren().done(function (dbEntries) {
                                   var clearPromise;
                                    // Clear the database first if it exists without cascade
@@ -2963,7 +2983,6 @@ from desktop.views import _ko
 
         self.disposals = [];
         self.isSolr = ko.observable(true);
-        self.activeSourceContext = ko.observable();
 
         self.filter = {
           querySpec: ko.observable({
@@ -2995,11 +3014,10 @@ from desktop.views import _ko
           if (!collectionName) {
             return;
           }
-          self.activeSourceContext(collection.activeSourceContext);
 
           var assistDbSource = new AssistDbSource({
             i18n : i18n,
-            activeSourceContext: collection.activeSourceContext,
+            initialNamespace: collection.activeNamespace,
             type: collection.engine(),
             name: collection.engine(),
             navigationSettings: navigationSettings
@@ -3011,14 +3029,14 @@ from desktop.views import _ko
 
           DataCatalog.getEntry({
             sourceType: sourceType,
-            sourceContext: collection.activeSourceContext,
+            namespace: collection.activeNamespace,
             path: [ fakeParentName ],
             definition: { type: 'database' }
           }).done(function (fakeDbCatalogEntry) {
             var assistFakeDb = new AssistDbEntry(fakeDbCatalogEntry, null, assistDbSource, self.filter, i18n, navigationSettings);
             DataCatalog.getEntry({
               sourceType: sourceType,
-              sourceContext: collection.activeSourceContext,
+              namespace: collection.activeNamespace,
               path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
               definition: { type: 'table' }
             }).done(function (collectionCatalogEntry) {

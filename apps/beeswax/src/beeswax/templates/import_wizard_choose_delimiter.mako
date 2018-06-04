@@ -197,10 +197,12 @@ ${ assist.assistPanel() }
 
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
+        // TODO: Handle namespaces
         location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
+        // TODO: Handle namespaces
         location.href = '/metastore/tables/' + databaseDef.name;
       });
     }

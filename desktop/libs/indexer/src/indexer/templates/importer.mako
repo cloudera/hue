@@ -2048,12 +2048,12 @@ ${ assist.assistPanel() }
       var self = this;
       var guessFieldTypesXhr;
 
-      self.activeSourceContext = ko.observable();
+      self.activeNamespace = ko.observable();
 
       // TODO: sourceType?
-      ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'hive' }).done(function (sourceContexts) {
-        // TODO: Context selection for create wizard
-        self.activeSourceContext(sourceContexts[0]);
+      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (namespaces) {
+        // TODO: Namespace selection for create wizard
+        self.activeNamespace(namespaces[0]);
       });
 
       self.fileType = ko.observable();
@@ -2322,13 +2322,13 @@ ${ assist.assistPanel() }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        DataCatalog.getEntry({ sourceType: snippet.type(), sourceContext: self.activeSourceContext(), path: [ db ]}).done(function (dbEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });
                       } else {
-                        DataCatalog.getEntry({ sourceType: snippet.type(), sourceContext: self.activeSourceContext(), path: []}).done(function (sourceEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })

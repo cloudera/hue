@@ -557,10 +557,12 @@ ${ assist.assistPanel() }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
+        // TODO: Handle namespaces
         location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
+        // TODO: Handle namespaces
         location.href = '/metastore/tables/' + databaseDef.name;
       });
     }

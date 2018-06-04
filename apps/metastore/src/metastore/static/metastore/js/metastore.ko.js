@@ -45,6 +45,7 @@ var MetastoreViewModel = (function () {
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
         source: self.sourceType(),
+        namespace: self.activeNamespace(),
         name: null
       });
     });
@@ -64,20 +65,20 @@ var MetastoreViewModel = (function () {
 
     self.currentTab = ko.observable('');
 
-    self.activeSourceContext = ko.observable();
-    self.sourceContexts = ko.observableArray();
+    self.activeNamespace = ko.observable();
+    self.namespaces = ko.observableArray();
 
-    self.activeSourceContext.subscribe(function () {
+    self.activeNamespace.subscribe(function () {
       self.lastLoadDatabasesPromise = null;
       self.loadDatabases()
     });
 
     self.database = ko.observable(null);
 
-    ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: self.sourceType() }).done(function (sourceContexts) {
-      // TODO: Context selection
-      self.sourceContexts(sourceContexts);
-      self.activeSourceContext(sourceContexts[0]);
+    ContextCatalog.getNamespaces({ sourceType: self.sourceType() }).done(function (namespaces) {
+      // TODO: Namespace selection
+      self.namespaces(namespaces);
+      self.activeNamespace(namespaces[0]);
     });
 
     huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
@@ -149,7 +150,15 @@ var MetastoreViewModel = (function () {
       });
     });
 
-    huePubSub.subscribe("assist.database.selected", function (databaseDef) {
+    huePubSub.subscribe('assist.database.selected', function (databaseDef) {
+      if (self.sourceType() !== databaseDef.sourceType) {
+        console.log(databaseDef.sourceType);
+        self.sourceType(databaseDef.sourceType);
+      }
+      if (self.activeNamespace() !== databaseDef.namespace) {
+        self.activeNamespace(databaseDef.namespace);
+      }
+      // TODO: Handle namespaces + sourceType
       if (self.database()) {
         self.database().table(null);
       }
@@ -218,7 +227,7 @@ var MetastoreViewModel = (function () {
 
   MetastoreViewModel.prototype.loadDatabases = function () {
     var self = this;
-    if (self.loadingDatabases() && lastLoadDatabasesPromise) {
+    if (self.loadingDatabases() && self.lastLoadDatabasesPromise) {
       return self.lastLoadDatabasesPromise;
     }
 
@@ -232,7 +241,7 @@ var MetastoreViewModel = (function () {
       self.loadingDatabases(false);
     });
 
-    DataCatalog.getEntry({ sourceContext: self.activeSourceContext(), sourceType: self.sourceType(), path: [], definition: { type: 'source' } }).done(function (entry) {
+    DataCatalog.getEntry({ namespace: self.activeNamespace(), sourceType: self.sourceType(), path: [], definition: { type: 'source' } }).done(function (entry) {
       self.catalogEntry(entry);
       entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {
@@ -248,6 +257,12 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadTableDef = function (tableDef, callback) {
     var self = this;
     self.loadingTable(true);
+    if (self.sourceType() !== tableDef.sourceType) {
+      self.sourceType(tableDef.sourceType);
+    }
+    if (self.activeNamespace() !== tableDef.namespace) {
+      self.activeNamespace(tableDef.namespace);
+    }
     self.setDatabaseByName(tableDef.database, function () {
       if (self.database()) {
         if (self.database().table() && self.database().table().catalogEntry.name === tableDef.name) {
@@ -332,7 +347,23 @@ var MetastoreViewModel = (function () {
           whenLoaded(true);
         });
       } else {
-        whenLoaded(true);
+        if (self.databases().length) {
+          whenLoaded(true);
+        } else {
+          if (!self.activeNamespace()) {
+            // TODO: Handle missing namespace in Table Browser
+            ContextCatalog.getNamespaces({ sourceType: self.sourceType() }).done(function (namespaces) {
+              self.activeNamespace(namespaces[0]);
+              self.loadDatabases().done(function () {
+                whenLoaded(true);
+              })
+            });
+          } else {
+            self.loadDatabases().done(function () {
+              whenLoaded(true);
+            })
+          }
+        }
       }
 
     }, 0);
@@ -372,7 +403,8 @@ var MetastoreViewModel = (function () {
         }, 'metastore');
         self.loadTableDef({
           name: path[2],
-          database: path[1]
+          database: path[1],
+          sourceType: self.sourceType()
         }, function(){
           if (path.length > 3 && path[3] === 'partitions'){
             huePubSub.subscribe('metastore.loaded.partitions', function() {
