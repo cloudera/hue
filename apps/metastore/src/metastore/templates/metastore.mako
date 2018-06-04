@@ -987,7 +987,7 @@ ${ components.menubar(is_embeddable) }
               <!-- ko component: {
                 name: 'hue-drop-down',
                 params: {
-                  icon: 'fa-snowflake-o',
+                  icon: 'fa-server',
                   value: activeSourceContext,
                   entries: sourceContexts,
                   searchable: true,

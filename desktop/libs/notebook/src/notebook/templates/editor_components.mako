@@ -942,6 +942,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
     <select data-bind="selectize: computes, value: selectedCompute" class="input-medium"></select>
+    ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-cluster', value: selectedCompute, entries: computes, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
 
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
