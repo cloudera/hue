@@ -194,24 +194,6 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div id="createDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
-      <!-- ko with: activeEntry -->
-      <form class="form-horizontal">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-          <h2 class="modal-title">${_('Create Directory')}</h2>
-        </div>
-        <div class="modal-body ">
-          <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
-        </div>
-        <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" value="${ _('Cancel') }">
-          <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { if ($('#newDirectoryName').val()) { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); } }"/>
-        </div>
-      </form>
-      <!-- /ko -->
-    </div>
-
     <div id="renameDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
@@ -336,7 +318,7 @@ from desktop.views import _ko
                       % endif
                       <li class="divider"></li>
                       <li data-bind="css: { 'disabled': isTrash() || isTrashed() || !canModify() }">
-                        <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
+                        <a href="javascript:void(0);" data-bind="click: function () {  huePubSub.publish('show.create.directory.modal', $data);showNewDirectoryModal() }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
                       </li>
                     </ul>
                   </span>

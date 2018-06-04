@@ -30,6 +30,7 @@
 <%namespace name="koSqlColumnsTable" file="/ko_components/ko_sql_columns_table.mako" />
 <%namespace name="koDeleteDocModal" file="/ko_components/ko_delete_doc_modal.mako" />
 <%namespace name="koSentryPrivileges" file="/ko_components/ko_sentry_privileges.mako" />
+<%namespace name="koCreateDirModal" file="/ko_components/ko_create_directory_modal.mako" />
 
 <%def name="all()">
   ${ koAppSwitcher.appSwitcher() }
@@ -48,4 +49,5 @@
   ${ koSqlColumnsTable.sqlColumnsTable() }
   ${ koDeleteDocModal.deleteDoc() }
   ${ koSentryPrivileges.sentryPrivileges() }
+  ${ koCreateDirModal.createDirectory() }
 </%def>
