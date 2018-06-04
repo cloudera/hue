@@ -49,13 +49,13 @@
     self._defaults = defaults;
     self._name = pluginName;
 
-    self.activeSourceContextDeferred = $.Deferred();
-    if (self.options.activeSourceContext) {
-      self.activeSourceContextDeferred.resolve(self.options.activeSourceContext);
+    self.activeContextNamespaceDeferred = $.Deferred();
+    if (self.options.activeNamespace) {
+      self.activeContextNamespaceDeferred.resolve(self.options.activeNamespace);
     } else {
-      ContextCatalog.getSourceContexts({ app: ContextCatalog.BROWSER_APP, sourceType: 'hive' }).done(function (sourceContexts) {
-        // TODO: Context selection in caller
-        self.activeSourceContextDeferred.resolve(sourceContexts[0]);
+      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (namespaces) {
+        // TODO: Namespace selection in caller
+        self.activeContextNamespaceDeferred.resolve(namespaces[0]);
       })
     }
 
@@ -240,8 +240,8 @@
 
     self.getDatabases = function (callback) {
       var self = this;
-      self.activeSourceContextDeferred.done(function (sourceContext) {
-        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, sourceContext: sourceContext, path: [] }).done(function (dbEntries) {
+      self.activeContextNamespaceDeferred.done(function (namespace) {
+        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, path: [] }).done(function (dbEntries) {
           callback($.map(dbEntries, function (entry) { return entry.name }));
         });
       })
@@ -249,8 +249,8 @@
 
     self.getTables = function (database, callback) {
       var self = this;
-      self.activeSourceContextDeferred.done(function (sourceContext) {
-        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, sourceContext: sourceContext, path: [ database ] }).done(function (entry) {
+      self.activeContextNamespaceDeferred.done(function (namespace) {
+        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, path: [ database ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });
@@ -258,8 +258,8 @@
 
     self.getColumns = function (database, table, callback) {
       var self = this;
-      self.activeSourceContextDeferred.done(function (sourceContext) {
-        DataCatalog.getEntry({sourceType: self.options.apiHelperType, sourceContext: sourceContext, path: [database, table]}).done(function (entry) {
+      self.activeContextNamespaceDeferred.done(function (namespace) {
+        DataCatalog.getEntry({sourceType: self.options.apiHelperType, namespace: namespace, path: [ database, table ]}).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });

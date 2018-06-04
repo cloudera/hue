@@ -1273,8 +1273,9 @@ var ApiHelper = (function () {
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {string} options.sourceContext
+   * @param {ContextNamespace} options.namespace
    * @param {boolean} [options.silenceErrors]
+   * @param {number} [options.timeout]
    *
    * @param {string[]} [options.path] - The path to fetch
    *
@@ -1296,7 +1297,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: '"' + options.sourceContext.id + '"'
+        cluster: '"' + options.namespace.id + '"'
       },
       timeout: options.timeout
     }).success(function (data) {
@@ -1368,6 +1369,7 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
+   * @param {ContextNamespace} [options.namespace]
    *
    * @param {string[]} options.path
    *
@@ -1397,8 +1399,8 @@ var ApiHelper = (function () {
       'format' : 'json'
     }
 
-    if (options.sourceContext && options.sourceContext.id) {
-      params['cluster'] = options.sourceContext.id;
+    if (options.namespace && options.namespace.id) {
+      params['cluster'] = options.namespace.id;
     }
 
     var request = self.simpleGet(url, params, {
@@ -1949,9 +1951,15 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.fetchSourceContexts = function (options) { // TODO rename
+  ApiHelper.prototype.fetchContextNamespaces = function (options) {
     var self = this;
     var url = '/desktop/api2/context/namespaces/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
+  };
+
+  ApiHelper.prototype.fetchContextComputes = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/computes/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 
