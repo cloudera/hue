@@ -272,6 +272,7 @@ def get_api(request, snippet):
       }]
     else:
       raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+
   interpreter = interpreter[0]
   interface = interpreter['interface']
 

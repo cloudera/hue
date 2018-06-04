@@ -32,7 +32,6 @@ from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
 from kafka.kafka_api import get_topics
 from librdbms.server import dbms as rdbms
-from libsentry.conf import is_enabled
 from metadata.manager_client import ManagerApi
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -302,6 +301,9 @@ def importer_submit(request):
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
+  elif source['inputFormat'] == 'altus':
+    # BDR copy or DistCP + DDL + Sentry DDL copy
+    pass
   elif source['inputFormat'] == 'rdbms':
     if destination['outputFormat'] in ('file', 'table', 'hbase'):
       job_handle = run_sqoop(request, source, destination, start_time)
