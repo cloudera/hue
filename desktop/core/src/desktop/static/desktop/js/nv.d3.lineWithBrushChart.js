@@ -47,7 +47,7 @@ nv.models.lineWithBrushChart = function() {
     , useInteractiveGuideline = false
     , tooltips = true
     , tooltip = null
-    , displayValuesInLegend = true
+    , displayValuesInLegend = false
     , tooltipSimple = function(value) {
       return '<h3>' + hueUtils.htmlEncode(value.key) + '</h3>' +
         '<p>' + hueUtils.htmlEncode(value.x) + '</p>';
@@ -105,13 +105,13 @@ nv.models.lineWithBrushChart = function() {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(lines.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex));
-        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
       });
     } else {
       values = tooltip((e.list || [e]).map(function (e) {
         var x = lines.x()(e.point, e.pointIndex),
         y = lines.y()(e.point, e.pointIndex);
-        return {x: x, y: y, key: displayValuesInLegend ? e.point.obj.field : e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
       }));
     }
 
@@ -133,7 +133,7 @@ nv.models.lineWithBrushChart = function() {
 
       var availableWidth = (width  || parseInt(container.style('width')) || 960)
                              - margin.left - margin.right,
-          availableChartWidth = Math.max(availableWidth - legendWidth, 0),
+          availableChartWidth = Math.max(availableWidth - showLegend * legendWidth, 0),
           availableHeight = (height || parseInt(container.style('height')) || 400)
                              - margin.top - margin.bottom;
 
@@ -918,6 +918,12 @@ nv.models.lineWithBrushChart = function() {
   chart.onLegendChange = function(_) {
     if (!arguments.length) return onLegendChange;
     onLegendChange = _;
+    return chart;
+  };
+
+  chart.displayValuesInLegend = function(_) {
+    if (!arguments.length) return displayValuesInLegend;
+    displayValuesInLegend = _;
     return chart;
   };
 

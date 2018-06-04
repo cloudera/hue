@@ -2588,7 +2588,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         facet.dimension(new_facet.dimension);
         facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
         facet.hideStacked = ko.computed(function () {
-          return !facet.extraSeries() || !facet.extraSeries().length;
+          return facet.dimension() != 2 && !facet.extraSeries().length;
+        });
+        facet.displayValuesInLegend = ko.computed(function () {
+          return !facet.hideStacked();
         });
         facet.selectedSerie = ko.observable({});
         facet.resultHash(_hash);
