@@ -941,9 +941,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
-    <select data-bind="selectize: computes, value: selectedCompute" class="input-medium"></select>
-    ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-cluster', value: selectedCompute, entries: computes, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
-
+    <!-- ko if: availableComputes().length > 1 -->
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: compute, entries: availableComputes, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
@@ -3270,7 +3270,7 @@ function togglePresentation(value) {};
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      var attachEntryResolver = function (location, sourceType, sourceContext) {
+      var attachEntryResolver = function (location, sourceType, namespace) {
         location.resolveCatalogEntry = function(options) {
           if (!options) {
             options = {};
@@ -3289,7 +3289,7 @@ function togglePresentation(value) {};
 
           var promise = SqlUtils.resolveCatalogEntry({
             sourceType: sourceType,
-            sourceContext: sourceContext,
+            namespace: namespace,
             cancellable: options.cancellable,
             cachedOnly: options.cachedOnly,
             identifierChain: location.identifierChain || location.colRef.identifierChain,
@@ -3341,7 +3341,7 @@ function togglePresentation(value) {};
             } else {
               if (e.data.locations) {
                 e.data.locations.forEach(function (location) {
-                  attachEntryResolver(location, e.data.sourceType, e.data.sourceContext);
+                  attachEntryResolver(location, e.data.sourceType, e.data.namespace);
                 })
               }
               huePubSub.publish('ace.sql.location.worker.message', e);
@@ -3363,7 +3363,7 @@ function togglePresentation(value) {};
           if (event.data.locationWorkerResponse) {
             if (event.data.locationWorkerResponse.locations) {
               event.data.locationWorkerResponse.locations.forEach(function (location) {
-                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType, event.data.locationWorkerResponse.sourceContext);
+                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType, event.data.locationWorkerResponse.namespace);
               })
             }
             huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
