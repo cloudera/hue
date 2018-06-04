@@ -110,6 +110,13 @@ ENABLE_KAFKA = Config(
   default=False
 )
 
+ENABLE_ALTUS = Config(
+  key="enable_altus",
+  help=_t("Flag to turn on Altus imports."),
+  type=bool,
+  default=False
+)
+
 # Unused
 BATCH_INDEXER_PATH = Config(
   key="batch_indexer_path",
