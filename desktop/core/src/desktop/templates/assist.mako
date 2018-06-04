@@ -615,6 +615,85 @@ from desktop.views import _ko
       <!-- ko if: !loading() -->
       <div class="highlightable" data-bind="css: { 'highlight': $parent.highlightTypeFilter() }, component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, searchable: true, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
+      <span class="dropdown new-document-drop-down">
+
+       <a class="inactive-action dropdown-toggle" data-toggle="dropdown" data-bind="dropdown" href="javascript:void(0);">
+            <i class="pointer fa fa-plus" title="${ _('New document') }"></i>
+          </a>
+       <ul class="dropdown-menu less-padding document-types" style="margin-top:30px; margin-left:300px; width: 175px;position: relative;" role="menu">
+           % if 'beeswax' in apps:
+             <li>
+               <a title="${_('Hive Query')}"
+               % if is_embeddable:
+                 data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': $data.getDirectory()}); }" href="javascript:void(0);"
+               % else:
+                 data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
+               % endif
+               >
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'hive' } } --><!-- /ko --> ${_('Hive Query')}
+               </a>
+             </li>
+           % endif
+           % if 'impala' in apps:
+             <li>
+               <a title="${_('Impala Query')}" class="dropdown-item"
+               % if is_embeddable:
+                 data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': $data.getDirectory()}); }" href="javascript:void(0);"
+               % else:
+                 data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
+               % endif
+               >
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'impala' } } --><!-- /ko --> ${_('Impala Query')}
+               </a>
+           </li>
+           % endif
+           <%
+           from notebook.conf import SHOW_NOTEBOOKS
+           %>
+           % if SHOW_NOTEBOOKS.get():
+             <li>
+               <a title="${_('Notebook')}" data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('notebook:index') }')">
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'notebook' } } --><!-- /ko --> ${_('Notebook')}
+               </a>
+             </li>
+           % endif
+           % if 'pig' in apps:
+             <li>
+               <a title="${_('Pig Script')}" data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('pig:index') }')">
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'pig' } } --><!-- /ko --> ${_('Pig Script')}
+               </a>
+             </li>
+           % endif
+           % if 'oozie' in apps:
+             <li>
+               <a title="${_('Oozie Workflow')}" data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
+               </a>
+             </li>
+             <li>
+               <a title="${_('Oozie Schedule')}" data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-coordinator' } } --><!-- /ko --> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
+               </a>
+             </li>
+             <li>
+               <a title="${_('Oozie Bundle')}" data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-bundle' } } --><!-- /ko --> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
+               </a>
+             </li>
+           % endif
+           % if 'search' in apps:
+             <li>
+               <a title="${_('Solr Search')}" data-bind="click: function() { $('.new-document-drop-down').removeClass('open');}, hueLink: $data.addDirectoryParamToUrl('${ url('search:new_search') }')">
+                 <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${_('Dashboard')}
+               </a>
+             </li>
+           % endif
+           <li class="divider"></li>
+           <li data-bind="css: { 'disabled': $data.isTrash() || $data.isTrashed() || !$data.canModify() }">
+             <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); $data.showNewDirectoryModal()}"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
+           </li>
+         </ul>
+      </span>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -939,6 +1018,15 @@ from desktop.views import _ko
 
 
     (function () {
+
+      ko.bindingHandlers.dropdown = {
+        init: function (element, valueAccessor) {
+          $(element).on('click', function (event) {
+            $(element).dropdown();
+          });
+        }
+      };
+
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
           var dragData;

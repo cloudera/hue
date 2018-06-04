@@ -28,6 +28,7 @@
 <%namespace name="koSimpleAceEditor" file="/ko_components/ko_simple_ace_editor.mako" />
 <%namespace name="koSqlColumnsTable" file="/ko_components/ko_sql_columns_table.mako" />
 <%namespace name="koDeleteDocModal" file="/ko_components/ko_delete_doc_modal.mako" />
+<%namespace name="koCreateDirModal" file="/ko_components/ko_create_directory_modal.mako" />
 
 <%def name="all()">
   ${ koBreadCrumbs.breadCrumbs() }
@@ -44,4 +45,5 @@
   ${ koSimpleAceEditor.simpleAceEditor() }
   ${ koSqlColumnsTable.sqlColumnsTable() }
   ${ koDeleteDocModal.deleteDoc() }
+  ${ koCreateDirModal.createDirectory() }
 </%def>
