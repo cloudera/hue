@@ -390,7 +390,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
                 <li class="nav-header">${_('Cell History:')}</li>
                 <li data-bind="css: { 'active': showingCurrent }"><a data-bind="click: switchToCurrent()" class="pointer">${_('Current Version')}<span data-bind="if: (originalValue !== value() && showingCurrent()) || (originalValue !== currentValue() && !showingCurrent())"> (${_('Edited')})</span></a></li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li data-bind="css: { 'active': $data.timestamp == $parent.timestamp() }"><a data-bind="click: function() { hbaseApp.switchToHistorical($data) }, text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
+                  <li data-bind="css: { 'active': $data.timestamp == $parent.timestamp() }"><a data-bind="click: function() { $parent.switchToHistorical($data) }, text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><i class="fa fa-spinner fa-spin"></i></li>
               </ul>
