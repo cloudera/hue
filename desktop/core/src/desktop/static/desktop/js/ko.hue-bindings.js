@@ -7340,4 +7340,10 @@
     };
   })();
 
+  ko.bindingHandlers.dropdown = {
+    init: function (element, valueAccessor) {
+        $(element).dropdown();
+    }
+  };
+
 })();
