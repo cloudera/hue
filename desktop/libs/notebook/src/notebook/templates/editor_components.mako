@@ -942,7 +942,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
     <!-- ko if: availableComputes().length > 1 -->
-    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: compute, entries: availableComputes, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-server', value: compute, entries: availableComputes, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
