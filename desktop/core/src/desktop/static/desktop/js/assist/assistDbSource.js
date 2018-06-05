@@ -117,7 +117,32 @@ var AssistDbSource = (function () {
   };
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
-    // TODO: Refresh namespaces
+    var self = this;
+    self.loading(true);
+    ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: true }).done(function (namespaces) {
+      var newNamespaces = [];
+      var existingNamespaceIndex = {};
+      self.namespaces().forEach(function (assistNamespace) {
+        existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
+      });
+      namespaces.forEach(function(newNamespace) {
+        if (existingNamespaceIndex[newNamespace.id]) {
+          existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
+          existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
+          newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
+        } else {
+          newNamespaces.push(new AssistDbNamespace({
+            sourceType: self.sourceType,
+            namespace: namespace,
+            i18n: self.i18n,
+            navigationSettings: self.navigationSettings
+          }));
+        }
+      });
+      self.namespaces(newNamespaces);
+    }).always(function () {
+      self.loading(false);
+    })
   };
 
   return AssistDbSource;
