@@ -764,6 +764,18 @@ from desktop.views import _ko
     <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${ _('Refresh') }</button></div>
   </script>
 
+  <script type="text/html" id="assist-namespace-header-actions">
+    <div class="assist-db-header-actions">
+      <!-- ko ifnot: loading -->
+      <span class="assist-tables-counter">(<span data-bind="text: filteredNamespaces().length"></span>)</span>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
+      <!-- /ko -->
+      <!-- ko if: loading -->
+      <i class="fa fa-refresh fa-spin blue" title="${_('Refresh')}"></i>
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="assist-db-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
@@ -819,6 +831,7 @@ from desktop.views import _ko
     <div class="assist-flex-header">
       <div class="assist-inner-header">
         ${_('Namespaces')}
+        <!-- ko template: 'assist-namespace-header-actions' --><!-- /ko -->
       </div>
     </div>
     <div class="assist-flex-search" data-bind="visible: hasNamespaces() && !hasErrors()">
