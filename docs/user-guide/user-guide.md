@@ -18,7 +18,7 @@
 
 # Concept
 Hue consists in 4 apps in a single page interface that allow the users to perform data
-analyzes without losing any context. The goal is to promote self service and stay simple like Excel
+analyses without losing any context. The goal is to promote self service and stay simple like Excel
 so that 80% of the user can find, explore and query data and become more data driven.
 
 **1. Find or import your data**
@@ -189,7 +189,7 @@ The goal of Hue's Editor is to make data querying easy and productive.
 
 It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
 
-The [http://gethue.com/custom-sql-query-editors/](customer SQL Editor page) also describes the configuration steps. Any editor can be `starred`
+The [custom SQL Editor page](http://gethue.com/custom-sql-query-editors/) also describes the configuration steps. Any editor can be `starred`
 next to its name so that it becomes the default editor and the landing page when logging in.
 
 First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
@@ -520,10 +520,10 @@ box will appear to enable you to specify the values of the variables.
 that appears if you specify variables for the job.</td></tr>
 <tr><td>Advanced</td><td>Advanced settings:<ul><li>Is shared- Indicate whether to share the action with all users.<li>Oozie parameters - parameters to pass to Oozie</td></tr>
 <tr><td>Prepare</td><td>Specifies paths to create or delete before starting the workflow job.</td></tr>
-<tr><td>Params</td>Parameters to pass to a script or command. The parameters are expressed
-using the [JSP 2.0 Specification (JSP.2.3) Expression
-Language](http://jcp.org/aboutJava/communityprocess/final/jsr152/),
-allowing variables, functions, and complex expressions as parameters.<td></td></tr>
+<tr><td>Params</td><td>Parameters to pass to a script or command. The parameters are expressed
+using the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr152/">JSP 2.0 Specification (JSP.2.3) Expression
+Language</a>,
+allowing variables, functions, and complex expressions as parameters.</td></tr>
 <tr><td>Job Properties</td><td>Job properties. To set a property value, click <b>Add Property</b>.<ol><li>Property name -  a configuration property name. This field provides autocompletion, so you can type the first few characters of a property name and then select the one you want from the drop-down
     list.<li>Valuethe property value.</td></tr>
 <tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
@@ -600,7 +600,7 @@ And how to use the [Spark Action](http://gethue.com/use-the-spark-action-in-oozi
 
 #### Interactive
 
-Hue relies on Livy (http://livy.io/) for the interactive Scala, Python and R snippets.
+Hue relies on [Livy](http://livy.io/) for the interactive Scala, Python and R snippets.
 
 Livy got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io. Here is a tutorial on how to use a notebook to perform some Bike Data analysis.
 
