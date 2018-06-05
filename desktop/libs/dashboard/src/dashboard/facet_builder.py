@@ -25,6 +25,7 @@ from datetime import datetime, timedelta
 from math import ceil
 from math import log
 from time import mktime
+from dateutil.relativedelta import *
 
 from django.utils.translation import ugettext as _
 
@@ -142,7 +143,7 @@ def _get_next_interval(interval, start_time, do_at_least_once):
   time = start_time
   while getattr(time, gap_duration_lowers) % gap_duration or (do_at_least_once and time == start_time): # Do while
     kwargs = {gap_duration_lower: 1}
-    time = time + timedelta(milliseconds=interval['base_ms'])
+    time = time + relativedelta(time, **kwargs)
   return time
 
 def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=None, gap=None, SLOTS=0, window_size=None):
