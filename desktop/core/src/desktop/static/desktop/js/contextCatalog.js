@@ -40,11 +40,17 @@ var ContextCatalog = (function () {
     /**
      * @param {Object} options
      * @param {string} options.sourceType
-     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.clearCache] - Default False
+     * @param {boolean} [options.silenceErrors] - Default False
      * @return {Promise}
      */
     ContextCatalog.prototype.getNamespaces = function (options) {
       var self = this;
+
+      if (options.clearCache) {
+        self.namespacePromises[options.sourceType] = undefined;
+        self.namespaces[options.sourceType] = undefined;
+      }
 
       if (self.namespacePromises[options.sourceType]) {
         return self.namespacePromises[options.sourceType];
@@ -79,7 +85,7 @@ var ContextCatalog = (function () {
     /**
      * @param {Object} options
      * @param {string} options.sourceType
-     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.silenceErrors] - Default False
      * @return {Promise}
      */
     ContextCatalog.prototype.getComputes = function (options) {
@@ -125,7 +131,8 @@ var ContextCatalog = (function () {
       /**
        * @param {Object} options
        * @param {string} options.sourceType
-       * @param {boolean} [options.silenceErrors]
+       * @param {boolean} [options.clearCache] - Default False
+       * @param {boolean} [options.silenceErrors] - Default False
        * @return {Promise}
        */
       getNamespaces: function (options) {
@@ -134,7 +141,7 @@ var ContextCatalog = (function () {
       /**
        * @param {Object} options
        * @param {string} options.sourceType
-       * @param {boolean} [options.silenceErrors]
+       * @param {boolean} [options.silenceErrors] - Default False
        * @return {Promise}
        */
       getComputes: function (options) {
