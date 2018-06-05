@@ -18,7 +18,7 @@
 
 # Concept
 Hue consists in 4 apps in a single page interface that allow the users to perform data
-analyzes without losing any context. The goal is to promote self service and stay simple like Excel
+analyses without losing any context. The goal is to promote self service and stay simple like Excel
 so that 80% of the user can find, explore and query data and become more data driven.
 
 **1. Find or import your data**
