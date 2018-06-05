@@ -742,36 +742,6 @@ from desktop.views import _ko
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="assist-sources-template">
-    <div class="assist-flex-header">
-      <div class="assist-inner-header">
-        ${_('Sources')}
-      </div>
-    </div>
-    <div class="assist-flex-fill">
-      <ul class="assist-tables" data-bind="foreach: sources">
-        <li class="assist-table">
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedSource($data); }"><i class="fa fa-fw fa-server muted valign-middle"></i> <span data-bind="text: name"></span></a>
-        </li>
-      </ul>
-    </div>
-  </script>
-
-  <script type="text/html" id="assist-namespaces-template">
-    <div class="assist-flex-header">
-      <div class="assist-inner-header">
-        ${_('Namespaces')}
-      </div>
-    </div>
-    <div class="assist-flex-fill">
-      <ul class="assist-tables" data-bind="foreach: namespaces">
-        <li class="assist-table">
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
-        </li>
-      </ul>
-    </div>
-  </script>
-
   <script type="text/html" id="ask-for-invalidate-title">
     &nbsp;<a class="pull-right pointer close-popover inactive-action">&times;</a>
   </script>
@@ -827,6 +797,63 @@ from desktop.views import _ko
       <!-- ko if: loading -->
       <i class="fa fa-refresh fa-spin blue" title="${_('Refresh')}"></i>
       <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-sources-template">
+    <div class="assist-flex-header">
+      <div class="assist-inner-header">
+        ${_('Sources')}
+      </div>
+    </div>
+    <div class="assist-flex-fill">
+      <ul class="assist-tables" data-bind="foreach: sources">
+        <li class="assist-table">
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedSource($data); }"><i class="fa fa-fw fa-server muted valign-middle"></i> <span data-bind="text: name"></span></a>
+        </li>
+      </ul>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-namespaces-template">
+    <div class="assist-flex-header">
+      <div class="assist-inner-header">
+        ${_('Namespaces')}
+      </div>
+    </div>
+    <div class="assist-flex-search" data-bind="visible: hasNamespaces() && !hasErrors()">
+      <div class="assist-filter">
+        <!-- ko component: {
+            name: 'inline-autocomplete',
+            params: {
+              querySpec: filter.querySpec,
+              facets: [],
+              knownFacetValues: {},
+              autocompleteFromEntries: autocompleteFromNamespaces
+            }
+          } --><!-- /ko -->
+      </div>
+    </div>
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: !hasErrors() && !loading() && hasNamespaces(), delayedOverflow">
+      <!-- ko if: !loading() && filteredNamespaces().length == 0 -->
+      <ul class="assist-tables">
+        <li class="assist-entry no-entries">${_('No results found')}</li>
+      </ul>
+      <!-- /ko -->
+      <ul class="assist-tables" data-bind="foreach: filteredNamespaces">
+        <li class="assist-table">
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
+        </li>
+      </ul>
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: loading">
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: hasErrors() && !loading()">
+      <span class="assist-errors">${ _('Error loading namespaces.') }</span>
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: !hasErrors() && !loading() && !hasNamespaces()">
+      <span class="assist-errors">${ _('No namespaces found.') }</span>
     </div>
   </script>
 
