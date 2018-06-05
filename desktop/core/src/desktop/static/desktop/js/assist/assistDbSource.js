@@ -40,6 +40,30 @@ var AssistDbSource = (function () {
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
 
+    self.filter = {
+      querySpec: ko.observable({}).extend({ rateLimit: 300 })
+    };
+
+    self.filteredNamespaces = ko.pureComputed(function () {
+      if (!self.filter.querySpec() || typeof self.filter.querySpec().query === 'undefined' || !self.filter.querySpec().query) {
+        return self.namespaces();
+      }
+      return self.namespaces().filter(function (namespace) {
+        return namespace.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1
+      });
+    });
+
+    self.autocompleteFromNamespaces = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.namespaces().forEach(function (namespace) {
+        if (namespace.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + namespace.name.substring(partial.length))
+        }
+      });
+      return result;
+    };
+
     self.selectedNamespace.subscribe(function (namespace) {
       if (namespace && !namespace.loaded() && !namespace.loading()) {
         namespace.initDatabases();
@@ -143,10 +167,6 @@ var AssistDbNamespace = (function () {
     self.filter = {
       querySpec: ko.observable({}).extend({ rateLimit: 300 })
     };
-
-    self.filterActive = ko.pureComputed(function () {
-      return self.filter.querySpec() && self.filter.querySpec().query !== '';
-    });
 
     self.hasEntries = ko.pureComputed(function() {
       return self.databases().length > 0;
