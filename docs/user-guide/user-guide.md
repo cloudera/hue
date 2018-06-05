@@ -517,10 +517,10 @@ box will appear to enable you to specify the values of the variables.
 that appears if you specify variables for the job.</td></tr>
 <tr><td>Advanced</td><td>Advanced settings:<ul><li>Is shared- Indicate whether to share the action with all users.<li>Oozie parameters - parameters to pass to Oozie</td></tr>
 <tr><td>Prepare</td><td>Specifies paths to create or delete before starting the workflow job.</td></tr>
-<tr><td>Params</td>Parameters to pass to a script or command. The parameters are expressed
+<tr><td>Params</td><td>Parameters to pass to a script or command. The parameters are expressed
 using the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr152/">JSP 2.0 Specification (JSP.2.3) Expression
 Language</a>,
-allowing variables, functions, and complex expressions as parameters.<td></td></tr>
+allowing variables, functions, and complex expressions as parameters.</td></tr>
 <tr><td>Job Properties</td><td>Job properties. To set a property value, click <b>Add Property</b>.<ol><li>Property name -  a configuration property name. This field provides autocompletion, so you can type the first few characters of a property name and then select the one you want from the drop-down
     list.<li>Valuethe property value.</td></tr>
 <tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
