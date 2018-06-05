@@ -413,22 +413,28 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
 
 
   <div class="container-fluid">
-  <div class="row-fluid">
-    %if is_embeddable:
-    <div class="span12 margin-top-20">
-    %else:
-    <div class="span12" data-bind="style:{'marginTop' : $root.isEditing() ? '120px': '50px'}">
-    %endif
-    <div class="object-name" style="text-align: center">
-      <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-    </div>
-    <div class="object-description" style="text-align: center; margin-top: 10px">
-      <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
-    </div>
+    <span class="pull-right">
+    <!-- ko if: availableComputes().length > 1 -->
+      <select data-bind="selectize: availableComputes, value: compute, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
+      ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: namespace, entries: availableNamespaces, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Namespaces') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
+    </span>
+      
+    <div class="row-fluid">
+      %if is_embeddable:
+      <div class="span12 margin-top-20">
+      %else:
+      <div class="span12" data-bind="style:{'marginTop' : $root.isEditing() ? '120px': '50px'}">
+      %endif
+      <div class="object-name" style="text-align: center">
+        <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+      </div>
+      <div class="object-description" style="text-align: center; margin-top: 10px">
+        <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
+      </div>
     </div>
   </div>
 </div>
-
 
 
 
