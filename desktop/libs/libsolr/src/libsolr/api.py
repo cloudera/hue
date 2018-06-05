@@ -254,8 +254,8 @@ class SolrApi(object):
       ('hl.fragsize', 1000),
     )
 
-    if query.get('timezone'):
-      params += (('TZ', query.get('timezone')),)
+    #if query.get('timezone'):
+    #  params += (('TZ', query.get('timezone')),)
 
     if collection['template']['fieldsSelected']:
       fields = []
@@ -951,12 +951,14 @@ class SolrApi(object):
         stat_facet = {'min': properties['min'], 'max': properties['max']}
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'],
                            SLOTS=properties['slot'])
+      gap = props['gap']
+      unit = re.split('\d+', gap)[1]
       return {
         'min': '%(min)s' % props,
         'max': '%(max)s' % props,
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
-        'gap': '%(gap)s' % props,  # add a 'auto'
+        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit},
       }
     elif timeFilter:
       props = {}
@@ -970,10 +972,12 @@ class SolrApi(object):
       else: # the user has zoomed in. Only show that section.
         stat_facet = {'min': properties['min'], 'max': properties['max']}
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS = properties['slot'])
+      gap = props['gap']
+      unit = re.split('\d+', gap)[1]
       return {
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
-        'gap': '%(gap)s' % props,  # add a 'auto'
+        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit},
         'min': '%(min)s' % props,
         'max': '%(max)s' % props,
       }
