@@ -78,15 +78,7 @@ class S3FileSystem(object):
     self._filebrowser_action = PERMISSION_ACTION_S3
 
   def _get_bucket(self, name):
-    try:
-      return self._s3_connection.get_bucket(name)
-    except S3FileSystemException, e:
-      raise e
-    except S3ResponseError, e:
-      raise S3FileSystemException(_('Failed to retrieve bucket: %s') % e.reason)
-    except Exception, e:
-      raise S3FileSystemException(_('Failed to retrieve bucket: %s') % e)
-
+    return self._s3_connection.get_bucket(name)
 
   def _get_or_create_bucket(self, name):
     try:
