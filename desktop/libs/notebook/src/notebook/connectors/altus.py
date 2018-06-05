@@ -19,6 +19,8 @@ import logging
 import json
 import subprocess
 
+from datetime import datetime,  timedelta
+
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -26,6 +28,8 @@ from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
+
+DATE_FORMAT = "%Y-%m-%d"
 
 
 def _exec(command, args):
@@ -68,6 +72,90 @@ class SdxApi():
     return _exec('sdx', args)['namespaces']
 
 
+class DataEngApi():
+
+  def __init__(self, user): pass
+
+  def list_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
+        creation_date_after=None, cluster_crn=None, order=None):
+    args = ['list-jobs']
+
+    if creation_date_after is None:
+      creation_date_after = (datetime.today() - timedelta(days=7)).strftime(DATE_FORMAT)
+
+    if submitter_crns:
+      args.extend(['--submitter-crns', submitter_crns])
+    if page_size is not None:
+      args.extend(['--page-size', str(page_size)])
+    if starting_token:
+      args.extend(['--starting-token', starting_token])
+    if job_statuses:
+      args.extend(['--job-statuses', job_statuses])
+    if job_ids:
+      args.extend(['--job-ids'] + job_ids)
+    if job_types:
+      args.extend(['--job-types', job_types])
+    if creation_date_before:
+      args.extend(['--creation-date-before', creation_date_before])
+    if creation_date_after:
+      args.extend(['--creation-date-after', creation_date_after])
+    if cluster_crn:
+      args.extend(['--cluster-crn', cluster_crn])
+    if order:
+      args.extend(['--order', order])
+
+    return _exec('dataeng', args)
+
+  def describe_job(self, job_id):
+    args = ['describe-job', '--job-id', job_id]
+
+    return _exec('dataeng', args)
+
+  def submit_hive_job(self, cluster_name, script, params=None, job_xml=None):
+    job = {'script': script}
+
+    if params:
+      job['params'] =  params
+    if job_xml:
+      job['jobXml'] =  job_xml
+
+    return self.submit_jobs(cluster_name, [{'hiveJob': job}])
+
+  def submit_spark_job(self):
+    return _exec('dataeng', ['submit-jobs'])
+
+  def submit_yarn_job(self):
+    return _exec('dataeng', ['submit-jobs'])
+
+  def submit_jobs(self, cluster_name, jobs):
+    return _exec('dataeng', ['submit-jobs', '--cluster-name', cluster_name, '--jobs', json.dumps(jobs)])
+
+  def terminate_job(self, job_id):
+    return _exec('dataeng', ['terminate-job', '--job-id', job_id])
+
+
+  def list_clusters(self, names=None, page_size=None, starting_token=None):
+    args = ['list-clusters']
+
+    if names:
+      args.extend(['--cluster-names', names])
+    if page_size is not None:
+      args.extend(['--page-size', str(page_size)])
+    if starting_token:
+      args.extend(['--starting-token', starting_token])
+
+    return _exec('dataeng', args)
+
+  def create_cluster(self):
+    return _exec('dataeng', ['create-cluster'])
+
+  def delete_cluster(self):
+    return _exec('dataeng', ['delete-cluster'])
+
+  def describe_clusters(self):
+    return _exec('dataeng', ['describe-cluster'])
+
+
 class AnalyticDbApi():
 
   def __init__(self, user): pass
@@ -96,4 +184,4 @@ class AnalyticDbApi():
     """
 
     args = ['list-clusters']
-    return _exec('analyticdb', args)['clusters']
+    return _exec('analyticdb', args)
