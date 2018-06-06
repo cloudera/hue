@@ -16,7 +16,7 @@
 
 var DataCatalog = (function () {
 
-  var STORAGE_POSTFIX = LOGGED_USERNAME; // TODO: Add flag for embedded mode
+  var STORAGE_POSTFIX = LOGGED_USERNAME;
 
   var DATA_CATALOG_VERSION = 4;
 
