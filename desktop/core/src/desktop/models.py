@@ -1820,13 +1820,15 @@ class ClusterConfig():
       })
 
     if 'sqoop' in self.apps and self.cluster_type != ANALYTIC_DB:
-      interpreters.append({
-        'type': 'sqoop',
-        'displayName': _('Sqoop'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Sqoop'),
-        'page': '/sqoop'
-      })
+      from sqoop.conf import IS_ENABLED
+      if IS_ENABLED.get():
+        interpreters.append({
+          'type': 'sqoop',
+          'displayName': _('Sqoop'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Sqoop'),
+          'page': '/sqoop'
+        })
 
     if interpreters:
       return {

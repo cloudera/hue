@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
+
 from sqoop.settings import NICE_NAME
 
 
@@ -41,6 +42,12 @@ SSL_CERT_CA_VERIFY = Config(
   type=coerce_bool
 )
 
+IS_ENABLED = Config(
+    key="is_enabled",
+    help=_t("If the Sqoop2 app is enabled. Sqoop2 project is deprecated. Sqoop1 is recommended."),
+    type=coerce_bool,
+    default=False
+)
 
 def config_validator(user):
   res = []

@@ -19,8 +19,8 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 from desktop.appmanager import get_apps_dict
-from notebook.conf import get_ordered_interpreters
 
+from notebook.conf import get_ordered_interpreters
 
 
 def is_enabled():
