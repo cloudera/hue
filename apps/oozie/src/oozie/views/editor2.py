@@ -46,6 +46,7 @@ from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_N
   _import_workspace, _save_workflow
 from oozie.utils import convert_to_server_timezone
 from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
+from notebook.connectors.dataeng import DataEngApi
 
 
 LOG = logging.getLogger(__name__)
@@ -390,6 +391,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
+    cluster = json.loads(request.POST.get('cluster', '{}'))
     params_form = ParametersFormSet(request.POST)
 
     if params_form.is_valid():
@@ -398,6 +400,12 @@ def _submit_workflow_helper(request, workflow, submit_action):
       mapping['send_email'] = request.POST.get('email_checkbox') == 'on'
       if '/submit_single_action/' in submit_action:
         mapping['submit_single_action'] = True
+
+      if cluster.get('type') == 'altus-de':
+        notebook = {}
+        snippet = {'statement': 'SELECT 1'}
+        # TODO: open in Job Browser, Jobs, compute context
+        print DataEngApi(user=request.user, request=request, cluster_name=cluster.get('name')).execute(notebook, snippet)
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
@@ -412,6 +420,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
+    cluster_json = request.GET.get('cluster', '{}')
     parameters = workflow and workflow.find_all_parameters() or []
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
@@ -424,7 +433,8 @@ def _submit_workflow_helper(request, workflow, submit_action):
                      'show_dryrun': True,
                      'email_id': request.user.email,
                      'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user),
-                     'return_json': request.GET.get('format') == 'json'
+                     'return_json': request.GET.get('format') == 'json',
+                     'cluster_json': cluster_json
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
