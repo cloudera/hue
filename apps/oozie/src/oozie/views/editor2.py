@@ -796,7 +796,7 @@ def save_bundle(request):
   if bundle_data['coordinators']:
     dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']])
     for doc in dependencies:
-      doc.doc.get().can_read_or_exception(request.user)
+      doc._get_doc1(doc2_type='coordinator2').can_read_or_exception(request.user)
     bundle_doc.dependencies = dependencies
 
   bundle_doc1 = bundle_doc.doc.get()
