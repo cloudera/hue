@@ -1255,28 +1255,51 @@ from desktop.views import _ko
             self.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
           });
 
-          var getPubDb  = function (source) {
-            var result = {
-              source: source,
-              namespace: { id: 'default' },
-              name: 'default'
-            };
-
-            if (self.sourceIndex[source] && self.sourceIndex[source].selectedNamespace()) {
-              result.namespace = self.sourceIndex[source].selectedNamespace().namespace;
-              if (self.sourceIndex[source].selectedNamespace().selectedDatabase()) {
-                result.name = self.sourceIndex[source].selectedNamespace().selectedDatabase().databaseName;
-              }
+          var getSelectedDatabase  = function (source) {
+            var deferred = $.Deferred();
+            var assistDbSource = self.sourceIndex[source];
+            if (assistDbSource) {
+              assistDbSource.loadedDeferred.done(function () {
+                if (assistDbSource.selectedNamespace()) {
+                  assistDbSource.selectedNamespace().loadedDeferred.done(function () {
+                    assistDbSource.selectedNamespace().namespace
+                    if (assistDbSource.selectedNamespace().selectedDatabase()) {
+                      deferred.resolve({
+                        sourceType: source,
+                        namespace: assistDbSource.selectedNamespace().namespace,
+                        name: assistDbSource.selectedNamespace().selectedDatabase()
+                      })
+                    } else {
+                      deferred.resolve({
+                        sourceType: source,
+                        namespace: assistDbSource.selectedNamespace().namespace,
+                        name: 'default'
+                      })
+                    }
+                  });
+                } else {
+                  deferred.resolve({
+                    sourceType: source,
+                    namespace: { id: 'default' },
+                    name: 'default'
+                  });
+                }
+              })
+            } else {
+              deferred.reject()
             }
-            return result;
+
+            return deferred;
           };
 
           huePubSub.subscribe('assist.get.database', function (source) {
-            huePubSub.publish('assist.database.set', getPubDb(source));
+            getSelectedDatabase(source).done(function (databaseDef) {
+              huePubSub.publish('assist.database.set', databaseDef);
+            })
           });
 
           huePubSub.subscribe('assist.get.database.callback',  function (options) {
-            options.callback(getPubDb(options.source));
+            getSelectedDatabase(options.source).done(options.callback);
           });
 
           huePubSub.subscribe('assist.get.source', function () {

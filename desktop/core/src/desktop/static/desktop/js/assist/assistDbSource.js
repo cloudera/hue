@@ -133,7 +133,7 @@ var AssistDbSource = (function () {
         } else {
           newNamespaces.push(new AssistDbNamespace({
             sourceType: self.sourceType,
-            namespace: namespace,
+            namespace: newNamespace,
             i18n: self.i18n,
             navigationSettings: self.navigationSettings
           }));
@@ -256,8 +256,8 @@ var AssistDbNamespace = (function () {
         if (!self.navigationSettings.rightAssist) {
           ApiHelper.getInstance().setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
           huePubSub.publish('assist.database.set', {
-            source: self.sourceType,
-            namespace: self.namespace.namespace,
+            sourceType: self.sourceType,
+            namespace: self.namespace,
             name: self.selectedDatabase().catalogEntry.name
           })
         }

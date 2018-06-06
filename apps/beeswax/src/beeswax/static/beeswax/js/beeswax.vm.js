@@ -92,7 +92,7 @@ function BeeswaxViewModel(server, apiHelper) {
   });
 
   huePubSub.subscribe("assist.database.set", function (database) {
-    if (database.source === type && self.database() !== database.name) {
+    if (database.sourceType === type && self.database() !== database.name) {
       self.database(database.name);
     }
   });
