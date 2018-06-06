@@ -2841,7 +2841,7 @@ viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
 var handleAssistSelection = function (databaseDef) {
-  if (databaseDef.source === snippetType && snippet.database() !== databaseDef.name) {
+  if (databaseDef.sourceType === snippetType && snippet.database() !== databaseDef.name) {
     snippet.database(databaseDef.name);
   }
 };
