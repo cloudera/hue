@@ -114,14 +114,17 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive':
+  if interface == 'hive' or interface == 'oozie':
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
-        'namespace': cluster['id'] # Dummy
+        'namespace': cluster['id'], # Dummy
+        'interface': interface,
+        'type': 'default'
       } for cluster in clusters
     ])
 
+  if interface == 'hive':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn', 'None'),
@@ -131,6 +134,7 @@ def get_context_computes(request, interface):
           # environmentType
           # secured
           # cdhVersion
+          'type': 'altus-adb'
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters']]
       )
 
@@ -142,6 +146,7 @@ def get_context_computes(request, interface):
           'status': cluster.get('status'),
           'environmentType': cluster.get('environmentType'),
           'serviceType': cluster.get('serviceType'),
+          'type': 'altus-de'
         } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
       )
 

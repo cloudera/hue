@@ -281,6 +281,7 @@ def get_api(request, snippet):
 
   # Multi cluster
   cluster = json.loads(request.POST.get('cluster', '""'))
+  print cluster
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
@@ -301,7 +302,7 @@ def get_api(request, snippet):
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'dataeng':
     from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get('name'))
   elif interface == 'jdbc' or interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApi
     return JdbcApi(request.user, interpreter=interpreter)
