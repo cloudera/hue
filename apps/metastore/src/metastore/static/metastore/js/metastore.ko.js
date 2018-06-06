@@ -152,7 +152,6 @@ var MetastoreViewModel = (function () {
 
     huePubSub.subscribe('assist.database.selected', function (databaseDef) {
       if (self.sourceType() !== databaseDef.sourceType) {
-        console.log(databaseDef.sourceType);
         self.sourceType(databaseDef.sourceType);
       }
       if (self.activeNamespace() !== databaseDef.namespace) {
