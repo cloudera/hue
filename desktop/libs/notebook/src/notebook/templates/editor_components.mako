@@ -942,10 +942,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
     <!-- ko if: availableComputes().length > 1 -->
-    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-server', value: compute, entries: availableComputes, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
+    <span class="editor-header-title">${ _('Namespace') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
+    <!-- ko if: availableComputes().length > 1 -->
+    <span class="editor-header-title">${ _('Compute') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
-    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
+    <span class="editor-header-title">${ _('Database') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
 
    <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
@@ -959,7 +965,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="snippet-header-statement-type${ suffix }">
   % if ENABLE_EXTERNAL_STATEMENT.get() and not IS_EMBEDDED.get():
   <!-- ko if: isSqlDialect() -->
-    <div class="margin-left-10 statement-type-selector" data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
+    <span class="editor-header-title">${ _('Type') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
   % endif
 </script>
