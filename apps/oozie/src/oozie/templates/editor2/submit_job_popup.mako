@@ -92,6 +92,9 @@
         % else:
           ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2"> ${_('profile.')} </a>
         % endif
+        % if cluster_json:
+          <input type="hidden" name="cluster" value="${ cluster_json }"></input>
+        % endif
         </label>
         %endif       
       % if return_json:
