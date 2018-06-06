@@ -1305,7 +1305,7 @@ DJANGO_ADMINS = UnspecifiedConfigSection(
 
 DJANGO_DEBUG_MODE = Config(
   key="django_debug_mode",
-  help=_("Enable or disable Django debug mode."),
+  help=_("Enable or disable debug mode."),
   type=coerce_bool,
   default=True
 )
