@@ -44,7 +44,7 @@ def collections(request, is_redirect=False):
 
 
 def indexes(request, index=''):
-  if not request.user.has_hue_permission(action="access", app='search'):
+  if not request.user.has_hue_permission(action="access", app='indexer'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
   return render('indexes.mako', request, {

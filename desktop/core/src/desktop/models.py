@@ -1760,7 +1760,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+    if 'indexer' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
