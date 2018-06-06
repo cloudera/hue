@@ -32,6 +32,9 @@ class Command(BaseCommand):
   args = "[appname]"
   label = _('application name')
 
+  def add_arguments(self, parser):
+    parser.add_argument('args', nargs='*')
+
   def handle(self, *args, **options):
     if len(args) > 2 or len(args) == 0:
       raise CommandError(_("Expected arguments: app_name [app_dir]"))

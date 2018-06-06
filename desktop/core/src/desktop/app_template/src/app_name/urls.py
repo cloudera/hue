@@ -16,7 +16,8 @@
 # limitations under the License.
 
 from django.conf.urls import url
+from ${app_name} import views
 
 urlpatterns = [
-  url(r'^$', ${app_name}.views.index),
+  url(r'^$', views.index),
 ]
