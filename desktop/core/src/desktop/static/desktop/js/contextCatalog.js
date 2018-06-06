@@ -22,7 +22,10 @@
 
 var ContextCatalog = (function () {
 
+  var STORAGE_POSTFIX = LOGGED_USERNAME;
   var CONTEXT_CATALOG_VERSION = 1;
+  var NAMESPACES_CONTEXT_TYPE = 'namespaces';
+  var COMPUTES_CONTEXT_TYPE = 'computes';
 
   var ContextCatalog = (function () {
 
@@ -33,9 +36,40 @@ var ContextCatalog = (function () {
 
       self.computes = {};
       self.computePromises = {};
-
-      // TODO: Add caching
     }
+
+    ContextCatalog.prototype.getStore = function () {
+      if (!self.store) {
+        self.store = localforage.createInstance({
+          name: 'HueContextCatalog_' + STORAGE_POSTFIX
+        });
+      }
+      return self.store;
+    };
+
+    ContextCatalog.prototype.saveLater = function (contextType, sourceType, entry) {
+      var self = this;
+      window.setTimeout(function () {
+        self.getStore().setItem(sourceType + '_' + contextType, { version: CONTEXT_CATALOG_VERSION, entry: entry });
+      }, 1000);
+    };
+
+    ContextCatalog.prototype.getSaved = function (contextType, sourceType) {
+      var self = this;
+      var deferred = $.Deferred();
+      self.getStore().getItem(sourceType + '_' + contextType).then(function (saved) {
+        if (saved && saved.version === CONTEXT_CATALOG_VERSION) {
+          deferred.resolve(saved.entry);
+        } else {
+          deferred.reject();
+        }
+      }).catch(function (error) {
+        console.warn(error);
+        deferred.reject();
+      });
+
+      return deferred.promise();
+    };
 
     /**
      * @param {Object} options
@@ -62,22 +96,34 @@ var ContextCatalog = (function () {
       }
 
       var deferred = $.Deferred();
+
       self.namespacePromises[options.sourceType] = deferred.promise();
 
-      ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
-        if (namespaces[options.sourceType]) {
-          var namespaces = namespaces[options.sourceType];
-          if (namespaces) {
-            self.namespaces[self.sourceType] = namespaces;
-            deferred.resolve(self.namespaces[self.sourceType])
-            // TODO: save
+      var fetchNamespaces = function () {
+        ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
+          if (namespaces[options.sourceType]) {
+            var namespaces = namespaces[options.sourceType];
+            if (namespaces) {
+              self.namespaces[self.sourceType] = namespaces;
+              deferred.resolve(self.namespaces[self.sourceType]);
+              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, namespaces);
+            } else {
+              deferred.reject();
+            }
           } else {
             deferred.reject();
           }
-        } else {
-          deferred.reject();
-        }
-      });
+        });
+      };
+
+      if (!options.clearCache) {
+        self.getSaved(NAMESPACES_CONTEXT_TYPE, options.sourceType).done(function (namespaces) {
+          self.namespaces[options.sourceType] = namespaces;
+          deferred.resolve(self.namespaces[options.sourceType]);
+        }).fail(fetchNamespaces);
+      } else {
+        fetchNamespaces();
+      }
 
       return self.namespacePromises[options.sourceType];
     };
