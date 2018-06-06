@@ -344,10 +344,13 @@ from desktop.views import _ko
   <script type="text/html" id="assist-solr-inner-panel">
     <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
     <!-- ko with: selectedSource -->
-    <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-    <!-- ko with: selectedDatabase -->
-    <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
-    <!-- /ko -->
+      <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' }--><!-- /ko -->
+      <!-- ko with: selectedNamespace -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+        <!-- ko with: selectedDatabase -->
+          <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
+        <!-- /ko-->
+      <!-- /ko -->
     <!-- /ko -->
   </script>
 
