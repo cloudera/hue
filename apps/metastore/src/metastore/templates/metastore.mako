@@ -83,13 +83,35 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-breadcrumbs">
   <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
+    <!-- ko if: namespaces().length > 1-->
+    <li>
+      <a href="javascript:void(0);" data-bind="click: namespacesBreadcrumb">${_('Namespaces')}
+        <!-- ko if: namespace -->
+        <span class="divider">&gt;</span>
+        <!-- /ko -->
+      </a>
+    </li>
+    <!-- /ko -->
+    <!-- ko if: namespaces().length <= 1-->
     <li>
       <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}
+        <!-- ko if: namespace() && namespace().database() -->
+        <span class="divider">&gt;</span>
+        <!-- /ko -->
+      </a>
+    </li>
+    <!-- /ko -->
+    <!-- ko with: namespace -->
+    <!-- ko if: $parent.namespaces().length > 1 -->
+    <li>
+      <a href="javascript:void(0);" data-bind="click: $root.databasesBreadcrumb">
+        <span data-bind="text: namespace.name"></span>
         <!-- ko if: database -->
         <span class="divider">&gt;</span>
         <!-- /ko -->
       </a>
     </li>
+    <!-- /ko -->
     <!-- ko with: database -->
     <li>
       <a href="javascript:void(0);" data-bind="click: $root.tablesBreadcrumb">
@@ -110,6 +132,7 @@ ${ components.menubar(is_embeddable) }
         <input type="text" data-bind="hivechooser: { data: catalogEntry.name, database: $parent.catalogEntry. name, skipColumns: true, searchEverywhere: true, onChange: function(val) { $parent.setTableByName(val); $parent.editingTable(false); }, apiHelperUser: '${ user }', apiHelperType: $root.sourceType()}" autocomplete="off" />
       </li>
       <!-- /ko -->
+    <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
   </ul>
@@ -328,6 +351,33 @@ ${ components.menubar(is_embeddable) }
     </div>
     <!-- /ko -->
   <!-- /ko -->
+</script>
+
+<script type="text/html" id="metastore-namespaces">
+  <div class="entries-table-container">
+    <div class="actionbar-actions">
+
+    </div>
+    <div class="entries-table-no-header">
+      <div class="catalog-entries-list-container">
+        <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
+        <!-- ko if: !loading() -->
+        <table id="entryTable" class="table table-condensed table-nowrap">
+          <thead>
+            <tr>
+              <th>${ _("Namespace") }</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: namespaces">
+            <tr>
+              <td><a href="javascript: void(0);" data-bind="text: namespace.name, click: function () { $parent.namespace($data) }"></a></td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- /ko -->
+      </div>
+    </div>
+  </div>
 </script>
 
 <script type="text/html" id="metastore-databases">
@@ -664,7 +714,6 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
 </script>
 
-
 <script type="text/html" id="metastore-sample-tab">
   <!-- ko with: samples -->
   <!-- ko if: loading -->
@@ -682,7 +731,6 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
   <!-- /ko -->
 </script>
-
 
 <script type="text/html" id="metastore-permissions-tab">
   <div class="acl-panel-content" style="height: 988px;">
@@ -984,17 +1032,7 @@ ${ components.menubar(is_embeddable) }
           <!-- ko ifnot: loading -->
           <h1>
             <div class="inline-block pull-right">
-              <!-- ko component: {
-                name: 'hue-drop-down',
-                params: {
-                  icon: 'fa-snowflake-o',
-                  value: activeNamespace,
-                  entries: namespaces,
-                  searchable: true,
-                  labelAttribute: 'name',
-                  linkTitle: 'Active context'
-                 }
-               } --><!-- /ko -->
+              <!-- ko with: namespace -->
               <!-- ko with: database -->
               <!-- ko with: table -->
               % if USE_NEW_EDITOR.get():
@@ -1022,10 +1060,14 @@ ${ components.menubar(is_embeddable) }
               <!-- ko if: !database() -->
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
+              <!-- /ko -->
             </div>
 
             <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
           </h1>
+
+          <!-- ko template: { if: !loading() && namespace() === null, name: 'metastore-namespaces' } --><!-- /ko -->
+          <!-- ko with: namespace -->
           <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
           <!-- ko with: database -->
           <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
@@ -1035,11 +1077,13 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
+          <!-- /ko -->
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ko with: namespace() -->
   <div id="dropSingleTable" class="modal hide fade">
     % if is_embeddable:
     <form data-bind="submit: dropAndWatch" method="POST">
@@ -1064,7 +1108,7 @@ ${ components.menubar(is_embeddable) }
       </div>
     </form>
   </div>
-
+  <!-- /ko -->
   <div id="import-data-modal" class="modal hide fade" style="display: block;width: 680px;margin-left: -340px!important;"></div>
 </div>
 </span>
