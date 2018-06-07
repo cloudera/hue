@@ -118,8 +118,8 @@
                 });
 
                 _command.onAdd = function (map) {
-                  var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar");
-                  div.innerHTML = '<label class="checkbox" style="font-size: 11px"><input id="command' + $(element).parents(".card-widget").attr("id") + '" type="checkbox"/> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</label>';
+                  var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar leaflet-move-label");
+                  div.innerHTML = '<button id="command' + $(element).parents(".card-widget").attr("id") + '" type="button" class="btn btn-mini disable-feedback"><i class="fa fa-fw fa-square-o"></i> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</button>';
                   return div;
                 };
 
@@ -133,8 +133,10 @@
                 var _onRegionChange = function () {
                 };
 
-                $("#command" + $(element).parents(".card-widget").attr("id")).on("change", function () {
-                  if ($(this).is(":checked")) {
+                $('#command' + $(element).parents('.card-widget').attr('id')).on('click', function (e) {
+                  $(this).toggleClass('btn-primary');
+                  $(this).find('.fa-fw').toggleClass('fa-check-square');
+                  if ($(this).hasClass("btn-primary")) {
                     if (_options.onRegionChange != null) {
                       _onRegionChange = _options.onRegionChange;
                     }
@@ -145,8 +147,8 @@
                   }
                 });
 
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-                  $("#command" + $(element).parents(".card-widget").attr("id")).off("change");
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                  $('#command' + $(element).parents('.card-widget').attr('id')).off('click');
                 });
 
                 _map.on("boxzoomend", function (e) {
