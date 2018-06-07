@@ -388,8 +388,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
          </a>
     </div>
     % if HAS_REPORT_ENABLED.get():
-    <div data-bind="visible: $root.collection.supportAnalytics(),
-                    css: { 'draggable-widget': true, 'disabled': false },
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableDocument(), isEnabled: true,
                     options: getDraggableOptions({ data: draggableDocument() }) }"
          title="${_('Document')}" rel="tooltip" data-placement="top">
@@ -5067,7 +5066,7 @@ $(document).ready(function () {
 
           selectedWidget = widget;
 
-          if (searchViewModel.collection.template.availableWidgetFields().length == 1) {
+          if (searchViewModel.collection.template.availableWidgetFields().length == 1 || widget.widgetType() == 'document-widget') {
             addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
           }
           else {
@@ -5106,7 +5105,7 @@ $(document).ready(function () {
         selectedWidget = widget;
         selectedRow = target;
 
-        if (searchViewModel.collection.template.availableWidgetFields().length == 1 || widget.widgetType() == 'document-widget') {
+        if (searchViewModel.collection.template.availableWidgetFields().length == 1) {
           addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
         }
         else {
@@ -5126,7 +5125,7 @@ $(document).ready(function () {
       selectedWidget.hasBeenSelected = true;
       selectedWidget.isLoading(true);
       searchViewModel.collection.addFacet({
-        'name': field.name(),
+        'name': field ? field.name() : 'Query',
         'widget_id': selectedWidget.id(),
         'widgetType': selectedWidget.widgetType()
       }, function () {

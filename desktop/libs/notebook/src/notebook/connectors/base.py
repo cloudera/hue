@@ -244,6 +244,9 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
 
+  if snippet['type'] == 'report':
+    snippet['type'] = 'impala'
+
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     if snippet['type'] == 'hbase':
