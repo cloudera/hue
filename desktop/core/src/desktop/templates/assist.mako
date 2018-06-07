@@ -311,7 +311,7 @@ from desktop.views import _ko
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
-        <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
+        <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-snowflake-o': selectedSource().namespaces().length > 1, 'fa-server': selectedSource().namespaces().length <= 1 }"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
       </a>
       <!-- /ko -->
@@ -1336,7 +1336,9 @@ from desktop.views import _ko
               if (self.selectedSource().selectedNamespace().selectedDatabase()) {
                 return self.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name
               }
-              return self.selectedSource().selectedNamespace().name
+              if (self.selectedSource().namespaces().length > 1) {
+                return self.selectedSource().selectedNamespace().name
+              }
             }
             return self.selectedSource().name;
           }
@@ -1350,8 +1352,10 @@ from desktop.views import _ko
           if (self.selectedSource() && self.selectedSource().selectedNamespace()) {
             if (self.selectedSource().selectedNamespace().selectedDatabase()) {
               self.selectedSource().selectedNamespace().selectedDatabase(null);
-            } else {
+            } else if (self.selectedSource().namespaces().length > 1) {
               self.selectedSource().selectedNamespace(null)
+            } else {
+              self.selectedSource(null);
             }
           } else {
             self.selectedSource(null);
