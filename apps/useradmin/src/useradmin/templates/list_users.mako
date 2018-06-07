@@ -49,10 +49,11 @@ ${layout.menubar(section='users')}
             %endif
 
             % if is_ldap_setup:
-            <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
-            <a href="javascript:void(0)" class="btn confirmationModal"
-               data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}"><i
-                class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
+              <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+              <a href="javascript:void(0)" class="btn confirmationModal"
+                 data-confirmation-url="${ url('useradmin_views_sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}">
+                 <i class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}
+              </a>
             % endif
 
             <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/"
