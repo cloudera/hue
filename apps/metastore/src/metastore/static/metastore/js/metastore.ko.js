@@ -33,8 +33,6 @@ var MetastoreViewModel = (function () {
     self.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     self.sourceType = ko.observable(options.sourceType || 'hive');
 
-    self.catalogEntry = ko.observable();
-
     self.navigatorEnabled.subscribe(function (newValue) {
       huePubSub.publish('meta.navigator.enabled', newValue);
     });
@@ -45,40 +43,24 @@ var MetastoreViewModel = (function () {
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
         source: self.sourceType(),
-        namespace: self.activeNamespace(),
+        namespace: self.namespace(),
         name: null
       });
     });
 
     self.reloading = ko.observable(false);
-    self.loadingDatabases = ko.observable(false);
-    self.loadingTable = ko.observable(false);
-    self.lastLoadDatabasesPromise = null;
-
-    self.loading = ko.pureComputed(function () {
-      return self.loadingDatabases() || self.loadingTable() || self.reloading();
-    });
-
-    self.databases = ko.observableArray();
-
-    self.selectedDatabases = ko.observableArray();
+    self.loading = ko.observable(false);
 
     self.currentTab = ko.observable('');
 
-    self.activeNamespace = ko.observable();
+    self.lastLoadNamespacesDeferred = $.Deferred();
+    self.namespace = ko.observable();
     self.namespaces = ko.observableArray();
 
-    self.activeNamespace.subscribe(function () {
-      self.lastLoadDatabasesPromise = null;
-      self.loadDatabases()
-    });
-
-    self.database = ko.observable(null);
-
-    ContextCatalog.getNamespaces({ sourceType: self.sourceType() }).done(function (namespaces) {
-      // TODO: Namespace selection
-      self.namespaces(namespaces);
-      self.activeNamespace(namespaces[0]);
+    self.namespace.subscribe(function () {
+      if (self.namespace() && self.namespace().databases().length === 0) {
+        self.namespace().loadDatabases();
+      }
     });
 
     huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
@@ -88,20 +70,29 @@ var MetastoreViewModel = (function () {
         return;
       }
 
+      var prevNamespaceId = null;
       var prevDbName = null;
       var prevTableName = null;
-      if (self.database()) {
-        prevDbName = self.database().catalogEntry.name;
-        if (self.database().table()) {
-          prevTableName = self.database().table().catalogEntry.name;
+      if (self.namespace()) {
+        prevNamespaceId = self.namespace().namespace.id;
+        if (self.namespace().database()) {
+          prevDbName = self.namespace().database().catalogEntry.name;
+          if (self.namespace().database().table()) {
+            prevTableName = self.namespace().database().table().catalogEntry.name;
+          }
+
         }
       }
 
       var setPrevious = function () {
-        if (prevDbName) {
-          self.setDatabaseByName(prevDbName, function () {
-            if (self.database() && prevTableName) {
-              self.database().setTableByName(prevTableName);
+        if (prevNamespaceId) {
+          self.setNamespaceById(prevNamespaceId).done(function () {
+            if (prevDbName) {
+              self.namespace().setDatabaseByName(prevDbName, function () {
+                if (self.namespace().database() && prevTableName) {
+                  self.namespace().database().setTableByName(prevTableName);
+                }
+              });
             }
           });
         }
@@ -109,28 +100,31 @@ var MetastoreViewModel = (function () {
 
       var completeRefresh = function () {
         self.reloading(true);
-        if (self.database() && self.database().table()) {
-          self.database().table(null);
+        if (self.namespace() && self.namespace().database() && self.namespace().database().table()) {
+          self.namespace().database().table(null);
         }
-        if (self.database()) {
-          self.database(null);
+        if (self.namespace() && self.namespace().database()) {
+          self.namespace().database(null);
         }
-        self.loadDatabases().done(setPrevious).always(function () {
+        if (self.namespace()) {
+          self.namespace(null);
+        }
+        self.loadNamespaces().done(setPrevious).always(function () {
           self.reloading(false);
         });
       };
 
       if (refreshedEntry.isSource()) {
         completeRefresh();
-      } else if (refreshedEntry.isDatabase()) {
-        self.databases().some(function (database) {
+      } else if (refreshedEntry.isDatabase() && self.namespace()) {
+        self.namespace().databases().some(function (database) {
           if (database.catalogEntry === refreshedEntry) {
             database.load(setPrevious, self.optimizerEnabled(), self.navigatorEnabled());
             return true;
           }
         })
       } else if (refreshedEntry.isTableOrView()) {
-        self.databases().some(function (database) {
+        self.namespace().databases().some(function (database) {
           if (database.catalogEntry.name === refreshedEntry.path[0]) {
             database.tables().some(function (table) {
               if (table.catalogEntry.name === refreshedEntry.name) {
@@ -154,12 +148,12 @@ var MetastoreViewModel = (function () {
       if (self.sourceType() !== databaseDef.sourceType) {
         self.sourceType(databaseDef.sourceType);
       }
-      if (self.activeNamespace() !== databaseDef.namespace) {
-        self.activeNamespace(databaseDef.namespace);
+      if (self.namespace() !== databaseDef.namespace) {
+        self.namespace(databaseDef.namespace);
       }
       // TODO: Handle namespaces + sourceType
-      if (self.database()) {
-        self.database().table(null);
+      if (self.namespace() && self.database()) {
+        self.namespace().database().table(null);
       }
       self.setDatabaseByName(databaseDef.name, function () {
         huePubSub.publish('metastore.url.change')
@@ -171,101 +165,103 @@ var MetastoreViewModel = (function () {
       if (self.isHue4()){
         prefix = '/hue' + prefix;
       }
-      if (self.database() && self.database().table()) {
-        hueUtils.changeURL(prefix + 'table/' + self.database().table().catalogEntry.path.join('/'));
-      }
-      else if (self.database()) {
-        hueUtils.changeURL(prefix + 'tables/' + self.database().catalogEntry.name);
-      }
-      else {
-        hueUtils.changeURL(prefix + 'databases');
+      if (self.namespace()) {
+        if (self.namespace().database() && self.namespace().database().table()) {
+          hueUtils.changeURL(prefix + 'table/' + self.namespace().database().table().catalogEntry.path.join('/'));
+        }
+        else if (self.namespace().database()) {
+          hueUtils.changeURL(prefix + 'tables/' + self.namespace().database().catalogEntry.name);
+        }
+        else {
+          hueUtils.changeURL(prefix + 'databases');
+        }
       }
     });
 
-    self.loadURL();
+    self.loadNamespaces().done(function () {
+      self.loadUrl();
+    });
 
     window.onpopstate = function () {
       if (window.location.pathname.indexOf('/metastore') > -1) {
-        self.loadURL();
+        self.loadUrl();
       }
     };
 
-    self.databasesBreadcrumb = function () {
-      if (self.database()) {
-        self.database().table(null);
+    self.namespacesBreadcrumb = function () {
+      if (self.namespace() && self.namespace().database()) {
+        self.namespace().database().table(null);
       }
-      self.database(null);
+      if (self.namespace()) {
+        self.namespace().database(null)
+      }
+      self.namespace(null);
+      huePubSub.publish('metastore.url.change');
+    };
+
+    self.databasesBreadcrumb = function () {
+      if (self.namespace().database()) {
+        self.namespace().database().table(null);
+      }
+      self.namespace().database(null);
       huePubSub.publish('metastore.url.change');
     };
 
     self.tablesBreadcrumb = function () {
-      self.database().table(null);
+      self.namespace().database().table(null);
       huePubSub.publish('metastore.url.change')
     }
   }
 
-  MetastoreViewModel.prototype.onDatabaseClick = function (catalogEntry) {
+  MetastoreViewModel.prototype.loadNamespaces = function () {
     var self = this;
-
-    self.databases().some(function (database) {
-      if (database.catalogEntry === catalogEntry) {
-        self.setDatabase(database, function() { huePubSub.publish('metastore.url.change') });
-        return true;
-      }
-    });
+    self.lastLoadNamespacesDeferred = $.Deferred();
+    ContextCatalog.getNamespaces({ sourceType: self.sourceType() }).done(function (namespaces) {
+      self.namespaces($.map(namespaces, function (namespace) {
+        return new MetastoreNamespace({
+          metastoreViewModel: self,
+          sourceType: self.sourceType,
+          navigatorEnabled: self.navigatorEnabled,
+          optimizerEnabled: self.optimizerEnabled,
+          namespace: namespace
+        });
+      }));
+      self.namespace(self.namespaces()[0]);
+      self.lastLoadNamespacesDeferred.resolve();
+    }).fail(self.lastLoadNamespacesDeferred.reject);
+    return self.lastLoadNamespacesDeferred;
   };
 
-  MetastoreViewModel.prototype.reload = function () {
+  MetastoreViewModel.prototype.setNamespaceById = function (namespaceId) {
     var self = this;
-    if (!self.reloading() && self.catalogEntry()) {
-      self.reloading(true);
-      // Clear will publish when done
-      self.catalogEntry().clearCache({ invalidate: self.catalogEntry().getSourceType() === 'impala' ? 'invalidate' : 'cache' });
-    }
-  };
-
-  MetastoreViewModel.prototype.loadDatabases = function () {
-    var self = this;
-    if (self.loadingDatabases() && self.lastLoadDatabasesPromise) {
-      return self.lastLoadDatabasesPromise;
-    }
-
-    self.loadingDatabases(true);
     var deferred = $.Deferred();
-    self.lastLoadDatabasesPromise = deferred.promise();
+    self.lastLoadNamespacesDeferred.done(function () {
+      var found = self.namespaces().some(function (namespace) {
+        if (namespace.namespace.id === namespaceId) {
+          self.namespace(namespace);
+          return true;
+          deferred.resolve();
+        }
+      });
+      if (!found) {
+        deferred.reject();
+      }
+    }).fail(deferred.reject);
+    return deferred.promise();
+  }
 
-    deferred.fail(function () {
-      self.databases([]);
-    }).always(function () {
-      self.loadingDatabases(false);
-    });
-
-    DataCatalog.getEntry({ namespace: self.activeNamespace(), sourceType: self.sourceType(), path: [], definition: { type: 'source' } }).done(function (entry) {
-      self.catalogEntry(entry);
-      entry.getChildren().done(function (databaseEntries) {
-        self.databases($.map(databaseEntries, function (databaseEntry) {
-          return new MetastoreDatabase({ catalogEntry: databaseEntry, optimizerEnabled: self.optimizerEnabled, metastoreViewModel: self });
-        }));
-        deferred.resolve();
-      }).fail(deferred.reject);
-    });
-
-    return self.lastLoadDatabasesPromise;
-  };
 
   MetastoreViewModel.prototype.loadTableDef = function (tableDef, callback) {
     var self = this;
-    self.loadingTable(true);
     if (self.sourceType() !== tableDef.sourceType) {
       self.sourceType(tableDef.sourceType);
     }
-    if (self.activeNamespace() !== tableDef.namespace) {
-      self.activeNamespace(tableDef.namespace);
+    if (self.namespace() !== tableDef.namespace) {
+      self.namespace(tableDef.namespace);
     }
-    self.setDatabaseByName(tableDef.database, function () {
-      if (self.database()) {
-        if (self.database().table() && self.database().table().catalogEntry.name === tableDef.name) {
-          self.loadingTable(false);
+    self.namespace().setDatabaseByName(tableDef.database, function () {
+      if (self.namespace() && self.namespace().database()) {
+        if (self.namespace().database().table() && self.namespace().database().table().catalogEntry.name === tableDef.name) {
           if (callback) {
             callback();
           }
@@ -273,15 +269,14 @@ var MetastoreViewModel = (function () {
         }
 
         var setTableAfterLoad = function (clearDbCacheOnMissing) {
-          var foundTables = self.database().tables().filter(function (table) {
+          var foundTables = self.namespace().database().tables().filter(function (table) {
             return table.catalogEntry.name === tableDef.name;
           });
           if (foundTables.length === 1) {
-            self.loadingTable(false);
-            self.database().setTable(foundTables[0], callback);
+            self.namespace().database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
-            self.database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
-              self.database().load(function () {
+            self.namespace().database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+              self.namespace().database().load(function () {
                 setTableAfterLoad(false);
               });
             });
@@ -290,8 +285,8 @@ var MetastoreViewModel = (function () {
           }
         };
 
-        if (!self.database().loaded()) {
-          var doOnce = self.database().loaded.subscribe(function () {
+        if (!self.namespace().database().loaded()) {
+          var doOnce = self.namespace().database().loaded.subscribe(function () {
             setTableAfterLoad(true);
             doOnce.dispose();
           });
@@ -302,73 +297,7 @@ var MetastoreViewModel = (function () {
     });
   };
 
-  MetastoreViewModel.prototype.setDatabaseByName = function (databaseName, callback) {
-    var self = this;
-
-    var whenLoaded = function (clearCacheOnMissing) {
-      if (!databaseName) {
-        databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
-            self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
-        clearCacheOnMissing = false;
-      }
-      if (self.database() && self.database().catalogEntry.name === databaseName) {
-        if (callback) {
-          callback();
-        }
-        return;
-      }
-      var foundDatabases = self.databases().filter(function (database) {
-        return database.catalogEntry.name === databaseName;
-      });
-      if (foundDatabases.length === 1) {
-        self.setDatabase(foundDatabases[0], callback);
-      } else if (clearCacheOnMissing) {
-        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
-          self.loadDatabases().done(function () {
-            whenLoaded(false)
-          })
-        })
-      } else {
-        foundDatabases = self.databases().filter(function (database) {
-          return database.catalogEntry.name === 'default';
-        });
-
-        if (foundDatabases.length === 1) {
-          self.setDatabase(foundDatabases[0], callback);
-        } else {
-        }
-      }
-    };
-
-    window.setTimeout(function () {
-      if (self.loadingDatabases() && self.lastLoadDatabasesPromise !== null) {
-        self.lastLoadDatabasesPromise.done(function () {
-          whenLoaded(true);
-        });
-      } else {
-        if (self.databases().length) {
-          whenLoaded(true);
-        } else {
-          if (!self.activeNamespace()) {
-            // TODO: Handle missing namespace in Table Browser
-            ContextCatalog.getNamespaces({ sourceType: self.sourceType() }).done(function (namespaces) {
-              self.activeNamespace(namespaces[0]);
-              self.loadDatabases().done(function () {
-                whenLoaded(true);
-              })
-            });
-          } else {
-            self.loadDatabases().done(function () {
-              whenLoaded(true);
-            })
-          }
-        }
-      }
-
-    }, 0);
-  };
-
-  MetastoreViewModel.prototype.loadURL = function () {
+  MetastoreViewModel.prototype.loadUrl = function () {
     var self = this;
 
     var path = (IS_HUE_4 ? window.location.pathname.substr(4) : window.location.pathname);
@@ -382,28 +311,29 @@ var MetastoreViewModel = (function () {
     if (path[0] === 'metastore') {
       path.shift();
     }
+    var namespace = self.namespace();
     switch (path[0]) {
       case 'databases':
-        if (self.database()) {
-          self.database().table(null);
-          self.database(null);
+        if (namespace.database()) {
+          namespace.database().table(null);
+          namespace.database(null);
         }
         break;
       case 'tables':
-        if (self.database()) {
-          self.database().table(null);
+        if (namespace.database()) {
+          namespace.database().table(null);
         }
-        self.setDatabaseByName(path[1]);
+        namespace.setDatabaseByName(path[1]);
         break;
       case 'table':
-
         huePubSub.subscribe('metastore.loaded.table', function() {
           self.currentTab('overview');
         }, 'metastore');
         self.loadTableDef({
           name: path[2],
           database: path[1],
-          sourceType: self.sourceType()
+          sourceType: self.sourceType(),
+          namespace: namespace
         }, function(){
           if (path.length > 3 && path[3] === 'partitions'){
             huePubSub.subscribe('metastore.loaded.partitions', function() {
@@ -411,18 +341,6 @@ var MetastoreViewModel = (function () {
             }, 'metastore');
           }
         });
-    }
-  };
-
-  MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase, callback) {
-    var self = this;
-    huePubSub.publish('metastore.scroll.to.top');
-    self.database(metastoreDatabase);
-
-    if (!metastoreDatabase.loaded()) {
-      metastoreDatabase.load(callback, self.optimizerEnabled(), self.navigatorEnabled(), self.sourceType());
-    } else if (callback) {
-      callback();
     }
   };
 
