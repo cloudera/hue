@@ -61,9 +61,9 @@ nv.models.multiBarWithBrushChart = function() {
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
     }
     , tooltipMultiple = function (values) {
-      return values.map(function (value) {
-          return '<p><b>' + hueUtils.htmlEncode(value.key) + '</b>: ' +  hueUtils.htmlEncode(value.y) + '</p>';
-        }).join("") + '<h3>' + hueUtils.htmlEncode(values[0] && values[0].x) + '</h3>';
+      return '<h3>' + hueUtils.htmlEncode(values[0] && values[0].x) + '</h3>' + values.map(function (value) {
+          return '<p><span class="circle" style="background-color:'+value.color+'"></span><b>' + hueUtils.htmlEncode(value.key) + '</b> ' +  hueUtils.htmlEncode(value.y) + '</p>';
+        }).join("");
     }
     , x //can be accessed via chart.xScale()
     , y //can be accessed via chart.yScale()
@@ -118,20 +118,20 @@ nv.models.multiBarWithBrushChart = function() {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(multibar.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex));
-        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key, color: e.series.color || color(e.series, e.point.series)};
       });
     } else {
       values = tooltipContent((e.list || [e]).map(function (e) {
         var x = multibar.x()(e.point, e.pointIndex),
         y = multibar.y()(e.point, e.pointIndex);
-        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key, color: e.series.color || color(e.series, e.point.series)};
       }));
     }
 
 
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
-        content = displayValuesInLegend ? tooltipSimple(values[0]) : values.length > 1 && tooltipMultiple(values) || tooltipSingle(values[0]);
+        content = displayValuesInLegend ? tooltipSimple(values[0]) : tooltipMultiple(values);
 
     nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
@@ -261,8 +261,12 @@ nv.models.multiBarWithBrushChart = function() {
           .selectAll('text')
           .text(function (d) {
             var value = d.key && d.key + '';
-            var addEllipsis = value && value.length > 12;
-            return value && value.substring(0, 12) + (addEllipsis ? '...' : '');
+            if (displayValuesInLegend) {
+              var addEllipsis = value && value.length > 12;
+              return value && value.substring(0, 12) + (addEllipsis ? '...' : '');
+            } else {
+              return value;
+            }
           })
           .append('title')
           .text(function(d){
@@ -612,8 +616,9 @@ nv.models.multiBarWithBrushChart = function() {
           }
         }
       }
-      function getElByMouse (coords, filterSeries) {
-        var extent = coords || d3v3.mouse(this)[0];
+      function getElByMouse (coords, allSeries) {
+        var xy = d3v3.mouse(this);
+        var extent = coords || xy[0];
         var _l, _j;
         var _width = x.rangeBand();
         var _leftEdges = x.range();
@@ -621,8 +626,8 @@ nv.models.multiBarWithBrushChart = function() {
         _l = Math.max(_l - 1, 0);
         var value = fGetNumericValue(x.domain()[_l]);
         var values = [];
-        if (!filterSeries || multibar.stacked()) {
-          var j;
+        var i,j;
+        if (allSeries) {
           for (j = 0; j < filteredData.length; j++) {
             for (i = 0; i < filteredData[j].values.length; i++) {
               if (fGetNumericValue(getX(filteredData[j].values[i])) == value) {
@@ -630,7 +635,7 @@ nv.models.multiBarWithBrushChart = function() {
               }
             }
           }
-        } else {
+        } else if (!multibar.stacked()) {
           var serieIndex = Math.floor(Math.min(extent - _leftEdges[_l], _width - 0.001) / (_width / filteredData.length)); // Math.min(extent - _leftEdges[_l], _width - 0.001) to handle the padding at the end. Would it make sense to remove the padding?
           var i;
           if (serieIndex < 0) return null;
@@ -639,6 +644,35 @@ nv.models.multiBarWithBrushChart = function() {
               values.push(filteredData[serieIndex].values[i]);
               break;
             }
+          }
+        } else {
+          // serieIndex depends on the y position of the bar
+          // y(getY(d) + (multibar.stacked() ? d.y0 : 0)
+          // get all series for the x value
+          var py = Math.round(y.invert(xy[1]));
+          var mindy = Number.MAX_VALUE;
+          var distances = {};
+          for (j = 0; j < filteredData.length; j++) {
+            for (i = 0; i < filteredData[j].values.length; i++) {
+              if (fGetNumericValue(getX(filteredData[j].values[i])) == value) {
+                if (py >= filteredData[j].values[i].y0 && py <= filteredData[j].values[i].y1) {
+                  values.push(filteredData[j].values[i]);
+                } else {
+                  var ym = filteredData[j].values[i].y0 + (filteredData[j].values[i].y1 - filteredData[j].values[i].y0) / 2;
+                  var dy = Math.abs(py - ym);
+                  if (!distances[dy]) {
+                    distances[dy] = [];
+                  }
+                  distances[dy].push(filteredData[j].values[i]);
+                  if (dy < mindy) {
+                    mindy = dy;
+                  }
+                }
+              }
+            }
+          }
+          if (!values.length) {
+            values = distances[mindy];
           }
         }
         return values;

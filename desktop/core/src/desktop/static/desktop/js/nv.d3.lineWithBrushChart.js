@@ -57,9 +57,9 @@ nv.models.lineWithBrushChart = function() {
         '<p>' + hueUtils.htmlEncode(value.y) + ' on ' + hueUtils.htmlEncode(value.x) + '</p>';
     }
     , tooltipMultiple = function (values) {
-      return values.map(function (value) {
-          return '<p><b>' + hueUtils.htmlEncode(value.key) + '</b>: ' +  hueUtils.htmlEncode(value.y) + '</p>';
-        }).join("") + '<h3>' + hueUtils.htmlEncode(values[0] && values[0].x) + '</h3>';
+      return '<h3>' + hueUtils.htmlEncode(values[0] && values[0].x) + '</h3>' + values.map(function (value) {
+          return '<p><span class="circle" style="background-color:'+value.color+'"></span><b>' + hueUtils.htmlEncode(value.key) + '</b> ' +  hueUtils.htmlEncode(value.y) + '</p>';
+        }).join("");
     }
     , x
     , y
@@ -105,20 +105,20 @@ nv.models.lineWithBrushChart = function() {
       values = (e.list || [e]).map(function (e) {
         var x = xAxis.tickFormat()(lines.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex));
-        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key, color: e.series.color || color(e.series, e.point.series)};
       });
     } else {
       values = tooltip((e.list || [e]).map(function (e) {
         var x = lines.x()(e.point, e.pointIndex),
         y = lines.y()(e.point, e.pointIndex);
-        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key};
+        return {x: x, y: y, key: displayValuesInLegend && (e.point.obj.field || e.point.obj.fq_fields && e.point.obj.fq_fields[0]) || e.series.key, color: e.series.color || color(e.series, e.point.series)};
       }));
     }
 
 
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
-        content = displayValuesInLegend ? tooltipSimple(values[0]) : values.length > 1 && tooltipMultiple(values) || tooltipSingle(values[0]);
+        content = displayValuesInLegend ? tooltipSimple(values[0]) : tooltipMultiple(values);
 
     nv.tooltip.show([left, top], content, null, null, offsetElement);
   };
@@ -235,8 +235,12 @@ nv.models.lineWithBrushChart = function() {
             .call(legend)
           .selectAll('text')
           .text(function (d) {
-            var addEllipsis = d.key && d.key.length > 12;
-            return d.key && d.key.substring(0, 12) + (addEllipsis ? '...' : '');
+            if (displayValuesInLegend) {
+              var addEllipsis = d.key && d.key.length > 12;
+              return d.key && d.key.substring(0, 12) + (addEllipsis ? '...' : '');
+            } else {
+              return d.key;
+            }
           })
           .append('title')
           .text(function(d){
@@ -585,27 +589,44 @@ nv.models.lineWithBrushChart = function() {
       }
 
       function getElByMouse () {
-        var point = x.invert(d3v3.mouse(this)[0]);
+        var xy = d3v3.mouse(this);
+        var px = x.invert(xy[0]);
         if (!filteredData.length || !filteredData[0].values.length) {
           return null;
         }
-        var min = Math.abs(filteredData[0].values[0].x - point);
+        var minx = Math.abs(filteredData[0].values[0].x - px);
         var distances = {};
-
-        for (var j = 0; j < filteredData.length; j++) {
-          for (var i = 0; i < filteredData[j].values.length; i++) {
-            var diff = Math.abs(fGetNumericValue(filteredData[j].values[i].x) - point);
+        var py = y.invert(xy[1]);
+        var i, j, diff;
+        // Find closest on x axis
+        for (j = 0; j < filteredData.length; j++) {
+          for (i = 0; i < filteredData[j].values.length; i++) {
+            diff = Math.abs(fGetNumericValue(filteredData[j].values[i].x) - px);
             if (!distances[diff]) {
               distances[diff] = [];
             }
             filteredData[j].values[i].seriesKey = filteredData[j].key;
             distances[diff].push(filteredData[j].values[i]);
-            if (diff < min) {
-              min = diff;
+            if (diff < minx) {
+              minx = diff;
             }
           }
         }
-        return distances[min];
+        // Find series with y axis
+        var miny = Number.MAX_VALUE;
+        var distancesy = {};
+        for (i = 0; i < distances[minx].length; i++) {
+          diff = Math.abs(distances[minx][i].y - py);
+          if (!distancesy[diff]) {
+            distancesy[diff] = [];
+          }
+          distancesy[diff].push(distances[minx][i]);
+          if (diff < miny) {
+            miny = diff;
+          }
+        };
+
+        return distancesy[miny];
       }
       function onMouseMove () {
         var el = getElByMouse.call(this);
