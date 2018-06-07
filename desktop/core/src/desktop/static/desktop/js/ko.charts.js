@@ -15,7 +15,7 @@
 // limitations under the License.
 
 (function () {
-  var MS = 1,
+	var MS = 1,
   SECOND_MS = 1000 * MS,
   MINUTE_MS = SECOND_MS * 60,
   HOUR_MS = MINUTE_MS * 60,
@@ -23,12 +23,6 @@
   WEEK_MS = DAY_MS * 7,
   MONTH_MS = DAY_MS * 30.5,
   YEAR_MS = DAY_MS * 365;
-  TIME_INTERVALS = [{ms: SECOND_MS * 1, coeff: 1, unit: 'SECONDS'}, {ms: SECOND_MS * 2, coeff: 2, unit: 'SECONDS'}, {ms: SECOND_MS * 5, coeff: 5, unit: 'SECONDS'}, {ms: SECOND_MS * 10, coeff: 10, unit: 'SECONDS'}, {ms: SECOND_MS * 15, coeff: 15, unit: 'SECONDS'}, {ms: SECOND_MS * 30, coeff: 30, unit: 'SECONDS'},
-  {ms: MINUTE_MS * 1, coeff: 1, unit: 'MINUTES'}, {ms: MINUTE_MS * 2, coeff: 2, unit: 'MINUTES'}, {ms: MINUTE_MS * 5, coeff: 5, unit: 'MINUTES'}, {ms: MINUTE_MS * 10, coeff: 10, unit: 'MINUTES'}, {ms: MINUTE_MS * 15, coeff: 15, unit: 'MINUTES'}, {ms: MINUTE_MS * 30, coeff: 30, unit: 'MINUTES'},
-  {ms: HOUR_MS * 1, coeff: 1, unit: 'HOURS'}, {ms: HOUR_MS * 2, coeff: 2, unit: 'HOURS'}, {ms: HOUR_MS * 4, coeff: 4, unit: 'HOURS'}, {ms: HOUR_MS * 6, coeff:6, unit: 'HOURS'}, {ms: HOUR_MS * 8, coeff: 8, unit: 'HOURS'}, {ms: HOUR_MS * 12, coeff: 12, unit: 'HOURS'},
-  {ms: DAY_MS * 1, coeff: 1, unit: 'DAYS'}, {ms: DAY_MS * 2, coeff: 2, unit: 'MONTHS'}, {ms: WEEK_MS * 1, coeff: 7, unit: 'DAYS'}, {ms: WEEK_MS * 2, coeff: 14, unit: 'DAYS'},
-  {ms: MONTH_MS * 1, coeff: 1, unit: 'MONTHS'}, {ms: MONTH_MS * 2, coeff: 2, unit: 'MONTHS'}, {ms: MONTH_MS * 3, coeff: 3, unit: 'MONTHS'}, {ms: MONTH_MS * 6, coeff: 6, unit: 'MONTHS'},
-  {ms: YEAR_MS * 1, coeff: 1, unit: 'YEARS'}];
   ko.HUE_CHARTS = {
     TYPES: {
       COUNTER: "counter",
@@ -242,21 +236,6 @@
       }
     }
   };
-  function getInterval(domainMs, maxSlots) {
-    var biggestInterval = TIME_INTERVALS[TIME_INTERVALS.length-1];
-    var biggestIntervalIsTooSmall = domainMs / biggestInterval.ms > maxSlots;
-    if (biggestIntervalIsTooSmall) {
-      var coeff = Math.ceil(domainMs / maxSlots);
-      return "+" + coeff + "YEARS";
-    }
-    for (var i = TIME_INTERVALS.length - 2; i >= 0; i--) {
-      var slots = domainMs / TIME_INTERVALS[i].ms;
-      if (slots > maxSlots) {
-        return "+" + TIME_INTERVALS[i + 1].coeff + TIME_INTERVALS[i + 1].unit;
-      }
-    }
-    return "+" + TIME_INTERVALS[0].coeff + TIME_INTERVALS[0].unit;
-  }
   ko.bindingHandlers.timelineChart = {
     init: function (element, valueAccessor) {
       if (valueAccessor().type && valueAccessor().type() == "line"){
@@ -853,9 +832,10 @@
           _chart.xScale(d3v3.time.scale.utc());
           _chart.tooltipContent(function(values){
             return values.map(function (value) {
-              var x = moment(value.x).utc().format("YYYY-MM-DD HH:mm:ss"),
-              y = _chart.yAxis.tickFormat()(value.y);
-              return {x: x, y: y, key: value.key};
+              value = JSON.parse(JSON.stringify(value));
+              value.x = moment(value.x).utc().format("YYYY-MM-DD HH:mm:ss");
+              value.y = _chart.yAxis.tickFormat()(value.y);
+              return value;
             });
           });
           _chart.xAxis.tickFormat(multi(_chart.xAxis, _chart));
@@ -935,7 +915,7 @@
     return true;
   }
   function handleSelection(_chart, _options, _datum) {
-    var i;
+    var i, j;
     var serieEnabled = {};
     if (_options.selectedSerie) {
       var selectedSerie = _options.selectedSerie();
@@ -948,7 +928,24 @@
         }
       }
       if (enabledCount === 0) {
-        for (i = 0; i < Math.min(5, _datum.length); i++) {
+        // Get the 5 series with the most non zero elements on x axis & total value.
+        var stats = {};
+        for (i = 0; i < _datum.length; i++) {
+          if (!stats[_datum[i].key]) {
+            stats[_datum[i].key] = {count: 0, total: 0};
+          }
+          for (j = 0; j < _datum[i].values.length; j++) {
+            stats[_datum[i].key].count += Math.min(_datum[i].values[j].y, 1);
+            stats[_datum[i].key].total += _datum[i].values[j].y;
+          }
+        }
+        var aStats = Object.keys(stats).map(function(key) {
+          return {key: key, stat: stats[key]};
+        });
+        aStats.sort(function (a, b) {
+          return a.stat.count - b.stat.count || a.stat.total - b.stat.total;
+        });
+        for (i = aStats.length - 1; i >= Math.max(aStats.length - 5, 0); i--) {
           _datum[i].disabled = false;
           selectedSerie[_datum[i].key] = true;
         }
@@ -1070,9 +1067,10 @@
         _chart.staggerLabels(false);
         _chart.tooltipContent(function(values){
           return values.map(function (value) {
-            var x = moment(value.x).utc().format("YYYY-MM-DD HH:mm:ss"),
-            y = _chart.yAxis.tickFormat()(value.y);
-            return {x: x, y: y, key: value.key};
+            value = JSON.parse(JSON.stringify(value));
+            value.x = moment(value.x).utc().format("YYYY-MM-DD HH:mm:ss");
+            value.y = _chart.yAxis.tickFormat()(value.y);
+            return value;
           });
         });
         _chart.xAxis.tickFormat(multi(_chart.xAxis));
