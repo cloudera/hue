@@ -102,7 +102,11 @@ var AssistDbSource = (function () {
         assistNamespaces.push(assistNamespace);
       });
       self.namespaces(assistNamespaces);
-      self.selectedNamespace(activeNamespace || assistNamespaces.length && assistNamespaces[0]);
+      if (activeNamespace) {
+        self.selectedNamespace(activeNamespace);
+      } else if (assistNamespaces.length) {
+        self.selectedNamespace(assistNamespaces[0]);
+      }
     }).fail(function () {
       self.hasErrors(true);
     }).always(function () {
