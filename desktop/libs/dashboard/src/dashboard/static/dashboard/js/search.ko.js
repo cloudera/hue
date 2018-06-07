@@ -562,7 +562,7 @@ var Collection = function (vm, collection) {
   });
   self.source = ko.observable(typeof collection.source != "undefined" && collection.source != null ? collection.source : "data");
   self.async = ko.computed(function() {
-    return ['impala', 'hive'].indexOf(self.engine()) != -1;
+    return ['impala', 'hive', 'report'].indexOf(self.engine()) != -1;
   });
   self.queryResult = ko.observable(new QueryResult(self, {
     type: self.engine(),
@@ -2196,7 +2196,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         else if (facet.queryResult().status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
         } else {
-
           if (data.status == 0) {
             facet.queryResult().status(data.query_status.status);
 

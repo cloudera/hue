@@ -53,6 +53,11 @@ def search(request):
   query['download'] = 'download' in request.POST
   fetch_result = 'fetch_result' in request.POST
 
+  if not facet.get('properties', {}).get('statement'):  
+    augment_solr_exception(response, collection)
+    response['responseHeader']['status'] = 0
+    return JsonResponse(response)
+  
   if collection:
     try:
       if fetch_result:
