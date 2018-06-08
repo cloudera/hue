@@ -21,8 +21,7 @@ from datetime import datetime,  timedelta
 
 from django.utils.translation import ugettext as _
 
-from notebook.connectors.altus import DATE_FORMAT
-from notebook.connectors.dataeng import DataEngApi
+from notebook.connectors.altus import DataEngApi, DATE_FORMAT
 
 from jobbrowser.apis.base_api import Api
 
