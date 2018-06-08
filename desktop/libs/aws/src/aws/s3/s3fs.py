@@ -106,8 +106,8 @@ class S3FileSystem(object):
     # We change location to default to fix issue
     # More information: https://github.com/boto/boto3/issues/125
 
-    if kwargs.get('location') == Location.USEast:
-      kwargs['location'] = Location.DEFAULT
+    if kwargs.get('location') == 'us-east-1':
+      kwargs['location'] = ''
 
     return self._s3_connection.create_bucket(name, **kwargs)
 
