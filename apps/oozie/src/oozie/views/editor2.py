@@ -27,7 +27,7 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str
+from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document, Document2
@@ -680,7 +680,11 @@ def submit_coordinator(request, doc_id):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       jsonify = request.POST.get('format') == 'json'
-      job_id = _submit_coordinator(request, coordinator, mapping)
+      try:
+        job_id = _submit_coordinator(request, coordinator, mapping)
+      except Exception, e:
+        message = force_unicode(str(e))
+        return JsonResponse({'status': -1, 'message': message}, safe=False)
       if jsonify:
         return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'schedule'}, safe=False)
       else:
