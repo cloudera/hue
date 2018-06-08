@@ -83,10 +83,10 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-breadcrumbs">
   <div style="font-size: 14px; margin: 0 12px; line-height: 27px;">
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onChanged: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
     <!-- ko with: source -->
     <!-- ko if: namespaces().length > 1 -->
-    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onChanged: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- /ko -->
   </div>
@@ -1032,10 +1032,10 @@ ${ components.menubar(is_embeddable) }
 
           <!-- ko with: source -->
           <!-- ko with: namespace -->
-          <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
+          <!-- ko template: { if: !loading() && !database(), name: 'metastore-databases' } --><!-- /ko -->
           <!-- ko with: database -->
           <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
-          <!-- ko template: { if: !loading() && table() === null, name: 'metastore-tables' } --><!-- /ko -->
+          <!-- ko template: { if: !loading() && !table(), name: 'metastore-tables' } --><!-- /ko -->
           <!-- ko with: table -->
             <!-- ko template: 'metastore-describe-table' --><!-- /ko -->
           <!-- /ko -->

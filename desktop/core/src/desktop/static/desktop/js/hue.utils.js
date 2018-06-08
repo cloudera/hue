@@ -223,15 +223,42 @@ window.hueUtils = window.hueUtils || (function () {
     }
   };
 
-  hueUtils.changeURL = function (newURL) {
-    if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
-      newURL = window.location.pathname + window.location.search + '#!' + newURL.replace('/hue', '');
-    } else {
-      if (window.location.hash !== '' && newURL.indexOf('#') === -1){
-        newURL = newURL + window.location.hash;
+  hueUtils.changeURL = function (newURL, params) {
+    var extraSearch = '';
+    if (params) {
+      var newSearchKeys = Object.keys(params);
+      if (newSearchKeys.length) {
+        while (newSearchKeys.length) {
+          var newKey = newSearchKeys.pop();
+          extraSearch += newKey + '=' + params[newKey];
+          if (newSearchKeys.length) {
+            extraSearch += '&';
+          }
+        }
       }
     }
-    window.history.pushState(null, null, newURL);
+
+    if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
+      var search = window.locations.search;
+      if (extraSearch) {
+        search += (search ? '&' : '?') + extraSearch
+      }
+      newURL = window.location.pathname + search + '#!' + newURL.replace('/hue', '');
+      window.history.pushState(null, null, newURL);
+      return;
+    }
+
+    var hashSplit = newURL.split('#');
+    var url = hashSplit[0];
+    if (extraSearch) {
+      url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;
+    }
+    if (hashSplit.length > 1) {
+      url += '#' + hashSplit[1];
+    } else if (window.location.hash) {
+      url += window.location.hash;
+    }
+    window.history.pushState(null, null, url);
   };
 
   hueUtils.replaceURL = function (newURL) {
