@@ -82,36 +82,24 @@ ${ components.menubar(is_embeddable) }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 <script type="text/html" id="metastore-breadcrumbs">
-  <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
-    <!-- ko if: namespaces().length > 1-->
-    <li>
-      <a href="javascript:void(0);" data-bind="click: namespacesBreadcrumb">${_('Namespaces')}
-        <!-- ko if: namespace -->
-        <span class="divider">&gt;</span>
-        <!-- /ko -->
-      </a>
-    </li>
+  <div style="font-size: 14px; margin: 0 12px; line-height: 27px;">
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
+    <!-- ko with: source -->
+    <!-- ko if: namespaces().length > 1 -->
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
-    <!-- ko if: namespaces().length <= 1-->
-    <li>
-      <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}
-        <!-- ko if: namespace() && namespace().database() -->
-        <span class="divider">&gt;</span>
-        <!-- /ko -->
-      </a>
-    </li>
     <!-- /ko -->
+  </div>
+  <ul style="padding-top: 0" class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
+    <!-- ko with: source -->
     <!-- ko with: namespace -->
-    <!-- ko if: $parent.namespaces().length > 1 -->
     <li>
-      <a href="javascript:void(0);" data-bind="click: $root.databasesBreadcrumb">
-        <span data-bind="text: namespace.name"></span>
+      <a href="javascript:void(0);" data-bind="click: $root.databasesBreadcrumb">${_('Databases')}
         <!-- ko if: database -->
         <span class="divider">&gt;</span>
         <!-- /ko -->
       </a>
     </li>
-    <!-- /ko -->
     <!-- ko with: database -->
     <li>
       <a href="javascript:void(0);" data-bind="click: $root.tablesBreadcrumb">
@@ -129,9 +117,10 @@ ${ components.menubar(is_embeddable) }
     <!-- ko if: editingTable -->
       <!-- ko with: table -->
       <li class="editable-breadcrumb-input">
-        <input type="text" data-bind="hivechooser: { data: catalogEntry.name, database: $parent.catalogEntry. name, skipColumns: true, searchEverywhere: true, onChange: function(val) { $parent.setTableByName(val); $parent.editingTable(false); }, apiHelperUser: '${ user }', apiHelperType: $root.sourceType()}" autocomplete="off" />
+        <input type="text" data-bind="hivechooser: { data: catalogEntry.name, database: $parent.catalogEntry. name, skipColumns: true, searchEverywhere: true, onChange: function(val) { $parent.setTableByName(val); $parent.editingTable(false); }, apiHelperUser: '${ user }', apiHelperType: $root.source().type }" autocomplete="off" />
       </li>
       <!-- /ko -->
+    <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
@@ -176,7 +165,7 @@ ${ components.menubar(is_embeddable) }
           </th>
           <th>${_('Values')}</th>
           <th>${_('Spec')}</th>
-          <th data-bind="visible: $root.sourceType() != 'impala'">${_('Browse')}</th>
+          <th data-bind="visible: $root.source().type !== 'impala'">${_('Browse')}</th>
         </tr>
       </thead>
       <tbody>
@@ -192,14 +181,14 @@ ${ components.menubar(is_embeddable) }
         </td>
         <td title="${_('Query partition data')}">
           <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function() { queryAndWatch(notebookUrl, $root.sourceType()); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
+            <a data-bind="click: function() { queryAndWatch(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
           <!-- /ko -->
           <!-- ko if: ! IS_HUE_4 -->
             <a data-bind="attr: { 'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a>
           <!-- /ko -->
         </td>
         <td data-bind="text: partitionSpec"></td>
-        <td data-bind="visible: $root.sourceType() != 'impala'">
+        <td data-bind="visible: $root.source().type != 'impala'">
           <!-- ko if: IS_HUE_4 -->
             <a data-bind="click: function () { browsePartitionFolder(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
               ${_('Files')}
@@ -353,33 +342,6 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="metastore-namespaces">
-  <div class="entries-table-container">
-    <div class="actionbar-actions">
-
-    </div>
-    <div class="entries-table-no-header">
-      <div class="catalog-entries-list-container">
-        <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
-        <!-- ko if: !loading() -->
-        <table id="entryTable" class="table table-condensed table-nowrap">
-          <thead>
-            <tr>
-              <th>${ _("Namespace") }</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: namespaces">
-            <tr>
-              <td><a href="javascript: void(0);" data-bind="text: namespace.name, click: function () { $parent.namespace($data) }"></a></td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- /ko -->
-      </div>
-    </div>
-  </div>
-</script>
-
 <script type="text/html" id="metastore-databases">
   <div class="entries-table-container">
     <div class="actionbar-actions">
@@ -391,7 +353,7 @@ ${ components.menubar(is_embeddable) }
           <form action="/metastore/databases/drop" data-bind="submit: dropAndWatch" method="POST">
             <input type="hidden" name="is_embeddable" value="true"/>
             <input type="hidden" name="start_time" value=""/>
-            <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
+            <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
         % else:
           <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
         % endif
@@ -552,7 +514,7 @@ ${ components.menubar(is_embeddable) }
       <h4 class="entries-table-header">${ _('Tables') }</h4>
       <div class="actionbar-actions" data-bind="visible: tables().length > 0">
         <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { onTableClick(selectedTables()[0].catalogEntry); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
-        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.sourceType()) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
+        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.source().type) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
           <i class="fa fa-play fa-fw"></i> ${_('Query')}
         </button>
         % if has_write_access:
@@ -578,7 +540,7 @@ ${ components.menubar(is_embeddable) }
       <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }, submit: dropAndWatch" method="POST">
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="start_time" value=""/>
-        <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
+        <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/tables/drop/' +catalogEntry. name }" method="POST">
     % endif
@@ -694,7 +656,7 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="format" value="json"/>
         <input type="hidden" name="start_time" value=""/>
-        <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
+        <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.catalogEntry.path.join('/')+ '/partitions/drop' }" method="POST">
     % endif
@@ -1032,12 +994,13 @@ ${ components.menubar(is_embeddable) }
           <!-- ko ifnot: loading -->
           <h1>
             <div class="inline-block pull-right">
+              <!-- ko with: source -->
               <!-- ko with: namespace -->
               <!-- ko with: database -->
               <!-- ko with: table -->
               % if USE_NEW_EDITOR.get():
                 <!-- ko if: IS_HUE_4 -->
-                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch('/notebook/browse/' + catalogEntry.path.join('/') + '/', $root.sourceType()); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
+                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch('/notebook/browse/' + catalogEntry.path.join('/') + '/', $root.source().type); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
                 <!-- /ko -->
                 <!-- ko if: ! IS_HUE_4 -->
                 <a class="btn btn-default" data-bind="attr: { 'href': '/notebook/browse/' + catalogEntry.path.join('/') }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
@@ -1061,12 +1024,13 @@ ${ components.menubar(is_embeddable) }
               <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- /ko -->
+              <!-- /ko -->
             </div>
 
             <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
           </h1>
 
-          <!-- ko template: { if: !loading() && namespace() === null, name: 'metastore-namespaces' } --><!-- /ko -->
+          <!-- ko with: source -->
           <!-- ko with: namespace -->
           <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
           <!-- ko with: database -->
@@ -1078,18 +1042,19 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
+          <!-- /ko -->
         </div>
       </div>
     </div>
   </div>
-
-  <!-- ko with: namespace() -->
+  <!-- ko with: source -->
+  <!-- ko with: namespace -->
   <div id="dropSingleTable" class="modal hide fade">
     % if is_embeddable:
     <form data-bind="submit: dropAndWatch" method="POST">
       <input type="hidden" name="is_embeddable" value="true"/>
       <input type="hidden" name="start_time" value=""/>
-      <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
+      <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
     % else:
     <form method="POST">
     % endif
@@ -1108,6 +1073,7 @@ ${ components.menubar(is_embeddable) }
       </div>
     </form>
   </div>
+  <!-- /ko -->
   <!-- /ko -->
   <div id="import-data-modal" class="modal hide fade" style="display: block;width: 680px;margin-left: -340px!important;"></div>
 </div>
@@ -1287,8 +1253,8 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        DataCatalog.getEntry({ namespace: viewModel.activeNamespace(), sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
-          entry.clearCache({ invalidate: sourceType() === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
+        DataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {
+          entry.clearCache({ invalidate: viewMode.source().type === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
           hueUtils.replaceURL('?');
         });
       }
