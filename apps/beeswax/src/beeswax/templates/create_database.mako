@@ -235,13 +235,11 @@ ${ assist.assistPanel() }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
-        // TODO: Handle namespaces
-        location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;
+        location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name + '?source=' + tableDef.sourceType + '&namespace=' + tableDef.namespace.id;
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
-        // TODO: Handle namespaces
-        location.href = '/metastore/tables/' + databaseDef.name;
+        location.href = '/metastore/tables/' + databaseDef.name + '?source=' + databaseDef.sourceType + '&namespace=' + databaseDef.namespace.id;
       });
     }
 

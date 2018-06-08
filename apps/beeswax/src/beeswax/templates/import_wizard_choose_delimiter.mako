@@ -197,13 +197,11 @@ ${ assist.assistPanel() }
 
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
-        // TODO: Handle namespaces
-        location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;
+        location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name + '?source=' + tableDef.sourceType + '&namespace=' + tableDef.namespace.id;
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
-        // TODO: Handle namespaces
-        location.href = '/metastore/tables/' + databaseDef.name;
+        location.href = '/metastore/tables/' + databaseDef.name + '?source=' + databaseDef.sourceType + '&namespace=' + databaseDef.namespace.id;
       });
     }
 

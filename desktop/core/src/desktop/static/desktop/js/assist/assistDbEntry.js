@@ -411,9 +411,9 @@ var AssistDbEntry = (function () {
     var self = this;
     var url;
     if (self.catalogEntry.isDatabase()) {
-      url = '/metastore/tables/' + self.catalogEntry.name;
+      url = '/metastore/tables/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
     } else if (self.catalogEntry.isTableOrView()) {
-      url = '/metastore/table/' + self.parent.catalogEntry.name + '/' + self.catalogEntry.name;
+      url = '/metastore/table/' + self.parent.catalogEntry.name + '/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
     } else {
       return;
     }
