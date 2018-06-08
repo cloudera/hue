@@ -40,9 +40,25 @@ AWS_ACCOUNT_REGION_DEFAULT = 'us-east-1' # Location.USEast
 
 
 def get_locations():
-  return (Location.EU, Location.EUCentral1, Location.EUWest, Location.EUWest2, Location.CACentral, Location.USEast,
-          Location.USEast2, Location.USWest, Location.USWest2, Location.SAEast, Location.APNortheast,
-          Location.APNortheast2, Location.APSoutheast, Location.APSoutheast2, Location.APSouth, Location.CNNorth1)
+  return ('EU',  # Ireland
+    'eu-central-1',  # Frankfurt
+    'eu-west-1',
+    'eu-west-2',
+    'eu-west-3',
+    'ca-central-1',
+    'us-east-1',
+    'us-east-2',
+    'us-west-1',
+    'us-west-2',
+    'sa-east-1',
+    'ap-northeast-1',
+    'ap-northeast-2',
+    'ap-northeast-3',
+    'ap-southeast-1',
+    'ap-southeast-2',
+    'ap-south-1',
+    'cn-north-1',
+    'cn-northwest-1')
 
 
 def get_default_access_key_id():
@@ -62,7 +78,7 @@ def get_default_secret_key():
 
 
 def get_default_region():
-  region = Location.DEFAULT
+  region = ''
 
   if 'default' in AWS_ACCOUNTS:
     # First check the host/endpoint configuration
@@ -80,7 +96,7 @@ def get_default_region():
     # If the parsed out region is not in the list of supported regions, fallback to the default
     if region not in get_locations():
       LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
-      region = Location.DEFAULT
+      region = ''
 
   return region
 
