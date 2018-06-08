@@ -415,9 +415,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
   <div class="container-fluid">
     <span class="pull-right">
     <!-- ko if: availableComputes().length > 1 -->
-      ##<select data-bind="selectize: availableComputes, value: compute, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
       <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }"></div>
-      ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: namespace, entries: availableNamespaces, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Namespaces') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     </span>
       
