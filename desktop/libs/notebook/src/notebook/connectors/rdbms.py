@@ -174,6 +174,35 @@ class RdbmsApi(Api):
   def get_browse_query(self, snippet, database, table, partition_spec=None):
     return "SELECT * FROM `%s`.`%s` LIMIT 1000" % (database, table)
 
+  @query_error_handler
+  def explain(self, notebook, snippet):
+    query_server = dbms.get_query_server_config(server=self.interpreter)
+    db = dbms.get(self.user, query_server)
+
+    db.use(snippet['database'])
+    result = db.explain(snippet['statement'])
+
+    rows = list(result.rows())
+    cols = result.cols()
+
+    # Prettify output
+    explanation = ""
+    cols_pretty = [(col + ":  ") for col in cols]
+    col_width = max(len(col) for col in cols_pretty)
+    for index, col in enumerate(cols_pretty):
+      lines = []
+      for row in rows:
+        lines += str(row[index]).split("\n")
+      explanation += col.ljust(col_width) + lines[0] + "\n"
+      for line in lines[1:]:
+        explanation += (" " * col_width) + line + "\n"
+
+    return {
+      'status': 0,
+      'explanation': explanation,
+      'statement': snippet['statement'],
+    }
+
 
 class Assist():
 
