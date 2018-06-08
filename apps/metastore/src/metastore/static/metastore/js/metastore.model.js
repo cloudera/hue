@@ -38,6 +38,11 @@ var MetastoreSource = (function () {
       }
     });
 
+    // When manually changed through dropdown
+    self.namespaceChanged = function () {
+      huePubSub.publish('metastore.url.change')
+    };
+
     huePubSub.subscribe("assist.db.panel.ready", function () {
       self.lastLoadNamespacesDeferred.done(function () {
         huePubSub.publish('assist.set.database', {
