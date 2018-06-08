@@ -329,7 +329,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     var multiLineHandlers = [];
 
-    huePubSub.subscribe('table.row.dblclick', function (data) {
+    huePubSub.subscribe('table.row.show.details', function (data) {
       var $el = $(data.table);
       var $t = $('#rowDetailsModal').find('table');
       $t.html('');
