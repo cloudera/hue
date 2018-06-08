@@ -1597,6 +1597,7 @@ def get_clusters(user):
         'id': CLUSTER_ID.get(),
         'name': CLUSTER_ID.get(),
         'type': 'direct',
+        'interface': 'all',
         'server_host': HIVE_SERVER_HOST.get()
         }
       )
@@ -1609,6 +1610,7 @@ def get_clusters(user):
       'id': i,
       'name': cluster_config[i].NAME.get() or i,
       'type': cluster_config[i].TYPE.get(),
+      'interface': cluster_config[i].INTERFACE.get() or 'hive',
       'server_host': cluster_config[i].SERVER_HOST.get()
     }) for i in cluster_config
   ])
@@ -1632,6 +1634,12 @@ CLUSTERS = UnspecifiedConfigSection(
           "type",
           help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
           default='direct',
+          type=str,
+      ),
+      INTERFACE=Config(
+          "interface",
+          help=_("Type of cluster interface"),
+          default='hive',
           type=str,
       ),
       SERVER_HOST=Config(
