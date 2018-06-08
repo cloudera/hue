@@ -404,8 +404,8 @@ def _submit_workflow_helper(request, workflow, submit_action):
       if cluster.get('type') == 'altus-de':
         notebook = {}
         snippet = {'statement': 'SELECT 1'}
-        # TODO: open in Job Browser, Jobs, compute context
-        print DataEngApi(user=request.user, request=request, cluster_name=cluster.get('name')).execute(notebook, snippet)
+        handle = DataEngApi(user=request.user, request=request, cluster_name=cluster.get('name')).execute(notebook, snippet)
+        return JsonResponse({'status': 0, 'job_id': handle.get('id'), 'type': 'workflow'}, safe=False)
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)

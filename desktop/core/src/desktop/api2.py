@@ -88,7 +88,7 @@ def get_context_namespaces(request, interface):
     namespaces.extend([{
         'id': cluster['id'],
         'name': cluster['name']
-      } for cluster in clusters if cluster.get('type') == 'direct' # and interfaces == 'hive'
+      } for cluster in clusters if cluster.get('type') == 'direct' # and interface == 'hive'
     ])
 
     # From Altus SDX
@@ -97,7 +97,6 @@ def get_context_namespaces(request, interface):
           'id': namespace.get('crn', 'None'),
           'name': namespace.get('namespaceName', 'Unknown'),
           'status': namespace.get('status'),
-          # creationDate
         } for namespace in SdxApi(request.user).list_namespaces()]
       )
 
@@ -114,17 +113,17 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive' or interface == 'oozie':
+  if interface == 'hive' or interface == 'oozie' or interface == 'jobs':
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
         'namespace': cluster['id'], # Dummy
         'interface': interface,
-        'type': 'default'
+        'type': cluster['type']
       } for cluster in clusters
     ])
 
-  if interface == 'hive':
+  if interface == 'hive' or interface == 'jobs':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn', 'None'),
@@ -138,7 +137,7 @@ def get_context_computes(request, interface):
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters']]
       )
 
-  if interface == 'oozie':
+  if interface == 'oozie' or interface == 'jobs':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn'),
