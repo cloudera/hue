@@ -179,15 +179,6 @@
       self.$parent.children('table').on('mouseout', 'tbody tr', outHandler);
     });
 
-    var dblClickHandler = function () {
-      huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
-    };
-    self.$parent.children('table').on('dblclick', 'tbody tr', dblClickHandler);
-    self.disposeFunctions.push(function () {
-      self.$parent.children('table').off('dblclick', 'tbody tr', dblClickHandler);
-    });
-
-
     if (!self.options.disableTopPosition) {
       self.repositionHeader();
       var scrollFunction = self.repositionHeader.bind(self);
@@ -427,7 +418,7 @@
           self.drawLockedRow($(this).parent().text()*1);
         }).attr('title', self.options.labels.LOCK);
         $('<i>').addClass('fa fa-expand pointer muted').prependTo(cell).on('click', function(){
-          huePubSub.publish('table.row.dblclick', {idx: idx, table: self.$element});
+          huePubSub.publish('table.row.show.details', {idx: idx, table: self.$element});
         }).attr('title', self.options.labels.ROW_DETAILS);
       });
     }

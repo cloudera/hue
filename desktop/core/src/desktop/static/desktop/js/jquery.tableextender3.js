@@ -207,7 +207,7 @@
       }
       $cell.addClass('lockable');
       $('<i>').addClass('fa fa-expand pointer muted').attr('title', self.options.labels.ROW_DETAILS).on('click', function(){
-        huePubSub.publish('table.row.dblclick', { idx: index, table: self.$sourceTable });
+        huePubSub.publish('table.row.show.details', { idx: index, table: self.$sourceTable });
       }).prependTo($cell);
     });
 
