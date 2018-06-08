@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
-from notebook.connectors.altus import DataEngApi as DataEngClient
+from notebook.connectors.altus import DataEngApi
 from notebook.connectors.base import Api, QueryError
 
 
@@ -43,7 +43,7 @@ class DataEngApi(Api):
   def execute(self, notebook, snippet):
     statement = snippet['statement']
 
-    handle = DataEngClient(self.user).submit_hive_job(self.cluster_name, statement, params=None, job_xml=None)
+    handle = DataEngApi(self.user).submit_hive_job(self.cluster_name, statement, params=None, job_xml=None)
     job = handle['jobs'][0]
 
     if job['status'] not in RUNNING_STATES:
@@ -61,7 +61,7 @@ class DataEngApi(Api):
 
     job_id = snippet['result']['handle']['id']
 
-    handle = DataEngClient(self.user).list_jobs(job_ids=[job_id])
+    handle = DataEngApi(self.user).list_jobs(job_ids=[job_id])
     job = handle['jobs'][0]
 
     if job['status'] in RUNNING_STATES:
@@ -86,7 +86,7 @@ class DataEngApi(Api):
   def cancel(self, notebook, snippet):
     if snippet['result']['handle'].get('id'):
       job_id = snippet['result']['handle']['id']
-      DataEngClient(self.user).terminate_job(job_id=job_id)
+      DataEngApi(self.user).terminate_job(job_id=job_id)
       response = {'status': 0}
     else:
       response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
