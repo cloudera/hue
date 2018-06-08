@@ -195,7 +195,7 @@
     });
     $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function () {
       if (huePubSub){
-        huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
+        huePubSub.publish('table.row.show.details', {idx: $(this).index(), table: $(this).parents('table')});
       }
     });
   };
