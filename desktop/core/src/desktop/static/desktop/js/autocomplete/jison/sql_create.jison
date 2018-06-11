@@ -336,6 +336,7 @@ ColumnSpecificationList_EDIT
 ColumnSpecification
  : ColumnIdentifier ColumnDataType OptionalColumnOptions
    {
+     $$ = $1;
      var keywords = [];
      if (parser.isImpala()) {
        if (!$3['primary']) {
@@ -365,7 +366,7 @@ ColumnSpecification
        }
      }
      if (keywords.length > 0) {
-       $$ = { suggestKeywords: keywords };
+       $$.suggestKeywords = keywords;
      }
    }
  ;
@@ -1061,6 +1062,7 @@ FileFormat
  | '<hive>TEXTFILE'
  | '<impala>AVRO'
  | '<impala>KUDU'
+ | '<impala>ORC'
  | '<impala>PARQUET'
  | '<impala>RCFILE'
  | '<impala>SEQUENCEFILE'

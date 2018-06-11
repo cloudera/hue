@@ -261,6 +261,7 @@
 <impala>'METADATA'                         { return '<impala>METADATA'; }
 <impala>'NULLS'                            { return '<impala>NULLS'; }
 <impala>'OFFSET'                           { return '<impala>OFFSET'; }
+<impala>'ORC'                              { return '<impala>ORC'; }
 <impala>'OVERWRITE'                        { return '<impala>OVERWRITE'; }
 <impala>'PARQUET'                          { return '<impala>PARQUET'; }
 <impala>'PARTITIONED'                      { return '<impala>PARTITIONED'; }
