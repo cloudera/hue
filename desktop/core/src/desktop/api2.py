@@ -227,6 +227,14 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
+      if document.type == 'query-pig': # Import correctly from before Hue 4.0
+        properties = data['snippets'][0]['properties']
+        if 'hadoopProperties' not in properties:
+          properties['hadoopProperties'] = []
+        if 'parameters' not in properties:
+          properties['parameters'] = []
+        if 'resources' not in properties:
+          properties['resources'] = []
       if data.get('uuid') != document.uuid: # Old format < 3.11
         data['uuid'] = document.uuid
 
