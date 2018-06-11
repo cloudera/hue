@@ -1171,7 +1171,7 @@ var SqlParseSupport = (function () {
       if (parser.isHive()) {
         parser.suggestKeywords(['AVRO', 'INPUTFORMAT', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
       } else {
-        parser.suggestKeywords(['AVRO', 'KUDU', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
+        parser.suggestKeywords(['AVRO', 'KUDU', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
       }
     };
 

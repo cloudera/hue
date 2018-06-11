@@ -1366,7 +1366,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AVRO', 'KUDU', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+              suggestKeywords: ['AVRO', 'KUDU', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
             }
           });
         });
@@ -1476,7 +1476,6 @@
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['PARQUET'],
-            doesNotContainKeywords: ['ORC'],
             expectedResult: {
               lowerCase: false
             }
