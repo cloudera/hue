@@ -358,6 +358,10 @@
           'white-space': 'nowrap'
         });
 
+        if (ko && ko.bindingHandlers.delayedOverflow) {
+          ko.bindingHandlers.delayedOverflow.init($scrollingBreadcrumbs[0]);
+        }
+
         if (_parent.options.showExtraHome) {
           var _extraHome = $("<li>");
           var _extraHomelink = $("<a>").addClass("nounderline").html('<i class="fa ' + _parent.options.extraHomeProperties.icon + '"></i> ' + _parent.options.extraHomeProperties.label).css("cursor", "pointer").click(function () {
