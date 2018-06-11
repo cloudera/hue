@@ -423,16 +423,22 @@ ${ assist.assistPanel() }
           <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
-            <label for="path" class="control-label"><div>${ _('Table') }</div>
-              <span data-bind="foreach: $root.createWizard.source.tables">
-                ## TODO: guessFormat() on focus lose only and use list of tables
-                <input type="text" class="input-xlarge" data-bind="value: $root.createWizard.source.table, hivechooser: $root.createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.createWizard.source.apiHelperType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
-                <a class="pointer pull-right margin-top-20" data-bind="click: function() { $root.createWizard.source.tables($data); }"><i class="fa fa-minus"></i></a>
-                <br/>
-              <span>
-            </label>
-            <br/>
-            <a class="pointer" data-bind="click: function() { createWizard.source.tables.push(''); }" title="${_('Add Table')}"><i class="fa fa-plus fa-padding-top"></i> ${_('Add table')}</a>
+
+            <!-- ko foreach: $root.createWizard.source.tables -->
+              <div>
+                <label class="control-label">
+                  <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
+                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive', mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
+                </label>
+              </div>
+            <!-- /ko -->
+            <div>
+              <label class="control-label">
+                <div>&nbsp;</div>
+                <a class="pointer" data-bind="click: function() { createWizard.source.tables.push(ko.mapping.fromJS({name: ''})); }" title="${_('Add Table')}"><i class="fa fa-plus fa-padding-top"></i> ${_('Add table')}</a>
+              </label>
+            </div>
           </div>
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'query'">
@@ -472,35 +478,51 @@ ${ assist.assistPanel() }
 
     <!-- ko ifnot: createWizard.source.inputFormat() == 'rdbms' && createWizard.source.rdbmsIsAllTables() -->
     <div class="card step" style="min-height: 310px;">
-      <!-- ko ifnot: createWizard.isGuessingFormat -->
-      <!-- ko if: createWizard.isGuessingFieldTypes -->
-      <h4>${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h4>
+      <!-- ko if: $root.createWizard.source.inputFormat() === 'table' || ($root.createWizard.source.inputFormat() !== 'table' && !createWizard.isGuessingFormat()) -->
+      <h4>${_('Preview')}
+        <!-- ko if: $root.createWizard.source.inputFormat() !== 'table' && createWizard.isGuessingFieldTypes() -->
+        <i class="fa fa-spinner fa-spin"></i>
+        <!-- /ko -->
+      </h4>
       <!-- /ko -->
-      <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
-      <h4>${_('Preview')}</h4>
+
       <!-- ko if: createWizard.source.inputFormat() == 'query' && createWizard.source.sample().length == 0 -->
         ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
       <!-- /ko -->
       <div class="card-body">
-        <div style="overflow: auto">
-          <table class="table table-condensed table-preview">
-            <thead>
-            <tr data-bind="foreach: createWizard.source.sampleCols">
-              ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-              <th data-bind="truncatedText: name" style="padding-right: 60px"></th>
-              ## TODO nested
-            </tr>
-            </thead>
-            <tbody data-bind="foreach: createWizard.source.sample">
-            <tr data-bind="foreach: $data">
-              <td data-bind="truncatedText: $data"></td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+        <!-- ko if: $root.createWizard.source.inputFormat() === 'table' && $root.createWizard.source.tables().length > 1 -->
+        <ul class="nav nav-tabs" style="margin-top: -14px">
+          <!-- ko foreach: $root.createWizard.source.tables -->
+          <li data-bind="css: { 'active': $root.createWizard.source.selectedTableIndex() === $index() }"><a href="#" data-bind="text: name, click: function(){ $root.createWizard.source.selectedTableIndex($index()) }"></a></li>
+          <!-- /ko -->
+        </ul>
+        <!-- /ko -->
+
+        <!-- ko if: $root.createWizard.source.inputFormat() === 'table' -->
+        <!-- ko hueSpinner: { spin: createWizard.isGuessingFormat() || createWizard.isGuessingFieldTypes() , inline: true } --><!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko ifnot: createWizard.isGuessingFormat -->
+          <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
+          <div data-bind="delayedOverflow">
+            <table class="table table-condensed table-preview">
+              <thead>
+              <tr data-bind="foreach: createWizard.source.sampleCols">
+                ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+                <th data-bind="truncatedText: name" style="padding-right: 60px"></th>
+                ## TODO nested
+              </tr>
+              </thead>
+              <tbody data-bind="foreach: createWizard.source.sample">
+              <tr data-bind="foreach: $data">
+                <td data-bind="truncatedText: $data"></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /ko -->
+        <!-- /ko -->
       </div>
-      <!-- /ko -->
-      <!-- /ko -->
     </div>
     <!-- /ko -->
     <!-- /ko -->
@@ -1375,19 +1397,21 @@ ${ assist.assistPanel() }
           }
         }
 
-        for (var i = 0; i < type.args.length; i++) {
-          self[type.args[i].name] = ko.observable();
-        }
+        if (type) {
+          for (var i = 0; i < type.args.length; i++) {
+            self[type.args[i].name] = ko.observable();
+          }
 
-        if (args) {
-          loadFromObj(args);
-        }
+          if (args) {
+            loadFromObj(args);
+          }
 
-        for (var i = 0; i < type.args.length; i++) {
-          self[type.args[i].name].subscribe(function(newVal) {
-            // Update the data preview when tweaking Format options on step 1
-            viewModel.createWizard.guessFieldTypes();
-          });
+          for (var i = 0; i < type.args.length; i++) {
+            self[type.args[i].name].subscribe(function(newVal) {
+              // Update the data preview when tweaking Format options on step 1
+              viewModel.createWizard.guessFieldTypes();
+            });
+          }
         }
       }
 
@@ -1398,7 +1422,7 @@ ${ assist.assistPanel() }
       }
 
       self.getArguments = function () {
-        return type.args;
+        return type ? type.args : [];
       }
 
       self.isCustomizable = function () {
@@ -1617,12 +1641,17 @@ ${ assist.assistPanel() }
       };
 
       // Table
-      self.table = ko.observable('');
-      self.tables = ko.observableArray(['']);
-      self.tableName = ko.computed(function() {
+      self.tables = ko.observableArray([
+        ko.mapping.fromJS({name: ''})
+      ]);
+      self.selectedTableIndex = ko.observable(0);
+      self.table = ko.pureComputed(function() {
+        return self.tables().length > 0 ? self.tables()[self.selectedTableIndex()].name() : ''
+      });
+      self.tableName = ko.pureComputed(function() {
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[1] : self.table();
       });
-      self.databaseName = ko.computed(function() {
+      self.databaseName = ko.pureComputed(function() {
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[0] : 'default';
       });
       self.table.subscribe(function(val) {
