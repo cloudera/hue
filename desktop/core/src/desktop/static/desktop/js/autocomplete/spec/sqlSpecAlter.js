@@ -325,6 +325,19 @@
           });
         });
 
+        it('should handle "ALTER TABLE bar SET OWNER ROLE boo;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET OWNER ROLE boo;',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest keywords for "ALTER TABLE bar |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE bar ',
@@ -335,7 +348,7 @@
               suggestKeywords: ['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
                 'CLUSTERED BY', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE', 'DROP',  'ENABLE NO_DROP',
                 'ENABLE OFFLINE', 'EXCHANGE PARTITION', 'NOT SKEWED', 'NOT STORED AS DIRECTORIES',  'PARTITION',
-                'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDE',
+                'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER', 'SET SERDE',
                 'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']
             }
           });
@@ -1386,7 +1399,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']
+              suggestKeywords: ['FILEFORMAT', 'LOCATION', 'OWNER', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']
             }
           });
         });
@@ -1411,6 +1424,18 @@
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET OWNER |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET OWNER ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['GROUP', 'ROLE', 'USER']
             }
           });
         });

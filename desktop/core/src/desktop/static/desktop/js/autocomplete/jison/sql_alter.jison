@@ -229,7 +229,7 @@ AlterTable_EDIT
        parser.suggestKeywords(['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
          'CLUSTERED BY', 'CONCATENATE', 'COMPACT', 'DISABLE NO_DROP', 'DISABLE OFFLINE', 'DROP', 'ENABLE NO_DROP',
          'ENABLE OFFLINE', 'EXCHANGE PARTITION', 'NOT SKEWED', 'NOT STORED AS DIRECTORIES', 'PARTITION',
-         'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDE',
+         'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER', 'SET SERDE',
          'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']);
      } else if (parser.isImpala()) {
        parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN', 'CHANGE',
@@ -264,7 +264,7 @@ AlterTable_EDIT
  | AlterTableLeftSide 'SET' 'CURSOR'
    {
      if (parser.isHive()) {
-       parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
+       parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'OWNER', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
      } else if (parser.isImpala()) {
        parser.suggestKeywords(['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
      }
@@ -294,6 +294,7 @@ HiveSpecificOperations
  | 'NOT' '<hive>SKEWED'
  | 'NOT' '<hive>STORED_AS_DIRECTORIES'
  | 'SET' '<hive>SKEWED_LOCATION' ParenthesizedSkewedLocationList
+ | 'SET' '<hive>OWNER' PrincipalSpecification
  | PartitionSpec '<hive>RENAME' 'TO' PartitionSpec
  | PartitionSpec AnyChange '<hive>COLUMN' ParenthesizedColumnSpecificationList OptionalHiveCascadeOrRestrict
  ;
@@ -341,6 +342,11 @@ HiveSpecificOperations_EDIT
    {
      parser.suggestKeywords(['BY']);
    }
+ | 'SET' '<hive>OWNER' 'CURSOR'
+   {
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
+   }
+ | 'SET' '<hive>OWNER' PrincipalSpecification_EDIT
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList_EDIT
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList_EDIT 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList 'CURSOR'
