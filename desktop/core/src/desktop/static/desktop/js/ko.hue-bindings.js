@@ -3623,7 +3623,9 @@
           self.blur();
         }
         self.on("blur", function () {
-          valueAccessor()(self.val());
+          if (!options.skipInvalids) {
+            valueAccessor()(self.val());
+          }
         });
         if (allBindingsAccessor().valueUpdate != null && allBindingsAccessor().valueUpdate == "afterkeydown") {
           self.on("keyup", function () {
@@ -3635,6 +3637,7 @@
           home: "/",
           skipColumns: ko.unwrap(options.skipColumns) || false,
           skipTables: ko.unwrap(options.skipTables) || false,
+          pathChangeLevel: ko.unwrap(options.pathChangeLevel) || '',
           apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
           apiHelperType: ko.unwrap(options.apiHelperType) || '',
           mainScrollable: ko.unwrap(options.mainScrollable) || $(window),
@@ -3642,13 +3645,17 @@
             setPathFromAutocomplete(path);
           },
           onEnter: function (el) {
-            setPathFromAutocomplete(el.val());
+            if (!options.skipInvalids) {
+              setPathFromAutocomplete(el.val());
+            }
           },
           onBlur: function () {
             if (self.val().lastIndexOf(".") == self.val().length - 1) {
               self.val(self.val().substr(0, self.val().length - 1));
             }
-            valueAccessor()(self.val());
+            if (!options.skipInvalids) {
+              valueAccessor()(self.val());
+            }
           }
         });
       }

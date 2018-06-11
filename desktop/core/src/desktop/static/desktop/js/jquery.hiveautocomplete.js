@@ -31,7 +31,8 @@
       },
       onPathChange: function () {
       },
-      smartTooltip: "",
+      pathChangeLevel: '',
+      smartTooltip: '',
       smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
       showOnFocus: false,
       startingPath: '',
@@ -351,7 +352,9 @@
               else {
                 $el.val(item);
               }
-              self.options.onPathChange($el.val());
+              if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'database'){
+                self.options.onPathChange($el.val());
+              }
               $("#jHueGenericAutocomplete").hide();
               _hiveAutocompleteSelectedIndex = -1;
               self.options.onEnter($el);
@@ -365,7 +368,9 @@
               else {
                 $el.val(item + ".");
               }
-              self.options.onPathChange($el.val());
+              if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'database') {
+                self.options.onPathChange($el.val());
+              }
               if (!self.options.skipTables) {
                 showAutocomplete();
               }
@@ -391,7 +396,9 @@
               if (!self.options.skipColumns) {
                 $el.val($el.val() + ".");
               }
-              self.options.onPathChange($el.val());
+              if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'table') {
+                self.options.onPathChange($el.val());
+              }
               if (!self.options.skipColumns) {
                 showAutocomplete();
               }
