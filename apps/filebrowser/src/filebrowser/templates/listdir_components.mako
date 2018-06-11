@@ -872,7 +872,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           // display context menu and ensure it is on-screen
-          if ($.inArray(row.name, ['..', '.', '.Trash']) === -1) {
+          if ($.inArray(row.name, ['..', '.Trash']) === -1) {
             this.selected(true);
             var verticalCorrection = 0;
             %if is_embeddable:
