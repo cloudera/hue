@@ -254,6 +254,20 @@
         });
       });
 
+      it('should handle "ALTER TABLE bar SET ROW FORMAT ... |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' ' +
+          'LINES TERMINATED BY \'q\'; ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest keywords for "ALTER |"', function() {
         assertAutoComplete({
           beforeCursor: 'ALTER ',
@@ -1610,7 +1624,7 @@
 
       });
 
-     describe('Impala specific', function () {
+      describe('Impala specific', function () {
         it('should handle "ALTER TABLE db.tbl SET COLUMN STATS foo (\'numDVs\'=\'2\',\'numNulls\'=\'0\'); |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE db.tbl SET COLUMN STATS foo (\'numDVs\'=\'2\',\'numNulls\'=\'0\'); ',
@@ -1694,7 +1708,7 @@
               suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN',
                 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS',
                 'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION',
-                'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
+                'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
             }
           });
         });
@@ -1706,7 +1720,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
+              suggestKeywords: ['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
             }
           });
         });
@@ -2144,7 +2158,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']
+              suggestKeywords: ['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']
             }
           });
         });
@@ -2156,7 +2170,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
+              suggestKeywords: ['CACHED IN', 'FILEFORMAT', 'LOCATION', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
             }
           });
         });
@@ -2215,7 +2229,6 @@
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['PARQUET'],
-            doesNotContainKeywords: ['ORC'],
             expectedResult: {
               lowerCase: false
             }
@@ -2230,6 +2243,92 @@
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW |"', function() {
+         assertAutoComplete({
+           beforeCursor: 'ALTER TABLE bar SET ROW ',
+           afterCursor: '',
+           dialect: 'impala',
+           expectedResult: {
+             lowerCase: false,
+             suggestKeywords: ['FORMAT']
+           }
+         });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW FORMAT |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ROW FORMAT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DELIMITED']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW FORMAT DELIMITED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ROW FORMAT DELIMITED ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['FIELDS TERMINATED BY', 'LINES TERMINATED BY' ],
+            doestNotContainKeywords: ['ROW FORMAT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TERMINATED BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS TERMINATED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS TERMINATED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['LINES TERMINATED BY' ],
+            doestNotContainKeywords: ['FIELDS TERMINATED BY', 'ROW FORMAT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET ROW FORMAT DELIMITED LINES TERMINATED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ROW FORMAT DELIMITED LINES TERMINATED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
             }
           });
         });
