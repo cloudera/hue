@@ -52,7 +52,7 @@ from desktop.views import _ko
     <!-- /ko -->
     <!-- ko if: searchResultCategories().length > 0 -->
     <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, style: { 'height' : heightWhenDragging }">
-      <div class="global-search-alternatives" data-bind="css: { 'global-search-full-width': !selectedResult() }" style="position: relative">
+      <div class="global-search-alternatives" data-bind="css: { 'global-search-full-width': !selectedResult() }, delayedOverflow" style="position: relative">
         <!-- ko foreach: searchResultCategories -->
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>

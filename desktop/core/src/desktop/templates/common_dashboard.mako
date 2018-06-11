@@ -420,7 +420,7 @@
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>
-    <div class="card-body" style="padding: 5px;">
+    <div class="card-body" style="padding: 5px;" data-bind="delayedOverflow">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
       <div class="clearfix"></div>
     </div>
