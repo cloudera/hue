@@ -373,14 +373,14 @@ var EditorViewModel = (function() {
       }
     });
 
-    var namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (namespaces) {
-      self.availableNamespaces(namespaces);
-      if (!snippet.namespace || !namespaces.some(function (namespace) {
+    var namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
+      self.availableNamespaces(context.namespaces);
+      if (!snippet.namespace || !context.namespaces.some(function (namespace) {
         if (namespace.id === snippet.namespace.id) {
           self.namespace(namespace);
           return true;
         }})) {
-        self.namespace(namespaces[0]);
+        self.namespace(context.namespaces[0]);
       }
     });
 

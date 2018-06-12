@@ -53,9 +53,9 @@
     if (self.options.activeNamespace) {
       self.activeContextNamespaceDeferred.resolve(self.options.activeNamespace);
     } else {
-      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (namespaces) {
+      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace selection in caller
-        self.activeContextNamespaceDeferred.resolve(namespaces[0]);
+        self.activeContextNamespaceDeferred.resolve(context.namespaces[0]);
       })
     }
 

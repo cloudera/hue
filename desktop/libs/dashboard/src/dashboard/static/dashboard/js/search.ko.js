@@ -558,9 +558,9 @@ var Collection = function (vm, collection) {
   self.suggest = ko.mapping.fromJS(collection.suggest);
   self.activeNamespace = ko.observable();
 
-  ContextCatalog.getNamespaces({ sourceType: collection.engine || 'solr' }).done(function (namespaces) {
+  ContextCatalog.getNamespaces({ sourceType: collection.engine || 'solr' }).done(function (context) {
     // TODO: Namespace selection
-    self.activeNamespace(namespaces[0]);
+    self.activeNamespace(context.namespaces[0]);
   });
 
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
