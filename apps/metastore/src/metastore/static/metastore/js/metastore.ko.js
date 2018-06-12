@@ -150,7 +150,7 @@ var MetastoreViewModel = (function () {
         var params = {
           source: self.source().type
         };
-        if (self.source().namespaces().length > 1) {
+        if (self.source().namespaces().length > 1 || self.source().namespaceRefreshEnabled()) {
           params.namespace = self.source().namespace().id
         }
         if (self.source().namespace().database() && self.source().namespace().database().table()) {

@@ -35,6 +35,7 @@ var AssistDbSource = (function () {
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();
+    self.namespaceRefreshEnabled = ko.observable(false);
 
     self.loadedDeferred = $.Deferred();
     self.loading = ko.observable(false);
@@ -82,13 +83,13 @@ var AssistDbSource = (function () {
 
   AssistDbSource.prototype.loadNamespaces = function () {
     var self = this;
-
     self.loading(true);
 
-    ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (namespaces) {
+    ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
-      namespaces.forEach(function (namespace) {
+      self.namespaceRefreshEnabled(context.dynamic);
+      context.namespaces.forEach(function (namespace) {
         var assistNamespace = new AssistDbNamespace({
           sourceType: self.sourceType,
           namespace: namespace,
@@ -123,13 +124,14 @@ var AssistDbSource = (function () {
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
     var self = this;
     self.loading(true);
-    ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: true }).done(function (namespaces) {
+    ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: true }).done(function (context) {
       var newNamespaces = [];
       var existingNamespaceIndex = {};
+      self.namespaceRefreshEnabled(context.dynamic);
       self.namespaces().forEach(function (assistNamespace) {
         existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
       });
-      namespaces.forEach(function(newNamespace) {
+      context.namespaces.forEach(function(newNamespace) {
         if (existingNamespaceIndex[newNamespace.id]) {
           existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
           existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
