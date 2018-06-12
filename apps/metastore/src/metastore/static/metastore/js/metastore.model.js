@@ -51,6 +51,67 @@ var MetastoreSource = (function () {
       });
     });
 
+    var getCurrentState = function () {
+      var result = {
+        namespaceId: null,
+        database: null,
+        table: null
+      };
+      var prevNamespaceId = null;
+      var prevDbName = null;
+      var prevTableName = null;
+      if (self.namespace()) {
+        result.namespaceId = self.namespace().id;
+        if (self.namespace().database()) {
+          result.database = self.namespace().database().catalogEntry.name;
+          if (self.namespace().database().table()) {
+            result.table = self.namespace().database().table().catalogEntry.name;
+          }
+        }
+      }
+      return result;
+    };
+
+    var setState = function (state) {
+      if (state.namespaceId) {
+        self.setNamespaceById(state.namespaceId).done(function () {
+          if (state.database) {
+            self.namespace().setDatabaseByName(state.database, function () {
+              if (self.namespace().database() && state.table) {
+                self.namespace().database().setTableByName(state.table);
+              }
+            });
+          }
+        });
+      }
+    };
+
+    var completeRefresh = function (previousState) {
+      self.reloading(true);
+      if (self.namespace() && self.namespace().database() && self.namespace().database().table()) {
+        self.namespace().database().table(null);
+      }
+      if (self.namespace() && self.namespace().database()) {
+        self.namespace().database(null);
+      }
+      if (self.namespace()) {
+        self.namespace(null);
+      }
+      self.loadNamespaces().done(function () {
+        setState(previousState);
+      }).always(function () {
+        self.reloading(false);
+      });
+    };
+
+    huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+      if (self.type !== sourceType) {
+        return;
+      }
+      var previousState = getCurrentState();
+      completeRefresh(previousState);
+    });
+
     huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
       var refreshedEntry = details.entry;
 
@@ -58,56 +119,16 @@ var MetastoreSource = (function () {
         return;
       }
 
-      var prevNamespaceId = null;
-      var prevDbName = null;
-      var prevTableName = null;
-      if (self.namespace()) {
-        prevNamespaceId = self.namespace().id;
-        if (self.namespace().database()) {
-          prevDbName = self.namespace().database().catalogEntry.name;
-          if (self.namespace().database().table()) {
-            prevTableName = self.namespace().database().table().catalogEntry.name;
-          }
-
-        }
-      }
-
-      var setPrevious = function () {
-        if (prevNamespaceId) {
-          self.setNamespaceById(prevNamespaceId).done(function () {
-            if (prevDbName) {
-              self.namespace().setDatabaseByName(prevDbName, function () {
-                if (self.namespace().database() && prevTableName) {
-                  self.namespace().database().setTableByName(prevTableName);
-                }
-              });
-            }
-          });
-        }
-      };
-
-      var completeRefresh = function () {
-        self.reloading(true);
-        if (self.namespace() && self.namespace().database() && self.namespace().database().table()) {
-          self.namespace().database().table(null);
-        }
-        if (self.namespace() && self.namespace().database()) {
-          self.namespace().database(null);
-        }
-        if (self.namespace()) {
-          self.namespace(null);
-        }
-        self.loadNamespaces().done(setPrevious).always(function () {
-          self.reloading(false);
-        });
-      };
+      var previousState = getCurrentState();
 
       if (refreshedEntry.isSource()) {
-        completeRefresh();
+        completeRefresh(previousState);
       } else if (refreshedEntry.isDatabase() && self.namespace()) {
         self.namespace().databases().some(function (database) {
           if (database.catalogEntry === refreshedEntry) {
-            database.load(setPrevious, self.optimizerEnabled(), self.navigatorEnabled());
+            database.load(function () {
+              setState(previousState);
+            }, self.optimizerEnabled(), self.navigatorEnabled());
             return true;
           }
         })
