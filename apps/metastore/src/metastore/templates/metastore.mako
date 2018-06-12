@@ -85,7 +85,7 @@ ${ components.menubar(is_embeddable) }
   <div style="font-size: 14px; margin: 0 12px; line-height: 27px;">
     <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onChanged: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
     <!-- ko with: source -->
-    <!-- ko if: namespaces().length > 1 -->
+    <!-- ko if: namespaces().length > 1 || namespaceRefreshEnabled() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onChanged: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- /ko -->

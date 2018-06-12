@@ -650,9 +650,9 @@ ${ assist.assistPanel() }
       self.activeNamespace = ko.observable();
 
 
-      ContextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (namespaces) {
+      ContextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
         // TODO: Namespace selection
-        self.activeNamespace(namespaces[0]);
+        self.activeNamespace(context.namespaces[0]);
       });
 
       self.assistAvailable = ko.observable(true);

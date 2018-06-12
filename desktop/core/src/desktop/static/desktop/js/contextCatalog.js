@@ -23,7 +23,7 @@
 var ContextCatalog = (function () {
 
   var STORAGE_POSTFIX = LOGGED_USERNAME;
-  var CONTEXT_CATALOG_VERSION = 1;
+  var CONTEXT_CATALOG_VERSION = 2;
   var NAMESPACES_CONTEXT_TYPE = 'namespaces';
   var COMPUTES_CONTEXT_TYPE = 'computes';
 
@@ -103,10 +103,11 @@ var ContextCatalog = (function () {
         ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
             var namespaces = namespaces[options.sourceType];
+            var dynamic = namespaces.hasMultiCluster;
             if (namespaces) {
-              self.namespaces[self.sourceType] = namespaces;
+              self.namespaces[self.sourceType] = { namespaces: namespaces, dynamic: dynamic };
               deferred.resolve(self.namespaces[self.sourceType]);
-              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, namespaces);
+              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, self.namespaces[self.sourceType]);
             } else {
               deferred.reject();
             }

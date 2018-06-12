@@ -2093,9 +2093,9 @@ ${ assist.assistPanel() }
       self.activeNamespace = ko.observable();
 
       // TODO: sourceType? --> self.apiHelperType
-      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (namespaces) {
+      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace selection for create wizard
-        self.activeNamespace(namespaces[0]);
+        self.activeNamespace(context.namespaces[0]);
       });
 
       self.fileType = ko.observable();
