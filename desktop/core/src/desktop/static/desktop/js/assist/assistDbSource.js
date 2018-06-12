@@ -74,6 +74,39 @@ var AssistDbSource = (function () {
     self.hasNamespaces = ko.pureComputed(function () {
       return self.namespaces().length > 0;
     });
+
+    huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+      if (self.sourceType !== sourceType) {
+        return;
+      }
+
+      self.loading(true);
+      ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
+        var newNamespaces = [];
+        var existingNamespaceIndex = {};
+        self.namespaceRefreshEnabled(context.dynamic);
+        self.namespaces().forEach(function (assistNamespace) {
+          existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
+        });
+        context.namespaces.forEach(function(newNamespace) {
+          if (existingNamespaceIndex[newNamespace.id]) {
+            existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
+            existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
+            newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
+          } else {
+            newNamespaces.push(new AssistDbNamespace({
+              sourceType: self.sourceType,
+              namespace: newNamespace,
+              i18n: self.i18n,
+              navigationSettings: self.navigationSettings
+            }));
+          }
+        });
+        self.namespaces(newNamespaces);
+      }).always(function () {
+        self.loading(false);
+      })
+    });
   }
 
   AssistDbSource.prototype.whenLoaded = function (callback) {
@@ -123,32 +156,7 @@ var AssistDbSource = (function () {
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
     var self = this;
-    self.loading(true);
-    ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: true }).done(function (context) {
-      var newNamespaces = [];
-      var existingNamespaceIndex = {};
-      self.namespaceRefreshEnabled(context.dynamic);
-      self.namespaces().forEach(function (assistNamespace) {
-        existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
-      });
-      context.namespaces.forEach(function(newNamespace) {
-        if (existingNamespaceIndex[newNamespace.id]) {
-          existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
-          existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
-          newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
-        } else {
-          newNamespaces.push(new AssistDbNamespace({
-            sourceType: self.sourceType,
-            namespace: newNamespace,
-            i18n: self.i18n,
-            navigationSettings: self.navigationSettings
-          }));
-        }
-      });
-      self.namespaces(newNamespaces);
-    }).always(function () {
-      self.loading(false);
-    })
+    ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: true });
   };
 
   return AssistDbSource;

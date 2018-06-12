@@ -356,6 +356,7 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
+    self.namespaceRefreshEnabled = ko.observable(false);
     self.availableNamespaces = ko.observableArray();
     self.namespace = ko.observable();
     self.availableComputes = ko.observableArray();
@@ -373,16 +374,22 @@ var EditorViewModel = (function() {
       }
     });
 
-    var namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
-      self.availableNamespaces(context.namespaces);
-      if (!snippet.namespace || !context.namespaces.some(function (namespace) {
-        if (namespace.id === snippet.namespace.id) {
-          self.namespace(namespace);
-          return true;
-        }})) {
-        self.namespace(context.namespaces[0]);
-      }
-    });
+    var namespacesPromise;
+    self.reloadNamespaces = function () {
+      namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
+        self.namespaceRefreshEnabled(context.dynamic);
+        self.availableNamespaces(context.namespaces);
+        if (!snippet.namespace || !context.namespaces.some(function (namespace) {
+          if (namespace.id === snippet.namespace.id) {
+            self.namespace(namespace);
+            return true;
+          }})) {
+          self.namespace(context.namespaces[0]);
+        }
+      });
+    };
+
+    self.reloadNamespaces();
 
     self.database = ko.observable();
     var previousDatabase = null;
@@ -2937,20 +2944,43 @@ var EditorViewModel = (function() {
 
     huePubSub.subscribeOnce('assist.db.panel.ready', function () {
       if (self.type().indexOf('query') === 0) {
-        if (self.snippets().length === 1) {
+
+        var whenDatabaseAvailable = function (snippet) {
           huePubSub.publish('assist.set.database', {
-            source: self.snippets()[0].type(),
-            namespace: self.snippets()[0].namespace(),
-            name: self.snippets()[0].database()
+            source: snippet.type(),
+            namespace: snippet.namespace(),
+            name: snippet.database()
           });
+        };
+
+        var whenNamespaceAvailable = function (snippet) {
+          if (snippet.database()) {
+            whenDatabaseAvailable(snippet);
+          } else {
+            var databaseSub = snippet.database.subscribe(function () {
+              databaseSub.dispose();
+              whenDatabaseAvailable(snippet);
+            })
+          }
+        };
+
+        var whenSnippetAvailable = function (snippet) {
+          if (snippet.namespace()) {
+            whenNamespaceAvailable(snippet);
+          } else {
+            var namespaceSub = snippet.namespace.subscribe(function () {
+              namespaceSub.dispose();
+              whenNamespaceAvailable(snippet);
+            })
+          }
+        };
+
+        if (self.snippets().length === 1) {
+          whenSnippetAvailable(self.snippets()[0]);
         } else {
           var snippetsSub = self.snippets.subscribe(function (snippets) {
             if (snippets.length === 1) {
-              huePubSub.publish('assist.set.database', {
-                source: self.snippets()[0].type(),
-                namespace: self.snippets()[0].namespace(),
-                name: self.snippets()[0].database()
-              });
+              whenSnippetAvailable(snippets[0])
             }
             snippetsSub.dispose();
           })
@@ -3217,6 +3247,14 @@ var EditorViewModel = (function() {
         huePubSub.publish('set.active.snippet.type', activeSnippet.type());
       })
     }, self.huePubSubId);
+
+    huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+      self.selectedNotebook().snippets().forEach(function (snippet) {
+        if (snippet.type() === sourceType) {
+          snippet.reloadNamespaces();
+        }
+      })
+    });
 
     huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
       var notebook = self.selectedNotebook();
