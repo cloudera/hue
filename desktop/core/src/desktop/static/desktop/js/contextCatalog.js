@@ -81,6 +81,7 @@ var ContextCatalog = (function () {
     ContextCatalog.prototype.getNamespaces = function (options) {
       var self = this;
 
+      var notifyForRefresh = self.namespacePromises[options.sourceType] && options.clearCache;
       if (options.clearCache) {
         self.namespacePromises[options.sourceType] = undefined;
         self.namespaces[options.sourceType] = undefined;
@@ -103,11 +104,15 @@ var ContextCatalog = (function () {
         ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
             var namespaces = namespaces[options.sourceType];
-            var dynamic = namespaces.hasMultiCluster;
+            var dynamic = true; //namespaces.hasMultiCluster;
             if (namespaces) {
-              self.namespaces[self.sourceType] = { namespaces: namespaces, dynamic: dynamic };
-              deferred.resolve(self.namespaces[self.sourceType]);
-              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, self.namespaces[self.sourceType]);
+              self.namespaces[options.sourceType] = { namespaces: namespaces, dynamic: dynamic };
+              deferred.resolve(self.namespaces[options.sourceType]);
+              if (notifyForRefresh) {
+                huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
+              }
+
+              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, self.namespaces[options.sourceType]);
             } else {
               deferred.reject();
             }
@@ -154,8 +159,8 @@ var ContextCatalog = (function () {
         if (computes[options.sourceType]) {
           var computes = computes[options.sourceType];
           if (computes) {
-            self.computes[self.sourceType] = computes;
-            deferred.resolve(self.computes[self.sourceType])
+            self.computes[options.sourceType] = computes;
+            deferred.resolve(self.computes[options.sourceType])
             // TODO: save
           } else {
             deferred.reject();
