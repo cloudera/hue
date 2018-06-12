@@ -79,7 +79,7 @@ def get_config(request):
 
 @api_error_handler
 def get_context_namespaces(request, interface):
-  response = {}
+  response = {'hasMulticluser': False}
   namespaces = []
 
   clusters = get_clusters(request.user).values()
@@ -99,6 +99,7 @@ def get_context_namespaces(request, interface):
           'status': namespace.get('status'),
         } for namespace in SdxApi(request.user).list_namespaces()]
       )
+      response['hasMulticluser'] = True
 
   response[interface] = namespaces
   response['status'] = 0
