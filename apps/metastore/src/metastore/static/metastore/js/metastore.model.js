@@ -25,12 +25,10 @@ var MetastoreSource = (function () {
     self.reloading = ko.observable(false);
     self.loading = ko.observable(false);
 
-    self.namespace = ko.observable();
-    self.namespaces = ko.observableArray();
-
     self.lastLoadNamespacesDeferred = $.Deferred();
     self.namespace = ko.observable();
     self.namespaces = ko.observableArray();
+    self.namespaceRefreshEnabled = ko.observable();
 
     self.namespace.subscribe(function () {
       if (self.namespace() && self.namespace().databases().length === 0) {
@@ -132,8 +130,9 @@ var MetastoreSource = (function () {
   MetastoreSource.prototype.loadNamespaces = function () {
     var self = this;
     self.loading(true);
-    ContextCatalog.getNamespaces({ sourceType: self.type }).done(function (namespaces) {
-      self.namespaces($.map(namespaces, function (namespace) {
+    ContextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
+      self.namespaceRefreshEnabled(context.dynamic);
+      self.namespaces($.map(context.namespaces, function (namespace) {
         return new MetastoreNamespace({
           metastoreViewModel: self.metastoreViewModel,
           sourceType: self.type,
