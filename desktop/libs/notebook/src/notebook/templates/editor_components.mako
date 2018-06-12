@@ -941,11 +941,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
-    <!-- ko if: availableNamespaces().length > 1 -->
+    <!-- ko if: availableNamespaces().length > 1 || namespaceRefreshEnabled() -->
     <span class="editor-header-title">${ _('Namespace') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
-    <!-- ko if: availableComputes().length > 1 -->
+    <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
     <span class="editor-header-title">${ _('Compute') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
