@@ -276,12 +276,15 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = json.loads(request.POST.get('cluster', '""'))
+  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog API
   if cluster == 'undefined':
     cluster = None
+  if not cluster and snippet.get('compute'): # Via notebook.ko.js
+    cluster = snippet.get('compute').get('id')
   if cluster and 'crn:altus:analyticdb:' in cluster:
     interface = 'altus-adb'
-  print cluster
+  if cluster:
+    LOG.info('Selected cluster %s' % cluster)
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api

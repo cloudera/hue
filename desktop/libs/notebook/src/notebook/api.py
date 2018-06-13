@@ -222,8 +222,8 @@ def fetch_result_data(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  rows = json.loads(request.POST.get('rows', 100))
-  start_over = json.loads(request.POST.get('startOver', False))
+  rows = json.loads(request.POST.get('rows', '100'))
+  start_over = json.loads(request.POST.get('startOver', 'false'))
 
   response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
 
