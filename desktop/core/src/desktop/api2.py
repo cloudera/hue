@@ -120,7 +120,7 @@ def get_context_computes(request, interface):
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
-        'namespace': cluster['id'], # Dummy
+        'namespace': cluster['id'],
         'interface': interface,
         'type': cluster['type']
       } for cluster in clusters
@@ -132,7 +132,7 @@ def get_context_computes(request, interface):
           'id': cluster.get('crn', 'None'),
           'name': cluster.get('clusterName', 'Unknown'),
           'status': cluster.get('status'),
-          # namespaceCrn
+          'namespace': cluster.get('namespaceCrn'),
           # environmentType
           # secured
           # cdhVersion
@@ -148,6 +148,7 @@ def get_context_computes(request, interface):
           'status': cluster.get('status'),
           'environmentType': cluster.get('environmentType'),
           'serviceType': cluster.get('serviceType'),
+          'namespace': cluster.get('namespaceCrn'),
           'type': 'altus-de'
         } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
       )
