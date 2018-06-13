@@ -494,7 +494,7 @@ var MetastoreTable = (function () {
         self.loadingViewSql(true);
       }
 
-      self.catalogEntry.getTopJoins().done(function (topJoins) {
+      self.catalogEntry.getTopJoins({ silenceErrors: true }).done(function (topJoins) {
         if (topJoins && topJoins.values) {
           var joins = [];
           var ownQidLower = self.catalogEntry.path.join('.').toLowerCase();

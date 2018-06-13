@@ -436,7 +436,7 @@ from desktop.views import _ko
             });
 
             if (self.catalogEntry.isTableOrView()) {
-              var joinsPromise = self.catalogEntry.getTopJoins().done(function (topJoins) {
+              var joinsPromise = self.catalogEntry.getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
                 if (topJoins && topJoins.values && topJoins.values.length) {
                   entriesAddedDeferred.done(function (entries) {
                     var entriesIndex = {};
