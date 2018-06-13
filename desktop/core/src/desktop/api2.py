@@ -140,9 +140,6 @@ def get_context_computes(request, interface):
           'name': cluster.get('clusterName', 'Unknown'),
           'status': cluster.get('status'),
           'namespace': cluster.get('namespaceCrn'),
-          # environmentType
-          # secured
-          # cdhVersion
           'type': 'altus-adb'
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters']]
       )
