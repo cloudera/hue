@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
 from notebook.connectors.altus import AnalyticDbApi
-from notebook.connectors.base import Api, QueryError
+from notebook.connectors.base import Api
 
 
 LOG = logging.getLogger(__name__)
@@ -45,25 +45,13 @@ class AltusAdbApi(Api):
   def execute(self, notebook, snippet):
     statement = snippet['statement']
 
-    return HueQuery(self.user, cluster_crn=self.cluster_name).do_execute('SHOW TABLES')
+    return HueQuery(self.user, cluster_crn=self.cluster_name).do_execute(statement)
 
 
   def check_status(self, notebook, snippet):
-    response = {'status': 'running'}
+    handle = snippet['result']['handle']
 
-    job_id = snippet['result']['handle']['id']
-
-    handle = AnalyticDbApi(self.user).list_jobs(job_ids=[job_id])
-    job = handle['jobs'][0]
-
-    if job['status'] in RUNNING_STATES:
-      return response
-    elif job['status'] in ('failed', 'terminated'):
-      raise QueryError(_('Job was %s') % job['status'])
-    else:
-      response['status'] = 'available'
-
-    return response
+    return HueQuery(self.user, cluster_crn=self.cluster_name).do_check_status(handle)
 
 
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -81,7 +69,7 @@ class AltusAdbApi(Api):
       AnalyticDbApi(self.user).terminate_job(job_id=job_id)
       response = {'status': 0}
     else:
-      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
+      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submission.')}
 
     return response
 
@@ -140,8 +128,8 @@ class HueQuery():
             "value": "%7B%22type%22%3A%22impala%22%2C%22source%22%3A%22data%22%7D"
           }
         ]
-      }}''' 
-    
+      }}'''
+
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
     return json.loads(resp['payload'])
 
@@ -190,17 +178,72 @@ class HueQuery():
                   }
                 ]
               }
-            }'''        
-            
-    
-            
+            }'''
+
     payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query))
-    
+
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
     return json.loads(resp['payload'])
 
-  # check_status
-  
+
+  def do_check_status(self, handle):
+    notebook = {"type":"impala", "name": "query", "isSaved": False, "sessions": [], "snippets": [{"id": "1234", "type":"impala","statement_raw": "SHOW DATABASES", "result": {"handle": {} }}]}
+    snippet = {"id": "1234", "type": "impala", "statement":"SHOW DATABASES", "status": "running", "result": {'handle': {"log_context":None,"statements_count":1,"end":{"column":13,"row":0},"statement_id":0,"has_more_statements":False,"start":{"column":0,"row":0},"secret":"3h9WBnLbTUYAAAAAPQjxlQ==\n","has_result_set":True,"session_guid":"qcrpEBmCTGacxfhM+CxbkQ==\n","statement":"SHOW DATABASES","operation_type":0,"modified_row_count":None,"guid":"3h9WBnLbTUYAAAAAPQjxlQ==\n","previous_statement_hash":"5b1f14102d749be7b41da376bcdbb64f993ce00bc46e3aab0b8008c4"}}, "properties": {}}
+
+    snippet['result']['handle'] = handle
+
+    notebook_payload = urllib.quote(json.dumps(notebook))
+    snippet_payload = urllib.quote(json.dumps(snippet))
+
+    payload = '''
+            {
+              "method": "POST",
+              "url": "http://127.0.0.1:8000/notebook/api/check_status",
+              "httpVersion": "HTTP/1.1",
+              "headers": [
+                {
+                  "name": "Accept-Encoding",
+                  "value": "gzip, deflate, br"
+                },
+                {
+                  "name": "Content-Type",
+                  "value": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                {
+                  "name": "Accept",
+                  "value": "*/*"
+                },
+                {
+                  "name": "X-Requested-With",
+                  "value": "XMLHttpRequest"
+                },
+                {
+                  "name": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "queryString": [],
+              "cookies": [
+              ],
+              "postData": {
+                "mimeType": "application/x-www-form-urlencoded; charset=UTF-8",
+                "text": "notebook=%(notebook)s&snippet=%(snippet)s",
+                "params": [
+                  {
+                    "name": "notebook",
+                    "value": "%(notebook)s"
+                  },
+                  {
+                    "name": "snippet",
+                    "value": "%(snippet)s"
+                  }
+                ]
+              }
+            }''' % {'notebook': notebook_payload, 'snippet': snippet_payload}
+
+    resp = self.api.submit_hue_query(self.cluster_crn, payload)
+    return json.loads(resp['payload'])#['query_status']
+
   # fetch_result
-  
+
   # close_statement
