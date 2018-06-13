@@ -108,7 +108,7 @@ class DataEngApi():
     if order:
       args['order'] = order
 
-    return _exec('dataeng', 'listJobs')
+    return _exec('dataeng', 'listJobs', args)
 
   def describe_job(self, job_id):
     return _exec('dataeng', 'describeJob', {'jobId', job_id})
@@ -135,7 +135,6 @@ class DataEngApi():
   def terminate_job(self, job_id):
     return _exec('dataeng', 'terminateJob', {'jobId': job_id})
 
-
   def list_clusters(self, names=None, page_size=None, starting_token=None):
     args = {}
 
@@ -146,7 +145,7 @@ class DataEngApi():
     if starting_token:
       args['startingToken'] = starting_token
 
-    return _exec('dataeng', 'listClusters')
+    return _exec('dataeng', 'listClusters', args)
 
   def create_cluster(self):
     return _exec('dataeng', 'createCluster')
