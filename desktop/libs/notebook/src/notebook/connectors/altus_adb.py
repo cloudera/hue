@@ -17,16 +17,13 @@
 
 import logging
 import json
-import re
 import urllib
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from metadata.workload_analytics_client import WorkfloadAnalyticsClient
-
 from notebook.connectors.altus import AnalyticDbApi
-from notebook.connectors.base import Api
+from notebook.connectors.base import Api, QueryError
 
 
 LOG = logging.getLogger(__name__)
@@ -55,32 +52,21 @@ class AltusAdbApi(Api):
 
 
   def fetch_result(self, notebook, snippet, rows, start_over):
-    return {
-        'data':  [[_('Job successfully completed.')]],
-        'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
-        'type': 'table',
-        'has_more': False,
-    }
+    handle = snippet['result']['handle']
+
+    return HueQuery(self.user, cluster_crn=self.cluster_name).do_fetch_result(handle)
+  
+  
+  def close_statement(self, snippet):
+    return {'status': -1} 
 
 
   def cancel(self, notebook, snippet):
-    if snippet['result']['handle'].get('id'):
-      job_id = snippet['result']['handle']['id']
-      AnalyticDbApi(self.user).terminate_job(job_id=job_id)
-      response = {'status': 0}
-    else:
-      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submission.')}
-
-    return response
+    return {'status': -1, 'message': _('Could not cancel.')}
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
-        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
-        attempt_id='attempt_1499705340501_0045_m_000000_0'
-    )
-
-    return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
+    return 'Running...'
 
 
   def progress(self, snippet, logs):
@@ -88,15 +74,7 @@ class AltusAdbApi(Api):
 
 
   def get_jobs(self, notebook, snippet, logs):
-    ## 50cf0e00-746b-4d86-b8e3-f2722296df71
-    job_id = snippet['result']['handle']['id']
-    return [{
-        'name': job_id,
-        'url': reverse('jobbrowser.views.apps') + '#!' + job_id,
-        'started': True,
-        'finished': False # Would need call to check_status
-      }
-    ]
+    return []
 
 
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
@@ -183,7 +161,12 @@ class HueQuery():
     payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query))
 
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
-    return json.loads(resp['payload'])
+    resp_payload = json.loads(resp['payload'])
+    
+    if 'handle' in resp_payload:
+      return resp_payload['handle']
+    else:
+      raise QueryError(resp_payload.get('message'))
 
 
   def do_check_status(self, handle):
@@ -242,8 +225,81 @@ class HueQuery():
             }''' % {'notebook': notebook_payload, 'snippet': snippet_payload}
 
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
-    return json.loads(resp['payload'])#['query_status']
+    resp_payload = json.loads(resp['payload'])
+    
+    if 'query_status' in resp_payload:
+      return resp_payload['query_status']
+    else:
+      return resp_payload
 
-  # fetch_result
 
-  # close_statement
+  def do_fetch_result(self, handle):
+    notebook = {"type":"impala", "name": "query", "isSaved": False, "sessions": [], "snippets": [{"id": "1234", "type":"impala","statement_raw": "SHOW DATABASES", "result": {"handle": {} }}]}
+    snippet = {"id": "1234", "type": "impala", "statement":"SHOW DATABASES", "status": "running", "result": {'handle': {"log_context":None,"statements_count":1,"end":{"column":13,"row":0},"statement_id":0,"has_more_statements":False,"start":{"column":0,"row":0},"secret":"3h9WBnLbTUYAAAAAPQjxlQ==\n","has_result_set":True,"session_guid":"qcrpEBmCTGacxfhM+CxbkQ==\n","statement":"SHOW DATABASES","operation_type":0,"modified_row_count":None,"guid":"3h9WBnLbTUYAAAAAPQjxlQ==\n","previous_statement_hash":"5b1f14102d749be7b41da376bcdbb64f993ce00bc46e3aab0b8008c4"}}, "properties": {}}
+
+    rows = 100
+    start_over = True
+
+    snippet['result']['handle'] = handle
+
+    notebook_payload = urllib.quote(json.dumps(notebook))
+    snippet_payload = urllib.quote(json.dumps(snippet))
+    rows_payload = urllib.quote(json.dumps(rows))
+    start_over_payload = urllib.quote(json.dumps(start_over))
+
+    payload = '''
+            {
+              "method": "POST",
+              "url": "http://127.0.0.1:8000/notebook/api/fetch_result_data",
+              "httpVersion": "HTTP/1.1",
+              "headers": [
+                {
+                  "name": "Accept-Encoding",
+                  "value": "gzip, deflate, br"
+                },
+                {
+                  "name": "Content-Type",
+                  "value": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                {
+                  "name": "Accept",
+                  "value": "*/*"
+                },
+                {
+                  "name": "X-Requested-With",
+                  "value": "XMLHttpRequest"
+                },
+                {
+                  "name": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "queryString": [],
+              "cookies": [
+              ],
+              "postData": {
+                "mimeType": "application/x-www-form-urlencoded; charset=UTF-8",
+                "text": "notebook=%(notebook)s&snippet=%(snippet)s&rows=%(rows)s&startOver=%(start_over)s",
+                "params": [
+                  {
+                    "name": "notebook",
+                    "value": "%(notebook)s"
+                  },
+                  {
+                    "name": "snippet",
+                    "value": "%(snippet)s"
+                  },
+                  {
+                    "name": "rows",
+                    "value": %(rows)s
+                  },
+                  {
+                    "name": "startOver",
+                    "value": "%(start_over)s"
+                  }
+                ]
+              }
+            }''' % {'notebook': notebook_payload, 'snippet': snippet_payload, 'rows': rows_payload, 'start_over': start_over_payload}
+
+    resp = self.api.submit_hue_query(self.cluster_crn, payload)
+    return json.loads(resp['payload'])['result']
