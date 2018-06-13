@@ -38,6 +38,7 @@ from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
+from desktop.conf import CLUSTER_ID
 
 
 LOG = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', server=None, cluster=None):
-  if cluster:
+  if cluster and cluster != CLUSTER_ID.get():
     cluster_config = Cluster(user=None).get_config(cluster)
   else:
     cluster_config = None
