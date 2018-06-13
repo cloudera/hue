@@ -162,6 +162,11 @@ var SqlSetOptions = (function () {
         type: 'String; SNAPPY, GZIP or NONE',
         default: 'SNAPPY'
       },
+      'COMPUTE_STATS_MIN_SAMPLE_SIZE': {
+        description: 'The COMPUTE_STATS_MIN_SAMPLE_SIZE query option specifies the minimum number of bytes that will be scanned in COMPUTE STATS TABLESAMPLE, regardless of the user-supplied sampling percent. This query option prevents sampling for very small tables where accurate stats can be obtained cheaply without sampling because the minimum sample size is required to get meaningful stats.',
+        type: 'Integer',
+        default: '1073741824 (1GB)'
+      },
       'DEFAULT_JOIN_DISTRIBUTION_MODE': {
         description: 'This option determines the join distribution that Impala uses when any of the tables involved in a join query is missing statistics.\n\nThe setting DEFAULT_JOIN_DISTRIBUTION_MODE=SHUFFLE is recommended when setting up and deploying new clusters, because it is less likely to result in serious consequences such as spilling or out-of-memory errors if the query plan is based on incomplete information.',
         type: 'Integer; The allowed values are BROADCAST (equivalent to 0) or SHUFFLE (equivalent to 1).',
@@ -196,6 +201,11 @@ var SqlSetOptions = (function () {
         description: 'This setting controls the cutoff point (in terms of number of rows scanned) below which Impala treats a query as a "small" query, turning off optimizations such as parallel execution and native code generation. The overhead for these optimizations is applicable for queries involving substantial amounts of data, but it makes sense to skip them for queries involving tiny amounts of data. Reducing the overhead for small queries allows Impala to complete them more quickly, keeping YARN resources, admission control slots, and so on available for data-intensive queries.',
         type: 'Numeric',
         default: '100'
+      },
+      'EXEC_TIME_LIMIT_S': {
+        description: 'The EXEC_TIME_LIMIT_S query option sets a time limit on query execution. If a query is still executing when time limit expires, it is automatically canceled. The option is intended to prevent runaway queries that execute for much longer than intended.',
+        type: 'Numeric',
+        default: '0 (no time limit)'
       },
       'EXPLAIN_LEVEL': {
         description: 'Controls the amount of detail provided in the output of the EXPLAIN statement. The basic output can help you identify high-level performance issues such as scanning a higher volume of data or more partitions than you expect. The higher levels of detail show how intermediate results flow between nodes and how different SQL operations such as ORDER BY, GROUP BY, joins, and WHERE clauses are implemented within a distributed query.',
@@ -336,6 +346,11 @@ var SqlSetOptions = (function () {
         description: 'Specifies the maximum amount of disk storage, in bytes, that any Impala query can consume on any host using the "spill to disk" mechanism that handles queries that exceed the memory limit.',
         type: 'Numeric, with optional unit specifier',
         default: '-1 (amount of spill space is unlimited)'
+      },
+      'SHUFFLE_DISTINCT_EXPRS': {
+        description: 'The SHUFFLE_DISTINCT_EXPRS query option controls the shuffling behavior when a query has both grouping and distinct expressions. Impala can optionally include the distinct expressions in the hash exchange to spread the data among more nodes. However, this plan requires one more hash exchange phase. It is recommended that you turn off this option if the NDVs of the grouping expressions are high.',
+        type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+        default: 'false (shown as 0 in output of SET statement)'
       },
       'SYNC_DDL': {
         description: 'When enabled, causes any DDL operation such as CREATE TABLE or ALTER TABLE to return only when the changes have been propagated to all other Impala nodes in the cluster by the Impala catalog service. That way, if you issue a subsequent CONNECT statement in impala-shell to connect to a different node in the cluster, you can be sure that other node will already recognize any added or changed tables. (The catalog service automatically broadcasts the DDL changes to all nodes automatically, but without this option there could be a period of inconsistency if you quickly switched to another node, such as by issuing a subsequent query through a load-balancing proxy.)',
@@ -2852,6 +2867,13 @@ var SqlFunctions = (function () {
         signature: 'parse_url(STRING urlString, STRING partToExtract [, STRING keyToExtract])',
 				draggable: 'parse_url()',
         description: 'Returns the portion of a URL corresponding to a specified part. The part argument can be \'PROTOCOL\', \'HOST\', \'PATH\', \'REF\', \'AUTHORITY\', \'FILE\', \'USERINFO\', or \'QUERY\'. Uppercase is required for these literal values. When requesting the QUERY portion of the URL, you can optionally specify a key to retrieve just the associated value from the key-value pairs in the query string.'
+      },
+      regexp_escape: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'regexp_escape(STRING source)',
+        draggable: 'regexp_escape()',
+        description: 'The regexp_escape function returns a string escaped for the special character in RE2 library so that the special characters are interpreted literally rather than as special characters. The following special characters are escaped by the function: .\\+*?[^]$(){}=!<>|:-'
       },
       regexp_extract: {
         returnTypes: ['STRING'],

@@ -90,7 +90,7 @@ GrantStatement_EDIT
  | '<hive>GRANT' '<hive>ROLE' UserOrRoleList 'TO' PrincipalSpecificationList WithAdminOption_EDIT
  | '<impala>GRANT' 'CURSOR'
    {
-     parser.suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']);
    }
  | '<impala>GRANT' '<impala>ROLE' RegularOrBacktickedIdentifier 'CURSOR'
    {
@@ -103,11 +103,19 @@ GrantStatement_EDIT
  | '<impala>GRANT' ImpalaPrivilegeType_EDIT
  | '<impala>GRANT' ImpalaPrivilegeType 'CURSOR'
    {
-     parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     if ($2.isCreate) {
+       parser.suggestKeywords(['ON DATABASE', 'ON SERVER']);
+     } else {
+       parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     }
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     if ($2.isCreate) {
+        parser.suggestKeywords(['DATABASE', 'SERVER']);
+     } else {
+        parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     }
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification_EDIT
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'CURSOR'
@@ -250,9 +258,13 @@ HivePrivilegeType
  ;
 
 ImpalaPrivilegeType
- : '<impala>INSERT'
+ : 'ALL'
+ | 'ALTER'
+ | '<impala>CREATE'  --> { isCreate: true }
+ | 'DROP'
+ | '<impala>INSERT'
+ | '<impala>REFRESH'
  | 'SELECT' OptionalParenthesizedColumnList
- | 'ALL'
  ;
 
 ImpalaPrivilegeType_EDIT
@@ -453,7 +465,7 @@ RevokeStatement_EDIT
    }
  | '<impala>REVOKE' 'CURSOR'
    {
-     parser.suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']);
    }
  | '<impala>REVOKE' '<impala>ROLE' RegularOrBacktickedIdentifier 'CURSOR'
    {
@@ -466,11 +478,19 @@ RevokeStatement_EDIT
  | '<impala>REVOKE' ImpalaPrivilegeType_EDIT
  | '<impala>REVOKE' ImpalaPrivilegeType 'CURSOR'
    {
-     parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     if ($2.isCreate) {
+       parser.suggestKeywords(['ON DATABASE', 'ON SERVER']);
+     } else {
+       parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     }
    }
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     if ($2.isCreate) {
+       parser.suggestKeywords(['DATABASE', 'SERVER']);
+     } else {
+       parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     }
    }
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification_EDIT
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'CURSOR'

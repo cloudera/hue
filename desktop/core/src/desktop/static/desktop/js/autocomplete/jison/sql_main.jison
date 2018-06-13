@@ -3062,7 +3062,7 @@ OptionalHiveTableSample_EDIT
 
 OptionalImpalaTableSample
  :
- | '<impala>TABLESAMPLE' '<impala>SYSTEM' '(' 'UNSIGNED_INTEGER' ')'                                                  --> { suggestKeywords: ['REPEATABLE'] }
+ | '<impala>TABLESAMPLE' '<impala>SYSTEM' '(' 'UNSIGNED_INTEGER' ')'                                                  --> { suggestKeywords: ['REPEATABLE()'] }
  | '<impala>TABLESAMPLE' '<impala>SYSTEM' '(' 'UNSIGNED_INTEGER' ')' '<impala>REPEATABLE' '(' 'UNSIGNED_INTEGER' ')'
  ;
 

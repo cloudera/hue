@@ -1335,7 +1335,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['TABLE']
+            suggestKeywords: ['TABLE', 'VIEW']
           }
         });
       });
@@ -1351,6 +1351,33 @@
             suggestDatabases: {
               appendDot: true
             }
+          }
+        });
+      });
+
+      it('should suggest views for "SHOW CREATE VIEW |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW CREATE VIEW ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { onlyViews: true },
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest views for "SHOW CREATE VIEW db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW CREATE VIEW db.',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { onlyViews: true, identifierChain: [{ name: 'db'}] },
           }
         });
       });

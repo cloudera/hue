@@ -3064,6 +3064,42 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
+              suggestKeywords: ['COMMENT', 'AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW boo (id |"', function () {
+          assertAutoComplete({
+            dialect: 'impala',
+            beforeCursor: 'CREATE VIEW boo (id ',
+            afterCursor: '',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW boo (id COMMENT \'boo\') |"', function () {
+          assertAutoComplete({
+            dialect: 'impala',
+            beforeCursor: 'CREATE VIEW boo (id COMMENT \'boo\') ',
+            afterCursor: '',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW boo (id COMMENT \'boo\') COMMENT \'foo\' |"', function () {
+          assertAutoComplete({
+            dialect: 'impala',
+            beforeCursor: 'CREATE VIEW boo (id COMMENT \'boo\') COMMENT \'foo\' ',
+            afterCursor: '',
+            expectedResult: {
+              lowerCase: false,
               suggestKeywords: ['AS']
             }
           });

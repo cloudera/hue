@@ -197,7 +197,7 @@ InvalidateStatement_EDIT
  ;
 
 ComputeStatsStatement
- : '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier
+ : '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalImpalaTableSample
    {
      parser.addTablePrimary($3);
    }
@@ -222,6 +222,23 @@ ComputeStatsStatement_EDIT
    {
      parser.addTablePrimary($3);
      parser.suggestKeywords(['STATS', 'INCREMENTAL STATS']);
+   }
+ | '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalImpalaTableSample 'CURSOR'
+   {
+     parser.addTablePrimary($3);
+     if (!$5) {
+       parser.suggestKeywords(['TABLESAMPLE']);
+     } else if ($5.suggestKeywords) {
+       parser.suggestKeywords($5.suggestKeywords);
+     }
+   }
+ | '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier ParenthesizedColumnList_EDIT OptionalImpalaTableSample
+   {
+     parser.addTablePrimary($3);
+   }
+ | '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalImpalaTableSample_EDIT
+   {
+     parser.addTablePrimary($3);
    }
  | '<impala>COMPUTE' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
