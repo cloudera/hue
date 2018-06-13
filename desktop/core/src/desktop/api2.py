@@ -87,21 +87,28 @@ def get_context_namespaces(request, interface):
   if interface == 'hive' or interface == 'impala':
     namespaces.extend([{
         'id': cluster['id'],
-        'name': cluster['name']
+        'name': cluster['name'],
+        'status': 'RUNNING',
+        'computes': [cluster]
       } for cluster in clusters if cluster.get('type') == 'direct' # and interface == 'hive'
     ])
 
     # From Altus SDX
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+      # Note: attaching computes to namespaces might be done via the frontend in the future
+      if interface == 'impala':
+        adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
+      else:
+        adb_clusters = []
+
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
           'name': namespace.get('namespaceName', 'Unknown'),
           'status': namespace.get('status'),
+          'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
         } for namespace in SdxApi(request.user).list_namespaces()]
       )
       response['dynamicClusters'] = True
-
-      # TODO, if impala, tag namespaces with computes
 
   response[interface] = namespaces
   response['status'] = 0
