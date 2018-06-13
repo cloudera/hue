@@ -280,6 +280,8 @@ def get_api(request, snippet):
 
   # Multi cluster
   cluster = json.loads(request.POST.get('cluster', '""'))
+  if cluster == 'undefined':
+    cluster = None
   if cluster and 'altus' in cluster:
     interface = 'altus-adb'
   print cluster
