@@ -32,7 +32,6 @@ from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
 from kafka.kafka_api import get_topics
 from librdbms.server import dbms as rdbms
-from libsentry.conf import is_enabled
 from metadata.manager_client import ManagerApi
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
