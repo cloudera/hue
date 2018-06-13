@@ -78,6 +78,8 @@ def get(user, query_server=None, cluster=None):
 def get_query_server_config(name='beeswax', server=None, cluster=None):
   if cluster:
     cluster_config = Cluster(user=None).get_config(cluster)
+  else:
+    cluster_config = None
 
   if name == 'impala':
     from impala.dbms import get_query_server_config as impala_query_server_config
