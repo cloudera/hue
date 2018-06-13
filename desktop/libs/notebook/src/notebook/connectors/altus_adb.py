@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import re
 import urllib
 
@@ -130,7 +131,7 @@ class AltusAdbApi(Api):
     if nested is not None:
       url_path = '%s/%s' % (url_path, nested)
 
-    return HueQuery(self.user, cluster_crn=self.cluster_name).do_post(url_path=url_path)['payload']
+    return HueQuery(self.user, cluster_crn=self.cluster_name).do_post(url_path=url_path)
 
 
 class HueQuery():
@@ -151,7 +152,8 @@ class HueQuery():
         ]
       }}''' 
     
-    return self.api.submit_hue_query(self.cluster_crn, payload)
+    resp = self.api.submit_hue_query(self.cluster_crn, payload)
+    return json.loads(resp['payload'])
 
   def do_execute(self, query):
     payload = r'''
@@ -204,7 +206,8 @@ class HueQuery():
             
     payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query))
     
-    return self.api.submit_hue_query(self.cluster_crn, payload)
+    resp = self.api.submit_hue_query(self.cluster_crn, payload)
+    return json.loads(resp['payload'])
 
   # check_status
   
