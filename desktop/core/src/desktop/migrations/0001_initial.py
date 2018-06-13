@@ -21,19 +21,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='DefaultConfiguration',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('app', models.CharField(db_index=True, help_text='App that this configuration belongs to.', max_length=32)),
-                ('properties', models.TextField(default=b'[]', help_text='JSON-formatted default properties values.')),
-                ('is_default', models.BooleanField(db_index=True, default=False)),
-                ('groups', models.ManyToManyField(db_index=True, db_table=b'defaultconfiguration_groups', to='auth.Group')),
-            ],
-            options={
-                'ordering': ['app', '-is_default', 'user'],
-            },
-        ),
-        migrations.CreateModel(
             name='Document',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -56,12 +43,9 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(db_index=True, default=b'', help_text='Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...', max_length=32)),
                 ('data', models.TextField(default=b'{}')),
                 ('extra', models.TextField(default=b'')),
-                ('search', models.TextField(blank=True, help_text='Searchable text for the document.', null=True)),
                 ('last_modified', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Time last modified')),
                 ('version', models.SmallIntegerField(db_index=True, default=1, verbose_name='Document version')),
                 ('is_history', models.BooleanField(db_index=True, default=False)),
-                ('is_managed', models.BooleanField(db_index=True, default=False, verbose_name='If managed under the cover by Hue and never by the user')),
-                ('is_trashed', models.NullBooleanField(db_index=True, default=False, verbose_name='True if trashed')),
                 ('dependencies', models.ManyToManyField(db_index=True, related_name='dependents', to='desktop.Document2')),
             ],
             options={
@@ -109,19 +93,6 @@ class Migration(migrations.Migration):
                 ('value', models.TextField(max_length=4096)),
             ],
         ),
-        migrations.CreateModel(
-            name='HueUser',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-                'indexes': [],
-            },
-            bases=('auth.user',),
-            managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
-            ],
-        ),
         migrations.AddField(
             model_name='userpreferences',
             name='user',
@@ -161,21 +132,6 @@ class Migration(migrations.Migration):
             model_name='document',
             name='tags',
             field=models.ManyToManyField(db_index=True, to='desktop.DocumentTag'),
-        ),
-        migrations.AddField(
-            model_name='defaultconfiguration',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.CreateModel(
-            name='Directory',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-                'indexes': [],
-            },
-            bases=('desktop.document2',),
         ),
         migrations.AlterUniqueTogether(
             name='documenttag',
