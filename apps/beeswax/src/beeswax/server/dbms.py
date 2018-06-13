@@ -89,8 +89,8 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
 
     query_server = {
-        'server_name': name if not cluster else '%s-%s' % (name, cluster_config.get('id')),
-        'server_host': HIVE_SERVER_HOST.get() if not cluster else cluster_config.get('server_host'),
+        'server_name': name if not cluster_config else '%s-%s' % (name, cluster_config.get('id')),
+        'server_host': HIVE_SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
         'server_port': HIVE_SERVER_PORT.get(),
         'principal': kerberos_principal,
         'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {

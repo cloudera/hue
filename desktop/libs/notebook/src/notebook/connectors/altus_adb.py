@@ -66,7 +66,7 @@ class AltusAdbApi(Api):
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    return 'Running...'
+    return '...'
 
 
   def progress(self, snippet, logs):
