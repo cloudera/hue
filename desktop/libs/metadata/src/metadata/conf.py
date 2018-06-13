@@ -158,6 +158,25 @@ OPTIMIZER = ConfigSection(
 )
 
 
+ALTUS = ConfigSection(
+  key='altus',
+  help=_t("""Configuration options for Altus API"""),
+  members=dict(
+
+    AUTH_KEY_ID=Config(
+      key="auth_key_id",
+      help=_t("The name of the key of the service."),
+      private=False,
+      default=None),
+    AUTH_KEY_SECRET=Config(
+      key="auth_key_secret",
+      help=_t("The private part of the key associated with the auth_key."),
+      private=True,
+      default=None)
+  )
+)
+
+
 def get_navigator_auth_type():
   return NAVIGATOR.AUTH_TYPE.get().lower()
 

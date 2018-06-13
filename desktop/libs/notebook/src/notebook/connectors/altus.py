@@ -68,6 +68,15 @@ class SdxApi():
     ]
     """
 
+    from navoptapi.api_lib import ApiLib
+    from metadata.conf import ALTUS
+#     api_url = 'sdxapi.us-west-1.altus.cloudera.com'
+    api_url = 'sdxapi.gridlink-dev.cloudera.com'
+    api = ApiLib("sdx", api_url, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
+    resp = api.call_api('listNamespaces', {'maxItems': 100}) # {'clusterId' : cluster_id}
+    print resp
+    print resp.json()
+
     args = ['list-namespaces']
     
     if True:
