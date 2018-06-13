@@ -204,7 +204,11 @@ ${ assist.assistPanel() }
             <!-- ko if: createWizard.source.inputFormat() == 'manual' -->
               ${ _('Create') }
             <!-- /ko -->
-            <span data-bind="text: createWizard.destination.outputFormat"></span> <span data-bind="text: createWizard.destination.name"></span>
+            <span data-bind="text: createWizard.destination.outputFormat"></span> 
+            <span data-bind="text: createWizard.destination.name"></span>
+            <!-- ko if: createWizard.destination.outputFormat() == 'altus' -->
+              ${ _('in') } <span data-bind="text: createWizard.destination.namespace"></span>
+            <!-- /ko -->
           </div>
         </li>
       </ol>
@@ -563,8 +567,8 @@ ${ assist.assistPanel() }
               <br/>
 
               <label class="control-label "><div>${ _('Database') }</div></label>
-              <input type="text" class="form-control input-xlarge" data-bind="value: databaseName" placeholder="${ _('Database') }">
-              <a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $root.createWizard.source.apiHelperType(), namespace: namespace, path: 'default', offset: { top: -3, left: 3 }}">
+              <input type="text" class="form-control input-xlarge" data-bind="value: name" placeholder="${ _('Database') }">
+              <a href="javscript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.apiHelperType(), namespace: namespace, path: 'default', offset: { top: -3, left: 3 }}">
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
@@ -1945,7 +1949,7 @@ ${ assist.assistPanel() }
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
           }
         } else if (wizard.source.inputFormat() == 'table') {
-           name = wizard.source.table();
+           name = wizard.source.databaseName();
         } else if (wizard.source.inputFormat() == 'query') {
           if (wizard.source.query()) {
             name = wizard.source.name();
