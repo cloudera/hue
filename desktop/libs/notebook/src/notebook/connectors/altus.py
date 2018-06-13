@@ -17,12 +17,14 @@
 
 import logging
 import json
-import subprocess
 
 from datetime import datetime,  timedelta
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from metadata.conf import ALTUS
+from navoptapi.api_lib import ApiLib
+
 
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -32,20 +34,24 @@ LOG = logging.getLogger(__name__)
 DATE_FORMAT = "%Y-%m-%d"
 
 
-def _exec(command, args):
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+  
+  if service == 'analyticdb':
+    hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
+  elif service == 'dataeng':
+    hostname = ALTUS.HOSTNAME_DATAENG.get()
+  else:
+    hostname = ALTUS.HOSTNAME.get()
+    
   try:
-    data = subprocess.check_output([
-        'altus',
-        command,
-       ] +
-       args
-    )
+    api = ApiLib(service, hostname, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
+    resp = api.call_api(command, parameters)
+    LOG.info(resp)
+    return resp.json()
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
-
-  response = json.loads(data)
-
-  return response
 
 
 class IAMApi(): pass
@@ -67,24 +73,7 @@ class SdxApi():
       ...
     ]
     """
-
-    from navoptapi.api_lib import ApiLib
-    from metadata.conf import ALTUS
-#     api_url = 'sdxapi.us-west-1.altus.cloudera.com'
-    api_url = 'sdxapi.gridlink-dev.cloudera.com'
-    api = ApiLib("sdx", api_url, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
-    resp = api.call_api('listNamespaces', {'maxItems': 100}) # {'clusterId' : cluster_id}
-    print resp
-    print resp.json()
-
-    args = ['list-namespaces']
-    
-    if True:
-      args.append('--endpoint-url')
-      args.append('https://ganeshk-2-api.arcus-dev.cloudera.com')
-      args.append('--profile=dev')
-
-    return _exec('sdx', args)['namespaces']
+    return _exec('sdx', 'listNamespaces')['namespaces']
 
 
 class DataEngApi():
@@ -93,38 +82,36 @@ class DataEngApi():
 
   def list_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
         creation_date_after=None, cluster_crn=None, order=None):
-    args = ['list-jobs']
+    args = {}
 
     if creation_date_after is None:
       creation_date_after = (datetime.today() - timedelta(days=7)).strftime(DATE_FORMAT)
 
     if submitter_crns:
-      args.extend(['--submitter-crns', submitter_crns])
+      args['submitterCrns'] = submitter_crns
     if page_size is not None:
-      args.extend(['--page-size', str(page_size)])
+      args['pageSize'] = str(page_size)
     if starting_token:
-      args.extend(['--starting-token', starting_token])
+      args['startingToken'] = starting_token
     if job_statuses:
-      args.extend(['--job-statuses', job_statuses])
+      args['jobStatuses'] = job_statuses
     if job_ids:
-      args.extend(['--job-ids'] + job_ids)
+      args['jobIds'] = job_ids
     if job_types:
-      args.extend(['--job-types', job_types])
+      args['jobTypes'] = job_types
     if creation_date_before:
-      args.extend(['--creation-date-before', creation_date_before])
+      args['creationDateBefore'] = creation_date_before
     if creation_date_after:
-      args.extend(['--creation-date-after', creation_date_after])
+      args['creationDateAfter'] = creation_date_after
     if cluster_crn:
-      args.extend(['--cluster-crn', cluster_crn])
+      args['clusterCrn'] = cluster_crn
     if order:
-      args.extend(['--order', order])
+      args['order'] = order
 
-    return _exec('dataeng', args)
+    return _exec('dataeng', 'listJobs')
 
   def describe_job(self, job_id):
-    args = ['describe-job', '--job-id', job_id]
-
-    return _exec('dataeng', args)
+    return _exec('dataeng', 'describeJob', {'jobId', job_id})
 
   def submit_hive_job(self, cluster_name, script, params=None, job_xml=None):
     job = {'script': script}
@@ -137,38 +124,38 @@ class DataEngApi():
     return self.submit_jobs(cluster_name, [{'hiveJob': job}])
 
   def submit_spark_job(self):
-    return _exec('dataeng', ['submit-jobs'])
+    return _exec('dataeng', 'submitJobs')
 
   def submit_yarn_job(self):
-    return _exec('dataeng', ['submit-jobs'])
+    return _exec('dataeng', 'submitJobs')
 
   def submit_jobs(self, cluster_name, jobs):
-    return _exec('dataeng', ['submit-jobs', '--cluster-name', cluster_name, '--jobs', json.dumps(jobs)])
+    return _exec('dataeng', 'submitJobs', {'clusterName': cluster_name, 'jobs': json.dumps(jobs)})
 
   def terminate_job(self, job_id):
-    return _exec('dataeng', ['terminate-job', '--job-id', job_id])
+    return _exec('dataeng', 'terminateJob', {'jobId': job_id})
 
 
   def list_clusters(self, names=None, page_size=None, starting_token=None):
-    args = ['list-clusters']
+    args = {}
 
     if names:
-      args.extend(['--cluster-names', names])
+      args['clusterNames'] = names
     if page_size is not None:
-      args.extend(['--page-size', str(page_size)])
+      args['pageSize'] = str(page_size)
     if starting_token:
-      args.extend(['--starting-token', starting_token])
+      args['startingToken'] = starting_token
 
-    return _exec('dataeng', args)
+    return _exec('dataeng', 'listClusters')
 
   def create_cluster(self):
-    return _exec('dataeng', ['create-cluster'])
+    return _exec('dataeng', 'createCluster')
 
   def delete_cluster(self):
-    return _exec('dataeng', ['delete-cluster'])
+    return _exec('dataeng', 'deleteCluster')
 
   def describe_clusters(self):
-    return _exec('dataeng', ['describe-cluster'])
+    return _exec('dataeng', 'describeCluster')
 
 
 class AnalyticDbApi():
@@ -197,15 +184,7 @@ class AnalyticDbApi():
       ...
     ]
     """
-
-    args = ['list-clusters']
-    
-    if True:
-      args.append('--endpoint-url')
-      args.append('https://ganeshk-2-api.arcus-dev.cloudera.com')
-      args.append('--profile=dev')
-
-    return _exec('analyticdb', args)
+    return _exec('analyticdb', 'listClusters')
 
   def submit_hue_query(self, cluster_crn, payload):
-    return _exec('analyticdb', ['submit-hue-query', '--cluster-crn', cluster_crn, '--payload', payload])
+    return _exec('analyticdb', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
