@@ -5987,7 +5987,7 @@
             dialect: 'impala',
             noErrors: true,
             containsKeywords: ['TABLESAMPLE', 'AS'],
-            doesNotContainKeywords: ['REPEATABLE'],
+            doesNotContainKeywords: ['REPEATABLE()'],
             expectedResult: {
               lowerCase: false,
               suggestJoins: {prependJoin: true, tables: [{identifierChain: [{name: 'boo'}]}]},
@@ -6022,7 +6022,7 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            containsKeywords: ['REPEATABLE'],
+            containsKeywords: ['REPEATABLE()'],
             doesNotContainKeywords: ['TABLESAMPLE'],
             expectedResult: {
               lowerCase: false,

@@ -406,7 +406,33 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['ALL', 'INSERT', 'ROLE', 'SELECT']
+              suggestKeywords: ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "GRANT ALTER ON SERVER svr TO |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'GRANT ALTER ON SERVER svr TO ',
+            afterCursor: '',
+            noErrors: true,
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ROLE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "GRANT DROP ON SERVER svr |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'GRANT DROP ON SERVER svr ',
+            afterCursor: '',
+            noErrors: true,
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TO']
             }
           });
         });
@@ -988,7 +1014,33 @@
             noErrors: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['ALL', 'INSERT', 'ROLE', 'SELECT']
+              suggestKeywords: ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "REVOKE CREATE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'REVOKE CREATE ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ON DATABASE', 'ON SERVER']
+            }
+          });
+        });
+
+        it('should suggest keywords for "REVOKE REFRESH |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'REVOKE REFRESH ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']
             }
           });
         });

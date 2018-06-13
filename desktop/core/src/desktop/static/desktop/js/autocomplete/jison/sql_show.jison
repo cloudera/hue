@@ -171,7 +171,7 @@ ShowConfStatement
  ;
 
 ShowCreateTableStatement
- : AnyShow HiveOrImpalaCreate AnyTable RegularOrBackTickedSchemaQualifiedName
+ : AnyShow HiveOrImpalaCreate AnyTableOrView RegularOrBackTickedSchemaQualifiedName
    {
      parser.addTablePrimary($4);
    }
@@ -180,21 +180,43 @@ ShowCreateTableStatement
 ShowCreateTableStatement_EDIT
  : AnyShow HiveOrImpalaCreate 'CURSOR'
    {
-     parser.suggestKeywords(['TABLE']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['TABLE', 'VIEW']);
+     } else {
+       parser.suggestKeywords(['TABLE']);
+     }
    }
- | AnyShow HiveOrImpalaCreate AnyTable 'CURSOR'
+ | AnyShow HiveOrImpalaCreate AnyTableOrView 'CURSOR'
    {
-     parser.suggestTables();
+     if ($3.isView && parser.isImpala()) {
+       parser.suggestTables({ onlyViews: true });
+     } else {
+       parser.suggestTables();
+     }
      parser.suggestDatabases({
        appendDot: true
      });
    }
- | AnyShow HiveOrImpalaCreate AnyTable RegularOrBackTickedSchemaQualifiedName_EDIT
+ | AnyShow HiveOrImpalaCreate AnyTableOrView RegularOrBackTickedSchemaQualifiedName_EDIT
+   {
+     if (parser.yy.result.suggestTables && $3.isView) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
  | AnyShow HiveOrImpalaCreate 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
      parser.addTablePrimary($4);
-     parser.suggestKeywords(['TABLE']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['TABLE', 'VIEW']);
+     } else {
+       parser.suggestKeywords(['TABLE']);
+     }
    }
+ ;
+
+AnyTableOrView
+ : AnyTable
+ | 'VIEW'   --> { isView: true }
  ;
 
 ShowCurrentRolesStatement
