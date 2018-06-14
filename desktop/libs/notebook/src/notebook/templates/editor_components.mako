@@ -941,10 +941,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
-    <!-- ko if: availableNamespaces().length > 1 || namespaceRefreshEnabled() -->
-    <span class="editor-header-title">${ _('Namespace') }</span>
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
-    <!-- /ko -->
     <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
     <!-- ko if: availableComputes().length > 0-->
     <span class="editor-header-title">${ _('Compute') }</span>
@@ -953,6 +949,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko if: availableComputes().length === 0-->
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
     <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: (availableNamespaces().length > 1 || namespaceRefreshEnabled() -->
+    <span class="editor-header-title">${ _('Namespace') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <span class="editor-header-title">${ _('Database') }</span>
