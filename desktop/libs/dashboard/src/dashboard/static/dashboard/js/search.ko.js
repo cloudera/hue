@@ -557,10 +557,12 @@ var Collection = function (vm, collection) {
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
   self.suggest = ko.mapping.fromJS(collection.suggest);
   self.activeNamespace = ko.observable();
+  self.activeCompute = ko.observable();
 
   ContextCatalog.getNamespaces({ sourceType: collection.engine || 'solr' }).done(function (context) {
     // TODO: Namespace selection
     self.activeNamespace(context.namespaces[0]);
+    self.activeCompute(context.namespaces[0].computes[0]);
   });
 
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
@@ -1861,6 +1863,8 @@ var Collection = function (vm, collection) {
       showInAssistEnabled: true,
       sourceType: self.engine(),
       orientation: 'right',
+      namespace: self.activeNamespace(),
+      compute: self.activeCompute(),
       defaultDatabase: 'default',
       pinEnabled: false,
       source: {

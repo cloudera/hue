@@ -568,7 +568,7 @@ ${ assist.assistPanel() }
 
               <label class="control-label "><div>${ _('Database') }</div></label>
               <input type="text" class="form-control input-xlarge" data-bind="value: name" placeholder="${ _('Database') }">
-              <a href="javscript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.apiHelperType(), namespace: namespace, path: 'default', offset: { top: -3, left: 3 }}">
+              <a href="javscript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.apiHelperType(), namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
@@ -2124,11 +2124,13 @@ ${ assist.assistPanel() }
       var guessFieldTypesXhr;
 
       self.activeNamespace = ko.observable();
+      self.activeCompute = ko.observable();
 
       // TODO: sourceType? --> self.apiHelperType
       ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace selection for create wizard
         self.activeNamespace(context.namespaces[0]);
+        self.activeCompute(context.namespaces[0].computes[0]);
       });
 
       self.fileType = ko.observable();
@@ -2397,13 +2399,13 @@ ${ assist.assistPanel() }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), path: [ db ]}).done(function (dbEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), compute: self.activeCompute(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });
                       } else {
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), path: []}).done(function (sourceEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), compute: self.activeCompute(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })

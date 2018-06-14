@@ -1273,7 +1273,7 @@ var ApiHelper = (function () {
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {ContextNamespace} options.namespace
+   * @param {ContextCompute} options.compute
    * @param {boolean} [options.silenceErrors]
    * @param {number} [options.timeout]
    *
@@ -1297,7 +1297,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: '"' + options.namespace.id + '"'
+        cluster: '"' + options.compute.id + '"'
       },
       timeout: options.timeout
     }).success(function (data) {
@@ -1369,7 +1369,7 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ContextNamespace} [options.namespace]
+   * @param {ContextCompute} [options.compute]
    *
    * @param {string[]} options.path
    *
@@ -1399,8 +1399,8 @@ var ApiHelper = (function () {
       'format' : 'json'
     }
 
-    if (options.namespace && options.namespace.id) {
-      params['cluster'] = options.namespace.id;
+    if (options.compute && options.compute.id) {
+      params['cluster'] = options.compute.id;
     }
 
     var request = self.simpleGet(url, params, {

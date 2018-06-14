@@ -869,7 +869,12 @@ from desktop.views import _ko
       <!-- /ko -->
       <ul class="assist-tables" data-bind="foreach: filteredNamespaces">
         <li class="assist-table">
+          <!-- ko if: namespace.computes.length -->
           <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
+          <!-- /ko -->
+          <!-- ko ifnot: namespace.computes.length -->
+          <span class="assist-table-link" title="${_('No related computes')}" data-bind="tooltip: { placement: 'bottom' }"><i class="fa fa-fw fa-warning muted valign-middle"></i> <span data-bind="text: name"></span></span>
+          <!-- /ko -->
         </li>
       </ul>
     </div>
@@ -1219,7 +1224,7 @@ from desktop.views import _ko
         });
 
         huePubSub.subscribe('assist.collections.refresh', function() {
-          DataCatalog.getEntry({ sourceType: 'solr', namespace: self.sourceIndex['solr'].activeNamespace(), path: [] }).done(function (entry) {
+          DataCatalog.getEntry({ sourceType: 'solr', namespace: self.sourceIndex['solr'].activeNamespace(), compute: self.sourceIndex['solr'].activeCompute(), path: [] }).done(function (entry) {
             entry.clearCache({ cascade: true });
           });
         });
@@ -2687,6 +2692,7 @@ from desktop.views import _ko
                     DataCatalog.getEntry({
                       sourceType: activeLocations.type,
                       namespace: activeLocations.namespace,
+                      compute: activeLocations.compute,
                       path: [ database ],
                       definition: { type: 'database' }
                     }).done(function (catalogEntry) {
@@ -2742,7 +2748,7 @@ from desktop.views import _ko
                                   self.reloading(false)
                                 })
                               });
-                              DataCatalog.getEntry({ sourceType: activeLocations.type, namespace: activeLocations.namespace, path: [] }).done(function (sourceEntry) {
+                              DataCatalog.getEntry({ sourceType: activeLocations.type, namespace: activeLocations.namespace, compute: activeLocations.compute, path: [] }).done(function (sourceEntry) {
                                 sourceEntry.getChildren().done(function (dbEntries) {
                                   var clearPromise;
                                    // Clear the database first if it exists without cascade
@@ -3101,6 +3107,7 @@ from desktop.views import _ko
           var assistDbSource = new AssistDbSource({
             i18n : i18n,
             initialNamespace: collection.activeNamespace,
+            initialCompute: collection.activeCompute,
             type: collection.engine(),
             name: collection.engine(),
             navigationSettings: navigationSettings
@@ -3113,6 +3120,7 @@ from desktop.views import _ko
           DataCatalog.getEntry({
             sourceType: sourceType,
             namespace: collection.activeNamespace,
+            compute: collection.activeCompute,
             path: [ fakeParentName ],
             definition: { type: 'database' }
           }).done(function (fakeDbCatalogEntry) {
@@ -3120,6 +3128,7 @@ from desktop.views import _ko
             DataCatalog.getEntry({
               sourceType: sourceType,
               namespace: collection.activeNamespace,
+              compute: collection.activeCompute,
               path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
               definition: { type: 'table' }
             }).done(function (collectionCatalogEntry) {
