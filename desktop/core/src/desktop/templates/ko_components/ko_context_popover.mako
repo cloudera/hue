@@ -534,7 +534,7 @@ from metadata.conf import has_navigator
                 path: catalogEntry.path.slice(0, i + 1),
                 catalogEntry: self.catalogEntry,
                 makeActive: function () {
-                  self.catalogEntry().dataCatalog.getEntry({ namespace: self.catalogEntry().namespace, path: this.path }).done(self.catalogEntry);
+                  self.catalogEntry().dataCatalog.getEntry({ namespace: self.catalogEntry().namespace, compute: self.catalogEntry().compute, path: this.path }).done(self.catalogEntry);
                 }
               })
             }
@@ -639,7 +639,7 @@ from metadata.conf import has_navigator
         huePubSub.publish('global.search.close');
       };
 
-      function AsteriskData(data, sourceType, namespace, defaultDatabase) {
+      function AsteriskData(data, sourceType, namespace, compute, defaultDatabase) {
         var self = this;
         self.loading = ko.observable(true);
         self.hasErrors = ko.observable(false);
@@ -702,6 +702,7 @@ from metadata.conf import has_navigator
             DataCatalog.getEntry({
               sourceType: sourceType,
               namespace: namespace,
+              compute: compute,
               path: path
             }).done(function (entry) {
               entry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
@@ -740,9 +741,9 @@ from metadata.conf import has_navigator
         });
       }
 
-      function AsteriskContextTabs(data, sourceType, namespace, defaultDatabase) {
+      function AsteriskContextTabs(data, sourceType, namespace, compute, defaultDatabase) {
         var self = this;
-        self.data = new AsteriskData(data, sourceType, namespace, defaultDatabase);
+        self.data = new AsteriskData(data, sourceType, namespace, compute, defaultDatabase);
 
         self.tabs = [
           { id: 'details', label: '${ _("Details") }', template: 'context-popover-asterisk-details', templateData: self.data }
@@ -1205,6 +1206,7 @@ from metadata.conf import has_navigator
         self.data = params.data;
         self.sourceType = params.sourceType;
         self.namespace = params.namespace;
+        self.compute = params.compute;
         self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
         var orientation = params.orientation || 'bottom';
@@ -1291,6 +1293,7 @@ from metadata.conf import has_navigator
           self.isCollection = true;
           self.isCatalogEntry = false;
           self.namespace = params.data.catalogEntry.namespace;
+          self.compute = params.data.catalogEntry.compute;
         }
 
         self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true)
@@ -1314,7 +1317,7 @@ from metadata.conf import has_navigator
           self.titleTemplate = 'context-storage-entry-title';
           self.contentsTemplate = 'context-storage-entry-contents';
         } else if (self.isAsterisk) {
-          self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.namespace, self.defaultDatabase);
+          self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.namespace, self.compute, self.defaultDatabase);
           self.title = '*';
           self.iconClass = 'fa-table';
         } else if (self.isDocument) {
@@ -1471,8 +1474,8 @@ from metadata.conf import has_navigator
 
         if (self.isCatalogEntry) {
           ContextCatalog.getNamespaces({ sourceType: sourceType }).done(function (context) {
-            // TODO: Namespace selection for global search results?
-            DataCatalog.getEntry({ sourceType: sourceType, namespace: context.namespaces[0], path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
+            // TODO: Namespace and compute selection for global search results?
+            DataCatalog.getEntry({ sourceType: sourceType, namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
               catalogEntry.navigatorMeta = params.data;
               catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta);
               catalogEntry.saveLater();

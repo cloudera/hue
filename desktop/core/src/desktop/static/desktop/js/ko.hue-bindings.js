@@ -2487,6 +2487,7 @@
    *
    * {string} sourceType - 'impala', 'hive' etc.
    * {ContextNamespace} namespace
+   * {ContextCompute} compute
    * {string} path - the path, i.e. 'default.customers' or ['default', 'customers'
    * {string} [orientation] - 'top', 'right', 'bottom', 'left'. Default 'right'
    * {Object} [offset] - Optional offset from the element
@@ -2495,8 +2496,8 @@
    *
    * Examples:
    *
-   * data-bind="sqlContextPopover: { sourceType: 'impala', namespace: { id: 'myNamespace' }, path: 'default.customers' }"
-   * data-bind="sqlContextPopover: { sourceType: 'hive', namespace: { id: 'myNamespace' }, path: 'default', orientation: 'bottom', offset: { top: 5 } }"
+   * data-bind="sqlContextPopover: { sourceType: 'impala', namespace: { id: 'myNamespace' }, compute: { id: 'myCompute' }, path: 'default.customers' }"
+   * data-bind="sqlContextPopover: { sourceType: 'hive', namespace: { id: 'myNamespace' }, compute: { id: 'myCompute' }, path: 'default', orientation: 'bottom', offset: { top: 5 } }"
    *
    * @type {{init: ko.bindingHandlers.sqlContextPopover.init}}
    */
@@ -2505,7 +2506,7 @@
       ko.bindingHandlers.click.init(element, function () {
         return function () {
           var options = valueAccessor();
-          DataCatalog.getEntry({ sourceType: options.sourceType, namespace: options.namespace, path: options.path }).done(function (entry) {
+          DataCatalog.getEntry(options).done(function (entry) {
             var $source = $(element);
             var offset = $source.offset();
             if (options.offset) {
@@ -4371,6 +4372,7 @@
       DataCatalog.getChildren({
         sourceType: self.snippet.type(),
         namespace: self.snippet.namespace(),
+        compute: self.snippet.compute(),
         path: $.map(identifierChain, function (identifier) { return identifier.name }),
         silenceErrors: true,
         cachedOnly: true
@@ -4452,6 +4454,7 @@
               DataCatalog.getChildren({
                 sourceType: self.snippet.type(),
                 namespace: self.snippet.namespace(),
+                compute: self.snippet.compute(),
                 path: $.map(nextTable.identifierChain, function (identifier) { return identifier.name }),
                 cachedOnly: true,
                 silenceErrors: true
@@ -4636,6 +4639,7 @@
           id: self.editorId,
           type: self.snippet.type(),
           namespace: self.snippet.namespace(),
+          compute: self.snippet.compute(),
           defaultDatabase: self.snippet.database(),
           locations: e.data.locations,
           editorChangeTime: e.data.editorChangeTime,
@@ -4740,6 +4744,7 @@
             statementDetails: statementDetails,
             type: self.snippet.type(),
             namespace: self.snippet.namespace(),
+            compute: self.snippet.compute(),
             defaultDatabase: self.snippet.database()
           });
         }
@@ -5153,6 +5158,7 @@
                         DataCatalog.getEntry({
                           sourceType: snippet.type(),
                           namespace: snippet.namespace(),
+                          compute: snippet.compute(),
                           path: $.map(tableChain, function (identifier) { return identifier.name })
                         }).done(function (entry) {
                           entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
@@ -5308,6 +5314,7 @@
                     data: token.parseLocation,
                     sourceType: snippet.type(),
                     namespace: snippet.namespace(),
+                    compute: snippet.compute(),
                     defaultDatabase: snippet.database(),
                     pinEnabled: true,
                     source: source

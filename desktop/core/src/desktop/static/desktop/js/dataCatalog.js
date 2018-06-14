@@ -18,7 +18,7 @@ var DataCatalog = (function () {
 
   var STORAGE_POSTFIX = LOGGED_USERNAME;
 
-  var DATA_CATALOG_VERSION = 4;
+  var DATA_CATALOG_VERSION = 5;
 
   var cacheEnabled = true;
 
@@ -66,7 +66,7 @@ var DataCatalog = (function () {
   var fetchAndSave = function (apiHelperFunction, attributeName, entry, apiOptions) {
     return ApiHelper.getInstance()[apiHelperFunction]({
       sourceType: entry.dataCatalog.sourceType,
-      namespace: entry.namespace,
+      compute: entry.compute,
       path: entry.path, // Set for DataCatalogEntry
       paths: entry.paths, // Set for MultiTableEntry
       silenceErrors: apiOptions && apiOptions.silenceErrors,
@@ -124,12 +124,13 @@ var DataCatalog = (function () {
      * Clears the data catalog and cache for the given path and any children thereof.
      *
      * @param {ContextNamespace} [namespace] - The context namespace
+     * @param {ContextCompute} [compute] - The context compute
      * @param {string[]} rootPath - The path to clear
      */
-    DataCatalog.prototype.clearStorageCascade = function (namespace, rootPath) {
+    DataCatalog.prototype.clearStorageCascade = function (namespace, compute, rootPath) {
       var self = this;
       var deferred = $.Deferred();
-      if (!namespace) {
+      if (!namespace || !compute) {
         if (rootPath.length === 0) {
           self.entries = {};
           self.store.clear().then(deferred.resolve).catch(deferred.reject);
@@ -138,7 +139,7 @@ var DataCatalog = (function () {
         return deferred.reject().promise();
       }
 
-      var keyPrefix = namespace.id;
+      var keyPrefix = namespace.id + '_' + compute.id;
       if (rootPath.length) {
         keyPrefix += '_' +  rootPath.join('.');
       }
@@ -178,7 +179,7 @@ var DataCatalog = (function () {
       }
       var deferred = $.Deferred();
 
-      var identifier = dataCatalogEntry.namespace.id;
+      var identifier = dataCatalogEntry.namespace.id + '_' + dataCatalogEntry.compute.id;
       if (dataCatalogEntry.path.length) {
         identifier += '_' + dataCatalogEntry.path.join('.');
       }
@@ -203,6 +204,7 @@ var DataCatalog = (function () {
      *
      * @param {Object} options
      * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
      * @param {string[][]} options.paths
      * @param {boolean} [options.silenceErrors] - Default true
      * @param {boolean} [options.cancellable] - Default false
@@ -221,7 +223,7 @@ var DataCatalog = (function () {
       var existingPromises = [];
       options.paths.forEach(function (path) {
         var existingDeferred = $.Deferred();
-        self.getEntry({ namespace: options.namespace, path: path }).done(function (tableEntry) {
+        self.getEntry({ namespace: options.namespace, compute: options.compute, path: path }).done(function (tableEntry) {
           if (tableEntry.navOptPopularityForChildrenPromise) {
             tableEntry.navOptPopularityForChildrenPromise.done(function (existingPopularEntries) {
               popularEntries = popularEntries.concat(existingPopularEntries);
@@ -281,7 +283,7 @@ var DataCatalog = (function () {
 
             Object.keys(perTable).forEach(function (path) {
               var tableDeferred = $.Deferred();
-              self.getEntry({ namespace: options.namespace, path: path }).done(function (entry) {
+              self.getEntry({ namespace: options.namespace, compute: options.compute, path: path }).done(function (entry) {
                 cancellablePromises.push(entry.trackedPromise('navOptPopularityForChildrenPromise', entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
                   popularEntries = popularEntries.concat(entries);
                   tableDeferred.resolve();
@@ -336,13 +338,14 @@ var DataCatalog = (function () {
     /**
      * @param {Object} options
      * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
      * @param {string|string[]} options.path
      * @return {DataCatalogEntry}
      */
     DataCatalog.prototype.getKnownEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = options.namespace.id + (identifier ? '_' + identifier : '');
+      identifier = options.namespace.id + '_' + options.compute.id + (identifier ? '_' + identifier : '');
       return self.entries[identifier];
     };
 
@@ -350,6 +353,7 @@ var DataCatalog = (function () {
      * @param {Object} options
      * @param {string|string[]} options.path
      * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
      * @param {Object} [options.definition] - The initial definition if not already set on the entry
      * @param {boolean} [options.cachedOnly] - Default: false
      * @return {Promise}
@@ -357,7 +361,7 @@ var DataCatalog = (function () {
     DataCatalog.prototype.getEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = options.namespace.id + (identifier ? '_' + identifier : '');
+      identifier = options.namespace.id + '_' + options.compute.id + (identifier ? '_' + identifier : '');
       if (self.entries[identifier]) {
         return self.entries[identifier];
       }
@@ -366,11 +370,11 @@ var DataCatalog = (function () {
       self.entries[identifier] = deferred.promise();
 
       if (!cacheEnabled) {
-        deferred.resolve(new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, path: options.path, definition: options.definition })).promise();
+        deferred.resolve(new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, compute: options.compute, path: options.path, definition: options.definition })).promise();
       } else {
         self.store.getItem(identifier).then(function (storeEntry) {
           var definition = storeEntry ? storeEntry.definition : options.definition;
-          var entry = new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, path: options.path, definition: definition });
+          var entry = new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, compute: options.compute, path: options.path, definition: definition });
           if (storeEntry) {
             mergeEntry(entry, storeEntry);
           } else if (!options.cachedOnly && options.definition) {
@@ -379,7 +383,7 @@ var DataCatalog = (function () {
           deferred.resolve(entry);
         }).catch(function (error) {
           console.warn(error);
-          var entry = new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, path: options.path, definition: options.definition });
+          var entry = new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, compute: options.compute, path: options.path, definition: options.definition });
           if (!options.cachedOnly && options.definition) {
             entry.saveLater();
           }
@@ -415,31 +419,34 @@ var DataCatalog = (function () {
     /**
      * Creates an identifier for the given paths with duplicates removed
      *
+     * @oaram {Object} options
      * @param {ContextNamespace} options.namespace - The context namespace
-     * @param {string[][]} paths
+     * @param {ContextCompute} options.compute - The context compute
+     * @param {string[][]} options.paths
      * @return {string}
      */
-    var createMultiTableIdentifier = function (namespace, paths) {
+    var createMultiTableIdentifier = function (options) {
       var pathSet = {};
-      paths.forEach(function (path) {
+      options.paths.forEach(function (path) {
         pathSet[path.join('.')] = true;
       });
       var uniquePaths = Object.keys(pathSet);
       uniquePaths.sort();
-      return namespace.id + '_' + uniquePaths.join(',');
+      return options.namespace.id + '_' + options.compute.id + '_' + uniquePaths.join(',');
     };
 
     /**
      *
      * @param {Object} options
      * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
      * @param {string[][]} options.paths
      *
      * @return {Promise}
      */
     DataCatalog.prototype.getMultiTableEntry = function (options) {
       var self = this;
-      var identifier = createMultiTableIdentifier(options.namespace, options.paths);
+      var identifier = createMultiTableIdentifier(options);
       if (self.multiTableEntries[identifier]) {
         return self.multiTableEntries[identifier];
       }
@@ -597,6 +604,7 @@ var DataCatalog = (function () {
      * @param {DataCatalog} options.dataCatalog
      * @param {string|string[]} options.path
      * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
      * @param {Object} options.definition - Initial known metadata on creation (normally comes from the parent entry)
      *
      * @constructor
@@ -605,6 +613,7 @@ var DataCatalog = (function () {
       var self = this;
 
       self.namespace = options.namespace;
+      self.compute = options.compute;
       self.dataCatalog = options.dataCatalog;
       self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
       self.name = self.path.length ? self.path[self.path.length - 1] : options.dataCatalog.sourceType;
@@ -655,7 +664,7 @@ var DataCatalog = (function () {
       self.childrenPromise = undefined;
       
       if (self.path.length) {
-        var parent = self.dataCatalog.getKnownEntry({ namespace: self.namespace, path: self.path.slice(0, self.path.length - 1) });
+        var parent = self.dataCatalog.getKnownEntry({ namespace: self.namespace, compute: self.compute, path: self.path.slice(0, self.path.length - 1) });
         if (parent) {
           parent.navigatorMetaForChildrenPromise = undefined;
           parent.navOptPopularityForChildrenPromise = undefined;
@@ -722,7 +731,7 @@ var DataCatalog = (function () {
       }
 
       self.reset();
-      var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.namespace, self.path) : self.save();
+      var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.namespace, self.compute, self.path) : self.save();
 
       var clearPromise = $.when(invalidatePromise, saveDeferred);
 
@@ -801,6 +810,7 @@ var DataCatalog = (function () {
             if (!sourceMeta.databases || ((entity.name || entity) !== '_impala_builtins')) {
               promises.push(self.dataCatalog.getEntry({
                 namespace: self.namespace,
+                compute: self.compute,
                 path: self.path.concat(entity.name || entity)
               }).done(function (catalogEntry) {
                 if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
@@ -828,7 +838,7 @@ var DataCatalog = (function () {
         if ((self.getSourceType() === 'impala' || self.getSourceType() === 'hive') && self.isComplex()) {
           (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
             if (sourceMeta[path]) {
-              promises.push(self.dataCatalog.getEntry({ namespace: self.namespace, path: self.path.concat(path) }).done(function (catalogEntry) {
+              promises.push(self.dataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, path: self.path.concat(path) }).done(function (catalogEntry) {
                 if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
                   var definition = sourceMeta[path];
                   definition.index = index++;
@@ -1741,7 +1751,7 @@ var DataCatalog = (function () {
           }
         };
 
-        self.dataCatalog.getEntry({ namespace: self.namespace, path: self.path.slice(0, 2), definition: { type: 'table' } }).done(function (tableEntry) {
+        self.dataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, path: self.path.slice(0, 2), definition: { type: 'table' } }).done(function (tableEntry) {
           if (tableEntry && tableEntry.samplePromise) {
             cancellablePromises.push(applyCancellable(tableEntry.samplePromise, options));
 
@@ -1806,7 +1816,7 @@ var DataCatalog = (function () {
         return deferred.reject();
       }
       var cancellablePromises = [];
-      catalogEntry.dataCatalog.getMultiTableEntry({ namespace: catalogEntry.namespace, paths: [ catalogEntry.path ] }).done(function (multiTableEntry) {
+      catalogEntry.dataCatalog.getMultiTableEntry({ namespace: catalogEntry.namespace, compute: catalogEntry.compute, paths: [ catalogEntry.path ] }).done(function (multiTableEntry) {
         cancellablePromises.push(multiTableEntry[functionName](options).done(deferred.resolve).fail(deferred.reject));
       }).fail(deferred.reject);
       return new CancellablePromise(deferred, undefined, cancellablePromises);
@@ -2153,6 +2163,7 @@ var DataCatalog = (function () {
        * @param {Object} options
        * @param {string} options.sourceType
        * @param {ContextNamespace} options.namespace - The context namespace
+       * @param {ContextCompute} options.compute - The context compute
        * @param {string|string[]} options.path
        * @param {Object} [options.definition] - Optional initial definition
        *
@@ -2166,6 +2177,7 @@ var DataCatalog = (function () {
        * @param {Object} options
        * @param {string} options.sourceType
        * @param {ContextNamespace} options.namespace - The context namespace
+       * @param {ContextCompute} options.compute - The context compute
        * @param {string[][]} options.paths
        *
        * @return {Promise}
@@ -2181,6 +2193,7 @@ var DataCatalog = (function () {
        * @param {Object} options
        * @param {string} options.sourceType
        * @param {ContextNamespace} options.namespace - The context namespace
+       * @param {ContextCompute} options.compute - The context compute
        * @param {string|string[]} options.path
        * @param {Object} [options.definition] - Optional initial definition of the parent entry
        * @param {boolean} [options.silenceErrors]

@@ -872,14 +872,14 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
     <!-- ko foreach: topJoins -->
     <tr>
-      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), namespace: parents[1].catalogEntry.namespace, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
+      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), namespace: parents[1].catalogEntry.namespace, compute: parents[1].catalogEntry.compute, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
       <td>
         <table class="metastore-join-column-table">
           <tbody data-bind="foreach: joinCols">
           <tr>
-            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
             <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
-            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
           </tr>
           </tbody>
         </table>
@@ -1253,7 +1253,7 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        DataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {
+        DataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, compute: viewModel.source().namespace().compute, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {
           entry.clearCache({ invalidate: viewMode.source().type === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
           hueUtils.replaceURL('?');
         });
