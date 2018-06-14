@@ -1681,11 +1681,11 @@ def validate_database(user):
     res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', unicode(_('SQLite is only recommended for development environments. '
         'It might cause the "Database is locked" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended.'))))
 
-  # Check if south_migrationhisotry table is up to date
+  # Check if django_migrations table is up to date
   try:
     from desktop import appmanager
 
-    cursor.execute('''SELECT * from south_migrationhistory''')
+    cursor.execute('''SELECT * from django_migrations''')
     migration_history_entries = [(entry[1], entry[2]) for entry in cursor.fetchall()]
 
     apps = appmanager.get_apps(user)
@@ -1699,10 +1699,10 @@ def validate_database(user):
               missing_migration_entries.append((app.name, migration_name))
 
     if missing_migration_entries:
-      res.append(('SOUTH_MIGRATION_HISTORY', unicode(_('''south_migrationhistory table seems to be corrupted or incomplete.
+      res.append(('django_migrations', unicode(_('''django_migrations table seems to be corrupted or incomplete.
                                                         %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries))))
   except Exception:
-    LOG.exception("Error in config validation of SOUTH_MIGRATION_HISTORY")
+    LOG.exception("Error in config validation of django_migrations")
 
   return res
 
