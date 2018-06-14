@@ -359,15 +359,27 @@ var EditorViewModel = (function() {
     self.namespaceRefreshEnabled = ko.observable(false);
     self.availableNamespaces = ko.observableArray();
     self.namespace = ko.observable();
-    self.availableComputes = ko.pureComputed(function () {
+    self.availableComputes = ko.observableArray();/*ko.pureComputed(function () {
       if (self.namespace()) {
         return self.namespace().computes;
       }
       return [];
-    });
+    });*/
 
     self.compute = ko.observable();
 
+    var computesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
+      self.availableComputes(computes);
+      if (!snippet.compute || !computes.some(function (compute) {
+        if (compute.id === snippet.compute.id) {
+          self.compute(compute);
+          return true;
+        }
+      })) {
+        self.compute(computes[0]);
+      }
+    });
+    /*
     self.availableComputes.subscribe(function (newComputes) {
       if (!self.compute() || !newComputes.some(function (newCompute) {
         if (newCompute.id === self.compute().id) {
@@ -377,7 +389,7 @@ var EditorViewModel = (function() {
       })) {
         self.compute(newComputes.length ? newComputes[0] : undefined);
       }
-    });
+    });*/
 
     var namespacesPromise;
     self.reloadNamespaces = function () {
@@ -390,7 +402,7 @@ var EditorViewModel = (function() {
             return true;
           }})) {
           self.namespace(context.namespaces[0]);
-
+/*
           var previousComputeId;
           var newCompute;
           if (self.compute()) {
@@ -409,7 +421,7 @@ var EditorViewModel = (function() {
           if (!newCompute && self.namespace().computes.length) {
             newCompute = self.namespace().computes[0];
           }
-          self.compute(newCompute);
+          self.compute(newCompute);*/
         }
       });
     };
