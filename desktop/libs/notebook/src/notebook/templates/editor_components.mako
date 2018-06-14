@@ -950,7 +950,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
     <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: (availableNamespaces().length > 1 || namespaceRefreshEnabled() -->
+    <!-- ko if: (availableNamespaces().length > 1 || namespaceRefreshEnabled()) -->
     <span class="editor-header-title">${ _('Namespace') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
