@@ -228,6 +228,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
                 </div>
                 <div data-bind="visible: $root.assist.privileges().length == 0 && $root.isLoadingPrivileges()"><i class="fa fa-spinner fa-spin" data-bind="visible: $root.isLoadingPrivileges()"></i> <em class="muted">${ _('Loading privileges...')}</em></div>
                 <h4 style="margin-top: 4px" data-bind="visible: $root.assist.privileges().length > 0 && ! $root.isLoadingPrivileges()">${ _('Privileges') } &nbsp;</h4>
+
                 <div data-bind="visible: $root.assist.privileges().length == 0 && ! $root.isLoadingPrivileges()">
                   <div class="span10 offset1 center" style="cursor: pointer" data-bind="click: function(){ if ($root.is_sentry_admin) { $root.showCreateRole(true); $('#createRoleModal').modal('show'); } }">
                     <i data-bind="visible: $root.is_sentry_admin" class="fa fa-plus-circle waiting"></i>
