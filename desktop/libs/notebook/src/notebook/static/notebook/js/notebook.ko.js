@@ -367,6 +367,14 @@ var EditorViewModel = (function() {
     });*/
 
     self.compute = ko.observable();
+    self.compute.subscribe(function(newCompute) {
+      $.each(self.availableNamespaces(), function(index, namespace) {console.log(newCompute.namespace); console.log(namespace.name);
+        if (namespace.name == newCompute.namespace) {
+          self.namespace(namespace);
+          return;
+        }
+      });
+    });
 
     var computesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
       self.availableComputes(computes);

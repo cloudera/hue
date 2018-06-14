@@ -179,7 +179,7 @@ var DataCatalog = (function () {
       }
       var deferred = $.Deferred();
 
-      var identifier = dataCatalogEntry.namespace.id + '_' + (dataCatalogEntry.compute ? dataCatalogEntry.compute.id : '');
+      var identifier = (dataCatalogEntry.namespace ? dataCatalogEntry.namespace.id : '') + '_' + (dataCatalogEntry.compute ? dataCatalogEntry.compute.id : '');
       if (dataCatalogEntry.path.length) {
         identifier += '_' + dataCatalogEntry.path.join('.');
       }
@@ -345,7 +345,7 @@ var DataCatalog = (function () {
     DataCatalog.prototype.getKnownEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = options.namespace.id + '_' + options.compute.id + (identifier ? '_' + identifier : '');
+      identifier = (options.namespace ? options.namespace.id : '') + '_' + (options.compute ? options.compute.id : '') + (identifier ? '_' + identifier : '');
       return self.entries[identifier];
     };
 
@@ -361,7 +361,7 @@ var DataCatalog = (function () {
     DataCatalog.prototype.getEntry = function (options) {
       var self = this;
       var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = options.namespace.id + '_' + (options.compute ? options.compute.id : '') + (identifier ? '_' + identifier : '');
+      identifier = (options.namespace ? options.namespace.id : '') + '_' + (options.compute ? options.compute.id : '') + (identifier ? '_' + identifier : '');
       if (self.entries[identifier]) {
         return self.entries[identifier];
       }
