@@ -198,6 +198,9 @@ var MetastoreNamespace = (function () {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
     self.namespace = options.namespace;
+
+    // TODO: Compute selection in the metastore?
+    self.compute = options.namespace.computes[0];
     self.id = options.namespace.id;
     self.name = options.namespace.name;
     self.metastoreViewModel = options.metastoreViewModel;
@@ -230,7 +233,7 @@ var MetastoreNamespace = (function () {
       self.loadingDatabases(false);
     });
 
-    DataCatalog.getEntry({ namespace: self.namespace, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
+    DataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
       self.catalogEntry(entry);
       entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {

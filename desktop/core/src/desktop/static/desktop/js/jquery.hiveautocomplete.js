@@ -242,7 +242,8 @@
     self.getDatabases = function (callback) {
       var self = this;
       self.activeContextNamespaceDeferred.done(function (namespace) {
-        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, path: [] }).done(function (dbEntries) {
+        // TODO: compute selection?
+        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, compute: namespace.computes[0], path: [] }).done(function (dbEntries) {
           callback($.map(dbEntries, function (entry) { return entry.name }));
         });
       })
@@ -251,7 +252,8 @@
     self.getTables = function (database, callback) {
       var self = this;
       self.activeContextNamespaceDeferred.done(function (namespace) {
-        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, path: [ database ] }).done(function (entry) {
+        // TODO: compute selection?
+        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, compute: namespace.computes[0], path: [ database ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });
@@ -260,7 +262,8 @@
     self.getColumns = function (database, table, callback) {
       var self = this;
       self.activeContextNamespaceDeferred.done(function (namespace) {
-        DataCatalog.getEntry({sourceType: self.options.apiHelperType, namespace: namespace, path: [ database, table ]}).done(function (entry) {
+        // TODO: compute selection?
+        DataCatalog.getEntry({sourceType: self.options.apiHelperType, namespace: namespace, compute: namespace.computes[0], path: [ database, table ]}).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });

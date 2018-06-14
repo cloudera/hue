@@ -148,7 +148,7 @@ var SqlAutocompleter2 = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(parseResult.suggestJoins.tables, database);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
           multiTableEntry.getTopJoins({ silenceErrors: true }).done(function (topJoins) {
             if (topJoins.values) {
               topJoins.values.forEach(function (value) {
@@ -210,7 +210,7 @@ var SqlAutocompleter2 = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(parseResult.suggestJoinConditions.tables, database);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
           multiTableEntry.getTopJoins({ silenceErrors: true }).done(function (topJoins) {
             if (topJoins.values) {
               topJoins.values.forEach(function (value) {
@@ -263,7 +263,7 @@ var SqlAutocompleter2 = (function () {
 
         var paths = self.tableIdentifierChainsToPaths(parseResult.suggestAggregateFunctions.tables, database);
         if (paths.length) {
-          DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
+          DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
             multiTableEntry.getTopAggs({ silenceErrors: true }).done(function (topAggs) {
               if (topAggs.values.length > 0) {
 
@@ -397,7 +397,7 @@ var SqlAutocompleter2 = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(parseResult.suggestFilters.tables, database);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), compute: self.snippet.compute(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
           multiTableEntry.getTopFilters({ silenceErrors: true }).done(function (topFilters) {
             if (topFilters.values) {
               topFilters.values.forEach(function (value) {
@@ -442,7 +442,7 @@ var SqlAutocompleter2 = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(tables, database);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
           multiTableEntry.getTopColumns({ silenceErrors: true }).done(function (topColumns) {
             if (topColumns.values && parseResult.suggestGroupBys && typeof topColumns.values.groupbyColumns !== 'undefined') {
               var prefix = parseResult.suggestGroupBys.prefix ? (parseResult.lowerCase ? parseResult.suggestGroupBys.prefix.toLowerCase() : parseResult.suggestGroupBys.prefix) + ' ' : '';
@@ -485,7 +485,7 @@ var SqlAutocompleter2 = (function () {
 
       $.when(topColumnsDeferral, suggestColumnsDeferral).then(function (topColumns, suggestions) {
         if (topColumns.length > 0) {
-          DataCatalog.getChildren({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), path: [], silenceErrors: true }).done(function (dbEntries) {
+          DataCatalog.getChildren({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], silenceErrors: true }).done(function (dbEntries) {
             var databases = $.map(dbEntries, function (dbEntry) { return dbEntry.name });
             suggestions.forEach(function (suggestion) {
               var path = '';
@@ -535,7 +535,7 @@ var SqlAutocompleter2 = (function () {
       if (HAS_OPTIMIZER && typeof parseResult.suggestColumns.source !== 'undefined') {
         var paths = self.tableIdentifierChainsToPaths(parseResult.suggestColumns.tables, database);
         if (paths.length) {
-          DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), paths: paths }).done(function (multiTableEntry) {
+          DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
             multiTableEntry.getTopColumns({ silenceErrors: true }).done(function (topColumns) {
               var values = [];
               if (topColumns.values) {
@@ -584,7 +584,7 @@ var SqlAutocompleter2 = (function () {
         var topTablesDeferral = $.Deferred();
         deferrals.push(topTablesDeferral);
 
-        DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({ paths: [[database]], namespace: self.snippet.namespace(), silenceErrors: true }).done(function (popularTables) {
+        DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({ paths: [[database]], namespace: self.snippet.namespace(), compute: self.snippet.compute(), silenceErrors: true }).done(function (popularTables) {
           var popularityIndex = {};
           popularTables.forEach(function (popularTable) {
             if (popularTable.navOptPopularity) {
@@ -614,6 +614,7 @@ var SqlAutocompleter2 = (function () {
         DataCatalog.getChildren({
           sourceType: self.snippet.type(),
           namespace: self.snippet.namespace(),
+          compute: self.snippet.compute(),
           path: [],
           silenceErrors: true
         }).done(function (dbEntries) {
@@ -803,7 +804,7 @@ var SqlAutocompleter2 = (function () {
         identifierChain = identifierChain.slice(1);
       }
 
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), path: [database, table].concat(fetchedFields) }).done(function (entry) {
+      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [database, table].concat(fetchedFields) }).done(function (entry) {
         entry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
           if (self.snippet.type() === 'hive'
             && typeof sourceMeta.extended_columns !== 'undefined'
@@ -842,6 +843,7 @@ var SqlAutocompleter2 = (function () {
         DataCatalog.getChildren({
           sourceType: self.snippet.type(),
           namespace: self.snippet.namespace(),
+          compute: self.snippet.compute(),
           path: [],
           silenceErrors: true
         }).done(function (dbEntries) {
@@ -878,7 +880,7 @@ var SqlAutocompleter2 = (function () {
         prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
       }
 
-      DataCatalog.getChildren({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), path: [databaseName], silenceErrors: true }).done(function (tableEntries) {
+      DataCatalog.getChildren({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [databaseName], silenceErrors: true }).done(function (tableEntries) {
         var tables = [];
         tableEntries.forEach(function (tableEntry) {
           if (parseResult.suggestTables.onlyTables && tableEntry.isTable() ||
@@ -1050,6 +1052,7 @@ var SqlAutocompleter2 = (function () {
     DataCatalog.getChildren({
       sourceType: self.snippet.type(),
       namespace: self.snippet.namespace(),
+      compute: self.snippet.compute(),
       path: [],
       silenceErrors: true
     }).done(function (dbEntries) {

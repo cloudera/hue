@@ -359,18 +359,23 @@ var EditorViewModel = (function() {
     self.namespaceRefreshEnabled = ko.observable(false);
     self.availableNamespaces = ko.observableArray();
     self.namespace = ko.observable();
-    self.availableComputes = ko.observableArray();
+    self.availableComputes = ko.pureComputed(function () {
+      if (self.namespace()) {
+        return self.namespace().computes;
+      }
+      return [];
+    });
+
     self.compute = ko.observable();
 
-    var computesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
-      self.availableComputes(computes);
-      if (!snippet.compute || !computes.some(function (compute) {
-        if (compute.id === snippet.compute.id) {
-          self.compute(compute);
+    self.availableComputes.subscribe(function (newComputes) {
+      if (!self.compute() || !newComputes.some(function (newCompute) {
+        if (newCompute.id === self.compute().id) {
+          self.compute(newCompute);
           return true;
         }
       })) {
-        self.compute(computes[0]);
+        self.compute(newComputes.length ? newComputes[0] : undefined);
       }
     });
 
@@ -385,6 +390,26 @@ var EditorViewModel = (function() {
             return true;
           }})) {
           self.namespace(context.namespaces[0]);
+
+          var previousComputeId;
+          var newCompute;
+          if (self.compute()) {
+            previousComputeId = self.compute().id;
+          } else if (snippet.compute) {
+            previousComputeId = snippet.compute.id;
+          }
+          if (previousComputeId) {
+            self.namespace().computes.some(function (compute) {
+              if (compute.id === previousComputeId) {
+                newCompute = compute;
+                return true;
+              }
+            })
+          }
+          if (!newCompute && self.namespace().computes.length) {
+            newCompute = self.namespace().computes[0];
+          }
+          self.compute(newCompute);
         }
       });
     };
@@ -406,11 +431,20 @@ var EditorViewModel = (function() {
     self.database(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
     self.availableDatabases = ko.observableArray();
 
+    self.availableDatabases.subscribe(function (newDatabases) {
+      if (self.database() && newDatabases.indexOf(self.database()) === -1) {
+        if (newDatabases.length === 0 || newDatabases.indexOf('default') !== -1) {
+          self.database('default');
+        } else {
+          self.database(newDatabases[0])
+        }
+      }
+    });
+
     self.updateDatabases = function () {
       if (self.isSqlDialect()) {
-
-        $.when(computesPromise, namespacesPromise).done(function () {
-          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
+        namespacesPromise.done(function () {
+          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
             sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
               var databaseNames = [];
               databaseEntries.forEach(function (databaseEntry) {
@@ -426,6 +460,14 @@ var EditorViewModel = (function() {
         self.availableDatabases([]);
       }
     };
+
+    namespacesPromise.done(function () {
+      self.compute.subscribe(function () {
+        window.setTimeout(function () {
+          self.updateDatabases();
+        }, 0)
+      })
+    });
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
@@ -951,7 +993,7 @@ var EditorViewModel = (function() {
           }
         }
         ignoreNextAssistDatabaseUpdate = true;
-        DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), path: path }).done(function (entry) {
+        DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: path }).done(function (entry) {
           entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
         });
       });

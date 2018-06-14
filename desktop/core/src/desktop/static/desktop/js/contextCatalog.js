@@ -15,9 +15,16 @@
 // limitations under the License.
 
 /**
+ * @typedef {Object} ContextCompute
+ * @property {string} id
+ * @property {string} name
+ */
+
+/**
  * @typedef {Object} ContextNamespace
  * @property {string} id
  * @property {string} name
+ * @property {ContextCompute} computes
  */
 
 var ContextCatalog = (function () {
