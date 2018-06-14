@@ -88,7 +88,7 @@ def get_context_namespaces(request, interface):
     namespaces.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
-        'status': 'RUNNING',
+        'status': 'CREATED',
         'computes': [cluster]
       } for cluster in clusters if cluster.get('type') == 'direct' # and interface == 'hive'
     ])
@@ -97,16 +97,25 @@ def get_context_namespaces(request, interface):
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       # Note: attaching computes to namespaces might be done via the frontend in the future
       if interface == 'impala':
-        adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
+        adb_clusters =  AnalyticDbApi(request.user).list_clusters()['clusters']
+        for _cluster in adb_clusters: # Add "fake" namespace if needed
+          if not _cluster.get('namespaceCrn'):
+            _cluster['namespaceCrn'] = _cluster['crn']
+            _cluster['id'] = _cluster['crn']
+            _cluster['namespaceName'] = _cluster['clusterName']
+            _cluster['name'] = _cluster['clusterName']
       else:
         adb_clusters = []
 
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
-          'name': namespace.get('namespaceName', 'Unknown'),
+          'name': namespace.get('namespaceName'),
           'status': namespace.get('status'),
           'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
-        } for namespace in SdxApi(request.user).list_namespaces()]
+        } for namespace in SdxApi(request.user).list_namespaces() +
+             # Adding "fake" namespace for cluster without one
+             [_cluster for _cluster in adb_clusters if not cluster.get('namespaceCrn')]
+        ]
       )
       response['dynamicClusters'] = True
 
@@ -136,10 +145,10 @@ def get_context_computes(request, interface):
   if interface == 'impala' or interface == 'jobs':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
-          'id': cluster.get('crn', 'None'),
-          'name': cluster.get('clusterName', 'Unknown'),
+          'id': cluster.get('crn'),
+          'name': cluster.get('clusterName'),
           'status': cluster.get('status'),
-          'namespace': cluster.get('namespaceCrn'),
+          'namespace': cluster.get('namespaceCrn', cluster.get('clusterName')),
           'type': 'altus-adb'
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters']]
       )
