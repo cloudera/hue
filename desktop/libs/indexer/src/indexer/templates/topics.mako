@@ -623,10 +623,12 @@ ${ assist.assistPanel() }
       self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/topics/';
 
       self.activeNamespace = ko.observable();
+      self.activeCompute = ko.observable();
 
       ContextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
         // TODO: Namespace selection
         self.activeNamespace(context.namespaces[0]);
+        self.activeCompute(context.namespaces[0].computes[0]);
       });
 
       self.assistAvailable = ko.observable(true);
@@ -830,6 +832,7 @@ ${ assist.assistPanel() }
           data: {
             type: 'collection',
             namespace: self.activeNamespace(),
+            compute: self.activeCompute(),
             identifierChain: [
               {}, // empty, needed by the context popover
               ko.mapping.toJS(self.index),

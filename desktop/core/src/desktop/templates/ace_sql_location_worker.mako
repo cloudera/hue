@@ -102,6 +102,7 @@ importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }');
           id: msg.data.id,
           sourceType: msg.data.type,
           namespace: msg.data.namespace,
+          compute: msg.data.compute,
           editorChangeTime: msg.data.statementDetails.editorChangeTime,
           locations: locations,
           activeStatementLocations: activeStatementLocations,

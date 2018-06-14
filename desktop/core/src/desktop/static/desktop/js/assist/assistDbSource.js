@@ -20,6 +20,7 @@ var AssistDbSource = (function () {
    * @param {Object} options.i18n
    * @param {string} options.type
    * @param {ContextNamespace} [options.initialNamespace] - Optional initial namespace to use
+   * @param {ContextCompute} [options.initialCompute] - Optional initial compute to use
    * @param {string} options.name
    * @param {Object} options.navigationSettings
    * @constructor
@@ -31,7 +32,8 @@ var AssistDbSource = (function () {
     self.name = options.name;
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
-    self.initialNamespace = options.activeNamespace;
+    self.initialNamespace = options.initialNamespace;
+    self.initialCompute = options.initialCompute
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();
@@ -121,6 +123,7 @@ var AssistDbSource = (function () {
     ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
+      var activeCompute;
       self.namespaceRefreshEnabled(context.dynamic);
       context.namespaces.forEach(function (namespace) {
         var assistNamespace = new AssistDbNamespace({
@@ -132,6 +135,13 @@ var AssistDbSource = (function () {
 
         if (self.initialNamespace && namespace.id === self.initialNamespace.id) {
           activeNamespace = assistNamespace;
+          if (self.initialCompute) {
+            activeNamespace.computes.some(function (compute) {
+              if (compute.id === self.initialCompute.id) {
+                activeCompute = compute;
+              }
+            })
+          }
         }
         assistNamespaces.push(assistNamespace);
       });
@@ -140,6 +150,9 @@ var AssistDbSource = (function () {
         self.selectedNamespace(activeNamespace);
       } else if (assistNamespaces.length) {
         self.selectedNamespace(assistNamespaces[0]);
+      }
+      if (activeCompute) {
+        self.selectedNamespace().compute(activeCompute);
       }
     }).fail(function () {
       self.hasErrors(true);
@@ -182,6 +195,11 @@ var AssistDbNamespace = (function () {
     self.sourceType = options.sourceType;
 
     self.namespace = options.namespace;
+    // TODO: Compute selection in assist?
+    self.compute = ko.observable();
+    if (self.namespace.computes.length) {
+      self.compute(self.namespace.computes[0]);
+    }
     self.name = options.namespace.name;
 
     self.catalogEntry;
@@ -313,7 +331,7 @@ var AssistDbNamespace = (function () {
       self.selectedDatabase(null);
       self.databases([]);
 
-      DataCatalog.getEntry({ sourceType: self.sourceType, namespace: self.namespace, path : [], definition: { type: 'source' } }).done(function (catalogEntry) {
+      DataCatalog.getEntry({ sourceType: self.sourceType, namespace: self.namespace, compute: self.compute(), path : [], definition: { type: 'source' } }).done(function (catalogEntry) {
         self.catalogEntry = catalogEntry;
         self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (databaseEntries) {
           self.dbIndex = {};

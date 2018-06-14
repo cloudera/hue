@@ -648,11 +648,12 @@ ${ assist.assistPanel() }
       self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
 
       self.activeNamespace = ko.observable();
-
+      self.activeCompute = ko.observable();
 
       ContextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
         // TODO: Namespace selection
         self.activeNamespace(context.namespaces[0]);
+        self.activeCompute(context.namespaces[0].computes[0]);
       });
 
       self.assistAvailable = ko.observable(true);
@@ -855,7 +856,6 @@ ${ assist.assistPanel() }
 
         huePubSub.publish('context.popover.show', {
           data: {
-            namespace: self.activeNamespace(),
             type: 'collection',
             identifierChain: [
               {}, // empty, needed by the context popover
@@ -863,6 +863,8 @@ ${ assist.assistPanel() }
               ko.mapping.toJS(field)
             ]
           },
+          namespace: self.activeNamespace(),
+          compute: self.activeCompute(),
           showInAssistEnabled: true,
           orientation: 'right',
           pinEnabled: false,

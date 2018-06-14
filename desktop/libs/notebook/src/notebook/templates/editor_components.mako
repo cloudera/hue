@@ -938,8 +938,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
+    <!-- ko if: availableComputes().length > 0-->
     <span class="editor-header-title">${ _('Compute') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
+    <!-- ko if: availableComputes().length === 0-->
+    <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
+    <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <span class="editor-header-title">${ _('Database') }</span>
@@ -3266,7 +3271,7 @@ function togglePresentation(value) {};
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      var attachEntryResolver = function (location, sourceType, namespace) {
+      var attachEntryResolver = function (location, sourceType, namespace, compute) {
         location.resolveCatalogEntry = function(options) {
           if (!options) {
             options = {};
@@ -3286,6 +3291,7 @@ function togglePresentation(value) {};
           var promise = SqlUtils.resolveCatalogEntry({
             sourceType: sourceType,
             namespace: namespace,
+            compute: compute,
             cancellable: options.cancellable,
             cachedOnly: options.cachedOnly,
             identifierChain: location.identifierChain || location.colRef.identifierChain,
@@ -3337,7 +3343,7 @@ function togglePresentation(value) {};
             } else {
               if (e.data.locations) {
                 e.data.locations.forEach(function (location) {
-                  attachEntryResolver(location, e.data.sourceType, e.data.namespace);
+                  attachEntryResolver(location, e.data.sourceType, e.data.namespace, e.data.compute);
                 })
               }
               huePubSub.publish('ace.sql.location.worker.message', e);
@@ -3359,7 +3365,7 @@ function togglePresentation(value) {};
           if (event.data.locationWorkerResponse) {
             if (event.data.locationWorkerResponse.locations) {
               event.data.locationWorkerResponse.locations.forEach(function (location) {
-                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType, event.data.locationWorkerResponse.namespace);
+                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType, event.data.locationWorkerResponse.namespace, event.data.locationWorkerResponse.compute);
               })
             }
             huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
