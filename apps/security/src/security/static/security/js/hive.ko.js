@@ -825,7 +825,24 @@ var HiveViewModel = (function () {
     self.isApplyingBulk = ko.observable(false);
 
     self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE', 'COLUMN']);
-    self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL']);
+
+    self.availableActions = function(scope) {
+      var actions = ['SELECT', 'INSERT', 'ALL'];
+      var databaseActions = ['CREATE'];
+      var tableActions = ['REFRESH', 'ALTER', 'DROP'];
+      switch (scope) {
+        case 'SERVER':
+          actions = actions.concat(databaseActions).concat(tableActions);
+          break;
+        case 'DATABASE':
+          actions = actions.concat(databaseActions);
+          break;
+        case 'TABLE':
+          actions = actions.concat(tableActions);
+          break;
+      }
+      return ko.observableArray(actions.sort());
+    }
 
     self.privilegeFilter = ko.observable("");
 

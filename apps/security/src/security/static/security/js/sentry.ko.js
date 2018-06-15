@@ -861,14 +861,30 @@ var SentryViewModel = (function () {
     self.isApplyingBulk = ko.observable(false);
 
     self.availablePrivileges = ko.observableArray();
-    self.availableActions = ko.observableArray();
     self.availableSolrConfigActions = ko.observableArray();
     if (initial.component == 'solr') {
-      self.availableActions(['QUERY', 'UPDATE', 'ALL']);
+      self.availableActions = function () {
+        return ko.observableArray(['QUERY', 'UPDATE', 'ALL']);
+      }
       self.availableSolrConfigActions(['ALL']);
     } else {
-      self.availableActions(['SELECT', 'INSERT', 'ALL']);
+      self.availableActions = function (authorizables) {
+        var actions = ['SELECT', 'INSERT', 'ALL'];
+        var databaseActions = ['CREATE'];
+        var tableActions = ['REFRESH', 'ALTER', 'DROP'];
+        if (authorizables.length === 0) {
+          actions = actions.concat(databaseActions).concat(tableActions);
+        }
+        else if (authorizables.length === 1) {
+          actions = actions.concat(databaseActions);
+        }
+        else {
+          actions = actions.concat(tableActions);
+        }
+        return ko.observableArray(actions.sort());
+      }
     }
+
 
     self.privilegeFilter = ko.observable("");
 

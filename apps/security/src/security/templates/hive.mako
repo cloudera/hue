@@ -58,7 +58,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
     </div>
 
     <div class="inline-block" style="vertical-align: middle">
-      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); action($root.availableActions()[0]) }">
+      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); action($root.availableActions(privilegeScope())[0]) }">
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}"></i>
       </a>
     </div>
@@ -71,7 +71,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
     </div>
     <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri', valueUpdate: 'afterkeydown'" placeholder="URI">
 
-    <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
+    <select data-bind="options: $root.availableActions(privilegeScope()), value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
 
     <div class="new-line-if-small">
       <label class="checkbox"><input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
