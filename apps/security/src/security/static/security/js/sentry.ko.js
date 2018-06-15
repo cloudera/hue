@@ -875,11 +875,8 @@ var SentryViewModel = (function () {
         var actions = ['SELECT', 'INSERT', 'ALL'];
         var databaseActions = ['CREATE'];
         var tableActions = ['REFRESH', 'ALTER', 'DROP'];
-        if (authorizables.length === 0) {
+        if (authorizables.length < 2) { // server and database
           actions = actions.concat(databaseActions).concat(tableActions);
-        }
-        else if (authorizables.length === 1) {
-          actions = actions.concat(databaseActions);
         }
         else {
           actions = actions.concat(tableActions);
