@@ -666,9 +666,9 @@ def collect_validation_messages(conf, error_list):
   message = []
   cm_extras = {
     'hadoop_hdfs_home': [('hadoop', 'hdfs_clusters', 'default')],
-    'hadoop_bin': [('hadoop', 'hdfs_clusters', 'default'), ('hadoop', 'yarn_clusters', 'default')],
-    'hadoop_mapred_home': [('hadoop', 'yarn_clusters', 'default')],
-    'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default')],
+    'hadoop_bin': [('hadoop', 'hdfs_clusters', 'default'), ('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
+    'hadoop_mapred_home': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
+    'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'ssl_cacerts': [('beeswax', 'ssl'), ('impala', 'ssl')],
     'remote_data_dir': [('liboozie', )],
     'shell': [()]
