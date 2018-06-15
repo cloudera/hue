@@ -356,27 +356,35 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
+    self.loadingNamespaces = ko.observable(true);
     self.namespaceRefreshEnabled = ko.observable(false);
     self.availableNamespaces = ko.observableArray();
     self.namespace = ko.observable();
-    self.availableComputes = ko.observableArray();/*ko.pureComputed(function () {
-      if (self.namespace()) {
-        return self.namespace().computes;
-      }
-      return [];
-    });*/
 
-    self.compute = ko.observable();
-    self.compute.subscribe(function(newCompute) {
-      $.each(self.availableNamespaces(), function(index, namespace) {
-        if (namespace.name == newCompute.namespace) {
-          self.namespace(namespace);
-          return;
+    self.lastNamespacePromise = undefined;
+    self.reloadNamespaces = function () {
+      self.loadingNamespaces(true);
+      self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
+        self.namespaceRefreshEnabled(context.dynamic);
+        self.availableNamespaces(context.namespaces);
+        if (!snippet.namespace || !context.namespaces.some(function (namespace) {
+          if (namespace.id === snippet.namespace.id) {
+            self.namespace(namespace);
+            return true;
+          }})) {
+          self.namespace(context.namespaces[0]);
         }
+      }).always(function () {
+        self.loadingNamespaces(false);
       });
-    });
+    };
+    self.reloadNamespaces();
 
-    var computesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
+    self.loadingComputes = ko.observable(true);
+    self.availableComputes = ko.observableArray();
+    self.compute = ko.observable();
+
+    self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
       self.availableComputes(computes);
       if (!snippet.compute || !computes.some(function (compute) {
         if (compute.id === snippet.compute.id) {
@@ -386,56 +394,11 @@ var EditorViewModel = (function() {
       })) {
         self.compute(computes[0]);
       }
+    }).always(function () {
+      self.loadingComputes(false);
     });
-    /*
-    self.availableComputes.subscribe(function (newComputes) {
-      if (!self.compute() || !newComputes.some(function (newCompute) {
-        if (newCompute.id === self.compute().id) {
-          self.compute(newCompute);
-          return true;
-        }
-      })) {
-        self.compute(newComputes.length ? newComputes[0] : undefined);
-      }
-    });*/
 
-    var namespacesPromise;
-    self.reloadNamespaces = function () {
-      namespacesPromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
-        self.namespaceRefreshEnabled(context.dynamic);
-        self.availableNamespaces(context.namespaces);
-        if (!snippet.namespace || !context.namespaces.some(function (namespace) {
-          if (namespace.id === snippet.namespace.id) {
-            self.namespace(namespace);
-            return true;
-          }})) {
-          self.namespace(context.namespaces[0]);
-/*
-          var previousComputeId;
-          var newCompute;
-          if (self.compute()) {
-            previousComputeId = self.compute().id;
-          } else if (snippet.compute) {
-            previousComputeId = snippet.compute.id;
-          }
-          if (previousComputeId) {
-            self.namespace().computes.some(function (compute) {
-              if (compute.id === previousComputeId) {
-                newCompute = compute;
-                return true;
-              }
-            })
-          }
-          if (!newCompute && self.namespace().computes.length) {
-            newCompute = self.namespace().computes[0];
-          }
-          self.compute(newCompute);*/
-        }
-      });
-    };
-
-    self.reloadNamespaces();
-
+    self.loadingDatabases = ko.observable(false);
     self.database = ko.observable();
     var previousDatabase = null;
 
@@ -448,44 +411,97 @@ var EditorViewModel = (function() {
         previousDatabase = newValue;
       }
     });
-    self.database(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
+    self.database(typeof snippet.database !== "undefined" && snippet.database != null ? snippet.database : null);
     self.availableDatabases = ko.observableArray();
 
-    self.availableDatabases.subscribe(function (newDatabases) {
-      if (self.database() && newDatabases.indexOf(self.database()) === -1) {
-        if (newDatabases.length === 0 || newDatabases.indexOf('default') !== -1) {
-          self.database('default');
-        } else {
-          self.database(newDatabases[0])
-        }
-      }
-    });
-
+    var updateDatabaseThrottle = -1;
     self.updateDatabases = function () {
       if (self.isSqlDialect()) {
-        namespacesPromise.done(function () {
-          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
-            sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
-              var databaseNames = [];
-              databaseEntries.forEach(function (databaseEntry) {
-                databaseNames.push(databaseEntry.name);
+        self.loadingDatabases(true);
+        $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
+          window.clearTimeout(updateDatabaseThrottle);
+          updateDatabaseThrottle = window.setTimeout(function () {
+            DataCatalog.getEntry({
+              sourceType: self.type(),
+              namespace: self.namespace(),
+              compute: self.compute(),
+              path: [],
+              definition: {type: 'source'}
+            }).done(function (sourceEntry) {
+              sourceEntry.getChildren({silenceErrors: true}).done(function (databaseEntries) {
+                var databaseNames = [];
+                databaseEntries.forEach(function (databaseEntry) {
+                  databaseNames.push(databaseEntry.name);
+                });
+                self.availableDatabases(databaseNames);
+              }).fail(function () {
+                self.availableDatabases([]);
+              }).always(function () {
+                if (self.database() && self.availableDatabases().indexOf(self.database()) === -1) {
+                  if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf('default') !== -1) {
+                    self.database('default');
+                  } else {
+                    self.database(self.availableDatabases()[0])
+                  }
+                }
+                self.loadingDatabases(false);
+
+                huePubSub.publish('assist.set.database', {
+                  source: self.type(),
+                  namespace: self.namespace(),
+                  name: self.database()
+                });
               });
-              self.availableDatabases(databaseNames);
-            }).fail(function () {
-              self.availableDatabases([]);
             });
-          });
+          }, 10);
         });
       } else {
         self.availableDatabases([]);
+        self.database(undefined);
       }
     };
 
-    namespacesPromise.done(function () {
-      self.compute.subscribe(function () {
-        window.setTimeout(function () {
-          self.updateDatabases();
-        }, 0)
+    self.loadingContext = ko.pureComputed(function () {
+      return self.loadingNamespaces() || self.loadingComputes() || self.loadingDatabases();
+    });
+
+    $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
+      self.compute.subscribe(function (newCompute) {
+        // When the compute changes we set the corresponding namespace and update the databases
+        if (newCompute) {
+          var found = self.availableNamespaces().some(function (namespace) {
+            // TODO: Remove name check once compute.namespace is a namespace ID
+            if (namespace.name === newCompute.namespace || namespace.id === newCompute.namespace) {
+              if (!self.namespace() || self.namespace().id !== namespace.id) {
+                self.namespace(namespace);
+                self.updateDatabases();
+              }
+              return true;
+            }
+          });
+          if (!found) {
+            self.namespace(undefined);
+          }
+        }
+      });
+
+      self.namespace.subscribe(function (newNamespace) {
+        if (newNamespace) {
+          // When the namespace changes we set the corresponding compute and update the databases
+          var found = self.availableComputes().some(function (compute) {
+            // TODO: Remove name check once compute.namespace is a namespace ID
+            if (compute.namespace === newNamespace.name || compute.namespace === newNamespace.id) {
+              if (!self.compute() || self.compute().id !== compute.id) {
+                self.compute(compute);
+                self.updateDatabases();
+              }
+              return true;
+            }
+          });
+          if (!found) {
+            self.compute(undefined);
+          }
+        }
       })
     });
 
