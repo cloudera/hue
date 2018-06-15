@@ -832,10 +832,8 @@ var HiveViewModel = (function () {
       var tableActions = ['REFRESH', 'ALTER', 'DROP'];
       switch (scope) {
         case 'SERVER':
-          actions = actions.concat(databaseActions).concat(tableActions);
-          break;
         case 'DATABASE':
-          actions = actions.concat(databaseActions);
+          actions = actions.concat(databaseActions).concat(tableActions);
           break;
         case 'TABLE':
           actions = actions.concat(tableActions);
