@@ -18,8 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED
-  from desktop.conf import DEV_EMBEDDED
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
@@ -176,7 +175,11 @@ ${ hueIcons.symbols() }
         </a>
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-          <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          % if IS_MULTICLUSTER_ONLY.get():
+            <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; margin-top: -6px">
+          % else:
+            <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          % endif
         </a>
         % endif
 
@@ -229,7 +232,7 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-right">
 
-        % if user.is_authenticated() and section != 'login' and cluster != ANALYTIC_DB:
+        % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
         <div class="dropdown navbar-dropdown pull-right">
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser

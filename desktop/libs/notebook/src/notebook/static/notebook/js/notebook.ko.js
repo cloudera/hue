@@ -368,7 +368,7 @@ var EditorViewModel = (function() {
 
     self.compute = ko.observable();
     self.compute.subscribe(function(newCompute) {
-      $.each(self.availableNamespaces(), function(index, namespace) {console.log(newCompute.namespace); console.log(namespace.name);
+      $.each(self.availableNamespaces(), function(index, namespace) {
         if (namespace.name == newCompute.namespace) {
           self.namespace(namespace);
           return;
