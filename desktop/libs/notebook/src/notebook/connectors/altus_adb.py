@@ -160,7 +160,7 @@ class HueQuery():
               }
             }'''
 
-    payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query))
+    payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query.replace('\n', ' ')))
 
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
     resp_payload = json.loads(resp['payload'])
