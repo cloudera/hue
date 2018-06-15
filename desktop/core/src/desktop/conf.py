@@ -1471,13 +1471,20 @@ DISABLE_HUE_3 = Config( # To remove in Hue 5
   help=_('Choose whether to still allow users to enable the old Hue 3 interface.')
 )
 
+IS_MULTICLUSTER_ONLY = Config(
+  key='is_multicluster_only',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
 
 def get_clusters(user):
   clusters = []
 
   # Get core standalone config if there
   apps = appmanager.get_apps_dict(user)
-  if 'beeswax' in apps:
+  if 'beeswax' in apps and not IS_MULTICLUSTER_ONLY.get():
     from beeswax.conf import HIVE_SERVER_HOST
     clusters.append(
       (CLUSTER_ID.get(), {

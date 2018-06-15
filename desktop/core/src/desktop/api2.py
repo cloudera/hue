@@ -139,7 +139,7 @@ def get_context_computes(request, interface):
         'namespace': cluster['id'],
         'interface': interface,
         'type': cluster['type']
-      } for cluster in clusters
+      } for cluster in clusters if cluster.get('type') == 'direct'
     ])
 
   if interface == 'impala' or interface == 'jobs':
