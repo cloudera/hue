@@ -82,6 +82,8 @@ class AltusAdbApi(Api):
 
     if database is not None:
       url_path = '%s/%s' % (url_path, database)
+    if table is not None:
+      url_path = '%s/%s' % (url_path, table)
     if column is not None:
       url_path = '%s/%s' % (url_path, column)
     if nested is not None:
