@@ -918,6 +918,7 @@ ${ components.menubar(is_embeddable) }
     <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('viewSql'); }">${ _('View SQL') }</a></li>
     <!-- /ko -->
     <li data-bind="css: { 'active' : $root.currentTab() === 'details' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('details'); }">${ _('Details') }</a></li>
+    <li data-bind="css: { 'active' : $root.currentTab() === 'privileges' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -952,6 +953,10 @@ ${ components.menubar(is_embeddable) }
 
       <!-- ko if: $root.currentTab() === 'details' -->
         <!-- ko template: 'metastore-details-tab' --><!-- /ko -->
+      <!-- /ko -->
+
+      <!-- ko if: $root.currentTab() === 'privileges' -->
+        <div data-bind="component: { name: 'hue-sentry-privileges', params: { isSentryAdmin: true, server: 'server1', path: catalogEntry.path.join('.')}}"></div>
       <!-- /ko -->
     </div>
   </div>
