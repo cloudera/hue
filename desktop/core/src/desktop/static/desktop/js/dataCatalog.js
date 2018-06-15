@@ -23,6 +23,36 @@ var DataCatalog = (function () {
   var cacheEnabled = true;
 
   /**
+   * Creates a cache identifier given a namespace and path(s)
+   *
+   * @param {Object|DataCatalogEntry} options
+   * @param {Object} options.namespace
+   * @param {string} options.namespace.id
+   * @param {string[]} [options.path]
+   * @param {string[][]} [options.paths]
+   * @return {string}
+   */
+  var generateEntryCacheId = function (options) {
+    var id = options.namespace.id;
+    if (options.path) {
+      if (typeof options.path === 'string') {
+        id += '_' + options.path;
+      } else if (options.path.length) {
+        id +='_' + options.path.join('.');
+      }
+    } else if (options.paths && options.paths.length) {
+      var pathSet = {};
+      options.paths.forEach(function (path) {
+        pathSet[path.join('.')] = true;
+      });
+      var uniquePaths = Object.keys(pathSet);
+      uniquePaths.sort();
+      id += '_' + uniquePaths.join(',');
+    }
+    return id;
+  };
+
+  /**
    * Helper function that adds sets the silence errors option to true if not specified
    *
    * @param {Object} [options]
@@ -139,10 +169,7 @@ var DataCatalog = (function () {
         return deferred.reject().promise();
       }
 
-      var keyPrefix = namespace.id + '_' + compute.id;
-      if (rootPath.length) {
-        keyPrefix += '_' +  rootPath.join('.');
-      }
+      var keyPrefix = generateEntryCacheId({ namespace: namespace, path: rootPath });
       Object.keys(self.entries).forEach(function (key) {
         if (key.indexOf(keyPrefix) === 0) {
           delete self.entries[key];
@@ -179,10 +206,7 @@ var DataCatalog = (function () {
       }
       var deferred = $.Deferred();
 
-      var identifier = (dataCatalogEntry.namespace ? dataCatalogEntry.namespace.id : '') + '_' + (dataCatalogEntry.compute ? dataCatalogEntry.compute.id : '');
-      if (dataCatalogEntry.path.length) {
-        identifier += '_' + dataCatalogEntry.path.join('.');
-      }
+      var identifier = generateEntryCacheId(dataCatalogEntry);
 
       self.store.setItem(identifier, {
         version: DATA_CATALOG_VERSION,
@@ -344,9 +368,7 @@ var DataCatalog = (function () {
      */
     DataCatalog.prototype.getKnownEntry = function (options) {
       var self = this;
-      var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = (options.namespace ? options.namespace.id : '') + '_' + (options.compute ? options.compute.id : '') + (identifier ? '_' + identifier : '');
-      return self.entries[identifier];
+      return self.entries[generateEntryCacheId(options)];
     };
 
     /**
@@ -360,8 +382,7 @@ var DataCatalog = (function () {
      */
     DataCatalog.prototype.getEntry = function (options) {
       var self = this;
-      var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-      identifier = (options.namespace ? options.namespace.id : '') + '_' + (options.compute ? options.compute.id : '') + (identifier ? '_' + identifier : '');
+      var identifier = generateEntryCacheId(options);
       if (self.entries[identifier]) {
         return self.entries[identifier];
       }
@@ -417,25 +438,6 @@ var DataCatalog = (function () {
     };
 
     /**
-     * Creates an identifier for the given paths with duplicates removed
-     *
-     * @oaram {Object} options
-     * @param {ContextNamespace} options.namespace - The context namespace
-     * @param {ContextCompute} options.compute - The context compute
-     * @param {string[][]} options.paths
-     * @return {string}
-     */
-    var createMultiTableIdentifier = function (options) {
-      var pathSet = {};
-      options.paths.forEach(function (path) {
-        pathSet[path.join('.')] = true;
-      });
-      var uniquePaths = Object.keys(pathSet);
-      uniquePaths.sort();
-      return options.namespace.id + '_' + options.compute.id + '_' + uniquePaths.join(',');
-    };
-
-    /**
      *
      * @param {Object} options
      * @param {ContextNamespace} options.namespace - The context namespace
@@ -446,7 +448,7 @@ var DataCatalog = (function () {
      */
     DataCatalog.prototype.getMultiTableEntry = function (options) {
       var self = this;
-      var identifier = createMultiTableIdentifier(options);
+      var identifier = generateEntryCacheId(options);
       if (self.multiTableEntries[identifier]) {
         return self.multiTableEntries[identifier];
       }
