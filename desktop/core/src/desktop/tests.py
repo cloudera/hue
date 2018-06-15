@@ -30,6 +30,7 @@ import tempfile
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
+from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.conf.urls import url
 from django.contrib.auth.models import User
@@ -40,6 +41,7 @@ from django.db.models import query, CharField, SmallIntegerField
 from configobj import ConfigObj
 
 from settings import HUE_DESKTOP_VERSION
+from settings import DATABASES
 
 from beeswax.conf import HIVE_SERVER_HOST
 from pig.models import PigScript
@@ -1415,4 +1417,22 @@ def test_collect_validation_messages_extras():
   assert_equal(len(error_list), 1)
   assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ', error_list[0]['message'])
 
-
+# Test db migration from 5.7,...,5.15 to latest
+def test_db_migrations():
+  versions = ['5.' + str(i) for i in range(7, 16)]
+  for version in versions:
+    name = 'hue_' + version
+    path = get_desktop_root('./core/src/desktop/test_data/' + name + '.db')
+    DATABASES[name] = {
+      'ENGINE' : 'django.db.backends.sqlite3',
+      'NAME' : path,
+      'USER' : '',
+      'SCHEMA' : 'public',
+      'PASSWORD' : '',
+      'HOST' : '',
+      'PORT' : '',
+      'OPTIONS' : '',
+      'ATOMIC_REQUESTS' : True,
+      'CONN_MAX_AGE' : 0,
+    }
+    call_command('migrate', '--fake-initial', '--database=' + name)
