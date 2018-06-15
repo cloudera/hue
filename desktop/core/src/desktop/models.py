@@ -1913,7 +1913,7 @@ class Cluster():
   def __init__(self, user):
     self.user = user
     self.clusters = get_clusters(user)
-    self.data = 'Altus' if IS_MULTICLUSTER_ONLY.get() else self.clusters[CLUSTER_ID.get()]
+    self.data = self.clusters['Altus' if IS_MULTICLUSTER_ONLY.get() else CLUSTER_ID.get()]
 
   def get_type(self):
     return self.data['type']
