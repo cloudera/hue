@@ -61,7 +61,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
     <!-- ko if: $root.component() == 'hive' -->
       <div class="inline-block" style="vertical-align: middle">
-        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('DATABASE'); action($root.availableActions()[0]) }">
+        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('DATABASE'); action($root.availableActions(authorizables())[0]) }">
           <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'DATABASE', 'fa-check-circle-o': privilegeType() == 'DATABASE'}"></i>
         </a>
       </div>
@@ -75,12 +75,12 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
       <input type="text" data-bind="filechooser: 'URI TODO', enable: privilegeType() == 'URI'" placeholder="URI">
 
-      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'DATABASE')" style="width: 100px; margin-bottom: 0"></select>
+      <select data-bind="options: $root.availableActions(authorizables()), value: $data.action, enable: (privilegeType() == 'DATABASE')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
     <!-- ko if: $root.component() == 'solr' -->
       <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection or config name <CTRL+SPACE>">
-      <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions, value: $data.action, enable: privilegeType() != 'CONFIG'" style="width: 100px; margin-bottom: 0"></select>
+      <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions(authorizables()), value: $data.action, enable: privilegeType() != 'CONFIG'" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
     <div class="new-line-if-small">
