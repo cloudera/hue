@@ -198,7 +198,7 @@ class NavigatorApi(Api):
         }
 
       auto_field_facets = ["tags", "type"] + f.keys()
-      query_s = query_s.strip() + '*'
+      query_s = (query_s.strip() if query_s else '') + '*'
 
       last_query_term = [term for term in query_s.split()][-1]
 
