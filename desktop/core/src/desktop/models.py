@@ -49,7 +49,7 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1558,7 +1558,7 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
-ANALYTIC_DB = 'analyticdb'
+ANALYTIC_DB = 'altus'
 
 
 class ClusterConfig():
@@ -1913,7 +1913,7 @@ class Cluster():
   def __init__(self, user):
     self.user = user
     self.clusters = get_clusters(user)
-    self.data = self.clusters[CLUSTER_ID.get()]
+    self.data = 'Altus' if IS_MULTICLUSTER_ONLY.get() else self.clusters[CLUSTER_ID.get()]
 
   def get_type(self):
     return self.data['type']
