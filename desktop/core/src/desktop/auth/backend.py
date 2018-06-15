@@ -31,10 +31,14 @@ User to remain a django.contrib.auth.models.User object.
 import ldap
 import logging
 import pam
+import requests
 
 import django.contrib.auth.backends
+from django.contrib import auth
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.http import HttpResponseRedirect
 from django.forms import ValidationError
 from importlib import import_module
 
@@ -45,6 +49,7 @@ import desktop.conf
 from desktop import metrics
 from liboauth.metrics import oauth_authentication_time
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
+from mozilla_django_oidc.utils import absolutify, import_from_settings
 
 from useradmin import ldap_access
 from useradmin.forms import validate_username
@@ -586,14 +591,95 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
 
 class OIDCBackend(OIDCAuthenticationBackend):
   def authenticate(self, **kwargs):
-    user = super(OIDCBackend, self).authenticate(**kwargs)
-    user = rewrite_user(user)
-    return user
+    self.request = kwargs.pop('request', None)
+    if not self.request:
+      return None
+
+    state = self.request.GET.get('state')
+    code = self.request.GET.get('code')
+    nonce = kwargs.pop('nonce', None)
+
+    if not code or not state:
+      return None
+
+    reverse_url = import_from_settings('OIDC_AUTHENTICATION_CALLBACK_URL',
+                                       'oidc_authentication_callback')
+
+    token_payload = {
+      'client_id': self.OIDC_RP_CLIENT_ID,
+      'client_secret': self.OIDC_RP_CLIENT_SECRET,
+      'grant_type': 'authorization_code',
+      'code': code,
+      'redirect_uri': absolutify(
+        self.request,
+        reverse(reverse_url)
+      ),
+    }
+
+    # Get the token
+    token_info = self.get_token(token_payload)
+    id_token = token_info.get('id_token')
+    access_token = token_info.get('access_token')
+    refresh_token = token_info.get('refresh_token')
+
+    # Validate the token
+    verified_id = self.verify_token(id_token, nonce=nonce)
+
+    if verified_id:
+      user =  self.get_or_create_user(access_token, id_token, verified_id)
+      user = rewrite_user(user)
+      self.save_refresh_tokens(refresh_token)
+      return user
+
+    return None
+
+  def save_refresh_tokens(self, refresh_token):
+    session = self.request.session
+
+    if import_from_settings('OIDC_STORE_REFRESH_TOKEN', False):
+      session['oidc_refresh_token'] = refresh_token
 
   def get_user(self, user_id):
     user = super(OIDCBackend, self).get_user(user_id)
     user = rewrite_user(user)
     return user
+
+  def logout(self, request, next_page):
+    # https://stackoverflow.com/questions/46689034/logout-user-via-keycloak-rest-api-doesnt-work
+    session = request.session
+    access_token = session['oidc_access_token']
+    refresh_token = session['oidc_refresh_token']
+
+    if access_token and refresh_token:
+      oidc_logout_url = desktop.conf.OIDC.LOGOUT_REDIRECT_URL.get()
+      client_id = import_from_settings('OIDC_RP_CLIENT_ID')
+      client_secret = import_from_settings('OIDC_RP_CLIENT_SECRET')
+      oidc_verify_ssl = import_from_settings('OIDC_VERIFY_SSL')
+      form = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'refresh_token': refresh_token,
+      }
+      headers = {
+        'Authorization': 'Bearer {0}'.format(access_token),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+      resp = requests.post(oidc_logout_url, data=form, headers=headers, verify=oidc_verify_ssl)
+      if resp.status_code >= 200 and resp.status_code < 300:
+        LOG.debug("OpenID Connect logout succeed!")
+        del session['oidc_access_token']
+        del session['oidc_id_token']
+        del session['oidc_id_token_expiration']
+        del session['oidc_login_next']
+        del session['oidc_refresh_token']
+        del session['oidc_state']
+        auth.logout(request)
+        return HttpResponseRedirect(next_page)
+      else:
+        LOG.error("OpenID Connect logout failed: %s" % resp.content)
+    else:
+      LOG.warn("OpenID Connect tokens are not available, logout skipped!")
+    return None
 
   # def filter_users_by_claims(self, claims):
 

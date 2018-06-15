@@ -37,6 +37,7 @@ Checked-in third party dependencies
 |Y|httplib2|0.8| |http://bitworking.org/projects/httplib2/|
 |Y|importlib|1.0.3|Python|http://docs.python.org/2.7/library/importlib.html|
 |Y|jdcal|1.0|BSD|http://oneau.wordpress.com/jdcal/|
+|Y|josepy|1.1.0|Apache|https://pypi.org/project/josepy/|
 |Y|kazoo|2.0|ASL2|https://github.com/python-zk/kazoo|
 |Y|kerberos|1.1.|ASL2|http://pypi.python.org/pypi/kerberos
 |Y|lockfile|0.8|MIT|http://smontanaro.dyndns.org/python/lockfile-0.8.tar.gz|
@@ -44,6 +45,7 @@ Checked-in third party dependencies
 |Y|Mako|0.8.1|MIT|http://makotemplates.org/|
 |Y|Markdown|2.0.3|BSD|http://pypi.python.org/packages/source/M/Markdown/Markdown-2.0.3.tar.gz|
 |Y|MarkupSafe|0.9.3|BSD|http://pypi.python.org/pypi/MarkupSafe|
+|Y|mozilla-django-oidc|1.0.0|MPL2.0|https://pypi.org/project/mozilla-django-oidc/|
 |Y|MySQL for Python|1.2.5|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|
 |Y|navoptapi|0.1.0|ASL2||
 |Y|ndg_httpsclient|0.4.0|BSD|https://github.com/cedadev/ndg_httpsclient/|
