@@ -170,9 +170,13 @@ ${ hueIcons.symbols() }
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
-        <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-        </a>
+        % if IS_MULTICLUSTER_ONLY.get():
+          <!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
+        % else:
+          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+          </a>
+        % endif
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           % if IS_MULTICLUSTER_ONLY.get():
