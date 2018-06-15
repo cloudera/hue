@@ -385,7 +385,7 @@
 <script type="text/html" id="start-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px;">
-    <div class="big-icon" title="${ _('It is where we start!') }"><i class="fa fa-dot-circle-o"></i></div>
+    <div class="big-icon" title="${ _('It is where we start!') }"><i class="fa fa-flag-checkered"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -394,7 +394,7 @@
 <script type="text/html" id="end-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
-    <div class="big-icon" title="${ _('It is where we successfully finish!') }"><i class="fa fa-flag-checkered"></i></div>
+    <div class="big-icon" title="${ _('It is where we successfully finish!') }"><i class="fa fa-dot-circle-o"></i></div>
   </div>
   <!-- /ko -->
 </script>
