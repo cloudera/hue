@@ -262,13 +262,14 @@
         </div>
       <!-- /ko -->
     </h2>
+
     <div class="card-body" style="padding: 0; position: relative">
-      <div class="advanced-triangle-container" data-bind="visible: $root.isEditing() && ! ooziePropertiesExpanded() && oozieMovable(), click: toggleProperties">
+      <div class="advanced-triangle-container" data-bind="visible: $root.isEditing() && ! ooziePropertiesExpanded(), click: toggleProperties">
         <div class="advanced-triangle">
           <a href="javascript:void(0)"><i class="fa fa-cogs"></i></a>
         </div>
       </div>
-      <!-- ko if: id() == '17c9c895-5a16-7443-bb81-f34b30b21548' && ooziePropertiesExpanded() -->
+      <!-- ko if: ooziePropertiesExpanded() -->
       <div class="advanced-triangle-container" data-bind="visible: $root.isEditing(), click: toggleProperties">
         <div class="advanced-triangle">
           <a href="javascript:void(0)"><i class="fa fa-caret-square-o-left"></i></a>
@@ -386,6 +387,34 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px;">
     <div class="big-icon" title="${ _('It is where we start!') }"><i class="fa fa-flag-checkered"></i></div>
+
+    <div data-bind="visible: $root.isEditing" style="margin: 10px">
+      <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      
+        <h6 class="field-title">${ _('Automate cluster creation') }</h6>
+        
+<div class="control-group">
+
+                <label class="checkbox inline-block">
+                  <input type="radio" checked id="contactChoice1" name="contact" value="email">
+                  <label for="contactChoice1">No</label>
+                </label>
+
+                <label class="checkbox inline-block">
+                  <input type="radio" id="contactChoice1" name="contact" value="email">
+                  <label for="contactChoice1">Create new</label>    
+                </label>
+
+              
+                <label class="checkbox inline-block">
+                  <input type="radio" id="contactChoice2" name="contact" value="phone">
+                  <label for="contactChoice2">Clone existing</label>  
+                </label>
+
+    </div>
+        <h6 class="field-title">${ _('Terminate on job completion') } <input type="checkbox" data-bind="checked: properties.enableMail" style="margin-top: -3px;margin-left: 4px;" /></h6>
+      </div>
+    </div>    
   </div>
   <!-- /ko -->
 </script>
@@ -395,6 +424,21 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
     <div class="big-icon" title="${ _('It is where we successfully finish!') }"><i class="fa fa-dot-circle-o"></i></div>
+
+    <div data-bind="visible: $root.isEditing" style="margin: 10px">
+      <div data-bind="visible: $parent.ooziePropertiesExpanded">
+        <input type="radio" id="contactChoice1" name="contact" value="email">
+        <label for="contactChoice1">No</label>
+
+        <input type="radio" id="contactChoice1" name="contact" value="email">
+        <label for="contactChoice1">Create new</label>
+    
+        <input type="radio" id="contactChoice2" name="contact" value="phone">
+        <label for="contactChoice2">Clone existing</label>
+    
+        <h6 class="field-title">${ _('Terminate on job completion') } <input type="checkbox" data-bind="checked: properties.enableMail" style="margin-top: -3px;margin-left: 4px;" /></h6>
+      </div>
+    </div>  
   </div>
   <!-- /ko -->
 </script>

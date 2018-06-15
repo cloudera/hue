@@ -902,13 +902,13 @@ ${ utils.submit_popup_event() }
 
 
     huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-      var interpreters = [];
-      $.each(clusterConfig['app_config']['editor']['interpreters'], function(index, interpreter) {
+      var interpreters = ['hive', 'spark2', 'mapreduce'];
+      /*$.each(clusterConfig['app_config']['editor']['interpreters'], function(index, interpreter) {
         interpreters.push(interpreter.type);
       });
       if (clusterConfig['cluster_type'] != 'dataeng') {
         interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'ssh', 'streaming', 'generic', 'stop']);
-      }
+      }*/
       viewModel.availableActions(interpreters);
     }, 'oozie');
 

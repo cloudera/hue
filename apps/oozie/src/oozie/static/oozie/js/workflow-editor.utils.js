@@ -15,7 +15,7 @@
 // limitations under the License.
 
 function toggleProperties(widget) {
-  if (widget.oozieMovable()) {
+//  if (widget.oozieMovable()) {
     var _el = $("#wdg_" + widget.id());
     if (!widget.ooziePropertiesExpanded()) {
       setLastExpandedWidget(widget);
@@ -30,7 +30,7 @@ function toggleProperties(widget) {
       }
     }
     $(document).trigger("drawArrows");
-  }
+//  }
 }
 
 var _linkMappingTimeout = -1;
