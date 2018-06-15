@@ -933,6 +933,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
+    <!-- ko if: loadingContext() && isSqlDialect()  -->
+    <i class="fa fa-spinner fa-spin muted"></i>
+    <!-- /ko -->
+
+    <!-- ko if: !loadingContext() && isSqlDialect() -->
     <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
     <!-- ko if: availableComputes().length > 0-->
     <span class="editor-header-title">${ _('Compute') }</span>
@@ -942,16 +947,22 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
     <!-- /ko -->
     <!-- /ko -->
+
     <!-- ko if: (availableNamespaces().length > 1 || namespaceRefreshEnabled()) -->
     <span class="editor-header-title">${ _('Namespace') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
-    <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
+
+    <!-- ko if: availableDatabases().length > 0 -->
     <span class="editor-header-title">${ _('Database') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
+    <!-- ko if: availableDatabases().length === 0-->
+    <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No databases found') }</span>
+    <!-- /ko -->
 
-   <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
+    <!-- /ko -->
+    <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
 
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Query settings') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor help') }" data-toggle="modal" data-target="#helpModal${ suffix }"><i class="fa fa-question"></i></a>
