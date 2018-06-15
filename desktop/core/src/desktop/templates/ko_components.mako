@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%namespace name="koAppSwitcher" file="/ko_components/ko_app_switcher.mako" />
 <%namespace name="koBreadCrumbs" file="/ko_components/ko_breadcrumbs.mako" />
 <%namespace name="koCatalogEntriesTable" file="/ko_components/ko_catalog_entries_table.mako" />
 <%namespace name="koContextPopover" file="/ko_components/ko_context_popover.mako" />
@@ -31,6 +32,7 @@
 <%namespace name="koSentryPrivileges" file="/ko_components/ko_sentry_privileges.mako" />
 
 <%def name="all()">
+  ${ koAppSwitcher.appSwitcher() }
   ${ koBreadCrumbs.breadCrumbs() }
   ${ koCatalogEntriesTable.catalogEntriesTable() }
   ${ koContextPopover.contextPopover() }
