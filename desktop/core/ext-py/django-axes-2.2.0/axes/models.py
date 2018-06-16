@@ -38,7 +38,7 @@ class CommonAccess(models.Model):
     )
 
     attempt_time = models.DateTimeField(
-        auto_now_add=True,
+        auto_now=True,
     )
 
     class Meta:
