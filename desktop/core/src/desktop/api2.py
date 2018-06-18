@@ -148,7 +148,7 @@ def get_context_computes(request, interface):
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
           'status': cluster.get('status'),
-          'namespace': cluster.get('namespaceCrn', cluster.get('clusterName')),
+          'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
           'type': 'altus-adb'
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters']]
       )
