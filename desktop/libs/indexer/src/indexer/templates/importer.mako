@@ -432,7 +432,7 @@ ${ assist.assistPanel() }
               <div>
                 <label class="control-label">
                   <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
-                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive', mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
                   <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
                 </label>
               </div>
@@ -554,7 +554,7 @@ ${ assist.assistPanel() }
               <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
-              <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+              <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
             <!-- ko if: outputFormat() == 'altus' -->
               <!-- ko if: availableNamespaces().length > 1 -->
@@ -568,7 +568,7 @@ ${ assist.assistPanel() }
 
               <label class="control-label "><div>${ _('Database') }</div></label>
               <input type="text" class="form-control input-xlarge" data-bind="value: name" placeholder="${ _('Database') }">
-              <a href="javscript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.apiHelperType(), namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
+              <a href="javscript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType, namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
@@ -1273,7 +1273,7 @@ ${ assist.assistPanel() }
       get: function(type, key, defaultValue) {
         return type[key] || defaultValue
       }
-    }
+    };
 
     var fieldNum = 0;
 
@@ -1294,33 +1294,30 @@ ${ assist.assistPanel() }
       var self = this;
 
       var createArgumentValue = function (arg) {
-        if (arg.type == "mapping") {
+        if (arg.type === "mapping") {
           return ko.observableArray([]);
         }
-        else if (arg.type == "checkbox") {
+        if (arg.type === "checkbox") {
           return ko.observable(false);
         }
-        else {
-          return ko.observable("");
-        }
-      }
+        return ko.observable("");
+      };
 
       var constructSettings = function (type) {
         var settings = {};
 
         var operation = viewModel.createWizard.operationTypes.find(function (currOperation) {
-          return currOperation.name == type;
+          return currOperation.name === type;
         });
 
         for (var i = 0; i < operation.args.length; i++) {
           var argVal = createArgumentValue(operation.args[i]);
 
-          if (operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields") {
+          if (operation.args[i].type === "checkbox" && operation.outputType === "checkbox_fields") {
             argVal.subscribe(function (newVal) {
               if (newVal) {
                 self.fields.push(createDefaultField());
-              }
-              else {
+              } else {
                 self.fields.pop();
               }
             });
@@ -1335,7 +1332,7 @@ ${ assist.assistPanel() }
 
         settings.outputType = function () {
           return operation.outputType;
-        }
+        };
 
         return settings;
       };
@@ -1347,8 +1344,7 @@ ${ assist.assistPanel() }
         self.numExpectedFields.subscribe(function (numExpectedFields) {
           if (numExpectedFields < self.fields().length) {
             self.fields(self.fields().slice(0, numExpectedFields));
-          }
-          else if (numExpectedFields > self.fields().length) {
+          } else if (numExpectedFields > self.fields().length) {
             var difference = numExpectedFields - self.fields().length;
 
             for (var i = 0; i < difference; i++) {
@@ -1357,7 +1353,7 @@ ${ assist.assistPanel() }
           }
         });
         self.settings(constructSettings(self.type()));
-      }
+      };
 
       self.load = function (data) {
         self.numExpectedFields(data.numExpectedFields);
@@ -1371,7 +1367,7 @@ ${ assist.assistPanel() }
         data.fields.forEach(function (field) {
           self.fields.push(loadField(field));
         });
-      }
+      };
 
       self.type = ko.observable(type);
       self.fields = ko.observableArray();
@@ -1380,10 +1376,10 @@ ${ assist.assistPanel() }
 
       init();
 
-      self.type.subscribe(function (newType) {
+      self.type.subscribe(function () {
         init();
       });
-    }
+    };
 
     var FileType = function (typeName, args) {
       var self = this;
@@ -1395,7 +1391,7 @@ ${ assist.assistPanel() }
         var types = viewModel.createWizard.fileTypes;
 
         for (var i = 0; i < types.length; i++) {
-          if (types[i].name == typeName) {
+          if (types[i].name === typeName) {
             type = types[i];
             break;
           }
@@ -1411,34 +1407,35 @@ ${ assist.assistPanel() }
           }
 
           for (var i = 0; i < type.args.length; i++) {
-            self[type.args[i].name].subscribe(function(newVal) {
+            self[type.args[i].name].subscribe(function() {
               // Update the data preview when tweaking Format options on step 1
               viewModel.createWizard.guessFieldTypes();
             });
           }
         }
-      }
+      };
 
       var loadFromObj = function (args) {
         for (var attr in args) {
           self[attr] = ko.mapping.fromJS(args[attr]);
         }
-      }
+      };
 
       self.getArguments = function () {
         return type ? type.args : [];
-      }
+      };
 
       self.isCustomizable = function () {
         return type.isCustomizable;
-      }
+      };
 
       init();
-    }
+    };
 
     var Source = function (vm, wizard) {
       var self = this;
 
+      self.sourceType = vm.sourceType;
       self.name = ko.observable('');
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
@@ -1453,14 +1450,14 @@ ${ assist.assistPanel() }
         self.path('');
         resizeElements();
         self.rdbmsMode('customRdbms');
-        if (val == 'stream') {
-          if (self.streamSelection() == 'kafka') {
+        if (val === 'stream') {
+          if (self.streamSelection() === 'kafka') {
             wizard.guessFormat();
             wizard.destination.tableFormat('kudu');
           } else {
             wizard.destination.tableFormat('text');
           }
-        } else if (val == 'table') {
+        } else if (val === 'table') {
           wizard.destination.outputFormat('altus');
         }
       });
@@ -1485,11 +1482,10 @@ ${ assist.assistPanel() }
           {'value': 'manual', 'name': 'Manually'}
       ]);
       self.inputFormats = ko.pureComputed(function() {
-        if (wizard.prefill.source_type() == 'manual') {
+        if (wizard.prefill.source_type() === 'manual') {
           return self.inputFormatsManual();
-        } else {
-          return self.inputFormatsAll();
         }
+        return self.inputFormatsAll();
       });
 
       // File
@@ -1501,8 +1497,8 @@ ${ assist.assistPanel() }
         }
         resizeElements();
       });
-      self.isObjectStore = ko.computed(function() {
-        return self.inputFormat() == 'file' && /^(s3a|adl):\/.*$/.test(self.path());
+      self.isObjectStore = ko.pureComputed(function() {
+        return self.inputFormat() === 'file' && /^(s3a|adl):\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
         wizard.destination.useDefaultLocation(!newVal);
@@ -1517,14 +1513,14 @@ ${ assist.assistPanel() }
         self.rdbmsTableName('');
         self.rdbmsIsAllTables(false);
         self.rdbmsAllTablesSelected(false);
-        self.rdbmsJdbcDriver('')
-        self.rdbmsJdbcDriverName('')
+        self.rdbmsJdbcDriver('');
+        self.rdbmsJdbcDriverName('');
         self.rdbmsHostname('');
         self.rdbmsPort('');
         self.rdbmsUsername('');
         self.rdbmsPassword('');
         self.rdbmsDbIsValid(false);
-        if (val == 'configRdbms') {
+        if (val === 'configRdbms') {
           $.post("${ url('indexer:get_drivers') }", {}, function (resp) {
             if (resp.data) {
               self.rdbmsTypes(resp.data);
@@ -1533,7 +1529,7 @@ ${ assist.assistPanel() }
               }, 0);
             }
           });
-        } else if (val == 'customRdbms') {
+        } else if (val === 'customRdbms') {
           self.rdbmsTypes([
             {'value': 'jdbc', 'name': 'JDBC'},
             {'value': 'mysql', 'name': 'MySQL'},
@@ -1552,7 +1548,7 @@ ${ assist.assistPanel() }
       self.rdbmsType.subscribe(function (val) {
         self.path('');
         resizeElements();
-        if(self.rdbmsMode() == 'configRdbms' && val != 'jdbc') {
+        if(self.rdbmsMode() === 'configRdbms' && val !== 'jdbc') {
           $.post("${ url('indexer:get_db_component') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
@@ -1560,7 +1556,7 @@ ${ assist.assistPanel() }
               self.rdbmsDatabaseNames(resp.data);
             }
           });
-        } else if(self.rdbmsMode() == 'configRdbms' && val == 'jdbc') {
+        } else if(self.rdbmsMode() === 'configRdbms' && val === 'jdbc') {
           $.post("${ url('indexer:jdbc_db_list') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
@@ -1572,7 +1568,7 @@ ${ assist.assistPanel() }
       });
       self.rdbmsDatabaseName = ko.observable('');
       self.rdbmsDatabaseName.subscribe(function (val) {
-        if (val != '') {
+        if (val !== '') {
           $.post("${ url('indexer:get_db_component') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
@@ -1585,14 +1581,14 @@ ${ assist.assistPanel() }
       self.rdbmsDatabaseNames = ko.observableArray();
       self.rdbmsTableName = ko.observable('');
       self.rdbmsTableName.subscribe(function (val) {
-        if (val != '') {
+        if (val !== '') {
           wizard.guessFieldTypes();
           wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
         }
       });
       self.rdbmsJdbcDriverNames = ko.observableArray();
       self.rdbmsJdbcDriverName = ko.observable();
-      self.rdbmsJdbcDriverName.subscribe(function (val) {
+      self.rdbmsJdbcDriverName.subscribe(function () {
         self.rdbmsDatabaseNames([]);
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
@@ -1603,24 +1599,24 @@ ${ assist.assistPanel() }
         });
       });
       self.rdbmsJdbcDriver = ko.observable('');
-      self.rdbmsJdbcDriver.subscribe(function (val) {
+      self.rdbmsJdbcDriver.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsTableNames = ko.observableArray();
       self.rdbmsHostname = ko.observable('');
-      self.rdbmsHostname.subscribe(function (val) {
+      self.rdbmsHostname.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsPort = ko.observable('');
-      self.rdbmsPort.subscribe(function (val) {
+      self.rdbmsPort.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsUsername = ko.observable('');
-      self.rdbmsUsername.subscribe(function (val) {
+      self.rdbmsUsername.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsPassword = ko.observable('');
-      self.rdbmsPassword.subscribe(function (val) {
+      self.rdbmsPassword.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsAllTablesSelected = ko.observable(false);
@@ -1634,10 +1630,10 @@ ${ assist.assistPanel() }
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
         }, function (resp) {
-          if (resp.status == 0 && resp.data) {
+          if (resp.status === 0 && resp.data) {
             self.rdbmsDbIsValid(true);
             self.rdbmsDatabaseNames(resp.data);
-          } else if (resp.status == 1) {
+          } else if (resp.status === 1) {
             $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
             self.rdbmsDbIsValid(false);
           }
@@ -1646,7 +1642,7 @@ ${ assist.assistPanel() }
 
       // Table
       self.tables = ko.observableArray([
-        ko.mapping.fromJS({name: ''})
+        ko.mapping.fromJS({ name: '' })
       ]);
       self.selectedTableIndex = ko.observable(0);
       self.table = ko.pureComputed(function() {
@@ -1665,7 +1661,6 @@ ${ assist.assistPanel() }
         }
         resizeElements();
       });
-      self.apiHelperType = ko.observable('${ source_type }');
 
       // Queries
       self.query = ko.observable('');
@@ -1702,7 +1697,7 @@ ${ assist.assistPanel() }
       });
       self.kafkaFieldTypes = ko.observable('');
       self.kafkaFieldTypes.subscribe(function(newValue) {
-        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue)
+        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue);
         viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldSchemaPath = ko.observable('');
@@ -1724,13 +1719,13 @@ ${ assist.assistPanel() }
         }
       });
       self.hasStreamSelected = ko.pureComputed(function() {
-        return (self.streamSelection() == 'kafka' && self.kafkaSelectedTopics()) ||
-           (self.streamSelection() == 'sfdc' && self.streamObject())
+        return (self.streamSelection() === 'kafka' && self.kafkaSelectedTopics()) ||
+           (self.streamSelection() === 'sfdc' && self.streamObject())
       });
       self.hasStreamSelected.subscribe(function(newValue) {
         if (newValue) {
           wizard.guessFormat();
-          if (newValue == 'kafka') {
+          if (newValue === 'kafka') {
             wizard.destination.tableFormat('kudu');
           }
         }
@@ -1739,9 +1734,9 @@ ${ assist.assistPanel() }
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
         }, function (resp) {
-          if (resp.status == 0 && resp.data) {
+          if (resp.status === 0 && resp.data) {
             huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-          } else if (resp.status == 1) {
+          } else if (resp.status === 1) {
             $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
             self.rdbmsDbIsValid(false);
           }
@@ -1759,38 +1754,41 @@ ${ assist.assistPanel() }
         }
 
         if (typeof newVal.fieldSeparator !== 'undefined') {
-          wizard.destination.useCustomDelimiters(newVal.fieldSeparator() != ',');
+          wizard.destination.useCustomDelimiters(newVal.fieldSeparator() !== ',');
           wizard.destination.customFieldDelimiter(newVal.fieldSeparator());
           newVal.fieldSeparator.subscribe(function(newVal) {
-            if (newVal != '') {
+            if (newVal !== '') {
               wizard.destination.customFieldDelimiter(newVal);
             }
           });
         }
       });
 
-      self.show = ko.computed(function() {
-        if (self.inputFormat() == 'file') {
+      self.show = ko.pureComputed(function() {
+        if (self.inputFormat() === 'file') {
           return self.path().length > 0;
-        } else if (self.inputFormat() == 'table') {
+        }
+        if (self.inputFormat() === 'table') {
           return self.tableName().length > 0;
-        } else if (self.inputFormat() == 'query') {
+        }
+        if (self.inputFormat() === 'query') {
           return self.query();
-        } else if (self.inputFormat() == 'manual') {
+        }
+        if (self.inputFormat() === 'manual') {
           return true;
-        } else if (self.inputFormat() == 'stream') {
-          if (self.streamSelection() == 'kafka') {
+        }
+        if (self.inputFormat() === 'stream') {
+          if (self.streamSelection() === 'kafka') {
             return self.kafkaSelectedTopics() && self.kafkaSelectedTopics().length > 0;
-          } else {
-            return self.streamSelection() == 'sfdc' &&
-                self.streamUsername().length > 0 &&
-                self.streamPassword().length > 0 &&
-                self.streamToken().length > 0 &&
-                self.streamEndpointUrl().length > 0 &&
-                self.streamObject()
-              ;
           }
-        } else if (self.inputFormat() == 'rdbms') {
+          return self.streamSelection() === 'sfdc' &&
+              self.streamUsername().length > 0 &&
+              self.streamPassword().length > 0 &&
+              self.streamToken().length > 0 &&
+              self.streamEndpointUrl().length > 0 &&
+              self.streamObject();
+        }
+        if (self.inputFormat() === 'rdbms') {
           return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.rdbmsAllTablesSelected());
         }
       });
@@ -1798,67 +1796,64 @@ ${ assist.assistPanel() }
 
     var Destination = function (vm, wizard) {
       var self = this;
+      self.sourceType = vm.sourceType;
 
-      self.name = ko.observable('').extend({throttle: 500});
+      self.name = ko.observable('').extend({ throttle: 500 });
       self.nameChanged = function(name) {
         var exists = false;
 
-        if (name.length == 0) {
+        if (name.length === 0) {
           self.isTargetExisting(false);
           self.isTargetChecking(false);
-        }
-        else if (self.outputFormat() == 'file') {
+        } else if (self.outputFormat() === 'file') {
           // self.path()
-        }
-        else if (self.outputFormat() == 'table' && wizard.isValidDestination()) {
+        } else if (self.outputFormat() === 'table' && wizard.isValidDestination()) {
           if (self.tableName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
-            $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
-              self.isTargetExisting(data.code != 500 && data.code != 404);
+
+            // TODO: Use DataCatalog.getEntry...
+            $.get("/" + (self.sourceType === 'hive' ? 'beeswax' : self.sourceType) + "/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
+              self.isTargetExisting(data.code !== 500 && data.code !== 404);
               self.isTargetChecking(false);
-            }).fail(function (xhr, textStatus, errorThrown) {
+            }).fail(function () {
               self.isTargetExisting(false);
               self.isTargetChecking(false);
             });
-          }
-          else {
+          } else {
             self.isTargetExisting(false);
             self.isTargetChecking(false);
           }
-        }
-        else if (self.outputFormat() == 'hbase') {
+        } else if (self.outputFormat() === 'hbase') {
           // Todo once autocomplete is implemented for hbase
-        }
-        else if (self.outputFormat() == 'database' && wizard.isValidDestination()) {
+        } else if (self.outputFormat() === 'database' && wizard.isValidDestination()) {
           if (self.databaseName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
-            $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName(), function (data) {
+            // TODO: Use DataCatalog.getEntry...
+            $.get("/" + (self.sourceType === 'hive' ? 'beeswax' : self.sourceType) + "/api/autocomplete/" + self.databaseName(), function (data) {
               self.isTargetExisting(data.tables_meta && data.tables_meta.length > 0);
               self.isTargetChecking(false);
-            }).fail(function (xhr, textStatus, errorThrown) {
+            }).fail(function () {
               self.isTargetExisting(false);
               self.isTargetChecking(false);
             });
-          }
-          else {
+          } else {
             self.isTargetExisting(false);
             self.isTargetChecking(false);
           }
-        }
-        else if (self.outputFormat() == 'index') {
+        } else if (self.outputFormat() === 'index') {
           $.post("${ url('indexer:list_index') }", {
               name: self.name()
           }, function (data) {
-            self.isTargetExisting(data.status == 0);
+            self.isTargetExisting(data.status === 0);
             self.isTargetChecking(false);
           }).fail(function (xhr, textStatus, errorThrown) {
             self.isTargetExisting(false);
             self.isTargetChecking(false);
           });
           $.post("/indexer/api/configs/list/", function (data) {
-            if (data.status == 0) {
+            if (data.status === 0) {
               self.indexerConfigSets(data.configs.map(function (config) {
                 return {'name': config, 'value': config};
               }));
@@ -1871,12 +1866,10 @@ ${ assist.assistPanel() }
       };
       self.name.subscribe(self.nameChanged);
 
-      self.apiHelperType = ko.observable('${ source_type }');
-
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
-        if (newValue && newValue != 'database' && ((newValue == 'table' || newValue == 'index') && wizard.source.table().length > 0)) {
+        if (newValue && newValue !== 'database' && ((newValue === 'table' || newValue === 'index') && wizard.source.table().length > 0)) {
           self.nameChanged(self.name());
           wizard.guessFieldTypes();
           resizeElements();
@@ -1898,24 +1891,24 @@ ${ assist.assistPanel() }
           {'name': 'HBase Table', 'value': 'hbase'},
           % endif
       ]);
-      self.outputFormats = ko.computed(function() {
+      self.outputFormats = ko.pureComputed(function() {
         return $.grep(self.outputFormatsList(), function(format) {
-          if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
+          if (format.value === 'database' && wizard.source.inputFormat() !== 'manual') {
             return false;
           }
-          if (format.value == 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) == -1) {
+          if (format.value === 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          else if (format.value == 'index' && ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) == -1) {
+          if (format.value === 'index' && ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          else if (format.value == 'table' && ['table'].indexOf(wizard.source.inputFormat()) != -1) {
+          if (format.value === 'table' && ['table'].indexOf(wizard.source.inputFormat()) !== -1) {
             return false;
           }
-          else if (format.value == 'altus' && ['table'].indexOf(wizard.source.inputFormat()) == -1) {
+          if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value == 'hbase' && wizard.source.inputFormat() != 'rdbms') {
+          if (format.value === 'hbase' && wizard.source.inputFormat() !== 'rdbms') {
             return false;
           }
           return true;
@@ -1923,21 +1916,21 @@ ${ assist.assistPanel() }
       });
       wizard.prefill.target_type.subscribe(function(newValue) {
         self.outputFormat(newValue || 'table');
-        if (newValue == 'database') {
+        if (newValue === 'database') {
           vm.currentStep(2);
         } else {
           vm.currentStep(1);
         }
       });
-      self.defaultName = ko.computed(function() {
-        var name = ''
+      self.defaultName = ko.pureComputed(function() {
+        var name = '';
 
-        if (wizard.source.inputFormat() == 'file' || wizard.source.inputFormat() == 'stream') {
-          if (self.outputFormat() == 'table') {
+        if (wizard.source.inputFormat() === 'file' || wizard.source.inputFormat() === 'stream') {
+          if (self.outputFormat() === 'table') {
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
 
-            if (wizard.source.inputFormat() == 'stream') {
-              if (wizard.source.streamSelection() == 'kafka') {
+            if (wizard.source.inputFormat() === 'stream') {
+              if (wizard.source.streamSelection() === 'kafka') {
                 name += '.' + wizard.source.kafkaSelectedTopics();
               } else {
                 name += '.' + wizard.source.streamObject();
@@ -1948,16 +1941,16 @@ ${ assist.assistPanel() }
           } else { // Index
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
           }
-        } else if (wizard.source.inputFormat() == 'table') {
+        } else if (wizard.source.inputFormat() === 'table') {
            name = wizard.source.databaseName();
-        } else if (wizard.source.inputFormat() == 'query') {
+        } else if (wizard.source.inputFormat() === 'query') {
           if (wizard.source.query()) {
             name = wizard.source.name();
           }
           if (wizard.prefill.target_path().length > 0) {
             name = wizard.prefill.target_path();
           }
-        } else if (wizard.source.inputFormat() == 'manual') {
+        } else if (wizard.source.inputFormat() === 'manual') {
           name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
         }
 
@@ -1988,10 +1981,10 @@ ${ assist.assistPanel() }
       self.processBulkColumnNames = function () {
         var val = self.bulkColumnNames();
         try {
-          if (val.indexOf("\"") == -1 && val.indexOf("'") == -1) {
+          if (val.indexOf("\"") === -1 && val.indexOf("'") === -1) {
             val = '"' + val.replace(/,/gi, '","') + '"';
           }
-          if (val.indexOf("[") == -1) {
+          if (val.indexOf("[") === -1) {
             val = "[" + val + "]";
           }
           var parsed = JSON.parse(val);
@@ -2008,19 +2001,19 @@ ${ assist.assistPanel() }
 
       self.isTargetExisting = ko.observable();
       self.isTargetChecking = ko.observable(false);
-      self.existingTargetUrl = ko.computed(function() { // Should open generic sample popup instead
+      self.existingTargetUrl = ko.pureComputed(function() { // Should open generic sample popup instead
         if (self.isTargetExisting()) {
-          if (self.outputFormat() == 'file') {
+          if (self.outputFormat() === 'file') {
             // Todo
             return '';
           }
-          else if (self.outputFormat() == 'table') {
+          if (self.outputFormat() === 'table') {
             return '/metastore/table/' + self.databaseName() + '/' + self.tableName();
           }
-          else if (self.outputFormat() == 'database') {
+          if (self.outputFormat() === 'database') {
             return '/metastore/tables/' + self.databaseName();
           }
-          else if (self.outputFormat() == 'index') {
+          if (self.outputFormat() === 'index') {
             return '/indexer/indexes/' + self.name();
           }
         }
@@ -2028,11 +2021,11 @@ ${ assist.assistPanel() }
       });
 
       // Table
-      self.tableName = ko.computed(function() {
-        return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
+      self.tableName = ko.pureComputed(function() {
+        return self.outputFormat() === 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
       });
-      self.databaseName = ko.computed(function() {
-        return self.outputFormat() == 'database' ? self.name() : (self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default');
+      self.databaseName = ko.pureComputed(function() {
+        return self.outputFormat() === 'database' ? self.name() : (self.outputFormat() === 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default');
       });
       self.tableFormat = ko.observable('text');
       self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
@@ -2041,18 +2034,17 @@ ${ assist.assistPanel() }
       self.tableFormats = ko.pureComputed(function() {
         if (wizard.source.inputFormat() === 'kafka') {
           return [{'value': 'kudu', 'name': 'Kudu'}];
-        } else {
-          return [
-            {'value': 'text', 'name': 'Text'},
-            {'value': 'parquet', 'name': 'Parquet'},
-            {'value': 'kudu', 'name': 'Kudu'},
-            {'value': 'csv', 'name': 'Csv'},
-            {'value': 'avro', 'name': 'Avro'},
-            {'value': 'json', 'name': 'Json'},
-            {'value': 'regexp', 'name': 'Regexp'},
-            {'value': 'orc', 'name': 'ORC'},
-          ]
         }
+        return [
+          {'value': 'text', 'name': 'Text'},
+          {'value': 'parquet', 'name': 'Parquet'},
+          {'value': 'kudu', 'name': 'Kudu'},
+          {'value': 'csv', 'name': 'Csv'},
+          {'value': 'avro', 'name': 'Avro'},
+          {'value': 'json', 'name': 'Json'},
+          {'value': 'regexp', 'name': 'Regexp'},
+          {'value': 'orc', 'name': 'ORC'},
+        ]
       });
 
       self.partitionColumns = ko.observableArray();
@@ -2101,7 +2093,7 @@ ${ assist.assistPanel() }
           path: ko.observable('')
         };
         self.sqoopJobLibPaths.push(newValue);
-      }
+      };
       self.removeSqoopJobLibPath = function (valueToRemove) {
         self.sqoopJobLibPaths.remove(valueToRemove);
       };
@@ -2126,11 +2118,24 @@ ${ assist.assistPanel() }
       self.activeNamespace = ko.observable();
       self.activeCompute = ko.observable();
 
-      // TODO: sourceType? --> self.apiHelperType
-      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
-        // TODO: Namespace selection for create wizard
-        self.activeNamespace(context.namespaces[0]);
-        self.activeCompute(context.namespaces[0].computes[0]);
+      ContextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
+        if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
+          if (namespace.id === vm.namespaceId) {
+            self.activeNamespace(namespace);
+            return true;
+          }
+        })) {
+          self.activeNamespace(context.namespaces[0]);
+        }
+
+        if (!vm.computeId || !self.activeNamespace().computes.some(function (compute) {
+          if (compute.id === vm.computeId) {
+            self.activeCompute(compute);
+            return true;
+          }
+        })) {
+          self.activeCompute(self.activeNamespace().computes[0]);
+        }
       });
 
       self.fileType = ko.observable();
@@ -2143,7 +2148,7 @@ ${ assist.assistPanel() }
       self.fileTypeName = ko.observable();
       self.fileTypeName.subscribe(function (newType) {
         for (var i = 0; i < self.fileTypes.length; i++) {
-          if (self.fileTypes[i].name == newType) {
+          if (self.fileTypes[i].name === newType) {
             self.fileType(self.fileTypes[i]);
             break;
           }
@@ -2190,27 +2195,27 @@ ${ assist.assistPanel() }
 
       self.isValidDestination = ko.pureComputed(function() {
         return self.destination.name().length > 0 && (
-          (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
-          (['index'].indexOf(self.destination.outputFormat()) == -1 || /^[^\\/:]+$/.test(self.destination.name()))
+          (['table', 'database'].indexOf(self.destination.outputFormat()) === -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
+          (['index'].indexOf(self.destination.outputFormat()) === -1 || /^[^\\/:]+$/.test(self.destination.name()))
         );
       });
-      self.readyToIndex = ko.computed(function () {
-        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
-        var validTableColumns = self.destination.outputFormat() != 'table' || ($.grep(self.destination.columns(), function(column) {
-            return column.name().length == 0;
-          }).length == 0
+      self.readyToIndex = ko.pureComputed(function () {
+        var validFields = self.destination.columns().length || self.destination.outputFormat() === 'database';
+        var validTableColumns = self.destination.outputFormat() !== 'table' || ($.grep(self.destination.columns(), function(column) {
+            return column.name().length === 0;
+          }).length === 0
           && $.grep(self.destination.partitionColumns(), function(column) {
-            return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
-          }).length == 0
+            return column.name().length === 0 || (self.source.inputFormat() !== 'manual' && column.partitionValue().length === 0);
+          }).length === 0
         );
-        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
-        var isValidTable = self.destination.outputFormat() != 'table' || (
-          self.destination.tableFormat() != 'kudu' || (
-              $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
+        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() === 'index';
+        var isValidTable = self.destination.outputFormat() !== 'table' || (
+          self.destination.tableFormat() !== 'kudu' || (
+              $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
         );
-        var validIndexFields = self.destination.outputFormat() != 'index' || ($.grep(self.destination.columns(), function(column) {
-            return ! (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column.name()) && column.name() != '_version_');
-          }).length == 0
+        var validIndexFields = self.destination.outputFormat() !== 'index' || ($.grep(self.destination.columns(), function(column) {
+            return ! (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column.name()) && column.name() !== '_version_');
+          }).length === 0
         ) || self.destination.indexerConfigSet();
 
         return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
@@ -2218,9 +2223,9 @@ ${ assist.assistPanel() }
 
       self.formatTypeSubscribed = false;
 
-      self.source.format.subscribe(function (newVal) {
+      self.source.format.subscribe(function () {
         for (var i = 0; i < self.fileTypes.length; i++) {
-          if (self.fileTypes[i].name == self.source.format().type()) {
+          if (self.fileTypes[i].name === self.source.format().type()) {
             self.fileType(self.fileTypes[i]);
             self.fileTypeName(self.fileTypes[i].name);
             break;
@@ -2246,27 +2251,27 @@ ${ assist.assistPanel() }
         $.post("${ url('indexer:guess_format') }", {
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
-          if (resp.status != 0) {
+          if (resp.status !== 0) {
             $(document).trigger("error", resp.message);
           } else {
             var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
             self.source.format(newFormat);
-            if (self.source.inputFormat() == 'stream') {
-              if (self.source.streamSelection() == 'kafka') {
+            if (self.source.inputFormat() === 'stream') {
+              if (self.source.streamSelection() === 'kafka') {
                 self.source.kafkaTopics(resp['topics']);
-              } else if (self.source.streamSelection() == 'sfdc') {
+              } else if (self.source.streamSelection() === 'sfdc') {
                 self.source.streamObjects(resp['objects']);
               }
             }
 
-            if (self.source.inputFormat() != 'stream' || self.source.streamSelection() != 'sfdc') {
+            if (self.source.inputFormat() !== 'stream' || self.source.streamSelection() !== 'sfdc') {
               self.guessFieldTypes();
             }
           }
 
           self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
-        }).fail(function (xhr, textStatus, errorThrown) {
+        }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
           self.isGuessingFormat(false);
@@ -2285,7 +2290,7 @@ ${ assist.assistPanel() }
         }, function (resp) {
           self.loadSampleData(resp);
           self.isGuessingFieldTypes(false);
-        }).fail(function (xhr, textStatus, errorThrown) {
+        }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
           self.isGuessingFieldTypes(false);
           viewModel.isLoading(false);
@@ -2335,7 +2340,7 @@ ${ assist.assistPanel() }
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination)
         }, function (resp) {
-          if (resp.status != 0) {
+          if (resp.status !== 0) {
             $(document).trigger("error", resp.message);
             self.indexingStarted(false);
             self.isIndexing(false);
@@ -2434,7 +2439,7 @@ ${ assist.assistPanel() }
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
           self.indexingStarted(false);
-          if (resp.status == 0) {
+          if (resp.status === 0) {
             if (resp.history_uuid) {
               $.jHueNotify.info("${ _('Task submitted') }");
               huePubSub.publish('notebook.task.submitted', resp.history_uuid);
@@ -2451,7 +2456,7 @@ ${ assist.assistPanel() }
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
           }
-        }).fail(function (xhr, textStatus, errorThrown) {
+        }).fail(function (xhr) {
           self.indexingStarted(false);
           $(document).trigger("error", xhr.responseText);
         });
@@ -2522,7 +2527,7 @@ ${ assist.assistPanel() }
       });
 
       var autoExpand = function (newVal) {
-        if ((newVal == 'array' || newVal == 'map' || newVal == 'struct') && koField.nested().length == 0) {
+        if ((newVal === 'array' || newVal === 'map' || newVal === 'struct') && koField.nested().length === 0) {
           koField.nested.push(loadDefaultField({level: koField.level() + 1}));
         }
       };
@@ -2536,6 +2541,10 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.apiHelper = ApiHelper.getInstance();
+      self.sourceType = window.location.getParameter('sourceType', true) || '${ source_type }';
+      self.namespaceId = window.location.getParameter('namespace', true);
+      self.computeId =  window.location.getParameter('compute', true);
+
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -2545,7 +2554,7 @@ ${ assist.assistPanel() }
 
       // Wizard related
       self.wizardEnabled = ko.observable(false);
-      self.currentStep = ko.observable(self.createWizard.prefill.target_type() == 'database' ? 2 : 1);
+      self.currentStep = ko.observable(self.createWizard.prefill.target_type() === 'database' ? 2 : 1);
       self.currentStep.subscribe(function () {
         %if is_embeddable:
         $('.page-content').scrollTop(0);
@@ -2554,7 +2563,7 @@ ${ assist.assistPanel() }
         %endif
       });
       self.previousStepVisible = ko.pureComputed(function(){
-        return self.currentStep() > 1 && self.createWizard.destination.outputFormat() != 'database';
+        return self.currentStep() > 1 && self.createWizard.destination.outputFormat() !== 'database';
       });
       self.nextStepVisible = ko.pureComputed(function(){
         return self.currentStep() < 3 && self.wizardEnabled();
