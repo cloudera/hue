@@ -35,7 +35,7 @@ from django.contrib.auth.models import Permission
 
 
 class Nonce(models.Model):
-    server_url = models.CharField(max_length=2047)
+    server_url = models.CharField(max_length=2000)
     timestamp = models.IntegerField()
     salt = models.CharField(max_length=40)
 
@@ -44,7 +44,7 @@ class Nonce(models.Model):
 
 
 class Association(models.Model):
-    server_url = models.TextField(max_length=2047)
+    server_url = models.TextField(max_length=2000)
     handle = models.CharField(max_length=255)
     secret = models.TextField(max_length=255)  # Stored base64 encoded
     issued = models.IntegerField()
@@ -57,8 +57,8 @@ class Association(models.Model):
 
 class UserOpenID(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    claimed_id = models.TextField(max_length=2047)
-    display_id = models.TextField(max_length=2047)
+    claimed_id = models.TextField(max_length=2000)
+    display_id = models.TextField(max_length=2000)
 
     class Meta:
         permissions = (
