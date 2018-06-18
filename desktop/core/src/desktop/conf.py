@@ -1484,7 +1484,7 @@ def get_clusters(user):
 
   # Get core standalone config if there
   apps = appmanager.get_apps_dict(user)
-  if 'beeswax' in apps and not IS_MULTICLUSTER_ONLY.get():
+  if 'beeswax' in apps: # and not IS_MULTICLUSTER_ONLY.get():
     from beeswax.conf import HIVE_SERVER_HOST
     clusters.append(
       (CLUSTER_ID.get(), {
@@ -1506,7 +1506,7 @@ def get_clusters(user):
       'type': cluster_config[i].TYPE.get(),
       'interface': cluster_config[i].INTERFACE.get() or 'hive',
       'server_host': cluster_config[i].SERVER_HOST.get()
-    }) for i in cluster_config
+    }) for i in cluster_config if cluster_config[i].NAME.get() != 'default'
   ])
 
   return OrderedDict(clusters)
