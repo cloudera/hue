@@ -27,8 +27,8 @@ from desktop.views import _ko
   <script type="text/html" id="hue-app-switcher-template">
     <ul class="cui-app-switcher nav navbar-nav">
       <li class="dropdown">
-        <a class="hamburger hamburger-hue dropdown-toggle" style="padding: 10px 5px 0 5px; margin: 8px 24px 0 -5px;" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
-          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+        <a style="padding: 10px 5px 0 5px; margin: 8px 24px 0 -5px;" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
+          <i class="fa fa-th"></i>
         </a>
 
         <ul class="dropdown-menu" style="margin: 7px 0 0 -5px;" role="menu">
@@ -64,6 +64,10 @@ from desktop.views import _ko
           label: 'Data Science',
           img:'hi-as-cdsw'
         },
+        altusAdmin: {
+          label: 'Altus Admin',
+          img:'hi-as-nav'
+        },
         hue: {
           label: 'Data Analytics (Hue)',
           img: 'hi-as-hue'
@@ -88,49 +92,15 @@ from desktop.views import _ko
         self.links = ko.observableArray([]);
 
         var altusLinks = [{
-          label: 'Dashboard',
-          icon: 'fa fa-home',
-          link: 'http://localhost:3001'
-        }, {
-          divider: true
-        }, {
-          label: 'Data Engineering',
-          link: '/',
-          icon: 'fa fa-gear'
-        },
-          {
-            product: 'cdsw',
-            link: '/'
-          }, {
-            product: 'hue',
-            link: '/'
-          },
-          {
-            divider: true
-          },
-          {
-            product: 'navigator',
-            link: '/'
-          }, {
-            label: 'Navigator Optimizer',
-            link: '/',
-            icon: 'fa fa-gear'
+            product: 'altusAdmin',
+            link: 'https://sso.staging.aem.cloudera.com'
           }
         ];
 
         var onPremLinks = [{
-          label: 'Dashboard',
-          icon: 'fa fa-home',
-          link: '/'
-        }, {
-          divider: true
-        }, {
-          product: 'cdsw',
-          link: '/'
-        }, {
-          product: 'hue',
-          link: '/'
-        },
+            product: 'cdsw',
+            link: '/'
+          },
           {
             divider: true
           }
@@ -141,7 +111,6 @@ from desktop.views import _ko
             product: 'navigator',
             link: '/'
           }
-
         ];
 
         var applyLinks = function (links) {
