@@ -170,13 +170,9 @@ ${ hueIcons.symbols() }
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
-        % if IS_MULTICLUSTER_ONLY.get():
-          <!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
-        % else:
-          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-          </a>
-        % endif
+        <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+        </a>
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           % if IS_MULTICLUSTER_ONLY.get():
@@ -238,6 +234,10 @@ ${ hueIcons.symbols() }
 
         % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
         <div class="dropdown navbar-dropdown pull-right">
+          % if IS_MULTICLUSTER_ONLY.get():
+            <!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
+          % endif
+
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
           %>
