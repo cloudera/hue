@@ -25,12 +25,9 @@
       home: "/",
       skipColumns: false,
       skipTables: false,
-      onEnter: function () {
-      },
-      onBlur: function () {
-      },
-      onPathChange: function () {
-      },
+      onEnter: function () {},
+      onBlur: function () {},
+      onPathChange: function () {},
       pathChangeLevel: '',
       smartTooltip: '',
       smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
@@ -50,15 +47,26 @@
     self._defaults = defaults;
     self._name = pluginName;
 
-    self.activeContextNamespaceDeferred = $.Deferred();
-    if (self.options.activeNamespace) {
-      self.activeContextNamespaceDeferred.resolve(self.options.activeNamespace);
+    self.namespaceDeferred = $.Deferred();
+    self.computeDeferred = $.Deferred();
+
+    if (self.options.namespace) {
+      self.namespaceDeferred.resolve(self.options.namespace);
     } else {
-      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
-        // TODO: Namespace selection in caller
-        self.activeContextNamespaceDeferred.resolve(context.namespaces[0]);
+      ContextCatalog.getNamespaces({ sourceType: options.apiHelperType }).done(function (context) {
+        self.namespaceDeferred.resolve(context.namespaces[0]);
       })
     }
+    self.namespaceDeferred.done(function (namespace) {
+      if (!self.options.compute || !namespace.computes.some(function (compute) {
+        if (compute.id === self.options.compute.id) {
+          self.computeDeferred.resolve(compute);
+          return true;
+        }
+      })) {
+        self.computeDeferred.resolve(namespace.computes[0]);
+      }
+    });
 
     this.init();
   }
@@ -68,7 +76,7 @@
     var $el = $(self.element);
 
     // creates autocomplete popover
-    if ($("#jHueGenericAutocomplete").length == 0) {
+    if ($("#jHueGenericAutocomplete").length === 0) {
       $("<div>").attr("id", "jHueGenericAutocomplete").addClass("jHueAutocomplete popover")
         .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
         .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>')
@@ -87,8 +95,7 @@
         _oSel.moveStart('character', elemLength);
         _oSel.moveEnd('character', 0);
         _oSel.select();
-      }
-      else if (element.selectionStart || element.selectionStart == '0') {
+      } else if (element.selectionStart || element.selectionStart === '0') {
         element.selectionStart = elemLength;
         element.selectionEnd = elemLength;
         element.focus();
@@ -105,7 +112,7 @@
     });
 
     $el.keydown(function (e) {
-      if (e.keyCode == 9) {
+      if (e.keyCode === 9) {
         e.preventDefault();
         showAutocomplete(function () {
           var path = $el.val();
@@ -118,9 +125,9 @@
     });
 
     function smartTooltipMaker() {
-      if (self.options.smartTooltip != "" && typeof $.totalStorage != "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") != -1) {
+      if (self.options.smartTooltip !== "" && typeof $.totalStorage !== "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") !== -1) {
         var cnt = 0;
-        if ($.totalStorage("jHueGenericAutocompleteTooltip") != null) {
+        if ($.totalStorage("jHueGenericAutocompleteTooltip")) {
           cnt = $.totalStorage("jHueGenericAutocompleteTooltip") + 1;
         }
         $.totalStorage("jHueGenericAutocompleteTooltip", cnt);
@@ -147,7 +154,7 @@
     var _filterTimeout = -1;
     $el.keyup(function (e) {
       window.clearTimeout(_filterTimeout);
-      if ($.inArray(e.keyCode, [17, 38, 40, 13, 32, 191]) == -1) {
+      if ($.inArray(e.keyCode, [17, 38, 40, 13, 32, 191]) === -1) {
         _hiveAutocompleteSelectedIndex = -1;
         _filterTimeout = window.setTimeout(function () {
           var path = $el.val();
@@ -156,15 +163,14 @@
           }
           $("#jHueGenericAutocomplete").show();
           $("#jHueGenericAutocomplete ul li").show();
-          if (path != "") {
+          if (path !== "") {
             $("#jHueGenericAutocomplete ul li").each(function () {
               if (self.options.searchEverywhere) {
-                if ($(this).text().trim().toLowerCase().indexOf(path.toLowerCase()) == -1) {
+                if ($(this).text().trim().toLowerCase().indexOf(path.toLowerCase()) === -1) {
                   $(this).hide();
                 }
-              }
-              else {
-                if ($(this).text().trim().indexOf(path) != 0) {
+              } else {
+                if ($(this).text().trim().indexOf(path) !== 0) {
                   $(this).hide();
                 }
               }
@@ -175,38 +181,35 @@
           }
         }, 500);
       }
-      if (e.keyCode == 38) {
+      if (e.keyCode === 38) {
         if (_hiveAutocompleteSelectedIndex <= 0) {
           _hiveAutocompleteSelectedIndex = $("#jHueGenericAutocomplete ul li:visible").length - 1;
-        }
-        else {
+        } else {
           _hiveAutocompleteSelectedIndex--;
         }
       }
-      if (e.keyCode == 40) {
-        if (_hiveAutocompleteSelectedIndex == $("#jHueGenericAutocomplete ul li:visible").length - 1) {
+      if (e.keyCode === 40) {
+        if (_hiveAutocompleteSelectedIndex === $("#jHueGenericAutocomplete ul li:visible").length - 1) {
           _hiveAutocompleteSelectedIndex = 0;
-        }
-        else {
+        } else {
           _hiveAutocompleteSelectedIndex++;
         }
       }
-      if (e.keyCode == 38 || e.keyCode == 40) {
+      if (e.keyCode === 38 || e.keyCode === 40) {
         smartTooltipMaker();
         $("#jHueGenericAutocomplete ul li").removeClass("active");
         $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).addClass("active");
         $("#jHueGenericAutocomplete .popover-content").scrollTop($("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).prevAll().length * $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).outerHeight());
       }
-      if ((e.keyCode == 32 && e.ctrlKey) || e.keyCode == 191) {
+      if ((e.keyCode === 32 && e.ctrlKey) || e.keyCode === 191) {
         smartTooltipMaker();
         showAutocomplete();
       }
-      if (e.keyCode == 13) {
+      if (e.keyCode === 13) {
         _pauseBlur = true;
         if (_hiveAutocompleteSelectedIndex > -1) {
           $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).click();
-        }
-        else {
+        } else {
           self.options.onEnter($(this));
         }
         $("#jHueGenericAutocomplete").hide();
@@ -231,19 +234,18 @@
     });
 
     var BASE_PATH = "/beeswax/api/autocomplete/";
-    if (self.options.serverType == "IMPALA") {
+    if (self.options.serverType === "IMPALA") {
       BASE_PATH = "/impala/api/autocomplete/";
     }
-    if (self.options.serverType == "SOLR") {
+    if (self.options.serverType === "SOLR") {
       BASE_PATH = "/indexer/api/autocomplete/";
     }
     var _currentFiles = [];
 
     self.getDatabases = function (callback) {
       var self = this;
-      self.activeContextNamespaceDeferred.done(function (namespace) {
-        // TODO: compute selection?
-        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, compute: namespace.computes[0], path: [] }).done(function (dbEntries) {
+      $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
+        DataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: [] }).done(function (dbEntries) {
           callback($.map(dbEntries, function (entry) { return entry.name }));
         });
       })
@@ -251,9 +253,8 @@
 
     self.getTables = function (database, callback) {
       var self = this;
-      self.activeContextNamespaceDeferred.done(function (namespace) {
-        // TODO: compute selection?
-        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, compute: namespace.computes[0], path: [ database ] }).done(function (entry) {
+      $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
+        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: [ database ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });
@@ -261,16 +262,15 @@
 
     self.getColumns = function (database, table, callback) {
       var self = this;
-      self.activeContextNamespaceDeferred.done(function (namespace) {
-        // TODO: compute selection?
-        DataCatalog.getEntry({sourceType: self.options.apiHelperType, namespace: namespace, compute: namespace.computes[0], path: [ database, table ]}).done(function (entry) {
+      $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
+        DataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: [ database, table ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });
     };
 
     function autocompleteLogic(autocompleteUrl, data) {
-      if (data.error == null) {
+      if (!data.error) {
         _currentFiles = [];
 
         var _ico = "";
@@ -278,32 +278,27 @@
         var _isSkipColumns = false;
         var _isSkipTables = false;
 
-        if (self.options.serverType == "SOLR") {
+        if (self.options.serverType === "SOLR") {
           _iterable = data.collections;
           _ico = "fa-search";
-        }
-        else {
-          if (data.databases != null) { // it's a db
+        } else {
+          if (data.databases) { // it's a db
             _iterable = data.databases;
             _ico = "fa-database";
-          }
-          else if (data.tables_meta != null) { // it's a table
+          } else if (data.tables_meta) { // it's a table
             if (!self.options.skipTables) {
               _iterable = $.map(data.tables_meta, function (tablesMeta) {
                 return tablesMeta.name;
               });
               _ico = "fa-table";
-            }
-            else {
+            } else {
               _isSkipTables = true;
             }
-          }
-          else {
+          } else {
             if (!self.options.skipColumns) {
               _iterable = data.columns;
               _ico = "fa-columns";
-            }
-            else {
+            } else {
               _isSkipColumns = true;
             }
           }
@@ -311,10 +306,10 @@
 
         var firstSolrCollection = false;
         var firstSolrConfig = false;
-
         if (!_isSkipColumns && !_isSkipTables) {
+
           $(_iterable).each(function (cnt, item) {
-            if (self.options.serverType == "SOLR") {
+            if (self.options.serverType === "SOLR") {
               if (item.isCollection && !firstSolrCollection) {
                 _currentFiles.push('<li class="hiveAutocompleteItem" data-value="collections.*" title="collections.*"><i class="fa fa-search-plus"></i> collections.*</li>');
                 _currentFiles.push('<li class="hiveAutocompleteItem" data-value="admin.collections" title="admin.collections"><i class="fa fa-database"></i> admin.collections</li>');
@@ -329,8 +324,7 @@
                 }
               }
               _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item.name + '" title="' + item.name + '"><i class="fa ' + _ico + '"></i> ' + item.name + '</li>');
-            }
-            else {
+            } else {
               _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa ' + _ico + '"></i> ' + item + '</li>');
             }
           });
@@ -346,13 +340,11 @@
             var path = autocompleteUrl.substring(BASE_PATH.length);
 
             if ($(this).html().indexOf("search") > -1 || $(this).html().indexOf("cog") > -1 || $(this).html().indexOf("database") > -1) {
-              if ($(this).html().indexOf("search") > -1 && $(this).html().indexOf("search-plus") == -1) {
+              if ($(this).html().indexOf("search") > -1 && $(this).html().indexOf("search-plus") === -1) {
                 $el.val("collections." + item);
-              }
-              else if ($(this).html().indexOf("cog") > -1 && $(this).html().indexOf("cogs") == -1) {
+              } else if ($(this).html().indexOf("cog") > -1 && $(this).html().indexOf("cogs") === -1) {
                 $el.val("configs." + item);
-              }
-              else {
+              } else {
                 $el.val(item);
               }
               if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'database'){
@@ -367,8 +359,7 @@
               if (self.options.skipTables) {
                 $el.val(item);
                 $("#jHueGenericAutocomplete").hide();
-              }
-              else {
+              } else {
                 $el.val(item + ".");
               }
               if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'database') {
@@ -381,18 +372,15 @@
 
             if ($(this).html().indexOf("table") > -1) {
               if ($el.val().indexOf(".") > -1) {
-                if ($el.val().match(/\./gi).length == 1) {
+                if ($el.val().match(/\./gi).length === 1) {
                   $el.val($el.val().substring(0, $el.val().lastIndexOf(".") + 1) + item);
-                }
-                else {
+                } else {
                   $el.val($el.val().substring(0, $el.val().indexOf(".") + 1) + item);
                 }
-              }
-              else {
+              } else {
                 if (self.options.rewriteVal) {
                   $el.val(item);
-                }
-                else {
+                } else {
                   $el.val($el.val() + item);
                 }
               }
@@ -404,8 +392,7 @@
               }
               if (!self.options.skipColumns) {
                 showAutocomplete();
-              }
-              else {
+              } else {
                 self.options.onEnter($el);
                 $("#jHueGenericAutocomplete").hide();
                 _hiveAutocompleteSelectedIndex = -1;
@@ -415,8 +402,7 @@
             if ($(this).html().indexOf("columns") > -1) {
               if ($el.val().match(/\./gi).length > 1) {
                 $el.val($el.val().substring(0, $el.val().lastIndexOf(".") + 1) + item);
-              }
-              else {
+              } else {
                 $el.val($el.val() + "." + item);
               }
               $("#jHueGenericAutocomplete").hide();
@@ -429,7 +415,7 @@
           window.setTimeout(function () {
             setHueBreadcrumbCaretAtEnd(self.element);
           }, 100)
-          if ("undefined" != typeof callback) {
+          if ("undefined" !== typeof callback) {
             callback();
           }
         }
@@ -440,24 +426,24 @@
     function showAutocomplete(callback) {
       $el.parent().find('.fa-spinner').show();
       var path = $el.val();
-      if (self.options.startingPath != '') {
+      if (self.options.startingPath !== '') {
         path = self.options.startingPath + path;
       }
       var autocompleteUrl = BASE_PATH;
 
-      if (path != "" && path.indexOf(".") == -1) {
+      if (path !== "" && path.indexOf(".") === -1) {
         path = "";
       }
 
-      if (path != "" && path.lastIndexOf(".") != path.length - 1) {
+      if (path !== "" && path.lastIndexOf(".") !== path.length - 1) {
         path = path.substring(0, (self.options.startingPath + $el.val()).lastIndexOf("."));
       }
 
-      if (self.options.serverType != "SOLR") {
+      if (self.options.serverType !== "SOLR") {
         autocompleteUrl += path.replace(/\./g, "/");
       }
 
-      if (self.options.serverType != "SOLR" && self.options.apiHelperUser !== '') {
+      if (self.options.serverType !== "SOLR" && self.options.apiHelperUser !== '') {
         var suffix = autocompleteUrl.substr(BASE_PATH.length);
         if (suffix === '') {
           self.getDatabases(function (data) {
@@ -465,8 +451,7 @@
               databases: data
             });
           });
-        }
-        else {
+        } else {
           var details = suffix.split('/');
           if (details.length > 1 && details[1] !== '') {
             self.getColumns(details[0], details[1], function (data) {
@@ -476,15 +461,13 @@
                 })
               });
             });
-          }
-          else {
+          } else {
             self.getTables(details[0], function (data) {
               autocompleteLogic(autocompleteUrl, data);
             });
           }
         }
-      }
-      else {
+      } else {
         $.getJSON(autocompleteUrl, function (data) {
           autocompleteLogic(autocompleteUrl, data);
         });
@@ -503,18 +486,17 @@
     function guessHivePath(lastChars) {
       var possibleMatches = [];
       for (var i = 0; i < _currentFiles.length; i++) {
-        if (($(_currentFiles[i]).text().trim().indexOf(lastChars) == 0 || lastChars == "") && $(_currentFiles[i]).text().trim() != "..") {
+        if (($(_currentFiles[i]).text().trim().indexOf(lastChars) === 0 || lastChars === "") && $(_currentFiles[i]).text().trim() !== "..") {
           possibleMatches.push(_currentFiles[i]);
         }
       }
-      if (possibleMatches.length == 1) {
+      if (possibleMatches.length === 1) {
         $el.val($el.val() + $(possibleMatches[0]).text().trim().substr(lastChars.length));
         if ($(possibleMatches[0]).html().indexOf("folder") > -1) {
           $el.val($el.val() + "/");
           showAutocomplete();
         }
-      }
-      else if (possibleMatches.length > 1) {
+      } else if (possibleMatches.length > 1) {
         // finds the longest common prefix
         var possibleMatchesPlain = [];
         for (var z = 0; z < possibleMatches.length; z++) {
@@ -523,7 +505,7 @@
         var arr = possibleMatchesPlain.slice(0).sort(),
           word1 = arr[0], word2 = arr[arr.length - 1],
           j = 0;
-        while (word1.charAt(j) == word2.charAt(j))++j;
+        while (word1.charAt(j) === word2.charAt(j))++j;
         var match = word1.substring(0, j);
         $el.val($el.val() + match.substr(lastChars.length));
       }
@@ -539,15 +521,14 @@
     return this.each(function () {
       if (!$.data(this, 'plugin_' + pluginName)) {
         $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
-      }
-      else {
+      } else {
         $.data(this, 'plugin_' + pluginName).setOptions(options);
       }
     });
-  }
+  };
 
   $[pluginName] = function (options) {
-    if (typeof console != "undefined") {
+    if (typeof console !== "undefined") {
       console.warn("$(elem).jHueGenericAutocomplete() is a preferred call method.");
     }
     $(options.element).jHueGenericAutocomplete(options);
