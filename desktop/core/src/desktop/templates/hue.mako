@@ -75,7 +75,7 @@
 % endif
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/fontawesome-all.min.css') }" rel="stylesheet">
 % if IS_EMBEDDED.get():
   <link href="${ static('desktop/css/hue-bootstrap-embedded.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-embedded.css') }" rel="stylesheet">
