@@ -29,7 +29,7 @@ from desktop import conf
 from requests import exceptions
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
-from requests.packages.urllib3.contrib import pyopenssl
+from urllib3.contrib import pyopenssl
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
