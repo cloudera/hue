@@ -489,8 +489,7 @@ var EditorViewModel = (function() {
         if (newNamespace) {
           // When the namespace changes we set the corresponding compute and update the databases
           var found = self.availableComputes().some(function (compute) {
-            // TODO: Remove name check once compute.namespace is a namespace ID
-            if (compute.namespace === newNamespace.name || compute.namespace === newNamespace.id) {
+            if (compute.namespace === newNamespace.id) {
               if (!self.compute() || self.compute().id !== compute.id) {
                 self.compute(compute);
                 self.updateDatabases();

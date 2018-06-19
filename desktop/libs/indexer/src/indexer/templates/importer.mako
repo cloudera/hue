@@ -204,7 +204,7 @@ ${ assist.assistPanel() }
             <!-- ko if: createWizard.source.inputFormat() == 'manual' -->
               ${ _('Create') }
             <!-- /ko -->
-            <span data-bind="text: createWizard.destination.outputFormat"></span> 
+            <span data-bind="text: createWizard.destination.outputFormat"></span>
             <span data-bind="text: createWizard.destination.name"></span>
             <!-- ko if: createWizard.destination.outputFormat() == 'altus' -->
               ${ _('in') } <span data-bind="text: createWizard.destination.namespace"></span>
@@ -432,7 +432,7 @@ ${ assist.assistPanel() }
               <div>
                 <label class="control-label">
                   <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
-                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
                   <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
                 </label>
               </div>
@@ -554,12 +554,12 @@ ${ assist.assistPanel() }
               <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
-              <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+              <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
             <!-- ko if: outputFormat() == 'altus' -->
-              <!-- ko if: availableNamespaces().length > 1 -->
-                <select data-bind="selectize: availableNamespaces, value: namespace, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
-                ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: namespace, entries: availableNamespaces, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Namespaces') }' } }" style="display: inline-block"></div>
+              <!-- ko if: namespaces().length > 1 -->
+                <select data-bind="selectize: namespaces, value: namespace, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
+                ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: namespace, entries: namespaces, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Namespaces') }' } }" style="display: inline-block"></div>
               <!-- /ko -->
               <label class="checkbox inline-block">
                 <input type="checkbox"> ${_('Copy Sentry privileges')}
@@ -1439,6 +1439,8 @@ ${ assist.assistPanel() }
       self.name = ko.observable('');
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
+      self.namespace = wizard.namespace;
+      self.compute = wizard.compute;
 
       self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
 
@@ -1743,7 +1745,6 @@ ${ assist.assistPanel() }
         });
       };
 
-
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
         if (typeof newVal.hasHeader !== 'undefined') {
@@ -1963,10 +1964,9 @@ ${ assist.assistPanel() }
       self.format = ko.observable();
       self.columns = ko.observableArray();
 
-      self.availableNamespaces = ko.observableArray([{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:BP_Downstream/0455d83b-2784-4d29-83de-ca618617884b","name":"BP_Downstream"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:perfeng-finra/0588a828-45f9-4f2e-8012-0cac069a0956","name":"perfeng-finra"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:daming-sdx-ns/0634073c-f062-4ae8-97ef-17f8008a0932","name":"daming-sdx-ns"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:abreshears-namespace/106c1b5a-60b3-4236-b289-cff62dfc4bd3","name":"abreshears-namespace"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:cca-demo-515-ns/1bb277ea-d052-4e99-a1c3-8b763b98d10d","name":"cca-demo-515-ns"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:cca-st-sdx-ns/26af523d-8eca-45d5-9e65-ec6f86272db7","name":"cca-st-sdx-ns"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:rjustice-ns/2853da1e-66b6-495f-a1f6-fcfce201f255","name":"rjustice-ns"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:perfeng-arcus-tpcds/33594f9f-aa2d-404e-bccb-82c0910a1ee4","name":"perfeng-arcus-tpcds"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:goswald-namespace/335b1e2d-89c1-4c3a-bb10-7fce0dc99855","name":"goswald-namespace"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:Mala_Namespace/3bedec91-9f38-4579-ab5a-b11addce8edf","name":"Mala_Namespace"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:launchpad-analytics/3db61842-ad16-4f00-8525-c14a74709898","name":"launchpad-analytics"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:iot-telemetry-prod/56618c4e-bad9-4180-ab1c-90b15bd39efa","name":"iot-telemetry-prod"},{"status":"CREATED","id":"crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:av-demo-data/573889e3-71ac-48b2-8d4c-c421661710eb","name":"av-demo-data"}]);
-      self.namespace = ko.observable();
-      self.availableComputes = ko.observableArray([{"namespace":"nightly-c5","id":"nightly-c5","name":"Nightly C5"},{"namespace":"nightly-c6","id":"nightly-c6","name":"Nightly C6"},{"status":"CREATED","id":"crn:altus:analyticdb:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:qe-sysinteg-adb-cca-demo-1/18624291-19b5-4d92-9941-4e6b57941085","name":"qe-sysinteg-adb-cca-demo-1"},{"status":"CREATED","id":"crn:altus:analyticdb:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:qe-sysinteg-adb-cca-demo-515-1/31940853-5530-4cb0-b720-114d79e0b037","name":"qe-sysinteg-adb-cca-demo-515-1"},{"status":"CREATED","id":"crn:altus:analyticdb:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:spot/70595482-6a46-4a9d-b395-56fcabe079e4","name":"spot"}]);
-      self.compute = ko.observable();
+      self.namespaces = wizard.namespaces;
+      self.namespace = wizard.namespace;
+      self.compute = wizard.compute;
 
       // UI
       self.bulkColumnNames = ko.observable('');
@@ -2115,27 +2115,42 @@ ${ assist.assistPanel() }
       var self = this;
       var guessFieldTypesXhr;
 
-      self.activeNamespace = ko.observable();
-      self.activeCompute = ko.observable();
+      self.namespaces = ko.observableArray();
+      self.namespace = ko.observable();
+      self.compute = ko.observable();
 
       ContextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
+        self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
           if (namespace.id === vm.namespaceId) {
-            self.activeNamespace(namespace);
+            self.namespace(namespace);
             return true;
           }
         })) {
-          self.activeNamespace(context.namespaces[0]);
+          self.namespace(context.namespaces[0]);
         }
 
-        if (!vm.computeId || !self.activeNamespace().computes.some(function (compute) {
+        if (!vm.computeId || !self.namespace().computes.some(function (compute) {
           if (compute.id === vm.computeId) {
-            self.activeCompute(compute);
+            self.compute(compute);
             return true;
           }
         })) {
-          self.activeCompute(self.activeNamespace().computes[0]);
+          self.compute(self.namespace().computes[0]);
         }
+        self.namespace.subscribe(function (namespace) {
+          if (!namespace) {
+            self.compute(undefined);
+            return;
+          }
+          if (!self.compute() || !namespace.computes.some(function (compute) {
+            if (compute.id === self.compute()) {
+              return true;
+            }
+          })) {
+            self.compute(namespace.computes[0]);
+          }
+        })
       });
 
       self.fileType = ko.observable();
@@ -2404,13 +2419,13 @@ ${ assist.assistPanel() }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), compute: self.activeCompute(), path: [ db ]}).done(function (dbEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });
                       } else {
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.activeNamespace(), compute: self.activeCompute(), path: []}).done(function (sourceEntry) {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })

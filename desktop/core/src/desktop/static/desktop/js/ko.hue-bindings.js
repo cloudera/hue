@@ -3588,13 +3588,11 @@
       var complexConfiguration = false;
       if (typeof options === 'function'){
         self.val(options());
-      }
-      else {
+      } else {
         if (options && options.data){
           self.val(options.data);
           complexConfiguration = true;
-        }
-        else {
+        } else {
           self.val(options);
         }
       }
@@ -3607,13 +3605,14 @@
           startingPath: options.database + '.',
           rewriteVal: true,
           onPathChange: options.onChange,
+          namespace: ko.unwrap(options.namespace),
+          compute: ko.unwrap(options.compute),
           searchEverywhere : ko.unwrap(options.searchEverywhere) || false,
           apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
           apiHelperType: ko.unwrap(options.apiHelperType) || '',
           mainScrollable: ko.unwrap(options.mainScrollable) || $(window)
         });
-      }
-      else {
+      } else {
         options = allBindingsAccessor();
         function setPathFromAutocomplete(path) {
           self.val(path);
@@ -3635,6 +3634,8 @@
           home: "/",
           skipColumns: ko.unwrap(options.skipColumns) || false,
           skipTables: ko.unwrap(options.skipTables) || false,
+          namespace: ko.unwrap(options.namespace),
+          compute: ko.unwrap(options.compute),
           pathChangeLevel: ko.unwrap(options.pathChangeLevel) || '',
           apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
           apiHelperType: ko.unwrap(options.apiHelperType) || '',
