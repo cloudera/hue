@@ -868,7 +868,7 @@ ${ components.menubar(is_embeddable) }
           <tbody data-bind="foreach: joinCols">
           <tr>
             <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
-            <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
+            <td class="metastore-join-arrow"><i class="fas fa-arrows-alt-h"></i></td>
             <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
           </tr>
           </tbody>

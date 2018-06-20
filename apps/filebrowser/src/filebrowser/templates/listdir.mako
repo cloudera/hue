@@ -72,7 +72,7 @@ ${ fb_components.menubar() }
               % if show_download_button:
               <li>
                 <a href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
-                  <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}
+                  <i class="far fa-fw fa-arrow-alt-circle-down"></i> ${_('Download')}
                 </a>
               </li>
               % endif
@@ -153,12 +153,12 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           % if show_upload_button:
           <!-- ko if: isS3 -->
-            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile() }}"><i class="far fa-arrow-alt-circle-up"></i> ${_('Upload')}</a>
           <!-- /ko -->
           <!-- ko ifnot: isS3 -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
             <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
-              <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
+              <i class="far fa-arrow-alt-circle-up"></i> ${_('Upload')}
             </a>
           </div>
           <!-- /ko -->

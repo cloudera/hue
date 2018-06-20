@@ -402,7 +402,7 @@
     <h2 class="card-heading simple" data-bind="attr: { title: $root.isGridster() ? '${ _ko('Drag to move') }' : '' }">
       <!-- ko ifnot: $root.isGridster -->
       <span data-bind="visible: $root.isEditing">
-        <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
+        <a href="javascript:void(0)" class="move-widget"><i class="fas fa-arrows-alt"></i></a>
         <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
         <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
         &nbsp;

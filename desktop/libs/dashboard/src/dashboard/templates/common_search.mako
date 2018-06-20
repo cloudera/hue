@@ -217,7 +217,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
           </li>
           <li data-bind="visible: columns().length != 0">
             <a class="pointer" data-toggle="modal" data-target="#qdefinitionsDemiModal">
-              <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Saved Queries') }
+              <i class="far fa-fw fa-bookmark"></i> ${ _('Saved Queries') }
             </a>
           </li>
         </ul>
@@ -325,7 +325,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggableBucket() }) }"
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-bar-chart"></i>
+                       <i class="far fa-chart-bar"></i>
          </a>
     </div>
     <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
@@ -2800,7 +2800,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="span12">
         <form class="form-inline">
           <fieldset>
-            <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }
+            <legend><i class="far fa-bookmark"></i> ${ _('Query definitions') }
               <div class="input-append" style="margin-left: 30px; margin-top: 4px">
                 <input id="newqname" type="text" class="input-xxlarge" data-bind="textInput: $root.collection.newQDefinitionName, valueUpdate:'afterkeydown', tagsNotAllowed" style="margin-bottom: 0" placeholder="${ _('Add current query as...') }" />
                 <a title="${ _('Click on this button to add the current query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css: {'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">

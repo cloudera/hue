@@ -570,7 +570,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
     <a href="javascript: void(0)" title="${_('Download')}" data-bind="click: (!$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file') ? $root.downloadFile: void(0)">
-    <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
+    <i class="far fa-fw fa-arrow-alt-circle-down"></i> ${_('Download')}</a></li>
     % endif
     <li class="divider" data-bind="visible: isPermissionEnabled()"></li>
     % if is_fs_superuser:

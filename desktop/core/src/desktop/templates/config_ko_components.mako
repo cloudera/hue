@@ -409,7 +409,7 @@ from desktop.views import _ko
           <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
           <!-- /ko -->
           <input type="text" class="config-property-input-mini" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
-          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fas fa-arrows-alt"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
@@ -512,7 +512,7 @@ from desktop.views import _ko
           <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
           <!-- /ko -->
           <input type="text" class="config-property-input-small" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
-          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fas fa-arrows-alt"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
@@ -577,7 +577,7 @@ from desktop.views import _ko
         <div class="input-append" style="margin-bottom: 4px">
           <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
           <input type="text" class="config-property-input-small" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
-          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fas fa-arrows-alt"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
@@ -630,7 +630,7 @@ from desktop.views import _ko
       <li>
         <div class="input-append" style="margin-bottom: 4px">
           <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
-          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fas fa-arrows-alt"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
@@ -709,7 +709,7 @@ from desktop.views import _ko
           <input type="text" data-bind="textInput: value, valueUpdate: 'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
           <!-- /ko -->
           <!-- ko template: { if: $parent.inputTemplate, name: $parent.inputTemplate } --><!-- /ko -->
-          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fas fa-arrows-alt"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>

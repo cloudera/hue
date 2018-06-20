@@ -83,8 +83,8 @@ ${layout.menubar(section='query')}
                     <li><a id="collapse" class="btn btn-small"><i class="fa fa-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a></li>
                     % if download_urls and download:
                       <li class="nav-header">${_('Results')}</li>
-                      <li><a target="_blank" href="${download_urls["csv"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as CSV')}</a></li>
-                      <li><a target="_blank" href="${download_urls["xls"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as XLS')}</a></li>
+                      <li><a target="_blank" href="${download_urls["csv"]}"><i class="far fa-arrow-alt-circle-down"></i> ${_('Download as CSV')}</a></li>
+                      <li><a target="_blank" href="${download_urls["xls"]}"><i class="far fa-arrow-alt-circle-down"></i> ${_('Download as XLS')}</a></li>
                     % endif
                     % if can_save and download:
                       <li><a data-toggle="modal" href="#saveAs"><i class="fa fa-floppy-o"></i> ${_('Save')}</a></li>
@@ -232,7 +232,7 @@ ${layout.menubar(section='query')}
           <form class="form-inline">
             ${_('Chart type')}&nbsp;
             <div class="btn-group" data-toggle="buttons-radio">
-              <a rel="tooltip" data-placement="top" title="${_('Bars')}" id="blueprintBars" href="javascript:void(0)" class="btn"><i class="fa fa-bar-chart-o"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Bars')}" id="blueprintBars" href="javascript:void(0)" class="btn"><i class="far fa-chart-bar"></i></a>
               <a rel="tooltip" data-placement="top" title="${_('Lines')}" id="blueprintLines" href="javascript:void(0)" class="btn"><i class="fa fa-signal"></i></a>
               <a rel="tooltip" data-placement="top" title="${_('Map')}" id="blueprintMap" href="javascript:void(0)" class="btn"><i class="fa fa-map-marker"></i></a>
             </div>&nbsp;&nbsp;

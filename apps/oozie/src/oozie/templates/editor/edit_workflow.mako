@@ -50,7 +50,7 @@ ${ layout.menubar(section='workflows') }
         % endif
 
         <li class="nav-header">${ _('Advanced') }</li>
-        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="fa fa-arrow-circle-o-down"></i> ${ _('Import action') }</a></li>
+        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="far fa-arrow-alt-circle-down"></i> ${ _('Import action') }</a></li>
         % if user_can_edit_job:
           <li>
             <a title="${ _('Edit kill node') }" rel="tooltip" data-placement="right" href="#kill"><i class="fa fa-power-off"></i> ${ _('Kill node') }</a>
@@ -262,79 +262,79 @@ ${ layout.menubar(section='workflows') }
         <div class="draggable-button">
           <a data-node-type="mapreduce"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> MapReduce
+            <i class="fas fa-arrows-alt"></i> MapReduce
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="streaming"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Streaming
+            <i class="fas fa-arrows-alt"></i> Streaming
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="java"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Java
+            <i class="fas fa-arrows-alt"></i> Java
           </a>
          </div>
         <div class="draggable-button">
           <a data-node-type="pig"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Pig
+            <i class="fas fa-arrows-alt"></i> Pig
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="hive"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Hive
+            <i class="fas fa-arrows-alt"></i> Hive
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="sqoop"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Sqoop
+            <i class="fas fa-arrows-alt"></i> Sqoop
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="shell"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Shell
+            <i class="fas fa-arrows-alt"></i> Shell
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="ssh"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Ssh
+            <i class="fas fa-arrows-alt"></i> Ssh
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="distcp"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> DistCp
+            <i class="fas fa-arrows-alt"></i> DistCp
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="fs"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Fs
+            <i class="fas fa-arrows-alt"></i> Fs
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="email"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Email
+            <i class="fas fa-arrows-alt"></i> Email
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="subworkflow"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Sub-workflow
+            <i class="fas fa-arrows-alt"></i> Sub-workflow
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="generic"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-arrows"></i> Generic
+            <i class="fas fa-arrows-alt"></i> Generic
           </a>
         </div>
       </div>

@@ -160,7 +160,7 @@
         id() != '17c9c895-5a16-7443-bb81-f34b30b21548' && (['fork-widget', 'join-widget', 'decision-widget'].indexOf(widgetType()) == -1 || $root.isEditing())">
 
       <span data-bind="visible: $root.isEditing() && oozieMovable() && ! oozieExpanded() && ! ooziePropertiesExpanded() && ($root.newAction() == null || $root.newAction().id() != id())">
-        <a href="javascript:void(0)" class="move-widget" title="${ _('Move node') }"><i class="fa fa-arrows"></i></a>
+        <a href="javascript:void(0)" class="move-widget" title="${ _('Move node') }"><i class="fas fa-arrows-alt"></i></a>
         &nbsp;
         <a href="javascript:void(0)" class="move-widget clone-widget" title="${ _('Copy node') }"><i class="fa fa-copy"></i></a>
         &nbsp;
@@ -519,7 +519,7 @@
   <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0,  sortable: { allowDrop: false, data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
     <li style="margin-bottom: 3px">
       <span class="muted move-widget">
-        <i class="fa fa-arrows"></i>
+        <i class="fas fa-arrows-alt"></i>
       </span>
       <textarea rows="1" style="resize: vertical" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"></textarea>
       <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
@@ -805,7 +805,7 @@
             <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0, sortable: { allowDrop: false, data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
               <li>
                 <span class="muted move-widget">
-                  <i class="fa fa-arrows"></i>
+                  <i class="fas fa-arrows-alt"></i>
                 </span>
                 <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
                 <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
@@ -972,7 +972,7 @@
             <ul class="unstyled white sortable-arguments" data-bind="visible: properties.spark_arguments().length > 0, sortable: { allowDrop: false, data: properties.spark_arguments, options: { axis: 'y', containment: 'parent' }}">
               <li>
                 <span class="muted move-widget">
-                  <i class="fa fa-arrows"></i>
+                  <i class="fas fa-arrows-alt"></i>
                 </span>
                 <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }, parseArguments: { list: $parent.properties.spark_arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
                 <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
@@ -2160,7 +2160,7 @@
         <ul class="unstyled white sortable-arguments" data-bind="sortable: { allowDrop: false, data: properties.distcp_parameters, options: { axis: 'y', containment: 'parent' }}">
           <li>
             <span class="muted move-widget">
-              <i class="fa fa-arrows"></i>
+              <i class="fas fa-arrows-alt"></i>
             </span>
             <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }, parseArguments: { list: $parent.properties.distcp_parameters, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
