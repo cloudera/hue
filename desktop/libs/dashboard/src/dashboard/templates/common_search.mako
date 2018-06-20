@@ -25,7 +25,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
-<%def name="page_structure(is_mobile=False, is_embeddable=False)">
+<%def name="page_structure(is_mobile=False, is_embeddable=False, is_report=False)">
 
 <script type="text/javascript">
   SLIDER_LABELS = {
@@ -90,7 +90,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
       <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
         <div class="search-bar-query-container">
-          <div class="search-bar-collection" data-bind="css: { 'report-mode': $root.collection.engine() === 'report' }">
+          <div class="search-bar-collection" data-bind="visible: $root.collection.engine() != 'report'">
             <div class="selectMask">
               <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
             </div>
@@ -235,6 +235,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
 <%dashboard:layout_toolbar>
   <%def name="results()">
+    % if not is_report:
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ data: draggableResultset(), stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
          title="${_('Grid')}" rel="tooltip" data-placement="top">
@@ -270,9 +271,11 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
              <i class="fa fa-map-marker"></i>
          </a>
     </div>
+      % endif
       </%def>
 
       <%def name="widgets()">
+    % if not is_report:
     <div data-bind="visible: $root.collection.supportAnalytics,
                     css: { 'draggable-widget': true, 'disabled': !hasAvailableFields() },
                     draggable: {data: draggableCounter(), isEnabled: hasAvailableFields,
@@ -391,7 +394,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                        <i class="hcha hcha-map-chart"></i>
          </a>
     </div>
-    % if HAS_REPORT_ENABLED.get():
+    % else:
     <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableDocument(), isEnabled: true,
                     options: getDraggableOptions({ data: draggableDocument() }) }"
@@ -3949,8 +3952,7 @@ function loadSearch(collection, query, initial) {
   searchViewModel = new SearchViewModel(collection, query, initial, ${ USE_GRIDSTER.get() and 'true' or 'false' }, ${ USE_NEW_ADD_METHOD.get() and 'true' or 'false' });
   ko.applyBindings(searchViewModel, $('#searchComponents')[0]);
 
-  searchViewModel.timelineChartTypes = ko.observableArray([
-    {
+  searchViewModel.timelineChartTypes = ko.observableArray([{
       value: "line",
       label: "${ _('Lines')}"
     },
@@ -3963,9 +3965,7 @@ function loadSearch(collection, query, initial) {
   searchViewModel.init(function(){
     $(".chosen-select").trigger("chosen:updated");
     if (searchViewModel.collection.engine() === 'report') {
-      // TODO: remove forced table
-      searchViewModel.collection.name('default.web_logs');
-      textSearchLayout(searchViewModel, true);
+      magicSearchLayout(searchViewModel);
     }
   });
 
