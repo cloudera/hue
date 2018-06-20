@@ -34,6 +34,7 @@ from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.conf.urls import url
 from django.contrib.auth.models import User
+from django.db import connection
 from django.urls import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
@@ -60,6 +61,7 @@ from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.conf import _configs_from_dir
 from desktop.lib.paths import get_desktop_root
+from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties,  ClusterConfig
 from desktop.redaction import logfilter
@@ -1418,7 +1420,7 @@ def test_collect_validation_messages_extras():
   assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ', error_list[0]['message'])
 
 # Test db migration from 5.7,...,5.15 to latest
-def test_db_migrations():
+def test_db_migrations_sqlite():
   versions = ['5.' + str(i) for i in range(7, 16)]
   for version in versions:
     name = 'hue_' + version
@@ -1436,3 +1438,29 @@ def test_db_migrations():
       'CONN_MAX_AGE' : 0,
     }
     call_command('migrate', '--fake-initial', '--database=' + name)
+
+def test_db_migrations_mysql():
+  if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
+    raise SkipTest
+  versions = ['5_' + str(i) for i in range(7, 16)]
+  for version in versions:
+    name = 'hue_' + version
+    path = get_desktop_root('./core/src/desktop/test_data/' + name + '_mysql.sql')
+    DATABASES[name] = {
+      'ENGINE': desktop.conf.DATABASE.ENGINE.get(),
+      'NAME': name,
+      'USER': desktop.conf.DATABASE.USER.get(),
+      'SCHEMA': name,
+      'PASSWORD': desktop.conf.get_database_password(),
+      'HOST': desktop.conf.DATABASE.HOST.get(),
+      'PORT': str(desktop.conf.DATABASE.PORT.get()),
+      'OPTIONS': force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
+      'ATOMIC_REQUESTS': True,
+      'PATH': path,
+      'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
+    }
+    os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "DROP DATABASE %(SCHEMA)s"' % DATABASES[name])
+    os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name]) # No way to run this command with django
+    os.system('mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name])
+    call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
+    os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "DROP DATABASE %(SCHEMA)s"' % DATABASES[name])
