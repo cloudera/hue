@@ -61,7 +61,7 @@ ${ layout.menubar(section='bundles') }
     <%def name="creation()">
       <a href="${ url('oozie:create_bundle') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
       &nbsp;&nbsp;
-      <a href="${ url('oozie:list_trashed_bundles') }" class="btn"><i class="fa fa-trash-o"></i> ${ _('View trash') }</a>
+      <a href="${ url('oozie:list_trashed_bundles') }" class="btn"><i class="far fa-trash-alt"></i> ${ _('View trash') }</a>
     </%def>
   </%actionbar:render>
 

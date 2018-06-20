@@ -119,7 +119,7 @@
 
                 _command.onAdd = function (map) {
                   var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar leaflet-move-label");
-                  div.innerHTML = '<button id="command' + $(element).parents(".card-widget").attr("id") + '" type="button" class="btn btn-mini disable-feedback"><i class="fa fa-fw fa-square-o"></i> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</button>';
+                  div.innerHTML = '<button id="command' + $(element).parents(".card-widget").attr("id") + '" type="button" class="btn btn-mini disable-feedback"><i class="far fa-fw fa-square"></i> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</button>';
                   return div;
                 };
 

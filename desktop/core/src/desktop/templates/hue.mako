@@ -256,7 +256,7 @@ ${ hueIcons.symbols() }
             <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
             % endif
             <li class="divider"></li>
-            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fas fa-fw fa-sign-out-alt"></i> ${ _('Sign out') }</a></li>
           </ul>
         </div>
         % endif

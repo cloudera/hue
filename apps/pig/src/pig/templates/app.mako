@@ -63,7 +63,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <%def name="actions()">
               <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="fa fa-play"></i> ${_('Run')}</button>
               <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="far fa-copy"></i> ${_('Copy')}</button>
-              <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+              <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="far fa-trash-alt"></i> ${_('Delete')}</button>
           </%def>
 
           <%def name="creation()">
@@ -166,7 +166,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
               </li>
               <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">
                 <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
-                  <i class="fa fa-trash-o"></i> ${ _('Delete') }
+                  <i class="far fa-trash-alt"></i> ${ _('Delete') }
                 </a>
               </li>
               <li>
@@ -402,7 +402,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
                         <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
                       </div>
                     </td>
-                    <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
+                    <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="far fa-trash-alt"></i> ${ _('Remove') }</button></td>
                   </tr>
                 </tbody>
                 <tfoot data-bind="visible: currentScript().parameters().length > 0">
@@ -451,7 +451,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
                         <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
                       </div>
                     </td>
-                    <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
+                    <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="far fa-trash-alt"></i> ${ _('Remove') }</button></td>
                   </tr>
                 </tbody>
                 <tfoot data-bind="visible: currentScript().hadoopProperties().length > 0">
@@ -508,7 +508,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
                     </td>
                     <td>
                       <button data-bind="click: viewModel.currentScript().removeResource" class="btn">
-                      <i class="fa fa-trash-o"></i> ${ _('Remove') }</button>
+                      <i class="far fa-trash-alt"></i> ${ _('Remove') }</button>
                     </td>
                   </tr>
                 </tbody>

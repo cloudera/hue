@@ -99,7 +99,7 @@ from desktop.views import _ko
       <!-- ko ifnot: sourceType === 'solr' -->
         <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
         <!-- ko if: !catalogEntry.isDatabase() && $currentApp() === 'editor' -->
-        <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
+        <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="far fa-fw fa-clipboard"></i> ${ _('Insert at cursor') }</a></li>
         <!-- /ko -->
         % if not IS_EMBEDDED.get():
         <!-- ko if: catalogEntry.path.length <=2 -->
@@ -178,7 +178,7 @@ from desktop.views import _ko
     <li><a href="javascript:void(0);" data-bind="click: openInImporter"><!-- ko template: { name: 'app-icon-template', data: { icon: 'importer' } } --><!-- /ko --> ${ _('Open in Importer') }</a></li>
     <!-- /ko -->
     <!-- ko if: $currentApp() === 'editor' -->
-    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
+    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="far fa-fw fa-clipboard"></i> ${ _('Insert at cursor') }</a></li>
     <!-- /ko -->
   </script>
 
@@ -189,7 +189,7 @@ from desktop.views import _ko
     <!-- ko if: definition().type !== 'directory' -->
     <li><a href="javascript: void(0);" data-bind="click: function(data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${ _('Open document') }</a></li>
-    <li><a href="javascript: void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data); activeEntry().getSelectedDocsWithDependents(); activeEntry().showDeleteConfirmation(); }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Delete document') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data); activeEntry().getSelectedDocsWithDependents(); activeEntry().showDeleteConfirmation(); }"><i class="far fa-fw fa-trash-alt"></i> ${ _('Delete document') }</a></li>
     <!-- /ko -->
   </script>
 
@@ -343,7 +343,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-s3-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
 
@@ -411,7 +411,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-git-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.git.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.git.refresh'); }"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
 
@@ -475,7 +475,7 @@ from desktop.views import _ko
             onComplete: function () { huePubSub.publish('assist.hdfs.refresh'); huePubSub.publish('fb.hdfs.refresh', path); } }" title="${_('Upload file')}" href="javascript:void(0)">
         <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
       </a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
 
@@ -490,7 +490,7 @@ from desktop.views import _ko
             onComplete: function () { huePubSub.publish('assist.adls.refresh'); } }" title="${_('Upload file')}" href="javascript:void(0)">
         <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
       </a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.adls.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.adls.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
 
@@ -615,7 +615,7 @@ from desktop.views import _ko
       <!-- ko if: !loading() -->
       <div class="highlightable" data-bind="css: { 'highlight': $parent.highlightTypeFilter() }, component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, searchable: true, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
 
@@ -674,7 +674,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-hbase-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hbase.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hbase.refresh'); }"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
 
@@ -793,14 +793,14 @@ from desktop.views import _ko
       </a>
       <!-- /ko -->
       <!-- ko if: sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
       <!-- ko if: sourceType !== 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
-      <i class="fa fa-refresh fa-spin blue" title="${_('Refresh')}"></i>
+      <i class="fas fa-sync fa-spin blue" title="${_('Refresh')}"></i>
       <!-- /ko -->
     </div>
   </script>
@@ -906,7 +906,7 @@ from desktop.views import _ko
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
           <!-- ko if: iconSvg --><span style="font-size:22px;"><svg class="hi"><use data-bind="attr: {'xlink:href': iconSvg }" xlink:href=''></use></svg></span><!-- /ko -->
-          <!-- ko if: !iconSvg --><i class="fa fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
+          <!-- ko if: !iconSvg --><i class="fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
         </div>
         <!-- /ko -->
       </div>
@@ -1831,7 +1831,7 @@ from desktop.views import _ko
                 apiHelper: self.apiHelper,
                 name: '${ _("SQL") }',
                 type: 'sql',
-                icon: 'fa-database',
+                icon: 'fa fa-database',
                 minHeight: 75
               });
               panels.push(sqlPanel);
@@ -1853,7 +1853,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("HDFS") }',
                   type: 'hdfs',
-                  icon: 'fa-files-o',
+                  icon: 'far fa-copy',
                   minHeight: 50
                 }));
               }
@@ -1866,7 +1866,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("S3") }',
                   type: 's3',
-                  icon: 'fa-cubes',
+                  icon: 'fa fa-cubes',
                   minHeight: 50
                 }));
               }
@@ -1879,7 +1879,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("ADLS") }',
                   type: 'adls',
-                  icon: 'fa-windows',
+                  icon: 'fab fa-windows',
                   iconSvg: '#hi-adls',
                   minHeight: 50
                 }));
@@ -1895,7 +1895,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("Indexes") }',
                   type: 'solr',
-                  icon: 'fa-search-plus',
+                  icon: 'fa fa-search-plus',
                   minHeight: 75
                 });
                 panels.push(solrPanel);
@@ -1916,7 +1916,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
                   type: 'solr',
-                  icon: 'fa-sitemap',
+                  icon: 'fa fa-sitemap',
                   minHeight: 75
                 });
                 panels.push(kafkaPanel);
@@ -1930,7 +1930,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("HBase") }',
                   type: 'hbase',
-                  icon: 'fa-th-large',
+                  icon: 'fa fa-th-large',
                   minHeight: 50
                 }));
               }
@@ -1944,7 +1944,7 @@ from desktop.views import _ko
                 apiHelper: self.apiHelper,
                 name: '${ _("Documents") }',
                 type: 'documents',
-                icon: 'fa-files-o',
+                icon: 'far fa-copy',
                 iconSvg: '#hi-documents',
                 minHeight: 50,
                 rightAlignIcon: true,
@@ -1973,7 +1973,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("Git") }',
                   type: 'git',
-                  icon: 'fa-github',
+                  icon: 'fab fa-github',
                   minHeight: 50,
                   rightAlignIcon: true
                 }));
@@ -1991,7 +1991,7 @@ from desktop.views import _ko
               apiHelper: self.apiHelper,
               name: '${ _("SQL") }',
               type: 'sql',
-              icon: 'fa-database',
+              icon: 'fa fa-database',
               minHeight: 75
             })]);
           }
@@ -2277,9 +2277,9 @@ from desktop.views import _ko
             <!-- ko if: hasErrors -->
             <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${ _ko('Error loading index details.') }' : '${ _ko('Error loading table details.') }'}">
               <span class="assist-entry">
-                <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
+                <i class="hue-warning fas fa-fw muted valign-middle fa-exclamation"></i>
                 <!-- ko with: catalogEntry -->
-                <span data-bind="text: getDisplayName()"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
+                <span data-bind="text: getDisplayName()"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fas fa-sync" data-bind="css: { 'fa-spin': reloading }"></i></a>
                 <!-- /ko -->
               </span>
             </li>

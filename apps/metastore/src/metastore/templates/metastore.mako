@@ -281,10 +281,10 @@ ${ components.menubar(is_embeddable) }
       <!-- ko ifnot: partition_keys.length -->
         % if has_write_access:
         <!-- ko if: $parent.refreshingTableStats -->
-        <i class="fa fa-refresh fa-spin"></i>
+        <i class="fas fa-sync fa-spin"></i>
         <!-- /ko -->
         <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
-        <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
+        <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fas fa-sync"></i></a>
         <!-- /ko -->
         % endif
         <span data-bind="visible: details.stats.COLUMN_STATS_ACCURATE == 'false' && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
@@ -627,7 +627,7 @@ ${ components.menubar(is_embeddable) }
       <div class="span2">
       % if has_write_access:
         <div class="pull-right">
-          <button class="btn" title="${_('Delete the selected partitions')}" data-bind="click: function () { $('#dropPartition').modal('show'); }, disable: selectedValues().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop partition(s)')}</button>
+          <button class="btn" title="${_('Delete the selected partitions')}" data-bind="click: function () { $('#dropPartition').modal('show'); }, disable: selectedValues().length === 0"><i class="far fa-trash-alt"></i>  ${_('Drop partition(s)')}</button>
         </div>
       % endif
       </div>
@@ -1002,14 +1002,14 @@ ${ components.menubar(is_embeddable) }
               % if has_write_access:
                 <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>
               % endif
-              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
+              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fas fa-sync" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- ko if: !table() -->
-              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the database')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
+              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the database')}"><i class="fas fa-sync" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
               <!-- /ko -->
               <!-- ko if: !database() -->
-              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
+              <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh')}"><i class="fas fa-sync" data-bind="css: { 'fa-spin blue' : loading }"></i> ${_('Refresh')}</a>
               <!-- /ko -->
             </div>
 

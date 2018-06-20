@@ -351,12 +351,12 @@ from desktop.views import _ko
                 <div class="margin-left-20 margin-right-20 pull-right doc-browser-type-filter" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
                   <!-- ko if: isTrash() || isTrashed() -->
                   <a href="javascript:void(0);" data-bind="click: emptyTrash">
-                    <i class="fa fa-fw fa-trash"></i> ${_('Empty trash')}
+                    <i class="fas fa-fw fa-trash-alt"></i> ${_('Empty trash')}
                   </a>
                   <!-- /ko -->
                   <!-- ko if: !isTrash() && !isTrashed() -->
                   <a class="inactive-action" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
-                    <i class="fa fa-fw fa-trash-o"></i> ${_('Trash')}
+                    <i class="far fa-fw fa-trash-alt"></i> ${_('Trash')}
                   </a>
                   <!-- /ko -->
                 </div>

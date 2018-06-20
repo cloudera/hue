@@ -151,7 +151,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       <!-- ko ifnot: $root.isGridster -->
       <div class="btn-group">
         <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-          <i class="fa fa-pencil"></i>
+          <i class="fas fa-pencil-alt"></i>
         </a>
       </div>
       <!-- /ko -->
@@ -283,7 +283,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggableFacet() }) }"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-sort-amount-asc"></i>
+                       <i class="fas fa-sort-amount-down"></i>
          </a>
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
@@ -291,7 +291,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggableTextFacet() }) }"
          title="${_('Value List')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-sort-amount-asc"></i>
+                       <i class="fas fa-sort-amount-down"></i>
          </a>
     </div>
     <div data-bind="visible: !$root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
@@ -307,7 +307,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggablePie2() }) }"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="fa fa-pie-chart"></i>
+                       <i class="fas fa-chart-pie"></i>
          </a>
     </div>
     <div data-bind="visible: !$root.collection.supportAnalytics(),
@@ -919,8 +919,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
   </ul>
   <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP">
     <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
-    <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
-    <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+    <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fas fa-sort-amount-down fa-rotate-270"></i></a>
+    <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fas fa-sort-amount-up fa-rotate-270"></i></a>
   </div>
 <!-- /ko -->
 
@@ -1026,7 +1026,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div class="result-main" style="overflow-x: auto">
       <div class="edit-dimensions" style="float: right">
         <div class="badge dimensions-badge-container dimensions-badge-container-add">
-          <div class="action-icon" data-bind="click: function(){ isEditing(true);}"><i class="fa fa-pencil"></i> ${ _('Edit template') }</div>
+          <div class="action-icon" data-bind="click: function(){ isEditing(true);}"><i class="fas fa-pencil-alt"></i> ${ _('Edit template') }</div>
         </div>
         <div class="clearfix"></div>
       </div>
@@ -1392,7 +1392,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
              data-bind="css: {'active': template.showChart() }, click: function(collection, event){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate'); }">
             % if HAS_REPORT_ENABLED.get():
             <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
-            <i class="fa fa-sort-amount-asc fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT"></i>
+            <i class="fas fa-sort-amount-down fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT"></i>
             % endif
             <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
             <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
@@ -1417,7 +1417,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               <a href="javascript:void(0)"
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TEXTSELECT); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
-                <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
+                <i class="fas fa-sort-amount-down fa-fw"></i> ${_('Text select')}
               </a>
             </li>
             <li>
@@ -1526,7 +1526,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <a href="javascript: void(0)" class="btn btn-mini"
             data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': template.fields().length > 0 }"
             style="margin-right: 2px;">
-            <i class="fa fa-square-o"></i>
+            <i class="far fa-square"></i>
           </a>
           <strong>${_('Field Name')}</strong>
         </div>
@@ -2317,7 +2317,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
         <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
         <a href="javascript: void(0)" class="pull-right" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1">
-          <i class="fa fa-trash"></i> ${ _('Remove') }
+          <i class="fas fa-trash-alt"></i> ${ _('Remove') }
         </a>
         <!-- /ko -->
         <!-- ko if: typeof $parents[0].isAdding !== 'undefined' && $parents[0].isAdding() -->

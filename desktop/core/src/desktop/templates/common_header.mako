@@ -366,7 +366,7 @@ ${ hueIcons.symbols() }
     % if 'help' in apps:
     <li><a title="${_('Documentation')}" data-rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
     % endif
-    <li><a title="${_('Sign out')}" data-rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
+    <li><a title="${_('Sign out')}" data-rel="navigator-tooltip" href="/accounts/logout/"><i class="fas fa-sign-out-alt"></i></a></li>
   </ul>
   % endif
 
@@ -494,7 +494,7 @@ ${ hueIcons.symbols() }
        % endif
        % if 'oozie' in apps:
        <li class="dropdown oozie">
-         <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-random inline-block hideMoreThan950"></i><span class="hide950">Workflows</span> <b class="caret"></b></a>
+         <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fab fa-rebelndom inline-block hideMoreThan950"></i><span class="hide950">Workflows</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
              <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon"  alt="${ _('Oozie dashboard icon') }"/> ${_('Dashboards')}</a>

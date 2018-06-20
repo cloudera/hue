@@ -141,7 +141,7 @@
 
       <div class="row-fluid" data-bind="visible: previewColumns() == 'magic'">
         <div class="span2 preview-row" style="font-size: 120px;">
-          <i class="fa fa-pie-chart" style="padding-top: 10px"></i>
+          <i class="fas fa-chart-pie" style="padding-top: 10px"></i>
         </div>
         <div class="span10">
           <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
@@ -252,7 +252,7 @@
                     <a class="dropdown-toggle" href="javascript: void(0)" data-toggle="dropdown" title="${ _('Change widget visualization') }">
                       <!-- ko switch: fieldViz -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.COUNTER --><i class="fa fa-superscript fa-fw"></i> ${_('Counter')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fas fa-sort-amount-down fa-fw"></i> ${_('Text select')}<!-- /ko -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fas fa-fw fa-chart-line"></i> ${_('Timeline')}<!-- /ko -->
@@ -270,7 +270,7 @@
                       <li>
                         <a href="javascript:void(0)"
                            data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TEXTSELECT); }">
-                          <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
+                          <i class="fas fa-sort-amount-down fa-fw"></i> ${_('Text select')}
                         </a>
                       </li>
                       <li>

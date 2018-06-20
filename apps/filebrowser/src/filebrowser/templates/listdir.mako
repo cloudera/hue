@@ -65,7 +65,7 @@ ${ fb_components.menubar() }
               enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
               ${_('Rename')}</a></li>
               <li><a href="javascript: void(0)" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
-              isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
+              isCurrentDirSelected().length == 0"><i class="fab fa-fw fa-rebelndom"></i> ${_('Move')}</a></li>
               <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
               <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0), enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="far fa-fw fa-copy"></i> ${_('Copy')}</a></li>
@@ -92,7 +92,7 @@ ${ fb_components.menubar() }
               <li class="divider" data-bind="visible: isCompressEnabled() || isReplicationEnabled() || isSummaryEnabled()"></li>
               <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }, visible: isSummaryEnabled()">
                 <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}">
-                  <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
+                  <i class="fas fa-fw fa-chart-pie"></i> ${_('Summary')}
                 </a>
               </li>
               <li>

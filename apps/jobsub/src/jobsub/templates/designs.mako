@@ -75,7 +75,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
       <!-- ko ifnot: inTrash -->
         <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="fa fa-play"></i> ${_('Submit')}</button>
-        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="fa fa-pencil"></i> ${_('Edit')}</button>
+        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="fas fa-pencil-alt"></i> ${_('Edit')}</button>
         <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="far fa-copy"></i> ${_('Copy')}</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
           <button id="trash-designs" class="btn" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
@@ -146,7 +146,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
           </ul>
         </div>
         &nbsp;&nbsp;
-        <a href="#trashed-designs" class="btn"><i class="fa fa-trash-o"></i> ${ _('View trash') }</a>
+        <a href="#trashed-designs" class="btn"><i class="far fa-trash-alt"></i> ${ _('View trash') }</a>
       <!-- /ko -->
 
       </div>

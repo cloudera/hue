@@ -93,7 +93,7 @@
       if (editableOptions.inlineEditAction) {
         onActionRender = function ($container, overflowing) {
           if (!overflowing) {
-            var $editAction = $('<a href="javascript:void(0);"><i class="fa fa-fw fa-pencil"></i></a>');
+            var $editAction = $('<a href="javascript:void(0);"><i class="fas fa-fw fa-pencil-alt"></i></a>');
             if (editableOptions.inlineEditAction.editClass) {
               $editAction.addClass(editableOptions.inlineEditAction.editClass);
             }
@@ -160,7 +160,7 @@
         };
 
         onActionRender = function ($container) {
-          var $editAction = $('<a href="javascript:void(0);"><i class="fa fa-fw fa-pencil"></i></a>');
+          var $editAction = $('<a href="javascript:void(0);"><i class="fas fa-fw fa-pencil-alt"></i></a>');
           if (editableOptions.inlineEditAction.editClass) {
             $editAction.addClass(editableOptions.inlineEditAction.editClass);
           }

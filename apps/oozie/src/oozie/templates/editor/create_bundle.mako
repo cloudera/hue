@@ -35,7 +35,7 @@ ${ layout.menubar(section='bundles') }
         <div class="sidebar-nav">
           <ul class="nav nav-list">
             <li class="nav-header">${ _('Properties') }</li>
-            <li class="active"><a href="#properties"><i class="fa fa-reorder"></i> ${ _('Edit properties') }</a></li>
+            <li class="active"><a href="#properties"><i class="fas fa-bars"></i> ${ _('Edit properties') }</a></li>
           </ul>
         </div>
       </div>

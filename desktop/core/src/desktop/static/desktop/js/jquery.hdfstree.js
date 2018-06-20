@@ -210,7 +210,7 @@
           });
           if (_this.options.createFolder) {
             var filteredCurrentPath = _this.options.isS3 ? currentPath.substr(5) : currentPath;
-            var _createFolderLi = $("<li>").html('<a class="pointer"><i class="fa fa-plus-square-o"></i> ' + _this.options.labels.CREATE_FOLDER + '</a>');
+            var _createFolderLi = $("<li>").html('<a class="pointer"><i class="far fa-plus-square"></i> ' + _this.options.labels.CREATE_FOLDER + '</a>');
             _createFolderLi.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(filteredCurrentPath)) + "']"));
 
             var _createFolderDetails = $("<form>").css("margin-top", "10px").addClass("form-inline");

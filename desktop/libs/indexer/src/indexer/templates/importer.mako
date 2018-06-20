@@ -527,7 +527,7 @@ ${ assist.assistPanel() }
               <i class="fa fa-spinner fa-spin"></i>
             </span>
             <span class="help-inline muted" data-bind="visible: !$parent.createWizard.isValidDestination()">
-              <i class="fa fa-warning" style="color: #c09853"></i>
+              <i class="fas fa-exclamation-triangle" style="color: #c09853"></i>
               <!-- ko if: name() -->
                 ${ _('Invalid characters') }
               <!-- /ko -->
@@ -536,7 +536,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
-              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
+              <i class="fas fa-exclamation-triangle" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
           </div>
@@ -557,7 +557,7 @@ ${ assist.assistPanel() }
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
-                  <i class="fa fa-sliders fa-padding-top"></i>
+                  <i class="fas fa-sliders-h fa-padding-top"></i>
                 </a>
               </label>
             </div>
@@ -722,7 +722,7 @@ ${ assist.assistPanel() }
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
-                  <i class="fa fa-sliders fa-padding-top"></i>
+                  <i class="fas fa-sliders-h fa-padding-top"></i>
                 </a>
               </label>
             </div>
@@ -786,7 +786,7 @@ ${ assist.assistPanel() }
           <div class="control-group">
             <label class="control-label"><div>${ _('Extras') }</div>
               <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
-                <i class="fa fa-sliders fa-padding-top"></i>
+                <i class="fas fa-sliders-h fa-padding-top"></i>
               </a>
             </label>
           </div>
@@ -1015,7 +1015,7 @@ ${ assist.assistPanel() }
     <!-- /ko -->
 
     <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-      <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
+      <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fas fa-sliders-h"></i></a>
 
       <span data-bind="visible: showProperties">
         <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
@@ -1053,7 +1053,7 @@ ${ assist.assistPanel() }
     <input type="text" class="input-small" placeholder="${ _('Field Type') }" data-bind="value: type, enable: false">
   </label>
   <!-- /ko -->
-  <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
+  <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fas fa-sliders-h"></i></a>
   <span data-bind="visible: showProperties" class="field-properties">
     <!-- ko if: $root.createWizard.source.inputFormat() != 'rdbms' -->
     <label class="checkbox">

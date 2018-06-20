@@ -34,7 +34,7 @@ ${ layout.menubar(section='workflows') }
       <div id="workflowControls" class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('New workflow') }</li>
-          <li class="active"><a href="#properties"><i class="fa fa-reorder"></i> ${ _('Properties') }</a></li>
+          <li class="active"><a href="#properties"><i class="fas fa-bars"></i> ${ _('Properties') }</a></li>
         </ul>
       </div>
     </div>

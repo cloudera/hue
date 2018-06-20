@@ -288,7 +288,7 @@
         _parent.previousPath = path;
         _parent.options.onNavigate(_parent.previousPath);
 
-        var $search = $('<div>').html('<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 3px; margin-left: -16px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">').css({
+        var $search = $('<div>').html('<i class="fas fa-sync inactive-action pointer" style="position: absolute; top: 3px; margin-left: -16px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">').css({
           'position': 'absolute',
           'right': '20px',
           'background-color': '#FFF'

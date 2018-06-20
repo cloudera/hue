@@ -45,43 +45,43 @@ ${ fb_components.menubar() }
         <ul class="nav nav-list">
           <!-- ko if: $root.isViewing -->
             <!-- ko if: $root.file().view.mode() === 'binary' -->
-            <li><a class="pointer" data-bind="click: function(){ switchMode('text'); }"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
+            <li><a class="pointer" data-bind="click: function(){ switchMode('text'); }"><i class="fa fa-fw fa-font"></i> ${_('View as text')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.mode() === 'text' -->
-              <li><a class="pointer" data-bind="click: function(){ switchMode('binary'); }"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchMode('binary'); }"><i class="fa fa-fw fa-barcode"></i> ${_('View as binary')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "gzip" && $root.file().path().toLowerCase().endsWith('.gz') -->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fab fa-fw fa-youtube"></i> ${_('Preview as Gzip')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "bz2" && ($root.file().path().toLowerCase().endsWith('.bz2') || $root.file().path().toLowerCase().endsWith('.bzip2'))-->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('bz2'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Bzip2')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('bz2'); }"><i class="fab fa-fw fa-youtube"></i> ${_('Preview as Bzip2')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "avro" && $root.file().view.compression() !== "snappy_avro" && $root.file().path().toLowerCase().endsWith('.avro') -->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fab fa-fw fa-youtube"></i> ${_('Preview as Avro')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() !== "none" -->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('none'); }"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('none'); }"><i class="fa fa-fw fa-times-circle"></i> ${_('Stop preview')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
-              <li><a class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
+              <li><a class="pointer" data-bind="click: $root.editFile"><i class="fas fa-fw fa-pencil-alt"></i> ${_('Edit file')}</a></li>
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: $root.isViewing -->
-            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-eye"></i> ${_('View file')}</a></li>
+            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-fw fa-eye"></i> ${_('View file')}</a></li>
           <!-- /ko -->
 
           <!-- ko if: $root.isViewing -->
           <!-- ko if: $root.file().show_download_button -->
-           <li><a class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-download"></i> ${_('Download')}</a></li>
+           <li><a class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-fw fa-download"></i> ${_('Download')}</a></li>
           <!-- /ko -->
-           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fas fa-file-alt"></i> ${_('View file location')}</a></li>
-           <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
+           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fas fa-fw fa-file-alt"></i> ${_('View file location')}</a></li>
+           <li><a class="pointer" data-bind="click: changePage"><i class="fas fa-fw fa-sync"></i> ${_('Refresh')}</a></li>
           <!-- /ko -->
 
            <!-- ko if: $root.file().stats -->
@@ -116,10 +116,10 @@ ${ fb_components.menubar() }
             </div>
             <div class="pagination inline">
               <ul>
-                <li class="first-page prev" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fab fa-font-awesomest-backward"></i></a></li>
+                <li class="first-page prev" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
                 <li class="previous-page" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
                 <li class="next-page" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
-                <li class="last-page next" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fab fa-font-awesomest-forward"></i></a></li>
+                <li class="last-page next" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a></li>
               </ul>
             </div>
           </div>

@@ -295,7 +295,7 @@ from desktop.views import _ko
   <script type="text/html" id="property">
     <div class="config-property" data-bind="visibleOnHover: { selector: '.hover-actions' }">
       <label class="config-label" data-bind="click: function(data, event){ $(event.target).siblings('.config-controls').find('.config-property-add-value a').click(); }">
-        <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
+        <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="far fa-question-circle"></i></div><!-- /ko -->
       </label>
       <div class="config-controls">
         <!-- ko template: { name: 'property-' + type } --><!-- /ko -->

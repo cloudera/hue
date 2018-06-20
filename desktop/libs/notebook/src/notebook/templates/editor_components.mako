@@ -582,7 +582,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </h4>
       <div class="session-actions">
         <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
-          <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
+          <i class="fas fa-sync" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
         </a>
         <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }">
           <i class="fa fa-times"></i> ${ _('Close') }
@@ -1408,8 +1408,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </ul>
     <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
       <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
-      <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
-      <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+      <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fas fa-sort-amount-down fa-rotate-270"></i></a>
+      <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fas fa-sort-amount-up fa-rotate-270"></i></a>
     </div>
   </div>
 </script>
@@ -1761,7 +1761,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </a>
     <!-- /ko -->
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }" title="${ _('Restart from the first statement') }">
-      <i class="fa fa-fw fa-repeat snippet-side-single"></i>
+      <i class="fas fa-fw fa-redo snippet-side-single"></i>
     </a>
     <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
@@ -1779,7 +1779,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
       <!-- ko if: isBatchable() && wasBatchExecuted() -->
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }">
-        <i class="fa fa-fw fa-send"></i>
+        <i class="fas fa-fw fa-paper-plane"></i>
       </a>
       <!-- /ko -->
       <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
@@ -1800,7 +1800,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </li>
           <li>
             <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(true); $('.dropdown-toggle').dropdown('toggle'); execute(); }, css: {'disabled': ! isReady() }" title="${ _('Submit all the queries as a background batch job.') }">
-              <i class="fa fa-fw fa-send"></i> ${_('Batch')}
+              <i class="fas fa-fw fa-paper-plane"></i> ${_('Batch')}
             </a>
           </li>
         </ul>
@@ -1838,7 +1838,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <li class="divider"></li>
         <li>
           <a href="javascript:void(0)" data-bind="click: function() { hasSuggestion(null); compatibilitySourcePlatform(type()); compatibilityTargetPlatform(type() == 'hive' ? 'impala' : 'hive'); queryCompatibility(); }, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
-            <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
+            <i class="fab fa-fw fa-rebelndom"></i> ${_('Check compatibility')}
           </a>
         </li>
         % if conf.DJANGO_DEBUG_MODE.get() and user.is_superuser:

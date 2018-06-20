@@ -92,7 +92,7 @@
         "<a href='#' class='btn btn-primary' data-dismiss='modal'>" + locale.image.insert + "</a>" +
         "</div>" +
         "</div>" +
-        "<a class='btn" + size + "' data-wysihtml5-command='insertImage' title='" + locale.image.insert + "' tabindex='-1'><i class='fa fa-picture-o'></i></a>" +
+        "<a class='btn" + size + "' data-wysihtml5-command='insertImage' title='" + locale.image.insert + "' tabindex='-1'><i class='far fa-image'></i></a>" +
         "</li>";
     },
 
@@ -100,7 +100,7 @@
       var size = (options && options.size) ? ' btn-' + options.size : '';
       return "<li>" +
         "<div class='btn-group'>" +
-        "<a class='btn" + size + "' data-wysihtml5-action='change_view' title='" + locale.html.edit + "' tabindex='-1'><i class='fa fa-pencil'></i></a>" +
+        "<a class='btn" + size + "' data-wysihtml5-action='change_view' title='" + locale.html.edit + "' tabindex='-1'><i class='fas fa-pencil-alt'></i></a>" +
         "</div>" +
         "</li>";
     },

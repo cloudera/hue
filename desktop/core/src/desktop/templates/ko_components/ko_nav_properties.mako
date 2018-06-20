@@ -53,7 +53,7 @@ from django.utils.translation import ugettext as _
        <!-- ko foreach: properties -->
        <div class="hue-nav-property"><div class="hue-nav-property-key" data-bind="text: key, attr: { 'title': key }"></div><div class="hue-nav-property-value" data-bind="text: value, attr: { 'title': value }"></div></div>
        <!-- /ko -->
-       <div class="editable-inline-action" title="${ _("Edit") }"><a href="javascript: void(0);" data-bind="click: startEdit"><i class="fa fa-pencil"></i></a></div>
+       <div class="editable-inline-action" title="${ _("Edit") }"><a href="javascript: void(0);" data-bind="click: startEdit"><i class="fas fa-pencil-alt"></i></a></div>
      </div>
      <!-- /ko -->
      <!-- ko if: editMode -->

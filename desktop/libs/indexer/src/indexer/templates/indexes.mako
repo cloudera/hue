@@ -281,7 +281,7 @@ ${ assist.assistPanel() }
         <td>
           <span data-bind="text: collections"></span>
           <a class="pointer" data-bind="click: $root.alias.edit, visible: type() == 'alias'">
-            <i class="fa fa-pencil"></i> ${ _('Edit') }
+            <i class="fas fa-pencil-alt"></i> ${ _('Edit') }
           </a>
         </td>
       </tr>

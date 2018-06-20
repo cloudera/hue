@@ -219,7 +219,7 @@ from metadata.conf import has_navigator
         <span class="muted" style="padding-left: 4px;" data-bind="html: subtitle"></span>
         <!-- /ko -->
         <div style="position: absolute; right: 6px; top: 8px;">
-          <a class="pointer inactive-action" data-bind="visible: pinEnabled, click: pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+          <a class="pointer inactive-action" data-bind="visible: pinEnabled, click: pin"><i class="fas fa-fw fa-thumbtack"></i></a>
           <a class="pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
         </div>
       </div>
@@ -305,8 +305,8 @@ from metadata.conf import has_navigator
       </span>
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
-        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
-        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fas fa-fw fa-sync"></i></a>
+        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fas fa-fw fa-thumbtack"></i></a>
         <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
       </div>
     </div>
@@ -475,7 +475,7 @@ from metadata.conf import has_navigator
           </a>
           <!-- ko if: typeof $parent.editorLocation !== 'undefined' -->
           <a class="inactive-action pointer" data-bind="click: function () { $parent.replaceInEditor($data, $parent) }">
-            <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
+            <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fas fa-pencil-alt"></i> ${ _("Insert in the editor") }
           </a>
           <!-- /ko -->
           <!-- /ko -->

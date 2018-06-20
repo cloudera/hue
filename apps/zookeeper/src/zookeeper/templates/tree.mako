@@ -78,13 +78,13 @@ ${ shared.header(_breadcrumbs, clusters, False) }
       <div class="tab-pane active" id="text">
         <textarea id="textareaText" rows="25" readonly="readonly"></textarea>
         % if user.is_superuser:
-        <a href="${url('zookeeper:edit_as_text', id=cluster['id'], path=path)}" class="btn"><i class="fa fa-pencil"></i> ${_('Edit as Text')}</a>
+        <a href="${url('zookeeper:edit_as_text', id=cluster['id'], path=path)}" class="btn"><i class="fas fa-pencil-alt"></i> ${_('Edit as Text')}</a>
         % endif
       </div>      
       <div class="tab-pane" id="base64">
         <textarea id="textarea64" rows="25" readonly="readonly">${znode.get('data64', '')}</textarea>
         % if user.is_superuser:
-        <a href="${url('zookeeper:edit_as_base64', id=cluster['id'], path=path)}" class="btn"><i class="fa fa-pencil"></i> ${_('Edit as Base64')}</a>
+        <a href="${url('zookeeper:edit_as_base64', id=cluster['id'], path=path)}" class="btn"><i class="fas fa-pencil-alt"></i> ${_('Edit as Base64')}</a>
         % endif
       </div>
       <div class="tab-pane" id="stats">

@@ -227,7 +227,7 @@ ${ layout.menubar(section='quick_start') }
           <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
           % if not user.is_authenticated():
             <br/>
-            <a href="${ url('desktop_views_home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+            <a href="${ url('desktop_views_home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fas fa-sign-in-alt"></i> ${ _('Sign in now!') }</a>
           % endif
         </p>
        </div>

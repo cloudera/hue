@@ -52,7 +52,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
 
   <!-- ko if: editing() -->
     <div class="pull-right privilege-actions" data-bind="visible: grantOption() || $root.is_sentry_admin">
-      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
+      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fas fa-paper-plane"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: function() { if (editing()) { editing(false); }}"><i class="fa fa-eye"></i></a>
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
@@ -88,8 +88,8 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
   <!-- ko ifnot: editing() -->
     <!-- ko ifnot: $root.isApplyingBulk() -->
     <div class="pull-right privilege-actions" data-bind="visible: grantOption() || $root.is_sentry_admin">
-      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fa fa-send"></i></a>
-      <a title="${ _('Edit this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: $root.is_sentry_admin, click: function() { if (! editing()) { editing(true); }}"><i class="fa fa-pencil"></i></a>
+      <a title="${ _('Grant this privilege') }" class="pointer" style="margin-right: 4px" data-bind="click: function(){ $root.grantToPrivilege($data); $('#grantPrivilegeModal').modal('show'); }"><i class="fas fa-paper-plane"></i></a>
+      <a title="${ _('Edit this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: $root.is_sentry_admin, click: function() { if (! editing()) { editing(true); }}"><i class="fas fa-pencil-alt"></i></a>
       <a title="${ _('Delete this privilege') }" class="pointer" style="margin-right: 4px" data-bind="visible: $root.is_sentry_admin, click: remove"><i class="fa fa-times"></i></a>
     </div>
     <!-- /ko -->
@@ -161,7 +161,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
         <div class="card-body">
           <div class="row-fluid" data-bind="visible: $root.doAs() != '${ user.username }' && ! $root.assist.isDiffMode()">
             <div class="span12">
-              <div class="alert"><i class="fa fa-warning"></i> ${ _('You are currently impersonating the user') } <strong data-bind="text: $root.doAs"></strong></div>
+              <div class="alert"><i class="fas fa-exclamation-triangle"></i> ${ _('You are currently impersonating the user') } <strong data-bind="text: $root.doAs"></strong></div>
             </div>
           </div>
           <div class="row-fluid">
@@ -202,7 +202,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
                     </a>
                     &nbsp;
                     <a class="pointer" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
-                      <i class="fa fa-refresh"></i>
+                      <i class="fas fa-sync"></i>
                     </a>
                     &nbsp;
                     <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $root.isApplyingBulk(true); $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
@@ -479,7 +479,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
           </div>
           <div class="span4 center">
             <div class="big-btn" data-bind="css: {'selected': $root.bulkAction() == 'sync'}, click: function(){$root.bulkAction('sync')}">
-              <i class="fa fa-random"></i><br/><br/>
+              <i class="fab fa-rebelndom"></i><br/><br/>
               <span>${ _('Replace selection with current privileges') }</span>
             </div>
           </div>
@@ -540,7 +540,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
 
 <%def name="withPrivilegesPullRight()">
   <div class="pull-right">
-    <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #0B7FAD" title="${ _('Has some privileges') }"></i>&nbsp;
+    <i class="fas fa-shield-alt" data-bind="visible: withPrivileges()" style="color: #0B7FAD" title="${ _('Has some privileges') }"></i>&nbsp;
     <i class="far fa-file muted" data-bind="click: $root.assist.showHdfs ,visible: isTable()"></i>
   </div>
 </%def>

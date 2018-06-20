@@ -305,7 +305,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
     <tbody data-bind="foreach: collection.fields">
       <tr data-bind="css: {'error': name.errors().length > 0}">
         <td data-bind="editableText: name">
-          <span class="pull-left fa fa-pencil"></span>
+          <span class="pull-left fas fa-pencil-alt"></span>
         </td>
         <td>
           <select data-bind="options: $parent.fieldTypes, value: type, chosen: {}" name="type"></select>
@@ -396,7 +396,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
           <tbody data-bind="foreach: ko.utils.arrayFilter(collection().fields(), function(field) { return !field.saved() })">
             <tr data-bind="css: {'error': name.errors().length > 0}"  class="ko_container editable">
               <td data-bind="editableText: name">
-                <span class="pull-left fa fa-pencil"></span>
+                <span class="pull-left fas fa-pencil-alt"></span>
               </td>
               <td><select data-bind="options: $parent.fieldTypes, value: type, chosen: {}" name="type"></select></td>
               <td><p class="text-center"><span class="fa" data-bind="css: {'fa-check': uniqueKeyField}"></span></p></td>

@@ -90,7 +90,7 @@ from django.utils.translation import ugettext as _
                   <label class="control-label"></label>
                   <div class="controls">
                     <a href="#" data-bind="click: function() { $root.coordinator.showAdvancedFrequencyUI(! $root.coordinator.showAdvancedFrequencyUI()) }">
-                      <i class="fa fa-sliders"></i> <span data-bind="visible: ! coordinator.showAdvancedFrequencyUI()">${ _('Options') }</span>
+                      <i class="fas fa-sliders-h"></i> <span data-bind="visible: ! coordinator.showAdvancedFrequencyUI()">${ _('Options') }</span>
                       <span data-bind="visible: coordinator.showAdvancedFrequencyUI">${ _('Hide') }</span>
                     </a>
                   </div>
@@ -249,7 +249,7 @@ from django.utils.translation import ugettext as _
               <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
 
                 <a href="#" data-bind="click: function() { show_advanced(! show_advanced()) }">
-                  <i class="fa fa-sliders"></i>
+                  <i class="fas fa-sliders-h"></i>
                 </a>
 
                 %if embedded:

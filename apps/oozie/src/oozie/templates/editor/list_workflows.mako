@@ -63,7 +63,7 @@ ${ layout.menubar(section='workflows') }
       <a href="${ url('oozie:create_workflow') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
       <a href="${ url('oozie:import_workflow') }" class="btn"><i class="fa fa-download"></i> ${ _('Import') }</a>
       &nbsp;&nbsp;
-      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="fa fa-trash-o"></i> ${ _('Trash') }</a>
+      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="far fa-trash-alt"></i> ${ _('Trash') }</a>
     </%def>
   </%actionbar:render>
 

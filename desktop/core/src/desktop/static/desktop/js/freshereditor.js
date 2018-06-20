@@ -135,7 +135,7 @@
               classname: 'toolbar_link'
             }, {
               name: 'insertimage',
-              label: "<i style='margin-top:2px;' class='fa fa-picture-o'></i>",
+              label: "<i style='margin-top:2px;' class='far fa-image'></i>",
               title: 'Insert an image (Ctrl+G)',
               userinput: "yes",
               classname: 'toolbar_image'

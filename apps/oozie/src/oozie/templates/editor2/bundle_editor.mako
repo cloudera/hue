@@ -40,7 +40,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
     </a>
 
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
-      <i class="fa fa-pencil"></i>
+      <i class="fas fa-pencil-alt"></i>
     </a>
 
     <a type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit() && bundle.coordinators().length > 0">

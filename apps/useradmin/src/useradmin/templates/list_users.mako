@@ -39,7 +39,7 @@ ${layout.menubar(section='users')}
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="far fa-trash-alt"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
@@ -52,7 +52,7 @@ ${layout.menubar(section='users')}
               <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
               <a href="javascript:void(0)" class="btn confirmationModal"
                  data-confirmation-url="${ url('useradmin_views_sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}">
-                 <i class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}
+                 <i class="fas fa-sync"></i> ${_('Sync LDAP users/groups')}
               </a>
             % endif
 

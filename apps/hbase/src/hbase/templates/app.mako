@@ -71,9 +71,9 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     <div class="smartview-row" data-bind="css:{selected:$data.isSelected()}, visible: $data.items().length > 0 || $data.isLoading()">
       <h5 data-bind="click: hbaseApp.lockClickOrigin($data.select, $element)"><code class="row_key" data-bind="text: $data.row.slice(0, 100) + ($data.row.length > 100 ? '...' : '')"></code> <i class="fa fa-check-square" data-bind="visible:$data.isSelected()"></i> <i class="fa fa-spinner fa-spin" data-bind="visible: $data.isLoading()"></i>
         <span class="smartview-row-controls controls-hover-bottom">
-          <button class="btn" data-bind="click: $data.reload, clickBubble: false" data-toggle="tooltip" title="${_('Refresh Row')}"><i class="fa fa-refresh"></i></button>
+          <button class="btn" data-bind="click: $data.reload, clickBubble: false" data-toggle="tooltip" title="${_('Refresh Row')}"><i class="fas fa-sync"></i></button>
           % if can_write:
-            <button class="btn" data-bind="click: $data.drop, clickBubble: false" data-toggle="tooltip" title="${_('Delete Row')}"><i class="fa fa-trash-o"></i></button>
+            <button class="btn" data-bind="click: $data.drop, clickBubble: false" data-toggle="tooltip" title="${_('Delete Row')}"><i class="far fa-trash-alt"></i></button>
           % endif
         </span>
         <span class="smartview-row-controls pull-right">
@@ -82,7 +82,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           <input type="text" placeholder="${('Filter Column Names/Family')}" data-bind="value: $data.searchQuery, valueUpdate: $data.items().length < 100 ? 'afterkeydown' : 'change', clickBubble: false"/>
           ${sortBtn('$data.sortDropDown')}
           % if can_write:
-            <button class="btn" data-bind="enable: $data.selected().length > 0, click: $data.dropSelected, clickBubble: false"><i class="fa fa-trash-o"></i> Drop Columns</button>
+            <button class="btn" data-bind="enable: $data.selected().length > 0, click: $data.dropSelected, clickBubble: false"><i class="far fa-trash-alt"></i> Drop Columns</button>
             <a href="#new_column_modal" data-bind="click:function(){hbaseApp.focusModel($data);launchModal('new_column_modal', $data);}" class="btn" title="${_('Add New Column/Cell')}"><i class="fa fa-plus"></i></a>
           % endif
         </span>
@@ -94,9 +94,9 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
             <h6><span class="label" data-bind="text: $data.name.split(':')[0]+':', style: {'backgroundColor': hbaseApp.stringHashColor($data.name.split(':')[0])}"></span> <span data-bind="text: $data.name.split(':')[1]"></span></h6>
             <span class="timestamp label"><i class='far fa-clock'></i> <span data-bind="text: convertTimestamp($data.timestamp)"></span></span>
             % if can_write:
-              <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="fa fa-trash-o"></i></a>
+              <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="far fa-trash-alt"></i></a>
             % endif
-            <a class="corner-btn btn" style="z-index:1000" data-bind="click: function() { hbaseApp.showFullEditor($data); }, clickBubble: false"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
+            <a class="corner-btn btn" style="z-index:1000" data-bind="click: function() { hbaseApp.showFullEditor($data); }, clickBubble: false"><i class="fas fa-pencil-alt"></i> ${_('Full Editor')}</a>
             <div data-bind="visible: ! isLoading()" style="display: none;">
               <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: hbaseApp.editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
               <textarea data-bind="visible: editing, hasFocus: editing, disable: ! hbaseApp.views.tabledata.canWrite(), value: value, click: function() {}, clickBubble: false"></textarea>
@@ -162,10 +162,10 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           <span class="btn-group margin-left-10">
             <button class="btn" data-bind="enable: views.tables.canEnable, click: views.tables.enableSelected"><i class="fa fa-check-square"></i> ${_('Enable')}</button>
             <button class="btn" data-bind="enable: views.tables.canDisable, click: views.tables.disableSelected">
-              <i class="fa fa-square-o"></i> ${_('Disable')}
+              <i class="far fa-square"></i> ${_('Disable')}
             </button>
           </span>
-          <button class="btn" data-bind="enable: views.tables.selected().length > 0, click: views.tables.dropSelected"><i class="fa fa-trash-o"></i> ${_('Drop')}</button>
+          <button class="btn" data-bind="enable: views.tables.selected().length > 0, click: views.tables.dropSelected"><i class="far fa-trash-alt"></i> ${_('Drop')}</button>
         % endif
         % if can_write:
         <span class="pull-right">
@@ -274,7 +274,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
               <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectedCollapse'), clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i class="fa fa-compress"></i></button>
               <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectAllVisible'), clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="far fa-check-square"></i></button>
               % if can_write:
-                <button class="btn" data-bind="enable: views.tabledata.items()[0].selected().length > 0, click: views.tabledata.items()[0].dropSelected, clickBubble: false"><i class="fa fa-trash-o"></i> ${_('Drop Columns')}</button>
+                <button class="btn" data-bind="enable: views.tabledata.items()[0].selected().length > 0, click: views.tabledata.items()[0].dropSelected, clickBubble: false"><i class="far fa-trash-alt"></i> ${_('Drop Columns')}</button>
               % endif
             </span>
         </div>
@@ -307,7 +307,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           </div>
           <span class="pull-right">
             % if can_write:
-              <a class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="fa fa-trash-o"></i> ${_('Drop Rows')}</a>
+              <a class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="far fa-trash-alt"></i> ${_('Drop Rows')}</a>
             % endif
             % if can_write:
             <a id="bulk-upload-btn" class="btn fileChooserBtn" data-toggle="tooltip" title="${_('.CSV, .TSV, etc...')}" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Bulk Upload')}</a>

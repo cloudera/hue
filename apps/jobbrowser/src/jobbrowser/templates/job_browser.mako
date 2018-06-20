@@ -204,7 +204,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </select>
 
                 <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
-                  <i class="fa fa-refresh"></i>
+                  <i class="fas fa-sync"></i>
                 </a>
               <!-- /ko -->
 
@@ -1074,7 +1074,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="dataeng-job-page${ SUFFIX }">
   <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
-    <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
+    <i class="fas fa-tachometer-alt"></i> ${ _('Troubleshoot') }
   </button>
 
   <!-- ko if: type() == 'dataeng-job-HIVE' -->
@@ -1300,7 +1300,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <!-- ko if: hasRerun -->
     <button class="btn" title="${ _('Rerun selected') }" data-bind="click: function() { control('rerun'); }, enable: rerunEnabled">
-      <i class="fa fa-repeat"></i> <!-- ko ifnot: $root.isMini -->${ _('Rerun') }<!-- /ko -->
+      <i class="fas fa-redo"></i> <!-- ko ifnot: $root.isMini -->${ _('Rerun') }<!-- /ko -->
     </button>
     <!-- /ko -->
 

@@ -40,7 +40,7 @@ ${layout.menubar(section='groups')}
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button class="btn delete-group-btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button class="btn delete-group-btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="far fa-trash-alt"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
@@ -49,7 +49,7 @@ ${layout.menubar(section='groups')}
               class="fa fa-plus-circle"></i> ${_('Add group')}</a>
           % if is_ldap_setup:
             <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_groups')}" class="btn"><i
-                class="fa fa-refresh"></i> ${_('Add/Sync LDAP group')}</a>
+                class="fas fa-sync"></i> ${_('Add/Sync LDAP group')}</a>
           % endif
           <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/"
             title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">

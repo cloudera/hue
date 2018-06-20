@@ -513,7 +513,7 @@
         });
 
         if (! options.readOnly && !options.hasErrors()) {
-          $('<i>').addClass('fa fa-pencil selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
+          $('<i>').addClass('fas fa-pencil-alt selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
           $readOnlyInner.click(function () {
             showEdit();
           });
@@ -563,7 +563,7 @@
           }
 
           if (! options.readOnly && !options.hasErrors()) {
-            $('<i>').addClass('fa fa-pencil selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
+            $('<i>').addClass('fas fa-pencil-alt selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
             $readOnlyInner.click(function () {
               showEdit();
             });
@@ -1881,7 +1881,7 @@
               '</div>' +
               '<div class="facet-field-cnt picker">' +
               '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.INTERVAL + '</div>' +
-              '<div class="input-prepend input-group"><span class="add-on input-group-addon"><i class="fa fa-repeat"></i></span></div>&nbsp;' +
+              '<div class="input-prepend input-group"><span class="add-on input-group-addon"><i class="fas fa-redo"></i></span></div>&nbsp;' +
               '<select class="input-small interval-select" style="margin-right: 6px">' +
               renderOptions(_intervalOptions) +
               '</select>' +
@@ -1909,7 +1909,7 @@
               '<div class="facet-field-cnt custom">' +
               '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.INTERVAL + '</div>' +
               '<div class="input-prepend input-group">' +
-              '<span class="add-on input-group-addon"><i class="fa fa-repeat"></i></span>' +
+              '<span class="add-on input-group-addon"><i class="fas fa-redo"></i></span>' +
               '<input type="text" class="input-large form-control interval-custom" />' +
               '</div>' +
               '</div>' +

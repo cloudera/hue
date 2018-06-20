@@ -378,7 +378,7 @@ ${ assist.assistPanel() }
     <select class="input-small" data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
   </label>
   <a href="javascript:void(0)" title="${ _('Show indexing properties') }" data-bind="click: function() {showProperties(! showProperties()) }">
-    <i class="fa fa-sliders"></i>
+    <i class="fas fa-sliders-h"></i>
   </a>
   <span data-bind="visible: showProperties">
     <label class="checkbox">

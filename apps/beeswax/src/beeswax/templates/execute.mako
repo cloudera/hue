@@ -182,7 +182,7 @@ ${ layout.menubar(section='query') }
                     <li class="white" style="padding-top:0; padding-left:0">
                       <div class="control-group">
                         <span id="refresh-dyk">
-                          <i class="fa fa-refresh"></i>
+                          <i class="fas fa-sync"></i>
                           ${ _('Sync tables tips') }
                         </span>
 
@@ -517,8 +517,8 @@ ${ layout.menubar(section='query') }
                 </label>&nbsp;
                 <div class="btn-group" data-toggle="buttons-radio">
                   <a rel="tooltip" data-placement="top" title="${_('No sorting')}" id="blueprintNoSort" href="javascript:void(0)" class="btn active"><i class="fa fa-align-left fa-rotate-270"></i></a>
-                  <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" id="blueprintSortAsc" href="javascript:void(0)" class="btn"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
-                  <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" id="blueprintSortDesc" href="javascript:void(0)" class="btn"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+                  <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" id="blueprintSortAsc" href="javascript:void(0)" class="btn"><i class="fas fa-sort-amount-down fa-rotate-270"></i></a>
+                  <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" id="blueprintSortDesc" href="javascript:void(0)" class="btn"><i class="fas fa-sort-amount-up fa-rotate-270"></i></a>
                 </div>&nbsp;&nbsp;
               </span>
               <span id="blueprintLatLng" class="hide">

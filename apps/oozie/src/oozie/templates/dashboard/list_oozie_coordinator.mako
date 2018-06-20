@@ -198,7 +198,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                            disabled="disabled"
                          % endif
                         data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
-                        <i class="fa fa-refresh"></i> ${ _('Rerun') }
+                        <i class="fas fa-sync"></i> ${ _('Rerun') }
                       </button>
                       <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"
                         data-bind="enable: selectedActions().length > 0">

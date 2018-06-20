@@ -37,7 +37,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
         <div class="card card-small card-tab" style="min-height: 470px;">
           <div class="card-body" style="margin-top: 0">
             <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-            <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
+            <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fas fa-sync"></i></a>
 
             <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
               <li class="nav-header">${_('server')}</li>

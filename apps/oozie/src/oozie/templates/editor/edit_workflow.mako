@@ -149,7 +149,7 @@ ${ layout.menubar(section='workflows') }
       <div class="card-body">
         <p>
           <fieldset data-bind="with: context().node">
-            <p>&nbsp;${_('Action enabled: ')} <i class="far fa-check-square" data-bind="visible: to().length > 0"></i><i class="fa fa-square-o" data-bind="visible: to().length == 0"></i></p>
+            <p>&nbsp;${_('Action enabled: ')} <i class="far fa-check-square" data-bind="visible: to().length > 0"></i><i class="far fa-square" data-bind="visible: to().length == 0"></i></p>
 
             % for form_info in action_forms:
               % if form_info[0] == 'email':
@@ -506,13 +506,13 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
         <strong style="color:#999" data-bind="text: node_type"></strong>
         &nbsp;&nbsp;
         <button type="button" class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="far fa-copy"></i></button>
-        <button type="button" class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="fa fa-trash-o"></i></button>
+        <button type="button" class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="far fa-trash-alt"></i></button>
       </a>
       </li>
     </ul>
     <div class="row-fluid">
       <div class="span12 action editor-action-body">
-        <div class="pull-right" style="font-size: 30px; margin-top:14px; cursor:pointer"><a class="edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a></div>
+        <div class="pull-right" style="font-size: 30px; margin-top:14px; cursor:pointer"><a class="edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fas fa-pencil-alt"></i></a></div>
         <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
         <div class="node-description muted" data-bind="text: description()"></div>
       </div>
@@ -530,7 +530,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
           <a class="action-link" data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;">
             <i style="color:#DDD" class="fa fa-sitemap"></i> &nbsp; <strong style="color:#999" data-bind="text: node_type"></strong>
             &nbsp;&nbsp;
-            <button type="button" class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fas fa-pencil-alt"></i></button>
             <button type="button" class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-magic"></i></button>
           </a>
         </li>
@@ -566,7 +566,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
           <a class="action-link" data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;">
             <i style="color:#DDD" class="fa fa-magic"></i> &nbsp; <strong style="color:#999" data-bind="text: node_type"></strong>
             &nbsp;&nbsp;
-            <button type="button" class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fas fa-pencil-alt"></i></button>
           </a>
         </li>
       </ul>

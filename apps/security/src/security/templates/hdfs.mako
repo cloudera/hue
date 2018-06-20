@@ -93,7 +93,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
         <div class="card-body">
           <div class="row-fluid" data-bind="visible: $root.doAs() != '${ user.username }' && ! $root.assist.isDiffMode()">
             <div class="span12">
-              <div class="alert"><i class="fa fa-warning"></i> ${ _('You are currently impersonating the user') } <strong data-bind="text: $root.doAs"></strong></div>
+              <div class="alert"><i class="fas fa-exclamation-triangle"></i> ${ _('You are currently impersonating the user') } <strong data-bind="text: $root.doAs"></strong></div>
             </div>
           </div>
           <div class="row-fluid">
@@ -125,7 +125,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
                     </a>
                     &nbsp;
                     <a class="pointer" data-bind="click: $root.assist.refreshTree" rel="tooltip" data-placement="right" title="${_('Refresh the tree')}">
-                      <i class="fa fa-refresh"></i>
+                      <i class="fas fa-sync"></i>
                     </a>
                     &nbsp;
                     <a class="pointer" data-bind="visible: $root.assist.checkedItems().length > 0, click: function(){ $('#bulkActionsModal').modal('show'); }" rel="tooltip" data-placement="right" title="${ _('Add, replace or remove ACLs for the checked paths') }">
@@ -143,7 +143,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
 
                   <ul class="nav nav-tabs">
-                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
+                    <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fas fa-pencil-alt"></i> ${ _('Edit') }</a></li>
                     <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fas fa-heading"></i> ${ _('View as text') }</a></li>
                   </ul>
 
@@ -220,7 +220,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
           </div>
           <div class="span4 center">
             <div class="big-btn" data-bind="css: {'selected': $root.assist.bulkAction() == 'sync'}, click: function(){$root.assist.bulkAction('sync')}">
-              <i class="fa fa-random"></i><br/><br/>
+              <i class="fab fa-rebelndom"></i><br/><br/>
               <span>${ _('Replace selection with current ACLs') }</span>
             </div>
           </div>
@@ -285,7 +285,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
     <span data-bind="text: rwx"></span>
   </div>
   <div class="pull-right">
-    <i class="fa fa-shield" data-bind="visible: aclBit()" style="color: #0B7FAD" title="${ _('Has some ACLs') }"></i>
+    <i class="fas fa-shield-alt" data-bind="visible: aclBit()" style="color: #0B7FAD" title="${ _('Has some ACLs') }"></i>
   </div>
 </%def>
 
