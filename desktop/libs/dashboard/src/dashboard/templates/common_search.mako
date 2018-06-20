@@ -90,11 +90,12 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
       <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
         <div class="search-bar-query-container">
-          <div class="search-bar-collection">
+          <div class="search-bar-collection" data-bind="css: { 'report-mode': $root.collection.engine() === 'report' }">
             <div class="selectMask">
               <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
             </div>
           </div>
+          <!-- ko if: $root.collection.engine() !== 'report' -->
           <div class="search-bar-query" data-bind="foreach: query.qs">
 
             <div data-bind="component: { name: 'hue-simple-ace-editor', params: {
@@ -113,10 +114,13 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
               <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
             <!-- /ko -->
           </div>
+          <!-- /ko -->
           <div class="search-bar-query-operations">
+            <!-- ko if: $root.collection.engine() !== 'report' -->
             <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ, css: { 'flat-left': $root.query.qs().length === 1}, style: { 'margin-left': $root.query.qs().length > 1 ? '10px' : '0' }, visible: ! collection.supportAnalytics()">
               <i class="fa fa-plus"></i>
             </a>
+            <!-- /ko -->
 
             <button type="submit" id="search-btn" class="btn btn-primary disable-feedback" style="margin-left:10px; margin-right:10px">
               <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
@@ -3956,12 +3960,17 @@ function loadSearch(collection, query, initial) {
     }
   ]);
 
-  searchViewModel.init(function(data){
+  searchViewModel.init(function(){
     $(".chosen-select").trigger("chosen:updated");
+    if (searchViewModel.collection.engine() === 'report') {
+      // TODO: remove forced table
+      searchViewModel.collection.name('default.web_logs');
+      textSearchLayout(searchViewModel, true);
+    }
   });
 
   searchViewModel.isRetrievingResults.subscribe(function(value){
-    if (! value){
+    if (!value){
       resizeFieldsList();
     }
   });
