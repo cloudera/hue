@@ -2175,7 +2175,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       self.isToolbarVisible(self.isEditing());
       self.initial.init();
       self.collection.syncFields();
-      if (self.collection.engine() == 'solr') {
+      if (self.collection.engine() === 'solr' || self.collection.engine() === 'report') {
         self.search(callback);
       }
     }
@@ -2322,7 +2322,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       hueAnalytics.log('dashboard', 'search');
       self.isRetrievingResults(true);
 
-      if (! self.collection.name()) {
+      if (!self.collection.name()) {
         return;
       }
 
@@ -2417,7 +2417,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
             huePubSub.publish('charts.state');
             data = JSON.bigdataParse(data);
             try {
-              if (self.collection.engine() == 'solr') {
+              if (self.collection.engine() === 'solr') {
                 self._make_grid_result(data, callback);
               } else {
                 self.collection.queryResult(new QueryResult(self, {
@@ -2427,6 +2427,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
                   progress: 0,
                 }));
                 self.checkStatus(self.collection);
+                if (callback) {
+                  callback();
+                }
               }
             }
             catch (e) {

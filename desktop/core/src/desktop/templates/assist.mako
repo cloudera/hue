@@ -2279,7 +2279,9 @@ from desktop.views import _ko
               <span class="assist-entry">
                 <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
                 <!-- ko with: catalogEntry -->
+                <!-- ko if: typeof reload !== 'undefined' -->
                 <span data-bind="text: getDisplayName()"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
+                <!-- /ko -->
                 <!-- /ko -->
               </span>
             </li>
