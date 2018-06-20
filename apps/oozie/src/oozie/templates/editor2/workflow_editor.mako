@@ -678,19 +678,22 @@ ${ utils.submit_popup_event() }
     _el.css("zIndex", "1032");
     var lastSeenPosition = _el.position();
     var _width = _el.width();
-
+    %if is_embeddable:
+    lastSeenPosition.left = lastSeenPosition.left + 290;
+    _el.css("position", "fixed");
+    $("#addActionDemiModal").css("position", "fixed");
+    %else:
     _el.css("position", "absolute");
+    %endif
+
     _el.css({
       "top": lastSeenPosition.top + "px",
       "left": lastSeenPosition.left + "px",
       "width": 450
     });
+
     $("#addActionDemiModal").width(_el.width()).css("top", _el.position().top + 25).css("left", _el.position().left).modal("show");
-    %if is_embeddable:
-    $(".page-content").animate({
-    scrollTop: $("#addActionDemiModal").offset().top - 200
-    }, 200);
-    %else:
+    %if not is_embeddable:
     $("html, body").animate({
       scrollTop: $("#addActionDemiModal").offset().top - 200
     }, 200);
