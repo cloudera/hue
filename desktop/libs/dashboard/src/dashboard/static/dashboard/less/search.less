@@ -119,9 +119,17 @@
           .flex(1 1 120px);
           white-space: nowrap;
 
+
           > div {
             border-radius: 4px 0 0 4px;
             border-right: none;
+          }
+          &.report-mode {
+            .flex(none);
+            > div {
+              border-right: 1px solid @cui-gray-400;
+              border-radius: 4px;
+            }
           }
         }
 
