@@ -72,7 +72,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
         <li class="divider"></li>
         <li data-bind="visible: workflow.id() != null, css: {'disabled': workflow.isDirty()}">
           <a class="pointer" data-bind="click: schedule">
-            <i class="fa fa-fw fa-calendar"></i> ${ _('Schedule') }
+            <i class="fas fa-fw fa-calendar-alt"></i> ${ _('Schedule') }
           </a>
         </li>
         <li data-bind="visible: canEdit">
@@ -328,7 +328,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableSubworkflowAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSubworkflowAction());}}}"
          title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
+         <a class="draggable-icon"><i class="fas fa-code-branch"></i></a>
     </div>
     <!-- /ko -->
 
@@ -364,7 +364,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableEmailAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableEmailAction());}}}"
          title="${_('Email')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-envelope-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-envelope"></i></a>
     </div>
     <!-- /ko -->
 
@@ -373,7 +373,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableStreamingAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableStreamingAction());}}}"
          title="${_('Streaming')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-exchange"></i></a>
+         <a class="draggable-icon"><i class="fas fa-exchange-alt"></i></a>
     </div>
     <!-- /ko -->
 
@@ -468,7 +468,7 @@ ${ workflow.render() }
             </div>
             <!-- ko if: $root.tempDocument -->
               <a class="pointer" data-bind="hueLink: $root.tempDocument().absoluteUrl" title="${ _('Open') }">
-                <i class="fa fa-external-link-square"></i>
+                <i class="fas fa-external-link-square-alt"></i>
               </a>
             <!-- /ko -->
           <!-- /ko -->
@@ -493,7 +493,7 @@ ${ workflow.render() }
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
           <span data-bind="with: $root.getSubWorkflow(value())">
             <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" title="${ _('Open') }">
-              <i class="fa fa-external-link-square"></i>
+              <i class="fas fa-external-link-square-alt"></i>
             </a>
           </span>
           <!-- /ko -->

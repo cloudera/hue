@@ -136,7 +136,7 @@
 
 % if is_demo:
   <ul class="side-labels unstyled">
-    <li class="feedback"><a href="javascript:showClassicWidget()"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>
+    <li class="feedback"><a href="javascript:showClassicWidget()"><i class="far fa-envelope"></i> ${_('Feedback')}</a></li>
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
@@ -248,7 +248,7 @@ ${ hueIcons.symbols() }
             <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
             % if not conf.DISABLE_HUE_3.get():
-            <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 3')}</a></li>
+            <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fas fa-fw fa-exchange-alt"></i> ${_('Switch to Hue 3')}</a></li>
             % endif
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
@@ -322,7 +322,7 @@ ${ hueIcons.symbols() }
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
             click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
-          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+          <div class="dz-message" data-dz-message><i class="fas fa-fw fa-cloud-upload-alt"></i> ${ _('Click or Drop files here') }</div>
         </div>
       </div>
     </div>

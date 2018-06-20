@@ -243,7 +243,7 @@ ${ assist.assistPanel() }
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
               <a data-bind="storageContextPopover: { path: createWizard.source.path(), offset: { right: 5 } }" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
-                <i class="fa fa-external-link-square"></i>
+                <i class="fas fa-external-link-square-alt"></i>
               </a>
             <!-- /ko -->
           </div>
@@ -701,7 +701,7 @@ ${ assist.assistPanel() }
               </label>
               <!-- ko if: indexerRunJob() && indexerJobLibPath().length > 0 -->
                 <a data-bind="hueLink: '/filebrowser/view=' + indexerJobLibPath()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
-                  <i class="fa fa-external-link-square"></i>
+                  <i class="fas fa-external-link-square-alt"></i>
                 </a>
               <!-- /ko -->
             </div>

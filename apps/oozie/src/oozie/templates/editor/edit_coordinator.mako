@@ -58,7 +58,7 @@ ${ layout.menubar(section='coordinators') }
 
           % if coordinator.coordinatorworkflow:
             <li class="nav-header">${ _('Workflow') }</li>
-            <li id="workflowName"><a href="${ coordinator.coordinatorworkflow.get_absolute_url() }" target="_blank"><i class="fa fa-code-fork"></i> ${ coordinator.coordinatorworkflow}</a></li>
+            <li id="workflowName"><a href="${ coordinator.coordinatorworkflow.get_absolute_url() }" target="_blank"><i class="fas fa-code-branch"></i> ${ coordinator.coordinatorworkflow}</a></li>
           % endif
 
           <li class="nav-header">${ _('Datasets') }</li>

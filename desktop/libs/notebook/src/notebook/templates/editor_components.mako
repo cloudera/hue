@@ -592,7 +592,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         % endif
         <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
           <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
-            <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
+            <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fas fa-external-link-alt"></i>
           </a>
         <!-- /ko -->
       </div>
@@ -684,7 +684,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
-            <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon far fa-calendar-times"></i></div>
           </a>
         </li>
         % if not IS_EMBEDDED.get():
@@ -1114,7 +1114,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- ko if: statementPath() -->
           <div class="inline-block" style="margin-top: 4px">
             <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" title="${ _('Open') }">
-              <i class="fa fa-external-link-square"></i>
+              <i class="fas fa-external-link-square-alt"></i>
             </a>
           </div>
           <a class="btn" data-bind="click: function() { getExternalStatement(); }"><i class="fa fa-lg fa-refresh"></i></a>
@@ -1136,7 +1136,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- ko if: associatedDocument() -->
             <div class="pull-left" style="margin-top: 4px">
               <a data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
-                <i class="fa fa-external-link-square"></i>
+                <i class="fas fa-external-link-square-alt"></i>
               </a>
               <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
             </div>
@@ -1844,7 +1844,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         % if conf.DJANGO_DEBUG_MODE.get() and user.is_superuser:
         <li>
           <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.upload.history'); }" title="${ _('Load recent queries in order to improve recommendations') }">
-            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
+            <i class="fas fa-fw fa-cloud-upload-alt"></i> ${_('Upload history')}
           </a>
         </li>
         % endif
@@ -1868,7 +1868,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" title="${ _('Bars') }"></i>
         <i class="hcha fa-fw hcha-timeline-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" title="${ _('Time') }"></i>
         <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" title="${ _('Pie') }"></i>
-        <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" title="${ _('Scatter') }"></i>
+        <i class="far fa-fw fa-dot-circle" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" title="${ _('Scatter') }"></i>
         <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" title="${ _('Marker Map') }"></i>
         <i class="hcha fa-fw hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" title="${ _('Gradient Map') }"></i>
       </a>
@@ -1894,7 +1894,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
         <li>
           <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-            <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+            <i class="far fa-fw fa-dot-circle chart-icon"></i> ${_('Scatter')}
           </a>
         </li>
         <li>

@@ -1090,7 +1090,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <i class="fa fa-save fa-fw"></i>
       </a>
       <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink }" target="_blank" title="${ _('Show original document') }">
-        <i class="fa fa-external-link fa-fw"></i>
+        <i class="fas fa-external-link-alt fa-fw"></i>
       </a>
     </div>
     <div class="document-details pull-left">
@@ -2864,7 +2864,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <span data-bind="visible: $root.availableDateFields().length > 0" >
     <span data-bind="template: {name: 'time-filter-select', data: {gap: collection.timeFilter.value} }"></span>
     <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
-      <i class="fa fa-calendar"></i>
+      <i class="fas fa-calendar-alt"></i>
     </a>
   </span>
 </script>
@@ -2906,7 +2906,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="span12">
         <form class="form-horizontal">
           <fieldset>
-            <legend><i class="fa fa-calendar"></i> ${ _('Time settings') }</legend>
+            <legend><i class="fas fa-calendar-alt"></i> ${ _('Time settings') }</legend>
 
             <span data-bind="visible: $root.availableDateFields().length > 0">
               <div class="control-group">

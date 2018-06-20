@@ -41,7 +41,7 @@ ${ layout.menubar(section='workflows') }
     <div id="workflowControls" class="sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${ _('Editor') }</li>
-        <li><a href="#editWorkflow"><i class="fa fa-code-fork"></i> ${ _('Workflow') }</a></li>
+        <li><a href="#editWorkflow"><i class="fas fa-code-branch"></i> ${ _('Workflow') }</a></li>
         <li><a href="#properties"><i class="fa fa-cog"></i> ${ _('Properties') }</a></li>
         % if user_can_edit_job:
           <li>
@@ -67,7 +67,7 @@ ${ layout.menubar(section='workflows') }
             <a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }" title="${ _('Submit this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-play"></i> ${ _('Submit') }</a>
           </li>
           <li>
-            <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-calendar"></i> ${ _('Schedule') }</a>
+            <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="fas fa-calendar-alt"></i> ${ _('Schedule') }</a>
           </li>
           <li>
             <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-files-o"></i> ${ _('Copy') }</a>
@@ -149,7 +149,7 @@ ${ layout.menubar(section='workflows') }
       <div class="card-body">
         <p>
           <fieldset data-bind="with: context().node">
-            <p>&nbsp;${_('Action enabled: ')} <i class="fa fa-check-square-o" data-bind="visible: to().length > 0"></i><i class="fa fa-square-o" data-bind="visible: to().length == 0"></i></p>
+            <p>&nbsp;${_('Action enabled: ')} <i class="far fa-check-square" data-bind="visible: to().length > 0"></i><i class="fa fa-square-o" data-bind="visible: to().length == 0"></i></p>
 
             % for form_info in action_forms:
               % if form_info[0] == 'email':
@@ -487,7 +487,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
       </div>
       <div class="tabbable tabs-below">
         <ul class="nav nav-tabs" style="margin-bottom:0">
-          <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-dot-circle-o"></i> &nbsp;
+          <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="far fa-dot-circle"></i> &nbsp;
             <strong style="color:#999" data-bind="text: node_type"></strong></a>
           </li>
         </ul>

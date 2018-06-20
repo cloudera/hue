@@ -220,7 +220,7 @@ except ImportError, e:
         % endif
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
-            <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
+            <i class="fas fa-fw fa-cloud-upload-alt"></i> ${ _('Export') }
           </a>
         </li>
       </ul>

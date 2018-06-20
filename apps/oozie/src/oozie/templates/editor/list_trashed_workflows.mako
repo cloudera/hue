@@ -38,7 +38,7 @@ ${ layout.menubar(section='workflows') }
 
     <%def name="actions()">
       <button type="button" id="restore-btn" class="btn toolbarBtn" disabled="disabled" title="${ _('Restore the selected workflows') }">
-        <i class="fa fa-cloud-upload"></i> ${ _('Restore') }
+        <i class="fas fa-cloud-upload-alt"></i> ${ _('Restore') }
       </button>
       <button type="button" id="destroy-btn" class="btn toolbarBtn" disabled="disabled" title="${ _('Delete the selected workflows') }">
         <i class="fa fa-bolt"></i> ${ _('Delete forever') }

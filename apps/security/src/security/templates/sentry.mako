@@ -111,7 +111,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
     <span class="muted" data-bind="text: privilegeType, attr: {title: moment(timestamp()).fromNow()}"></span>
     <!-- ko if: $root.component() == 'solr' && authorizables().length > 0 && authorizables()[0].type() == 'COLLECTION'  && authorizables()[0].name_() != '*' -->
       <a data-bind="hueLink: indexerPath()" title="${ _('Open in Indexer') }" class="muted">
-        <i class="fa fa-external-link"></i>
+        <i class="fas fa-external-link-alt"></i>
       </a>
     <!-- /ko -->
 
@@ -121,7 +121,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
     <!-- ko if: $root.component() == 'hive' -->
       <span data-bind="visible: metastorePath() != '' && privilegeType() == 'DATABASE'">
-        <a data-bind="hueLink: metastorePath()" class="muted" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
+        <a data-bind="hueLink: metastorePath()" class="muted" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fas fa-external-link-alt"></i></a>
       </span>
       <br/>
 
@@ -217,12 +217,12 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
                   <input id="path" class="path" type="text" autocomplete="off" />
                   <!-- ko if: $root.component() == 'solr' -->
                   <a data-bind="hueLink: $root.assist.indexerPath()" title="${ _('Open in Indexer') }" class="btn btn-inverse">
-                    <i class="fa fa-external-link"></i>
+                    <i class="fas fa-external-link-alt"></i>
                   </a>
                   <!-- /ko -->
                   <!-- ko ifnot: $root.component() == 'solr' -->
                   <a data-bind="hueLink: $root.assist.metastorePath()" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
-                    <i class="fa fa-external-link"></i>
+                    <i class="fas fa-external-link-alt"></i>
                   </a>
                   <!-- /ko -->
                 </div>

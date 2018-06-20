@@ -544,11 +544,11 @@ class BundleForm(forms.ModelForm):
 
 class UpdateCoordinatorForm(forms.Form):
   endTime = forms.SplitDateTimeField(label='End Time', input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
-                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fa fa-calendar', 'id': 'update_endtime'},
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fas fa-calendar-alt', 'id': 'update_endtime'},
                                                             date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
   pauseTime = forms.SplitDateTimeField(label='Pause Time', input_time_formats=[TIME_FORMAT], required=False, initial=None,
-                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fa fa-calendar', 'id': 'update_pausetime'},
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fas fa-calendar-alt', 'id': 'update_pausetime'},
                                                             date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
   clearPauseTime = forms.BooleanField(label='Clear Pause Time', initial=False)

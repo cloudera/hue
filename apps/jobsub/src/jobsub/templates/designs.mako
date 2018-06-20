@@ -88,7 +88,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
         </div>
       <!-- /ko -->
       <!-- ko if: inTrash -->
-        <button id="restore-designs" disabled="disabled" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
+        <button id="restore-designs" disabled="disabled" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="fas fa-cloud-upload-alt"></i> ${_('Restore')}</button>
         <button id="destroy-designs" disabled="disabled" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
       <!-- /ko -->
       </div>

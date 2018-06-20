@@ -124,7 +124,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
           <h1 class="card-heading simple">
             <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
             <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id()" title="${ _('Open') }">
-              <i class="fa fa-external-link-square"></i>
+              <i class="fas fa-external-link-square-alt"></i>
             </a>
             <a class="pointer pull-right" data-bind="click: function() { $root.bundle.coordinators.remove(this); }, visible: $root.isEditing">
               <i class="fa fa-times"></i>
@@ -182,7 +182,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
           <span data-bind="click: selectCoordinator" class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
           <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
+            <i class="fas fa-external-link-square-alt"></i>
           </a>
         </li>
       </ul>
@@ -240,7 +240,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 <script type="text/html" id="calendar-dropdown">
 <div class="btn-group">
   <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-    <i class="fa fa-calendar"></i>
+    <i class="fas fa-calendar-alt"></i>
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu pull-right" role="menu">

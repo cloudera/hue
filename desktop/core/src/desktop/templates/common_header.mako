@@ -356,7 +356,7 @@ ${ hueIcons.symbols() }
         % endif
       % endif
       % if conf.IS_HUE_4.get():
-      <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 4)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 4')}</a></li>
+      <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 4)"><i class="fas fa-fw fa-exchange-alt"></i> ${_('Switch to Hue 4')}</a></li>
       % endif
       </ul>
     </li>
@@ -602,7 +602,7 @@ ${ hueIcons.symbols() }
 
 % if is_demo:
   <ul class="side-labels unstyled">
-    <li class="feedback"><a href="javascript:showClassicWidget()"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>
+    <li class="feedback"><a href="javascript:showClassicWidget()"><i class="far fa-envelope"></i> ${_('Feedback')}</a></li>
   </ul>
 
   <!-- UserVoice JavaScript SDK -->

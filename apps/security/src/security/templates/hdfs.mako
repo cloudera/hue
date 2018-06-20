@@ -102,7 +102,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" data-bind="value: $root.assist.path" autocomplete="off" />
                   <a data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" class="btn btn-inverse">
-                    <i class="fa fa-external-link"></i>
+                    <i class="fas fa-external-link-alt"></i>
                   </a>
                 </div>
                 <div class="clearfix"></div>

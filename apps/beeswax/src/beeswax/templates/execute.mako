@@ -221,7 +221,7 @@ ${ layout.menubar(section='query') }
                 <li class="nav-header">${ _('address')}</li>
               </ul>
               <div style="margin: 2px">
-              <a data-bind="attr: {'href': $root.impalaSessionLink()}" target="_blank"><span data-bind="text: $root.impalaSessionLink().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i></a>
+              <a data-bind="attr: {'href': $root.impalaSessionLink()}" target="_blank"><span data-bind="text: $root.impalaSessionLink().replace(/^(https?):\/\//, '')"></span> <i class="fas fa-external-link-alt"></i></a>
               </div>
               <!-- /ko -->
               <!-- ko if: $root.impalaSessionLink() == '' -->
@@ -363,7 +363,7 @@ ${ layout.menubar(section='query') }
         <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" href="javascript:void(0)" title="${_('Download the results in XLS format')}" rel="tooltip"
           class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-xls"></i></h4></a>
         <!-- /ko -->
-        <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="clear-queries pull-right" data-toggle="modal"><h4><i class="fa fa-calendar-times-o"></i></h4></a>
+        <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="clear-queries pull-right" data-toggle="modal"><h4><i class="far fa-calendar-times"></i></h4></a>
       </div>
 
       <div class="card-body">

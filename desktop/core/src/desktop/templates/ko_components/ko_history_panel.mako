@@ -80,7 +80,7 @@ from desktop.views import _ko
         <div class="notification-history-title">
           <strong class="margin-left-5">${ _('Task History') }</strong>
           <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
-            <i class="fa fa-calendar-times-o"></i>
+            <i class="far fa-calendar-times"></i>
           </div>
           <div class="clearfix"></div>
         </div>

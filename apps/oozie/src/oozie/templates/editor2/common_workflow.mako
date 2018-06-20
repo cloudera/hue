@@ -195,7 +195,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'subworkflow-widget' -->
-      <a class="widget-icon"><i class="fa fa-code-fork"></i></a>
+      <a class="widget-icon"><i class="fas fa-code-branch"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'shell-widget' || widgetType() == 'shell-document-widget' -->
@@ -211,11 +211,11 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'email-widget' -->
-      <a class="widget-icon"><i class="fa fa-envelope-o"></i></a>
+      <a class="widget-icon"><i class="far fa-envelope"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'streaming-widget' -->
-      <a class="widget-icon"><i class="fa fa-exchange"></i></a>
+      <a class="widget-icon"><i class="fas fa-exchange-alt"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'distcp-widget' || widgetType() == 'distcp-document-widget' -->
@@ -258,7 +258,7 @@
       <!-- /ko -->
       <!-- ko if: ooziePropertiesExpanded() -->
         <div class="inline pull-right">
-          <a href="javascript:void(0)" data-bind="click: toggleProperties"><i class="fa fa-caret-square-o-left"></i></a>
+          <a href="javascript:void(0)" data-bind="click: toggleProperties"><i class="far fa-caret-square-left"></i></a>
         </div>
       <!-- /ko -->
     </h2>
@@ -271,7 +271,7 @@
       <!-- ko if: id() == '17c9c895-5a16-7443-bb81-f34b30b21548' && ooziePropertiesExpanded() -->
       <div class="advanced-triangle-container" data-bind="visible: $root.isEditing(), click: toggleProperties">
         <div class="advanced-triangle">
-          <a href="javascript:void(0)"><i class="fa fa-caret-square-o-left"></i></a>
+          <a href="javascript:void(0)"><i class="far fa-caret-square-left"></i></a>
         </div>
       </div>
       <!-- /ko -->
@@ -394,7 +394,7 @@
 <script type="text/html" id="end-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
-    <div class="big-icon" title="${ _('It is where we successfully finish!') }"><i class="fa fa-dot-circle-o"></i></div>
+    <div class="big-icon" title="${ _('It is where we successfully finish!') }"><i class="far fa-dot-circle"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -626,7 +626,7 @@
 
    <!-- ko if: ! with_label -->
      <a data-bind="storageContextPopover: { path: ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path, offset: { right: 5 }, orientation: 'left' }" title="${ _('Preview') }" href="javascript: void(0);">
-       <i class="fa fa-external-link-square"></i>
+       <i class="fas fa-external-link-square-alt"></i>
      </a>
    <!-- /ko -->
  <!-- /ko -->
@@ -652,7 +652,7 @@
         </div>
         <!-- ko if: associatedDocument -->
           <a class="pointer" data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
+            <i class="fas fa-external-link-square-alt"></i>
           </a>
           <div class="clearfix"></div>
           <div data-bind='text: associatedDocument().description' style="padding-left: 3px;" class="muted"></div>
@@ -669,7 +669,7 @@
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
     <a data-bind="storageContextPopover: { path: $data.path.split('=', 2)[1], offset: { right: 5 }, orientation: 'left' }" title="${ _('Preview') }" href="javascript: void(0);">
-      <i class="fa fa-external-link-square"></i>
+      <i class="fas fa-external-link-square-alt"></i>
     </a>
   <!-- /ko -->
 </script>
@@ -1566,7 +1566,7 @@
         <select data-bind="valueAllowUnset: true, options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
         <span data-bind="visible: properties.workflow().length > 0">
           <a class="pointer" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow()" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
+            <i class="fas fa-external-link-square-alt"></i>
           </a>
         </span>
 

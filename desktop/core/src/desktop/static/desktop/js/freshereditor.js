@@ -129,7 +129,7 @@
           ], [
             {
               name: 'createlink',
-              label: "<i style='margin-top:2px;' class='fa fa-external-link'></i>",
+              label: "<i style='margin-top:2px;' class='fas fa-external-link-alt'></i>",
               title: 'Link to a web page (Ctrl+L)',
               userinput: "yes",
               classname: 'toolbar_link'

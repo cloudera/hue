@@ -153,7 +153,7 @@ from django.utils.translation import ugettext as _
        data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/>
   </a>
   <ul class="nav nav-pills pull-left hide" id="visit">
-    <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="fa fa-external-link-circle"></i></a></li>
+    <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="fas fa-external-link-alt-circle"></i></a></li>
   </ul>
 </div>
 

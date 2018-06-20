@@ -44,13 +44,13 @@ from django.utils.translation import ugettext as _
             <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
 
             <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" title="${ _('Open') }">
-             <i class="fa fa-external-link-square"></i>
+             <i class="fas fa-external-link-square-alt"></i>
             </a>
             <!-- /ko -->
             <!-- ko ifnot: isEditing -->
             <span data-bind="text: getWorkflowById(coordinator.properties.workflow()).name"></span>
             <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" title="${ _('Open') }">
-              <i class="fa fa-external-link-square"></i>
+              <i class="fas fa-external-link-square-alt"></i>
             </a>
             <!-- /ko -->
           <!-- /ko -->
@@ -128,13 +128,13 @@ from django.utils.translation import ugettext as _
                 <div class="controls">
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon">
-                      <i class="fa fa-calendar"></i>
+                      <i class="fas fa-calendar-alt"></i>
                     </span>
                     <input type="text" class="input-small" data-bind="value: coordinator.properties.startDateUI, datepicker: {}, enable: $root.isEditing" />
                   </div>
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon">
-                      <i class="fa fa-clock-o"></i>
+                      <i class="far fa-clock"></i>
                     </span>
                     <input type="text" class="input-mini" data-bind="value: coordinator.properties.startTimeUI, timepicker: {}, enable: $root.isEditing" />
                   </div>
@@ -146,13 +146,13 @@ from django.utils.translation import ugettext as _
                 <div class="controls">
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon">
-                      <i class="fa fa-calendar"></i>
+                      <i class="fas fa-calendar-alt"></i>
                     </span>
                     <input type="text" class="input-small" data-bind="value: coordinator.properties.endDateUI, datepicker: {}, enable: $root.isEditing" />
                   </div>
                   <div class="input-prepend input-group">
                     <span class="add-on input-group-addon">
-                      <i class="fa fa-clock-o"></i>
+                      <i class="far fa-clock"></i>
                     </span>
                     <input type="text" class="input-mini" data-bind="value: coordinator.properties.endTimeUI, timepicker: {}, enable: $root.isEditing" />
                   </div>
@@ -409,7 +409,7 @@ from django.utils.translation import ugettext as _
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
           <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
+            <i class="fas fa-external-link-square-alt"></i>
           </a>
         </li>
       </ul>

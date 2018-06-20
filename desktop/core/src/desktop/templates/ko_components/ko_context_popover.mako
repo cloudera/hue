@@ -356,13 +356,13 @@ from metadata.conf import has_navigator
           </a>
           % if HAS_SQL_ENABLED.get():
             <a class="inactive-action pointer" data-bind="visible: openActionsEnabled, click: openInDashboard">
-              <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
+              <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fas fa-external-link-alt"></i> ${ _("Dashboard") }
             </a>
           % endif
           % if not IS_EMBEDDED.get():
             <!-- ko if: catalogEntry().getSourceType() !== 'solr' && openActionsEnabled() -->
             <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
-              <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
+              <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fas fa-external-link-alt"></i> ${ _("Table Browser") }
             </a>
             <!-- /ko -->
           % endif
@@ -471,7 +471,7 @@ from metadata.conf import has_navigator
         <div class="context-popover-link-row">
           <!-- ko ifnot: loading -->
           <a class="inactive-action pointer" data-bind="click: $parent.openInFileBrowser">
-            <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
+            <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fas fa-external-link-alt"></i> ${ _("File Browser") }
           </a>
           <!-- ko if: typeof $parent.editorLocation !== 'undefined' -->
           <a class="inactive-action pointer" data-bind="click: function () { $parent.replaceInEditor($data, $parent) }">

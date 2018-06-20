@@ -45,7 +45,7 @@ ${layout.menubar(section='saved queries')}
             <i class="fa fa-bolt"></i> ${_('Delete forever')}
           </button>
           <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
-            <i class="fa fa-cloud-upload"></i> ${_('Restore')}
+            <i class="fas fa-cloud-upload-alt"></i> ${_('Restore')}
           </button>
         </div>
       </%def>

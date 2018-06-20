@@ -333,7 +333,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/>
   <!-- /ko -->
   <!-- ko case: 'workflow-action' -->
-    <i class="fa fa-fw fa-code-fork"></i>
+    <i class="fas fa-fw fa-code-branch"></i>
   <!-- /ko -->
   <!-- ko case: 'schedule' -->
     <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/>

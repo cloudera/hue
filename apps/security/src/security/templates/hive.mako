@@ -99,7 +99,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
     <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
-      <a data-bind="hueLink: metastorePath()" class="muted" style="margin-left: 4px" title="${ _('Open in Table Browser') }"><i class="fa fa-external-link"></i></a>
+      <a data-bind="hueLink: metastorePath()" class="muted" style="margin-left: 4px" title="${ _('Open in Table Browser') }"><i class="fas fa-external-link-alt"></i></a>
     </span>
     <br/>
 
@@ -170,7 +170,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
                   <a data-bind="hueLink: $root.assist.metastorePath()" title="${ _('Open in Table Browser') }" class="btn btn-inverse">
-                    <i class="fa fa-external-link"></i>
+                    <i class="fas fa-external-link-alt"></i>
                   </a>
                 </div>
                 <div class="clearfix"></div>

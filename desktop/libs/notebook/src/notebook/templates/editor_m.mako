@@ -120,7 +120,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
   <div class="clearfix"></div>
 
   <ul class="nav nav-tabs margin-top-20">
-    <li class="active"><a href="#history"><i class="fa fa-clock-o"></i></a></li>
+    <li class="active"><a href="#history"><i class="far fa-clock"></i></a></li>
     <li><a href="#saved"><i class="fa fa-save"></i></a></li>
     <li><a href="#results"><i class="fa fa-table"></i></a></li>
   </ul>

@@ -38,7 +38,7 @@ ${ layout.menubar(section='coordinators') }
 
     <%def name="actions()">
         <button class="btn toolbarBtn" id="restore-btn" disabled="disabled" title="${_('Restore the selected coordinators')}">
-          <i class="fa fa-cloud-upload"></i> ${ _('Restore') }
+          <i class="fas fa-cloud-upload-alt"></i> ${ _('Restore') }
         </button>
         <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled" title="${_('Delete the selected coordinators')}">
           <i class="fa fa-bolt"></i> ${ _('Delete forever') }

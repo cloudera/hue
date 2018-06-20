@@ -241,7 +241,7 @@ ${ assist.assistPanel() }
   <!-- ko if: channelSourceType() -->
     Used to populate <span data-bind="text: channelSinkType"></span> <span data-bind="text: channelSinkPath"></span>
     from <span data-bind="text: channelSourceType"></span> <span data-bind="text: channelSourcePath"></span>
-    via <a href="" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }">jobs <i class="fa fa-external-link"></i></a>
+    via <a href="" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }">jobs <i class="fas fa-external-link-alt"></i></a>
   <!-- /ko -->
   <br/>
   <br/>
@@ -280,7 +280,7 @@ ${ assist.assistPanel() }
           <div class="acl-block acl-block-airy">
             <span class="muted" title="3 months ago">TOPIC</span>
             <span>
-              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fas fa-external-link-alt"></i></a>
             </span>
             <br>
             server=<span>server1</span>
@@ -290,7 +290,7 @@ ${ assist.assistPanel() }
           <div class="acl-block acl-block-airy">
             <span class="muted" title="3 months ago">TOPIC</span>
             <span>
-              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fas fa-external-link-alt"></i></a>
             </span>
             <br>
             server=server1

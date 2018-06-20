@@ -466,7 +466,7 @@
 
       $(".time:not('.input-append')").each(function () {
         $(this).attr("class", "input-mini timepicker-default").wrap($("<div>").addClass("input-append").addClass("date").addClass("bootstrap-timepicker-component"));
-        $("<span>").addClass("add-on").html('<i class="fa fa-clock-o"></i>').appendTo($(this).parent());
+        $("<span>").addClass("add-on").html('<i class="far fa-clock"></i>').appendTo($(this).parent());
       });
 
       $(".timepicker-default").timepicker({

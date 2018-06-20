@@ -53,7 +53,7 @@
               ${ utils.render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
               <div class="btn-group">
                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <i class="fa fa-calendar"></i>
+                  <i class="fas fa-calendar-alt"></i>
                   <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu pull-right" role="menu">

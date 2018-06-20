@@ -701,7 +701,7 @@ ${ components.menubar(is_embeddable) }
       <div class="acl-block acl-block-airy">
         <span class="muted" title="3 months ago">TABLE</span>
         <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fas fa-external-link-alt"></i></a>
         </span>
         <br>
         server=<span>server1</span>
@@ -720,7 +720,7 @@ ${ components.menubar(is_embeddable) }
       <div class="acl-block acl-block-airy">
         <span class="muted" title="3 months ago">TABLE</span>
         <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fas fa-external-link-alt"></i></a>
         </span>
         <br>
         server=server1
@@ -753,7 +753,7 @@ ${ components.menubar(is_embeddable) }
         <span class="muted" title="3 months ago">TABLE</span>
 
         <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fas fa-external-link-alt"></i></a>
         </span>
         <br>
 

@@ -67,7 +67,7 @@ from django.utils.translation import ugettext as _
        <div class="hue-nav-property-add"><a href="javascript: void(0);" title="${ _("Add") }" data-bind="click: addProperty"><i class="fa fa-plus"></i></a></div>
        <div class="hue-nav-properties-edit-actions">
          <a href="javascript: void(0);" title="${ _("Save") }" data-bind="click: saveEdit"><i class="fa fa-check"></i></a>
-         <a href="javascript: void(0);" title="${ _("Cancel") }" data-bind="click: cancelEdit"><i class="fa fa-close"></i></a>
+         <a href="javascript: void(0);" title="${ _("Cancel") }" data-bind="click: cancelEdit"><i class="fas fa-times"></i></a>
        </div>
      </div>
      <!-- /ko -->
