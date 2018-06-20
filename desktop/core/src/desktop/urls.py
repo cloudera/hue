@@ -65,6 +65,7 @@ dynamic_patterns = [
   url(r'^profile$', desktop_auth_views.profile),
   url(r'^login/oauth/?$', desktop_auth_views.oauth_login),
   url(r'^login/oauth_authenticated/?$', desktop_auth_views.oauth_authenticated),
+  url(r'^hue/oidc_failed', desktop_auth_views.oidc_failed),
 ]
 
 if USE_NEW_EDITOR.get():

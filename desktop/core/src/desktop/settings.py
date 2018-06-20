@@ -482,6 +482,7 @@ if is_oidc_configured():
   OIDC_STORE_ACCESS_TOKEN = True
   OIDC_STORE_ID_TOKEN = True
   OIDC_STORE_REFRESH_TOKEN = True
+  OIDC_CREATE_USER = desktop.conf.OIDC.CREATE_USERS_ON_LOGIN.get()
 
 # OAuth
 OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS

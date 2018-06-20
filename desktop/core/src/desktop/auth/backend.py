@@ -48,7 +48,7 @@ from django_auth_ldap.config import LDAPSearch
 import desktop.conf
 from desktop import metrics
 from liboauth.metrics import oauth_authentication_time
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend
+from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
 from mozilla_django_oidc.utils import absolutify, import_from_settings
 
 from useradmin import ldap_access
@@ -626,12 +626,20 @@ class OIDCBackend(OIDCAuthenticationBackend):
     verified_id = self.verify_token(id_token, nonce=nonce)
 
     if verified_id:
+      self.save_refresh_tokens(refresh_token)
       user =  self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
-      self.save_refresh_tokens(refresh_token)
       return user
 
     return None
+
+  def filter_users_by_claims(self, claims):
+    username = claims.get('preferred_username')
+    if not username:
+      return self.UserModel.objects.none()
+    # iexact is equals to SQL 'like', replace % and _ for wildcards
+    username = username.replace('%', '').replace('_', '')
+    return self.UserModel.objects.filter(username__iexact=username)
 
   def save_refresh_tokens(self, refresh_token):
     session = self.request.session
@@ -639,10 +647,55 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if import_from_settings('OIDC_STORE_REFRESH_TOKEN', False):
       session['oidc_refresh_token'] = refresh_token
 
+  def create_user(self, claims):
+    """Return object for a newly created user account."""
+    # Overriding lib's logic, use preferred_username from oidc as username
+
+    username = claims.get('preferred_username', '')
+    email = claims.get('email', '')
+    first_name = claims.get('given_name', '')
+    last_name = claims.get('family_name', '')
+
+    if not username:
+      if not email:
+        LOG.debug("OpenID Connect no username and email while creating new user")
+        return None
+      username = default_username_algo(email)
+
+    return self.UserModel.objects.create_user(username=username, email=email,
+                                              first_name=first_name, last_name=last_name,
+                                              is_superuser=self.is_hue_superuser(claims))
+
+  def get_or_create_user(self, access_token, id_token, verified_id):
+    user = super(OIDCBackend, self).get_or_create_user(access_token, id_token, verified_id)
+    if not user and not import_from_settings('OIDC_CREATE_USER', True):
+      # in this case, user is login from Keycloak, but not allow create
+      self.logout(self.request, next_page=import_from_settings('LOGIN_REDIRECT_URL_FAILURE', '/'))
+    return user
+
   def get_user(self, user_id):
     user = super(OIDCBackend, self).get_user(user_id)
     user = rewrite_user(user)
     return user
+
+  def update_user(self, user, claims):
+    if user.is_superuser != self.is_hue_superuser(claims):
+      user.is_superuser = self.is_hue_superuser(claims)
+      user.save()
+    return user
+
+  def is_hue_superuser(self, claims):
+    """
+    To use this feature, setup in Keycloak:
+      1. add the name of Hue superuser group to superuser_group in hue.ini
+      2. in Keycloak, go to your_realm --> your_clients --> Mappers, add a mapper
+           Mapper Type: Group Membership (this is predefined mapper type)
+           Token Claim Name: group_membership (required exact string)
+    """
+    sueruser_group = '/' + desktop.conf.OIDC.SUPERUSER_GROUP.get()
+    if sueruser_group:
+      return sueruser_group in claims.get('group_membership', [])
+    return False
 
   def logout(self, request, next_page):
     # https://stackoverflow.com/questions/46689034/logout-user-via-keycloak-rest-api-doesnt-work
@@ -667,12 +720,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
       resp = requests.post(oidc_logout_url, data=form, headers=headers, verify=oidc_verify_ssl)
       if resp.status_code >= 200 and resp.status_code < 300:
         LOG.debug("OpenID Connect logout succeed!")
-        del session['oidc_access_token']
-        del session['oidc_id_token']
-        del session['oidc_id_token_expiration']
-        del session['oidc_login_next']
-        del session['oidc_refresh_token']
-        del session['oidc_state']
+        delete_oidc_session_tokens(session)
         auth.logout(request)
         return HttpResponseRedirect(next_page)
       else:
@@ -684,3 +732,19 @@ class OIDCBackend(OIDCAuthenticationBackend):
   # def filter_users_by_claims(self, claims):
 
   # def verify_claims(self, claims):
+
+def delete_oidc_session_tokens(session):
+  if session:
+    if 'oidc_access_token' in session:
+      del session['oidc_access_token']
+    if 'oidc_id_token' in session:
+      del session['oidc_id_token']
+    if 'oidc_id_token_expiration' in session:
+      del session['oidc_id_token_expiration']
+    if 'oidc_login_next' in session:
+      del session['oidc_login_next']
+    if 'oidc_refresh_token' in session:
+      del session['oidc_refresh_token']
+    if 'oidc_state' in session:
+      del session['oidc_state']
+
