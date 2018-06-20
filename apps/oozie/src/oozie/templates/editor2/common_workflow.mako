@@ -569,7 +569,7 @@
 <script type="text/html" id="common-action-transition">
   <!-- ko if: children().length == 2 -->
   <div>
-  OK <i class="fa fa-long-arrow-right"></i>
+  OK <i class="fas fa-long-arrow-alt-right"></i>
   <select data-bind="options: $root.workflow.nodeIds,
       optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
       value: children()[0]['to']
@@ -577,7 +577,7 @@
   </select>
   </div>
   <div class="margin-top-10">
-  KO <i class="fa fa-long-arrow-right"></i>
+  KO <i class="fas fa-long-arrow-alt-right"></i>
   <select data-bind="options: $root.workflow.nodeIds,
      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
    value: children()[1]['error']

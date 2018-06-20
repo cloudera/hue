@@ -254,7 +254,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <div class="btn-group">
         <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
         css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
-          <i class="fa fa-line-chart"></i>
+          <i class="fas fa-chart-line"></i>
         </a>
 
         <!-- ko if: $root.canSave() -->
@@ -1811,7 +1811,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko if: isSqlDialect && ! $root.isPresentationMode() -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
-        <i class="fa fa-fw fa-map-o"></i>
+        <i class="far fa-fw fa-map"></i>
       </a>
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
         <i class="fa fa-caret-down"></i>
@@ -1819,7 +1819,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <ul class="dropdown-menu less-padding">
         <li>
           <a href="javascript:void(0)" data-bind="click: explain, style: { color: ! isReady() || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
-            <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
+            <i class="far fa-fw fa-map"></i> ${_('Explain')}
           </a>
         </li>
         <!-- ko if: formatEnabled -->
@@ -1869,7 +1869,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <i class="hcha fa-fw hcha-timeline-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" title="${ _('Time') }"></i>
         <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" title="${ _('Pie') }"></i>
         <i class="far fa-fw fa-dot-circle" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" title="${ _('Scatter') }"></i>
-        <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" title="${ _('Marker Map') }"></i>
+        <i class="fas fa-fw fa-map-marker-alt" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" title="${ _('Marker Map') }"></i>
         <i class="hcha fa-fw hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" title="${ _('Gradient Map') }"></i>
       </a>
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'active': $data.showChart}">
@@ -1899,7 +1899,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
         <li>
           <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-            <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+            <i class="fas fa-fw fa-map-marker-alt chart-icon"></i> ${_('Marker Map')}
           </a>
         </li>
         <li>

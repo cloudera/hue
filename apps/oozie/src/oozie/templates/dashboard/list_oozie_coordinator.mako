@@ -249,8 +249,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
               <div class="pagination dataTables_paginate">
                 <ul>
-                  <li class="prev"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="prev" data-table="calendar"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
-                  <li class="next"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="next" data-table="calendar">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+                  <li class="prev"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="prev" data-table="calendar"><i class="fas fa-long-arrow-alt-left"></i> ${ _('Previous') }</a></li>
+                  <li class="next"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="next" data-table="calendar">${ _('Next') } <i class="fas fa-long-arrow-alt-right"></i></a></li>
                 </ul>
               </div>
             </div>
@@ -320,8 +320,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
               <div class="pagination dataTables_paginate">
                 <ul>
-                  <li class="prev"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="prev" data-table="actions"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
-                  <li class="next"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="next" data-table="actions">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+                  <li class="prev"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="prev" data-table="actions"><i class="fas fa-long-arrow-alt-left"></i> ${ _('Previous') }</a></li>
+                  <li class="next"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="next" data-table="actions">${ _('Next') } <i class="fas fa-long-arrow-alt-right"></i></a></li>
                 </ul>
               </div>
             </div>

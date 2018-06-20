@@ -104,8 +104,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
     <div class="pagination dataTables_paginate">
       <ul>
-        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="running"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
-        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="running">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="running"><i class="fas fa-long-arrow-alt-left"></i> ${ _('Previous') }</a></li>
+        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="running">${ _('Next') } <i class="fas fa-long-arrow-alt-right"></i></a></li>
       </ul>
     </div>
 
@@ -152,8 +152,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
      <div class="pagination dataTables_paginate">
       <ul>
-        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="completed"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
-        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="completed">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="completed"><i class="fas fa-long-arrow-alt-left"></i> ${ _('Previous') }</a></li>
+        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="completed">${ _('Next') } <i class="fas fa-long-arrow-alt-right"></i></a></li>
       </ul>
      </div>
 

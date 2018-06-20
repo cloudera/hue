@@ -706,15 +706,15 @@ ${ components.menubar(is_embeddable) }
         <br>
         server=<span>server1</span>
         <span>
-          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
+          <i class="fas fa-long-arrow-alt-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
         </span>
         <span>
-          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
+          <i class="fas fa-long-arrow-alt-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
         </span>
         <span style="display: none;">
-          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+          <i class="fas fa-long-arrow-alt-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
         </span>
-        <i class="fa fa-long-arrow-right"></i> action=INSERT
+        <i class="fas fa-long-arrow-alt-right"></i> action=INSERT
       </div>
 
       <div class="acl-block acl-block-airy">
@@ -725,16 +725,16 @@ ${ components.menubar(is_embeddable) }
         <br>
         server=server1
         <span>
-          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
+          <i class="fas fa-long-arrow-alt-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
         </span>
         <span>
-          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
+          <i class="fas fa-long-arrow-alt-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
         </span>
         <span style="display: none;">
-          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+          <i class="fas fa-long-arrow-alt-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
         </span>
 
-        <i class="fa fa-long-arrow-right"></i> action=<span>SELECT</span>
+        <i class="fas fa-long-arrow-alt-right"></i> action=<span>SELECT</span>
       </div>
     </div>
 
@@ -760,16 +760,16 @@ ${ components.menubar(is_embeddable) }
         server=server1
 
           <span>
-            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
+            <i class="fas fa-long-arrow-alt-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
           </span>
           <span>
-            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
+            <i class="fas fa-long-arrow-alt-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
           </span>
           <span style="display: none;">
-            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+            <i class="fas fa-long-arrow-alt-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
           </span>
 
-        <i class="fa fa-long-arrow-right"></i> action=<span>ALL</span>
+        <i class="fas fa-long-arrow-alt-right"></i> action=<span>ALL</span>
       </div>
       <div class="acl-block acl-actions">
         <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>

@@ -56,7 +56,7 @@
     <a href="javascript: magicSearchLayout(searchViewModel)" title="${ _('Dynamic dashboard: multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
-        <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
+        <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fas fa-chart-line"></i></div>
       </div>
     </a>
     <a href="javascript: fullLayout(searchViewModel)" title="${ _('Empty dashboard that can be used as a starting point') }" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
@@ -148,7 +148,7 @@
             <i class="fa fa-filter"></i>
           </div>
           <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
-            <i class="fa fa-line-chart" style="font-size: 120px"></i><br/>
+            <i class="fas fa-chart-line" style="font-size: 120px"></i><br/>
             <div style="font-size: 80px; padding-top: 20px">${ _('Dashboard') }</div>
           </div>
         </div>
@@ -255,9 +255,9 @@
                         <!-- ko case: ko.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fas fa-fw fa-chart-line"></i> ${_('Timeline')}<!-- /ko -->
                         <!-- ko case: ko.HUE_CHARTS.TYPES.GRADIENTMAP --><i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.MAP --><i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
+                        <!-- ko case: ko.HUE_CHARTS.TYPES.MAP --><i class="fas fa-fw fa-map-marker-alt chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
                       <!-- /ko -->
                     </a>
                     <ul class="dropdown-menu">
@@ -288,7 +288,7 @@
                       <li>
                         <a href="javascript:void(0)"
                            data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TIMELINECHART); }">
-                          <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
+                          <i class="fas fa-fw fa-chart-line"></i> ${_('Timeline')}
                         </a>
                       </li>
                       <li>
@@ -300,7 +300,7 @@
                       <li>
                         <a href="javascript:void(0)"
                            data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.MAP); }">
-                          <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+                          <i class="fas fa-fw fa-map-marker-alt chart-icon"></i> ${_('Marker Map')}
                         </a>
                       </li>
                     </ul>

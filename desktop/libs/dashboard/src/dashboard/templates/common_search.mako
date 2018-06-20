@@ -263,7 +263,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggableLeafletMap() }) }"
          title="${_('Marker Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: 'move' }">
-             <i class="fa fa-map-marker"></i>
+             <i class="fas fa-map-marker-alt"></i>
          </a>
     </div>
       </%def>
@@ -376,7 +376,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggableTimeline() }) }"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableTimeline() ? 'move' : 'default' }">
-                       <i class="fa fa-line-chart"></i>
+                       <i class="fas fa-chart-line"></i>
          </a>
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
@@ -1396,9 +1396,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
             % endif
             <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
             <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
-            <i class="fa fa-fw fa-line-chart" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" style="display: none;"></i>
+            <i class="fas fa-fw fa-chart-line" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" style="display: none;"></i>
             <i class="hcha hcha-map-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" style="display: none;"></i>
-            <i class="fa fa-fw fa-map-marker" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" style="display: none;"></i>
+            <i class="fas fa-fw fa-map-marker-alt" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" style="display: none;"></i>
           </a>
           <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
              href="javascript: void(0)" data-bind="css: {'active': template.showChart()}">
@@ -1437,7 +1437,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TIMELINECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
-                <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
+                <i class="fas fa-fw fa-chart-line"></i> ${_('Timeline')}
               </a>
             </li>
             <li>
@@ -1449,7 +1449,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
-                <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+                <i class="fas fa-fw fa-map-marker-alt chart-icon"></i> ${_('Marker Map')}
               </a>
             </li>
           </ul>
@@ -2874,7 +2874,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <span data-bind="visible: $root.availableDateFields().length > 0" class="muted" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal" style="cursor:pointer">
     &nbsp;
     <span data-bind="text: moment($root.collection.timeFilter.from()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
-    <i class="fa fa-long-arrow-right"></i>
+    <i class="fas fa-long-arrow-alt-right"></i>
     <span data-bind="text: moment($root.collection.timeFilter.to()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
   </span>
 </script>
@@ -3206,7 +3206,7 @@ function prettifyDateRange(from, to, widget, withCommon) {
       _format = getFormat(_format, _minMaxDiff, widget);
     }
 
-    return ((_common != "" && withCommon) ? _mFrom.utc().format(_common) + "&nbsp;" : "") + _mFrom.utc().format(withCommon ? _formatWithCommon : _format) + " <i class='fa fa-long-arrow-right'></i> " + ((_common != "" && withCommon) ? _mTo.utc().format(_common) + "&nbsp;" : "") + _mTo.utc().format(withCommon ? _formatWithCommon : _format);
+    return ((_common != "" && withCommon) ? _mFrom.utc().format(_common) + "&nbsp;" : "") + _mFrom.utc().format(withCommon ? _formatWithCommon : _format) + " <i class='fas fa-long-arrow-alt-right'></i> " + ((_common != "" && withCommon) ? _mTo.utc().format(_common) + "&nbsp;" : "") + _mTo.utc().format(withCommon ? _formatWithCommon : _format);
   }
   else {
     return from + " - " + to;

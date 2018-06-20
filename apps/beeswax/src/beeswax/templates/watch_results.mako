@@ -234,7 +234,7 @@ ${layout.menubar(section='query')}
             <div class="btn-group" data-toggle="buttons-radio">
               <a rel="tooltip" data-placement="top" title="${_('Bars')}" id="blueprintBars" href="javascript:void(0)" class="btn"><i class="far fa-chart-bar"></i></a>
               <a rel="tooltip" data-placement="top" title="${_('Lines')}" id="blueprintLines" href="javascript:void(0)" class="btn"><i class="fa fa-signal"></i></a>
-              <a rel="tooltip" data-placement="top" title="${_('Map')}" id="blueprintMap" href="javascript:void(0)" class="btn"><i class="fa fa-map-marker"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Map')}" id="blueprintMap" href="javascript:void(0)" class="btn"><i class="fas fa-map-marker-alt"></i></a>
             </div>&nbsp;&nbsp;
             <span id="blueprintAxis" class="hide">
               <label>${_('X-Axis')}

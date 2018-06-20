@@ -284,7 +284,7 @@ ${ assist.assistPanel() }
             </span>
             <br>
             server=<span>server1</span>
-            <i class="fa fa-long-arrow-right"></i> action=READ
+            <i class="fas fa-long-arrow-alt-right"></i> action=READ
           </div>
 
           <div class="acl-block acl-block-airy">
@@ -294,7 +294,7 @@ ${ assist.assistPanel() }
             </span>
             <br>
             server=server1
-            <i class="fa fa-long-arrow-right"></i> action=<span>WRITE</span>
+            <i class="fas fa-long-arrow-alt-right"></i> action=<span>WRITE</span>
           </div>
         </div>
       </div>

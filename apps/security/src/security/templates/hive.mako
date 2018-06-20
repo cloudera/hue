@@ -107,21 +107,21 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
 
     <!-- ko if: privilegeType() == 'db' -->
       <span data-bind="visible: dbName">
-        <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }" title="${ _('Browse db privileges') }"><span data-bind="text: dbName"></span></a>
+        <i class="fas fa-long-arrow-alt-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }" title="${ _('Browse db privileges') }"><span data-bind="text: dbName"></span></a>
       </span>
       <span data-bind="visible: tableName">
-        <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName()) }" title="${ _('Browse table privileges') }"><span data-bind="text: tableName"></span></a>
+        <i class="fas fa-long-arrow-alt-right"></i> table=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName()) }" title="${ _('Browse table privileges') }"><span data-bind="text: tableName"></span></a>
       </span>
       <span data-bind="visible: columnName">
-        <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }" title="${ _('Browse column privileges') }"><span data-bind="text: columnName"></span></a>
+        <i class="fas fa-long-arrow-alt-right"></i> column=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }" title="${ _('Browse column privileges') }"><span data-bind="text: columnName"></span></a>
       </span>
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-long-arrow-right"></i> <i class="far fa-file"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]"><span data-bind="text: URI"></span></a>
+      <i class="fas fa-long-arrow-alt-right"></i> <i class="far fa-file"></i> <i class="fas fa-long-arrow-alt-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
-    <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
+    <i class="fas fa-long-arrow-alt-right"></i> action=<span data-bind="text: action"></span>
 
   <!-- /ko -->
 </div>
@@ -497,11 +497,11 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
           <li data-bind="visible: path.indexOf('.') > -1" class="force-word-break">
             <i class="fa fa-database muted"></i>
             <span data-bind="text: path.split('.')[0]"></span>
-            <i class="fa fa-long-arrow-right muted"></i>
+            <i class="fas fa-long-arrow-alt-right muted"></i>
             <i class="fa fa-table muted"></i>
             <span data-bind="text: path.split('.')[1]"></span>
             <span data-bind="visible: path.split('.')[2]">
-              <i class="fa fa-long-arrow-right muted"></i>
+              <i class="fas fa-long-arrow-alt-right muted"></i>
               <i class="fa fa-columns muted"></i>
               <span data-bind="text: path.split('.')[2]"></span>
             </span>
