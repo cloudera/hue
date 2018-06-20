@@ -37,14 +37,16 @@ DATE_FORMAT = "%Y-%m-%d"
 def _exec(service, command, parameters=None):
   if parameters is None:
     parameters = {}
-  
+
   if service == 'analyticdb':
     hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
   elif service == 'dataeng':
     hostname = ALTUS.HOSTNAME_DATAENG.get()
+  elif service == 'wa':
+    hostname = ALTUS.HOSTNAME_WA.get()
   else:
     hostname = ALTUS.HOSTNAME.get()
-    
+
   try:
     api = ApiLib(service, hostname, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
     resp = api.call_api(command, parameters)
