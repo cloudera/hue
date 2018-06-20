@@ -1353,6 +1353,19 @@ OIDC = ConfigSection(
       default="https://localhost:8888/hue/oidc_failed/"
     ),
 
+    CREATE_USERS_ON_LOGIN=Config(
+      key="create_users_on_login",
+      help=_("Create a new user from OpenID Connect on login if it doesn't exist."),
+      type=coerce_bool,
+      default=True
+    ),
+
+    SUPERUSER_GROUP=Config(
+      key="superuser_group",
+      help=_("The group of users will be created and updated as superuser."),
+      type=str,
+      default=""
+    ),
   )
 )
 

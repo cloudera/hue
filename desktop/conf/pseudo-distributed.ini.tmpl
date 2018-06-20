@@ -757,6 +757,16 @@
     # As relay party Hue URL path to redirect to after login
     ## login_redirect_url_failure=https://localhost:8888/hue/oidc_failed/
 
+    # Create a new user from OpenID Connect on login if it doesn't exist
+    ## create_users_on_login=true
+
+    # The group of users will be created and updated as superuser. To use this feature, setup in Keycloak:
+    # 1. add the name of the group here
+    # 2. in Keycloak, go to your_realm --> your_clients --> Mappers, add a mapper
+    #      Mapper Type: Group Membership (this is predefined mapper type)
+    #      Token Claim Name: group_membership (required exact string)
+    ## superuser_group=hue_superusers
+
   # Configuration options for Metrics
   # ------------------------------------------------------------------------
   [[metrics]]

@@ -36,6 +36,7 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
 from desktop.auth import forms as auth_forms
+from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
@@ -269,4 +270,11 @@ def oauth_authenticated(request):
 
   redirect_to = request.GET.get('next', '/')
   return HttpResponseRedirect(redirect_to)
+
+@login_notrequired
+def oidc_failed(request):
+  if request.user.is_authenticated():
+    return HttpResponseRedirect('/')
+  access_warn(request, "401 Unauthorized by oidc")
+  return render("oidc_failed.mako", request, dict(uri=request.build_absolute_uri()), status=401)
 
