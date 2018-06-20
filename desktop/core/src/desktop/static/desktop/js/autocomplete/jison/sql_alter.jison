@@ -29,6 +29,7 @@ AlterStatement
  | AlterView
  | Msck
  | ReloadFunction
+ | CommentOn
  ;
 
 AlterStatement_EDIT
@@ -38,6 +39,7 @@ AlterStatement_EDIT
  | AlterView_EDIT
  | Msck_EDIT
  | ReloadFunction_EDIT
+ | CommentOn_EDIT
  | 'ALTER' 'CURSOR'
    {
      if (parser.isHive()) {
@@ -1058,4 +1060,41 @@ ReloadFunction_EDIT
    {
      parser.suggestKeywords(['FUNCTION']);
    }
+ ;
+
+CommentOn
+ : '<impala>COMMENT' 'ON' 'DATABASE' RegularOrBacktickedIdentifier 'IS' NullableComment
+   {
+     parser.addDatabaseLocation(@4, [ { name: $4 } ]);
+   }
+ ;
+
+CommentOn_EDIT
+ : '<impala>COMMENT' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON DATABASE']);
+   }
+ | '<impala>COMMENT' 'ON' 'CURSOR'
+   {
+     parser.suggestKeywords(['DATABASE']);
+   }
+ | '<impala>COMMENT' 'ON' 'DATABASE' 'CURSOR'
+   {
+     parser.suggestDatabases();
+   }
+ | '<impala>COMMENT' 'ON' 'DATABASE' RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     parser.addDatabaseLocation(@4, [ { name: $4 } ]);
+     parser.suggestKeywords(['IS']);
+   }
+ | '<impala>COMMENT' 'ON' 'DATABASE' RegularOrBacktickedIdentifier 'IS' 'CURSOR'
+   {
+     parser.addDatabaseLocation(@4, [ { name: $4 } ]);
+     parser.suggestKeywords(['NULL']);
+   }
+ ;
+
+NullableComment
+ : QuotedValue
+ | 'NULL'
  ;

@@ -279,7 +279,7 @@ var SqlSetOptions = (function () {
       },
       'PARQUET_FALLBACK_SCHEMA_RESOLUTION': {
         description: 'Allows Impala to look up columns within Parquet files by column name, rather than column order, when necessary.',
-        type: 'integer or string. Allowed values are 0 or position, 1 or name.',
+        type: 'integer or string. Allowed values are 0 for POSITION and 1 for NAME.',
         default: '0'
       },
       'PARQUET_FILE_SIZE': {
@@ -303,8 +303,8 @@ var SqlSetOptions = (function () {
         default: 'empty (use the user-to-pool mapping defined by an impalad startup option in the Impala configuration file)'
       },
       'REPLICA_PREFERENCE': {
-        description: 'The REPLICA_PREFERENCE query option lets you spread the load more evenly if hotspots and bottlenecks persist, by allowing hosts to do local reads, or even remote reads, to retrieve the data for cached blocks if Impala can determine that it would be too expensive to do all such processing on a particular host.',
-        type: 'Numeric (0, 3, 5) or corresponding mnemonic strings (CACHE_LOCAL, DISK_LOCAL, REMOTE). The gaps in the numeric sequence are to accomodate other intermediate values that might be added in the future.',
+        description: 'The REPLICA_PREFERENCE query option lets you distribute the work more evenly if hotspots and bottlenecks persist. It causes the access cost of all replicas of a data block to be considered equal to or worse than the configured value. This allows Impala to schedule reads to suboptimal replicas (e.g. local in the presence of cached ones) in order to distribute the work across more executor nodes.',
+        type: 'Numeric (0, 2, 4) or corresponding mnemonic strings (CACHE_LOCAL, DISK_LOCAL, REMOTE). The gaps in the numeric sequence are to accomodate other intermediate values that might be added in the future.',
         default: '0 (equivalent to CACHE_LOCAL)'
       },
       'RUNTIME_BLOOM_FILTER_SIZE': {
@@ -1009,6 +1009,13 @@ var SqlFunctions = (function () {
         signature: 'mod(T a, T b)',
         draggable: 'mod()',
         description: 'Returns the modulus of a number. Equivalent to the % arithmetic operator. Works with any size integer type, any size floating-point type, and DECIMAL with any precision and scale.'
+      },
+      murmur_hash: {
+        returnTypes: ['BIGINT'],
+        arguments: [[{type: 'T'}]],
+        signature: 'murmur_hash(T a)',
+        draggable: 'murmur_hash()',
+        description: 'Returns a consistent 64-bit value derived from the input argument, for convenience of implementing MurmurHash2 non-cryptographic hash function.'
       },
       negative: {
         returnTypes: ['T'],
@@ -2039,6 +2046,13 @@ var SqlFunctions = (function () {
 				draggable: 'month()',
         description: 'Returns the month field, represented as an integer, from the date portion of a TIMESTAMP.'
       },
+      monthname: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'monthname(TIMESTAMP date)',
+        draggable: 'monthname()',
+        description: 'Returns the month field from TIMESTAMP value, converted to the string corresponding to that month name.'
+      },
       months_add: {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'BIGINT'}, {type: 'INT'}]],
@@ -2080,6 +2094,13 @@ var SqlFunctions = (function () {
         signature: 'now()',
 				draggable: 'now()',
         description: 'Returns the current date and time (in the local time zone) as a timestamp value.'
+      },
+      quarter: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'quarter(TIMESTAMP date)',
+        draggable: 'quarter()',
+        description: 'Returns the quarter in the input TIMESTAMP expression as an integer value, 1, 2, 3, or 4, where 1 represents January 1 through March 31.'
       },
       second: {
         returnTypes: ['INT'],
@@ -2819,6 +2840,13 @@ var SqlFunctions = (function () {
 				draggable: 'instr()',
         description: 'Returns the position (starting from 1) of the first occurrence of a substring within a longer string. The optional third and fourth arguments let you find instances of the substring other than the first instance starting from the left.'
       },
+      left: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT'}]],
+        signature: 'left(STRING a, INT num_chars)',
+        draggable: 'left()',
+        description: 'Returns the leftmost characters of the string. Same as strleft().'
+      },
       length: {
         returnTypes: ['INT'],
         arguments: [[{type: 'STRING'}]],
@@ -2856,10 +2884,10 @@ var SqlFunctions = (function () {
       },
       ltrim: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'ltrim(STRING a)',
+        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        signature: 'ltrim(STRING a [, STRING charsToTrim])',
 				draggable: 'ltrim()',
-        description: 'Returns the argument string with any leading spaces removed from the left side.'
+        description: 'Returns the argument string with all occurrences of characters specified by the second argument removed from the left side. Removes spaces if the second argument is not specified.'
       },
       parse_url: {
         returnTypes: ['STRING'],
@@ -2917,6 +2945,13 @@ var SqlFunctions = (function () {
 				draggable: 'reverse()',
         description: 'Returns the argument string with characters in reversed order.'
       },
+      right: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT'}]],
+        signature: 'right(STRING a, INT num_chars)',
+        draggable: 'right()',
+        description: 'Returns the rightmost characters of the string. Same as strright().'
+      },
       rpad: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING'}], [{type: 'INT'}], [{type: 'STRING'}]],
@@ -2926,10 +2961,10 @@ var SqlFunctions = (function () {
       },
       rtrim: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'rtrim(STRING a)',
+        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        signature: 'rtrim(STRING a [, STRING charsToTrim])',
 				draggable: 'rtrim()',
-        description: 'Returns the argument string with any trailing spaces removed from the right side.'
+        description: 'Returns the argument string with all occurrences of characters specified by the second argument removed from the right side. Removes spaces if the second argument is not specified.'
       },
       space: {
         returnTypes: ['STRING'],

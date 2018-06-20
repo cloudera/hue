@@ -217,7 +217,7 @@
 <impala>'CLOSE_FN'                         { return '<impala>CLOSE_FN'; }
 <impala>'COLUMN'                           { return '<impala>COLUMN'; }
 <impala>'COLUMNS'                          { return '<impala>COLUMNS'; }
-<impala>'COMMENT'                          { return '<impala>COMMENT'; }
+<impala>'COMMENT'                          { parser.determineCase(yytext); return '<impala>COMMENT'; }
 <impala>'COMPUTE'                          { parser.determineCase(yytext); return '<impala>COMPUTE'; }
 <impala>'CREATE'                           { parser.determineCase(yytext); return '<impala>CREATE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
