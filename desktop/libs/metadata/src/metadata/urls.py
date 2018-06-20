@@ -69,4 +69,5 @@ urlpatterns += [
 # Workload Analytics API
 urlpatterns += [
   url(r'^api/workload_analytics/get_operation_execution_details/?$', metadata_workload_analytics_api.get_operation_execution_details, name='get_operation_execution_details'),
+  url(r'^api/workload_analytics/get_impala_query/?$', metadata_workload_analytics_api.get_impala_query, name='get_impala_query'),
 ]

@@ -16,31 +16,13 @@
 # limitations under the License.
 
 import logging
-import json
-import subprocess
 
 from django.utils.translation import ugettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
+from notebook.connectors.altus import _exec
 
 
 LOG = logging.getLogger(__name__)
-
-
-def _exec(args):
-  try:
-    data = subprocess.check_output([
-        'altus',
-        'wa',
-       ] +
-       args
-    )
-  except Exception, e:
-    raise PopupException(e, title=_('Error accessing'))
-
-  response = json.loads(data)
-
-  return response
 
 
 class WorkfloadAnalyticsClient():
@@ -54,20 +36,31 @@ class WorkfloadAnalyticsClient():
   def get_mr_task_attempt_log(self, operation_execution_id, attempt_id):
     return WorkloadAnalytics(self.user).get_mr_task_attempt_log(operation_execution_id=operation_execution_id, attempt_id=attempt_id)
 
+  def get_impala_query(self, cluster_id, query_id):
+    return WorkloadAnalytics(self.user).get_impala_query(cluster_id=cluster_id, query_id=query_id)
+
+
 
 class WorkloadAnalytics():
 
   def __init__(self, user): pass
 
+  def get_impala_query(self, cluster_id, query_id):
+    parameters = {'clusterId': cluster_id, 'queryId': query_id}
+
+    return _exec('wa', 'getImpalaQuery', parameters=parameters)
+
+
   def get_operation_execution_details(self, operation_id, include_tree=False):
-    args = ['get-operation-execution-details', '--id', operation_id]
+    parameters = {'id': operation_id}
 
     if include_tree:
-      args.append('--include-tree')
+      parameters['includeTree'] = ''
 
-    return _exec(args)
+    return _exec('wa', 'getOperationExecutionDetails', parameters=parameters)
+
 
   def get_mr_task_attempt_log(self, operation_execution_id, attempt_id):
-    args = ['get-mr-task-attempt-log', '--operation-execution-id', operation_execution_id, '--attempt-id', attempt_id]
+    parameters = {'operationExecutionId': operation_execution_id, 'attemptId': attempt_id}
 
-    return _exec(args)
+    return _exec('wa', 'getMrTaskAttemptLog', parameters=parameters)

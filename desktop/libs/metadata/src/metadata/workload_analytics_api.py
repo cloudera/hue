@@ -46,6 +46,27 @@ def error_handler(view_fn):
 
 @require_POST
 @error_handler
+def get_impala_query(request):
+  response = {'status': -1}
+
+  cluster_id = json.loads(request.POST.get('cluster_id'))
+  query_id = json.loads(request.POST.get('query_id'))
+
+  client = WorkfloadAnalyticsClient(request.user)
+  data = client.get_impala_query(cluster_id=cluster_id, query_id=query_id)
+
+  if data:
+    response['status'] = 0
+    response['data'] = data
+  else:
+    response['message'] = 'Workload Analytics: %s' % data['details']
+
+  return JsonResponse(response)
+
+
+
+@require_POST
+@error_handler
 def get_operation_execution_details(request):
   response = {'status': -1}
 
