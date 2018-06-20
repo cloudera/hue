@@ -407,7 +407,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
+            suggestKeywords: ['ALTER', 'COMMENT ON', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'GRANT', 'INSERT', 'INVALIDATE METADATA', 'LOAD', 'REFRESH',
               'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'UPSERT', 'USE', 'WITH']
           }

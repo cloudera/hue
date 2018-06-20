@@ -2620,6 +2620,106 @@
           }
         });
       });
+    });
+
+    describe('COMMENT ON', function () {
+      it('should handle "COMMENT ON DATABASE boo IS \'foo\';|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMMENT ON DATABASE boo IS \'foo\';',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "COMMENT ON DATABASE boo IS NULL;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMMENT ON DATABASE boo IS NULL;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['COMMENT ON'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "comment |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'comment ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['ON DATABASE']
+          }
+        });
+      });
+
+      it('should suggest keywords for "comment on |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'comment on ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['DATABASE']
+          }
+        });
+      });
+
+      it('should suggest datagbase for "COMMENT ON DATABASE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMMENT ON DATABASE ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: {}
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMMENT ON DATABASE bar |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMMENT ON DATABASE bar ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMMENT ON DATABASE bar IS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMMENT ON DATABASE bar IS ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NULL']
+          }
+        });
+      });
     })
   });
 })();
