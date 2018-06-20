@@ -45,7 +45,7 @@ ${ layout.menubar(section='workflows') }
         <li><a href="#properties"><i class="fa fa-cog"></i> ${ _('Properties') }</a></li>
         % if user_can_edit_job:
           <li>
-            <a data-bind="attr: {href: '/filebrowser/view=' + fixLeadingSlash(deployment_dir()) }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="fa fa-folder-open"></i> ${ _('Workspace') }</a>
+            <a data-bind="attr: {href: '/filebrowser/view=' + fixLeadingSlash(deployment_dir()) }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="far fa-folderpen"></i> ${ _('Workspace') }</a>
           </li>
         % endif
 
@@ -70,7 +70,7 @@ ${ layout.menubar(section='workflows') }
             <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="fas fa-calendar-alt"></i> ${ _('Schedule') }</a>
           </li>
           <li>
-            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-files-o"></i> ${ _('Copy') }</a>
+            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="far fa-copy"></i> ${ _('Copy') }</a>
           </li>
           <li>
             <a id="export-btn" href="${ url('oozie:export_workflow', workflow=workflow.id) }" title="${ _('Export this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-upload"></i> ${ _('Export') }</a>
@@ -505,7 +505,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
       <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-cogs"></i> &nbsp;
         <strong style="color:#999" data-bind="text: node_type"></strong>
         &nbsp;&nbsp;
-        <button type="button" class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="fa fa-files-o"></i></button>
+        <button type="button" class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="far fa-copy"></i></button>
         <button type="button" class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="fa fa-trash-o"></i></button>
       </a>
       </li>

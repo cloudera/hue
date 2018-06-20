@@ -55,7 +55,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <ul class="dropdown-menu">
         <li>
           <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_bundle') }'">
-            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+            <i class="far fa-fw fa-file"></i> ${ _('New') }
           </a>
         </li>
         %if is_embeddable:

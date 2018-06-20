@@ -88,7 +88,7 @@ ${ assist.assistPanel() }
 
             <h3>
               <div class="inline-block pull-right" style="margin-top: -8px">
-                <a href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}" class="inactive-action"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
+                <a href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}" class="inactive-action"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="far fa-file fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
               </div>
               <ul id="breadcrumbs" class="nav nav-pills hue-breadcrumbs-bar">
                 <li>

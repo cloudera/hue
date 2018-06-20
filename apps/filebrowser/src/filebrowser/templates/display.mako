@@ -80,7 +80,7 @@ ${ fb_components.menubar() }
           <!-- ko if: $root.file().show_download_button -->
            <li><a class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-download"></i> ${_('Download')}</a></li>
           <!-- /ko -->
-           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
+           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fas fa-file-alt"></i> ${_('View file location')}</a></li>
            <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
           <!-- /ko -->
 
@@ -116,10 +116,10 @@ ${ fb_components.menubar() }
             </div>
             <div class="pagination inline">
               <ul>
-                <li class="first-page prev" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
+                <li class="first-page prev" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fab fa-font-awesomest-backward"></i></a></li>
                 <li class="previous-page" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
                 <li class="next-page" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
-                <li class="last-page next" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a></li>
+                <li class="last-page next" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fab fa-font-awesomest-forward"></i></a></li>
               </ul>
             </div>
           </div>

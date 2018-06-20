@@ -144,7 +144,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
 
                   <ul class="nav nav-tabs">
                     <li data-bind="css: {'active': ! $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(false); }"><i class="fa fa-pencil"></i> ${ _('Edit') }</a></li>
-                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fa fa-header"></i> ${ _('View as text') }</a></li>
+                    <li data-bind="css: {'active': $root.assist.showAclsAsText()}"><a class="pointer" data-bind="click: function() { $root.assist.showAclsAsText(true); }"><i class="fas fa-heading"></i> ${ _('View as text') }</a></li>
                   </ul>
 
                   <div class="acl-panel-content">

@@ -245,7 +245,7 @@ ${ hueIcons.symbols() }
             <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/edit/${ user.username }'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
             % endif
             % if user.is_superuser:
-            <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+            <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fas fa-fw fa-users"></i> ${_('Manage Users')}</a></li>
             % endif
             % if not conf.DISABLE_HUE_3.get():
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fas fa-fw fa-exchange-alt"></i> ${_('Switch to Hue 3')}</a></li>

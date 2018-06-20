@@ -96,7 +96,7 @@
       })
     }
 
-    var _tree = $("<ul>").addClass("content unstyled").html('<li><a class="pointer"><i class="fa fa-folder-open-o"></i> /</a></li>');
+    var _tree = $("<ul>").addClass("content unstyled").html('<li><a class="pointer"><i class="far fa-folder-open"></i> /</a></li>');
     if (_this.options.withTopPadding) {
       _tree.css("padding-top", "30px");
     }
@@ -178,7 +178,7 @@
               var filteredPath = _this.options.isS3 ? _path.substr(5) : _path;
               var _escapedPath = escapeSingleQuote(filteredPath);
               if (_el.find("[data-path='" + removeLeadingSlash(_escapedPath) + "']").length == 0) {
-                var _li = $("<li>").html('<a class="pointer"><i class="fa fa-folder-o"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + removeLeadingSlash(_escapedPath) + '" data-loaded="false"></ul>');
+                var _li = $("<li>").html('<a class="pointer"><i class="far fa-folder"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + removeLeadingSlash(_escapedPath) + '" data-loaded="false"></ul>');
                 var _destination = filteredPath.substr(0, filteredPath.lastIndexOf("/"));
                 if (_destination == "") {
                   _destination = "__JHUEHDFSTREE__ROOT__";

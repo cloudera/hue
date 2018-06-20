@@ -183,7 +183,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'java-widget' || widgetType() == 'java-document-widget' -->
-      <a class="widget-icon"><i class="fa fa-file-code-o"></i></a>
+      <a class="widget-icon"><i class="far fa-file-code"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'sqoop-widget' || widgetType() == 'sqoop-document-widget' -->
@@ -191,7 +191,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'mapreduce-widget' || widgetType() == 'mapreduce-document-widget' -->
-      <a class="widget-icon"><i class="fa fa-file-archive-o"></i></a>
+      <a class="widget-icon"><i class="far fa-file-archive"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'subworkflow-widget' -->
@@ -207,7 +207,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'fs-widget' -->
-      <a class="widget-icon"><i class="fa fa-file-o"></i></a>
+      <a class="widget-icon"><i class="far fa-file"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'email-widget' -->
@@ -219,7 +219,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'distcp-widget' || widgetType() == 'distcp-document-widget' -->
-      <a class="widget-icon"><i class="fa fa-files-o"></i></a>
+      <a class="widget-icon"><i class="far fa-copy"></i></a>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'spark-widget' || widgetType() == 'spark-document-widget' -->

@@ -48,7 +48,7 @@ ${layout.menubar(section='my queries')}
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <button id="viewBtn" class="btn toolbarBtn" title="${_('View the result of the selected')}" disabled="disabled"><i class="fa fa-eye"></i> ${_('View result')}</button>
           <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="fa fa-edit"></i> ${_('Edit')}</button>
-          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="far fa-copy"></i> ${_('Copy')}</button>
           <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="fa fa-tasks"></i> ${_('Usage history')}</button>
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
             <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>

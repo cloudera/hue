@@ -54,7 +54,7 @@
       <%def name="actions()">
         %if not is_mobile:
         <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': selectedCollections().length == 0}">
-          <i class="fa fa-files-o"></i> ${_('Copy')}
+          <i class="far fa-copy"></i> ${_('Copy')}
         </a>
 
         <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">

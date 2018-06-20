@@ -62,7 +62,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
           <%def name="actions()">
               <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="fa fa-play"></i> ${_('Run')}</button>
-              <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+              <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="far fa-copy"></i> ${_('Copy')}</button>
               <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
           </%def>
 
@@ -130,7 +130,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
               </li>
               <li data-bind="click: saveScript, visible: currentScript().can_write()">
                 <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
-                  <i class="fa fa-floppy-o"></i> ${ _('Save') }
+                  <i class="far fa-save"></i> ${ _('Save') }
                 </a>
               </li>
 
@@ -161,7 +161,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
               </li>
               <li data-bind="visible: currentScript().id() != -1, click: copyScript">
                 <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
-                  <i class="fa fa-files-o"></i> ${ _('Copy') }
+                  <i class="far fa-copy"></i> ${ _('Copy') }
                 </a>
               </li>
               <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">

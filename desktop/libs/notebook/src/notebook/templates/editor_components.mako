@@ -196,7 +196,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               </a>
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
-              <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
+              <i class="far fa-file-alt app-icon" style="vertical-align: middle"></i>
                 Notebook
               <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'notebook' }} --><!-- /ko -->
             <!-- /ko -->
@@ -211,16 +211,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </li>
           <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('Open directory of this query') }" data-bind="hueLink: '/home/?uuid=' + directoryUuid()"
-              class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
+              class="pointer inactive-action" href="javascript:void(0)"><i class="far fa-fw fa-folder"></i>
             </a>
           </li>
           <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
-              <i class="fa fa-fw fa-file-o"></i>
+              <i class="far fa-fw fa-file"></i>
             </a>
           </li>
           <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
+            <a title="${ _('This is a saved query') }"><i class="far fa-fw fa-file"></i></a>
           </li>
           <li data-bind="visible: isSchedulerJobRunning" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
@@ -274,7 +274,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     % if IS_EMBEDDED.get():
       <div class="btn-group">
         <a class="btn" rel="tooltip" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
-          <i class="fa fa-fw fa-file-o"></i>
+          <i class="far fa-fw fa-file"></i>
         </a>
       </div>
       <div class="btn-group">
@@ -311,12 +311,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <li>
           <!-- ko if: editorMode -->
             <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
-              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+              <i class="far fa-fw fa-file"></i> ${ _('New') }
             </a>
           <!-- /ko -->
           <!-- ko ifnot: editorMode -->
             <a href="javascript:void(0)" data-bind="click: newNotebook">
-              <i class="fa fa-fw fa-file-o"></i> ${ _('New Notebook') }
+              <i class="far fa-fw fa-file"></i> ${ _('New Notebook') }
             </a>
           <!-- /ko -->
           </li>
@@ -1219,7 +1219,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </li>
       <li>
         <a href="javascript:void(0)" data-bind="click: displayCombinedContent, visible: ! $root.isPresentationMode() ">
-          <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
+          <i class="far fa-fw fa-file-alt"></i> ${ _('Show all content') }
         </a>
       </li>
     </ul>

@@ -352,7 +352,7 @@ ${ hueIcons.symbols() }
         </a>
       </li>
         % if user.is_superuser:
-          <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+          <li><a href="${ url('useradmin.views.list_users') }"><i class="fas fa-fw fa-users"></i> ${_('Manage Users')}</a></li>
         % endif
       % endif
       % if conf.IS_HUE_4.get():
@@ -445,12 +445,12 @@ ${ hueIcons.symbols() }
          <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
            <li>
-             <a title="${_('Notebook')}" data-rel="navigator-tooltip" href="${ url('notebook:new') }"><i class="fa fa-files-o hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span></a>
+             <a title="${_('Notebook')}" data-rel="navigator-tooltip" href="${ url('notebook:new') }"><i class="far fa-copy hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span></a>
            </li>
          % else:
            <li class="dropdown">
              <a title="${_('Notebook')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
-               <i class="fa fa-files-o inline-block hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span> <b class="caret"></b>
+               <i class="far fa-copy inline-block hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span> <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
                <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
@@ -459,7 +459,7 @@ ${ hueIcons.symbols() }
                % for notebook in notebooks:
                  <li>
                    <a href="${ url('notebook:notebook') }?notebook=${ notebook['id'] }">
-                     <i class="fa fa-fw fa-file-text-o" style="vertical-align: middle"></i> ${ notebook['name'] |n }
+                     <i class="far fa-fw fa-file-alt" style="vertical-align: middle"></i> ${ notebook['name'] |n }
                    </a>
                  </li>
                % endfor

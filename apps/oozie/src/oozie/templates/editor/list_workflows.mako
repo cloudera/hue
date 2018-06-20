@@ -45,7 +45,7 @@ ${ layout.menubar(section='workflows') }
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-play"></i> ${ _('Submit') }</button>
         <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="fas fa-calendar-alt"></i> ${ _('Schedule') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-files-o"></i> ${ _('Copy') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="far fa-copy"></i> ${ _('Copy') }</button>
         <button class="btn toolbarBtn" id="export-btn" disabled="disabled"><i class="fa fa-upload"></i> ${ _('Export') }</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
           <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>

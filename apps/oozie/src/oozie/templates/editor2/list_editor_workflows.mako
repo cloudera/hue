@@ -51,7 +51,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
         </a>
 
         <a data-bind="click: function(e) { atLeastOneSelectedNoV1() ? copy(e) : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelectedNoV1()}">
-          <i class="fa fa-files-o"></i> ${ _('Copy') }
+          <i class="far fa-copy"></i> ${ _('Copy') }
         </a>
 
         <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteWf').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">

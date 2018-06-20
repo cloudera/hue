@@ -36,7 +36,7 @@ from metadata.conf import has_navigator
         <!-- ko if: isDocument -->
         <!-- ko with: contents -->
         <a href="javascript: void(0);" class="inactive-action" data-bind="click: open">
-          <i style="font-size: 11px;" title="${ _("Open...") }" class="fa fa-file-o"></i> ${ _("Open") }
+          <i style="font-size: 11px;" title="${ _("Open...") }" class="far fa-file"></i> ${ _("Open") }
         </a>
         <!-- /ko -->
         <!-- /ko -->
@@ -434,7 +434,7 @@ from metadata.conf import has_navigator
           <tbody>
             <!-- ko if: $parent.storageEntry().parent -->
             <tr>
-              <td><i class="fa fa-folder-o"></i></td>
+              <td><i class="far fa-folder"></i></td>
               <td><a href="javascript: void(0);" data-bind="click: function () { $parent.storageEntry($parent.storageEntry().parent) }">..</a></td>
               <td data-bind="text: $parent.storageEntry().definition.humansize"></td>
               <td data-bind="text: $parent.storageEntry().definition.rwx"></td>

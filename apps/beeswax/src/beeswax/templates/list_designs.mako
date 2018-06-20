@@ -55,7 +55,7 @@ ${ layout.menubar(section='saved queries') }
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected %s' % noun)}" disabled="disabled"><i class="fa fa-edit"></i> ${_('Edit')}</button>
-          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected %s' % noun)}" disabled="disabled"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected %s' % noun)}" disabled="disabled"><i class="far fa-copy"></i> ${_('Copy')}</button>
           <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected %s' % noun)}" disabled="disabled"><i class="fa fa-tasks"></i> ${_('Usage history')}</button>
 
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">

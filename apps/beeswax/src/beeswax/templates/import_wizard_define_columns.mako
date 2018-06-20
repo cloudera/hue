@@ -87,7 +87,7 @@ ${ assist.assistPanel() }
           <div class="metastore-main">
             <h3>
               <div class="inline-block pull-right" style="margin-top: -8px">
-                <a href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}" class="inactive-action"><i class="fa fa-files-o"></i></a>
+                <a href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}" class="inactive-action"><i class="far fa-copy"></i></a>
                 <a href="${ url('beeswax:create_table', database=database) }" title="${_('Create a new table manually')}" class="inactive-action margin-left-10"><i class="fa fa-wrench"></i></a>
               </div>
 

@@ -278,17 +278,17 @@
     <!-- ko case: 'dashboard' --><svg class="hi"><use xlink:href="#hi-dashboard"></use></svg><!-- /ko -->
     <!-- ko case: 'documents' --><svg class="hi"><use xlink:href="#hi-documents"></use></svg><!-- /ko -->
     <!-- ko case: 'report' --><i class="fas fa-fw fa-chart-area"></i><!-- /ko -->
-    <!-- ko case: 'dist-cp' --><i class="fa fa-fw fa-files-o"></i><!-- /ko -->
+    <!-- ko case: 'dist-cp' --><i class="far fa-fw fa-copy"></i><!-- /ko -->
     <!-- ko case: 'editor' --><svg class="hi"><use xlink:href="#hi-editor"></use></svg><!-- /ko -->
     <!-- ko case: 'hbase' --><svg class="hi"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->
-    <!-- ko case: 'hdfs' --><i class="fa fa-fw fa-folder-o"></i><!-- /ko -->
+    <!-- ko case: 'hdfs' --><i class="far fa-fw fa-folder"></i><!-- /ko -->
     <!-- ko case: 'hive' --><svg class="hi"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
     <!-- ko case: 'impala' --><svg class="hi"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
     <!-- ko case: 'indexes' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
     <!-- ko case: 'jar' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'java' --><i class="fa fa-fw fa-file-code-o"></i><!-- /ko -->
+    <!-- ko case: 'java' --><i class="far fa-fw fa-file-code"></i><!-- /ko -->
     <!-- ko case: 'job-designer' --><svg class="hi"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
-    <!-- ko case: 'mapreduce' --><i class="fa fa-fw fa-file-archive-o"></i><!-- /ko -->
+    <!-- ko case: 'mapreduce' --><i class="far fa-fw fa-file-archive"></i><!-- /ko -->
     <!-- ko case: 'markdown' --><svg class="hi"><use xlink:href="#hi-markdown"></use></svg><!-- /ko -->
     <!-- ko case: 'notebook' --><svg class="hi"><use xlink:href="#hi-file-notebook"></use></svg><!-- /ko -->
     <!-- ko case: 'oozie' --><svg class="hi"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->

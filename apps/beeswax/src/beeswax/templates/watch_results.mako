@@ -87,7 +87,7 @@ ${layout.menubar(section='query')}
                       <li><a target="_blank" href="${download_urls["xls"]}"><i class="far fa-arrow-alt-circle-down"></i> ${_('Download as XLS')}</a></li>
                     % endif
                     % if can_save and download:
-                      <li><a data-toggle="modal" href="#saveAs"><i class="fa fa-floppy-o"></i> ${_('Save')}</a></li>
+                      <li><a data-toggle="modal" href="#saveAs"><i class="far fa-save"></i> ${_('Save')}</a></li>
                     % endif
                     % if app_name != 'impala':
                       <%

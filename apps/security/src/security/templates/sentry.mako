@@ -141,7 +141,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
       <!-- /ko -->
 
       <!-- ko if: privilegeType() == 'URI' -->
-        <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]"><span data-bind="text: URI"></span></a>
+        <i class="fa fa-long-arrow-right"></i> <i class="far fa-file"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]"><span data-bind="text: URI"></span></a>
       <!-- /ko -->
 
     <!-- /ko -->
@@ -176,7 +176,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
           <li class="nav-header">${ _('Privileges') }</li>
           <li class="active"><a href="javascript:void(0)" data-toggleSection="edit"><i class="fa fa-sitemap fa-rotate-270"></i> ${ _('Browse') }</a></li>
           <li><a href="javascript:void(0)" data-toggleSection="roles"><i class="fa fa-cubes"></i> ${ _('Roles') }</a></li>
-          <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
+          <li class="nav-header"><i class="fas fa-users"></i> ${ _('Groups') }
             <div>
             <br/>
              <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true, vm: $root }" style="width: 100%"></select>
@@ -597,7 +597,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 <%def name="withPrivilegesPullRight()">
   <div class="pull-right">
     <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #0B7FAD" title="${ _('Has some privileges') }"></i>&nbsp;
-    <i class="fa fa-file-o muted" data-bind="click: $root.assist.showAuthorizable ,visible: isTable()"></i>
+    <i class="far fa-file muted" data-bind="click: $root.assist.showAuthorizable ,visible: isTable()"></i>
   </div>
 </%def>
 

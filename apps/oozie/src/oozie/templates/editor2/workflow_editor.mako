@@ -59,7 +59,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       <ul class="dropdown-menu">
         <li>
           <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_workflow') }'">
-            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+            <i class="far fa-fw fa-file"></i> ${ _('New') }
           </a>
         </li>
         %if is_embeddable:
@@ -85,7 +85,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
               title="${ _('Go upload additional files and libraries to the deployment directory') }"
               data-bind="hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()"
             >
-            <i class="fa fa-fw fa-folder-open"></i> ${ _('Workspace') }
+            <i class="far fa-fw fa-folderpen"></i> ${ _('Workspace') }
           </a>
         </li>
         <li data-bind="visible: workflow.id() != null && canEdit()">
@@ -171,7 +171,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableJavaDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaDocumentAction());}}}"
          title="${_('Saved Java program')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-file-code"></i></a>
     </div>
     <!-- /ko -->
 
@@ -198,7 +198,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableMapReduceDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableMapReduceDocumentAction());}}}"
          title="${_('Saved MapReduce job')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-file-archive-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-file-archive"></i></a>
     </div>
     <!-- /ko -->
 
@@ -216,7 +216,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableDistCpDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableDistCpDocumentAction());}}}"
          title="${_('Saved DistCp command')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-copy"></i></a>
     </div>
     <!-- /ko -->
 
@@ -301,7 +301,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableJavaAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaAction());}}}"
          title="${_('Java program')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-file-code"></i></a>
     </div>
     <!-- /ko -->
 
@@ -319,7 +319,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableMapReduceAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableMapReduceAction());}}}"
          title="${_('MapReduce job')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-file-archive-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-file-archive"></i></a>
     </div>
     <!-- /ko -->
 
@@ -355,7 +355,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableFsAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableFsAction());}}}"
          title="${_('Fs')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-file-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-file"></i></a>
     </div>
     <!-- /ko -->
 
@@ -382,7 +382,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableDistCpAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableDistCpAction());}}}"
          title="${_('Distcp')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
+         <a class="draggable-icon"><i class="far fa-copy"></i></a>
     </div>
     <!-- /ko -->
 

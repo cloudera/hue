@@ -184,7 +184,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="document-context-items">
     <!-- ko if: definition().type === 'directory' -->
-    <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-folder-open-o"></i> ${ _('Open folder') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: open"><i class="far fa-fw fa-folder-open"></i> ${ _('Open folder') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition().type !== 'directory' -->
     <li><a href="javascript: void(0);" data-bind="click: function(data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
@@ -195,7 +195,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="hbase-context-items">
     <!-- ko if: definition.host -->
-    <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-folder-open-o"></i> ${ _('Open cluster') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: open"><i class="far fa-fw fa-folder-open"></i> ${ _('Open cluster') }</a></li>
     <!-- /ko -->
     <!-- ko ifnot: definition.host -->
     <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'hbase' } } --><!-- /ko --> ${ _('Open in HBase') }</a></li>
@@ -354,13 +354,13 @@ from desktop.views import _ko
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
       <div>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
@@ -382,10 +382,10 @@ from desktop.views import _ko
 
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.type === 'dir' -->
-              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <i class="far fa-fw fa-folder muted valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: definition.type === 'file' -->
-              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <i class="far fa-fw fa-file muted valign-middle"></i>
               <!-- /ko -->
               <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 's3', 'definition': definition} }"></span>
             </a>
@@ -421,13 +421,13 @@ from desktop.views import _ko
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectGitEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: path, attr: {'title': path }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
       <div>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
@@ -441,10 +441,10 @@ from desktop.views import _ko
 
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.type === 'dir' -->
-              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <i class="far fa-fw fa-folder muted valign-middle"></i>
               <!-- /ko -->
               <!-- ko ifnot: definition.type === 'dir' -->
-              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <i class="far fa-fw fa-file muted valign-middle"></i>
               <!-- /ko -->
               <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'git', 'definition': definition} }"></span>
             </a>
@@ -501,13 +501,13 @@ from desktop.views import _ko
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
       <div>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
@@ -529,10 +529,10 @@ from desktop.views import _ko
 
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.type === 'dir' -->
-              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <i class="far fa-fw fa-folder muted valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: definition.type === 'file' -->
-              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <i class="far fa-fw fa-file muted valign-middle"></i>
               <!-- /ko -->
               <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
             </a>
@@ -559,13 +559,13 @@ from desktop.views import _ko
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-adls-scrollable' }, click: function () { huePubSub.publish('assist.selectAdlsEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
       <div>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
@@ -587,10 +587,10 @@ from desktop.views import _ko
 
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.type === 'dir' -->
-              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <i class="far fa-fw fa-folder muted valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: definition.type === 'file' -->
-              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <i class="far fa-fw fa-file muted valign-middle"></i>
               <!-- /ko -->
               <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'adls', 'definition': definition} }"></span>
             </a>
@@ -625,13 +625,13 @@ from desktop.views import _ko
       <!-- ko ifnot: isRoot -->
       <a href="javascript: void(0);" data-bind="click: function () { if (loaded()) { parent.makeActive(); } }">
         <i class="fa fa-fw fa-chevron-left"></i>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span data-bind="text: definition().name, attr: {'title': definition().name }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: isRoot -->
       <div>
-        <i class="fa fa-fw fa-folder-o"></i>
+        <i class="far fa-fw fa-folder"></i>
         <span>/</span>
       </div>
       <!-- /ko -->

@@ -261,7 +261,7 @@ ${ comps.menubar() }
             % if location_url != None:
             <a href="${location_url}" title="${output_dir}">
             % endif
-            <i class="fa fa-folder-open"></i> ${dir_name}
+            <i class="far fa-folderpen"></i> ${dir_name}
             % if location_url != None:
             </a>
             % endif

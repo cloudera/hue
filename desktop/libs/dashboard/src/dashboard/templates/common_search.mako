@@ -179,7 +179,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
         <ul class="dropdown-menu">
           <li>
             <a href="javascript:void(0)" data-bind="click: newSearch">
-              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+              <i class="far fa-fw fa-file"></i> ${ _('New') }
             </a>
           </li>
           <!-- ko if: IS_HUE_4 -->
@@ -394,7 +394,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                     options: getDraggableOptions({ data: draggableDocument() }) }"
          title="${_('Document')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-                       <i class="fa fa-file-o"></i>
+                       <i class="far fa-file"></i>
          </a>
     </div>
     % endif

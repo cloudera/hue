@@ -472,7 +472,7 @@
             if (file.type == "file" && !_parent.options.displayOnlyFolders) {
               _f.addClass('file-list-item');
               _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
-              $("<i class='fa fa-file-o'></i>").prependTo(_flink);
+              $("<i class='far fa-file'></i>").prependTo(_flink);
               _flink.click(function () {
                 _parent.options.onFileChoose(file.path);
               });

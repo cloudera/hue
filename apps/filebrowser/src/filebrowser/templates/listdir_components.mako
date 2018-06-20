@@ -78,7 +78,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         <ul class="inline">
           <li class="first-page prev" data-bind="css: { 'disabled': (page().number === page().start_index || page().num_pages <= 1) }">
-            <a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a>
+            <a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fab fa-font-awesomest-backward"></i></a>
           </li>
           <li class="previous-page" data-bind="css: { 'disabled': (page().number === page().start_index || page().num_pages <= 1) }">
             <a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a>
@@ -87,7 +87,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             <a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a>
           </li>
           <li class="last-page next" data-bind="css: { 'disabled': page().number === page().num_pages }">
-            <a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a>
+            <a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fab fa-font-awesomest-forward"></i></a>
           </li>
         </ul>
     </div>
@@ -566,7 +566,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
-    <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
+    <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="far fa-fw fa-copy"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
     <a href="javascript: void(0)" title="${_('Download')}" data-bind="click: (!$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file') ? $root.downloadFile: void(0)">
@@ -598,17 +598,17 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </li>
     <li data-bind="css: {'disabled': inTrash() || !isReplicationEnabled() || selectedFiles().length != 1 || selectedFile().type != 'file'}">
       <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="click: (!inTrash() && isReplicationEnabled() && selectedFiles().length == 1 && selectedFile().type == 'file') ? setReplicationFactor: void(0)">
-        <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
+        <i class="far fa-fw fa-hdd"></i> ${_('Set replication')}
       </a>
     </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
       <li data-bind="css: {'disabled': ! showCompressButton}">
         <a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
-        <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
+        <i class="far fa-fw fa-file-archive"></i> ${_('Compress')}</a>
       </li>
       <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive(selectedFile().name) || !isCompressEnabled()}">
         <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
-        <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
+        <i class="far fa-fw fa-file-archive"></i> ${_('Extract')}</a>
       </li>
     % endif
   <!-- /ko -->

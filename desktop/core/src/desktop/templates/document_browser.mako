@@ -368,7 +368,7 @@ from desktop.views import _ko
                   </a>
                   <ul class="dropdown-menu">
                     <li data-bind="css: { 'disabled': directorySelected() || selectedEntries().length < 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }">
-                      <a href="javascript:void(0);" data-bind="click: function () {  copy() }"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a>
+                      <a href="javascript:void(0);" data-bind="click: function () {  copy() }"><i class="far fa-fw fa-copy"></i> ${_('Copy')}</a>
                     </li>
                     <!-- ko if: isTrash() -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 }">
@@ -474,7 +474,7 @@ from desktop.views import _ko
                 <!-- ko if: isDirectory -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: showRenameDirectoryModal, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-edit"></i> ${ _('Rename') }</a></li>
                 <!-- /ko -->
-                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-file-o"></i> ${ _('Open') }</a></li>
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="far fa-fw fa-file"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
                   <i class="fa fa-fw fa-times"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a>

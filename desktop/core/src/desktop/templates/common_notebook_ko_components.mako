@@ -190,7 +190,7 @@ except ImportError, e:
           title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
           % endif
           >
-            <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
+            <i class="far fa-fw fa-file"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
@@ -203,7 +203,7 @@ except ImportError, e:
           title="${ _('Download first %s rows as XLS') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
           % endif
           >
-            <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
+            <i class="far fa-fw fa-file-excel"></i> ${ _('Excel') }
           </a>
         </li>
         <li>

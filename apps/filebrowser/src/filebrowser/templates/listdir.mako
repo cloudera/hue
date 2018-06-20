@@ -68,7 +68,7 @@ ${ fb_components.menubar() }
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
               <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
               <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0), enable: selectedFiles().length > 0 &&
-              isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
+              isCurrentDirSelected().length == 0"><i class="far fa-fw fa-copy"></i> ${_('Copy')}</a></li>
               % if show_download_button:
               <li>
                 <a href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
@@ -97,15 +97,15 @@ ${ fb_components.menubar() }
               </li>
               <li>
                 <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && isReplicationEnabled() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
-                  <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
+                  <i class="far fa-fw fa-hdd"></i> ${_('Set replication')}
                 </a>
               </li>
               % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
                 <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
-                  <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
+                  <i class="far fa-fw fa-file-archive"></i> ${_('Compress')}</a>
                 </li>
                 <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
-                  <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
+                  <i class="far fa-fw fa-file-archive"></i> ${_('Extract')}</a>
                 </li>
               % endif
             </ul>
@@ -135,7 +135,7 @@ ${ fb_components.menubar() }
             % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
               <button class="btn extractArchiveBtn" title="${_('Extract zip, tar.gz, bz2 or bzip2')}"
                 data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
-                <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}
+                <i class="far fa-fw fa-file-archive"></i> ${_('Extract')}
               </button>
             % endif
           % endif
@@ -169,7 +169,7 @@ ${ fb_components.menubar() }
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu pull-right" style="top: auto">
-              <li data-bind="visible: !isS3() || isS3() && !isS3Root()"><a href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
+              <li data-bind="visible: !isS3() || isS3() && !isS3Root()"><a href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="far fa-file"></i> ${_('File')}</a></li>
               <li><a href="javascript: void(0)" class="create-directory-link" title="${_('Directory')}"><i class="fa fa-folder"></i> <span data-bind="visible: !isS3() || isS3() && !isS3Root()">${_('Directory')}</span><span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span></a></li>
             </ul>
           </div>

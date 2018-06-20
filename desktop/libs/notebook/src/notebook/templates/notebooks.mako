@@ -67,7 +67,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <a data-bind="click: function(e){ atLeastOneSelected() ? copy(e) : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
-          <i class="fa fa-files-o"></i> ${ _('Copy') }
+          <i class="far fa-copy"></i> ${ _('Copy') }
         </a>
 
         <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteNotebook').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
