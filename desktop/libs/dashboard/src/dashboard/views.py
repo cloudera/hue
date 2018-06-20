@@ -53,6 +53,10 @@ DEFAULT_LAYOUT = [
         "drops":["temp"],"klass":"card card-home card-column span10"},
 ]
 
+REPORT_LAYOUT = [
+  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets":[]}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}
+]
+
 QUERY_BUILDER_LAYOUT = [
   {u'klass': u'card card-home card-column span12', u'rows': [
     {u'widgets': [
@@ -137,6 +141,7 @@ def new_search(request):
 
   collection = Collection2(user=request.user, name=collections[0], engine=engine)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
+  layout = DEFAULT_LAYOUT if engine != 'report' else REPORT_LAYOUT
 
   if request.GET.get('format', 'plain') == 'json':
     return JsonResponse({
@@ -144,7 +149,7 @@ def new_search(request):
       'query': query,
       'initial': {
           'collections': collections,
-          'layout': DEFAULT_LAYOUT,
+          'layout': layout,
           'qb_layout': QUERY_BUILDER_LAYOUT,
           'text_search_layout': TEXT_SEARCH_LAYOUT,
           'is_latest': _get_latest(),
@@ -157,7 +162,7 @@ def new_search(request):
       'query': query,
       'initial': json.dumps({
           'collections': collections,
-          'layout': DEFAULT_LAYOUT,
+          'layout': layout,
           'qb_layout': QUERY_BUILDER_LAYOUT,
           'text_search_layout': TEXT_SEARCH_LAYOUT,
           'is_latest': _get_latest(),
@@ -165,7 +170,8 @@ def new_search(request):
        }),
       'is_owner': True,
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'can_edit_index': can_edit_index(request.user)
+      'can_edit_index': can_edit_index(request.user),
+      'is_report': engine == 'report'
     })
 
 def browse(request, name, is_mobile=False):

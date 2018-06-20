@@ -1698,18 +1698,9 @@ class ClusterConfig():
 
   def _get_dashboard(self):
     interpreters = get_engines(self.user)
+    _interpreters = []
 
     if interpreters and self.cluster_type != ANALYTIC_DB:
-      _interpreters = [{
-          'type': interpreter['type'],
-          'displayName': interpreter['type'].title(),
-          'buttonName': interpreter['type'].title(),
-          'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
-          'tooltip': _('%s Dashboard') % interpreter['type'].title(),
-          'is_sql': True
-        } for interpreter in interpreters
-      ]
-
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',
@@ -1719,6 +1710,16 @@ class ClusterConfig():
           'tooltip': _('Report'),
           'is_sql': False
         })
+
+      _interpreters.extend([{
+          'type': interpreter['type'],
+          'displayName': interpreter['type'].title(),
+          'buttonName': interpreter['type'].title(),
+          'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
+          'tooltip': _('%s Dashboard') % interpreter['type'].title(),
+          'is_sql': True
+        } for interpreter in interpreters
+      ])
 
       return {
         'name': 'dashboard',

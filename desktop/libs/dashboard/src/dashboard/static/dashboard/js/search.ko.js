@@ -2175,8 +2175,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       self.isToolbarVisible(self.isEditing());
       self.initial.init();
       self.collection.syncFields();
-      if (self.collection.engine() === 'solr' || self.collection.engine() === 'report') {
+      if (self.collection.engine() === 'solr') {
         self.search(callback);
+      } else if (self.collection.engine() === 'report') {
+        callback();
       }
     }
 
@@ -2370,10 +2372,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       }
 
       if (self.collection.engine() != 'solr') {
-    	var queryFragments = [].concat(self.collection.facets());
-    	if (self.collection.engine() != 'report') {
-    	  queryFragments.concat([self.collection]);
-    	}
+        var queryFragments = [].concat(self.collection.facets());
+        if (self.collection.engine() != 'report') {
+          queryFragments.concat([self.collection]);
+        }
+
         $.each(queryFragments, function (index, facet) {
           if (facet.queryResult().result.handle) {
             self.close(facet);
@@ -2410,7 +2413,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         self.getFieldAnalysis().update();
       }
 
-      
       if (self.collection.engine() != 'report') {
         multiQs.concat([
           $.post("/dashboard/search", {
