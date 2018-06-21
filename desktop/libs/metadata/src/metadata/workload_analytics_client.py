@@ -30,14 +30,17 @@ class WorkfloadAnalyticsClient():
   def __init__(self, user):
     self.user = user
 
+  def get_impala_query(self, cluster_id, query_id):
+    return WorkloadAnalytics(self.user).get_impala_query(cluster_id=cluster_id, query_id=query_id)
+
+  def list_environments(self):
+    return WorkloadAnalytics(self.user).list_environments()
+
   def get_operation_execution_details(self, operation_id):
     return WorkloadAnalytics(self.user).get_operation_execution_details(operation_id=operation_id, include_tree=True)
 
   def get_mr_task_attempt_log(self, operation_execution_id, attempt_id):
     return WorkloadAnalytics(self.user).get_mr_task_attempt_log(operation_execution_id=operation_execution_id, attempt_id=attempt_id)
-
-  def get_impala_query(self, cluster_id, query_id):
-    return WorkloadAnalytics(self.user).get_impala_query(cluster_id=cluster_id, query_id=query_id)
 
 
 
@@ -49,6 +52,10 @@ class WorkloadAnalytics():
     parameters = {'clusterId': cluster_id, 'queryId': query_id}
 
     return _exec('wa', 'getImpalaQuery', parameters=parameters)
+
+
+  def list_environments(self):
+    return _exec('wa', 'listEnvironments')
 
 
   def get_operation_execution_details(self, operation_id, include_tree=False):
