@@ -312,6 +312,8 @@ var MetastoreViewModel = (function () {
             } else {
               sourceAndNamespaceDeferred.resolve();
             }
+          } else {
+            sourceAndNamespaceDeferred.resolve();
           }
         });
       }
