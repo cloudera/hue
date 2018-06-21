@@ -200,10 +200,10 @@ class SQLIndexer(object):
 
     editor_type = 'impala' if table_format == 'kudu' else destination['apiHelperType']
 
-    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name})
 
     return make_notebook(
-        name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': table_name},
+        name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': final_table_name},
         editor_type=editor_type,
         statement=sql.strip(),
         status='ready',
