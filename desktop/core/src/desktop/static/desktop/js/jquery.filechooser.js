@@ -50,8 +50,8 @@
           root: "/",
           home: "/?default_to_home",
           icon: {
-            brand: "fa-files-o",
-            home: "fa-home",
+            brand: "far fa-copy",
+            home: "fas fa-home",
           },
           label : {
             home: "home",
@@ -63,8 +63,8 @@
           root: "/",
           home: "/?default_to_home",
           icon: {
-            brand: "fa-files-o",
-            home: "fa-home",
+            brand: "far fa-copy",
+            home: "fas fa-home",
           },
           label : {
             home: "home",
@@ -76,8 +76,8 @@
           root: "s3a://",
           home: "s3a://",
           icon: {
-            brand: "fa-cubes",
-            home: "fa-cubes",
+            brand: "fas fa-cubes",
+            home: "fas fa-cubes",
           },
           label : {
             home: "",
@@ -93,8 +93,8 @@
               brand: "#hi-adls",
               home: "#hi-adls"
             },
-            brand: "fa-windows",
-            home: "fa-windows"
+            brand: "fab fa-windows",
+            home: "fab fa-windows"
           },
           label : {
             home: "",
@@ -251,7 +251,7 @@
       var _home = $("<li>");
       //var filesysteminfo = self.options.filesysteminfo;
       var fs = _parent.options.filesysteminfo[_parent.options.fsSelected || "hdfs"];
-      var el = fs.icon.svg ? '<svg class="hi"><use xlink:href="'+fs.icon.svg.home+'"></use></svg>' : '<i class="fa '+fs.icon.home+'"></i> ' + fs.label.home;
+      var el = fs.icon.svg ? '<svg class="hi"><use xlink:href="'+fs.icon.svg.home+'"></use></svg>' : '<i class="'+fs.icon.home+'"></i> ' + fs.label.home;
       var _homelink = $("<a>").addClass("nounderline").html(el).css("cursor", "pointer").click(function () {
         _parent.navigateTo(fs.home);
       });
@@ -364,7 +364,7 @@
 
         if (_parent.options.showExtraHome) {
           var _extraHome = $("<li>");
-          var _extraHomelink = $("<a>").addClass("nounderline").html('<i class="fa ' + _parent.options.extraHomeProperties.icon + '"></i> ' + _parent.options.extraHomeProperties.label).css("cursor", "pointer").click(function () {
+          var _extraHomelink = $("<a>").addClass("nounderline").html('<i class="' + _parent.options.extraHomeProperties.icon + '"></i> ' + _parent.options.extraHomeProperties.label).css("cursor", "pointer").click(function () {
             _parent.navigateTo(_parent.options.extraHomeProperties.path);
           });
           _extraHomelink.appendTo(_extraHome);

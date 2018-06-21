@@ -234,11 +234,11 @@
         if (data.error == null) {
           $(data.files).each(function (cnt, item) {
             if (item.name != ".") {
-              var ico = "fa-file-o";
+              var ico = "fa-file";
               if (item.type == "dir") {
                 ico = "fa-folder";
               }
-              _currentFiles.push('<li class="hdfsAutocompleteItem" data-value="' + escapeOutput(item.name) + '"><i class="fa ' + ico + '"></i> ' + escapeOutput(item.name) + '</li>');
+              _currentFiles.push('<li class="hdfsAutocompleteItem" data-value="' + escapeOutput(item.name) + '"><i class="far ' + ico + '"></i> ' + escapeOutput(item.name) + '</li>');
             }
           });
           window.setTimeout(function () {
