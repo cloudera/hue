@@ -169,9 +169,7 @@
       </div>
 
       <div class="row-fluid" data-bind="visible: previewColumns() == 'search'">
-        <div class="span2 preview-row" style="font-size: 80px;">
-        </div>
-        <div class="span10">
+        <div class="span12">
           <div class="preview-row" style="font-size: 80px; ">
             <i class="fa fa-search" style="font-size: 120px; padding-top: 100px"></i><br/>
             <div style="font-size: 40px; padding-top: 20px; line-height: 48px">${ _('Retrieve and display records of data') }</div>

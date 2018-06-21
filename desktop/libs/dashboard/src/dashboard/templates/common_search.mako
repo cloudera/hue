@@ -1023,6 +1023,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </div>
     <!-- /ko -->
 
+
     <div class="result-main" style="overflow-x: auto">
       <div class="edit-dimensions" style="float: right">
         <div class="badge dimensions-badge-container dimensions-badge-container-add">
