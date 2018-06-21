@@ -120,7 +120,7 @@ var AssistDbSource = (function () {
     var self = this;
     self.loading(true);
 
-    ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
+    return ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
       var activeCompute;
@@ -160,11 +160,42 @@ var AssistDbSource = (function () {
       self.loadedDeferred.resolve();
       self.loading(false);
     })
-
   };
 
-  AssistDbSource.prototype.highlightInside = function (path) {
-    // TODO: Highlight from namespace
+  AssistDbSource.prototype.highlightInside = function (catalogEntry) {
+    var self = this;
+    if (self.navigationSettings.rightAssist) {
+      return;
+    }
+
+    var whenLoaded = function () {
+      self.namespaces().some(function (namespace) {
+        if (namespace.namespace.id === catalogEntry.namespace.id) {
+          if (self.selectedNamespace() !== namespace) {
+            self.selectedNamespace(namespace);
+          }
+          if (self.selectedNamespace().hasEntries()) {
+            self.selectedNamespace().highlightInside(catalogEntry);
+          } else {
+            self.selectedNamespace().initDatabases(function () {
+              self.selectedNamespace().highlightInside(catalogEntry);
+            })
+          }
+          return true;
+        }
+      })
+    };
+
+    if (self.namespaces().length) {
+      whenLoaded();
+    } else if (self.loading()) {
+      var loadingSub = self.loading.subscribe(function () {
+        loadingSub.dispose();
+        whenLoaded();
+      })
+    } else {
+      self.loadNamespaces().done(whenLoaded);
+    }
   };
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
@@ -396,20 +427,15 @@ var AssistDbNamespace = (function () {
     self.loadedDeferred.done(callback);
   };
 
-  AssistDbNamespace.prototype.highlightInside = function (path) {
+  AssistDbNamespace.prototype.highlightInside = function (catalogEntry) {
     var self = this;
-
-    if (self.navigationSettings.rightAssist) {
-      return;
-    }
-
     var foundDb;
     var index;
 
     var findDatabase = function () {
       $.each(self.databases(), function (idx, db) {
         db.highlight(false);
-        if (db.databaseName === path[0]) {
+        if (db.databaseName === catalogEntry.path[0]) {
           foundDb = db;
           index = idx;
         }
@@ -431,8 +457,8 @@ var AssistDbNamespace = (function () {
                 foundDb.highlight(false);
               }, 1800);
             });
-            if (path.length > 1) {
-              foundDb.highlightInside(path.slice(1), []);
+            if (catalogEntry.path.length > 1) {
+              foundDb.highlightInside(catalogEntry.path.slice(1));
             } else {
               huePubSub.publish('assist.db.scrollTo', foundDb);
             }

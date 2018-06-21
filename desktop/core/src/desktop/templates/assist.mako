@@ -1229,35 +1229,27 @@ from desktop.views import _ko
           });
         });
 
-        huePubSub.subscribe('assist.db.highlight', function (location) {
+        huePubSub.subscribe('assist.db.highlight', function (catalogEntry) {
           huePubSub.publish('left.assist.show');
-          if (location.sourceType === 'solr') {
+          if (catalogEntry.getSourceType() === 'solr') {
             huePubSub.publish('assist.show.solr');
-          }
-          else {
+          } else {
             huePubSub.publish('assist.show.sql');
           }
           huePubSub.publish('context.popover.hide');
           window.setTimeout(function () {
             var foundSource;
             $.each(self.sources(), function (idx, source) {
-              if (source.sourceType === location.sourceType) {
+              if (source.sourceType === catalogEntry.getSourceType()) {
                 foundSource = source;
                 return false;
               }
             });
             if (foundSource) {
-              var whenLoaded = function () {
-                if (self.selectedSource() !== foundSource) {
-                  self.selectedSource(foundSource);
-                }
-                foundSource.highlightInside(location.path);
-              };
-              if (foundSource.hasEntries()) {
-                whenLoaded();
-              } else {
-                foundSource.initDatabases(whenLoaded);
+              if (self.selectedSource() !== foundSource) {
+                self.selectedSource(foundSource);
               }
+              foundSource.highlightInside(catalogEntry);
             }
           }, 0);
         });
