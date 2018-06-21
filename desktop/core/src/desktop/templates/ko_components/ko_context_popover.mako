@@ -617,10 +617,7 @@ from metadata.conf import has_navigator
 
       DataCatalogContext.prototype.showInAssist = function () {
         var self = this;
-        huePubSub.publish('assist.db.highlight', {
-          sourceType: self.catalogEntry().getSourceType(),
-          path: self.catalogEntry().path
-        });
+        huePubSub.publish('assist.db.highlight', self.catalogEntry());
         huePubSub.publish('global.search.close');
       };
 
@@ -946,10 +943,7 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('terms');
 
         var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
-          huePubSub.publish('assist.db.highlight', {
-            sourceType: 'solr',
-            path: self.catalogEntry.path
-          });
+          huePubSub.publish('assist.db.highlight', self.catalogEntry);
         });
         self.disposals.push(function () {
           showInAssistPubSub.remove();
