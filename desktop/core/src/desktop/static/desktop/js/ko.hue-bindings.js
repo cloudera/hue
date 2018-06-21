@@ -6534,6 +6534,7 @@
       var options = valueAccessor() || {};
       var scrollable = options.scrollable ? options.scrollable : window;
       var triggerAdjust = options.triggerAdjust || 0;
+      var zIndex = options.zIndex || 1000;
       $(element).addClass('dockable');
 
       var initialTopPosition = -1;
@@ -6550,7 +6551,7 @@
           ghost.height($(element).outerHeight() + (options.jumpCorrection || 0));
         }
         if ($(scrollable).scrollTop() + triggerAdjust > initialTopPosition) {
-          $(element).attr('style', 'position: fixed!important; top: ' + options.topSnap + '; width: ' + initialSize.w + 'px!important');
+          $(element).attr('style', 'position: fixed!important; top: ' + options.topSnap + '; width: ' + initialSize.w + 'px!important; z-index: ' + zIndex);
           ghost.show();
         }
         else {
