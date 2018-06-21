@@ -701,6 +701,26 @@ var hueDrop = (function () {
   };
 })();
 
+if (!window.hueDebug) {
+  window.hueDebug = {};
+}
+
+window.hueDebug.clearCaches = function () {
+  var promises = [];
+  var clearInstance = function(prefix) {
+    promises.push(localforage.createInstance({ name: prefix + LOGGED_USERNAME }).clear());
+  };
+  clearInstance('HueContextCatalog_');
+  clearInstance('HueDataCatalog_');
+  clearInstance('HueDataCatalog_hive_');
+  clearInstance('HueDataCatalog_hive_multiTable_');
+  clearInstance('HueDataCatalog_impala_');
+  clearInstance('HueDataCatalog_impala_multiTable_');
+  Promise.all(promises).then(function () {
+    console.log('Done! Refresh the browser.');
+  })
+};
+
 var hueDebugTimer = (function () {
   var initialTime = null;
   var times = [];
