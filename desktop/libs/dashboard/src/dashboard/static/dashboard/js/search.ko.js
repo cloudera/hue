@@ -30,6 +30,7 @@ function queryBuilderSearchLayout(vm, isQueryBuilder) {
 function textSearchLayout(vm, isQueryBuilder) {
   vm.isQueryBuilder(!!isQueryBuilder);
   loadSearchLayout(vm, vm.initial.textSearchLayout);
+  vm.collection.template.isGridLayout(false);
   $(document).trigger("magicSearchLayout");
   huePubSub.publish('dashboard.set.layout');
 }
