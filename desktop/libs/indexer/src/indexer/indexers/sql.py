@@ -49,7 +49,7 @@ class SQLIndexer(object):
     final_table_name = table_name
 
     table_format = destination['tableFormat']
-    source_type = source['apiHelperType']
+    source_type = source['sourceType']
 
     columns = destination['columns']
     partition_columns = destination['partitionColumns']
@@ -199,7 +199,7 @@ class SQLIndexer(object):
           'table_name': table_name
       }
 
-    editor_type = 'impala' if table_format == 'kudu' else destination['apiHelperType']
+    editor_type = 'impala' if table_format == 'kudu' else destination['sourceType']
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
