@@ -159,7 +159,7 @@ def dt_login(request, from_modal=False):
     first_user_form = None
     auth_form = AuthenticationForm()
     # SAML user is already authenticated in djangosaml2.views.login
-    if 'SAML2Backend' in backend_names and request.user.is_authenticated():
+    if ('OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException), e:

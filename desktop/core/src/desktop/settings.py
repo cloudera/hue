@@ -463,7 +463,9 @@ def is_oidc_configured():
 
 if is_oidc_configured():
   INSTALLED_APPS.append('mozilla_django_oidc')
-  LOGIN_URL = '/oidc/authenticate/'
+  if 'desktop.auth.backend.AllowFirstUserDjangoBackend' not in AUTHENTICATION_BACKENDS:
+    # when multi-backend auth, standard login URL '/hue/accounts/login' is used.
+    LOGIN_URL = '/oidc/authenticate/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
   MIDDLEWARE_CLASSES.append('mozilla_django_oidc.middleware.SessionRefresh')
   OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = 15 * 60

@@ -262,6 +262,12 @@ class AppSpecificMiddleware(object):
 
 
 class LoginAndPermissionMiddleware(object):
+  def process_request(self, request):
+    # When local user login, oidc middleware refresh token if oidc_id_token_expiration doesn't exists!
+    if request.session.get('_auth_user_backend', '') == 'desktop.auth.backend.AllowFirstUserDjangoBackend'\
+            and 'desktop.auth.backend.OIDCBackend' in desktop.conf.AUTH.BACKEND.get():
+      request.session['oidc_id_token_expiration'] = time.time() + 300
+
   """
   Middleware that forces all views (except those that opt out) through authentication.
   """

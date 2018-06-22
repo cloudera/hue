@@ -47,6 +47,7 @@ from django_auth_ldap.config import LDAPSearch
 
 import desktop.conf
 from desktop import metrics
+from desktop.settings import LOAD_BALANCER_COOKIE
 from liboauth.metrics import oauth_authentication_time
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
 from mozilla_django_oidc.utils import absolutify, import_from_settings
@@ -699,9 +700,12 @@ class OIDCBackend(OIDCAuthenticationBackend):
 
   def logout(self, request, next_page):
     # https://stackoverflow.com/questions/46689034/logout-user-via-keycloak-rest-api-doesnt-work
+    if request.session.get('_auth_user_backend', '') != 'desktop.auth.backend.OIDCBackend':
+      return None
+
     session = request.session
-    access_token = session['oidc_access_token']
-    refresh_token = session['oidc_refresh_token']
+    access_token = session.get('oidc_access_token', '')
+    refresh_token = session.get('oidc_refresh_token', '')
 
     if access_token and refresh_token:
       oidc_logout_url = desktop.conf.OIDC.LOGOUT_REDIRECT_URL.get()
@@ -722,7 +726,9 @@ class OIDCBackend(OIDCAuthenticationBackend):
         LOG.debug("OpenID Connect logout succeed!")
         delete_oidc_session_tokens(session)
         auth.logout(request)
-        return HttpResponseRedirect(next_page)
+        response = HttpResponseRedirect(next_page)
+        response.delete_cookie(LOAD_BALANCER_COOKIE)
+        return response
       else:
         LOG.error("OpenID Connect logout failed: %s" % resp.content)
     else:
