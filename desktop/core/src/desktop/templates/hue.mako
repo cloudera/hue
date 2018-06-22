@@ -1815,7 +1815,7 @@ ${ commonHeaderFooterComponents.footer(messages) }
 </div>
 % endif
 
-<div class="monospace-preload" style="opacity: 0">
+<div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
   <b>Query. Explore. Repeat.</b>
 </div>
