@@ -758,12 +758,12 @@ from desktop.views import _ko
     </label>
     <label class="radio">
       <input type="radio" name="refreshImpala" value="invalidate" data-bind="checked: invalidateOnRefresh" />
-      ${ _('Perform incremental metadata update') }
+      ${ _('Perform incremental metadata update.') }
     </label>
-    <div class="assist-invalidate-description">${ _('This will sync missing tables in Hive.') }</div>
+    <div class="assist-invalidate-description">${ _('This will sync missing tables.') }</div>
     <label class="radio">
       <input type="radio" name="refreshImpala" value="invalidateAndFlush" data-bind="checked: invalidateOnRefresh"  />
-      ${ _('Invalidate all metadata and rebuild index') }
+      ${ _('Invalidate all metadata and rebuild index.') }
     </label>
     <div class="assist-invalidate-description">${ _('WARNING: This can be both resource and time-intensive.') }</div>
     <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${ _('Refresh') }</button></div>
@@ -773,7 +773,7 @@ from desktop.views import _ko
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      % if hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get():
+      % if hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get() and not IS_EMBEDDED.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <!-- ko if: typeof databaseName !== 'undefined' -->
           <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName + '/?sourceType=' + sourceType" title="${_('Create table')}" href="javascript:void(0)">

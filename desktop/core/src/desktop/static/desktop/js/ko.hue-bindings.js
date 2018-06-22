@@ -1512,10 +1512,13 @@
         $element.popover('show');
         var $tip = $element.data('popover').$tip;
         if (HUE_CONTAINER !== 'body') {
+          $tip.css({ 'position': 'fixed', 'z-index': 2000 });
           $tip.appendTo(HUE_CONTAINER);
-          var tipOffset = $tip.offset();
-          var containerOffset = $(HUE_CONTAINER).offset();
-          $tip.offset({ left: tipOffset.left - containerOffset.left, top: tipOffset.top - containerOffset.top });
+
+          $tip.offset({
+            left: $element.offset().left + $element.outerWidth(true) + 10,
+            top: $element.offset().top + ($element.outerHeight(true) / 2) - ($tip.outerHeight(true) / 2)
+          });
         }
         ko.cleanNode($tip.get(0));
         ko.applyBindings(viewModel, $tip.get(0));
