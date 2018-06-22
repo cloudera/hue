@@ -81,6 +81,12 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     </div>
     <h3>Query. Explore. Repeat.</h3>
 
+    %if 'OIDCBackend' in backend_names:
+      <button title="${ _('Single Sign-on') }" class="btn btn-primary" onclick="location.href='/oidc/authenticate/'">${ _('Single Sign-on') }</button>
+
+      <hr class="separator-line"/>
+    %endif
+
     %if first_login_ever:
       <div class="alert alert-info center">
         ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
