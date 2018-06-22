@@ -41,7 +41,6 @@ from django.db.models import query, CharField, SmallIntegerField
 
 from configobj import ConfigObj
 
-from settings import HUE_DESKTOP_VERSION
 from settings import DATABASES
 
 from beeswax.conf import HIVE_SERVER_HOST
@@ -63,7 +62,7 @@ from desktop.lib.conf import _configs_from_dir
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties,  ClusterConfig
+from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, ClusterConfig, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
