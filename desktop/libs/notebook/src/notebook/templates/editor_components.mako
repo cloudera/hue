@@ -190,7 +190,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'text' -->Text<!-- /ko -->
                 <!-- ko case: $default -->SQL<!-- /ko -->
               <!-- /ko -->
+              % if not IS_EMBEDDED.get():
               <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
+              % endif
               </a>
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
@@ -247,7 +249,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="notebook-menu-buttons-${ suffix }">
   <div class="pull-right margin-right-10">
-  % if ENABLE_PRESENTATION.get():
+  % if ENABLE_PRESENTATION.get() and not IS_EMBEDDED.get():
     <!-- ko with: selectedNotebook() -->
       <div class="btn-group">
         <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
@@ -586,11 +588,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         % if conf.USE_DEFAULT_CONFIGURATION.get():
           <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
         % endif
+        % if not IS_EMBEDDED.get():
         <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
           <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
             <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
           </a>
         <!-- /ko -->
+        % endif
       </div>
       % if conf.USE_DEFAULT_CONFIGURATION.get():
       <div style="width:100%;">
@@ -627,6 +631,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
+      %if not IS_EMBEDDED.get():
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
           %if is_embeddable:
@@ -642,6 +647,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <div class="clearfix"></div>
         </li>
       </ul>
+      %endif
       <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
         <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
@@ -680,7 +686,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+            % if not IS_EMBEDDED.get():
             <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            %endif
           </a>
         </li>
         % if not IS_EMBEDDED.get():
@@ -941,7 +949,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
 <script type="text/html" id="snippet-header-statement-type${ suffix }">
-  % if ENABLE_EXTERNAL_STATEMENT.get():
+  % if ENABLE_EXTERNAL_STATEMENT.get() and not IS_EMBEDDED.get():
   <!-- ko if: isSqlDialect() -->
     <div class="margin-left-10 statement-type-selector" data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
@@ -1922,7 +1930,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
-    % if conf.ENABLE_DOWNLOAD.get():
+    % if conf.ENABLE_DOWNLOAD.get() and not IS_EMBEDDED.get():
     <div data-bind="component: { name: 'downloadSnippetResults', params: { gridSideBtn: false, snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
     % endif
   </div>
