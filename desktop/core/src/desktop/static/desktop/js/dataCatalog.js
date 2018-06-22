@@ -16,7 +16,11 @@
 
 var DataCatalog = (function () {
 
-  var STORAGE_POSTFIX = LOGGED_USERNAME; // TODO: Add flag for embedded mode
+  var STORAGE_POSTFIX = LOGGED_USERNAME;
+
+  if (typeof window.EMBEDDED_CLUSTER_ID !== 'undefined') {
+    STORAGE_POSTFIX += '_' + window.EMBEDDED_CLUSTER_ID;
+  }
 
   var DATA_CATALOG_VERSION = 1;
 
