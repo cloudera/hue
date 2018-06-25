@@ -146,9 +146,15 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
           <i class="fa fa-plus"></i>
         </a>
         % else:
-        <a class="btn" title="${ _('Toggle the widget toolbar') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
-          <i class="fa fa-plus"></i>
-        </a>
+          %if is_report:
+            <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: draggableDocument(), options: getDraggableOptions({ data: draggableDocument(), plusButton: true })}, visible: columns().length">
+              <i class="fa fa-plus"></i>
+            </a>
+          % else:
+            <a class="btn" title="${ _('Toggle the widget toolbar') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+              <i class="fa fa-plus"></i>
+            </a>
+          %endif
         % endif:
       </div>
       <!-- /ko -->
@@ -233,9 +239,9 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 </div>
 %endif
 
+% if not is_report:
 <%dashboard:layout_toolbar>
   <%def name="results()">
-    % if not is_report:
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ data: draggableResultset(), stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
          title="${_('Grid')}" rel="tooltip" data-placement="top">
@@ -271,11 +277,9 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
              <i class="fa fa-map-marker"></i>
          </a>
     </div>
-      % endif
       </%def>
 
       <%def name="widgets()">
-    % if not is_report:
     <div data-bind="visible: $root.collection.supportAnalytics,
                     css: { 'draggable-widget': true, 'disabled': !hasAvailableFields() },
                     draggable: {data: draggableCounter(), isEnabled: hasAvailableFields,
@@ -394,18 +398,10 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
                        <i class="hcha hcha-map-chart"></i>
          </a>
     </div>
-    % else:
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
-                    draggable: {data: draggableDocument(), isEnabled: true,
-                    options: getDraggableOptions({ data: draggableDocument() }) }"
-         title="${_('Document')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
-                       <i class="fa fa-file-o"></i>
-         </a>
-    </div>
-    % endif
+
       </%def>
 </%dashboard:layout_toolbar>
+% endif
 
 <div class="player-toolbar" data-bind="visible: $root.isPlayerMode">
   <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
