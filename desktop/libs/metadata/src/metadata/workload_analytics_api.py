@@ -66,6 +66,29 @@ def get_impala_query(request):
 
 @require_POST
 @error_handler
+def get_cluster_id(request):
+  response = {'status': -1}
+
+  crn = json.loads(request.POST.get('crn'))
+
+  client = WorkfloadAnalyticsClient(request.user)
+  data = client.list_uploads()
+
+  if data:
+    env = [_env for _env in data['environments'] if _env['crn'] == crn]
+    if not env:
+      response['message'] = 'Workload Analytics: %s environment not found' % crn
+    else:
+      response['status'] = 0
+      response['data'] = env[0]
+  else:
+    response['message'] = 'Workload Analytics: %s' % data['details']
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def get_environment(request):
   response = {'status': -1}
 
