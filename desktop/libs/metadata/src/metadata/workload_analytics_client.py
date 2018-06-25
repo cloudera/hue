@@ -33,6 +33,9 @@ class WorkfloadAnalyticsClient():
   def get_impala_query(self, cluster_id, query_id):
     return WorkloadAnalytics(self.user).get_impala_query(cluster_id=cluster_id, query_id=query_id)
 
+  def list_uploads(self):
+    return WorkloadAnalytics(self.user).list_uploads()
+
   def list_environments(self):
     return WorkloadAnalytics(self.user).list_environments()
 
@@ -52,6 +55,10 @@ class WorkloadAnalytics():
     parameters = {'clusterId': cluster_id, 'queryId': query_id}
 
     return _exec('wa', 'getImpalaQuery', parameters=parameters)
+
+
+  def list_uploads(self):
+    return _exec('wa', 'listUploads')
 
 
   def list_environments(self):
