@@ -706,7 +706,7 @@ var EditorViewModel = (function() {
           while (matchList = reList.exec(match[2])) {
             var option = {text:matchList[2] || matchList[3], value:matchList[3] || matchList[1]};
             option.text = option.text && option.text.trim();
-            option.value = option.value && option.value.trim();
+            option.value = option.value && option.value.trim().replace('\,', ',').replace('\(', '(').replace('\)', ')');
 
             if (value.placeholder || matchList[2]) {
               if (!value.options) {
