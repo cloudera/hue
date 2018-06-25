@@ -216,7 +216,7 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fas fa-long-arrow-alt-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} }">
-        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': catalogEntry.isView() && !navigationSettings.rightAssist, 'fa-table': catalogEntry.isTable() && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
+        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': catalogEntry.isView() && !navigationSettings.rightAssist, 'fa-th': catalogEntry.isTable() && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
         <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(navigationSettings.rightAssist), css: { 'highlight': highlight }"></span>
       </a>
       <div class="center assist-spinner" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin"></i></div>
@@ -1760,25 +1760,6 @@ from desktop.views import _ko
         }
         self.reload();
         self.initialized = true;
-      };
-
-      var NAV_FACET_ICON = 'fa-tags';
-      var NAV_TYPE_ICONS = {
-        'DATABASE': 'fa-database',
-        'TABLE': 'fa-table',
-        'VIEW': 'fa-eye',
-        'FIELD': 'fa-columns',
-        'PARTITION': 'fa-th',
-        'SOURCE': 'fa-server',
-        'OPERATION': 'fa-cogs',
-        'OPERATION_EXECUTION': 'fa-cog',
-        'DIRECTORY': 'fa-folder-o',
-        'FILE': 'fa-file-o',
-        'S3BUCKET': 'fa-cubes',
-        'SUB_OPERATION': 'fa-code-fork',
-        'COLLECTION': 'fa-search',
-        'HBASE': 'fa-th-large',
-        'HUE': 'fa-file-o'
       };
 
       /**
