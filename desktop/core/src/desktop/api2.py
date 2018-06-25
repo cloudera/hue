@@ -34,8 +34,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from metadata.conf import has_navigator
-from metadata.navigator_api import search_entities as metadata_search_entities, _highlight
-from metadata.navigator_api import search_entities_interactive as metadata_search_entities_interactive
+from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties

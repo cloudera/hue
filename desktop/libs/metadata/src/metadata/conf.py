@@ -185,8 +185,7 @@ ALTUS = ConfigSection(
       key="has_wa",
       help=_t("Switch to turn on workload analytics insights."),
       default=True,
-      type=coerce_bool
-    ),
+      type=coerce_bool),
     AUTH_KEY_ID=Config(
       key="auth_key_id",
       help=_t("The name of the key of the service."),
