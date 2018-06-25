@@ -48,6 +48,8 @@
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
+  window.IS_MULTICLUSTER_ONLY = '${ conf.IS_MULTICLUSTER_ONLY.get() }' === 'True';
+
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
   window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
