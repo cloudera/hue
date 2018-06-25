@@ -1999,7 +1999,7 @@ ${ assist.assistPanel() }
       self.useDefaultLocation = ko.observable(true);
       self.nonDefaultLocation = ko.observable('');
 
-      self.hasHeader = ko.observable(true);
+      self.hasHeader = ko.observable(false);
 
       self.useCustomDelimiters = ko.observable(false);
       self.customFieldDelimiter = ko.observable(',');
