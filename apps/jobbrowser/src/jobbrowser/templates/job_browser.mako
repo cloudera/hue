@@ -540,7 +540,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-mapreduce-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['default', 'stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'default' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'default' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
           <!-- ko if: properties.diagnostics() -->
@@ -655,7 +655,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-mapreduce-task-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
 
@@ -749,7 +749,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-oozie-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
@@ -877,7 +877,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
@@ -940,7 +940,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-spark-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
 
@@ -1059,7 +1059,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-spark-executor-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
@@ -1966,7 +1966,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.submitted = ko.observableDefault(job.submitted);
       self.canWrite = ko.observableDefault(job.canWrite == true);
 
-      self.logs = ko.observable('');
+      self.logActive = ko.observable('default');
+      self.logsByName = ko.observable({});
+      self.logs = ko.pureComputed(function() {
+        return self.logsByName()[self.logActive()];
+      });
 
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
@@ -2217,7 +2221,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               vm.job(new Job(vm, data.app)); // Updates everything but redraw the page
             } else {
               vm.job().fetchStatus();
-              vm.job().fetchLogs();
+              vm.job().fetchLogs(vm.job().logActive());
             }
             var profile = $("div[data-jobType] .tab-content .active").data("profile")
             if (profile) {
@@ -2228,17 +2232,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.fetchLogs = function (name) {
-        self.logs('');
+        name = name || 'default';
         $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           type: ko.mapping.toJSON(self.type),
-          name: ko.mapping.toJSON(name ? name : 'default')
+          name: ko.mapping.toJSON(name)
         }, function (data) {
           if (data.status == 0) {
-            self.logs(data.logs.logs);
+            var result = self.logsByName();
+            result[name] = data.logs.logs;
+            self.logsByName(result);
             if ($('.jb-panel pre:visible').length > 0){
-              $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 30));
+              $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 75));
             }
           } else {
             $(document).trigger("error", data.message);
@@ -2954,7 +2960,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       $(document).on('shown', '.jb-logs-link', function (e) {
         var dest = $(e.target).attr('href');
         if (dest.indexOf('logs') > -1 && $(dest).find('pre:visible').length > 0){
-          $(dest).find('pre').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $(dest).find('pre').offset().top - $('.page-content').scrollTop() - 30));
+          $(dest).find('pre').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $(dest).find('pre').offset().top - $('.page-content').scrollTop() - 75));
         }
       });
     });
