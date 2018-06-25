@@ -570,22 +570,26 @@
   white-space: nowrap;
 }
 
-.assist-flex-fill {
+.assist-flex-fill,
+.assist-flex-half,
+.assist-flex-quarter {
   position: relative;
-  .flex(1 1 100%);
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: auto;
   outline: none !important;
 }
 
+.assist-flex-fill {
+  .flex(1 1 100%);
+}
+
 .assist-flex-half {
-  position: relative;
   .flex(1 1 50%);
-  white-space: nowrap;
-  overflow-x: hidden;
-  overflow-y: auto;
-  outline: none !important;
+}
+
+.assist-flex-quarter {
+  .flex(1 1 25%);
 }
 
 .database-tree ul {

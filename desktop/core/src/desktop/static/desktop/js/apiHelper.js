@@ -1951,12 +1951,40 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.computeId
+   * @param {string} options.queryId
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchQueryExecutionAnalysis = function (options)  {
+    var self = this;
+    var url = '/metadata/api/workload_analytics/get_impala_query/';
+    return self.simplePost(url, {
+      'cluster_id': '"' + options.computeId + '"',
+      'query_id': '"' + options.queryId + '"'
+    }, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
   ApiHelper.prototype.fetchContextNamespaces = function (options) {
     var self = this;
     var url = '/desktop/api2/context/namespaces/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
   ApiHelper.prototype.fetchContextComputes = function (options) {
     var self = this;
     var url = '/desktop/api2/context/computes/' + options.sourceType;

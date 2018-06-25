@@ -1533,6 +1533,10 @@ var EditorViewModel = (function() {
         return;
       }
 
+      if (self.type() === 'impala') {
+        huePubSub.publish('assist.clear.execution.analysis');
+      }
+
       self.status('running');
       self.statusForButtons('executing');
 
@@ -1975,6 +1979,15 @@ var EditorViewModel = (function() {
                 self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
               }
             } else if (self.status() === 'available') {
+              if (self.type() === 'impala') {
+
+                // TODO: Use real compute and query ID
+                huePubSub.publish('assist.update.execution.analysis', {
+                  computeId: '6bfa86a8-55a2-4466-9003-2b222a9be137', // TODO: Compute ID ?
+                  queryId: '56433486cd84d475:3a86f97000000000'
+                });
+
+              }
               self.fetchResult(100);
               self.progress(100);
               if (self.isSqlDialect()) {

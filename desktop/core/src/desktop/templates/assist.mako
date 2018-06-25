@@ -26,7 +26,7 @@ from dashboard.conf import HAS_SQL_ENABLED
 
 from desktop import appmanager
 from desktop import conf
-from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS
+from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS, IS_MULTICLUSTER_ONLY
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
@@ -2405,8 +2405,8 @@ from desktop.views import _ko
         </div>
 
         <!-- ko if: HAS_OPTIMIZER && !isSolr() -->
-        <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Suggestions') }</div></div>
-        <div class="assist-flex-half">
+        <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Query Analysis') }</div></div>
+        <div data-bind="css: IS_MULTICLUSTER_ONLY ? 'assist-flex-quarter' : 'assist-flex-half'">
           <!-- ko if: ! activeRisks().hints -->
           <div class="assist-no-entries">${ _('Select a query or start typing to get optimization hints.') }</div>
           <!-- /ko -->
@@ -2436,8 +2436,35 @@ from desktop.views import _ko
           <!-- /ko -->
         </div>
         <!-- /ko -->
+
+        <!-- ko if: IS_MULTICLUSTER_ONLY && !isSolr() -->
+          <div class="assist-flex-header" data-bind="css: { 'assist-divider': !HAS_OPTIMIZER }"><div class="assist-inner-header">${ _('Execution Analysis') }</div></div>
+          <div data-bind="css: HAS_OPTIMIZER ? 'assist-flex-quarter' : 'assist-flex-half'">
+          <!-- ko hueSpinner: { spin: loadingExecutionAnalysis, inline: true} --><!-- /ko -->
+            <!-- ko ifnot: loadingExecutionAnalysis -->
+            <!-- ko if: !executionAnalysis() -->
+            <div class="assist-no-entries">${ _('Execute a query to get query execution analysis.') }</div>
+            <!-- /ko -->
+            <!-- ko with: executionAnalysis -->
+            <ul class="risk-list" data-bind="foreach: healthChecks">
+              <li data-bind="templatePopover : { placement: 'left', contentTemplate: 'health-check-details-content', titleTemplate: 'health-check-details-title', minWidth: '320px', trigger: 'hover' }">
+                <div class="risk-list-title risk-list-normal"><span data-bind="text: name"></span></div>
+              </li>
+            </ul>
+            <!-- /ko -->
+          <!-- /ko -->
+          </div>
+        <!-- /ko -->
       </div>
     </div>
+  </script>
+
+  <script type="text/html" id="health-check-details-content">
+    <div data-bind="text: description"></div>
+  </script>
+
+  <script type="text/html" id="health-check-details-title">
+    <span data-bind="text: name"></span>
   </script>
 
   <script type="text/javascript">
@@ -2509,6 +2536,9 @@ from desktop.views import _ko
         self.activeLocations = ko.observable();
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
+
+        self.loadingExecutionAnalysis = ko.observable(false);
+        self.executionAnalysis = ko.observable();
 
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
@@ -2807,8 +2837,7 @@ from desktop.views import _ko
           }
         };
 
-
-        huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+        var entryRefreshedSub = huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
           var sourceType = details.entry.getSourceType();
           if (sources[sourceType]) {
             var completeRefresh = false;
@@ -2851,8 +2880,29 @@ from desktop.views import _ko
           }
         });
 
+        var clearAnalysisSub = huePubSub.subscribe('assist.clear.execution.analysis', function() {
+          self.executionAnalysis(undefined);
+        });
+
+        var executionAnalysisSub = huePubSub.subscribe('assist.update.execution.analysis', function (details) {
+          self.loadingExecutionAnalysis(true);
+          ApiHelper.getInstance().fetchQueryExecutionAnalysis({
+            silenceErrors: true,
+            computeId: details.computeId,
+            queryId: details.queryId
+          }).done(function (response) {
+            if (response && response.data && response.data.query)
+            self.executionAnalysis(response.data.query)
+          }).always(function () {
+            self.loadingExecutionAnalysis(false);
+          });
+        });
+
         self.disposals.push(function () {
+          entryRefreshedSub.remove();
           activeTabSub.dispose();
+          clearAnalysisSub.remove();
+          executionAnalysisSub.remove();
         });
 
         var activeLocationsSub = huePubSub.subscribe('editor.active.locations', function (activeLocations) {
