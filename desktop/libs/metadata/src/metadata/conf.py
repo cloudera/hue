@@ -56,6 +56,9 @@ def get_optimizer_url():
 def has_optimizer():
   return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
+def has_workload_analytics():
+  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
+
 
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
@@ -178,6 +181,12 @@ ALTUS = ConfigSection(
       key='hostname_wa',
       help=_t('Hostname prefix to Altus WA API or compatible service.'),
       default='waapi.us-west-1.altus.cloudera.com'),
+    HAS_WA = Config(
+      key="has_wa",
+      help=_t("Switch to turn on workload analytics insights."),
+      default=True,
+      type=coerce_bool
+    ),
     AUTH_KEY_ID=Config(
       key="auth_key_id",
       help=_t("The name of the key of the service."),
