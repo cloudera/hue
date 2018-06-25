@@ -31,7 +31,7 @@ from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document, FilesystemException
 from desktop.views import serve_403_error
 
-from metadata.conf import has_optimizer, has_navigator
+from metadata.conf import has_optimizer, has_navigator, has_workload_analytics
 
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
 from notebook.connectors.base import Notebook, get_api, _get_snippet_name
@@ -86,6 +86,7 @@ def notebook(request, is_embeddable=False):
           'languages': get_ordered_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
+          'is_wa_enabled': has_workload_analytics(),
           'is_navigator_enabled': has_navigator(request.user),
           'editor_type': 'notebook'
       }),
@@ -126,6 +127,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
         'languages': get_ordered_interpreters(request.user),
         'mode': 'editor',
         'is_optimizer_enabled': has_optimizer(),
+        'is_wa_enabled': has_workload_analytics(),
         'is_navigator_enabled': has_navigator(request.user),
         'editor_type': editor_type,
         'mobile': is_mobile
