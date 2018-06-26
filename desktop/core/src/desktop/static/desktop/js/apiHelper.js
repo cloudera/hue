@@ -53,6 +53,7 @@ var CancellablePromise = (function () {
 
   function CancellablePromise(deferred, request, otherCancellables) {
     var self = this;
+    self.cancelCallbacks = [];
     self.deferred = deferred;
     self.request = request;
     self.otherCancellables = otherCancellables;
@@ -92,7 +93,21 @@ var CancellablePromise = (function () {
     if (self.otherCancellables) {
       self.otherCancellables.forEach(function (cancellable) { if (cancellable.cancel) { cancellable.cancel() } });
     }
+
+    while (self.cancelCallbacks.length) {
+      self.cancelCallbacks.pop()();
+    }
     return this;
+  };
+
+  CancellablePromise.prototype.onCancel = function (callback) {
+    var self = this;
+    if (self.cancelled) {
+      callback();
+    } else {
+      self.cancelCallbacks.push(callback);
+    }
+    return self;
   };
 
   CancellablePromise.prototype.then = function () {
@@ -1956,15 +1971,46 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    * @param {string} options.computeId
    * @param {string} options.queryId
-   * @return {Promise}
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchQueryExecutionAnalysis = function (options)  {
     var self = this;
     var url = '/metadata/api/workload_analytics/get_impala_query/';
-    return self.simplePost(url, {
-      'cluster_id': '"' + options.computeId + '"',
-      'query_id': '"' + options.queryId + '"'
-    }, options);
+    var deferred = $.Deferred();
+
+    var tries = 0;
+
+    var cancellablePromises = [];
+
+    var promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+
+    var pollForAnalysis = function () {
+      if (tries === 10) {
+        deferred.reject();
+        return;
+      }
+      tries++;
+      cancellablePromises.pop(); // Remove the last one
+      cancellablePromises.push(deferred, self.simplePost(url, {
+        'cluster_id': '"' + options.computeId + '"',
+        'query_id': '"' + options.queryId + '"'
+      }, options).done(function (response) {
+        if (response && response.data) {
+          deferred.resolve(response.data)
+        } else {
+          var timeout = window.setTimeout(function () {
+            pollForAnalysis();
+          }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
+          promise.onCancel(function () {
+            window.clearTimeout(timeout);
+          })
+        }
+      }).fail(deferred.reject));
+    };
+
+    pollForAnalysis();
+
+    return promise;
   };
 
   /**
