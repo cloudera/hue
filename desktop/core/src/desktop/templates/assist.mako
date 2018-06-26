@@ -2960,9 +2960,14 @@ from desktop.views import _ko
           }
         });
 
+        var lastExecutionAnalysisPromise = undefined;
+
         var clearAnalysisSub = huePubSub.subscribe('assist.clear.execution.analysis', function() {
           if (!HAS_WORKLOAD_ANALYTICS) {
             return;
+          }
+          if (lastExecutionAnalysisPromise) {
+            lastExecutionAnalysisPromise.cancel();
           }
           self.executionAnalysis(undefined);
         });
@@ -2972,13 +2977,12 @@ from desktop.views import _ko
             return;
           }
           self.loadingExecutionAnalysis(true);
-          ApiHelper.getInstance().fetchQueryExecutionAnalysis({
+          lastExecutionAnalysisPromise = ApiHelper.getInstance().fetchQueryExecutionAnalysis({
             silenceErrors: true,
             computeId: details.computeId,
             queryId: details.queryId
           }).done(function (response) {
-            if (response && response.data && response.data.query)
-            self.executionAnalysis(response.data.query)
+            self.executionAnalysis(response.query)
           }).always(function () {
             self.loadingExecutionAnalysis(false);
           });
