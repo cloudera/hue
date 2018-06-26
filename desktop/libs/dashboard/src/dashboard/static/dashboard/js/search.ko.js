@@ -799,22 +799,22 @@ var Collection = function (vm, collection) {
   };
 
   // Very top facet
-  self._addObservablesToFacet = function(facet, vm) {
+  self._addObservablesToFacet = function (facet, vm) {
     if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
-      facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
+      facet.properties.facets_form.aggregate.metrics = ko.computed(function () {
         var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
 
       // Here we could weight the fields
-      facet.properties.facets_form.aggregate.facetFieldsNames = ko.computed(function() {
+      facet.properties.facets_form.aggregate.facetFieldsNames = ko.computed(function () {
         return self._getCompatibleMetricFields(facet.properties.facets_form);
-      }).extend({ trackArrayChanges: true });
+      }).extend({trackArrayChanges: true});
 
       facet.properties.facets_form.isEditing = ko.observable(true);
 
       if (facet.properties.facets) {
-        facet.properties.facets.subscribe(function(newValue) {
+        facet.properties.facets.subscribe(function (newValue) {
           vm.search();
         });
       }
@@ -844,20 +844,20 @@ var Collection = function (vm, collection) {
       facet.properties.compare.gap.subscribe(function () {
         vm.search();
       });
-     }
+    }
 
     // For Solr 5+  only
     if (typeof facet.template != 'undefined') {
-      facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
+      facet.template.filteredAttributeFields = ko.computed(function () { // Dup of template.filteredAttributeFields
         var _fields = [];
 
         var _iterable = facet.template.fieldsAttributes();
-        if (! facet.template.filteredAttributeFieldsAll()){
+        if (!facet.template.filteredAttributeFieldsAll()) {
           _iterable = facet.template.fields();
         }
 
         $.each(_iterable, function (index, field) {
-          if (facet.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(facet.template.fieldsAttributesFilter().toLowerCase()) > -1){
+          if (facet.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(facet.template.fieldsAttributesFilter().toLowerCase()) > -1) {
             _fields.push(field);
           }
         });
@@ -878,20 +878,50 @@ var Collection = function (vm, collection) {
         return _fields;
       });
 
-      facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
+      facet.template.getMeta = function (extraCheck) {
+        return $.map(facet.template.fields(), function (field) {
+          var fieldType = field.type().toLowerCase();
+          if (fieldType.indexOf('_') > -1) {
+            fieldType = fieldType.split('_')[0];
+          }
+          if (typeof field !== 'undefined' && field.name() != '' && extraCheck(fieldType)) {
+            return field;
+          }
+        }).sort(function (a, b) {
+          return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
+        });
+      }
+
+      facet.template.cleanedMeta = ko.computed(function () {
+        return facet.template.getMeta(alwaysTrue);
+      });
+
+      facet.template.cleanedNumericMeta = ko.computed(function () {
+        return facet.template.getMeta(isNumericColumn);
+      });
+
+      facet.template.cleanedStringMeta = ko.computed(function () {
+        return facet.template.getMeta(isStringColumn);
+      });
+
+      facet.template.cleanedDateTimeMeta = ko.computed(function () {
+        return facet.template.getMeta(isDateTimeColumn);
+      });
+
+      facet.template.fieldsSelected.subscribe(function (newValue) { // Could be more efficient as we don't need to research, just redraw
         if (newValue.length > 0) {
           vm.getFacetFromQuery(facet.id()).resultHash('');
           vm.search();
         }
       });
 
-      facet.template.chartSettings.chartType.subscribe(function(newValue) {
+      facet.template.chartSettings.chartType.subscribe(function (newValue) {
         facet.widgetType(
-            newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
+          newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
             (newValue == ko.HUE_CHARTS.TYPES.TIMELINECHART ? 'timeline-widget' :
-            (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' :
-            (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' :
-            (newValue == ko.HUE_CHARTS.TYPES.TEXTSELECT ? 'text-facet-widget' : 'bucket-widget'))))
+              (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' :
+                (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' :
+                  (newValue == ko.HUE_CHARTS.TYPES.TEXTSELECT ? 'text-facet-widget' : 'bucket-widget'))))
         );
       });
 
@@ -909,7 +939,8 @@ var Collection = function (vm, collection) {
         self._addObservablesToNestedFacet(facet, nestedFacet, vm, index);
       });
     }
-    function getFq () {
+
+    function getFq() {
       var _fq, fqs = vm.query && vm.query.fqs();
       for (var i = 0; fqs && i < fqs.length; i++) {
         var fq = fqs[i];
@@ -920,9 +951,11 @@ var Collection = function (vm, collection) {
       }
       return _fq;
     }
+
     facet.canReset = ko.computed(function () {
       var _fq = getFq();
-      function isNotInitial () {
+
+      function isNotInitial() {
         if (!facet.properties.canRange()) {
           return false;
         }
@@ -932,6 +965,7 @@ var Collection = function (vm, collection) {
           return facet.properties.start() !== facet.properties.initial_start() || facet.properties.end() !== facet.properties.initial_end();
         }
       }
+
       return _fq && _fq.filter().length || isNotInitial();
     });
     facet.canZoomIn = ko.computed(function () {
@@ -970,7 +1004,7 @@ var Collection = function (vm, collection) {
     return self.template.getMeta(isDateTimeColumn);
   });
 
-  self._addObservablesToNestedFacet = function(facet, nestedFacet, vm, index) {
+  self._addObservablesToNestedFacet = function (facet, nestedFacet, vm, index) {
     nestedFacet.limit.subscribe(function () {
       vm.search();
     });
@@ -986,7 +1020,7 @@ var Collection = function (vm, collection) {
         vm.search();
       });
 
-      nestedFacet.aggregate.metrics = ko.computed(function() {
+      nestedFacet.aggregate.metrics = ko.computed(function () {
         var _field = self.getTemplateField(nestedFacet.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
@@ -1003,17 +1037,17 @@ var Collection = function (vm, collection) {
         } else {
           return template.cleanedStringMeta();
         }
-      }).extend({ trackArrayChanges: true });
+      }).extend({trackArrayChanges: true});
     }
 
     nestedFacet.isEditing = ko.observable(false);
   }
 
-  self._getCompatibleMetricFields = function(nestedFacet) {
+  self._getCompatibleMetricFields = function (nestedFacet) {
     var fields = null;
 
     if (['avg', 'sum', 'median', 'percentile', 'stddev', 'variance'].indexOf(nestedFacet.aggregate.function()) != -1) {
-      fields = $.grep(self.template.fieldsAttributes(), function(field) {
+      fields = $.grep(self.template.fieldsAttributes(), function (field) {
         return isNumericColumn(field.type()) || isDateTimeColumn(field.type());
       })
     } else {
@@ -1022,7 +1056,7 @@ var Collection = function (vm, collection) {
 
     return fields.sort(function (a, b) {
       return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
-   });
+    });
   };
 
   self.facets = ko.mapping.fromJS(collection.facets);
