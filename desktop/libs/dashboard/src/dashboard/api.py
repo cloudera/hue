@@ -509,6 +509,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
           'chartYMulti': [],
           'chartData': [],
           'chartMapLabel': None,
+          'chartSelectorType': 'bar'
         },
         "fieldsAttributes": [],
         "fieldsAttributesFilter": "",
