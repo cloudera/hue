@@ -2486,7 +2486,7 @@ from desktop.views import _ko
 
         <!-- ko if: HAS_OPTIMIZER && !isSolr() -->
         <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Query Analysis') }</div></div>
-        <div data-bind="css: IS_MULTICLUSTER_ONLY ? 'assist-flex-quarter' : 'assist-flex-half'">
+        <div data-bind="css: HAS_WORKLOAD_ANALYTICS ? 'assist-flex-quarter' : 'assist-flex-half'">
           <!-- ko if: ! activeRisks().hints -->
           <div class="assist-no-entries">${ _('Select a query or start typing to get optimization hints.') }</div>
           <!-- /ko -->
@@ -2517,7 +2517,7 @@ from desktop.views import _ko
         </div>
         <!-- /ko -->
 
-        <!-- ko if: IS_MULTICLUSTER_ONLY && !isSolr() -->
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && !isSolr() -->
           <div class="assist-flex-header" data-bind="css: { 'assist-divider': !HAS_OPTIMIZER }"><div class="assist-inner-header">${ _('Execution Analysis') }</div></div>
           <div data-bind="css: HAS_OPTIMIZER ? 'assist-flex-quarter' : 'assist-flex-half'">
           <!-- ko hueSpinner: { spin: loadingExecutionAnalysis, inline: true} --><!-- /ko -->
@@ -2961,10 +2961,16 @@ from desktop.views import _ko
         });
 
         var clearAnalysisSub = huePubSub.subscribe('assist.clear.execution.analysis', function() {
+          if (!HAS_WORKLOAD_ANALYTICS) {
+            return;
+          }
           self.executionAnalysis(undefined);
         });
 
         var executionAnalysisSub = huePubSub.subscribe('assist.update.execution.analysis', function (details) {
+          if (!HAS_WORKLOAD_ANALYTICS) {
+            return;
+          }
           self.loadingExecutionAnalysis(true);
           ApiHelper.getInstance().fetchQueryExecutionAnalysis({
             silenceErrors: true,
