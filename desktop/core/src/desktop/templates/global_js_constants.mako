@@ -23,7 +23,7 @@
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_navigator, has_optimizer, OPTIMIZER
+  from metadata.conf import has_navigator, has_optimizer, has_workload_analytics, OPTIMIZER
 %>
 
 (function () {
@@ -48,7 +48,7 @@
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
-  window.IS_MULTICLUSTER_ONLY = '${ conf.IS_MULTICLUSTER_ONLY.get() }' === 'True';
+  window.HAS_WORKLOAD_ANALYTICS = '${ has_workload_analytics() }' === 'True';
 
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
