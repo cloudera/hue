@@ -249,10 +249,15 @@ nv.models.multiBarWithBrushChart = function() {
         legend.height(availableHeight);
         legend.rightAlign(false);
         legend.margin({top: 5, right: 0, left: 10, bottom: 0});
-        if (multibar.barColor())
+        if (multibar.barColor()) {
           data.forEach(function(series,i) {
             series.color = d3v3.rgb('#ccc').darker(i * 1.5).toString();
           });
+        } else {
+          data.forEach(function(series,i) {
+            series.color = color(series, i);
+          });
+        }
 
         try {
           legendG
@@ -755,7 +760,7 @@ nv.models.multiBarWithBrushChart = function() {
             multibar.dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
-              series: data[d.series],
+              series: filteredData[d.series],
               pointIndex: i,
               seriesIndex: d.series,
               e: d3v3.event
@@ -787,7 +792,7 @@ nv.models.multiBarWithBrushChart = function() {
                   return {
                     value: getY(d),
                     point: d,
-                    series: data[d.series],
+                    series: filteredData[d.series],
                     pos: [x(getX(d)) + width * 0.5, y(getY(d) + (multibar.stacked() ? d.y0 : 0))],
                     pointIndex: -1,
                     seriesIndex: d.series,
@@ -807,7 +812,7 @@ nv.models.multiBarWithBrushChart = function() {
             multibar.dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
-              series: data[d.series],
+              series: filteredData[d.series],
               pointIndex: d.index,
               seriesIndex: d.series,
               e: d3v3.event
@@ -821,7 +826,7 @@ nv.models.multiBarWithBrushChart = function() {
         multibar.dispatch.elementClick({
           value: getY(d),
           point: d,
-          series: data[d.series],
+          series: filteredData[d.series],
           pointIndex: d.index,
           seriesIndex: d.series,
           e: d3v3.event

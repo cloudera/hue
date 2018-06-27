@@ -952,13 +952,16 @@ class SolrApi(object):
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'],
                            SLOTS=properties['slot'])
       gap = props['gap']
-      unit = re.split('\d+', gap)[1]
+      if isinstance(gap, basestring):
+        unit = re.split('\d+', gap)[1]
+      else:
+        unit = ''
       return {
         'min': '%(min)s' % props,
         'max': '%(max)s' % props,
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
-        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit},
+        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit} if unit else '%(gap)s' % {'gap': gap},
       }
     elif timeFilter:
       props = {}
@@ -973,11 +976,12 @@ class SolrApi(object):
         stat_facet = {'min': properties['min'], 'max': properties['max']}
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS = properties['slot'])
       gap = props['gap']
-      unit = re.split('\d+', gap)[1]
+      if isinstance(gap, basestring):
+        unit = re.split('\d+', gap)[1]
       return {
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
-        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit},
+        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit} if unit else '%(gap)s' % {'gap': gap},
         'min': '%(min)s' % props,
         'max': '%(max)s' % props,
       }

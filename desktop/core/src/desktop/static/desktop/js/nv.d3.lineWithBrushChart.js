@@ -228,6 +228,9 @@ nv.models.lineWithBrushChart = function() {
         legend.height(availableHeight);
         legend.rightAlign(false);
         legend.margin({top: 5, right: 0, left: 10, bottom: 0});
+        data.forEach(function(series,i) {
+          series.color = color(series, i);
+        });
 
         try {
           legendG
@@ -697,7 +700,7 @@ nv.models.lineWithBrushChart = function() {
               lines.dispatch.elementMouseover({
                 value: getY(d),
                 point: d,
-                series: data[d.series],
+                series: filteredData[d.series],
                 pos: [x(getX(d)), y(getY(d))],
                 pointIndex: -1,
                 seriesIndex: d.series,
@@ -705,7 +708,7 @@ nv.models.lineWithBrushChart = function() {
                   return {
                     value: getY(d),
                     point: d,
-                    series: data[d.series],
+                    series: filteredData[d.series],
                     pos: [x(getX(d)), y(getY(d))],
                     pointIndex: -1,
                     seriesIndex: d.series,
@@ -725,7 +728,7 @@ nv.models.lineWithBrushChart = function() {
             lines.dispatch.elementMouseout({
               value: getY(d),
               point: d,
-              series: data[d.series],
+              series: filteredData[d.series],
               pointIndex: d.index,
               seriesIndex: d.series,
               e: d3v3.event
@@ -739,7 +742,7 @@ nv.models.lineWithBrushChart = function() {
         lines.dispatch.elementClick({
           value: getY(d),
           point: d,
-          series: data[d.series],
+          series: filteredData[d.series],
           pointIndex: d.index,
           seriesIndex: d.series,
           e: d3v3.event
