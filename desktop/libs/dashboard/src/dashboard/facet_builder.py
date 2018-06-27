@@ -56,7 +56,8 @@ TIME_INTERVALS_STARTING_VALUE = {
   'minute': 0,
   'hour': 0,
   'day': 1,
-  'month': 1
+  'month': 1,
+  'year': 0
 }
 TIME_INTERVAL_SORTED = ['microsecond', 'second', 'minute', 'hour', 'day', 'month']
 TIME_INTERVALS = [
