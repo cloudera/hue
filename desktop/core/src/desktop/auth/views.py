@@ -161,6 +161,11 @@ def dt_login(request, from_modal=False):
       except (IOError, WebHdfsException), e:
         LOG.error('Could not create home directory for SAML user %s.' % request.user)
 
+  if is_active_directory and not is_ldap_option_selected and \
+                  request.method == 'POST' and request.user.username != request.POST.get('username'):
+    # local user login failed, give the right auth_form with 'server' field
+    auth_form = auth_forms.LdapAuthenticationForm()
+
   if not from_modal:
     request.session.set_test_cookie()
 
