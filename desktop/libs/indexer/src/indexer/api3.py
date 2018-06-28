@@ -21,6 +21,7 @@ import logging
 import urllib
 import StringIO
 
+from urlparse import urlparse
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from simple_salesforce.api import Salesforce
@@ -307,6 +308,16 @@ def importer_submit(request):
     if source['path']:
       path = urllib.unquote(source['path'])
       source['path'] = request.fs.netnormpath(path)
+      parent_path = request.fs.parent_path(path)
+      stats = request.fs.stats(parent_path)
+      split = urlparse(path)
+      # Only for HDFS, import data and non-external table
+      if split.scheme in ('', 'hdfs') and destination['importData'] and destination['useDefaultLocation'] and oct(stats["mode"])[-1] != '7':
+        user_scratch_dir = request.fs.get_home_dir() + '/.scratchdir'
+        request.fs.do_as_user(request.user, request.fs.mkdir, user_scratch_dir, 00777)
+        request.fs.do_as_user(request.user, request.fs.rename, source['path'], user_scratch_dir)
+        source['path'] = user_scratch_dir + '/' + source['path'].split('/')[-1]
+
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
