@@ -71,12 +71,11 @@ def is_alive(request):
 
 
 def hue(request):
-  apps = appmanager.get_apps_dict(request.user)
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   clusters = get_clusters(request.user).values()
 
   return render('hue.mako', request, {
-    'apps': apps,
+    'apps': apps_list,
     'other_apps': other_apps,
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
@@ -509,7 +508,7 @@ def get_banner_message(request):
   banner_message = None
   forwarded_host = request.get_host()
 
-  message = None;
+  message = None
   path_info = request.environ.get("PATH_INFO")
   if IS_HUE_4.get() and path_info.find("/hue/") < 0 and path_info.find("accounts/login") < 0:
     url = request.build_absolute_uri("/hue")
