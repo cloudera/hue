@@ -30,7 +30,7 @@
 var ContextCatalog = (function () {
 
   var STORAGE_POSTFIX = LOGGED_USERNAME;
-  var CONTEXT_CATALOG_VERSION = 2;
+  var CONTEXT_CATALOG_VERSION = 3;
   var NAMESPACES_CONTEXT_TYPE = 'namespaces';
   var COMPUTES_CONTEXT_TYPE = 'computes';
 
@@ -111,11 +111,10 @@ var ContextCatalog = (function () {
         ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
             var namespaces = namespaces[options.sourceType];
-            var dynamic = true; //namespaces.hasMultiCluster;
             if (namespaces) {
               self.namespaces[options.sourceType] = { namespaces: namespaces.filter(function (namespace) {
                 return namespace.name; // Only include namespaces with a name.
-              }), dynamic: dynamic };
+              }), dynamic: namespaces.hasMultiCluster };
               deferred.resolve(self.namespaces[options.sourceType]);
               if (notifyForRefresh) {
                 huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
