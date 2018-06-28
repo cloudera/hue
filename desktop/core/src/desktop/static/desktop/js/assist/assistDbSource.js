@@ -116,11 +116,11 @@ var AssistDbSource = (function () {
     self.loadedDeferred.done(callback);
   };
 
-  AssistDbSource.prototype.loadNamespaces = function () {
+  AssistDbSource.prototype.loadNamespaces = function (refresh) {
     var self = this;
     self.loading(true);
 
-    return ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
+    return ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: refresh }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
       var activeCompute;
@@ -146,12 +146,12 @@ var AssistDbSource = (function () {
         assistNamespaces.push(assistNamespace);
       });
       self.namespaces(assistNamespaces);
-      if (activeNamespace) {
+      if (!refresh && activeNamespace) {
         self.selectedNamespace(activeNamespace);
-      } else if (assistNamespaces.length) {
+      } else if (!refresh && assistNamespaces.length) {
         self.selectedNamespace(assistNamespaces[0]);
       }
-      if (activeCompute) {
+      if (!refresh && activeCompute) {
         self.selectedNamespace().compute(activeCompute);
       }
     }).fail(function () {
@@ -200,7 +200,7 @@ var AssistDbSource = (function () {
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
     var self = this;
-    ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: true });
+    self.loadNamespaces(true);
   };
 
   return AssistDbSource;

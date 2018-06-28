@@ -110,11 +110,12 @@ var ContextCatalog = (function () {
       var fetchNamespaces = function () {
         ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
+            var dynamic = namespaces.dynamicClusters;
             var namespaces = namespaces[options.sourceType];
             if (namespaces) {
               self.namespaces[options.sourceType] = { namespaces: namespaces.filter(function (namespace) {
                 return namespace.name; // Only include namespaces with a name.
-              }), dynamic: namespaces.hasMultiCluster };
+              }), dynamic: dynamic };
               deferred.resolve(self.namespaces[options.sourceType]);
               if (notifyForRefresh) {
                 huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
