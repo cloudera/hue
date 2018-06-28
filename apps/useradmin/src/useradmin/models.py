@@ -120,10 +120,8 @@ class UserProfile(models.Model):
     if self.user.is_superuser:
       return True
 
-    for group in self.user.groups.all():
-      if group_has_permission(group, perm):
-        return True
-    return False
+    group_ids = self.user.groups.values_list('id', flat=True)
+    return GroupPermission.objects.filter(group__id__in=group_ids, hue_permission=perm).exists()
 
   def check_hue_permission(self, perm=None, app=None, action=None):
     """
