@@ -49,16 +49,17 @@ def search(request):
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
   facet = json.loads(request.POST.get('facet', '{}'))
+  cluster = request.POST.get('cluster', '""')
 
   query['download'] = 'download' in request.POST
   fetch_result = 'fetch_result' in request.POST
-  
+
   if collection:
     try:
       if fetch_result:
-        response = get_engine(request.user, collection, facet).fetch_result(collection, query, facet)
+        response = get_engine(request.user, collection, facet, cluster=cluster).fetch_result(collection, query, facet)
       else:
-        response = get_engine(request.user, collection, facet).query(collection, query, facet)
+        response = get_engine(request.user, collection, facet, cluster=cluster).query(collection, query, facet)
     except RestException, e:
       response.update(extract_solr_exception_message(e))
     except Exception, e:

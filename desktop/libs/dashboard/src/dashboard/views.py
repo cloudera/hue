@@ -132,7 +132,8 @@ def index_m(request):
 
 def new_search(request):
   engine = request.GET.get('engine', 'solr')
-  collections = get_engine(request.user, engine).datasets() if engine != 'report' else ['default']
+  cluster = request.POST.get('cluster','""')
+  collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
   if not collections:
     if engine == 'solr':
       return no_collections(request)
