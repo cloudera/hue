@@ -40,14 +40,15 @@ LIMIT = 100
 
 
 class MockRequest():
-  def __init__(self, user):
+  def __init__(self, user, cluster):
     self.user = user
+    self.POST = {'cluster': cluster}
 
 
 class SQLDashboardApi(DashboardApi):
 
-  def __init__(self, user, engine, source='data'):
-    super(SQLDashboardApi, self).__init__(user)
+  def __init__(self, user, engine, source='data', cluster='""'):
+    super(SQLDashboardApi, self).__init__(user, cluster)
     self.engine = engine
     self.source = source
     self.async = engine == 'hive' or engine == 'impala'
@@ -176,7 +177,7 @@ class SQLDashboardApi(DashboardApi):
         skip_historify=True
     )
 
-    response = editor.execute(MockRequest(self.user))
+    response = editor.execute(MockRequest(self.user, self.cluster))
 
     if 'handle' in response and response['handle'].get('sync'):
       response['result'] = self._convert_result(response['result'], dashboard, facet, query)
@@ -192,7 +193,7 @@ class SQLDashboardApi(DashboardApi):
 
     start_over = True # TODO
 
-    result = get_api(MockRequest(self.user), snippet).fetch_result(
+    result = get_api(MockRequest(self.user, self.cluster), snippet).fetch_result(
         notebook,
         snippet,
         dashboard['template']['rows'],
@@ -206,9 +207,9 @@ class SQLDashboardApi(DashboardApi):
   def datasets(self, show_all=False):
     snippet = {'type': self.engine}
     # Ideally from left assist at some point instead
-    databases = get_api(MockRequest(self.user), snippet).autocomplete(snippet)['databases']
+    databases = get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet)['databases']
     database = databases and 'default' not in databases and databases[0] or 'default'
-    return [database + '.' + table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database=database)['tables_meta']]
+    return [database + '.' + table['name'] for table in get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet, database=database)['tables_meta']]
 
 
   # This method currently behaves more like a static method
@@ -221,7 +222,7 @@ class SQLDashboardApi(DashboardApi):
     else:
       database, table = self._get_database_table_names(name)
 
-    table_metadata = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table)
+    table_metadata = get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet, database, table)
 
     return {
       'schema': {
@@ -322,7 +323,7 @@ class SQLDashboardApi(DashboardApi):
         # async=False
     )
 
-    request = MockRequest(self.user)
+    request = MockRequest(self.user, self.cluster)
     mock_notebook = {}
     snippet = {'type': self.engine}
     response = editor.execute(request)
