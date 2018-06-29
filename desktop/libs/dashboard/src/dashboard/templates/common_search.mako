@@ -1026,13 +1026,15 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- /ko -->
 
 
-    <div class="result-main" style="overflow-x: auto">
+    <div class="result-main html-resultset" style="overflow-x: auto">
+      <!-- ko if: $root.isToolbarVisible -->
       <div class="edit-dimensions" style="float: right">
         <div class="badge dimensions-badge-container dimensions-badge-container-add">
           <div class="action-icon" data-bind="click: function(){ isEditing(true);}"><i class="fa fa-pencil"></i> ${ _('Edit template') }</div>
         </div>
         <div class="clearfix"></div>
       </div>
+      <!-- /ko -->
 
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
         <br/>
