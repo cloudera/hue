@@ -3399,7 +3399,7 @@ from desktop.views import _ko
 
         var updateContentsForType = function (type) {
           self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
-          self.editorAssistantTabAvailable(type === 'hive' || type === 'impala');
+          self.editorAssistantTabAvailable((!window.IS_EMBEDDED || window.EMBEDDED_ASSISTANT_ENABLED) && (type === 'hive' || type === 'impala'));
           self.dashboardAssistantTabAvailable(type === 'dashboard');
           self.schedulesTabAvailable(false);
           if (type !== 'dashboard') {
