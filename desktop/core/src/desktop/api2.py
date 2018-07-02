@@ -83,7 +83,7 @@ def get_context_namespaces(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive' or interface == 'impala':
+  if interface == 'hive' or interface == 'impala' or interface == 'report':
     namespaces.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
@@ -131,7 +131,7 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'jobs':
+  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'jobs' or interface == 'report':
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
@@ -141,7 +141,7 @@ def get_context_computes(request, interface):
       } for cluster in clusters if cluster.get('type') == 'direct'
     ])
 
-  if interface == 'impala' or interface == 'jobs':
+  if interface == 'impala' or interface == 'jobs' or interface == 'report':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn'),

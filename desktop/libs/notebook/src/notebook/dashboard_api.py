@@ -59,6 +59,7 @@ class SQLDashboardApi(DashboardApi):
 
     filters = [q['q'] for q in query['qs'] if q['q']]
     filters.extend(self._get_fq(dashboard, query, facet))
+    result_properties = {}
 
     timeFilter = self._get_time_filter_query(dashboard, query)
     if timeFilter:
@@ -152,6 +153,7 @@ class SQLDashboardApi(DashboardApi):
         }
       elif facet['type'] == 'statement':
         sql = facet['properties']['statement']
+        result_properties = facet['properties']['result']
     else:
       fields = Collection2.get_field_list(dashboard)
       order_by = ', '.join(['`%s` %s' % (f['name'], f['sort']['direction']) for f in dashboard['template']['fieldsAttributes'] if f['sort']['direction'] and f['name'] in fields])
@@ -174,7 +176,8 @@ class SQLDashboardApi(DashboardApi):
         statement=sql,
         database=database,
         status='ready-execute',
-        skip_historify=True
+        skip_historify=True,
+        result_properties=result_properties
     )
 
     response = editor.execute(MockRequest(self.user, self.cluster))
