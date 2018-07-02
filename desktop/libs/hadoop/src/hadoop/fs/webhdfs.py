@@ -149,13 +149,16 @@ class WebHdfs(Hdfs):
   @property
   def superuser(self):
     if self._superuser is None:
-      try:
-        # The owner of '/' is usually the superuser
-        sb = self.stats('/')
-        self._superuser = sb.user
-      except Exception, ex:
-        LOG.exception('Failed to determine superuser of %s: %s' % (self, ex))
+      if DEFAULT_HDFS_SUPERUSER != desktop.conf.DEFAULT_HDFS_SUPERUSER.config.default_value:
         self._superuser = DEFAULT_HDFS_SUPERUSER
+      else:
+        try:
+          # The owner of '/' is usually the superuser
+          sb = self.stats('/')
+          self._superuser = sb.user
+        except Exception, ex:
+          LOG.exception('Failed to determine superuser of %s: %s' % (self, ex))
+          self._superuser = DEFAULT_HDFS_SUPERUSER
 
     return self._superuser
 
