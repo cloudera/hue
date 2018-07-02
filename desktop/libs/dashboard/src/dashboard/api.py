@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import json
 import logging
+import uuid
 
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
@@ -24,6 +26,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
+from desktop.models import Document2
 
 from libsolr.api import SolrApi
 
@@ -392,9 +395,22 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     facet_type = 'pivot'
   elif widget_type == 'document-widget':
     # SQL query, 1 solr widget
+    doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
+    snippets = doc.data_dict.get('snippets', [])
+    snippets = [snippet for snippet in snippets if snippet['type'] in ('hive', 'impala')]
+    snippets[0]['statement_raw']
     properties['uuid'] = facet_field
     properties['engine'] = 'impala'
-    properties['statement'] = 'select * from web_logs limit 50'
+
+    properties['result'] = snippets[0]['result'] if snippets else {'handle': {}}
+    if snippets:
+      handle = snippets[0]['result']['handle']
+      # Replace previous_statement_hash so that we rerun current statement
+      properties['result'] = {'handle': {'statement_id': handle['statement_id'], 'statements_count': handle['statements_count'], 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
+      properties['statement'] = snippets[0]['statement_raw']
+    else:
+      properties['result'] = {'handle': {}}
+      properties['statement'] = ''
     properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False}]
     facet_type = 'statement'
   else:
