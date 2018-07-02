@@ -380,6 +380,10 @@ def submit_single_action(request, doc_id, node_id):
   workflow.set_workspace(request.user)
 
   workflow.check_workspace(request.fs, request.user)
+
+  # The imported wf deployment directory might not neccessarily exist on first submission
+  if not request.fs.exists(parent_wf.deployment_dir):
+    request.fs.do_as_user(request.user.username, request.fs.mkdir, parent_wf.deployment_dir)
   workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
   workflow.document = parent_doc
 
