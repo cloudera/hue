@@ -324,7 +324,8 @@ class LoginAndPermissionMiddleware(object):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    if request.ajax and not 'libsaml.backend.SAML2Backend' in desktop.conf.AUTH.BACKEND.get():
+    no_idle_backends = ("libsaml.backend.SAML2Backend", "desktop.auth.backend.SpnegoDjangoBackend")
+    if request.ajax and all(no_idle_backend not in desktop.conf.AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
       # request.
