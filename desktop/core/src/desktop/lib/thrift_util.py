@@ -293,6 +293,7 @@ def connect_to_thrift(conf):
   """
   if conf.transport_mode == 'http':
     mode = THttpClient(conf.http_url)
+    mode.set_verify(conf.validate)
   else:
     if conf.use_ssl:
       mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
