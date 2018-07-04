@@ -956,7 +956,7 @@ ${ components.menubar(is_embeddable) }
       <!-- /ko -->
 
       <!-- ko if: $root.currentTab() === 'privileges' -->
-        <div data-bind="component: { name: 'hue-sentry-privileges', params: { isSentryAdmin: true, server: 'server1', path: catalogEntry.path.join('.')}}"></div>
+        <div data-bind="component: { name: 'hue-sentry-privileges', params: { isSentryAdmin: false, readOnly: true, server: 'server1', path: catalogEntry.path.join('.')}}"></div>
       <!-- /ko -->
     </div>
   </div>
