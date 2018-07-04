@@ -892,3 +892,14 @@ a:visited {
     }
   }
 }
+
+@-webkit-keyframes autofill {
+  to {
+    background: transparent;
+  }
+}
+
+:-webkit-autofill {
+  -webkit-animation-name: autofill;
+  -webkit-animation-fill-mode: both;
+}
