@@ -855,6 +855,35 @@ var Collection = function (vm, collection) {
       });
     }
 
+    facet.properties.parsedStatements = ko.observableArray([]);
+    facet.properties.selectedStatement = ko.observable();
+    facet.properties.selectedStatement.subscribe(function(val){
+      if (val) {
+        facet.properties.statement(val);
+        vm.search();
+      }
+    });
+
+    if (facet.properties.uuid) {
+      facet.properties.uuid.subscribe(function(val){
+        $.get('/desktop/api2/doc/', {
+          uuid: val,
+          data: true,
+          dependencies: true
+        }, function (data) {
+          if (data && data.data && data.data.snippets.length > 0) {
+            var snippet = data.data.snippets[0];
+            facet.properties.parsedStatements(sqlStatementsParser.parse(snippet.statement));
+            facet.template.chartSettings.chartType(snippet.chartType);
+            facet.template.chartSettings.chartX(snippet.chartX);
+            facet.template.chartSettings.chartYSingle(snippet.chartYSingle);
+            facet.template.chartSettings.chartYMulti(snippet.chartYMulti);
+            facet.properties.selectedStatement(facet.properties.parsedStatements()[0].statement);
+          }
+        });
+      });
+    }
+
     // For Solr 5+  only
     if (typeof facet.template != 'undefined') {
       facet.template.filteredAttributeFields = ko.computed(function () { // Dup of template.filteredAttributeFields
@@ -929,13 +958,13 @@ var Collection = function (vm, collection) {
       });
 
       /*facet.template.chartSettings.chartType.subscribe(function (newValue) {
-        facet.widgetType(
-          newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
-            (newValue == ko.HUE_CHARTS.TYPES.TIMELINECHART ? 'timeline-widget' :
-              (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' :
-                (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' :
-                  (newValue == ko.HUE_CHARTS.TYPES.TEXTSELECT ? 'text-facet-widget' : 'bucket-widget'))))
-        );
+      if (facet.widgetType() === 'document-widget') {
+        var _fields = [];
+        $.each(facet.fields(), function (index, field) {
+          _fields.push(field.name());
+        });
+        facet.template.fieldsSelected(_fields);
+      }
       });*/
 
       // TODO Reload QueryResult

@@ -6936,7 +6936,7 @@
       }
       var type = 'query-hive';
       if (options.type) {
-        var tempType = options.type();
+        var tempType = ko.unwrap(options.type);
         if (tempType === 'function') {
           tempType = tempType();
         }

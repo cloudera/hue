@@ -1803,14 +1803,26 @@ ${ dashboard.layout_skeleton(suffix='search') }
   ##  <i class="fa fa-spinner fa-spin"></i>
   ##</div>
 
+
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
 
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div>
+      <!-- ko if: properties.parsedStatements && properties.parsedStatements().length > 1 -->
+      <div class="selectize-wrapper query-chooser">
+        <select placeholder="${ _('Available statements') }" data-bind="selectize: properties.parsedStatements, optionsText: 'statement', optionsValue: 'statement', value: properties.selectedStatement"></select>
+      </div>
+      <!-- /ko -->
+      <div class="selectize-wrapper query-chooser">
+        <select placeholder="${ _('Search your queries...') }" data-bind="documentChooser: { value: properties.uuid, type: 'impala' }"></select>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div>
 
-      <input type="text" class="input-medium" data-bind="value: properties.engine"/>
-      <textarea data-bind="value: properties.statement"></textarea>
+##       <input type="text" class="input-medium" data-bind="value: properties.engine"/>
+##       <textarea data-bind="value: properties.statement"></textarea>
 
       ## Get sub widget by ID
       ## <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
