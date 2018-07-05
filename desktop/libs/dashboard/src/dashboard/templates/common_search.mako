@@ -2755,7 +2755,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
-                <input type="text" class="no-margin" data-bind="hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+                <input type="text" class="no-margin" data-bind="hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }">
               </div>
             </div>
             <!-- /ko -->
