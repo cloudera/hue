@@ -2222,6 +2222,19 @@ from desktop.views import _ko
     })();
   </script>
 
+  <script type="text/html" id="language-reference-topic-tree">
+    <!-- ko if: $data.length -->
+    <ul class="assist-docs-topic-tree " data-bind="foreach: $data">
+      <li>
+        <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, click: function () { $component.selectedTopic($data); }, toggle: open, text: title"></a>
+        <!-- ko if: open -->
+        <!-- ko template: { name: 'language-reference-topic-tree', data: children } --><!-- /ko -->
+        <!-- /ko -->
+      </li>
+    </ul>
+    <!-- /ko -->
+  </script>
+
   <script type="text/html" id="language-reference-panel-template">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
@@ -2230,39 +2243,28 @@ from desktop.views import _ko
             <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           </div>
         </div>
-        <div data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-half': selectedTopic() }">
+        <div class="assist-docs-topics" data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-quarter': selectedTopic() }">
           <!-- ko ifnot: query -->
-          <ul class="assist-functions" data-bind="foreach: availableTopics">
-            <li>
-              <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parent.selectedTopic() === $data }, click: function () { $parent.selectedTopic($data); }, toggle: open, text: title"></a>
-              <!-- ko if: open -->
-              <ul class="assist-functions" data-bind="foreach: children">
-                <li>
-                  <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parents[1].selectedTopic() === $data }, click: function () { $parents[1].selectedTopic($data); }, toggle: open, text: title"></a>
-                </li>
-              </ul>
-              <!-- /ko -->
-            </li>
-          </ul>
+          <!-- ko template: { name: 'language-reference-topic-tree', data: availableTopics } --><!-- /ko -->
           <!-- /ko -->
           <!-- ko if: query -->
           <!-- ko if: filteredTopics().length > 0 -->
-          <ul class="assist-functions" data-bind="foreach: filteredTopics">
+          <ul class="assist-docs-topic-tree" data-bind="foreach: filteredTopics">
             <li>
-              <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parent.selectedTopic() === $data }, click: function () { $parent.selectedTopic($data); }, html: titleMatch() || title"></a>
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, click: function () { $component.selectedTopic($data); }, html: titleMatch() || title"></a>
             </li>
           </ul>
           <!-- /ko -->
           <!-- ko if: filteredTopics().length === 0 -->
-          <ul class="assist-functions">
+          <ul class="assist-docs-topic-tree">
             <li class="assist-no-entries">${ _('No matches found. ') }</li>
           </ul>
           <!-- /ko -->
           <!-- /ko -->
         </div>
         <!-- ko if: selectedTopic -->
-        <div class="assist-flex-half assist-function-details" data-bind="with: selectedTopic">
-          <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedTopic(undefined); }">&times;</button></div>
+        <div class="assist-flex-three-quarter assist-docs-details" data-bind="with: selectedTopic">
+          <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
           <div class="assist-function-signature blue" data-bind="html: titleMatch() || title"></div>
           <div data-bind="html: bodyMatch() || body"></div>
         </div>
@@ -2329,6 +2331,7 @@ from desktop.views import _ko
     (function () {
       function LanguageReferencePanel (params, element) {
         var self = this;
+        self.disposals = [];
         self.availableTopics = impalaLangRefTopics;
         self.selectedTopic = ko.observable();
 
@@ -2365,8 +2368,61 @@ from desktop.views import _ko
             return a.title.localeCompare(b.title);
           });
           return flattenedTopics;
+        });
+
+        var selectedTopicSub = self.selectedTopic.subscribe(function () {
+          $(element).find('.assist-docs-details').scrollTop(0);
+        });
+
+        var querySub = self.query.subscribe(function () {
+          $(element).find('.assist-docs-topics').scrollTop(0);
+        });
+
+        self.disposals.push(function () {
+          selectedTopicSub.dispose();
+          querySub.dispose();
+        });
+
+        $(element).on('click.langref', function (event) {
+          if (event.target.className === 'lang-ref-link') {
+            var targetTopic = $(event.target).data('target').split('#');
+            var topicId = targetTopic[0];
+
+            var topicStack = [];
+            var findTopic = function (topics) {
+              topics.some(function (topic) {
+                topicStack.push(topic);
+                if (topic.id === topicId) {
+                  while (topicStack.length) {
+                    topicStack.pop().open(true);
+                  }
+                  self.query('');
+                  self.selectedTopic(topic);
+                  return true;
+                } else if (topic.children.length) {
+                  var inChild = findTopic(topic.children);
+                  if (inChild) {
+                    return true;
+                  }
+                }
+                topicStack.pop();
+              })
+            };
+            findTopic(self.availableTopics);
+          }
+        });
+
+        self.disposals.push(function () {
+          $(element).off('click.langref');
         })
       }
+
+      LanguageReferencePanel.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
 
       ko.components.register('language-reference-panel', {
         viewModel: {

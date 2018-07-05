@@ -572,7 +572,8 @@
 
 .assist-flex-fill,
 .assist-flex-half,
-.assist-flex-quarter {
+.assist-flex-quarter,
+.assist-flex-three-quarter {
   position: relative;
   white-space: nowrap;
   overflow-x: hidden;
@@ -589,7 +590,11 @@
 }
 
 .assist-flex-quarter {
-  .flex(1 1 25%);
+  .flex(0 1 25%);
+}
+
+.assist-flex-three-quarter {
+  .flex(0 1 75%);
 }
 
 .database-tree ul {
@@ -631,12 +636,19 @@
   box-shadow: none;
 }
 
-.assist-function-details {
+.assist-docs-topic-tree {
+  list-style: none;
+  overflow-x: hidden;
+  margin: 0 0 0 8px;
+}
+
+.assist-docs-details {
   border-top: 2px solid @cui-default-border-color;
   margin-top: 5px;
   margin-right: 10px;
   padding: 10px;
   white-space: normal;
+  overflow-x: auto;
 
   .sql-docs-inline-code {
     font-family: @font-family-monospace;
@@ -645,7 +657,7 @@
   .sql-docs-code-block {
     display: block;
     font-family: @font-family-monospace;
-    white-space: pre;
+    white-space: pre-wrap;
     margin-bottom: 10px;
     color: @cui-gray-700;
   }
