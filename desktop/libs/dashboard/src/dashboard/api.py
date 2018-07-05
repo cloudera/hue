@@ -395,23 +395,28 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     facet_type = 'pivot'
   elif widget_type == 'document-widget':
     # SQL query, 1 solr widget
-    doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
-    snippets = doc.data_dict.get('snippets', [])
-    snippets = [snippet for snippet in snippets if snippet['type'] in ('hive', 'impala')]
-    snippets[0]['statement_raw']
-    properties['uuid'] = facet_field
-    properties['engine'] = 'impala'
-
-    properties['result'] = snippets[0]['result'] if snippets else {'handle': {}}
-    if snippets:
-      handle = snippets[0]['result']['handle']
-      # Replace previous_statement_hash so that we rerun current statement
-      properties['result'] = {'handle': {'statement_id': handle['statement_id'], 'statements_count': handle['statements_count'], 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
-      properties['statement'] = snippets[0]['statement_raw']
-    else:
+    if collection['selectedDocument'].get('uuid'):
+      doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
+      snippets = doc.data_dict.get('snippets', [])
+      snippets = [snippet for snippet in snippets if snippet['type'] in ('hive', 'impala')]
+      if snippets:
+        if snippets[0]['result']['handle']:
+          handle = snippets[0]['result']['handle']
+          # Replace previous_statement_hash so that we rerun current statement
+          properties['result'] = {'handle': {'statement_id': handle['statement_id'], 'statements_count': handle['statements_count'], 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
+        else:
+          properties['result'] = {'handle': {}}
+        properties['statement'] = snippets[0]['statement_raw']
+      else:
+        properties['result'] = {'handle': {}}
+        properties['statement'] = ''
+    else: # Demo data for now
+      properties['statement'] = 'select * from customers'
       properties['result'] = {'handle': {}}
-      properties['statement'] = ''
-    properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False}]
+
+    properties['engine'] = 'impala'
+    properties['uuid'] = facet_field
+    properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
     facet_type = 'statement'
   else:
     api = get_engine(user, collection)

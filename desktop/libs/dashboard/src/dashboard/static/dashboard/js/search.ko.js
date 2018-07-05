@@ -878,10 +878,11 @@ var Collection = function (vm, collection) {
 
       facet.template.fields = ko.computed(function () { // Dup of template.fields
         var _fields = [];
+        var fieldsSelected = facet.template.fieldsSelected();
         $.each(facet.template.fieldsAttributes(), function (index, field) {
           var position = facet.template.fieldsSelected.indexOf(field.name());
-          if (position != -1) {
-            _fields[position] = field;
+          if (!fieldsSelected.length || position != -1) {
+            _fields.push(field);
           }
         });
         return _fields;
@@ -923,8 +924,11 @@ var Collection = function (vm, collection) {
           vm.search();
         }
       });
+      facet.template.chartSettings.hideStacked = ko.computed(function () {
+          return facet.template.chartSettings.chartYMulti().length <= 1;
+      });
 
-      facet.template.chartSettings.chartType.subscribe(function (newValue) {
+      /*facet.template.chartSettings.chartType.subscribe(function (newValue) {
         facet.widgetType(
           newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
             (newValue == ko.HUE_CHARTS.TYPES.TIMELINECHART ? 'timeline-widget' :
@@ -932,7 +936,7 @@ var Collection = function (vm, collection) {
                 (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' :
                   (newValue == ko.HUE_CHARTS.TYPES.TEXTSELECT ? 'text-facet-widget' : 'bucket-widget'))))
         );
-      });
+      });*/
 
       // TODO Reload QueryResult
       facet.queryResult = ko.observable(new QueryResult(self, {
