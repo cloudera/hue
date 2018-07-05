@@ -40,21 +40,21 @@ certain development libraries be installed on your system. To install from the
 tarball, you'll need these library development packages and tools installed on your system:
 
 * Python 2.7
+* [MySQL InnoDB or PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
 
 ### Ubuntu
 
     sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
 
-* [Oracle JDK](https://help.ubuntu.com/community/Java)
-* mvn (from maven package or maven3 tarball)
-* openldap-dev / libldap2-dev
-* libtidy-0.99-0 (for unit tests only)
-
 #### Install Oracle JDK
 
     sudo add-apt-repository ppa:webupd8team/java
     sudo apt-get update
-    sudo apt-get install oracle-java7-installer
+    sudo apt-get install oracle-java8-installer
+
+#### If you want to run the unit tests
+
+    sudo apt-get install libtidy-0.99-0
 
 
 ### CentOS/RHEL
