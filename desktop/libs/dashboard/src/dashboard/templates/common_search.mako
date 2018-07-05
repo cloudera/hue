@@ -890,25 +890,25 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
   </ul>
   <div data-bind="visible: chartSettings.chartType() != ''">
-    <select data-bind="options: (chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART) ? cleanedMeta : chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART ? cleanedDateTimeMeta : cleanedNumericMeta, value: chartSettings.chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartX}" class="input-medium"></select>
+    <select data-bind="options: [ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.PIECHART, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.MAP].indexOf(chartSettings.chartType()) >= 0 ? cleanedMeta : chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART ? cleanedDateTimeMeta : cleanedNumericMeta, value: chartSettings.chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartX}" class="input-medium"></select>
   </div>
 
   <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != ''">
-    <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartSettings.chartType()) == -1" class="nav-header">${_('y-axis')}</li>
+    <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, , ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartSettings.chartType()) == -1" class="nav-header">${_('y-axis')}</li>
     <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
     <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
   </ul>
 
   <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartSettings.chartType() != '' && ([ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.LINECHART].indexOf(chartSettings.chartType()) >= 0 )">
     <ul class="unstyled" data-bind="foreach: cleanedNumericMeta">
-      <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartSettings.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
+      <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartSettings.chartYMulti" /> <span data-bind="text: name"></span></li>
     </ul>
   </div>
-  <div data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP">
-    <select data-bind="options: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? cleanedMeta : cleanedNumericMeta, value: chartSettings.chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartYSingle}" class="input-medium"></select>
+  <div data-bind="visible: [ko.HUE_CHARTS.TYPES.PIECHART, ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) >= 0">
+    <select data-bind="options: cleanedNumericMeta, value: chartSettings.chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartYSingle}" class="input-medium"></select>
   </div>
 
-  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP">
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP && ko.HUE_CHARTS.TYPES.GRADIENTMAP">
     <li class="nav-header">${_('label')}</li>
   </ul>
   <div data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP">
@@ -916,10 +916,10 @@ ${ dashboard.layout_skeleton(suffix='search') }
   </div>
 
 
-  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && chartSettings.chartType() != ko.HUE_CHARTS.TYPES.MAP">
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) < 0">
     <li class="nav-header">${_('sorting')}</li>
   </ul>
-  <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartSettings.chartType() != '' && chartSettings.chartType() != ko.HUE_CHARTS.TYPES.MAP">
+  <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartSettings.chartType() != '' && [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) < 0">
     <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSettings.chartSorting() == 'none'}, click: function(){ chartSettings.chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
     <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSettings.chartSorting() == 'asc'}, click: function(){ chartSettings.chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
     <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSettings.chartSorting() == 'desc'}, click: function(){ chartSettings.chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
@@ -1603,7 +1603,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
       <div class="grid-results-chart" data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
         <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
-        <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
+        <div class="grid-chart-container" style="overflow-x: auto">
 
         <!-- ko if: widgetType() == 'hit-widget' -->
           <!-- ko with: $parent -->
@@ -1748,20 +1748,23 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'document-widget' -->
-          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
-                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle}, fqs: ko.observableArray([]),
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container'}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
-          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
+          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
                 transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: template.chartSettings.chartSelectorType},  stacked: true, showLegend: true, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
-          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data},
-                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti},
+                transformer: multiSerieDataTransformerGrid, showControls: false}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
-          <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $parent.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+          <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle, chartZ: template.chartSettings.chartMapLabel},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
 
-          <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
+          <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
+                transformer: multiSerieDataTransformerGrid, showControls: false}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
+
+          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $parent.results(), scope: template.chartSettings.chartScope(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle},
+              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" />
           <div class="clearfix"></div>
         <!-- /ko -->
 
@@ -1780,6 +1783,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
           <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
                 transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
+
+          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $root.results(), scope: $root.collection.template.chartSettings.chartScope(), snippet: $data},
+              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" />
           <div class="clearfix"></div>
         <!-- /ko -->
 
@@ -3385,8 +3391,19 @@ function rangeUpPieChartDataTransformer(data) {
 
 function pieChartDataTransformerGrid(data) {
   var _data = [];
-  var chartX = searchViewModel.collection.template.chartSettings.chartX();
-  var chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
+  var chartX, chartY;
+  if (data.chartX && typeof data.chartX === 'function') {
+    chartX = data.chartX();
+  } else if (!data.chartX) {
+    chartX = searchViewModel.collection.template.chartSettings.chartX()
+  } // else we just take value as is
+
+  if (data.chartY && typeof data.chartY === 'function') {
+    chartY = data.chartY();
+  } else if (!data.chartY) {
+    chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
+  } // else we just take value as is
+
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
     if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
@@ -3751,6 +3768,61 @@ function gradientMapChartDataTransformer(data) {
   return _data;
 }
 
+function gradientMapChartDataTransformerGrid(data) {
+  var chartX, chartY;
+  if (data.chartX && typeof data.chartX === 'function') {
+    chartX = data.chartX();
+  } else if (!data.chartX) {
+    chartX = searchViewModel.collection.template.chartSettings.chartX()
+  } // else we just take value as is
+
+  if (data.chartY && typeof data.chartY === 'function') {
+    chartY = data.chartY();
+  } else if (!data.chartY) {
+    chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
+  } // else we just take value as is
+  var _data = [];
+  if (!chartX || !chartY) {
+    return _data;
+  }
+  $(data.counts).each(function (cnt, item) {
+    if (typeof item.item[chartX] === 'function') {
+      item.fields = [item.item[chartX]()];
+    } else {
+      item.fields = [item.item[chartX]];
+    }
+    if (typeof item.item[chartY] === 'function') {
+      item.values = [item.item[chartY]()];
+    } else {
+      item.values = [item.item[chartY]];
+    }
+    item.field = item.fields[0];
+    item.value = item.values[0];
+    item.pivot = [];
+
+    if (item.value != null && item.value != "" && item.field.length < 4) {
+      var _label = data.scope == "world" ? HueGeo.getISOAlpha3(item.field) : item.field.toUpperCase();
+      var _found = false;
+      for (var i = 0; i < _data.length; i++) { // we group lower and upper cases together
+        if (_data[i].label == _label) {
+          _data[i].obj.pivot.push({count: item.value, value: item.field});
+          _found = true;
+          break;
+        }
+      }
+      if (! _found) {
+        item.pivot = [{field: item.value, value: item.field}];
+        _data.push({
+          label: _label,
+          value: item.values,
+          obj: item
+        });
+      }
+    }
+  });
+  return _data;
+}
+
 function leafletMapChartDataTransformer(data) {
   var _data = [];
   if (!$.isEmptyObject(data.counts) && data.counts.response.docs && searchViewModel.collection.template.leafletmap.latitudeField() != "" && searchViewModel.collection.template.leafletmap.longitudeField() != "") {
@@ -3770,10 +3842,26 @@ function leafletMapChartDataTransformer(data) {
 
 function leafletMapChartDataTransformerGrid(data) {
   var _data = [];
+  var chartX, chartY, chartMapLabel;
+  if (data.chartX && typeof data.chartX === 'function') {
+    chartX = data.chartX();
+  } else if (!data.chartX) {
+    chartX = searchViewModel.collection.template.chartSettings.chartX()
+  } // else we just take value as is
+
+  if (data.chartY && typeof data.chartY === 'function') {
+    chartY = data.chartY();
+  } else if (!data.chartY) {
+    chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
+  } // else we just take value as is
+
+  if (data.chartZ && typeof data.chartZ === 'function') {
+    chartMapLabel = data.chartZ();
+  } else if (!data.chartZ) {
+    chartMapLabel = searchViewModel.collection.template.chartSettings.chartMapLabel();
+  }
+
   $(data.counts).each(function (cnt, item) {
-    var chartX = searchViewModel.collection.template.chartSettings.chartX();
-    var chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
-    var chartMapLabel = searchViewModel.collection.template.chartSettings.chartMapLabel();
     if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
       var _obj = {
         lat: item.item[chartX](),
@@ -3840,9 +3928,18 @@ function multiSerieDataTransformer(rawDatum) {
 
 function multiSerieDataTransformerGrid(rawDatum, isTimeline) {
   var _datum = [];
+  var chartX, chartY;
+  if (rawDatum.chartX && typeof rawDatum.chartX === 'function') {
+    chartX = rawDatum.chartX();
+  } else if (!rawDatum.chartX) {
+    chartX = searchViewModel.collection.template.chartSettings.chartX()
+  } // else we just take value as is
 
-  var chartX = searchViewModel.collection.template.chartSettings.chartX();
-  var chartY = searchViewModel.collection.template.chartSettings.chartYMulti();
+  if (rawDatum.chartY && typeof rawDatum.chartY === 'function') {
+    chartY = rawDatum.chartY();
+  } else if (!rawDatum.chartY) {
+    chartY = searchViewModel.collection.template.chartSettings.chartYMulti();
+  } // else we just take value as is
 
   if (chartX != null && chartY.length > 0 && rawDatum.counts.length > 0) {
     var _plottedSerie = 0;
