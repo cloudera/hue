@@ -2222,6 +2222,55 @@ from desktop.views import _ko
     })();
   </script>
 
+  <script type="text/html" id="language-reference-panel-template">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <div class="assist-flex-search">
+          <div class="assist-filter">
+            <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          </div>
+        </div>
+        <div data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-half': selectedTopic() }">
+          <!-- ko ifnot: query -->
+          <ul class="assist-functions" data-bind="foreach: availableTopics">
+            <li>
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parent.selectedTopic() === $data }, click: function () { $parent.selectedTopic($data); }, toggle: open, text: title"></a>
+              <!-- ko if: open -->
+              <ul class="assist-functions" data-bind="foreach: children">
+                <li>
+                  <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parents[1].selectedTopic() === $data }, click: function () { $parents[1].selectedTopic($data); }, toggle: open, text: title"></a>
+                </li>
+              </ul>
+              <!-- /ko -->
+            </li>
+          </ul>
+          <!-- /ko -->
+          <!-- ko if: query -->
+          <!-- ko if: filteredTopics().length > 0 -->
+          <ul class="assist-functions" data-bind="foreach: filteredTopics">
+            <li>
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parent.selectedTopic() === $data }, click: function () { $parent.selectedTopic($data); }, html: titleMatch() || title"></a>
+            </li>
+          </ul>
+          <!-- /ko -->
+          <!-- ko if: filteredTopics().length === 0 -->
+          <ul class="assist-functions">
+            <li class="assist-no-entries">${ _('No matches found. ') }</li>
+          </ul>
+          <!-- /ko -->
+          <!-- /ko -->
+        </div>
+        <!-- ko if: selectedTopic -->
+        <div class="assist-flex-half assist-function-details" data-bind="with: selectedTopic">
+          <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedTopic(undefined); }">&times;</button></div>
+          <div class="assist-function-signature blue" data-bind="html: titleMatch() || title"></div>
+          <div data-bind="html: bodyMatch() || body"></div>
+        </div>
+        <!-- /ko -->
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="functions-panel-template">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
@@ -2278,6 +2327,56 @@ from desktop.views import _ko
 
   <script type="text/javascript">
     (function () {
+      function LanguageReferencePanel (params, element) {
+        var self = this;
+        self.availableTopics = impalaLangRefTopics;
+        self.selectedTopic = ko.observable();
+
+        self.query = ko.observable();
+        self.filteredTopics = ko.pureComputed(function () {
+          var lowerCaseQuery = self.query().toLowerCase();
+          var replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
+          var flattenedTopics = [];
+
+          var findInside = function (topic) {
+            if (topic.title.toLowerCase().indexOf(lowerCaseQuery) === 0) {
+              topic.weight = 1;
+              topic.titleMatch(topic.title.replace(replaceRegexp, '<b>$1</b>'));
+              topic.bodyMatch(undefined);
+              flattenedTopics.push(topic);
+            } else if (topic.body && topic.body.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+              topic.weight = 0;
+              topic.titleMatch(undefined);
+              topic.bodyMatch(topic.body.replace(replaceRegexp, '<b>$1</b>'));
+              flattenedTopics.push(topic);
+            } else {
+              topic.titleMatch(undefined);
+              topic.bodyMatch(undefined);
+            }
+            topic.children.forEach(findInside);
+          };
+
+          self.availableTopics.forEach(findInside);
+
+          flattenedTopics.sort(function (a, b) {
+            if (a.weight !== b.weight) {
+              return b.weight - a.weight;
+            }
+            return a.title.localeCompare(b.title);
+          });
+          return flattenedTopics;
+        })
+      }
+
+      ko.components.register('language-reference-panel', {
+        viewModel: {
+          createViewModel: function(params, componentInfo) {
+            return new LanguageReferencePanel(params, componentInfo.element)
+          }
+        },
+        template: { element: 'language-reference-panel-template' }
+      });
+
       function FunctionsPanel(params) {
         var self = this;
         self.categories = {};
@@ -3317,6 +3416,7 @@ from desktop.views import _ko
       <ul class="right-panel-tabs nav nav-pills">
         <li data-bind="css: { 'active' : activeTab() === 'editorAssistant' }, visible: editorAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('editorAssistant'); activeTab('editorAssistant'); }">${ _('Assistant') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'syntx' }, visible: langRefTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('langRef'); activeTab('langRef'); }">${ _('Reference') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'dashboardAssistant' }, visible: dashboardAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabDashboard('dashboardAssistant'); activeTab('dashboardAssistant'); }">${ _('Assistant') }</a></li>
       </ul>
@@ -3328,6 +3428,10 @@ from desktop.views import _ko
 
         <!-- ko if: functionsTabAvailable -->
         <div data-bind="component: { name: 'functions-panel' }, visible: activeTab() === 'functions'"></div>
+        <!-- /ko -->
+
+        <!-- ko if: langRefTabAvailable -->
+        <div data-bind="component: { name: 'language-reference-panel' }, visible: activeTab() === 'langRef'"></div>
         <!-- /ko -->
 
         <!-- ko if: dashboardAssistantTabAvailable -->
@@ -3358,6 +3462,7 @@ from desktop.views import _ko
         self.editorAssistantTabAvailable = ko.observable(false);
         self.dashboardAssistantTabAvailable = ko.observable(false);
         self.functionsTabAvailable = ko.observable(false);
+        self.langRefTabAvailable = ko.observable(false);
         self.schedulesTabAvailable = ko.observable(false);
 
         var apiHelper = ApiHelper.getInstance();
@@ -3399,6 +3504,7 @@ from desktop.views import _ko
 
         var updateContentsForType = function (type) {
           self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
+          self.langRefTabAvailable(type === 'impala');
           self.editorAssistantTabAvailable((!window.IS_EMBEDDED || window.EMBEDDED_ASSISTANT_ENABLED) && (type === 'hive' || type === 'impala'));
           self.dashboardAssistantTabAvailable(type === 'dashboard');
           self.schedulesTabAvailable(false);
