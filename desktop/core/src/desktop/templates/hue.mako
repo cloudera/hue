@@ -512,7 +512,9 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+%if conf.ENABLE_SQL_LANGUAGE_REF.get():
 <script src="${ static('desktop/js/sqlImpalaLangRef.js') }"></script>
+%endif
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('desktop/js/ace/ace.js') }"></script>

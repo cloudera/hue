@@ -1591,6 +1591,13 @@ IS_MULTICLUSTER_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+ENABLE_SQL_LANGUAGE_REF = Config(
+  key='enable_sql_language_ref',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to enable the SQL Language Reference or not.')
+)
+
 
 def get_clusters(user):
   clusters = []
