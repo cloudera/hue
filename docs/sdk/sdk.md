@@ -259,7 +259,7 @@ namespace. See ``apps/about/src/about/urls.py`` for an example.
 Developing for the Hue SDK has similar requirements to running
 Hue itself.  We require Python 2.7, Django (1.11 included
 with our distribution), Hadoop (Apache Hadoop 2+), Java (Java 1.8),
-and Browser (latest Chrome, Firefox or IE10+).
+and a browser (latest Chrome, Firefox or IE11+).
 
 ### Recommended Reading / Important Technologies
 
@@ -314,8 +314,6 @@ it is preferable to checkout a particular release tag instead.
     calculator/src/static/calculator/css/calculator.css
     calculator/src/static/calculator/js/calculator.js
 
-To download an app or browse dditional plugin apps available in the Hue app store:
-    ## Visit http://gethue.com/app-store/
 
 <div class="note">
   Some apps are blacklisted on certain versions of CDH (such as the 'Spark' app) due to
@@ -374,31 +372,77 @@ You should see the app in the left menu.
 Now that your app has been installed, you'll want to customize it.
 As you may have guessed, we're going to build a small calculator
 application.  Edit `calculator/src/calculator/templates/index.mako`
-to include a simple form:
+to include a simple form and a Knockout viewmodel:
+
 
     <%!from desktop.views import commonheader, commonfooter %>
     <%namespace name="shared" file="shared_components.mako" />
 
+    %if not is_embeddable:
     ${commonheader("Calculator", "calculator", user, "100px") | n,unicode}
+    %endif
 
     ## Main body
+    <div class="container-fluid calculator-components">
+      <div class="row">
+        <div class="span6 offset3 margin-top-30 text-center">
+          <form class="form-inline">
+            <input type="text" class="input-mini margin-right-10" placeholder="A" data-bind="value: a">
+            <!-- ko foreach: operations -->
+            <label class="radio margin-left-5">
+              <input type="radio" name="op" data-bind="checkedValue: $data, checked: $parent.chosenOperation" /><span data-bind="text: $data"></span>
+            </label>
+            <!-- /ko -->
+            <input type="text" class="input-mini margin-left-10" placeholder="B" data-bind="value: b">
+            <button class="btn" data-bind="click: calculate">Calculate</button>
+          </form>
 
-    <div class="container-fluid">
-      % if op:
-      <span>${a} ${op} ${b} = ${result}</span>
-      % endif
-      <form action=${url("calculator.views.index")} method=POST>
-        ${ csrf_token(request) | n,unicode }
-        <input name="a">
-        <input type="radio" name="op" value="add" />+
-        <input type="radio" name="op" value="subtract"/>-
-        <input type="radio" name="op" value="multiply"/>*
-        <input type="radio" name="op" value="divide"/>/
-        <input name="b">
-        <input type="submit" value="Calculate">
-      </form>
+          <h2 data-bind="visible: result() !== null">The result is <strong data-bind="text: result"></strong></h2>
+        </div>
+      </div>
     </div>
+
+    <script>
+      (function() {
+        var CalculatorViewModel = function () {
+          var self = this;
+
+          self.operations = ko.observableArray(['+', '-', '*', '/']);
+
+          self.a = ko.observable();
+          self.b = ko.observable();
+          self.chosenOperation = ko.observable('+');
+          self.result = ko.observable(null);
+
+          self.calculate = function () {
+            var a = parseFloat(self.a());
+            var b = parseFloat(self.b());
+            var result = null;
+            switch (self.chosenOperation()) {
+              case '+':
+                result = a + b;
+                break;
+              case '-':
+                result = a - b;
+                break;
+              case '*':
+                result = a * b;
+                break;
+              case '/':
+                result = a / b;
+            }
+            self.result(result);
+          }
+        };
+        $(document).ready(function () {
+          ko.applyBindings(new CalculatorViewModel(), $('.calculator-components')[0]);
+        });
+      })();
+    </script>
+
+    %if not is_embeddable:
     ${commonfooter(messages) | n,unicode}
+    %endif
 
 The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
 which is flexible and powerful.  If you use the "`.html`" extension, Hue
@@ -406,34 +450,24 @@ will render your page using
 <a href="https://docs.djangoproject.com/en/1.11/#the-template-layer">Django templates</a>
 instead.
 
-Note that we used the `url()` function to generate the URL to the calculator
-view.  This trick protects you a bit from changing URLs.
+Note that we use Knockout.js to do the heavy lifting of this app.
 
-Let's edit `calculator/src/calculator/views.py` to process that form:
+Let's edit `calculator/src/calculator/views.py` to simply render the page:
 
     #!/usr/bin/env python
 
     from desktop.lib.django_util import render
-    import operator
-
-    OPS=dict(add=operator.add, subtract=operator.sub, multiply=operator.mul, divide=operator.truediv)
-    OP_STRING=dict(add="+", subtract="-", multiply="*", divide="/")
 
     def index(request):
-      if "op" not in request.REQUEST:
-        return render('index.mako', request, dict())
-      a = float(request.REQUEST["a"])
-      b = float(request.REQUEST["b"])
-      op = request.POST["op"]
-      result = OPS[op](a, b)
-      return render('index.mako', request,
-        dict(a=a, b=b, op=OP_STRING[op], result=result))
+      return render('index.mako', request, {
+        'is_embeddable': request.GET.get('is_embeddable', False),
+      })
 
 
 You can now go and try the calculator.  If you set everything up right, you
 should see something like:
 
-<img src="calculator_working.png">
+<img src="calculator_working.jpg">
 
 
 ## A Look at some Existing Apps
