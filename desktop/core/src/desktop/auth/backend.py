@@ -638,13 +638,6 @@ class OIDCBackend(OIDCAuthenticationBackend):
     username = claims.get('preferred_username')
     if not username:
       return self.UserModel.objects.none()
-    # If username contains '_', each time a oidc user will always be treated
-    # as a new user WHICH should be created and call function create_user
-    # that results in a "Duplicate entry '****' for key 'username'"
-    # Django mode filter doc:
-    # https://docs.djangoproject.com/en/1.11/topics/db/queries/#escaping-percent-signs-and-underscores-in-like-statements
-    # iexact is equals to SQL 'like', replace % and _ for wildcards
-    # username = username.replace('%', '').replace('_', '')
     return self.UserModel.objects.filter(username__iexact=username)
 
   def save_refresh_tokens(self, refresh_token):
