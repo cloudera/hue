@@ -1418,6 +1418,21 @@ from desktop.views import _ko
           });
         }
 
+        if (options.isSolr) {
+          if (self.sources().length === 1) {
+            self.selectedSource(self.sources()[0]);
+            self.selectedSource().loadNamespaces().done(function () {
+              var solrNamespace = self.selectedSource().selectedNamespace();
+              if (solrNamespace) {
+                solrNamespace.initDatabases();
+                solrNamespace.whenLoaded(function () {
+                  solrNamespace.setDatabase('default');
+                })
+              }
+            })
+          }
+        }
+
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
             if (self.selectedSource().selectedNamespace()) {
