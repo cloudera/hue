@@ -285,6 +285,29 @@ from metadata.conf import has_navigator
   <script type="text/html" id="context-catalog-doc-title">
   </script>
 
+  <script type="text/html" id="context-lang-ref-title">
+    <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 20px;">
+      <i class="fa fa-question muted" style="margin-top: 3px"></i> <span style="padding-left: 4px;" data-bind="text: title"></span>
+      <div class="hue-popover-title-actions">
+        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="context-lang-ref-contents">
+    <div class="context-popover-content">
+      <div class="context-popover-flex-fill" data-bind="html: body"></div>
+      <div class="context-popover-flex-bottom-links">
+        <div class="context-popover-link-row">
+          <a class="inactive-action pointer" data-bind="click: $parent.openInRightAssist">
+            <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
+          </a>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="context-catalog-entry-title">
     <div class="hue-popover-title">
       <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && catalogEntry().isView() ? 'fa-eye' : 'fa-table'"></i>
@@ -824,13 +847,35 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('details');
       }
 
-      function HueAppContext(data) {
+      function LangRefContext(options) {
         var self = this;
-        self.data = data;
-        self.hasErrors = ko.observable(false);
-        self.loading = ko.observable(false);
-        self.template = 'context-hue-app-details';
-      }
+        self.popover = options.popover;
+        self.title = ko.observable();
+        self.body = ko.observable();
+
+        var topicId = 'topics/impala_' + options.data.identifier.toLowerCase().replace(/ /g, '_') + '.xml';
+
+        console.log(topicId);
+        var findTopic = function (topics) {
+          topics.some(function (topic) {
+            if (topic.id === topicId) {
+              self.title(topic.title);
+              self.body(topic.body);
+              return true;
+            }
+            if (findTopic(topic.children)) {
+              return true;
+            }
+          });
+        };
+
+        findTopic(impalaLangRefTopics);
+      };
+
+      LangRefContext.prototype.openInRightAssist = function () {
+        var self = this;
+        // TODO: implement
+      };
 
       function DocumentContext(data) {
         var self = this;
@@ -872,7 +917,7 @@ from metadata.conf import has_navigator
         huePubSub.publish('open.link', entry.details.link);
         huePubSub.publish('context.popover.hide');
         huePubSub.publish('global.search.close');
-      }
+      };
 
       DocumentContext.prototype.dispose = function () {
         var self = this;
@@ -1282,6 +1327,7 @@ from metadata.conf import has_navigator
         self.isDocument = params.data.type.toLowerCase() === 'hue';
         self.isCollection = params.data.type === 'collection';
         self.isCatalogEntry = !!params.data.catalogEntry;
+        self.isLangRef = params.data.type === 'statementType';
 
         if (self.isCatalogEntry && params.data.catalogEntry.getSourceType() === 'solr' && params.data.catalogEntry.isField()) {
           self.isCollection = true;
@@ -1321,6 +1367,10 @@ from metadata.conf import has_navigator
           self.contents = new CollectionContextTabs(self.data);
           self.title = self.data.catalogEntry.path.slice(1).join('.');
           self.iconClass = 'fa-search';
+        } else if (self.isLangRef) {
+          self.contents = new LangRefContext({ popover: self, data: params.data });
+          self.titleTemplate = 'context-lang-ref-title';
+          self.contentsTemplate = 'context-lang-ref-contents';
         } else {
           self.title = '';
           self.iconClass = 'fa-info';
@@ -1397,11 +1447,11 @@ from metadata.conf import has_navigator
       ContextPopoverViewModel.prototype.pin = function () {
         var self = this;
         hidePopover();
-        if (typeof self.contents.sample !== 'undefined') {
+        if (self.contents && typeof self.contents.sample !== 'undefined') {
           self.contents.sample.fetchedData(undefined);
         }
         huePubSub.publish('sql.context.pin', self);
-        if (self.contents.activeTab() === 'sample') {
+        if (self.contents && self.contents.activeTab() === 'sample') {
           self.contents.refetchSamples();
         }
       };

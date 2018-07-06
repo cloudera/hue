@@ -467,6 +467,14 @@ var SqlTestUtils = (function() {
               }
             }
 
+            if (testDefinition.dialect !== 'impala' && actualResponse.locations) {
+              actualResponse.locations = actualResponse.locations.filter(function (location) {
+                if (location.type !== 'statementType') {
+                  return location;
+                }
+              })
+            }
+
             if (testDefinition.locationsOnly) {
               return {
                 pass: resultEquals(actualResponse.locations, testDefinition.expectedLocations),
@@ -587,11 +595,9 @@ var SqlTestUtils = (function() {
     assertAutocomplete: function(testDefinition) {
       var debug = false;
       if (typeof testDefinition.dialect === 'undefined') {
-        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
-        testDefinition.dialect = 'hive';
-        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
-        testDefinition.dialect = 'impala';
-        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, undefined, debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'hive', debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'impala', debug)).toEqualDefinition(testDefinition);
       } else {
         expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
       }

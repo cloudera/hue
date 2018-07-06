@@ -41,6 +41,7 @@
         dialect: 'impala',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 38 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
           { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ alias: 'c', identifierChain: [{ name: 'customers' }] }, { alias: 'o', identifierChain: [{ name: 'customers' }, { name: 'orders' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'customers' }] },
@@ -60,6 +61,7 @@
         dialect: 'impala',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 47 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 18 } },
           { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'customers' }, { name: 'orders' }], qualified: false },
           { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 18 }, identifierChain: [{ name: 'order_id' }], qualified: true, tables: [{ identifierChain: [{ name: 'customers' }, { name: 'orders' }], alias: 'o' }] },
@@ -81,6 +83,7 @@
         dialect: 'impala',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 42 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 12 } },
           // TODO: Does it matter if we mark following as complex or column?
           { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable' }, { name: 'testMap' }], qualified: false },
@@ -101,6 +104,7 @@
         dialect: 'impala',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 69 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
           { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ alias: 'c', identifierChain: [{ name: 'customers' }] }, { alias: 'o', identifierChain: [{ name: 'customers' }, { name: 'orders' }] }, { identifierChain: [{ subQuery: 'v' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'customers' }] },
@@ -108,6 +112,7 @@
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 29 }, identifierChain: [{ name: 'customers' }] },
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 36 }, identifierChain: [{ name: 'orders' }], tables: [{ identifierChain: [{ name: 'customers' }], alias: 'c' }], qualified: false },
           { type: 'alias', source: 'table', alias: 'o', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 38 }, identifierChain: [{ name: 'c' }, { name: 'orders' }] },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 47 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53 }, subquery: true },
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53 }, identifierChain: [{ name: 'price' }], qualified: false, tables: [{ identifierChain: [{ name: 'customers' }, { name: 'orders' }, { name: 'items' }] }] },
           { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 59, last_column: 60 }, identifierChain: [{ name: 'customers' }, { name: 'orders' }] },
@@ -197,6 +202,7 @@
         beforeCursor: 'SELECT db.tbl.col FROM db.tbl; ',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 30 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 18 } },
           { type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'db' }]},
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 11, last_column: 14 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }]},
@@ -215,6 +221,7 @@
         dialect: 'impala',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 23 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 } },
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [ { name: 'tbl' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }], qualified: false },
           { type: 'database', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 19 }, identifierChain: [{ name: 'db' }] },
@@ -231,6 +238,7 @@
         dialect: 'impala',
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 27 } },
+          { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 15 } },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }], qualified: true },
@@ -565,6 +573,7 @@
           beforeCursor: 'CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\';',
           expectedLocations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 47 } },
+            { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'CREATE TABLE' },
             { type: 'file', location: {first_line: 1, last_line: 1, first_column: 37, last_column: 46}, path: '/bla/bla/' }
           ]
         });
@@ -888,6 +897,7 @@
           afterCursor: '',
           expectedLocations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 271 } },
+            { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
             { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 36 } },
             { type: 'subQuery', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ subQuery: 'tmp' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 14 }, identifierChain: [{ name: 'bc' }], tables: [{ subQuery: 'tmp' }], qualified: true },
@@ -895,6 +905,7 @@
             { type: 'subQuery', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 25 }, identifierChain: [{ subQuery: 'tmp' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 27 }, identifierChain: [{ name: 'r' }], tables: [{ subQuery: 'tmp' }], qualified: true },
             { type: 'alias', source: 'column', alias: 'r', location: { first_line: 1, last_line: 1, first_column: 35, last_column: 36 }, parentLocation: { first_line: 1, last_line: 1, first_column: 16, last_column: 31 } },
+            { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 50 }, identifier: 'SELECT' },
             { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 51, last_column: 108 }, subquery: true },
             { type: 'database', location: { first_line: 1, last_line: 1, first_column: 51, last_column: 57 }, identifierChain: [{ name: 'tstDb1' }]},
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 58, last_column: 60 }, identifierChain: [{ name:'tstDb1' }, { name: 'b1' }]},
@@ -938,6 +949,7 @@
           afterCursor: '',
           expectedLocations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 53 } },
+            { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
             { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
             { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'testTable' }]},
@@ -959,6 +971,7 @@
             beforeCursor: 'select a as b from tbl where b = ${var_name=10}; ',
             expectedLocations: [
               { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 48 } },
+              { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
               { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 } },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'a' }], qualified: false, alias: 'b', tables: [{ identifierChain: [{ name: 'tbl' }] }] },
               { type: 'alias', source: 'column', alias: 'b', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 14 }, parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
@@ -994,6 +1007,7 @@
             afterCursor: '',
             expectedLocations: [
               { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 48 } },
+              { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
               { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
               { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'testTable' }] },
@@ -1012,6 +1026,7 @@
             afterCursor: '',
             expectedLocations: [
               { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 49 } },
+              { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
               { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
               { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }] }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 19 }, identifierChain: [{ name: 'tbl1' }] },
@@ -1031,6 +1046,7 @@
             afterCursor: '',
             expectedLocations: [
               { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 54 } },
+              { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
               { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
               { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }] }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 19 }, identifierChain: [{ name: 'tbl1' }] },
@@ -1051,6 +1067,7 @@
             afterCursor: '',
             expectedLocations: [
               { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 60 } },
+              { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
               { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
               { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'somedb' }, { name: 'tbl2' }] }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 19 }, identifierChain: [{ name: 'tbl1' }] },

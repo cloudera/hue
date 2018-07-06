@@ -435,10 +435,12 @@
       assertAutoComplete({
         beforeCursor: '-- line comment\nSELECT * from testTable1;\n',
         afterCursor: '\n-- other line comment',
+        dialect: 'impala',
         containsKeywords: ['SELECT'],
         expectedResult: {
           locations: [
             { type: 'statement', location: { first_line: 1, last_line: 2, first_column: 1, last_column: 25 } },
+            { type: 'statementType', location: { first_line: 2, last_line: 2, first_column: 1, last_column: 7 }, identifier: 'SELECT' },
             { type: 'selectList', missing: false, location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 } },
             { type: 'asterisk', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
             { type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] },
@@ -454,6 +456,7 @@
       assertAutoComplete({
         beforeCursor: '/* line 1\nline 2\n*/\nSELECT * from testTable1;\n',
         afterCursor: '',
+        dialect: 'hive',
         containsKeywords: ['SELECT'],
         expectedResult: {
           locations: [

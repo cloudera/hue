@@ -1479,6 +1479,74 @@ var SqlParseSupport = (function () {
       parser.yy.locations.push(location)
     };
 
+    parser.addStatementTypeLocation = function (identifier, location, additionalText) {
+      if (!parser.isImpala()) {
+        return;
+      }
+      var loc = {
+        type: 'statementType',
+        location: adjustLocationForCursor(location),
+        identifier: identifier
+      };
+      if (typeof additionalText !== 'undefined') {
+        switch (identifier) {
+          case 'ALTER':
+            if (/ALTER\s+VIEW/i.test(additionalText)) {
+              loc.identifier = 'ALTER VIEW';
+            } else {
+              loc.identifier = 'ALTER TABLE';
+            }
+            break;
+          case 'COMPUTE':
+            loc.identifier = 'COMPUTE STATS';
+            break;
+          case 'CREATE':
+            if (/CREATE\s+VIEW/i.test(additionalText)) {
+              loc.identifier = 'CREATE VIEW';
+            } else if (/CREATE\s+TABLE/i.test(additionalText)) {
+              loc.identifier = 'CREATE TABLE';
+            } else if (/CREATE\s+DATABASE/i.test(additionalText)) {
+              loc.identifier = 'CREATE DATABASE';
+            } else if (/CREATE\s+ROLE/i.test(additionalText)) {
+              loc.identifier = 'CREATE ROLE';
+            } else if (/CREATE\s+FUNCTION/i.test(additionalText)) {
+              loc.identifier = 'CREATE FUNCTION';
+            } else {
+              loc.identifier = 'CREATE TABLE';
+            }
+            break;
+          case 'DROP':
+            if (/DROP\s+VIEW/i.test(additionalText)) {
+              loc.identifier = 'DROP VIEW';
+            } else if (/DROP\s+TABLE/i.test(additionalText)) {
+              loc.identifier = 'DROP TABLE';
+            } else if (/DROP\s+DATABASE/i.test(additionalText)) {
+              loc.identifier = 'DROP DATABASE';
+            } else if (/DROP\s+ROLE/i.test(additionalText)) {
+              loc.identifier = 'DROP ROLE';
+            } else if (/DROP\s+STATS/i.test(additionalText)) {
+              loc.identifier = 'DROP STATS';
+            } else if (/DROP\s+FUNCTION/i.test(additionalText)) {
+              loc.identifier = 'DROP FUNCTION';
+            } else {
+              loc.identifier = 'DROP TABLE';
+            }
+            break;
+          case 'INVALIDATE':
+            loc.identifier = 'INVALIDATE METADATA';
+            break;
+          case 'LOAD':
+            loc.identifier = 'LOAD DATA';
+            break;
+          case 'TRUNCATE':
+            loc.identifier = 'TRUNCATE TABLE';
+            break;
+          default:
+        }
+      }
+      parser.yy.locations.push(loc);
+    };
+
     parser.addFileLocation = function (location, path) {
       parser.yy.locations.push({
         type: 'file',
@@ -1876,9 +1944,9 @@ var SqlParseSupport = (function () {
     'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords',
     'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',
     'suggestColumns', 'suggestGroupBys', 'suggestIdentifiers', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
-    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addFileLocation', 'addDatabaseLocation', 'addColumnAliasLocation', 'addTableAliasLocation',
-    'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addVariableLocation', 'addColumnLocation', 'addCteAliasLocation', 'addUnknownLocation',
-    'addColRefToVariableIfExists', 'suggestDatabases', 'suggestHdfs', 'suggestValues'];
+    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addStatementTypeLocation', 'addFileLocation', 'addDatabaseLocation', 'addColumnAliasLocation',
+    'addTableAliasLocation', 'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addVariableLocation', 'addColumnLocation', 'addCteAliasLocation',
+    'addUnknownLocation', 'addColRefToVariableIfExists', 'suggestDatabases', 'suggestHdfs', 'suggestValues'];
 
   var SYNTAX_PARSER_NOOP = function () {};
 

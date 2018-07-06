@@ -219,14 +219,14 @@
 <impala>'COLUMNS'                          { return '<impala>COLUMNS'; }
 <impala>'COMMENT'                          { parser.determineCase(yytext); return '<impala>COMMENT'; }
 <impala>'COMPUTE'                          { parser.determineCase(yytext); return '<impala>COMPUTE'; }
-<impala>'CREATE'                           { parser.determineCase(yytext); return '<impala>CREATE'; }
+<impala>'CREATE'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('CREATE', yylloc, yy.lexer.upcomingInput()); return '<impala>CREATE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
 <impala>'DATABASES'                        { return '<impala>DATABASES'; }
 <impala>'DELETE'                           { return '<impala>DELETE'; }
 <impala>'DELIMITED'                        { return '<impala>DELIMITED'; }
-<impala>'DESCRIBE'                         { parser.determineCase(yytext); return '<impala>DESCRIBE'; }
+<impala>'DESCRIBE'                         { parser.determineCase(yytext); parser.addStatementTypeLocation('DESCRIBE', yylloc); return '<impala>DESCRIBE'; }
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
-<impala>'EXPLAIN'                          { parser.determineCase(yytext); return '<impala>EXPLAIN'; }
+<impala>'EXPLAIN'                          { parser.determineCase(yytext); parser.addStatementTypeLocation('EXPLAIN', yylloc); return '<impala>EXPLAIN'; }
 <impala>'EXTERNAL'                         { return '<impala>EXTERNAL'; }
 <impala>'EXTENDED'                         { return '<impala>EXTENDED'; }
 <impala>'FIELDS'                           { return '<impala>FIELDS'; }
@@ -242,11 +242,11 @@
 <impala>'HASH'                             { return '<impala>HASH'; }
 <impala>'ILIKE'                            { return '<impala>ILIKE'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
-<impala>'INSERT'                           { parser.determineCase(yytext); return '<impala>INSERT'; }
+<impala>'INSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('INSERT', yylloc); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
 <impala>'INTERMEDIATE'                     { return '<impala>INTERMEDIATE'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
-<impala>'INVALIDATE'                       { parser.determineCase(yytext); return '<impala>INVALIDATE'; }
+<impala>'INVALIDATE'                       { parser.determineCase(yytext); parser.addStatementTypeLocation('INVALIDATE', yylloc, yy.lexer.upcomingInput()); return '<impala>INVALIDATE'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'IREGEXP'                          { return '<impala>IREGEXP'; }
 <impala>'KEY'                              { return '<impala>KEY'; }
@@ -255,7 +255,7 @@
 <impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
 <impala>'LIMIT'                            { return '<impala>LIMIT'; }
 <impala>'LINES'                            { return '<impala>LINES'; }
-<impala>'LOAD'                             { parser.determineCase(yytext); return '<impala>LOAD'; }
+<impala>'LOAD'                             { parser.determineCase(yytext); parser.addStatementTypeLocation('LOAD', yylloc, yy.lexer.upcomingInput()); return '<impala>LOAD'; }
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
 <impala>'METADATA'                         { return '<impala>METADATA'; }
@@ -271,14 +271,14 @@
 <impala>'RCFILE'                           { return '<impala>RCFILE'; }
 <impala>'RANGE'                            { return '<impala>RANGE'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
-<impala>'REFRESH'                          { parser.determineCase(yytext); return '<impala>REFRESH'; }
+<impala>'REFRESH'                          { parser.determineCase(yytext); parser.addStatementTypeLocation('REFRESH', yylloc); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPEATABLE'                       { return '<impala>REPEATABLE'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
 <impala>'REPLICATION'                      { return '<impala>REPLICATION'; }
 <impala>'RESTRICT'                         { return '<impala>RESTRICT'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
-<impala>'REVOKE'                           { return '<impala>REVOKE'; }
+<impala>'REVOKE'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('REVOKE', yylloc); return '<impala>REVOKE'; }
 <impala>'SEQUENCEFILE'                     { return '<impala>SEQUENCEFILE'; }
 <impala>'SERDEPROPERTIES'                  { return '<impala>SERDEPROPERTIES'; }
 <impala>'SCHEMAS'                          { return '<impala>SCHEMAS'; }
@@ -297,7 +297,7 @@
 <impala>'TEXTFILE'                         { return '<impala>TEXTFILE'; }
 <impala>'UNCACHED'                         { return '<impala>UNCACHED'; }
 <impala>'UPDATE_FN'                        { return '<impala>UPDATE_FN'; }
-<impala>'UPSERT'                           { parser.determineCase(yytext); return '<impala>UPSERT'; }
+<impala>'UPSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('UPSERT', yylloc); return '<impala>UPSERT'; }
 <impala>'URI'                              { return '<impala>URI'; }
 <impala>'USING'                            { return '<impala>USING'; }
 <impala>PARTITION\s+VALUE\s                { return '<impala>PARTITION_VALUE'; }
@@ -331,7 +331,7 @@
 
 // Reserved Keywords
 'ALL'                                      { return 'ALL'; }
-'ALTER'                                    { parser.determineCase(yytext); return 'ALTER'; }
+'ALTER'                                    { parser.determineCase(yytext); parser.addStatementTypeLocation('ALTER', yylloc, yy.lexer.upcomingInput()); return 'ALTER'; }
 'AND'                                      { return 'AND'; }
 'AS'                                       { return 'AS'; }
 'ASC'                                      { return 'ASC'; }
@@ -350,7 +350,7 @@
 'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
 'DOUBLE'                                   { return 'DOUBLE'; }
 'DESC'                                     { return 'DESC'; }
-'DROP'                                     { parser.determineCase(yytext); return 'DROP'; }
+'DROP'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('DROP', yylloc, yy.lexer.upcomingInput()); return 'DROP'; }
 'ELSE'                                     { return 'ELSE'; }
 'END'                                      { return 'END'; }
 'EXISTS'                                   { parser.yy.correlatedSubQuery = true; return 'EXISTS'; }
@@ -389,10 +389,10 @@
 'ROW'                                      { return 'ROW'; }
 'ROWS'                                     { return 'ROWS'; }
 'SCHEMA'                                   { return 'SCHEMA'; }
-'SELECT'                                   { parser.determineCase(yytext); return 'SELECT'; }
+'SELECT'                                   { parser.determineCase(yytext); parser.addStatementTypeLocation('SELECT', yylloc); return 'SELECT'; }
 'SEMI'                                     { return 'SEMI'; }
-'SET'                                      { parser.determineCase(yytext); return 'SET'; }
-'SHOW'                                     { parser.determineCase(yytext); return 'SHOW'; }
+'SET'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('SET', yylloc); return 'SET'; }
+'SHOW'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
 'SMALLINT'                                 { return 'SMALLINT'; }
 'STRING'                                   { return 'STRING'; }
 'TABLE'                                    { return 'TABLE'; }
@@ -401,17 +401,17 @@
 'TINYINT'                                  { return 'TINYINT'; }
 'TO'                                       { return 'TO'; }
 'TRUE'                                     { return 'TRUE'; }
-'TRUNCATE'                                 { parser.determineCase(yytext); return 'TRUNCATE'; }
+'TRUNCATE'                                 { parser.determineCase(yytext); parser.addStatementTypeLocation('TRUNCATE', yylloc, yy.lexer.upcomingInput()); return 'TRUNCATE'; }
 'UNBOUNDED'                                { return 'UNBOUNDED'; }
 'UPDATE'                                   { parser.determineCase(yytext); return 'UPDATE'; }
-'USE'                                      { parser.determineCase(yytext); return 'USE'; }
+'USE'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
 'UNION'                                    { return 'UNION'; }
 'VIEW'                                     { return 'VIEW'; }
 'VARCHAR'                                  { return 'VARCHAR'; } // Not in Impala
 'VALUES'                                   { return 'VALUES'; }
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
-'WITH'                                     { parser.determineCase(yytext); return 'WITH'; }
+'WITH'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return 'WITH'; }
 
 // Non-reserved Keywords
 'OVER'                                     { return 'OVER'; }

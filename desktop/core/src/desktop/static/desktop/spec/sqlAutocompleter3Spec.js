@@ -28,6 +28,9 @@
           },
           namespace: function () {
             return { id: 'defaultNamespace' }
+          },
+          compute: function () {
+            return { id: 'defaultCompute' }
           }
         },
         editor: function () {
@@ -415,6 +418,12 @@
             },
             database: function () {
               return 'default';
+            },
+            namespace: function () {
+              return { id: 'defaultNamespace' }
+            },
+            compute: function () {
+              return { id: 'defaultCompute' }
             },
             positionStatement: ko.observable(positionStatement)
           },
