@@ -83,15 +83,15 @@ def get_context_namespaces(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive' or interface == 'impala' or interface == 'report':
-    namespaces.extend([{
-        'id': cluster['id'],
-        'name': cluster['name'],
-        'status': 'CREATED',
-        'computes': [cluster]
-      } for cluster in clusters if cluster.get('type') == 'direct' # and interface == 'hive'
-    ])
+  namespaces.extend([{
+      'id': cluster['id'],
+      'name': cluster['name'],
+      'status': 'CREATED',
+      'computes': [cluster]
+    } for cluster in clusters if cluster.get('type') == 'direct'
+  ])
 
+  if interface == 'hive' or interface == 'impala' or interface == 'report':
     # From Altus SDX
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       # Note: attaching computes to namespaces might be done via the frontend in the future
