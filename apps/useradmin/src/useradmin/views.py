@@ -759,6 +759,10 @@ def import_ldap_groups(connection, group_pattern, import_members, import_members
                              import_by_dn, failed_users=failed_users)
 
 
+def get_find_groups_filter(ldap_info):
+  return _get_find_groups_filter(ldap_info)
+
+
 def sync_ldap_users(connection, failed_users=None):
   """
   Syncs LDAP user information. This will not import new
@@ -803,7 +807,6 @@ def ensure_home_directory(fs, user):
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
     LOG.warn("Not creating home directory of %s as his profile is empty" % user)
-
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   """
@@ -899,6 +902,30 @@ def _import_ldap_users(connection, username_pattern, sync_groups=False, import_b
   return _import_ldap_users_info(connection, user_info, sync_groups, import_by_dn, server, failed_users=failed_users)
 
 
+def _get_find_groups_filter(ldap_info):
+  if desktop.conf.LDAP.LDAP_SERVERS.get():
+    # Choose from multiple server configs
+    ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server]
+  else:
+    ldap_config = desktop.conf.LDAP
+
+  group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
+  group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
+  # Search for groups based on group_member_attr=username and group_member_attr=dn
+  # covers AD, Standard Ldap and posixAcount/posixGroup
+  if not group_filter.startswith('('):
+    group_filter = '(' + group_filter + ')'
+
+  # Sanitizing the DN before using in a Search filter
+  sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
+  sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
+
+  find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+                       group_member_attr + "=" + sanitized_dn + ")))"
+
+  return find_groups_filter
+
+
 def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_dn=False, server=None, failed_users=None):
   """
   Import user_info found through ldap_access.find_users.
@@ -943,25 +970,8 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         new_groups = set()
         current_ldap_groups = set()
 
-        if desktop.conf.LDAP.LDAP_SERVERS.get():
-          # Choose from multiple server configs
-          ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server]
-        else:
-          ldap_config = desktop.conf.LDAP
+        find_groups_filter = _get_find_groups_filter(ldap_info)
 
-        group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
-        group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
-        # Search for groups based on group_member_attr=username and group_member_attr=dn
-        # covers AD, Standard Ldap and posixAcount/posixGroup
-        if not group_filter.startswith('('):
-          group_filter = '(' + group_filter + ')'
-
-        # Sanitizing the DN before using in a Search filter
-        sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
-        sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
-
-        find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
-                             group_member_attr + "=" + sanitized_dn + ")))"
         group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
         for group_info in group_ldap_info:
           if Group.objects.filter(name=group_info['name']).exists():
