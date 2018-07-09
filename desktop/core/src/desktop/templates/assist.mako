@@ -2393,43 +2393,43 @@ from desktop.views import _ko
           $(element).find('.assist-docs-topics').scrollTop(0);
         });
 
-        self.disposals.push(function () {
-          selectedTopicSub.dispose();
-          querySub.dispose();
+        var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (topicId) {
+          var mainTopic = topicId.split('#')[0]; // TODO: Handle subtopics
+          var topicStack = [];
+          var findTopic = function (topics) {
+            topics.some(function (topic) {
+              topicStack.push(topic);
+              if (topic.id === mainTopic) {
+                while (topicStack.length) {
+                  topicStack.pop().open(true);
+                }
+                self.query('');
+                self.selectedTopic(topic);
+                return true;
+              } else if (topic.children.length) {
+                var inChild = findTopic(topic.children);
+                if (inChild) {
+                  return true;
+                }
+              }
+              topicStack.pop();
+            })
+          };
+          findTopic(self.availableTopics);
         });
 
         $(element).on('click.langref', function (event) {
           if (event.target.className === 'lang-ref-link') {
-            var targetTopic = $(event.target).data('target').split('#');
-            var topicId = targetTopic[0];
-
-            var topicStack = [];
-            var findTopic = function (topics) {
-              topics.some(function (topic) {
-                topicStack.push(topic);
-                if (topic.id === topicId) {
-                  while (topicStack.length) {
-                    topicStack.pop().open(true);
-                  }
-                  self.query('');
-                  self.selectedTopic(topic);
-                  return true;
-                } else if (topic.children.length) {
-                  var inChild = findTopic(topic.children);
-                  if (inChild) {
-                    return true;
-                  }
-                }
-                topicStack.pop();
-              })
-            };
-            findTopic(self.availableTopics);
+            huePubSub.publish('assist.lang.ref.panel.show.topic', $(event.target).data('target'));
           }
         });
 
         self.disposals.push(function () {
+          selectedTopicSub.dispose();
+          querySub.dispose();
+          showTopicSub.remove();
           $(element).off('click.langref');
-        })
+        });
       }
 
       LanguageReferencePanel.prototype.dispose = function () {
@@ -3487,7 +3487,7 @@ from desktop.views import _ko
       <ul class="right-panel-tabs nav nav-pills">
         <li data-bind="css: { 'active' : activeTab() === 'editorAssistant' }, visible: editorAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('editorAssistant'); activeTab('editorAssistant'); }">${ _('Assistant') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'syntx' }, visible: langRefTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('langRef'); activeTab('langRef'); }">${ _('Reference') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'langRef' }, visible: langRefTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('langRef'); activeTab('langRef'); }">${ _('Reference') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'dashboardAssistant' }, visible: dashboardAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabDashboard('dashboardAssistant'); activeTab('dashboardAssistant'); }">${ _('Assistant') }</a></li>
       </ul>
@@ -3523,6 +3523,7 @@ from desktop.views import _ko
       var DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
       var FUNCTIONS_TAB = 'functions';
       var SCHEDULES_TAB = 'schedules';
+      var LANG_REF_TAB = 'langRef';
 
       function RightAssistPanel(params) {
         var self = this;
@@ -3548,6 +3549,14 @@ from desktop.views import _ko
           }
         });
 
+        huePubSub.subscribe('assist.lang.ref.show.topic', function (topicId) {
+          huePubSub.publish('right.assist.show');
+          if (self.langRefTabAvailable() && self.activeTab() !== LANG_REF_TAB) {
+            self.activeTab(LANG_REF_TAB);
+          }
+          huePubSub.publish('assist.lang.ref.panel.show.topic', topicId)
+        });
+
         var updateTabs = function () {
           if (!assistEnabledApp) {
             params.rightAssistAvailable(false);
@@ -3558,6 +3567,8 @@ from desktop.views import _ko
             self.activeTab(FUNCTIONS_TAB);
           } else if (self.lastActiveTabEditor() === SCHEDULES_TAB && self.schedulesTabAvailable()) {
             self.activeTab(SCHEDULES_TAB);
+          } else if (self.lastActiveTabEditor() === LANG_REF_TAB && self.langRefTabAvailable()) {
+            self.activeTab(LANG_REF_TAB);
           } else if (self.editorAssistantTabAvailable()) {
             self.activeTab(EDITOR_ASSISTANT_TAB);
           } else if (self.functionsTabAvailable()) {
