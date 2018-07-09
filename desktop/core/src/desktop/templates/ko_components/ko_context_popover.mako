@@ -300,7 +300,7 @@ from metadata.conf import has_navigator
       <div class="context-popover-flex-fill" data-bind="html: body"></div>
       <div class="context-popover-flex-bottom-links">
         <div class="context-popover-link-row">
-          <a class="inactive-action pointer" data-bind="click: $parent.openInRightAssist">
+          <a class="inactive-action pointer" data-bind="click: openInRightAssist">
             <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
           </a>
         </div>
@@ -853,12 +853,11 @@ from metadata.conf import has_navigator
         self.title = ko.observable();
         self.body = ko.observable();
 
-        var topicId = 'topics/impala_' + options.data.identifier.toLowerCase().replace(/ /g, '_') + '.xml';
+        self.topicId = 'topics/impala_' + options.data.identifier.toLowerCase().replace(/ /g, '_') + '.xml';
 
-        console.log(topicId);
         var findTopic = function (topics) {
           topics.some(function (topic) {
-            if (topic.id === topicId) {
+            if (topic.id === self.topicId) {
               self.title(topic.title);
               self.body(topic.body);
               return true;
@@ -870,11 +869,22 @@ from metadata.conf import has_navigator
         };
 
         findTopic(impalaLangRefTopics);
+
+        $('.hue-popover').on('click.contextLangRef', function (event) {
+          if (event.target.className === 'lang-ref-link') {
+            huePubSub.publish('assist.lang.ref.show.topic', $(event.target).data('target'));
+          }
+        });
+      }
+
+      LangRefContext.prototype.dispose = function () {
+        $('.hue-popover').off('click.contextLangRef');
       };
 
       LangRefContext.prototype.openInRightAssist = function () {
         var self = this;
-        // TODO: implement
+        huePubSub.publish('assist.lang.ref.show.topic', self.topicId);
+        huePubSub.publish('context.popover.hide');
       };
 
       function DocumentContext(data) {
