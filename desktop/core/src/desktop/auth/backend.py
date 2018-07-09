@@ -55,7 +55,7 @@ from mozilla_django_oidc.utils import absolutify, import_from_settings
 from useradmin import ldap_access
 from useradmin.forms import validate_username
 from useradmin.models import get_profile, get_default_user_group, UserProfile
-from useradmin.views import import_ldap_users
+from useradmin.views import import_ldap_users, get_find_groups_filter
 
 
 LOG = logging.getLogger(__name__)
@@ -467,7 +467,12 @@ class LdapBackend(object):
       return None
 
     try:
-      user = self._backend.authenticate(username, password)
+      allowed_group = self.check_ldap_access_groups(server, username)
+      if allowed_group:
+        user = self._backend.authenticate(username, password)
+      else:
+        LOG.warn("%s not in an allowed login group" % username)
+        return None
     except ImproperlyConfigured, detail:
       LOG.warn("LDAP was not properly configured: %s", detail)
       return None
@@ -490,6 +495,33 @@ class LdapBackend(object):
     user = self._backend.get_user(user_id)
     user = rewrite_user(user)
     return user
+
+  def check_ldap_access_groups(self, server, username):
+    allowed_group = False
+
+    if desktop.conf.LDAP.LOGIN_GROUPS.get() and desktop.conf.LDAP.LOGIN_GROUPS.get() != ['']:
+      login_groups = desktop.conf.LDAP.LOGIN_GROUPS.get()
+      connection = ldap_access.get_connection_from_server(server)
+      try:
+        user_info = connection.find_users(username, find_by_dn=False)
+      except LdapSearchException, e:
+        LOG.warn("Failed to find LDAP user: %s" % e)
+
+      if not user_info:
+        LOG.warn("Could not get LDAP details for users with pattern %s" % username_pattern)
+        return None
+
+      ldap_info = user_info[0]
+      group_ldap_info = connection.find_groups("*", group_filter=get_find_groups_filter(ldap_info))
+      for group in group_ldap_info:
+        if group['name'] in login_groups:
+          allowed_group = True
+
+    else:
+      #Login groups not set default to True
+      allowed_group = True
+
+    return allowed_group
 
   def import_groups(self, server, user):
     connection = ldap_access.get_connection_from_server(server)
