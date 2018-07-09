@@ -30,7 +30,7 @@
 var ContextCatalog = (function () {
 
   var STORAGE_POSTFIX = LOGGED_USERNAME;
-  var CONTEXT_CATALOG_VERSION = 3;
+  var CONTEXT_CATALOG_VERSION = 4;
   var NAMESPACES_CONTEXT_TYPE = 'namespaces';
   var COMPUTES_CONTEXT_TYPE = 'computes';
 
@@ -121,7 +121,11 @@ var ContextCatalog = (function () {
                 huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
               }
 
-              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, self.namespaces[options.sourceType]);
+              if (self.namespaces[options.sourceType].namespaces.length) {
+                self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, self.namespaces[options.sourceType]);
+              } else {
+                self.getStore().removeItem(options.sourceType + '_' + NAMESPACES_CONTEXT_TYPE);
+              }
             } else {
               deferred.reject();
             }
