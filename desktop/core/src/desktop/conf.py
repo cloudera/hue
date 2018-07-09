@@ -397,6 +397,12 @@ COLLECT_USAGE = Config(
   type=coerce_bool,
   default=True)
 
+REST_RESPONSE_SIZE = Config(
+  key="rest_response_size",
+  help=_("Number of characters the rest api reponse calls to dump to the logs when debug is enabled.  Enter -1 for entire response."),
+  type=int,
+  default=2000)
+
 LEAFLET_TILE_LAYER = Config(
   key="leaflet_tile_layer",
   help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),

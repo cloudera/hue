@@ -21,6 +21,8 @@ import time
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 
+from desktop import conf
+
 
 LOG = logging.getLogger(__name__)
 
@@ -97,13 +99,14 @@ class Resource(object):
                                 clear_cookies=clear_cookies)
 
     if log_response:
+      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get()
       duration = time.time() - start_time
       message = "%s %s Got response%s: %s%s" % (
           method,
           smart_unicode(path, errors='ignore'),
           ' in %dms' % (duration * 1000),
-          smart_unicode(resp.content[:1000], errors='replace'),
-          len(resp.content) > 1000 and "..." or ""
+          smart_unicode(resp.content[:log_length or None], errors='replace'),
+          log_length and len(resp.content) > log_length and "..." or ""
       )
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
 
