@@ -2241,7 +2241,10 @@ from desktop.views import _ko
     <!-- ko if: $data.length -->
     <ul class="assist-docs-topic-tree " data-bind="foreach: $data">
       <li>
-        <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, click: function () { $component.selectedTopic($data); }, toggle: open, text: title"></a>
+        <a class="black-link" href="javascript: void(0);" data-bind="click: function () { $component.selectedTopic($data); }, toggle: open">
+          <i class="fa fa-fw" style="font-size: 12px;" data-bind="css: { 'fa-chevron-right': children.length && !open(), 'fa-chevron-down': children.length && open() }"></i>
+          <span class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, text: title"></span>
+        </a>
         <!-- ko if: open -->
         <!-- ko template: { name: 'language-reference-topic-tree', data: children } --><!-- /ko -->
         <!-- /ko -->
@@ -2258,7 +2261,7 @@ from desktop.views import _ko
             <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           </div>
         </div>
-        <div class="assist-docs-topics" data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-quarter': selectedTopic() }">
+        <div class="assist-docs-topics" data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-40': selectedTopic() }">
           <!-- ko ifnot: query -->
           <!-- ko template: { name: 'language-reference-topic-tree', data: availableTopics } --><!-- /ko -->
           <!-- /ko -->
@@ -2278,7 +2281,7 @@ from desktop.views import _ko
           <!-- /ko -->
         </div>
         <!-- ko if: selectedTopic -->
-        <div class="assist-flex-three-quarter assist-docs-details" data-bind="with: selectedTopic">
+        <div class="assist-flex-60 assist-docs-details" data-bind="with: selectedTopic">
           <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
           <div class="assist-function-signature blue" data-bind="html: titleMatch() || title"></div>
           <div data-bind="html: bodyMatch() || body"></div>
@@ -2393,6 +2396,15 @@ from desktop.views import _ko
           $(element).find('.assist-docs-topics').scrollTop(0);
         });
 
+        var scrollToSelectedTopic = function () {
+          var topics = $(element).find('.assist-docs-topics');
+          if (topics.find('.blue').length) {
+            topics.scrollTop(Math.min(topics.scrollTop() + topics.find('.blue').position().top - 20, topics.find('> ul').height() - topics.height()));
+          }
+        };
+
+        huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
+
         var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (topicId) {
           var mainTopic = topicId.split('#')[0]; // TODO: Handle subtopics
           var topicStack = [];
@@ -2405,6 +2417,9 @@ from desktop.views import _ko
                 }
                 self.query('');
                 self.selectedTopic(topic);
+                window.setTimeout(function () {
+                  scrollToSelectedTopic();
+                }, 0);
                 return true;
               } else if (topic.children.length) {
                 var inChild = findTopic(topic.children);
