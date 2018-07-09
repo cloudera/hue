@@ -573,12 +573,17 @@
 .assist-flex-fill,
 .assist-flex-half,
 .assist-flex-quarter,
-.assist-flex-three-quarter {
+.assist-flex-40,
+.assist-flex-60 {
   position: relative;
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: auto;
   outline: none !important;
+}
+
+.assist-docs-topics {
+  position: relative;
 }
 
 .assist-flex-fill {
@@ -593,8 +598,12 @@
   .flex(0 1 25%);
 }
 
-.assist-flex-three-quarter {
-  .flex(0 1 75%);
+.assist-flex-40 {
+  .flex(0 1 40%);
+}
+
+.assist-flex-60 {
+  .flex(0 1 60%);
 }
 
 .database-tree ul {
