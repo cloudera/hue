@@ -27,27 +27,27 @@ from desktop.views import _ko
   <script type="text/html" id="hue-app-switcher-template">
     <ul class="cui-app-switcher nav navbar-nav">
       <li class="dropdown">
-        <a style="padding: 10px 5px 0 5px; margin: 8px 24px 0 -5px;" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
+        <button class="btn btn-flat" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
           <i class="fa fa-th"></i>
-        </a>
+        </button>
 
-        <ul class="dropdown-menu" style="margin: 7px 0 0 -5px;" role="menu">
+        <ul class="dropdown-menu pull-right" role="menu">
           <!-- ko foreach: links -->
           <li class="nav-item">
             <!-- ko if: $data.divider -->
             <div class="divider"></div>
             <!-- /ko -->
             <!-- ko ifnot: $data.divider -->
-            <a role="button" class="nav-link" data-bind="attr: {href: link}">
+            <a role="button" class="nav-link" data-bind="attr: { href: link }">
               <span class="app-switcher-app-icon">
                 <!-- ko if: $data.icon -->
-                <i data-bind="attr: {class: icon}"></i>
+                <i data-bind="attr: { class: icon }"></i>
                 <!-- /ko -->
                 <!-- ko if: $data.img -->
                 <!-- ko template: 'app-switcher-icon-template' --><!-- /ko -->
                 <!-- /ko -->
               </span>
-              <span class="app-switcher-app-name" data-bind="text: label, attr: {href: link}"></span>
+              <span class="app-switcher-app-name" data-bind="text: label"></span>
             </a>
             <!-- /ko -->
           </li>
