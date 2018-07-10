@@ -18,6 +18,7 @@
 import logging
 import os
 import os.path
+import fnmatch
 import sys
 import traceback
 import subprocess
@@ -32,6 +33,22 @@ def _deprecation_check(arg0):
     print >> sys.stderr, msg
     LOG.warn(msg)
 
+def reload_with_cm_env(ignore_cm):
+  try:
+    from django.db.backends.oracle.base import Oracle_datetime
+  except:
+    if 'LD_LIBRARY_PATH' in os.environ:
+      print "We need to reload the process to include LD_LIBRARY_PATH for Oracle backend"
+      try:
+        if ignore_cm:
+          sys.argv.append("--ignore-cm")
+ 
+        sys.argv.append("--skip-reload")
+        os.execv(sys.argv[0], sys.argv)
+      except Exception, exc:
+        print 'Failed re-exec: %s' % exc
+        sys.exit(1)
+
 def entry():
   _deprecation_check(sys.argv[0])
 
@@ -41,10 +58,26 @@ def entry():
   from django.core.management.base import BaseCommand
 
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
+  cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+  ld_path_orig = None
+  if "LD_LIBRARY_PATH" in os.environ.keys():
+    ld_path_orig = os.environ["LD_LIBRARY_PATH"]
 
   # What's the subcommand being run?
   # This code uses the same logic from django.core.management to handle command args
   subcommand = None
+  if "--skip-reload" in sys.argv:
+    skip_reload = True
+    sys.argv.remove("--skip-reload")
+  else:
+    skip_reload = False
+
+  if "--ignore-cm" in sys.argv:
+    ignore_cm = True
+    sys.argv.remove("--ignore-cm")
+  else:
+    ignore_cm = False
+
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
   parser = CommandParser(None, usage="%(prog)s subcommand [options] [args]", add_help=False)
@@ -52,50 +85,53 @@ def entry():
 
   if len(sys.argv) > 1:
     prof_id = subcommand = sys.argv[1]
-    commands_req_db = [ "changepassword", "createsuperuser",
-                        "clean_history_docs", "convert_documents", "sync_documents",
-                        "dbshell", "dumpdata", "loaddata", "shell",
-                        "migrate", "syncdb",
-                        "import_ldap_group", "import_ldap_user", "sync_ldap_users_and_groups", "useradmin_sync_with_unix" ]
-    if subcommand in commands_req_db:
-      #Check if this is a CM managed cluster
-      cm_config_file = '/etc/cloudera-scm-agent/config.ini'
-      if os.path.isfile(cm_config_file) and "--cm-managed" not in sys.argv:
-        if not "HUE_CONF_DIR" in os.environ:
-          print "ALERT: This appears to be a CM Managed environment"
-          print "ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment"
-          print "ALERT: Please run 'hue <command> --cm-managed'"
+    #Check if this is a CM managed cluster
+    if os.path.isfile(cm_config_file) and not ignore_cm and not skip_reload:
+        print "WARN: This appears to be a CM Managed environment"
+        print "WARN: Automatically running as CM managed"
+        print "WARN: To ignore CM configurations run"
+        print        "hue <command> --ignore-cm"
   else:
     prof_id = str(os.getpid())
 
   # Check if --cm-managed flag is set and strip it out
   # to prevent from sending to subcommands
-  if "--cm-managed" in sys.argv:
-    sys.argv.remove("--cm-managed")
+  if not ignore_cm:
+    if "--cm-managed" in sys.argv:
+      sys.argv.remove("--cm-managed")
+
     import ConfigParser
     from ConfigParser import NoOptionError
     config = ConfigParser.RawConfigParser()
     config.read(cm_config_file)
     try:
-      cm_supervisor_dir = config.get('General', 'agent_wide_credential_cache_location')
+      cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
     except NoOptionError:
-      cm_supervisor_dir = '/var/run/cloudera-scm-agent'
+      cm_agent_run_dir = '/var/run/cloudera-scm-agent'
       pass
 
     #Parse CM supervisor include file for Hue and set env vars
-    cm_supervisor_dir = cm_supervisor_dir + '/supervisor/include'
+    cm_supervisor_dir = cm_agent_run_dir + '/supervisor/include'
+    cm_process_dir = cm_agent_run_dir + '/process'
     hue_env_conf = None
     envline = None
     cm_hue_string = "HUE_SERVER"
 
-
     for file in os.listdir(cm_supervisor_dir):
       if cm_hue_string in file:
         hue_env_conf = file
+        hue_env_conf = cm_supervisor_dir + "/" + hue_env_conf
+
+    if hue_env_conf == None:
+      process_dirs = fnmatch.filter(os.listdir(cm_process_dir), '*%s*' % cm_hue_string)
+      process_dirs.sort()
+      hue_process_dir = cm_process_dir + "/" + process_dirs[-1]
+      hue_env_conf = fnmatch.filter(os.listdir(hue_process_dir), 'supervisor.conf')[0]
+      hue_env_conf = hue_process_dir + "/" + hue_env_conf
 
     if not hue_env_conf == None:
-      if os.path.isfile(cm_supervisor_dir + "/" + hue_env_conf):
-        hue_env_conf_file = open(cm_supervisor_dir + "/" + hue_env_conf, "r")
+      if os.path.isfile(hue_env_conf):
+        hue_env_conf_file = open(hue_env_conf, "r")
         for line in hue_env_conf_file:
           if "environment" in line:
             envline = line
@@ -103,39 +139,73 @@ def entry():
             empty, hue_conf_dir = line.split("directory=")
             os.environ["HUE_CONF_DIR"] = hue_conf_dir.rstrip()
     else:
-      print "This appears to be a CM managed cluster the"
+      print "This appears to be a CM managed cluster, but the"
       print "supervisor/include file for Hue could not be found"
       print "in order to successfully run commands that access"
       print "the database you need to set the following env vars:"
       print ""
       print "  export JAVA_HOME=<java_home>"
-      print "  export HUE_CONF_DIR=\"/var/run/cloudera-scm-agent/process/\`ls -1 /var/run/cloudera-scm-agent/process | grep HUE_SERVER | sort -n | tail -1 \`\""
+      print "  export HUE_CONF_DIR=\"%s/`ls -1 %s | grep %s | sort -n | tail -1 `\"" % (cm_processs_dir, cm_process_dir, cm_hue_string)
       print "  export HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1"
       print "  export HUE_DATABASE_PASSWORD=<hueDBpassword>"
+      print "If using Oracle as your database:"
+      print "  export LD_LIBRARY_PATH=/path/to/instantclient"
+      print ""
+      print "If the above does not work, make sure Hue has been started on this server."
 
     if not envline == None:
       empty, environment = envline.split("environment=")
       for envvar in environment.split(","):
-        if "HADOOP_C" in envvar or "PARCEL" in envvar:
+        include_env_vars = ("HADOOP_C", "PARCEL", "SCM_DEFINCES", "LD_LIBRARY")
+        if any(include_env_var in envvar for include_env_var in include_env_vars):
           envkey, envval = envvar.split("=")
           envval = envval.replace("'", "").rstrip()
           os.environ[envkey] = envval
 
-    #Set JAVA_HOME:
+    #Set JAVA_HOME
     if "JAVA_HOME" not in os.environ.keys():
-      parcel_dir=os.environ["PARCELS_ROOT"] + '/' + os.environ["PARCEL_DIRNAMES"]
-      bigtop_javahome=parcel_dir + '/lib/bigtop-utils/bigtop-detect-javahome'
-      if os.path.isfile(bigtop_javahome):
-        command = "/bin/bash -c \"source " + bigtop_javahome + " && env\""
-        proc = subprocess.Popen(command, stdout = subprocess.PIPE, shell = True)
-        for procline in proc.stdout:
-          (key, _, value) = procline.partition("=")
-          if key == "JAVA_HOME":
-            os.environ[key] = value.rstrip()
-    
-    if "JAVA_HOME" not in os.environ.keys():
-      print "Not able to set JAVA_HOME.  Please set manually:"
-      print "  export JAVA_HOME=<java_home>"
+      if os.path.isfile('/usr/lib64/cmf/service/common/cloudera-config.sh'):
+        locate_java = subprocess.Popen(
+          ['bash', '-c', '. /usr/lib64/cmf/service/common/cloudera-config.sh; locate_java_home'], stdout=subprocess.PIPE,
+          stderr=subprocess.PIPE)
+      elif os.path.isfile('/opt/cloudera/cm-agent/service/common/cloudera-config.sh'):
+        locate_java = subprocess.Popen(
+          ['bash', '-c', '. /opt/cloudera/cm-agent/service/common/cloudera-config.sh; locate_java_home'],
+          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+      JAVA_HOME = "UNKNOWN"
+
+      for line in iter(locate_java.stdout.readline, ''):
+        if 'JAVA_HOME' in line:
+          JAVA_HOME = line.rstrip().split('=')[1]
+
+      if JAVA_HOME != "UNKNOWN":
+        os.environ["JAVA_HOME"] = JAVA_HOME
+
+      if "JAVA_HOME" not in os.environ.keys():
+        print "JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable"
+        print "  export JAVA_HOME=<java_home>"
+        sys.exit(1)
+
+    #Make sure we set Oracle Client if configured
+    if "LD_LIBRARY_PATH" not in os.environ.keys():
+      if "SCM_DEFINES_SCRIPTS" in os.environ.keys():
+        for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
+          if "ORACLE" in scm_script:
+            if os.path.isfile(scm_script):
+              subprocess.Popen('bash', '-c', '. %s' % scm_script)
+
+    if "LD_LIBRARY_PATH" not in os.environ.keys():
+      print "LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database"
+      print "then it must be set, if not, you can ignore"
+      print "  export LD_LIBRARY_PATH=/path/to/instantclient"
+
+  if "LD_LIBRARY_PATH" in os.environ.keys():
+    if ld_path_orig is not None and ld_path_orig == os.environ["LD_LIBRARY_PATH"]:
+      skip_reload = True
+
+  if not skip_reload:
+    reload_with_cm_env(ignore_cm)
 
   try:
     # Let django handle the normal execution
