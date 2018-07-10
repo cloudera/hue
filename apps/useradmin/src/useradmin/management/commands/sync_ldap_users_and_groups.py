@@ -32,12 +32,10 @@ class Command(BaseCommand):
   user information and group memberships will be updated based on the LDAP
   server's current state.
   """
-
-  option_list = BaseCommand.option_list + (
-      make_option("--server", help=_t("Server to connect to."),
+  def add_arguments(self, parser):
+    parser.add_argument("--server", help=_t("Server to connect to."),
                               action="store",
-                              default=None),
-   )
+                              default=None)
 
   def handle(self, **options):
     server = options['server']

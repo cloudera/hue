@@ -33,27 +33,23 @@ class Command(BaseCommand):
   group with the LDAP server. If --import-members is specified, it will import
   all unimported users.
   """
-
-  option_list = BaseCommand.option_list + (
-      make_option("--dn", help=_t("Whether or not the user should be imported by "
+  def add_arguments(self, parser):
+    parser.add_argument("--dn", help=_t("Whether or not the user should be imported by "
                                "distinguished name."),
                           action="store_true",
-                          default=False),
-      make_option("--import-members", help=_t("Import users from the group."),
+                          default=False)
+    parser.add_argument("--import-members", help=_t("Import users from the group."),
                                       action="store_true",
-                                      default=False),
-      make_option("--import-members-recursive", help=_t("Import users from the group, but also do so recursively."),
+                                      default=False)
+    parser.add_argument("--import-members-recursive", help=_t("Import users from the group, but also do so recursively."),
                                                 action="store_true",
-                                                default=False),
-      make_option("--sync-users", help=_t("Sync users in the group."),
+                                                default=False)
+    parser.add_argument("--sync-users", help=_t("Sync users in the group."),
                                   action="store_true",
-                                  default=False),
-      make_option("--server", help=_t("Server to connect to."),
+                                  default=False)
+    parser.add_argument("--server", help=_t("Server to connect to."),
                               action="store",
-                              default=None),
-   )
-
-  args = "group-name"
+                              default=None)
 
   def handle(self, group=None, **options):
     if group is None:

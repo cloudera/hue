@@ -34,12 +34,9 @@ from django.utils.translation import ugettext as _
 LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-  args = ''
   help = _('Upgrades the Hue configuration with a mapping file.')
-
-  option_list = BaseCommand.option_list + (
-      make_option('--mapping_file', help=_('Location of the mapping file.')),
-  )
+  def add_arguments(self, parser):
+    parser.add_argument('--mapping_file', help=_('Location of the mapping file.'))
 
   """Upgrades a configuration."""
   def handle(self, *args, **options):
