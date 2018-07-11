@@ -56,6 +56,9 @@ class THttpClient(TTransportBase):
   def set_basic_auth(self, username, password):
     self._client.set_basic_auth(username, password)
 
+  def set_verify(self, verify=True):
+    self._client.set_verify(verify)
+
   def close(self):
     self._headers = None
     # Close session too?
