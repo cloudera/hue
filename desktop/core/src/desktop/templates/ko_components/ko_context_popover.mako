@@ -287,7 +287,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="context-lang-ref-title">
     <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 20px;">
-      <i class="fa fa-question muted" style="margin-top: 3px"></i> <span style="padding-left: 4px;" data-bind="text: title"></span>
+      <i class="fa fa-book muted" style="margin-top: 3px"></i> <span class="blue" style="padding-left: 4px;" data-bind="text: title"></span>
       <div class="hue-popover-title-actions">
         <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
         <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
