@@ -65,7 +65,9 @@ def dataset(headers, data, encoding=None):
   dataset = tablib.Dataset()
 
   if headers:
-    dataset.headers = encode_row(headers, encoding)
+    with_bom_header = encode_row(headers, encoding)
+    with_bom_header[0] = codecs.BOM_UTF8 + with_bom_header[0]
+    dataset.headers = with_bom_header
 
   for row in data:
     dataset.append(encode_row(row, encoding))
