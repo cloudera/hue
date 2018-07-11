@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from django.conf.urls import url
-from metadata import catalog_api as metadata_catalog_api
+from metadata import catalog_api as metadata_catalog_api, analytic_db_api
 from metadata import optimizer_api as metadata_optimizer_api
 from metadata import workload_analytics_api as metadata_workload_analytics_api
 from metadata import manager_api as metadata_manager_api
@@ -78,6 +78,12 @@ urlpatterns += [
 # Manager API
 urlpatterns += [
   url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='hello'),
+]
+
+
+# ADB API
+urlpatterns += [
+  url(r'^api/analytic_db/create_cluster/?$', analytic_db_api.create_cluster, name='create_cluster'),
 ]
 
 # Workload Analytics API
