@@ -54,8 +54,6 @@
 
   window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
 
-  window.ENABLE_SQL_LANGUAGE_REF = '${ conf.ENABLE_SQL_LANGUAGE_REF.get() }' === 'True';
-
   window.HUE_I18n = {
     autocomplete: {
       category: {
