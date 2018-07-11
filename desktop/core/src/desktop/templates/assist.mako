@@ -31,6 +31,8 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
 
+<%namespace name="impalaDocIndex" file="/impala_doc_index.mako" />
+
 <%def name="assistJSModels()">
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
@@ -2263,7 +2265,7 @@ from desktop.views import _ko
         </div>
         <div class="assist-docs-topics" data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-40': selectedTopic() }">
           <!-- ko ifnot: query -->
-          <!-- ko template: { name: 'language-reference-topic-tree', data: availableTopics } --><!-- /ko -->
+          <!-- ko template: { name: 'language-reference-topic-tree', data: topics } --><!-- /ko -->
           <!-- /ko -->
           <!-- ko if: query -->
           <!-- ko if: filteredTopics().length > 0 -->
@@ -2284,7 +2286,7 @@ from desktop.views import _ko
         <div class="assist-flex-60 assist-docs-details" data-bind="with: selectedTopic">
           <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
           <div class="assist-function-signature blue" data-bind="html: titleMatch() || title"></div>
-          <div data-bind="html: bodyMatch() || body"></div>
+          <div data-bind="html: bodyMatch() || body()"></div>
         </div>
         <!-- /ko -->
       </div>
@@ -2347,12 +2349,57 @@ from desktop.views import _ko
 
   <script type="text/javascript">
     (function () {
+
+      ${ impalaDocIndex.impalaDocIndex() }
+      ${ impalaDocIndex.impalaDocTopLevel() }
+
+      var LanguageReferenceTopic = function (entry) {
+        var self = this;
+        self.ref = entry.ref;
+        self.title = entry.title;
+        self.weight = 1;
+        self.children = [];
+        entry.children.forEach(function (child) {
+          self.children.push(new LanguageReferenceTopic(child));
+        });
+
+        self.loading = ko.observable(false);
+        self.body = ko.observable();
+        self.bodyMatch = ko.observable();
+        self.open = ko.observable(false);
+        self.titleMatch = ko.observable();
+      };
+
+      LanguageReferenceTopic.prototype.load = function () {
+        var self = this;
+        if (self.body() || self.loading()) {
+          return;
+        }
+        self.loading(true);
+        ApiHelper.getInstance().simpleGet(IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
+          self.body(doc.body);
+        }).always(function () {
+          self.loading(false);
+        })
+      };
+
       function LanguageReferencePanel (params, element) {
         var self = this;
         self.disposals = [];
-        self.availableTopics = impalaLangRefTopics;
+        self.topics = [];
+        IMPALA_DOC_TOP_LEVEL.forEach(function (topLevelItem) {
+          self.topics.push(new LanguageReferenceTopic(topLevelItem));
+        });
+
         self.selectedTopic = ko.observable();
 
+        var selectedSub = self.selectedTopic.subscribe(function (newTopic) {
+          newTopic.load();
+        });
+
+        self.disposals.push(function () {
+          selectedSub.dispose();
+        })
         self.query = ko.observable();
         self.filteredTopics = ko.pureComputed(function () {
           var lowerCaseQuery = self.query().toLowerCase();
@@ -2365,10 +2412,10 @@ from desktop.views import _ko
               topic.titleMatch(topic.title.replace(replaceRegexp, '<b>$1</b>'));
               topic.bodyMatch(undefined);
               flattenedTopics.push(topic);
-            } else if (topic.body && topic.body.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+            } else if (topic.body() && topic.body().toLowerCase().indexOf(lowerCaseQuery) !== -1) {
               topic.weight = 0;
               topic.titleMatch(undefined);
-              topic.bodyMatch(topic.body.replace(replaceRegexp, '<b>$1</b>'));
+              topic.bodyMatch(topic.body().replace(replaceRegexp, '<b>$1</b>'));
               flattenedTopics.push(topic);
             } else {
               topic.titleMatch(undefined);
@@ -2377,7 +2424,7 @@ from desktop.views import _ko
             topic.children.forEach(findInside);
           };
 
-          self.availableTopics.forEach(findInside);
+          self.topics.forEach(findInside);
 
           flattenedTopics.sort(function (a, b) {
             if (a.weight !== b.weight) {
@@ -2411,7 +2458,7 @@ from desktop.views import _ko
           var findTopic = function (topics) {
             topics.some(function (topic) {
               topicStack.push(topic);
-              if (topic.id === mainTopic) {
+              if (topic.ref === mainTopic) {
                 while (topicStack.length) {
                   topicStack.pop().open(true);
                 }
@@ -2430,7 +2477,7 @@ from desktop.views import _ko
               topicStack.pop();
             })
           };
-          findTopic(self.availableTopics);
+          findTopic(self.topics);
         });
 
         $(element).on('click.langref', function (event) {

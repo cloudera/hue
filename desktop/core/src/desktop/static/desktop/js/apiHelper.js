@@ -477,6 +477,9 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.simpleGet = function (url, data, options) {
     var self = this;
+    if (!options) {
+      options = {}
+    }
     return $.get(url, data, function (data) {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);

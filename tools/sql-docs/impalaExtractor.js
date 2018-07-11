@@ -109,7 +109,13 @@ let handleElement = (x, path, body) => {
           var preChildren = [];
           handleChildNodes(x, path, preChildren);
           preChildren.forEach(function (child) {
-            body.push(child.replace(/^\s*/g, '').replace(/\n/g, '<br/>'));
+            if (typeof child === 'string') {
+              body.push(child.replace(/^\s*/g, '').replace(/\n/g, '<br/>'));
+            } else if (child.xrefNode) {
+              body.push(child);
+            } else {
+              console.log('Could not process codeblock child: ' + child.toString());
+            }
           });
           body.push('</div>');
           break;
@@ -119,12 +125,18 @@ let handleElement = (x, path, body) => {
         case 'filepath':
         case 'term': { wrapHtmlElement(x, path, body, 'span', 'sql-docs-variable'); break; }
         case 'note': { wrapHtmlElement(x, path, body, 'div', 'sql-docs-note'); break; }
-        case 'b': { wrapHtmlElement(x, path, body, 'b'); break; }
-        case 'q':  { wrapHtmlElement(x, path, body, 'q'); break; }
-        case 'i': { wrapHtmlElement(x, path, body, 'i'); break; }
-        case 'sup': { wrapHtmlElement(x, path, body, 'sup'); break; }
-        case 'ul': { wrapHtmlElement(x, path, body, 'ul'); break; }
-        case 'li': { wrapHtmlElement(x, path, body, 'li'); break; }
+        case 'example': { wrapHtmlElement(x, path, body, 'div', 'sql-docs-example'); break; }
+        case 'b':
+        case 'dl':
+        case 'dlentry':
+        case 'ol':
+        case 'dd':
+        case 'dt':
+        case 'q':
+        case 'i':
+        case 'sup':
+        case 'ul':
+        case 'li': { wrapHtmlElement(x, path, body, x.name()); break; }
         case 'indexterm':
         case 'metadata':
         case 'fig':
@@ -163,6 +175,76 @@ let parseDml = (path) => {
   });
 };
 
+let flattenBody = (body, prefix) => {
+  let bodyString = '';
+  body.forEach(function (bodyElement) {
+    if (typeof bodyElement === 'string') {
+      bodyString += bodyElement;
+    } else if (bodyElement.xrefNode) {
+      if (bodyElement.xrefNode.attr('href')) {
+        if (bodyElement.xrefNode.attr('scope') && bodyElement.xrefNode.attr('scope').value() === 'external') {
+          bodyString += '<a target="_blank" href="' + bodyElement.xrefNode.attr('href').value() + '">' + bodyElement.xrefNode.text() + '</a>'
+        } else {
+          let href = bodyElement.xrefNode.attr('href').value();
+          if (href.indexOf('#') === 0) {
+            href = bodyElement.path.substring(bodyElement.path.indexOf('topics/')) + href;
+          } else if (href.indexOf('topics/') !== -1) {
+            href = href.substring(href.indexOf('topics')); // clean up [..]/topic/ etc.
+          } else {
+            href = 'topics/' + href;
+          }
+          var split = href.split('#');
+
+          var unknown = false;
+          let title = href;
+          if (knownTitles[href]) {
+            title = bodyElement.xrefNode.text() || knownTitles[href];
+          } else if (knownTitles[split[0]]) {
+            title = bodyElement.xrefNode.text() || knownTitles[split[0]];
+          } else if (bodyElement.xrefNode.text()) {
+            unknown = true;
+            title = bodyElement.xrefNode.text();
+          } else if (split[1]) {
+            unknown = true;
+            title = split[1].replace(/_/g, ' ');
+          } else {
+            unknown = true;
+            title = href.replace('topics/', '').replace('.xml', '').replace(/_/g, ' ');
+          }
+
+          if (unknown) {
+            bodyString += '<span>' + title + '</span>'; // Unknown = not parsed reference as some docs are excluded
+          } else {
+            bodyString += '<a href="javascript: void(0);" class="lang-ref-link" data-target="' + href + '">' + title + '</a>';
+          }
+        }
+      }
+    }
+  });
+  return bodyString;
+};
+
+let stringifyTopic = (topic, prefix) => {
+  let result = prefix + '{\n' + prefix + '  id: \'' + topic.ref + '\',\n' + prefix + '  title: \'' + topic.title + '\',\n' + prefix + '  weight: 1,\n' + prefix + '  bodyMatch: ko.observable(),\n' + prefix + '  open: ko.observable(false),\n' + prefix +'  titleMatch: ko.observable()';
+
+  if (topic.body.length) {
+    result += ',\n' + prefix + '  body: \'' + flattenBody(topic.body, prefix) + '\''
+  }
+  if (topic.children.length) {
+    result += ',\n' + prefix + '  children: [\n';
+    let stringifiedChildren = [];
+    topic.children.forEach(child => {
+      stringifiedChildren.push(stringifyTopic(child, prefix + '  '))
+    });
+    result += stringifiedChildren.join(',\n');
+    result += prefix + ']';
+  } else {
+    result += ',\n' + prefix + '  children: []\n';
+  }
+  result += prefix + '}';
+  return result;
+};
+
 class Topic {
   constructor (ref, node, promises) {
     this.ref = ref;
@@ -185,6 +267,13 @@ class Topic {
         }
       });
     }
+  }
+
+  toJson() {
+    return JSON.stringify({
+      body: flattenBody(this.body, ''),
+      title: this.title
+    })
   }
 }
 
@@ -211,72 +300,6 @@ class Topic {
    }
   });
 
-  let stringifyTopic = (topic, prefix) => {
-     let result = prefix + '{\n' + prefix + '  id: \'' + topic.ref + '\',\n' + prefix + '  title: \'' + topic.title + '\',\n' + prefix + '  weight: 1,\n' + prefix + '  bodyMatch: ko.observable(),\n' + prefix + '  open: ko.observable(false),\n' + prefix +'  titleMatch: ko.observable()';
-
-     if (topic.body.length) {
-       var bodyString = '';
-       topic.body.forEach(function (bodyElement) {
-         if (typeof bodyElement === 'string') {
-           bodyString += bodyElement;
-         } else if (bodyElement.xrefNode) {
-           if (bodyElement.xrefNode.attr('href')) {
-             if (bodyElement.xrefNode.attr('scope') && bodyElement.xrefNode.attr('scope').value() === 'external') {
-               bodyString += '<a target="_blank" href="' + bodyElement.xrefNode.attr('href').value() + '">' + bodyElement.xrefNode.text() + '</a>'
-             } else {
-               let href = bodyElement.xrefNode.attr('href').value();
-               if (href.indexOf('#') === 0) {
-                 href = bodyElement.path.substring(bodyElement.path.indexOf('topics/')) + href;
-               } else if (href.indexOf('topics/') !== -1) {
-                 href = href.substring(href.indexOf('topics')); // clean up [..]/topic/ etc.
-               } else {
-                 href = 'topics/' + href;
-               }
-               var split = href.split('#');
-
-               var unknown = false;
-               let title = href;
-               if (knownTitles[href]) {
-                 title = bodyElement.xrefNode.text() || knownTitles[href];
-               } else if (knownTitles[split[0]]) {
-                 title = bodyElement.xrefNode.text() || knownTitles[split[0]];
-               } else if (bodyElement.xrefNode.text()) {
-                 unknown = true;
-                 title = bodyElement.xrefNode.text();
-               } else if (split[1]) {
-                 unknown = true;
-                 title = split[1].replace(/_/g, ' ');
-               } else {
-                 unknown = true;
-                 title = href.replace('topics/', '').replace('.xml', '').replace(/_/g, ' ');
-               }
-
-               if (unknown) {
-                 bodyString += '<span>' + title + '</span>'; // Unknown = not parsed reference as some docs are excluded
-               } else {
-                 bodyString += '<a href="javascript: void(0);" class="lang-ref-link" data-target="' + href + '">' + title + '</a>';
-               }
-             }
-           }
-         }
-       });
-       result += ',\n' + prefix + '  body: \'' + bodyString.replace(/([^\\])\\([^\\])/g, '$1\\\\$2').replace(/'/g, '\\\'').replace(/\n/g, '\' + \n' + prefix + '    \'') + '\''
-     }
-     if (topic.children.length) {
-       result += ',\n' + prefix + '  children: [\n';
-       let stringifiedChildren = [];
-       topic.children.forEach(child => {
-         stringifiedChildren.push(stringifyTopic(child, prefix + '  '))
-       });
-       result += stringifiedChildren.join(',\n');
-       result += prefix + ']';
-     } else {
-       result += ',\n' + prefix + '  children: []\n';
-     }
-     result += prefix + '}';
-     return result;
-   };
-
   fs.readFile('../Impala/docs/shared/impala_common.xml', 'utf-8', (err, commonRaw) => {
 
     let handleCommonChildren = children => {
@@ -297,24 +320,67 @@ class Topic {
       let promises = [];
 
       libxml.parseXmlString(mapRaw).get('//map').childNodes().forEach(x => {
-        if (x.name() === 'topicref' && x.attr('href').value() !== 'topics/impala_functions.xml') {
+        if (x.name() === 'topicref') {
           topics.push(new Topic(x.attr('href').value(), x, promises));
         }
       });
 
+      let index = {};
+      let topLevel = [];
       Promise.all(promises).then(() => {
-        fs.readFile('tools/jison/license.txt', 'utf-8', (err, licenseHeader) => {
-          let result = licenseHeader + '\n\n\n// NOTE: This is a generated file!\n// Run \'node tools/sql-docs/impalaExtractor.js\' to generate.\n\n\nvar impalaLangRefTopics = [\n';
-          let stringifiedTopics = [];
+        let saveTopics = (topics, parent) => {
           topics.forEach(topic => {
-            stringifiedTopics.push(stringifyTopic(topic, ''));
-          });
-          result += stringifiedTopics.join(',\n');
-          result += '\n];';
-          fs.writeFile('desktop/core/src/desktop/static/desktop/js/sqlImpalaLangRef.js', result, () => {
-            console.log('desktop/core/src/desktop/static/desktop/js/sqlImpalaLangRef.js updated!');
+            let entry = {
+              title: topic.title,
+              ref: topic.ref,
+              children: []
+            };
+            if (!parent) {
+              topLevel.push(entry)
+            } else {
+              parent.children.push(entry);
+            }
+
+            let fileName = topic.ref.replace('topics/', '').replace('.xml', '.json');
+            index[topic.ref] = fileName;
+            fs.writeFile('desktop/core/src/desktop/static/desktop/docs/impala/' + fileName, topic.toJson(), () => {
+              console.log('desktop/core/src/desktop/static/desktop/docs/impala/' + fileName + ' written.');
+            });
+            saveTopics(topic.children, entry);
           })
-        })
+        };
+
+        saveTopics(topics);
+
+        fs.readFile('tools/sql-docs/impala_doc_index.mako.template', 'utf-8', (err, contents) => {
+          let indexStrings = [];
+          Object.keys(index).forEach(key => {
+            indexStrings.push('\'' + key + '\':\'${ static(\'desktop/docs/impala/' + index[key] + '\') }\'')
+          });
+          contents = contents.replace('/* docIndex */', indexStrings.join(','));
+
+          let createTopicJs = (entry) => {
+            return '{title:\'' + entry.title +'\',ref:\'' + entry.ref + '\',children:[' + entry.children.map(createTopicJs).join(',') + ']}';
+          };
+
+          contents = contents.replace('/* topLevel */', topLevel.map(createTopicJs).join(','));
+          fs.writeFile('desktop/core/src/desktop/templates/impala_doc_index.mako', contents, () => {
+            console.log('desktop/core/src/desktop/templates/impala_doc_index.mako written.');
+          })
+        });
+
+        // fs.readFile('tools/jison/license.txt', 'utf-8', (err, licenseHeader) => {
+        //   let result = licenseHeader + '\n\n\n// NOTE: This is a generated file!\n// Run \'node tools/sql-docs/impalaExtractor.js\' to generate.\n\n\nvar impalaLangRefTopics = [\n';
+        //   let stringifiedTopics = [];
+        //   topics.forEach(topic => {
+        //     stringifiedTopics.push(stringifyTopic(topic, ''));
+        //   });
+        //   result += stringifiedTopics.join(',\n');
+        //   result += '\n];';
+        //   fs.writeFile('desktop/core/src/desktop/static/desktop/js/sqlImpalaLangRef.js', result, () => {
+        //     console.log('desktop/core/src/desktop/static/desktop/js/sqlImpalaLangRef.js updated!');
+        //   })
+        // })
       });
     });
   })

@@ -26,6 +26,8 @@ from desktop.views import _ko
 from metadata.conf import has_navigator
 %>
 
+<%namespace name="impalaDocIndex" file="/impala_doc_index.mako" />
+
 <%def name="contextPopover()">
   <script type="text/html" id="context-popover-footer">
     <div class="context-popover-flex-bottom-links">
@@ -847,6 +849,8 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('details');
       }
 
+      ${ impalaDocIndex.impalaDocIndex() }
+
       function LangRefContext(options) {
         var self = this;
         self.popover = options.popover;
@@ -855,20 +859,10 @@ from metadata.conf import has_navigator
 
         self.topicId = 'topics/impala_' + options.data.identifier.toLowerCase().replace(/ /g, '_') + '.xml';
 
-        var findTopic = function (topics) {
-          topics.some(function (topic) {
-            if (topic.id === self.topicId) {
-              self.title(topic.title);
-              self.body(topic.body);
-              return true;
-            }
-            if (findTopic(topic.children)) {
-              return true;
-            }
-          });
-        };
-
-        findTopic(impalaLangRefTopics);
+        $.get(IMPALA_DOC_INDEX[self.topicId]).done(function (topic) {
+          self.title(topic.title);
+          self.body(topic.body);
+        });
 
         $('.hue-popover').on('click.contextLangRef', function (event) {
           if (event.target.className === 'lang-ref-link') {
