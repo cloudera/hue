@@ -158,12 +158,12 @@ def dt_login(request, from_modal=False):
   else:
     first_user_form = None
     auth_form = AuthenticationForm()
-    # SAML user is already authenticated in djangosaml2.views.login
-    if ('OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
+    # SAML/OIDC user is already authenticated in djangosaml2.views.login
+    if hasattr(request,'fs') and ('OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException), e:
-        LOG.error('Could not create home directory for SAML user %s.' % request.user)
+        LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
 
   if is_active_directory and not is_ldap_option_selected and \
                   request.method == 'POST' and request.user.username != request.POST.get('username'):
