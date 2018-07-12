@@ -45,7 +45,7 @@ let addStartElement = (x, path, body, elemName, classes) => {
 let wrapHtmlElement = (x, path, body, elemName, classes) => {
   addStartElement(x, path, body, elemName, classes);
   handleChildNodes(x, path, body);
-  body.push('</' + elemName + '> ');
+  body.push('</' + elemName + '>');
 };
 
 let handleElement = (x, path, body) => {
@@ -110,7 +110,7 @@ let handleElement = (x, path, body) => {
           handleChildNodes(x, path, preChildren);
           preChildren.forEach(function (child) {
             if (typeof child === 'string') {
-              body.push(child.replace(/^\s*/g, '').replace(/\n/g, '<br/>'));
+              body.push(child.replace(/\n/g, '<br/>'));
             } else if (child.xrefNode) {
               body.push(child);
             } else {
@@ -343,9 +343,7 @@ class Topic {
 
             let fileName = topic.ref.replace('topics/', '').replace('.xml', '.json');
             index[topic.ref] = fileName;
-            fs.writeFile('desktop/core/src/desktop/static/desktop/docs/impala/' + fileName, topic.toJson(), () => {
-              console.log('desktop/core/src/desktop/static/desktop/docs/impala/' + fileName + ' written.');
-            });
+            fs.writeFile('desktop/core/src/desktop/static/desktop/docs/impala/' + fileName, topic.toJson(), () => { });
             saveTopics(topic.children, entry);
           })
         };
@@ -368,19 +366,6 @@ class Topic {
             console.log('desktop/core/src/desktop/templates/impala_doc_index.mako written.');
           })
         });
-
-        // fs.readFile('tools/jison/license.txt', 'utf-8', (err, licenseHeader) => {
-        //   let result = licenseHeader + '\n\n\n// NOTE: This is a generated file!\n// Run \'node tools/sql-docs/impalaExtractor.js\' to generate.\n\n\nvar impalaLangRefTopics = [\n';
-        //   let stringifiedTopics = [];
-        //   topics.forEach(topic => {
-        //     stringifiedTopics.push(stringifyTopic(topic, ''));
-        //   });
-        //   result += stringifiedTopics.join(',\n');
-        //   result += '\n];';
-        //   fs.writeFile('desktop/core/src/desktop/static/desktop/js/sqlImpalaLangRef.js', result, () => {
-        //     console.log('desktop/core/src/desktop/static/desktop/js/sqlImpalaLangRef.js updated!');
-        //   })
-        // })
       });
     });
   })
