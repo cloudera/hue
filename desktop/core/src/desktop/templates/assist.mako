@@ -2394,7 +2394,9 @@ from desktop.views import _ko
         self.selectedTopic = ko.observable();
 
         var selectedSub = self.selectedTopic.subscribe(function (newTopic) {
-          newTopic.load();
+          if (newTopic) {
+            newTopic.load();
+          }
         });
 
         self.disposals.push(function () {
