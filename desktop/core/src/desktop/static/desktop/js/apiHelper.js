@@ -539,7 +539,11 @@ var ApiHelper = (function () {
       url = HDFS_API_PREFIX;
     }
 
-    url += options.path.join('/') + '?compression=none&mode=text';
+    var clonedPath = options.path.concat();
+    if (clonedPath.length && clonedPath[0] === '/') {
+      clonedPath.shift();
+    }
+    url += clonedPath.join('/') + '?compression=none&mode=text';
     url += '&offset=' + (options.offset || 0);
     url += '&length=' + (options.length || 118784);
 
