@@ -18,8 +18,6 @@
 
 import logging
 
-from optparse import make_option
-
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError, BaseCommand
 from django.utils.translation import ugettext_lazy as _

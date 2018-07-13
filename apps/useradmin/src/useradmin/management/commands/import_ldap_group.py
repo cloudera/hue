@@ -14,8 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from optparse import make_option
-
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
@@ -23,7 +21,6 @@ from desktop.conf import LDAP
 
 from useradmin import ldap_access
 from useradmin.views import import_ldap_groups
-
 
 class Command(BaseCommand):
   """
