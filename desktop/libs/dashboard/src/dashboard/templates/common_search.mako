@@ -1748,23 +1748,40 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'document-widget' -->
-          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle}, fqs: ko.observableArray([]),
-                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container'}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
-
-          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: template.chartSettings.chartSelectorType},  stacked: true, showLegend: true, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
-
-          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti},
-                transformer: multiSerieDataTransformerGrid, showControls: false}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
-
+          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
+          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle}, field: template.chartSettings.chartX, fqs: $root.query.fqs,
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container',
+                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.data.label}, widget_id: $parent.id()}); }}" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
+          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: true, hideStacked: template.chartSettings.hideStacked,
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: template.chartSettings.chartSelectorType,
+                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.x}, widget_id: $parent.id()}); },
+                onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: template.chartSettings.chartX(), widget_id: $parent.id()}) }},  stacked: true, showLegend: true" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
+          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: true,
+                transformer: multiSerieDataTransformerGrid, showControls: false,
+                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.x}, widget_id: $parent.id()}); },
+                onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: template.chartSettings.chartX(), widget_id: $parent.id()}) }}" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle, chartZ: template.chartSettings.chartMapLabel},
-                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
-
-          <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, showControls: false}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
-
-          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $parent.results(), scope: template.chartSettings.chartScope(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle},
-              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" />
+                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, forceRedraw: true,
+                showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }',
+                onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: $parent.id(), 'bounds': ko.toJS(bounds, null, 2), lat: template.chartSettings.chartX(), lon: template.chartSettings.chartYSingle()}); }}" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
+          <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti, widget_id: $parent.id()}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: true, hideStacked: template.chartSettings.hideStacked,
+                transformer: multiSerieDataTransformerGrid, showControls: false,
+                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.x}, widget_id: $parent.id()}); },
+                onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: template.chartSettings.chartX(), widget_id: $parent.id()}) }}" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
+          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $parent.results(), scope: template.chartSettings.chartScope(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle},
+              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true,
+              onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.fields[0]}, widget_id: $parent.id()}); }}" />
+          <!-- /ko -->
           <div class="clearfix"></div>
         <!-- /ko -->
 
@@ -3419,6 +3436,7 @@ function pieChartDataTransformerGrid(data) {
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
     if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
+      item.from = item.item[chartX]();
       _data.push({
         label: item.item[chartX](),
         value: item.item[chartY](),
@@ -3961,7 +3979,7 @@ function multiSerieDataTransformerGrid(rawDatum, isTimeline) {
         if (item.item[chartX] && item.item[col]) {
           _data.push({
             series: _plottedSerie,
-            x: isTimeline && new Date(item.item[chartX]()) || item.item[chartX](),
+            x: isTimeline && new Date(moment.utc(item.item[chartX]()).valueOf()) || item.item[chartX](),
             y: item.item[col](),
             obj: item.item
           });

@@ -979,7 +979,7 @@
       $.each(_options.fqs ? _options.fqs() : [], function (cnt, item) {
         if (item.id() == _options.datum.widget_id) {
           if (item.field() == _field) {
-            if (item.properties) {
+            if (item.properties && typeof item.properties === 'function') {
               bHasSelection = true;
               _chart.selectBars({
                 singleValues: $.map(item.filter(), function (it) {
