@@ -18,7 +18,6 @@
 from configobj import ConfigObj
 
 from django.core.management.base import BaseCommand, CommandError
-from optparse import make_option
 
 import simplejson as json
 

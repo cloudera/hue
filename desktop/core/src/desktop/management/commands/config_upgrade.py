@@ -26,7 +26,6 @@ import logging
 import os, glob, string
 import desktop.conf
 import desktop.log
-from optparse import make_option
 from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
