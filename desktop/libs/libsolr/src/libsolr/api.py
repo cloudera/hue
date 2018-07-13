@@ -458,7 +458,7 @@ class SolrApi(object):
           ('action', 'LISTALIASES'),
           ('wt', 'json'),
       )
-      return self._root.get('admin/collections', params=params)['aliases']
+      return self._root.get('admin/collections', params=params)['aliases'] or []
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
