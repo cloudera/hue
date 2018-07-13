@@ -152,7 +152,16 @@ class SQLDashboardApi(DashboardApi):
             'filters': self._convert_filters_to_where(filters),
         }
       elif facet['type'] == 'statement':
-        sql = facet['properties']['statement']
+        if filters:
+          sql = '''SELECT *
+          FROM
+          (%(statement)s) as sub
+          %(filters)s''' % {
+            'statement': facet['properties']['statement'],
+            'filters': self._convert_filters_to_where(filters, alias='sub')
+          }
+        else:
+          sql = facet['properties']['statement']
         result_properties = facet['properties']['result']
     else:
       fields = Collection2.get_field_list(dashboard)
@@ -377,7 +386,9 @@ class SQLDashboardApi(DashboardApi):
     return [f for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
 
 
-  def _convert_filters_to_where(self, filters):
+  def _convert_filters_to_where(self, filters, alias=None):
+    if alias:
+      filters = [alias + '.' + filter for filter in filters]
     return ('WHERE ' + ' AND '.join(filters)) if filters else ''
 
 
@@ -405,29 +416,53 @@ class SQLDashboardApi(DashboardApi):
           value = _filter['value']
           if value is not None:
             if isinstance(value, list):
-              f.append(' AND '.join([self._get_field_condition_formatting(collection, _f) % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]))
+              field_conditions = [self._get_field_condition_formatting(collection, facet, _f) % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]
+              field_conditions = [condition for condition in field_conditions if condition]
+              if field_conditions:
+                f.append(' AND '.join(field_conditions))
             else:
-              sql_condition = self._get_field_condition_formatting(collection, fq['field'])
-              f.append(sql_condition % (fq['field'], exclude, value))
-        clauses.append(' OR '.join(f))
+              sql_condition = self._get_field_condition_formatting(collection, facet, fq['field'])
+              if sql_condition:
+                f.append(sql_condition % (fq['field'], exclude, value))
+        if f:
+          clauses.append(' OR '.join(f))
       elif fq['type'] == 'range':
-        field = self._get_field(collection, fq['field'])
-        if self._is_date(field['type']):
-          quote = "'"
-        else:
-          quote = ''
-        clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
-          'field': fq['field'],
-          'to': fq['properties'][0]['to'],
-          'from': fq['properties'][0]['from'],
-          'quote': quote
-        })
-
+        field = self._get_field(collection, fq['field'], facet=facet)
+        if field:
+          if self._is_date(field['type']):
+            quote = "'"
+          else:
+            quote = ''
+          clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
+            'field': fq['field'],
+            'to': fq['properties'][0]['to'],
+            'from': fq['properties'][0]['from'],
+            'quote': quote
+          })
+      elif fq['type'] == 'map':
+        for direction in ['lat', 'lon']:
+          field = self._get_field(collection, fq[direction], facet=facet)
+          if field:
+            if self._is_number(field['type']):
+              quote = ''
+            else:
+              quote = "'"
+            min_direction = min(fq['properties'][direction+'_sw'], fq['properties'][direction+'_ne'])
+            max_direction = max(fq['properties'][direction+'_sw'], fq['properties'][direction+'_ne'])
+            clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
+              'field': fq[direction],
+              'to': max_direction,
+              'from': min_direction,
+              'quote': quote
+            })
     return clauses
 
-  def _get_field_condition_formatting(self, table, field_name):
-    field = self._get_field(table, field_name)
-    return "`%s` %s %s" if self._is_number(field['type']) else "`%s` %s '%s'"
+  def _get_field_condition_formatting(self, table, facet, field_name):
+    field = self._get_field(table, field_name, facet=facet)
+    if field:
+      return "`%s` %s %s" if self._is_number(field['type']) else "`%s` %s '%s'"
+    else:
+      return ''
 
 
   @classmethod
@@ -584,18 +619,19 @@ class SQLDashboardApi(DashboardApi):
 
     return duration
 
-  def _get_field(self, collection, name):
-    _field = [_f for _f in collection['template']['fieldsAttributes'] if _f['name'] == name]
+  def _get_field(self, collection, name, facet=None):
+    fields = collection['template']['fieldsAttributes'] or (facet and facet['template']['fieldsAttributes'])
+    _field = [_f for _f in fields if _f['name'] == name]
     if _field:
       return _field[0]
 
 
   def _is_number(self, _type):
-    return _type in ('int', 'long', 'bigint', 'float')
+    return _type in ('int', 'long', 'bigint', 'float', 'INT_TYPE', 'DECIMAL_TYPE', 'DOUBLE_TYPE', 'FLOAT_TYPE', 'SMALLINT_TYPE', 'TINYINT_TYPE', 'BIGINT_TYPE')
 
 
   def _is_date(self, _type):
-    return _type in ('timestamp',)
+    return _type in ('timestamp','TIMESTAMP_TYPE')
 
 
   def _get_time_filter_range(self, collection, query):
