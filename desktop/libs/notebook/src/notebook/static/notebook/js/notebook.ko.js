@@ -2366,7 +2366,6 @@ var EditorViewModel = (function() {
     self.isPresentationMode = ko.observable(false);
     self.isPresentationModeInitialized = ko.observable(false);
     self.isPresentationMode.subscribe(function(newValue) {
-      wasResultFullScreenMode = false;
       if (! newValue) {
         self.cancelExecutingAll();
       }

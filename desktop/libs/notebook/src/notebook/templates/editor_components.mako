@@ -2118,8 +2118,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   var shareViewModel = initSharing("#documentShareModal");
   % endif
 
-function togglePresentation(value) {};
-
   var isLeftNavOpen = false;
   huePubSub.subscribe('left.nav.open.toggle', function (val) {
     isLeftNavOpen = val;
@@ -3451,9 +3449,10 @@ function togglePresentation(value) {};
         } else {
           viewModel.isResultFullScreenMode(false);
         }
+        wasResultFullScreenMode = false;
       }
 
-       huePubSub.subscribe('editor.presentation.operate.toggle', function (value) {
+      huePubSub.subscribe('editor.presentation.operate.toggle', function (value) {
         viewModel.isEditing(! viewModel.isEditing());
         if (value) {
           $(".jHueNotify").remove();
@@ -3506,8 +3505,8 @@ function togglePresentation(value) {};
       }, HUE_PUB_SUB_EDITOR_ID);
 
       viewModel.isResultFullScreenMode.subscribe(function(newValue) {
-        wasResultFullScreenMode = true;
-        togglePresentation(newValue);
+        wasResultFullScreenMode = newValue;
+        huePubSub.publish('editor.presentation.operate.toggle', newValue);
       });
 
       huePubSub.subscribe('assist.set.manual.visibility', function () {
