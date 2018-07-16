@@ -33,15 +33,15 @@ def _deprecation_check(arg0):
     print >> sys.stderr, msg
     LOG.warn(msg)
 
-def reload_with_cm_env(ignore_cm):
+def reload_with_cm_env(cm_managed):
   try:
     from django.db.backends.oracle.base import Oracle_datetime
   except:
     if 'LD_LIBRARY_PATH' in os.environ:
       print "We need to reload the process to include LD_LIBRARY_PATH for Oracle backend"
       try:
-        if ignore_cm:
-          sys.argv.append("--ignore-cm")
+        if cm_managed:
+          sys.argv.append("--cm-managed")
  
         sys.argv.append("--skip-reload")
         os.execv(sys.argv[0], sys.argv)
@@ -72,11 +72,13 @@ def entry():
   else:
     skip_reload = False
 
-  if "--ignore-cm" in sys.argv:
-    ignore_cm = True
-    sys.argv.remove("--ignore-cm")
+  # Check if --cm-managed flag is set and strip it out
+  # to prevent from sending to subcommands
+  if "--cm-managed" in sys.argv:
+    sys.argv.remove("--cm-managed")
+    cm_managed = True
   else:
-    ignore_cm = False
+    cm_managed = False
 
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
@@ -86,20 +88,15 @@ def entry():
   if len(sys.argv) > 1:
     prof_id = subcommand = sys.argv[1]
     #Check if this is a CM managed cluster
-    if os.path.isfile(cm_config_file) and not ignore_cm and not skip_reload:
-        print "WARN: This appears to be a CM Managed environment"
-        print "WARN: Automatically running as CM managed"
-        print "WARN: To ignore CM configurations run"
-        print        "hue <command> --ignore-cm"
+    if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
+        print "ALERT: This appears to be a CM Managed environment"
+        print "ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment"
+        print "ALERT: Please run 'hue <command> --cm-managed'"
   else:
     prof_id = str(os.getpid())
 
-  # Check if --cm-managed flag is set and strip it out
-  # to prevent from sending to subcommands
-  if not ignore_cm:
-    if "--cm-managed" in sys.argv:
-      sys.argv.remove("--cm-managed")
-
+  # CM managed configure env vars
+  if cm_managed:
     import ConfigParser
     from ConfigParser import NoOptionError
     config = ConfigParser.RawConfigParser()
@@ -156,7 +153,7 @@ def entry():
     if not envline == None:
       empty, environment = envline.split("environment=")
       for envvar in environment.split(","):
-        include_env_vars = ("HADOOP_C", "PARCEL", "SCM_DEFINCES", "LD_LIBRARY")
+        include_env_vars = ("HADOOP_C", "PARCEL", "SCM_DEFINES", "LD_LIBRARY")
         if any(include_env_var in envvar for include_env_var in include_env_vars):
           envkey, envval = envvar.split("=")
           envval = envval.replace("'", "").rstrip()
@@ -193,7 +190,11 @@ def entry():
         for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
           if "ORACLE" in scm_script:
             if os.path.isfile(scm_script):
-              subprocess.Popen('bash', '-c', '. %s' % scm_script)
+              oracle_source = subprocess.Popen(". %s; env" % scm_script, stdout=subprocess.PIPE, shell=True, executable="/bin/bash")
+              for line in oracle_source.communicate()[0].splitlines():
+                if "LD_LIBRARY_PATH" in line:
+                  var, oracle_ld_path = line.split("=")
+                  os.environ["LD_LIBRARY_PATH"] = oracle_ld_path
 
     if "LD_LIBRARY_PATH" not in os.environ.keys():
       print "LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database"
@@ -205,7 +206,7 @@ def entry():
       skip_reload = True
 
   if not skip_reload:
-    reload_with_cm_env(ignore_cm)
+    reload_with_cm_env(cm_managed)
 
   try:
     # Let django handle the normal execution
@@ -219,6 +220,10 @@ def entry():
       sys.exit(10)
     else:
       raise e
+  except subprocess.CalledProcessError, e:
+    if "altscript.sh" in str(e).lower():
+      print "%s" % e
+      print "HUE_CONF_DIR seems to be set to CM location and '--cm-managed' flag not used"
 
 def _profile(prof_id, func):
   """
