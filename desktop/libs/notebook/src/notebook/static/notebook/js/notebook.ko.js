@@ -3563,6 +3563,7 @@ var EditorViewModel = (function() {
     };
 
     self.newNotebook = function (editorType, callback, queryTab) {
+      huePubSub.publish('active.snippet.type.changed', editorType);
       $.post("/notebook/api/create_notebook", {
         type: editorType || options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')

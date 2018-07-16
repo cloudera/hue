@@ -411,26 +411,12 @@ ${ hueIcons.symbols() }
       % endif
     </div>
 
-    <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
-      containerSelector: '.content-wrapper',
-      sidePanelSelector: '.right-panel',
-      sidePanelVisible: rightAssistVisible,
-      orientation: 'right',
-      onPosition: function() { huePubSub.publish('split.draggable.position') }
-    }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
-
-    <div class="right-panel side-panel-closed" data-bind="visible: rightAssistAvailable, css: { 'side-panel-closed': !rightAssistVisible() || !rightAssistAvailable() }, visibleOnHover: { selector: '.hide-right-side-panel' }" style="display:none;">
-      <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: rightAssistAvailable() && !rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistAvailable() && rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
-
-      <div class="assist" data-bind="component: {
-          name: 'right-assist-panel',
-          params: {
-            rightAssistAvailable: rightAssistAvailable
-          }
-        }, visible: rightAssistAvailable() && rightAssistVisible()" style="display: none;">
-      </div>
-    </div>
+    <div class="right-panel" data-bind="css: { 'right-assist-minimized': !rightAssistVisible() }, visible: rightAssistAvailable, component: {
+        name: 'right-assist-panel',
+        params: {
+          visible: rightAssistVisible
+        }
+      }" style="display: none;"></div>
 
     <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
       <div class="margin-top-10 padding-left-10 padding-right-10">
@@ -1361,6 +1347,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }
         });
 
+        huePubSub.subscribe('set.current.app.name', function (appName) {
+          if (appName === 'dashboard') {
+            self.rightAssistAvailable(true);
+          } else if (appName !== 'editor' && appName !== 'notebook') {
+            self.rightAssistAvailable(false);
+          }
+        });
+
+        huePubSub.subscribe('active.snippet.type.changed', function (snippetType) {
+          self.rightAssistAvailable(snippetType === 'impala' || snippetType === 'hive' || snippetType ==='pig');
+        });
+
+        huePubSub.publish('get.current.app.name');
+
         self.activeAppViewModel = ko.observable();
         self.currentApp = ko.observable('');
         self.templateApp = ko.pureComputed(function(){
@@ -1448,7 +1448,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       var sidePanelViewModel = new SidePanelViewModel();
       ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
       ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
-      ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
+      ##  ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
       ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
 
