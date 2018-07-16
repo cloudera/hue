@@ -906,7 +906,7 @@ ${ assist.assistPanel() }
               <a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">${_('Fields')} /</a> ${_('Editor')}
               <!-- /ko -->
               <!-- ko ifnot: useFieldEditor -->
-              ${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a> <!-- ko if: fieldEditorEnabled --><a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">/ ${_('Editor')}</a><!-- /ko -->
+              ${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0, publish: 'importer.show.bulkeditor'" href="javascript:void(0)"><i class="fa fa-edit"></i></a> <!-- ko if: fieldEditorEnabled --><a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">/ ${_('Editor')}</a><!-- /ko -->
               <!-- /ko -->
             </h4>
             <div class="card-body no-margin-top columns-form">
@@ -2622,6 +2622,9 @@ ${ assist.assistPanel() }
         draggableMeta = meta;
       });
 
+      huePubSub.subscribe('importer.show.bulkeditor', function (meta) {
+        $('#fieldsBulkEditor').modal('show');
+      }, 'importer');
 
       huePubSub.subscribe('split.panel.resized', resizeElements);
 
