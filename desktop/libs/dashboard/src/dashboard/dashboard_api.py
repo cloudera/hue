@@ -28,7 +28,7 @@ def get_engine(user, engine='solr', facet=None, source='data', cluster='""'):
     engine = engine.get('engine', 'solr')
 
   if engine == 'report' and facet:
-    engine = facet.get('engine')
+    engine = facet['properties'].get('engine')
 
   if engine != 'solr':
     if engine == 'impala':
