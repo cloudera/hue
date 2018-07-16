@@ -206,26 +206,28 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <table id="sampleTable" class="table table-condensed table-nowrap sample-table old-datatable metastore-table">
-    <thead>
-      <tr>
-        <th style="width: 1%">&nbsp;</th>
-        <!-- ko foreach: headers -->
-        <th data-bind="text: $data"></th>
-        <!-- /ko -->
-      </tr>
-    </thead>
-    <tbody>
-      <!-- ko foreach: rows -->
+  <div data-bind="delayedOverflow">
+    <table id="sampleTable" class="table table-condensed table-nowrap sample-table old-datatable metastore-table">
+      <thead>
         <tr>
-          <td data-bind="text: $index() + 1"></td>
-          <!-- ko foreach: $data -->
-            <td data-bind="html: $data"></td>
+          <th style="width: 1%">&nbsp;</th>
+          <!-- ko foreach: headers -->
+          <th data-bind="text: $data"></th>
           <!-- /ko -->
         </tr>
-      <!-- /ko -->
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <!-- ko foreach: rows -->
+          <tr>
+            <td data-bind="text: $index() + 1"></td>
+            <!-- ko foreach: $data -->
+              <td data-bind="html: $data"></td>
+            <!-- /ko -->
+          </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
+  </div>
 
   <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
