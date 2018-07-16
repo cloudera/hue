@@ -336,7 +336,53 @@
 }
 
 .right-panel {
+  .display-flex();
   min-width: 250px;
+
+  &.right-assist-minimized {
+    min-width: 38px;
+    max-width: 38px;
+    flex-basis: 38px;
+    .right-assist-tabs {
+      cursor: default;
+    }
+
+  }
+
+  .right-assist-tabs {
+    .flex(0 0 35px);
+    padding-top: 5px;
+    border-left: 1px solid @cui-gray-300;
+    border-right: 1px solid @cui-gray-300;
+    cursor: ew-resize;
+
+    .right-assist-tab {
+      cursor: pointer;
+      height: 35px;
+      font-size: 20px;
+
+      a {
+        display: block;
+        height: 31px;
+        width: 31px;
+        margin: 2px;
+        padding: 1px 0 0 1px;
+
+        i {
+          margin-top: 6px;
+          margin-left: 3px;
+        }
+      }
+    }
+  }
+
+  .right-assist-contents {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    position: relative;
+    .flex(1 1 100%);
+  }
 }
 
 .side-panel-closed {

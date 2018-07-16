@@ -2757,7 +2757,7 @@
 
       var positionPanels = function () {
         if (options.sidePanelVisible()) {
-          $sidePanel.css('width',  Math.max(sidePanelWidth, 200) + 'px');
+          $sidePanel.css('flex-basis',  Math.max(sidePanelWidth, 200) + 'px');
           onPosition();
         }
       };

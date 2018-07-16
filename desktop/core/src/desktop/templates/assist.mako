@@ -3547,36 +3547,42 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="right-assist-panel-template">
-    <div style="height: 100%; width: 100%; position: relative;">
-      <ul class="right-panel-tabs nav nav-pills">
-        <li data-bind="css: { 'active' : activeTab() === 'editorAssistant' }, visible: editorAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('editorAssistant'); activeTab('editorAssistant'); }">${ _('Assistant') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'langRef' }, visible: langRefTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('langRef'); activeTab('langRef'); }">${ _('Reference') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'dashboardAssistant' }, visible: dashboardAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabDashboard('dashboardAssistant'); activeTab('dashboardAssistant'); }">${ _('Assistant') }</a></li>
-      </ul>
-
-      <div class="right-panel-tab-content tab-content">
-        <!-- ko if: editorAssistantTabAvailable-->
-        <div data-bind="component: { name: 'editor-assistant-panel', params: { activeTab: activeTab } }, visible: activeTab() === 'editorAssistant'"></div>
-        <!-- /ko -->
-
-        <!-- ko if: functionsTabAvailable -->
-        <div data-bind="component: { name: 'functions-panel' }, visible: activeTab() === 'functions'"></div>
-        <!-- /ko -->
-
-        <!-- ko if: langRefTabAvailable -->
-        <div data-bind="component: { name: 'language-reference-panel' }, visible: activeTab() === 'langRef'"></div>
-        <!-- /ko -->
-
-        <!-- ko if: dashboardAssistantTabAvailable -->
-        <div data-bind="component: { name: 'dashboard-assistant-panel' }, visible: activeTab() === 'dashboardAssistant'"></div>
-        <!-- /ko -->
-
-        ## TODO: Switch to if: when loadSchedules from notebook.ko.js has been moved to the schedule-panel component
-        <div data-bind="component: { name: 'schedule-panel' }, visible: activeTab() === 'schedules'" style="display:none;"></div>
-      </div>
+    <div class="right-assist-tabs" data-bind="splitFlexDraggable : {
+        containerSelector: '.content-wrapper',
+        sidePanelSelector: '.right-panel',
+        sidePanelVisible: visible,
+        orientation: 'right',
+        onPosition: function() { huePubSub.publish('split.draggable.position') }
+      }">
+      <div class="right-assist-tab" data-bind="visible: editorAssistantTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${ _('Assistant') }" data-bind="css: { 'blue' : activeTab() === 'editorAssistant' }, tooltip: { placement: 'left' }, click: editorAssistantTabClick"><i class="fa fa-fw fa-compass"></i></a></div>
+      <div class="right-assist-tab" data-bind="visible: dashboardAssistantTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${ _('Assistant') }" data-bind="css: { 'blue' : activeTab() === 'dashboardAssistant' }, tooltip: { placement: 'left' }, click: dashboardAssistantTabClick"><i class="fa fa-fw fa-compass"></i></a></div>
+      <div class="right-assist-tab" data-bind="visible: functionsTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${ _('Functions') }" data-bind="css: { 'blue' : activeTab() === 'functions' }, tooltip: { placement: 'left' }, click: functionsTabClick"><i class="fa fa-fw fa-superscript"></i></a></div>
+      <div class="right-assist-tab" data-bind="visible: langRefTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${ _('Language Reference') }" data-bind="css: { 'blue' : activeTab() === 'langRef' }, tooltip: { placement: 'left' }, click: langRefTabClick"><i class="fa fa-fw fa-book"></i></a></div>
+      <div class="right-assist-tab" data-bind="visible: schedulesTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${ _('Schedule') }" data-bind="css: { 'blue' : activeTab() === 'schedules' }, tooltip: { placement: 'left' }, click: schedulesTabClick"><i class="fa fa-fw fa-calendar"></i></a></div>
     </div>
+
+    <!-- ko if: visible -->
+    <div class="right-assist-contents">
+      <!-- ko if: editorAssistantTabAvailable-->
+      <div data-bind="component: { name: 'editor-assistant-panel', params: { activeTab: activeTab } }, visible: activeTab() === 'editorAssistant'"></div>
+      <!-- /ko -->
+
+      <!-- ko if: functionsTabAvailable -->
+      <div data-bind="component: { name: 'functions-panel' }, visible: activeTab() === 'functions'"></div>
+      <!-- /ko -->
+
+      <!-- ko if: langRefTabAvailable -->
+      <div data-bind="component: { name: 'language-reference-panel' }, visible: activeTab() === 'langRef'"></div>
+      <!-- /ko -->
+
+      <!-- ko if: dashboardAssistantTabAvailable -->
+      <div data-bind="component: { name: 'dashboard-assistant-panel' }, visible: activeTab() === 'dashboardAssistant'"></div>
+      <!-- /ko -->
+
+      ## TODO: Switch to if: when loadSchedules from notebook.ko.js has been moved to the schedule-panel component
+      <div data-bind="component: { name: 'schedule-panel' }, visible: activeTab() === 'schedules'" style="display:none;"></div>
+    </div>
+    <!-- /ko -->
   </script>
 
 
@@ -3594,6 +3600,7 @@ from desktop.views import _ko
         self.disposals = [];
 
         self.activeTab = ko.observable();
+        self.visible = params.visible;
 
         self.editorAssistantTabAvailable = ko.observable(false);
         self.dashboardAssistantTabAvailable = ko.observable(false);
@@ -3604,8 +3611,6 @@ from desktop.views import _ko
         var apiHelper = ApiHelper.getInstance();
         self.lastActiveTabEditor = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), EDITOR_ASSISTANT_TAB);
         self.lastActiveTabDashboard = apiHelper.withTotalStorage('assist', 'last.open.right.panel.dashboard', ko.observable(), DASHBOARD_ASSISTANT_TAB);
-
-        var assistEnabledApp = false;
 
         huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
           if (self.editorAssistantTabAvailable() && self.activeTab() !== EDITOR_ASSISTANT_TAB) {
@@ -3622,11 +3627,10 @@ from desktop.views import _ko
         });
 
         var updateTabs = function () {
-          if (!assistEnabledApp) {
-            params.rightAssistAvailable(false);
+          if (!self.visible()) {
+            self.activeTab(undefined);
             return;
           }
-          var rightAssistAvailable = true;
           if (self.lastActiveTabEditor() === FUNCTIONS_TAB && self.functionsTabAvailable()) {
             self.activeTab(FUNCTIONS_TAB);
           } else if (self.lastActiveTabEditor() === SCHEDULES_TAB && self.schedulesTabAvailable()) {
@@ -3642,10 +3646,8 @@ from desktop.views import _ko
           } else if (self.dashboardAssistantTabAvailable()) {
             self.activeTab(DASHBOARD_ASSISTANT_TAB);
           } else {
-            self.activeTab(null);
-            rightAssistAvailable = false;
+            self.activeTab(undefined);
           }
-          params.rightAssistAvailable(rightAssistAvailable);
         };
 
         var updateContentsForType = function (type) {
@@ -3675,20 +3677,57 @@ from desktop.views import _ko
 
         if (IS_HUE_4) {
           huePubSub.subscribe('set.current.app.name', function (appName) {
-            assistEnabledApp = appName === 'editor' || appName === 'notebook' || appName === 'dashboard';
-            if (!assistEnabledApp) {
-              params.rightAssistAvailable(false);
-            }
             if (appName === 'dashboard') {
               updateContentsForType(appName);
             }
           });
           huePubSub.publish('get.current.app.name');
-        } else {
-          assistEnabledApp = true;
         }
         updateTabs();
       }
+
+      RightAssistPanel.prototype.switchTab = function (tabName) {
+        var self = this;
+        if (self.activeTab() === tabName) {
+          self.visible(false);
+          self.activeTab(undefined);
+        } else {
+          self.activeTab(tabName);
+          if (!self.visible()) {
+            self.visible(true);
+          }
+        }
+      };
+
+      RightAssistPanel.prototype.editorAssistantTabClick = function () {
+        var self = this;
+        self.lastActiveTabEditor(EDITOR_ASSISTANT_TAB);
+        self.switchTab(EDITOR_ASSISTANT_TAB);
+      };
+
+      RightAssistPanel.prototype.dashboardAssistantTabClick = function () {
+        var self = this;
+        self.lastActiveTabDashboard(DASHBOARD_ASSISTANT_TAB);
+        self.switchTab(DASHBOARD_ASSISTANT_TAB);
+      };
+
+      RightAssistPanel.prototype.functionsTabClick = function () {
+        var self = this;
+        self.lastActiveTabEditor(FUNCTIONS_TAB);
+        self.switchTab(FUNCTIONS_TAB);
+      };
+
+      RightAssistPanel.prototype.langRefTabClick = function () {
+        var self = this;
+        self.lastActiveTabEditor(LANG_REF_TAB);
+        self.switchTab(LANG_REF_TAB);
+      };
+
+      RightAssistPanel.prototype.schedulesTabClick = function () {
+        var self = this;
+        self.lastActiveTabEditor(SCHEDULES_TAB);
+        self.switchTab(SCHEDULES_TAB);
+      };
 
       RightAssistPanel.prototype.dispose = function () {
         var self = this;
