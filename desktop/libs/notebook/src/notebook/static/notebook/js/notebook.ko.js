@@ -479,8 +479,8 @@ var EditorViewModel = (function() {
               return true;
             }
           });
-          if (!found) {
-            self.namespace(undefined);
+          if (!found && newCompute.namespace) {
+            self.namespace(newCompute.namespace);
           }
         }
       });
