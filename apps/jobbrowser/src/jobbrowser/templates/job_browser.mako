@@ -1819,10 +1819,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="link-or-text${ SUFFIX }">
   <!-- ko if: typeof $data.value === 'string' -->
+    <!-- ko if: $data.name.indexOf('logs') > -1 -->
+      <a href="javascript:void(0)" data-bind="text: $data.value, attr: { href: $data.value }" target="_blank"></a>
+    <!-- /ko -->
     <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
       <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value) , text: $data.value"></a>
     <!-- /ko -->
-    <!-- ko ifnot: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <!-- ko ifnot: $data.name.indexOf('logs') > -1 || $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
       <span data-bind="text: $data.value"></span>
     <!-- /ko -->
   <!-- /ko -->
