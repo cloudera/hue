@@ -30,6 +30,8 @@ from desktop.models import Document2
 
 from libsolr.api import SolrApi
 
+from notebook.connectors.base import get_api
+from notebook.dashboard_api import MockRequest
 from search.conf import SOLR_URL
 
 from dashboard.conf import get_engines, USE_GRIDSTER
@@ -390,7 +392,34 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'slot': 0,
     'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
   }
-
+  template = {
+      "showFieldList": True,
+      "showGrid": False,
+      "showChart": True,
+      "chartSettings" : {
+        'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
+        'chartSorting': 'none',
+        'chartScatterGroup': None,
+        'chartScatterSize': None,
+        'chartScope': 'world',
+        'chartX': None,
+        'chartYSingle': None,
+        'chartYMulti': [],
+        'chartData': [],
+        'chartMapLabel': None,
+        'chartSelectorType': 'bar'
+      },
+      "fieldsAttributes": [],
+      "fieldsAttributesFilter": "",
+      "filteredAttributeFieldsAll": True,
+      "fields": [],
+      "fieldsSelected": [],
+      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
+      'leafletmapOn': False,
+      'isGridLayout': False,
+      "hasDataForChart": True,
+      "rows": 25,
+  }
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
   elif widget_type == 'document-widget':
@@ -398,8 +427,10 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     if collection['selectedDocument'].get('uuid'):
       doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
       snippets = doc.data_dict.get('snippets', [])
-      snippets = [snippet for snippet in snippets if snippet['type'] in ('hive', 'impala')]
       if snippets:
+        table_metadata = get_api(MockRequest(user, '""'), snippets[0]).autocomplete({'source': 'query', 'type': snippets[0]['type']}, doc.id)
+        template['fieldsAttributes'] = [Collection2._make_gridlayout_header_field(field) for field in table_metadata['extended_columns']]
+        properties['engine'] = snippets[0]['type']
         if snippets[0]['result']['handle']:
           handle = snippets[0]['result']['handle']
           # Replace previous_statement_hash so that we rerun current statement
@@ -414,7 +445,6 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['statement'] = 'select * from customers'
       properties['result'] = {'handle': {}}
 
-    properties['engine'] = 'impala'
     properties['uuid'] = facet_field
     properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
     facet_type = 'statement'
@@ -516,34 +546,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'widgetType': widget_type,
     'properties': properties,
     # Hue 4+
-    'template': {
-        "showFieldList": True,
-        "showGrid": False,
-        "showChart": True,
-        "chartSettings" : {
-          'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
-          'chartSorting': 'none',
-          'chartScatterGroup': None,
-          'chartScatterSize': None,
-          'chartScope': 'world',
-          'chartX': None,
-          'chartYSingle': None,
-          'chartYMulti': [],
-          'chartData': [],
-          'chartMapLabel': None,
-          'chartSelectorType': 'bar'
-        },
-        "fieldsAttributes": [],
-        "fieldsAttributesFilter": "",
-        "filteredAttributeFieldsAll": True,
-        "fields": [],
-        "fieldsSelected": [],
-        "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
-        'leafletmapOn': False,
-        'isGridLayout': False,
-        "hasDataForChart": True,
-        "rows": 25,
-    },
+    'template': template,
     'queryResult': {}
   }
 
