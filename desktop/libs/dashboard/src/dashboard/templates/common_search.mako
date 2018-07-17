@@ -3357,6 +3357,7 @@ var getDraggableOptions = function (options) {
         left: 5
       };
     }
+    setup.refreshPositions = true;
     return setup
   }
   else {
@@ -4410,7 +4411,7 @@ $(document).ready(function () {
       });
       $huePreviewHolder.show();
 
-      if (isEmptyWidget || isOverSelf) {
+      if ((isEmptyWidget && overlapZone !== 'N') || isOverSelf) {
         $huePreviewHolder.hide();
       }
     }
