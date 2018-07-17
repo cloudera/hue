@@ -443,6 +443,29 @@
   margin-right: 4px;
 }
 
+.selectize-width(@width: 200px) {
+  width: @width;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectize-100 {
+  .selectize-width(100px);
+}
+
+.selectize-200 {
+  .selectize-width(200px);
+}
+
+.selectize-300 {
+  .selectize-width(300px);
+}
+
+.selectize-400 {
+  .selectize-width(400px);
+}
+
 .hue-tags .selectize-input {
   padding-top: 6px;
   padding-bottom: 5px;
