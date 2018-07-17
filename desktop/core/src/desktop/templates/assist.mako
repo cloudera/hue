@@ -1352,12 +1352,11 @@ from desktop.views import _ko
               assistDbSource.loadedDeferred.done(function () {
                 if (assistDbSource.selectedNamespace()) {
                   assistDbSource.selectedNamespace().loadedDeferred.done(function () {
-                    assistDbSource.selectedNamespace().namespace
                     if (assistDbSource.selectedNamespace().selectedDatabase()) {
                       deferred.resolve({
                         sourceType: source,
                         namespace: assistDbSource.selectedNamespace().namespace,
-                        name: assistDbSource.selectedNamespace().selectedDatabase()
+                        name: assistDbSource.selectedNamespace().selectedDatabase().name
                       })
                     } else {
                       deferred.resolve({
