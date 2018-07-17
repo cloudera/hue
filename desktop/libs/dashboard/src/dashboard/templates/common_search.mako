@@ -4227,7 +4227,7 @@ $(document).ready(function () {
 
   function addPreviewHolder() {
     if (!$('.hue-preview-holder').length && searchViewModel.columns().length > 0) {
-      $('<li>').addClass('preview-holder hue-preview-holder').attr('data-sizex', '6').attr('data-sizey', '2').attr('data-row', '1').attr('data-col', '1').appendTo($('.gridster>ul'));
+      $('<li>').addClass('preview-holder hue-preview-holder').attr('data-sizex', '12').attr('data-sizey', '2').attr('data-row', '1').attr('data-col', '1').appendTo($('.gridster>ul'));
     }
   }
 
