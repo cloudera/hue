@@ -2765,6 +2765,25 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
+<div id="addDocumentFacetDemiModal" class="demi-modal fade" data-backdrop="false">
+  <div class="modal-body">
+    <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
+    <div class="demi-modal-label">${ _('Query') }</div>
+    <div class="selectize-wrapper selectize-400">
+      <select placeholder="${ _('Search your queries...') }" data-bind="documentChooser: { value: $root.tempDocument.uuid, type: 'impala' }"></select>
+    </div>
+    <!-- ko if: $root.tempDocument.parsedStatements && $root.tempDocument.parsedStatements().length > 1 -->
+      <div class="demi-modal-label">${ _('Statement') }</div>
+      <div class="selectize-wrapper selectize-400">
+        <select placeholder="${ _('Available statements') }" data-bind="selectize: $root.tempDocument.parsedStatements, optionsText: 'statement', optionsValue: 'statement', value: $root.tempDocument.selectedStatement"></select>
+      </div>
+    <!-- /ko -->
+    <a class="btn btn-primary disable-feedback" data-bind="publish: 'dashboard.confirm.document'">${ _('Confirm') }</a>
+  </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel"><i class="fa fa-chevron-up"></i></a></div>
+</div>
+
+
 <div id="settingsDemiModal" class="demi-modal fade" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
@@ -4975,6 +4994,12 @@ $(document).ready(function () {
     }
   }, 'dashboard');
 
+  huePubSub.subscribe('dashboard.confirm.document', function () {
+    $('#addDocumentFacetDemiModal').modal('hide');
+    console.log('Selected document', searchViewModel.tempDocument.uuid(), 'statement', searchViewModel.tempDocument.selectedStatement());
+    searchViewModel.tempDocument.reset();
+  }, 'dashboard');
+
   huePubSub.subscribe('app.dom.unload', function (app) {
     if (app === 'dashboard') {
       $gridster.destroy();
@@ -5224,12 +5249,17 @@ $(document).ready(function () {
 
           selectedWidget = widget;
 
-          if (searchViewModel.collection.template.availableWidgetFields().length == 1 || widget.widgetType() == 'document-widget') {
-            addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
+          if (widget.widgetType() == 'document-widget') {
+            $("#addDocumentFacetDemiModal").modal("show");
           }
           else {
-            $("#addFacetDemiModal").modal("show");
-            $("#addFacetDemiModal input[type='text']").focus();
+            if (searchViewModel.collection.template.availableWidgetFields().length == 1) {
+              addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
+            }
+            else {
+              $("#addFacetDemiModal").modal("show");
+              $("#addFacetDemiModal input[type='text']").focus();
+            }
           }
         }
         else {

@@ -2019,6 +2019,32 @@ var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 
 var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
+var TempDocument = function () {
+  var self = this;
+
+  self.uuid = ko.observable();
+  self.uuid.subscribe(function (val) {
+    if (val) {
+      ApiHelper.getInstance().fetchDocument({ uuid: val, silenceErrors: false, fetchContents: true }).done(function (data) {
+        if (data && data.data && data.data.snippets.length > 0) {
+          var snippet = data.data.snippets[0];
+          self.parsedStatements(sqlStatementsParser.parse(snippet.statement));
+          self.selectedStatement(self.parsedStatements()[0].statement);
+        }
+      });
+    }
+  });
+
+  self.parsedStatements = ko.observableArray([]);
+  self.selectedStatement = ko.observable();
+
+  self.reset = function () {
+    self.uuid('');
+    self.parsedStatements([]);
+    self.selectedStatement('');
+  }
+}
+
 
 var SearchViewModel = function (collection_json, query_json, initial_json, has_gridster_enabled, has_new_add_method) {
 
@@ -2043,6 +2069,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     }
   });
   self.showPlusButtonHintShownOnce = ko.observable(false);
+
+  self.tempDocument = new TempDocument();
 
 
   self.build = function () {
