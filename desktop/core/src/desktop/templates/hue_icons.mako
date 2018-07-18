@@ -334,41 +334,41 @@
 
   <script type="text/html" id="app-icon-template">
     <!-- ko switch: icon -->
-    <!-- ko case: 'dashboard' --><svg class="hi"><use xlink:href="#hi-dashboard"></use></svg><!-- /ko -->
-    <!-- ko case: 'documents' --><svg class="hi"><use xlink:href="#hi-documents"></use></svg><!-- /ko -->
+    <!-- ko case: 'dashboard' --><svg class="hi hi-fw"><use xlink:href="#hi-dashboard"></use></svg><!-- /ko -->
+    <!-- ko case: 'documents' --><svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg><!-- /ko -->
     <!-- ko case: 'report' --><i class="fa fa-fw fa-area-chart"></i><!-- /ko -->
     <!-- ko case: 'dist-cp' --><i class="fa fa-fw fa-files-o"></i><!-- /ko -->
-    <!-- ko case: 'editor' --><svg class="hi"><use xlink:href="#hi-editor"></use></svg><!-- /ko -->
-    <!-- ko case: 'hbase' --><svg class="hi"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->
+    <!-- ko case: 'editor' --><svg class="hi hi-fw"><use xlink:href="#hi-editor"></use></svg><!-- /ko -->
+    <!-- ko case: 'hbase' --><svg class="hi hi-fw"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->
     <!-- ko case: 'hdfs' --><i class="fa fa-fw fa-folder-o"></i><!-- /ko -->
-    <!-- ko case: 'hive' --><svg class="hi"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
-    <!-- ko case: 'impala' --><svg class="hi"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
+    <!-- ko case: 'hive' --><svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
+    <!-- ko case: 'impala' --><svg class="hi hi-fw"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
     <!-- ko case: 'indexes' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
-    <!-- ko case: 'jar' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'jar' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
     <!-- ko case: 'java' --><i class="fa fa-fw fa-file-code-o"></i><!-- /ko -->
-    <!-- ko case: 'job-designer' --><svg class="hi"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
+    <!-- ko case: 'job-designer' --><svg class="hi hi-fw"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
     <!-- ko case: 'mapreduce' --><i class="fa fa-fw fa-file-archive-o"></i><!-- /ko -->
-    <!-- ko case: 'markdown' --><svg class="hi"><use xlink:href="#hi-markdown"></use></svg><!-- /ko -->
-    <!-- ko case: 'notebook' --><svg class="hi"><use xlink:href="#hi-file-notebook"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie' --><svg class="hi"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie-bundle' --><svg class="hi"><use xlink:href="#hi-oozie-bundle"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie-coordinator' --><svg class="hi"><use xlink:href="#hi-oozie-coordinator"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie-workflow' --><svg class="hi"><use xlink:href="#hi-oozie-workflow"></use></svg><!-- /ko -->
-    <!-- ko case: 'pig' --><svg class="hi"><use xlink:href="#hi-pig"></use></svg><!-- /ko -->
-    <!-- ko case: 'py' --><svg class="hi"><use xlink:href="#hi-py"></use></svg><!-- /ko -->
-    <!-- ko case: 'pyspark' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'r' --><svg class="hi"><use xlink:href="#hi-r"></use></svg><!-- /ko -->
-    <!-- ko case: 'scala' --><svg class="hi"><use xlink:href="#hi-scala"></use></svg><!-- /ko -->
+    <!-- ko case: 'markdown' --><svg class="hi hi-fw"><use xlink:href="#hi-markdown"></use></svg><!-- /ko -->
+    <!-- ko case: 'notebook' --><svg class="hi hi-fw"><use xlink:href="#hi-file-notebook"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-bundle' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie-bundle"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-coordinator' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie-coordinator"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-workflow' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie-workflow"></use></svg><!-- /ko -->
+    <!-- ko case: 'pig' --><svg class="hi hi-fw"><use xlink:href="#hi-pig"></use></svg><!-- /ko -->
+    <!-- ko case: 'py' --><svg class="hi hi-fw"><use xlink:href="#hi-py"></use></svg><!-- /ko -->
+    <!-- ko case: 'pyspark' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'r' --><svg class="hi hi-fw"><use xlink:href="#hi-r"></use></svg><!-- /ko -->
+    <!-- ko case: 'scala' --><svg class="hi hi-fw"><use xlink:href="#hi-scala"></use></svg><!-- /ko -->
     <!-- ko case: 'solr' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
-    <!-- ko case: 'scheduler' --><svg class="hi"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
+    <!-- ko case: 'scheduler' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: 'security' --><i class="fa fa-fw fa-lock"></i><!-- /ko -->
     <!-- ko case: 'shell' --><i class="fa fa-fw fa-terminal"></i><!-- /ko -->
-    <!-- ko case: 'spark' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'sqoop' --><svg class="hi"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
-    <!-- ko case: 'sqoop1' --><svg class="hi"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
+    <!-- ko case: 'spark' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'sqoop' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
+    <!-- ko case: 'sqoop1' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
     <!-- ko case: 'tables' --><i class="fa fa-fw fa-table"></i><!-- /ko -->
     <!-- ko case: 'text' --><i class="fa fa-fw fa-i-cursor"></i><!-- /ko -->
-    <!-- ko case: 'yarn' --><svg class="hi"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
+    <!-- ko case: 'yarn' --><svg class="hi hi-fw"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
     <!-- ko case: $else --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- /ko -->
   </script>

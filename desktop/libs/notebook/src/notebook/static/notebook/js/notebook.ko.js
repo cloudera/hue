@@ -21,7 +21,7 @@ var EditorViewModel = (function() {
       'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
       'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
       'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
-      'snippetImage', 'user', 'positionStatement', 'lastExecutedStatement'
+      'snippetImage', 'user', 'positionStatement', 'lastExecutedStatement', 'downloadResultViewModel'
     ]
   };
 
@@ -2443,6 +2443,8 @@ var EditorViewModel = (function() {
 
     self.avoidClosing = false;
 
+    self.canSave = vm.canSave;
+
 
     self.getSession = function (session_type) {
       var _s = null;
@@ -2692,10 +2694,15 @@ var EditorViewModel = (function() {
               self.loadScheduler();
             }
 
-            if (vm.isHue4()){
-              vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
-            } else {
-              vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            if (self.snippets()[0].downloadResultViewModel && self.snippets()[0].downloadResultViewModel().saveTarget() === 'dashboard') {
+              huePubSub.publish('open.link', vm.URLS.report + '&uuid=' + data.uuid + '&statement=' + self.snippets()[0].result.handle().statement_id);
+            }
+            else {
+              if (vm.isHue4()){
+                vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
+              } else {
+                vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+              }
             }
           } else {
             if (vm.isHue4()){
@@ -3089,7 +3096,8 @@ var EditorViewModel = (function() {
       editorMobile: '/notebook/editor_m',
       notebook: '/notebook/notebook',
       hue4: '/hue/editor',
-      hue4_notebook: '/hue/notebook'
+      hue4_notebook: '/hue/notebook',
+      report: '/hue/dashboard/new_search?engine=report'
     };
 
     self.huePubSubId = options.huePubSubId || 'editor';
