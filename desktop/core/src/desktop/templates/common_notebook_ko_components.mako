@@ -213,8 +213,8 @@ except ImportError, e:
         </li>
         % if ENABLE_SQL_INDEXER.get():
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); trySaveResults(); }" title="${ _('Visually explore the result') }">
-            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); if (notebook.canSave() ) { notebook.save() } else { $('#saveAsModaleditor').modal('show');} }" title="${ _('Visually explore the result') }">
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'report' } } --><!-- /ko --> ${ _('Report') }
           </a>
         </li>
         % endif
@@ -368,6 +368,10 @@ except ImportError, e:
 
         self.checkDownloadInterval = -1;
 
+        if (!self.snippet.downloadResultViewModel) {
+          self.snippet.downloadResultViewModel = ko.observable(self);
+        }
+
         self.saveResultsModalId = '#saveResultsModal' + self.snippet.id();
         self.downloadProgressModalId = '#downloadProgressModal' + self.snippet.id();
 
@@ -445,7 +449,7 @@ except ImportError, e:
                   $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.importer.query', resp);
                 } else if (self.saveTarget() == 'dashboard') {
-                  $(self.saveResultsModalId).modal('hide');
+                   $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.link', resp.watch_url);
                 } else if (resp.history_uuid) {
                   $(self.saveResultsModalId).modal('hide');
