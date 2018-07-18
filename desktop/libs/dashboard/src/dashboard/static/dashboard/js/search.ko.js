@@ -1125,7 +1125,7 @@ var Collection = function (vm, collection) {
     return self.fields();
   });
 
-  self.selectedDocument = ko.observable({});
+  self.selectedDocument = ko.observable({uuid: window.location.getParameter('uuid'), statement_id: parseInt(window.location.getParameter('statement')) || 0});
 
   self.newQDefinitionName = ko.observable("");
 

@@ -427,20 +427,24 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     if collection['selectedDocument'].get('uuid'):
       doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
       snippets = doc.data_dict.get('snippets', [])
+      properties['result'] = {'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
       if snippets:
         table_metadata = get_api(MockRequest(user, '""'), snippets[0]).autocomplete({'source': 'query', 'type': snippets[0]['type']}, doc.id)
         template['fieldsAttributes'] = [Collection2._make_gridlayout_header_field(field) for field in table_metadata['extended_columns']]
         properties['engine'] = snippets[0]['type']
         if snippets[0]['result']['handle']:
           handle = snippets[0]['result']['handle']
-          # Replace previous_statement_hash so that we rerun current statement
-          properties['result'] = {'handle': {'statement_id': handle['statement_id'], 'statements_count': handle['statements_count'], 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
-        else:
-          properties['result'] = {'handle': {}}
+          properties['result']['handle'].update({
+            'statement_id': handle['statement_id'],
+            'statements_count': handle['statements_count']
+          })
         properties['statement'] = snippets[0]['statement_raw']
       else:
-        properties['result'] = {'handle': {}}
         properties['statement'] = ''
+
+      if collection['selectedDocument'].get('statement_id'):
+        properties['result']['handle']['statement_id'] = collection['selectedDocument'].get('statement_id')
+        properties['result']['handle']['statements_count'] = properties['result']['handle'].get('statements_count', collection['selectedDocument'].get('statement_id'))
     else: # Demo data for now
       properties['statement'] = 'select * from customers'
       properties['result'] = {'handle': {}}
