@@ -85,10 +85,32 @@
     cursor: pointer !important;
   }
 
+  .app-header {
+    cursor: default !important;
+  }
+
   @import "hue-assist.less";
   @import "hue-autocomplete.less";
   @import "hue-cui-overrides.less";
   @import "hue-cross-version.less";
   @import "hue4.less";
   @import "home.less";
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  background-color: #000000;
+}
+.modal-backdrop.fade {
+  opacity: 0;
+}
+.modal-backdrop,
+.modal-backdrop.fade.in {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
 }

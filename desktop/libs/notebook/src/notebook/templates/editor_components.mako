@@ -165,7 +165,35 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <ul class="nav editor-nav">
           <li class="app-header">
             <!-- ko if: editorMode -->
-              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
+              % if IS_EMBEDDED.get():
+                <span>
+                  <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
+                  <!-- ko switch: editorType() -->
+                  <!-- ko case: 'impala' -->Impala<!-- /ko -->
+                  <!-- ko case: 'rdbms' -->DB Query<!-- /ko -->
+                  <!-- ko case: 'pig' -->Pig<!-- /ko -->
+                  <!-- ko case: 'java' -->Java<!-- /ko -->
+                  <!-- ko case: 'spark2' -->Spark<!-- /ko -->
+                  <!-- ko case: 'sqoop1' -->Sqoop 1<!-- /ko -->
+                  <!-- ko case: 'distcp' -->DistCp<!-- /ko -->
+                  <!-- ko case: 'shell' -->Shell<!-- /ko -->
+                  <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
+                  <!-- ko case: ['beeswax', 'hive'] -->Hive<!-- /ko -->
+                  <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
+                  <!-- ko case: 'spark' -->Scala<!-- /ko -->
+                  <!-- ko case: 'pyspark' -->PySpark<!-- /ko -->
+                  <!-- ko case: 'r' -->R<!-- /ko -->
+                  <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
+                  <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
+                  <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
+                  <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
+                  <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
+                  <!-- ko case: 'text' -->Text<!-- /ko -->
+                  <!-- ko case: $default -->SQL<!-- /ko -->
+                  <!-- /ko -->
+                </span>
+              % else:
+                <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
               <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
 
               <!-- ko switch: editorType() -->
@@ -190,10 +218,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'text' -->Text<!-- /ko -->
                 <!-- ko case: $default -->SQL<!-- /ko -->
               <!-- /ko -->
-              % if not IS_EMBEDDED.get():
               <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
-              % endif
               </a>
+              % endif
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
@@ -202,6 +229,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- /ko -->
           </li>
 
+          % if not IS_EMBEDDED.get():
           <!-- ko with: selectedNotebook -->
           <li class="no-horiz-padding">
             <a>&nbsp;</a>
@@ -227,7 +255,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               ${ _("Scheduling on") }
             </a>
           </li>
-          % if not IS_EMBEDDED.get():
           <li class="query-name no-horiz-padding skip-width-calculation">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
@@ -238,8 +265,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
             </a>
           </li>
-          % endif
           <!-- /ko -->
+          % endif
         </ul>
       </div>
     </div>
