@@ -359,7 +359,11 @@ from metadata.conf import has_navigator
         <tbody data-bind="foreach: partition_values_json">
           <tr>
             <td data-bind="text: $index() + 1"></td>
+            % if IS_EMBEDDED.get():
+            <td data-bind="text: '[\'' + columns.join('\',\'') + '\']'"></td>
+            % else:
             <td><a href="#" data-bind="click: function () { window.open(readUrl, '_blank'); return false; }, text: '[\'' + columns.join('\',\'') + '\']'"></a></td>
+            % endif
             <td data-bind="text: partitionSpec"></td>
             % if not IS_EMBEDDED.get():
             <td>
