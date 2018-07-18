@@ -239,7 +239,7 @@ window.hueUtils = window.hueUtils || (function () {
     }
 
     if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
-      var search = window.locations.search;
+      var search = window.location.search;
       if (extraSearch) {
         search += (search ? '&' : '?') + extraSearch
       }

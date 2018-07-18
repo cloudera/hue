@@ -66,9 +66,9 @@
     .hue-embedded-container {
       position: absolute !important;
       top: 60px !important;
-      left: 60px !important;
-      bottom: 60px !important;
-      right: 60px !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      right: 0 !important;
     }
   </style>
 % endif
@@ -92,18 +92,22 @@
   // Bootstrap 2.3.2 relies on the hide css class presence for modals but doesn't remove it when opened for fade type
   // modals, a parent container might have it set to !important which will prevent the modal from showing. This
   // redefines all .hide definitions to exclude .modal.fade
-  for (var i = 0; i < document.styleSheets.length; i++) {
-    if (document.styleSheets[i] && document.styleSheets[i].cssRules) {
-      for (var j = document.styleSheets[i].cssRules.length - 1; j > 0; j--) {
-        if (document.styleSheets[i] && document.styleSheets[i].cssRules[j] && document.styleSheets[i].cssRules[j].selectorText === '.hide') {
-          var originalCssText = document.styleSheets[i].cssRules[j].cssText;
-          if (originalCssText.indexOf('!important') !== -1) {
-            document.styleSheets[i].deleteRule(j);
-            document.styleSheets[i].insertRule(originalCssText.replace('.hide', '.hide:not(.modal):not(.fade)'));
+  try {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      if (document.styleSheets[i] && document.styleSheets[i].cssRules) {
+        for (var j = document.styleSheets[i].cssRules.length - 1; j > 0; j--) {
+          if (document.styleSheets[i] && document.styleSheets[i].cssRules[j] && document.styleSheets[i].cssRules[j].selectorText === '.hide') {
+            var originalCssText = document.styleSheets[i].cssRules[j].cssText;
+            if (originalCssText.indexOf('!important') !== -1) {
+              document.styleSheets[i].deleteRule(j);
+              document.styleSheets[i].insertRule(originalCssText.replace('.hide', '.hide:not(.modal):not(.fade)'));
+            }
           }
         }
       }
     }
+  } catch (e) {
+    console.warn(e);
   }
 
   // Add modified URL for .clearable background
@@ -478,11 +482,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
 <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
-% if IS_EMBEDDED.get():
-<script src="${ static('desktop/js/jquery.tableextender3.js') }"></script>
-% else:
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-% endif
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
 <script src="${ static('desktop/js/dataCatalog.js') }"></script>
