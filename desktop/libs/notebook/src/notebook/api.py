@@ -298,7 +298,7 @@ def get_logs(request):
   db = get_api(request, snippet)
 
   full_log = smart_str(request.POST.get('full_log', ''))
-  logs = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
+  logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
   full_log += logs
 
   jobs = db.get_jobs(notebook, snippet, full_log)
