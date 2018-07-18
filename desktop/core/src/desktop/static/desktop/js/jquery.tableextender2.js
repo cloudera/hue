@@ -125,15 +125,7 @@
       hideSubscription.remove();
     });
 
-    var lastHeight = -1, currentHeight;
     var adjustSizes = function () {
-      currentHeight = self.$parent.height();
-      if (currentHeight != lastHeight) {
-        self.firstColumnInner.height(self.$parent.get(0).scrollHeight);
-        self.firstColumn.height(currentHeight);
-        lastHeight = currentHeight;
-      }
-
       if (self.lastHeaderWidth !== self.$parent.width()) {
         self.lastHeaderWidth = self.$parent.width();
         self.headerRowContainer.width(self.lastHeaderWidth);
@@ -187,15 +179,6 @@
       self.$parent.children('table').on('mouseout', 'tbody tr', outHandler);
     });
 
-    var dblClickHandler = function () {
-      huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
-    };
-    self.$parent.children('table').on('dblclick', 'tbody tr', dblClickHandler);
-    self.disposeFunctions.push(function () {
-      self.$parent.children('table').off('dblclick', 'tbody tr', dblClickHandler);
-    });
-
-
     if (!self.options.disableTopPosition) {
       self.repositionHeader();
       var scrollFunction = self.repositionHeader.bind(self);
@@ -238,17 +221,24 @@
     var pos = self.options.stickToTopPosition;
     var topPos = 0;
     var firstColTopPos = 0;
-    if (typeof pos === 'function'){
+    if (typeof pos === 'function') {
       pos = pos();
     }
     if (window.IS_EMBEDDED) {
-      pos = $('.hue-embedded-container').offset().top;
+      if (self.options.mainScrollable && self.options.mainScrollable.indexOf('sample') !== -1) {
+        pos = $(self.options.mainScrollable).offset().top;
+      } else {
+        pos = $('.hue-embedded-container').offset().top;
+      }
     }
+    var isFixed = false;
     if (pos > -1) {
       if (self.$element.offset().top < pos) {
         topPos = pos;
+        isFixed = true;
       } else {
         topPos = self.$element.offset().top;
+        isFixed = false;
       }
       firstColTopPos = self.$element.offset().top;
     } else if (self.options.clonedContainerPosition == 'absolute') {
@@ -258,10 +248,31 @@
       topPos = self.$parent.offset().top;
       firstColTopPos = topPos;
     }
-    self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
-    self.firstColumn.css("top", firstColTopPos + "px");
-    self.headerRowContainer.css("top", topPos + "px");
-    self.firstColumnTopCell.css("top", topPos + "px");
+
+    if (pos > -1) {
+      var fixCSS = {
+        "top": "",
+        "left": self.$parent.position().left + "px",
+        "position": "absolute"
+      };
+      self.firstColumn.css(fixCSS);
+      if (isFixed) {
+        fixCSS = {
+          "top": topPos + "px",
+          "left": "",
+          "position": "fixed"
+        };
+      }
+      self.firstColumnTopCell.css(fixCSS);
+      self.headerRowContainer.css(fixCSS);
+    }
+    else {
+      self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
+      self.firstColumn.css("top", firstColTopPos + "px");
+      self.headerRowContainer.css("top", topPos + "px");
+      self.firstColumnTopCell.css("top", topPos + "px");
+    }
+
   };
 
   Plugin.prototype.drawHeader = function () {
@@ -319,7 +330,7 @@
       topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();
     }
     var headerRowContainer = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainer")
-        .addClass("fixed-header-row").width(totalThWidth).css("overflow-x", "hidden");
+      .addClass("fixed-header-row").width(totalThWidth).css("overflow-x", "hidden");
     if (!self.options.disableTopPosition) {
       headerRowContainer.css("top", topPosition + "px");
     }
@@ -427,9 +438,9 @@
     firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
 
     firstColumnInner.appendTo(firstColumn);
-    firstColumn.appendTo(self.$parent);
+    firstColumn.insertAfter(self.$element.prev());
 
-    firstColumnTopCell.appendTo(self.$parent);
+    firstColumnTopCell.insertAfter(firstColumn);
 
     self.firstColumnInner = firstColumnInner;
     self.firstColumnTopCell = firstColumnTopCell;
