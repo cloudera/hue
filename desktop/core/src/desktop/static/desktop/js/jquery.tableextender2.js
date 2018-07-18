@@ -224,6 +224,9 @@
     if (typeof pos === 'function') {
       pos = pos();
     }
+    if (window.IS_EMBEDDED) {
+      pos = $('.hue-embedded-container').offset().top;
+    }
     var isFixed = false;
     if (pos > -1) {
       if (self.$element.offset().top < pos) {
