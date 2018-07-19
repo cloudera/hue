@@ -53,6 +53,15 @@
       hueUtils.changeURL('/jasmine');
     });
 
+    it("should change URL and a parameter in embedded mode", function () {
+      window.IS_EMBEDDED = true;
+      hueUtils.changeURL('/banana?peeled=no');
+      hueUtils.changeURLParameter('peeled', 'yes');
+      expect(/#\!\/banana\?peeled=yes/.test(window.location.href)).toBeTruthy();
+      window.IS_EMBEDDED = false;
+      window.location.hash = '';
+    });
+
     it("should remove a parameter in the URL", function () {
       hueUtils.changeURL('/banana?peeled=no');
       hueUtils.removeURLParameter('peeled');
