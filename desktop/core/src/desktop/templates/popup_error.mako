@@ -18,6 +18,7 @@
 from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from desktop.auth.backend import is_admin
 %>
 
 %if not is_embeddable:
@@ -41,7 +42,7 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
             % if traceback:
               <a href="javascript:toggleDisplay('#traceback');"><i class="fa fa-share"></i> ${_('More Info')}</a>
               &nbsp;
-              % if user.is_superuser:
+              % if is_admin(user):
               <a href="/logs" target="_new">${_('View Logs')}</a>
               % endif
               <br />
@@ -67,7 +68,7 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
                 </table>
               </div>
             % else:
-              % if user.is_superuser:
+              % if is_admin(user):
               <a href="/logs" target="_new">${_('View Logs')}</a>
               % endif
               <br />

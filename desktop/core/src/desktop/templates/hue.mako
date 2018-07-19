@@ -26,6 +26,8 @@
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
+
+  from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
@@ -247,7 +249,7 @@ ${ hueIcons.symbols() }
           % endif
 
           <%
-            view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
+            view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
           %>
           <button class="btn btn-flat" data-toggle="dropdown" data-bind="click: function(){ huePubSub.publish('hide.jobs.panel'); huePubSub.publish('hide.history.panel'); }">
             <i class="fa fa-user"></i> ${ user.username } <span class="caret"></span>
@@ -256,7 +258,7 @@ ${ hueIcons.symbols() }
             % if view_profile:
             <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/edit/${ user.username }'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
             % endif
-            % if user.is_superuser:
+            % if is_admin(user):
             <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
             % if not conf.DISABLE_HUE_3.get():
@@ -264,7 +266,7 @@ ${ hueIcons.symbols() }
             % endif
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
-            % if user.is_superuser:
+            % if is_admin(user):
             <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
             % endif
             <li class="divider"></li>
@@ -1527,7 +1529,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 }
               });
 
-              % if user.is_superuser and cluster != ANALYTIC_DB:
+              % if is_admin(user) and cluster != ANALYTIC_DB:
                 if (app.name === 'editor') {
                   interpreters.push({
                     displayName: '${ _('Add more...') }',
@@ -1754,7 +1756,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       attachTo: '.navbar-default bottom'
     });
 
-    %if user.is_superuser:
+    %if is_admin(user):
       tour.addStep('admin', {
         text: '${ _ko('As a superuser, you can check system configuration from the username drop down and install sample data and jobs for your users.') }',
         attachTo: '.top-nav-right .dropdown bottom'

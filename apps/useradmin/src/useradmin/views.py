@@ -52,6 +52,7 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ def list_configurations(request):
 def list_for_autocomplete(request):
   extended_user_object = request.GET.get('extend_user') == 'true'
   autocomplete_filter = request.GET.get('filter', "")
-  if request.user.is_superuser:
+  if is_admin(request.user):
     users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
     groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
     if request.GET.get('only_mygroups'):
@@ -166,7 +167,7 @@ def is_user_locked_out(username):
 
 
 def delete_user(request):
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'DELETE_USER',
       'operationText': _get_failed_operation_text(request.user.username, 'DELETE_USER'),
@@ -206,7 +207,7 @@ def delete_user(request):
 
 
 def delete_group(request):
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'DELETE_GROUP',
        'operationText': _get_failed_operation_text(request.user.username, 'DELETE_GROUP'),
@@ -257,7 +258,7 @@ def edit_user(request, username=None):
   @type username:       string
   @param username:      Default to None, when creating a new user
   """
-  if request.user.username != username and not request.user.is_superuser:
+  if request.user.username != username and not is_admin(request.user):
     request.audit = {'allowed': False}
     if username is not None:
       request.audit['operation'] = 'EDIT_USER'
@@ -278,14 +279,14 @@ def edit_user(request, username=None):
 
   if require_change_password(userprofile):
     form_class = PasswordChangeForm
-  elif request.user.is_superuser:
+  elif is_admin(request.user):
     form_class = SuperUserChangeForm
   else:
     form_class = UserChangeForm
 
   if request.method == 'POST':
     form = form_class(request.POST, instance=instance)
-    if request.user.is_superuser and request.user.username != username:
+    if is_admin(request.user) and request.user.username != username:
       form.fields.pop("password_old")
     if form.is_valid(): # All validation rules pass
       if instance is None:
@@ -309,7 +310,7 @@ def edit_user(request, username=None):
             if not form.instance.is_superuser or not form.instance.is_active:
               _check_remove_last_super(orig)
           else:
-            if form.instance.is_superuser and not request.user.is_superuser:
+            if form.instance.is_superuser and not is_admin(request.user):
               raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
 
           # All ok
@@ -317,7 +318,7 @@ def edit_user(request, username=None):
 
           # Unlock account if selected
           if form.cleaned_data.get('unlock_account'):
-            if not request.user.is_superuser:
+            if not is_admin(request.user):
               raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
 
             try:
@@ -361,11 +362,11 @@ def edit_user(request, username=None):
         userprofile.first_login = False
         userprofile.save()
 
-        if request.user.is_superuser:
+        if is_admin(request.user):
           return redirect(reverse('about:index'))
         else:
           return redirect(reverse('desktop_views_home'))
-      elif request.user.is_superuser:
+      elif is_admin(request.user):
         if is_embeddable:
           return JsonResponse({'url': '/hue' + reverse(list_users)})
         else:
@@ -385,7 +386,7 @@ def edit_user(request, username=None):
     }
     form = form_class(instance=instance, initial=initial)
 
-    if request.user.is_superuser and request.user.username != username:
+    if is_admin(request.user) and request.user.username != username:
       form.fields.pop("password_old")
 
   if require_change_password(userprofile):
@@ -416,7 +417,7 @@ def edit_group(request, name=None):
 
   Only superusers may create a group
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {'allowed': False}
     if name is not None:
       request.audit['operation'] = 'EDIT_GROUP'
@@ -487,7 +488,7 @@ def edit_permission(request, app=None, priv=None):
 
   Only superusers may modify permissions
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'EDIT_PERMISSION',
       'operationText': _get_failed_operation_text(request.user.username, 'EDIT_PERMISSION'),
@@ -536,7 +537,7 @@ def add_ldap_users(request):
   If a user has been previously imported, this will sync their user information.
   If the LDAP request failed, the error message is generic right now.
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'ADD_LDAP_USERS',
       'operationText': _get_failed_operation_text(request.user.username, 'ADD_LDAP_USERS'),
@@ -606,7 +607,7 @@ def add_ldap_groups(request):
   group with the LDAP server. If --import-members is specified, it will import
   all unimported users.
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'ADD_LDAP_GROUPS',
       'operationText': _get_failed_operation_text(request.user.username, 'ADD_LDAP_GROUPS'),
@@ -686,7 +687,7 @@ def sync_ldap_users_groups(request):
   user information and group memberships will be updated based on the LDAP
   server's current state.
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'SYNC_LDAP_USERS_GROUPS',
       'operationText': _get_failed_operation_text(request.user.username, 'SYNC_LDAP_USERS_GROUPS'),
@@ -871,6 +872,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
+  """We could actually check the entire super group as well"""
   if not user_obj.is_superuser:
     return
 

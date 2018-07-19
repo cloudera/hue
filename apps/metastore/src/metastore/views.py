@@ -44,6 +44,7 @@ from metastore.conf import FORCE_HS2_METADATA
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -656,7 +657,7 @@ def drop_partition(request, database, table):
 
 
 def has_write_access(user):
-  return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
+  return is_admin(user) or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
 
 
 

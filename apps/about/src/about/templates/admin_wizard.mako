@@ -22,6 +22,8 @@ from django.utils.translation import ugettext as _
 from desktop.conf import IS_HUE_4
 from desktop.views import commonheader, commonfooter
 from metadata.conf import OPTIMIZER, has_optimizer
+
+from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
@@ -36,13 +38,13 @@ ${ layout.menubar(section='quick_start') }
   <div class="row-fluid" style="margin-bottom: 100px;">
     <div>
       <h1 class="margin-top-20 margin-bottom-30">
-        % if user.is_superuser:
+        % if is_admin(user):
           ${ _('Quick Start Wizard') } -
         % endif
         Hue&trade; ${version} - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Open gethue.com in a new window.') }">${ _("Query. Explore. Repeat.") }</a>
       </h1>
 
-     % if user.is_superuser:
+     % if is_admin(user):
 
       <div class="margin-bottom-30">
          <div class="row-fluid">
@@ -238,7 +240,7 @@ ${ layout.menubar(section='quick_start') }
 
 </div>
 
-% if user.is_superuser:
+% if is_admin(user):
 <style type="text/css">
   .steps {
     min-height: 300px;

@@ -38,6 +38,7 @@ from navoptapi.api_lib import ApiLib
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -229,7 +230,7 @@ class OptimizerApi(object):
     }
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
-    if self.user.is_superuser:
+    if is_admin(self.user):
       return self._call('getSimilarQueries', {'tenant' : self._tenant_id, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, 'startingToken': startingToken})
     else:
       raise PopupException(_('Call not supported'))
