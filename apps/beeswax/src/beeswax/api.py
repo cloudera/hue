@@ -51,6 +51,7 @@ from beeswax.views import authorized_get_design, authorized_get_query_history, m
 from metastore.conf import FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
   app_name = None if FORCE_HS2_METADATA.get() else get_app_name(request)
 
   do_as = request.user
-  if (request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
+  if (is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
     do_as = User.objects.get(username=request.GET.get('doas'))
 
   db = _get_db(user=do_as, source_type=app_name)
@@ -845,7 +846,7 @@ def close_session(request, session_id):
 
   try:
     filters = {'id': session_id, 'application': query_server['server_name']}
-    if not request.user.is_superuser:
+    if not is_admin(request.user):
       filters['owner'] = request.user
     session = Session.objects.get(**filters)
   except Session.DoesNotExist:

@@ -42,6 +42,7 @@ from desktop.views import register_status_bar_view
 from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 from hadoop.yarn import resource_manager_api as resource_manager_api
+from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ def check_job_permission(view_func):
       LOG.warn('Job %s has not yet been accepted by the RM, will poll for status.' % jobid)
       return job_not_assigned(request, jobid, request.path)
 
-    if not SHARE_JOBS.get() and not request.user.is_superuser \
+    if not SHARE_JOBS.get() and not is_admin(request.user) \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job

@@ -19,8 +19,13 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import USERNAME_RE_RULE
 from desktop.views import commonheader, commonfooter, antixss
+from desktop.auth.backend import is_admin
+<<<<<<< HEAD
 
 import re
+=======
+from desktop.auth.backend import is_admin
+>>>>>>> [useradmin] Added superuser group priv to useradmin
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -41,12 +46,12 @@ ${layout.menubar(section='users')}
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
       </%def>
       <%def name="actions()">
-        %if user.is_superuser:
+        %if is_admin(user):
             <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
-        %if user.is_superuser:
+        %if is_admin(user):
             % if not is_ldap_setup:
               <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             %endif
@@ -70,7 +75,7 @@ ${layout.menubar(section='users')}
     <table class="table table-condensed datatables">
       <thead>
       <tr>
-        %if user.is_superuser:
+        %if is_admin(user):
             <th width="1%">
               <div class="select-all hue-checkbox fa"></div>
             </th>
@@ -87,13 +92,17 @@ ${layout.menubar(section='users')}
           % for listed_user in users:
           <tr class="tableRow"
               data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
-          %if user.is_superuser:
+          %if is_admin(user):
               <td data-row-selector-exclude="true">
                 <div class="hue-checkbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
               </td>
           %endif
           <td>
-            %if (user.is_superuser or user.username == listed_user.username) and re.match(USERNAME_RE_RULE, listed_user.username):
+<<<<<<< HEAD
+            %if (is_admin(user) or user.username == listed_user.username) and re.match(USERNAME_RE_RULE, listed_user.username):
+=======
+            %if is_admin(user) or user.username == listed_user.username:
+>>>>>>> [useradmin] Added superuser group priv to useradmin
               <strong><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}"
                          href="${ url('useradmin.views.edit_user', username=listed_user.username) }"
                          data-row-selector="true">${listed_user.username}</a></strong>
@@ -171,7 +180,7 @@ ${layout.menubar(section='users')}
       "bInfo": false,
       "bFilter": true,
       "aoColumns": [
-        %if user.is_superuser:
+        %if is_admin(user):
             { "bSortable": false },
         %endif
         null,

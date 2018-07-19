@@ -28,7 +28,6 @@ import aws
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
 
-
 LOG = logging.getLogger(__name__)
 
 
@@ -209,7 +208,8 @@ def has_iam_metadata():
 
 
 def has_s3_access(user):
-  return user.is_authenticated() and user.is_active and (user.is_superuser or user.has_hue_permission(action="s3_access", app="filebrowser"))
+  from desktop.auth.backend import is_admin
+  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser"))
 
 
 def config_validator(user):

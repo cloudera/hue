@@ -56,7 +56,7 @@ from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
 
-
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -319,7 +319,7 @@ class LoginAndPermissionMiddleware(object):
 
       if app_accessed and \
           app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403") and \
-          not (request.user.has_hue_permission(action="access", app=app_accessed) or
+          not (is_admin(request.user) or request.user.has_hue_permission(action="access", app=app_accessed) or
                request.user.has_hue_permission(action=access_view, app=app_accessed)) and \
           not (app_accessed == '__debug__' and desktop.conf.DJANGO_DEBUG_MODE):
         access_log(request, 'permission denied', level=access_log_level)

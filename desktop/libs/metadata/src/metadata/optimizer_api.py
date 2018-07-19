@@ -34,6 +34,7 @@ from notebook.models import Notebook
 from metadata.optimizer_client import OptimizerApi, NavOptException, _get_table_name, _clean_query
 from metadata.conf import OPTIMIZER
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -325,7 +326,7 @@ def _convert_queries(queries_data):
 def upload_history(request):
   response = {'status': -1}
 
-  if request.user.is_superuser:
+  if is_admin(request.user):
     api = OptimizerApi(request.user)
     histories = []
     upload_stats = {}

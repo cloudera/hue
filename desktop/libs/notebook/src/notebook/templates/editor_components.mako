@@ -24,6 +24,7 @@ from desktop.views import _ko, antixss
 from desktop.conf import IS_EMBEDDED
 from metadata.conf import has_optimizer, OPTIMIZER
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
+from desktop.auth.backend import is_admin
 %>
 
 <%def name="includes(is_embeddable=False, suffix='')">
@@ -1910,7 +1911,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
-        % if conf.DJANGO_DEBUG_MODE.get() and user.is_superuser:
+        % if conf.DJANGO_DEBUG_MODE.get() and is_admin(user):
         <li>
           <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.upload.history'); }" title="${ _('Load recent queries in order to improve recommendations') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
