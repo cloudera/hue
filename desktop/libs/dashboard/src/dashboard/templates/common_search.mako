@@ -142,13 +142,13 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       <!-- ko if: $root.isGridster() -->
       <div class="btn-group">
         % if USE_NEW_ADD_METHOD.get():
-        <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length">
+        <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" data-bind="draggable: {data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), options: getDraggableOptions({ data: $root.collection.supportAnalytics() ? draggableBucket() : draggableBar(), plusButton: true })}, visible: columns().length">
           <i class="fa fa-plus"></i>
         </a>
         % else:
           %if is_report:
-            <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" rel="tooltip" data-placement="bottom" data-bind="draggable: {data: draggableDocument(), options: getDraggableOptions({ data: draggableDocument(), plusButton: true })}, visible: columns().length">
-              <i class="fa fa-plus"></i>
+            <a class="btn draggable-plus-button move-cursor" title="${ _('Drag to add a widget') }" data-bind="draggable: {data: draggableDocument(), options: getDraggableOptions({ data: draggableDocument(), plusButton: true })}, visible: columns().length">
+              <i class="fa fa-fw fa-plus"></i>
             </a>
           % else:
             <a class="btn" title="${ _('Toggle the widget toolbar') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
