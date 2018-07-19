@@ -44,6 +44,8 @@ FREQUENCY_REGEX = r'^\$\{coord:(?P<frequency_unit>\w+)\((?P<frequency_number>\d+
 def format_field_value(field, value):
   if field in JSON_FIELDS:
     if isinstance(value, basestring):
+      if field == 'params':
+        return value
       value = json.loads(value)
     value = [item for item in value if isinstance(item, dict) and item.get('name')]
     return json.dumps(value)
