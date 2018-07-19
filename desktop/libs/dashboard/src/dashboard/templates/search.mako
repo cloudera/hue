@@ -30,7 +30,7 @@ ${ commonshare() | n,unicode }
 ${ notebookKoComponents.downloadSnippetResults() }
 %endif
 
-<div id="searchComponents" class="dashboard-container search-components">
+<div id="searchComponents" class="dashboard-container dashboard-container-flex search-components">
 ${ common_search.page_structure(False, is_embeddable, is_report) }
 </div>
 

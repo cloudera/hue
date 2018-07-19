@@ -19,8 +19,24 @@
 @import (reference) "hue-mixins.less";
 
 .dashboard-container {
+  &.dashboard-container-flex {
+    .display-flex();
+    .flex-direction(column);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+
   .dashboard .container-fluid {
     padding: 6px;
+  }
+
+  .dashboard-flex {
+    .flex(1 1 auto);
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   .row-container {

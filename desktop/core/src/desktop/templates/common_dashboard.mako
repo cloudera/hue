@@ -81,7 +81,7 @@
 
   % if not USE_NEW_ADD_METHOD.get():
   <!-- ko if: columns().length > 0 && isToolbarVisible -->
-  <div data-bind="dockable: { scrollable: '.page-content', jumpCorrection: 50, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "128px" or "100px" }', triggerAdjust: 50 }">
+  <div>
     %if hasattr(caller, "results"):
     <div style="float: left; margin-left: 20px">
       <div class="toolbar-label">${_('DISPLAY')}</div>
@@ -180,7 +180,7 @@
     </div>
   </div>
 
-<div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
+<div class="dashboard dashboard-flex" data-bind="css: {'with-top-margin': isEditing()}">
   <div class="container-fluid">
   <!-- ko if: $root.isGridster -->
     <div class="gridster" data-bind="click: function(){ showPlusButtonHint(false); }">

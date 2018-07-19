@@ -51,7 +51,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
     </div>
   </form>
 %else:
-<div class="search-bar" data-bind="visible: !$root.isPlayerMode(), dockable: { scrollable: '.page-content', jumpCorrection: 0, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 50, zIndex: 1001 }, event: { mouseover: function(){ if (columns().length && isGridster()) { showPlusButtonHint(true); } } }">
+<div class="search-bar" data-bind="visible: !$root.isPlayerMode(), event: { mouseover: function(){ if (columns().length && isGridster()) { showPlusButtonHint(true); } } }">
   <div class="search-bar-header">
     <div class="search-bar-logo">
       <div class="app-header">
