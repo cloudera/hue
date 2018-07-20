@@ -97,7 +97,32 @@ class Notebook(object):
     return _data
 
   def get_str(self):
-    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw']) for snippet in self.get_data()['snippets']])
+    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], Notebook.statement_with_variables(snippet)) for snippet in self.get_data()['snippets']])
+
+  @staticmethod
+  def statement_with_variables(snippet):
+    statement_raw = snippet['statement_raw']
+    hasCurlyBracketParameters = snippet['type'] != 'pig'
+    variables = {}
+    for variable in snippet['variables']:
+      variables[variable['name']] = variable
+
+    if variables:
+      variables_names = []
+      for variable in snippet['variables']:
+        variables_names.append(variable['name'])
+      variablesString = '|'.join(variables_names)
+
+      def replace(match):
+        p1 = match.group(1)
+        p2 = match.group(2)
+        variable = variables[p2]
+        value = variable['value']
+        return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
+        
+      return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
+      
+    return statement_raw
 
   def add_hive_snippet(self, database, sql):
     _data = json.loads(self.data)

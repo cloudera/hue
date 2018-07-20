@@ -152,16 +152,20 @@ class SQLDashboardApi(DashboardApi):
             'filters': self._convert_filters_to_where(filters),
         }
       elif facet['type'] == 'statement':
+        doc = Document2.objects.get_by_uuid(user=self.user, uuid=facet['statementUuid'], perm_type='read')
+        snippets = doc.data_dict.get('snippets', [])
+        statement = snippets[0]['statement_raw']
+
         if filters:
           sql = '''SELECT *
           FROM
           (%(statement)s) as sub
           %(filters)s''' % {
-            'statement': facet['properties']['statement'],
+            'statement': statement,
             'filters': self._convert_filters_to_where(filters, alias='sub')
           }
         else:
-          sql = facet['properties']['statement']
+          sql = statement
         result_properties = facet['properties']['result']
     else:
       fields = Collection2.get_field_list(dashboard)

@@ -408,16 +408,9 @@ def _historify(notebook, user):
 
 
 def _get_statement(notebook):
-  statement = ''
   if notebook['snippets'] and len(notebook['snippets']) > 0:
-    try:
-      statement = notebook['snippets'][0]['result']['handle']['statement']
-      if type(statement) == dict:  # Old format
-        statement = notebook['snippets'][0]['statement_raw']
-    except KeyError:  # Old format
-      statement = notebook['snippets'][0]['statement_raw']
-  return statement
-
+    return Notebook.statement_with_variables(notebook['snippets'][0])
+  return ''
 
 @require_GET
 @api_error_handler
