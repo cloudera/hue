@@ -939,12 +939,12 @@ class SolrApi(object):
 
   def _get_time_filter_query(self, timeFilter, facet, collection):
     properties = facet.get('properties', facet)
-    if not timeFilter and properties['slot'] != 0:
+    if timeFilter:
       props = {}
-      # If the start & end are equal to min/max, then we want to show the whole domain. Since min/max can change, we fetch latest values and update start/end
+      # If the start & end are equal to min/max, then we want to show the whole domain (either interval now-x or static)
+      # In that case use timeFilter values
       if properties['start'] == properties['min'] and properties['end'] == properties['max']:
-        stats_json = self.stats(collection['name'], [facet['field']])
-        stat_facet = stats_json['stats']['stats_fields'][facet['field']]
+        stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
         properties['start'] = None
         properties['end'] = None
       else: # The user has zoomed in. Only show that section.
@@ -952,45 +952,30 @@ class SolrApi(object):
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'],
                            SLOTS=properties['slot'])
       gap = props['gap']
-      if isinstance(gap, basestring):
-        unit = re.split('\d+', gap)[1]
-      else:
-        unit = ''
       return {
         'min': '%(min)s' % props,
         'max': '%(max)s' % props,
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
-        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit} if unit else '%(gap)s' % {'gap': gap},
+        'gap': '%(gap)s' % props,
       }
-    elif timeFilter:
+    else:
       props = {}
-
-      # If the start & end are equal to min/max, then we want to show the whole domain (either interval now-x or static)
-      # In that case use timeFilter values
+      # If the start & end are equal to min/max, then we want to show the whole domain. Since min/max can change, we fetch latest values and update start/end
       if properties['start'] == properties['min'] and properties['end'] == properties['max']:
-        stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
+        stats_json = self.stats(collection['name'], [facet['field']])
+        stat_facet = stats_json['stats']['stats_fields'][facet['field']]
         properties['start'] = None
         properties['end'] = None
       else: # the user has zoomed in. Only show that section.
         stat_facet = {'min': properties['min'], 'max': properties['max']}
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS = properties['slot'])
-      gap = props['gap']
-      if isinstance(gap, basestring):
-        unit = re.split('\d+', gap)[1]
       return {
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
-        'gap': '%(gap)s/%(unit)s' % {'gap': gap, 'unit': unit} if unit else '%(gap)s' % {'gap': gap},
+        'gap': '%(gap)s' % props,
         'min': '%(min)s' % props,
         'max': '%(max)s' % props,
-      }
-    else:
-      gap = timeFilter['gap'][facet['widgetType']]
-      return {
-        'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},
-        'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': gap['unit']},
-        'gap': '%(coeff)s%(unit)s/%(unit)s' % gap, # add a 'auto'
       }
 
   def _get_fq(self, collection, query):
