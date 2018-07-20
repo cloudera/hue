@@ -278,7 +278,7 @@ def _round_number_range(n):
     return n, n + 1
   else:
     i = int(log(n, 10))
-    end = round(n, -i)
+    end = int(round(n, -i))
     start = end - 10 ** i
     return start, end
 
