@@ -51,7 +51,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
     </div>
   </form>
 %else:
-<div class="search-bar" data-bind="visible: !$root.isPlayerMode(), event: { mouseover: function(){ if (columns().length && isGridster()) { showPlusButtonHint(true); } } }">
+<div class="search-bar" data-bind="event: { mouseover: function(){ if (columns().length && isGridster()) { showPlusButtonHint(true); } } }">
   <div class="search-bar-header">
     <div class="search-bar-logo">
       <div class="app-header">
@@ -216,6 +216,17 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
             <li>
               <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
                 <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
+              </a>
+            </li>
+          %else:
+            <li>
+              <a class="pointer" data-bind="toggle: $root.isPlayerMode">
+                <!-- ko if: $root.isPlayerMode -->
+                <i class="fa fa-fw fa-compress"></i> ${ _('Exit presentation') }
+                <!-- /ko -->
+                <!-- ko ifnot: $root.isPlayerMode -->
+                <i class="fa fa-fw fa-expand"></i> ${ _('Present') }
+                <!-- /ko -->
               </a>
             </li>
           %endif
@@ -408,23 +419,6 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       </%def>
 </%dashboard:layout_toolbar>
 % endif
-
-<div class="player-toolbar" data-bind="visible: $root.isPlayerMode">
-  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
-  <img src="${ static('desktop/art/icon_hue_48.png') }" alt="${ _('Hue logo') }" />
-  <h4 data-bind="text: collection.label"></h4>
-  <form class="form-search" data-bind="submit: searchBtn">
-  <span data-bind="foreach: query.qs">
-    <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
-    <!-- ko if: $parent.query.qs().length > 1 -->
-    <div class="pointer muted link" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></div>
-    <!-- /ko -->
-  </span>
-  <div class="pointer muted link" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></div>
-  <div class="pointer muted link" data-bind="click: $root.searchBtn"><i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i></div>
-  <i class="fa fa-spinner fa-spin muted" data-bind="visible: isRetrievingResults()"></i>
-  </form>
-</div>
 
 
 ${ dashboard.layout_skeleton(suffix='search') }
@@ -4137,12 +4131,12 @@ function loadSearch(collection, query, initial) {
 
   searchViewModel.isPlayerMode.subscribe(function(value) {
     if (value){
-      $(".navigator").hide();
-      $(HUE_CONTAINER).css("paddingTop", "40px");
+      $('nav.navbar.navbar-default').hide();
+      huePubSub.publish('both.assists.hide', true);
     }
     else {
-      $(".navigator").show();
-      $(HUE_CONTAINER).css("paddingTop", "80px");
+      $('nav.navbar.navbar-default').show();
+      huePubSub.publish('both.assists.show', true);
     }
   });
 
