@@ -223,18 +223,18 @@ def import_saved_beeswax_query(bquery):
 def import_saved_pig_script(pig_script):
   snippet_properties = {}
 
+  snippet_properties['hadoopProperties'] = []
   if pig_script.dict.get('hadoopProperties'):
-    snippet_properties['hadoopProperties'] = []
     for prop in pig_script.dict.get('hadoopProperties'):
       snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
 
+  snippet_properties['parameters'] = []
   if pig_script.dict.get('parameters'):
-    snippet_properties['parameters'] = []
     for param in pig_script.dict.get('parameters'):
       snippet_properties['parameters'].append("%s=%s" % (param.get('name'), param.get('value')))
 
+  snippet_properties['resources'] = []
   if pig_script.dict.get('resources'):
-    snippet_properties['resources'] = []
     for resource in pig_script.dict.get('resources'):
       snippet_properties['resources'].append(resource.get('value'))
 
