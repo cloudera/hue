@@ -823,44 +823,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           loadedCss.push($(this).attr('href'));
         });
 
-        var loadScriptsSync = function (scriptUrls, promise) {
-          if (scriptUrls.length) {
+
+        var loadScripts = function (scriptUrls) {
+          var promises = [];
+          while (scriptUrls.length) {
             var scriptUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(scriptUrls.shift()) : scriptUrls.shift();
-
             if (loadedJs.indexOf(scriptUrl) !== -1) {
-              loadScriptsSync(scriptUrls, promise);
-              return;
+              continue;
             }
-
-            var scriptElement = document.createElement('script');
-            % if conf.DEV.get():
-              scriptElement.src = scriptUrl + '?dev=' + Math.random();
-            % else:
-              scriptElement.src = scriptUrl;
-            % endif
-
-            scriptElement.type = 'text/javascript';
-
-            scriptElement.onload = function () {
+            var deferred = $.Deferred();
+            promises.push(deferred.promise());
+            deferred.always(function () {
               loadedJs.push(scriptUrl);
-              loadScriptsSync(scriptUrls, promise);
-            };
-
-            scriptElement.onerror = function () {
-              loadScriptsSync(scriptUrls, promise);
-            };
-
-            // Legacy IE not happy with onload
-            scriptElement.onreadystatechange = function() {
-              if (this.readyState === 'complete') {
-                loadedJs.push(scriptUrl);
-                loadScriptsSync(scriptUrls, promise);
-              }
-            };
-            head.appendChild(scriptElement);
-          } else {
-            promise.resolve();
+            });
+            $.get(scriptUrl).done(deferred.resolve).fail(function () {
+              // Ignore failed ones, they appear in the dev tools
+              deferred.resolve('');
+            });
           }
+          return promises;
         };
 
         var addGlobalCss = function ($el) {
@@ -891,8 +872,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }).toArray();
           $allScripts.remove();
 
-          var scriptsPromise = $.Deferred();
-          loadScriptsSync(scriptsToLoad, scriptsPromise);
+          var scriptPromises = loadScripts(scriptsToLoad);
 
           $rawHtml.find('link[href]').each(function () {
             addGlobalCss($(this)); // Also removes the elements;
@@ -914,7 +894,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }
 
           $rawHtml.unwrap('<span>');
-          scriptsPromise.done(function () {
+
+          $.when.apply($, scriptPromises).done(function () {
+            for (var i = 0; i < arguments.length; i++) {
+              eval(arguments[i]);
+            }
             promise.resolve($rawHtml);
           });
           return promise;
