@@ -2764,7 +2764,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko if: $root.tempDocument.parsedStatements && $root.tempDocument.parsedStatements().length > 1 -->
       <div class="demi-modal-label">${ _('Statement') }</div>
       <div class="selectize-wrapper selectize-400">
-        <select placeholder="${ _('Available statements') }" data-bind="selectize: $root.tempDocument.parsedStatements, optionsText: 'statement', optionsValue: 'statement', value: $root.tempDocument.selectedStatement"></select>
+        <select placeholder="${ _('Available statements') }" class="temp-document-statement" data-bind="selectize: $root.tempDocument.parsedStatements, optionsText: 'statement', optionsValue: 'statement', value: $root.tempDocument.selectedStatement"></select>
       </div>
     <!-- /ko -->
     <a class="btn btn-primary disable-feedback" data-bind="publish: 'dashboard.confirm.document'">${ _('Confirm') }</a>
@@ -4986,6 +4986,14 @@ $(document).ready(function () {
   huePubSub.subscribe('dashboard.confirm.document', function () {
     $('#addDocumentFacetDemiModal').modal('hide');
     if (selectedWidget != null) {
+      // there's no programmatic way to get the selected index from the Selectize API...
+      var $dropdown = $('.temp-document-statement')[0].selectize.$dropdown_content;
+      if ($dropdown.find('.selected').length > 1) {
+        searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected.active').index());
+      }
+      else {
+        searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected').index());
+      }
       searchViewModel.collection.selectedDocument({
         uuid: searchViewModel.tempDocument.uuid(),
         statement_id: searchViewModel.tempDocument.selectedStatementId(),

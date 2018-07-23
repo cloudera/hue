@@ -2003,6 +2003,7 @@ var TempDocument = function () {
           var snippet = data.data.snippets[0];
           self.parsedStatements(sqlStatementsParser.parse(snippet.statement));
           self.selectedStatement(self.parsedStatements()[0].statement);
+          self.selectedStatementId(0);
         }
       });
     }
@@ -2010,15 +2011,6 @@ var TempDocument = function () {
 
   self.parsedStatements = ko.observableArray([]);
   self.selectedStatement = ko.observable();
-  self.selectedStatement.subscribe(function (val) {
-    if (self.parsedStatements().length) {
-      for (var i = 0; i < self.parsedStatements().length; i++) {
-        if (self.parsedStatements()[i].statement === val) {
-          self.selectedStatementId(i);
-        }
-      }
-    }
-  });
   self.selectedStatementId = ko.observable();
 
   self.reset = function () {
