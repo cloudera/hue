@@ -4190,6 +4190,10 @@ $(document).ready(function () {
     huePubSub.publish('gridster.remove.scrollbars');
   });
 
+  %if is_report:
+    huePubSub.publish('right.assist.hide', true);
+  %endif
+
   var isDraggingOrResizingWidgets = false;
   var tempDraggableGridsterWidget = null;
 
