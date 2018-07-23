@@ -1199,7 +1199,7 @@ def has_job_edition_permission(oozie_job, user):
   else:
 	  user_groups = user.groups.values_list()
 	  for user_group in user_groups:
-  	  group_name = user_group[1]
+  	    group_name = user_group[1]
 	    if oozie_job.group and user.group.filter(name=groupname).exists() and group_name != 'default':
 	      return True
 	  return False
