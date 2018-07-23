@@ -831,14 +831,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (loadedJs.indexOf(scriptUrl) !== -1) {
               continue;
             }
-            var deferred = $.Deferred();
-            promises.push(deferred.promise());
-            deferred.always(function () {
+            var loadDeferred = $.Deferred();
+            promises.push(loadDeferred.promise());
+            loadDeferred.always(function () {
               loadedJs.push(scriptUrl);
             });
-            $.get(scriptUrl).done(deferred.resolve).fail(function () {
-              // Ignore failed ones, they appear in the dev tools
-              deferred.resolve('');
+            $.get(scriptUrl).done(loadDeferred.resolve).fail(function () {
+              // Ignore failed ones, they'll still appear as failed in the network tab as before
+              loadDeferred.resolve('');
             });
           }
           return promises;
@@ -895,12 +895,23 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
           $rawHtml.unwrap('<span>');
 
-          $.when.apply($, scriptPromises).done(function () {
-            for (var i = 0; i < arguments.length; i++) {
-              eval(arguments[i]);
+          var evalScriptSync = function () {
+            if (scriptPromises.length) {
+              // Evaluate the scripts in the order they were defined in the page
+              var nextScriptPromise = scriptPromises.shift();
+              nextScriptPromise.done(function (contents) {
+                if (contents) {
+                  eval(contents);
+                }
+                evalScriptSync();
+              });
+            } else {
+              // All evaluated
+              promise.resolve($rawHtml);
             }
-            promise.resolve($rawHtml);
-          });
+          };
+
+          evalScriptSync();
           return promise;
         };
 
