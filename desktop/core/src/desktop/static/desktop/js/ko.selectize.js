@@ -82,6 +82,7 @@ ko.bindingHandlers.selectize = {
 
     var $select = $(element).selectize(options)[0].selectize;
 
+
     if (typeof allBindingsAccessor.get('value') == 'function') {
       $select.addItem(allBindingsAccessor.get('value')());
       allBindingsAccessor.get('value').subscribe(function (new_val) {

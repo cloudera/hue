@@ -6963,20 +6963,13 @@
           if (query === '' && options.value && !firstLoad){
             firstLoad = true;
           }
-          $.ajax({
-            url: '/desktop/api2/docs/',
-            data: {
-              type: type,
-              text: query,
-              include_trashed: false,
-              limit: 100
-            },
-            type: 'GET',
-            error: function () {
-              callback();
-            },
-            success: function (res) {
-              callback(res.documents);
+          ApiHelper.getInstance().searchDocuments({
+            type: type,
+            text: query,
+            include_trashed: false,
+            limit: 100,
+            successCallback: function(data){
+              callback(data.documents)
             }
           });
         },
