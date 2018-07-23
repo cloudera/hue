@@ -1826,17 +1826,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div>
-      <!-- ko if: properties.parsedStatements && properties.parsedStatements().length > 1 -->
-      <div class="selectize-wrapper query-chooser">
-        <select placeholder="${ _('Available statements') }" data-bind="selectize: properties.parsedStatements, optionsText: 'statement', optionsValue: 'statement', value: properties.selectedStatement"></select>
-      </div>
-      <!-- /ko -->
-      <div class="selectize-wrapper query-chooser">
-        <select placeholder="${ _('Search your queries...') }" data-bind="documentChooser: { value: properties.uuid, type: 'impala' }"></select>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-    <div>
 
 ##       <input type="text" class="input-medium" data-bind="value: properties.engine"/>
 ##       <textarea data-bind="value: properties.statement"></textarea>
@@ -4996,7 +4985,28 @@ $(document).ready(function () {
 
   huePubSub.subscribe('dashboard.confirm.document', function () {
     $('#addDocumentFacetDemiModal').modal('hide');
-    console.log('Selected document', searchViewModel.tempDocument.uuid(), 'statement', searchViewModel.tempDocument.selectedStatement());
+    if (selectedWidget != null) {
+      searchViewModel.collection.selectedDocument({
+        uuid: searchViewModel.tempDocument.uuid(),
+        statement_id: searchViewModel.tempDocument.selectedStatementId(),
+        statement: searchViewModel.tempDocument.selectedStatement()
+      });
+      selectedWidget.hasBeenSelected = true;
+      selectedWidget.isLoading(true);
+      searchViewModel.collection.addFacet({
+        'name': searchViewModel.tempDocument.name() ? searchViewModel.tempDocument.name() : 'Query',
+        'widget_id': selectedWidget.id(),
+        'widgetType': selectedWidget.widgetType()
+      }, function () {
+        if (searchViewModel.isGridster()) {
+          huePubSub.publish('gridster.add.widget', {id: selectedWidget.id(), target: selectedGridster});
+        }
+      });
+      if (!searchViewModel.isGridster() && selectedRow != null) {
+        distributeRowWidgetsSize(selectedRow);
+      }
+    }
+
     searchViewModel.tempDocument.reset();
   }, 'dashboard');
 
