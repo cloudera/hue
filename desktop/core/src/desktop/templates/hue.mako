@@ -823,6 +823,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           loadedCss.push($(this).attr('href'));
         });
 
+        var loadScript = function (scriptUrl) {
+          var deferred = $.Deferred();
+          $.get(scriptUrl).done(function (contents) {
+            loadedJs.push(scriptUrl);
+            deferred.resolve(contents);
+          }).fail(function () {
+            deferred.resolve('');
+          });
+          return deferred.promise();
+        };
 
         var loadScripts = function (scriptUrls) {
           var promises = [];
@@ -831,15 +841,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (loadedJs.indexOf(scriptUrl) !== -1) {
               continue;
             }
-            var loadDeferred = $.Deferred();
-            promises.push(loadDeferred.promise());
-            loadDeferred.always(function () {
-              loadedJs.push(scriptUrl);
-            });
-            $.get(scriptUrl).done(loadDeferred.resolve).fail(function () {
-              // Ignore failed ones, they'll still appear as failed in the network tab as before
-              loadDeferred.resolve('');
-            });
+            promises.push(loadScript(scriptUrl));
           }
           return promises;
         };
@@ -872,8 +874,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }).toArray();
           $allScripts.remove();
 
-          var scriptPromises = loadScripts(scriptsToLoad);
-
           $rawHtml.find('link[href]').each(function () {
             addGlobalCss($(this)); // Also removes the elements;
           });
@@ -895,13 +895,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
           $rawHtml.unwrap('<span>');
 
+          var scriptPromises = loadScripts(scriptsToLoad);
+
           var evalScriptSync = function () {
             if (scriptPromises.length) {
               // Evaluate the scripts in the order they were defined in the page
               var nextScriptPromise = scriptPromises.shift();
               nextScriptPromise.done(function (contents) {
                 if (contents) {
-                  eval(contents);
+                  new Function(contents)();
                 }
                 evalScriptSync();
               });
