@@ -855,35 +855,6 @@ var Collection = function (vm, collection) {
       });
     }
 
-    facet.properties.parsedStatements = ko.observableArray([]);
-    facet.properties.selectedStatement = ko.observable();
-    facet.properties.selectedStatement.subscribe(function(val){
-      if (val) {
-        facet.properties.statement(val);
-        vm.search();
-      }
-    });
-
-    if (facet.properties.uuid) {
-      facet.properties.uuid.subscribe(function(val){
-        $.get('/desktop/api2/doc/', {
-          uuid: val,
-          data: true,
-          dependencies: true
-        }, function (data) {
-          if (data && data.data && data.data.snippets.length > 0) {
-            var snippet = data.data.snippets[0];
-            facet.properties.parsedStatements(sqlStatementsParser.parse(snippet.statement));
-            facet.template.chartSettings.chartType(snippet.chartType);
-            facet.template.chartSettings.chartX(snippet.chartX);
-            facet.template.chartSettings.chartYSingle(snippet.chartYSingle);
-            facet.template.chartSettings.chartYMulti(snippet.chartYMulti);
-            facet.properties.selectedStatement(facet.properties.parsedStatements()[0].statement);
-          }
-        });
-      });
-    }
-
     // For Solr 5+  only
     if (typeof facet.template != 'undefined') {
       facet.template.filteredAttributeFields = ko.computed(function () { // Dup of template.filteredAttributeFields
@@ -2022,11 +1993,13 @@ var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget']
 var TempDocument = function () {
   var self = this;
 
+  self.name = ko.observable('');
   self.uuid = ko.observable();
   self.uuid.subscribe(function (val) {
     if (val) {
       ApiHelper.getInstance().fetchDocument({ uuid: val, silenceErrors: false, fetchContents: true }).done(function (data) {
         if (data && data.data && data.data.snippets.length > 0) {
+          self.name(data.document.name);
           var snippet = data.data.snippets[0];
           self.parsedStatements(sqlStatementsParser.parse(snippet.statement));
           self.selectedStatement(self.parsedStatements()[0].statement);
@@ -2037,11 +2010,23 @@ var TempDocument = function () {
 
   self.parsedStatements = ko.observableArray([]);
   self.selectedStatement = ko.observable();
+  self.selectedStatement.subscribe(function (val) {
+    if (self.parsedStatements().length) {
+      for (var i = 0; i < self.parsedStatements().length; i++) {
+        if (self.parsedStatements()[i].statement === val) {
+          self.selectedStatementId(i);
+        }
+      }
+    }
+  });
+  self.selectedStatementId = ko.observable();
 
   self.reset = function () {
+    self.name('');
     self.uuid('');
     self.parsedStatements([]);
     self.selectedStatement('');
+    self.selectedStatementId('');
   }
 }
 
