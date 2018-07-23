@@ -27,6 +27,7 @@
   .search-bar, .card-toolbar {
     position: static !important;
     width: auto !important;
+    z-index: auto;
   }
   .card-toolbar-fixed {
     position: fixed !important;
@@ -855,6 +856,28 @@
     }
   }
 
+  .even-row {
+    background-color: @cui-white;
+  }
+
+  .odd-row {
+    background-color: @cui-gray-050;
+  }
+
+  .field-list-container {
+    float:left;
+    width:200px;
+    margin-right:10px;
+    background-color: @cui-white;
+    padding:5px;
+  }
+
+  .field-help {
+    position:absolute;
+    left: 168px;
+    background-color: @cui-white;
+  }
+
   @media screen and (max-width: 1000px) {
     .card-widget, .card-column {
       float: left !important;
@@ -887,6 +910,134 @@
 
     .form-search > strong, .form-search > .input-append .selectMask, .form-search > .input-append a.btn, .form-search > .time-filter, .form-search > .time-fixed-filter {
       display: none;
+    }
+  }
+}
+
+body.dark-mode {
+  #searchComponents {
+    background: @hue-dark-mode-darker-color;
+    color: @cui-gray-050 !important;
+
+    ::-webkit-scrollbar-thumb {
+      border-color: @cui-black;
+      background-color: @cui-black;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: @hue-dark-mode-lighter-color;
+    }
+
+    .search-bar {
+      background: @hue-dark-mode-darker-color;
+      border-color: @hue-dark-mode-darker-color;
+    }
+    .card-toolbar {
+      background: @hue-dark-mode-darker-color;
+    }
+    .btn, .btn:focus, select, select:focus, .selectize-input.full {
+      color: @cui-gray-050;
+      border-color: @cui-black;
+      background: @hue-dark-mode-lighter-color;
+    }
+    .btn:hover {
+      background: @hue-dark-mode-darker-color;
+    }
+
+    .btn-inverse {
+      background: @cui-black;
+    }
+
+    .selectize-control.single .selectize-input:after {
+      border-top-color: @cui-gray-050;
+    }
+
+    .selectize-control.plugin-clear_button .clearAll {
+      color: @cui-gray-050;
+    }
+
+    .simple-ace-single-line {
+      background-color: #272822;
+      border-color: @cui-black;
+    }
+
+    .selectMask {
+      border-color: @cui-black;
+      background: @hue-dark-mode-lighter-color;
+      color: @cui-gray-050;
+    }
+
+    a {
+      color: @cui-gray-050 !important;
+    }
+
+    .draggable-widget {
+      background: @hue-dark-mode-lighter-color;
+      border-color: @hue-dark-mode-darker-color;
+    }
+    .container-fluid {
+      background: @hue-dark-mode-darker-color;
+    }
+
+    .gridster>ul>li, .card {
+      border-color: @hue-dark-mode-darker-color !important;
+      background: @hue-dark-mode-darker-color !important;
+      &.preview-holder, .droppable-hover {
+        background: @cui-black !important;
+        opacity: .3;
+      }
+    }
+
+    .card-widget .card-heading {
+      border-color: @hue-dark-mode-darker-color !important;
+      background: @hue-dark-mode-darker-color !important;
+      color: @cui-gray-050 !important;
+    }
+
+    .initial-hint, .layout-box-text, .toolbar-label, .preview-row {
+      color: @cui-gray-050 !important;
+    }
+
+    .layout-box {
+      background: @cui-black;
+      border: 1px solid @cui-black;
+    }
+
+    .layout-box:hover {
+      background: @hue-dark-mode-darker-color !important;
+    }
+
+    .preview-row {
+      background: @hue-dark-mode-lighter-color;
+    }
+
+    .dropdown-menu {
+      background: @cui-black;
+      .divider {
+        background: @cui-black !important;
+        border-color: @hue-dark-mode-darker-color !important;
+      }
+    }
+
+    .even-row {
+      background-color: @hue-dark-mode-lighter-color;
+    }
+
+    .odd-row, .field-list-container, .field-help {
+      background-color: @hue-dark-mode-darker-color;
+    }
+
+    input {
+      background-color: @cui-black;
+    }
+
+    .dimensions-badge-container {
+      background-color: @cui-black;
+      color: @cui-gray-050 !important;
+    }
+
+    .nv-label, .nv-axis, .nv-legend-text {
+      fill: @cui-gray-050 !important;
     }
   }
 }

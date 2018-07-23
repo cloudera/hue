@@ -220,6 +220,12 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
             </li>
           %endif
 
+          <li>
+            <a class="pointer" data-bind="toggle: $root.isDarkMode">
+              <i class="fa fa-fw fa-toggle-off" data-bind="css: { 'fa-toggle-on': $root.isDarkMode }"></i> ${ _('Dark theme') }
+            </a>
+          </li>
+
           <li data-bind="visible: columns().length != 0">
             <a class="pointer" data-toggle="modal" data-target="#settingsDemiModal">
               <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
@@ -1055,7 +1061,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </tr>
         </thead>
         <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
-          <tr data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+          <tr class="odd-row" data-bind="css: { 'even-row': $index() % 2 == 0  }">
             <td><div data-bind="html: content" style="margin-bottom: -20px"></div></td>
           </tr>
           <tr>
@@ -1135,7 +1141,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             </tr>
           </thead>
           <tbody data-bind="foreach: {data: childDocuments, as: 'doc'}" class="result-tbody">
-            <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+            <tr class="result-row odd-row" data-bind="css: { 'even-row': $index() % 2 == 0  }">
               <td>
                 <a href="javascript:void(0)" data-bind="click: function() { doc.showDetails(! doc.showDetails()); }">
                   <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
@@ -1522,7 +1528,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   <div class="grid-results">
     <span data-bind="visible: $parent.hasRetrievedResults() && $parent.response().response">
-      <div data-bind="visible: template.showFieldList() && template.showGrid()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
+      <div data-bind="visible: template.showFieldList() && template.showGrid()" class="field-list-container">
         <input type="text" data-bind="clearable: template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width:180px; margin-bottom:10px" />
         <div style="margin-bottom: 8px">
           <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(true)}, style: {'font-weight': template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: template.fields().length"></span>)</a>
@@ -1542,7 +1548,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $parent.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $parent.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn, attr: {'title': name() + ' (' + type() + ')'}" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'" style="position:absolute; left: 168px; background-color: #FFF"></i>
+            <i class="fa fa-question-circle muted pointer analysis field-help" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'"></i>
           </div>
         </div>
       </div>
@@ -1563,7 +1569,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
       <div class="grid-results-table" data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showGrid()">
         <!-- ko if: $parent.response().response -->
-          <div data-bind="template: {name: 'resultset-pagination', data: $parent.response()}" style="padding:8px; color:#666"></div>
+          <div data-bind="template: {name: 'resultset-pagination', data: $parent.response()}" style="padding:8px"></div>
         <!-- /ko -->
 
         <div class="result-main" style="overflow-x: auto">
@@ -1577,7 +1583,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               </tr>
             </thead>
             <tbody data-bind="foreach: {data: $parent.results, as: 'doc'}" class="result-tbody">
-              <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+              <tr class="result-row odd-row" data-bind="css: { 'even-row': $index() % 2 == 0  }">
                 <td>
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
                     <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
@@ -4137,6 +4143,15 @@ function loadSearch(collection, query, initial) {
     else {
       $(".navigator").show();
       $(HUE_CONTAINER).css("paddingTop", "80px");
+    }
+  });
+
+  searchViewModel.isDarkMode.subscribe(function(val) {
+    if (val){
+      $('body').addClass('dark-mode');
+    }
+    else {
+      $('body').removeClass('dark-mode');
     }
   });
 

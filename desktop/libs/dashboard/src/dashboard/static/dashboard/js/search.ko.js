@@ -2141,6 +2141,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     self.isSyncingCollections = ko.observable(false);
 
     self.isPlayerMode = ko.observable(false);
+    self.isDarkMode = ko.observable(false);
 
     self.draggableWidgets = {};
 
