@@ -217,6 +217,11 @@ except ImportError, e:
             <!-- ko template: { name: 'app-icon-template', data: { icon: 'report' } } --><!-- /ko --> ${ _('Report') }
           </a>
         </li>
+        <li>
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); trySaveResults(); }" title="${ _('Visually explore the result') }">
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
+          </a>
+        </li>
         % endif
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
