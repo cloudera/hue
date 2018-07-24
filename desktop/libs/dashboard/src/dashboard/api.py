@@ -430,12 +430,10 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       snippets = doc.data_dict.get('snippets', [])
       properties['result'] = {'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
       if snippets:
-        table_metadata = get_api(MockRequest(user, '""'), snippets[0]).autocomplete({'source': 'query', 'type': snippets[0]['type']}, doc.id)
-        template['fieldsAttributes'] = [Collection2._make_gridlayout_header_field(field) for field in table_metadata['extended_columns']]
         properties['engine'] = snippets[0]['type']
     else:
       properties['statementUuid'] = ''
-
+    properties['statement'] = ''
     properties['uuid'] = facet_field
     properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
     facet_type = 'statement'
