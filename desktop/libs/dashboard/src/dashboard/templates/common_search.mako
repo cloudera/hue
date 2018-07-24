@@ -4982,13 +4982,15 @@ $(document).ready(function () {
   huePubSub.subscribe('dashboard.confirm.document', function () {
     $('#addDocumentFacetDemiModal').modal('hide');
     if (selectedWidget != null) {
-      // there's no programmatic way to get the selected index from the Selectize API...
-      var $dropdown = $('.temp-document-statement')[0].selectize.$dropdown_content;
-      if ($dropdown.find('.selected').length > 1) {
-        searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected.active').index());
-      }
-      else {
-        searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected').index());
+      if (searchViewModel.tempDocument.parsedStatements().length > 1) {
+        // there's no programmatic way to get the selected index from the Selectize API...
+        var $dropdown = $('.temp-document-statement')[0].selectize.$dropdown_content;
+        if ($dropdown.find('.selected').length > 1) {
+          searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected.active').index());
+        }
+        else {
+          searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected').index());
+        }
       }
       searchViewModel.collection.selectedDocument({
         uuid: searchViewModel.tempDocument.uuid(),
