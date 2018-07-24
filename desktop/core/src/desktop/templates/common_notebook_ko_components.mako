@@ -374,7 +374,7 @@ except ImportError, e:
         self.checkDownloadInterval = -1;
 
         if (!self.snippet.downloadResultViewModel) {
-          self.snippet.downloadResultViewModel = ko.observable(self);
+          self.snippet.downloadResultViewModel = ko.observable({});
         }
 
         self.saveResultsModalId = '#saveResultsModal' + self.snippet.id();
