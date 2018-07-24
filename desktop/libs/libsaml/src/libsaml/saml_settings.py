@@ -99,7 +99,7 @@ def config_settings_loader(request):
     # Encryption
     'encryption_keypairs': [{
       'key_file': libsaml.conf.KEY_FILE.get(),  # private part
-      'key_file_passphrase': libsaml.conf.get_key_file_password(), # TODO: need test because might need implementation
+      'key_file_passphrase': libsaml.conf.get_key_file_password(),
       'cert_file': libsaml.conf.CERT_FILE.get(),  # public part
     }],
   })

@@ -1501,11 +1501,12 @@ class SecurityContext(object):
         :return: The decrypted text
         """
         _enctext = None
+        passphrase = self.key_file_passphrase
         if not isinstance(keys, list):
             keys = [keys]
         if self.enc_key_files is not None:
             for _enc_key_file in self.enc_key_files:
-                _enctext = self.crypto.decrypt(enctext, _enc_key_file)
+                _enctext = self.crypto.decrypt(enctext, _enc_key_file, passphrase)
                 if _enctext is not None and len(_enctext) > 0:
                     return _enctext
         for _key in keys:
@@ -1513,7 +1514,7 @@ class SecurityContext(object):
                 if not isinstance(_key, six.binary_type):
                     _key = str(_key).encode('ascii')
                 _, key_file = make_temp(_key, decode=False)
-                _enctext = self.crypto.decrypt(enctext, key_file)
+                _enctext = self.crypto.decrypt(enctext, key_file, passphrase)
                 if _enctext is not None and len(_enctext) > 0:
                     return _enctext
         return enctext
@@ -1525,17 +1526,18 @@ class SecurityContext(object):
         :return: The decrypted text
         """
         _enctext = None
+
+        if passphrase is None:
+            passphrase = self.key_file_passphrase
+
         if self.enc_key_files is not None:
             for _enc_key_file in self.enc_key_files:
-                _enctext = self.crypto.decrypt(enctext, _enc_key_file)
+                _enctext = self.crypto.decrypt(enctext, _enc_key_file, passphrase)
                 if _enctext is not None and len(_enctext) > 0:
                     return _enctext
 
         if key_file is None or len(key_file.strip()) == 0:
             key_file = self.key_file
-
-        if passphrase is None:
-            passphrase = self.key_file_passphrase
 
         if key_file is not None and len(key_file.strip()) > 0:
             _enctext = self.crypto.decrypt(enctext, key_file, passphrase)
