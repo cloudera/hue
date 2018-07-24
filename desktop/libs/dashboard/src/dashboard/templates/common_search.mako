@@ -1527,20 +1527,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div style="margin-bottom: 8px">
           <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(true)}, style: {'font-weight': template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: template.fields().length"></span>)</a>
         </div>
-        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
-          <a href="javascript: void(0)" class="btn btn-mini"
-            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': template.fields().length > 0 }"
-            style="margin-right: 2px;">
-            <i class="fa fa-square-o"></i>
-          </a>
-          <strong>${_('Field Name')}</strong>
+        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;margin-left:4px">
+          <div class="pull-left hue-checkbox fa" data-bind="click: toggleGridFieldsSelection, css: { 'fa-check': template.fields().length > 0 }"></div>
+          <strong>&nbsp;${_('Field Name')}</strong>
         </div>
         <div data-bind="visible: template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; color:#CCC">
           ${ _('No matches.') }
         </div>
         <div class="fields-list" data-bind="foreach: { data: template.filteredAttributeFields, afterRender: resizeFieldsListThrottled }">
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
-            <input type="checkbox" data-bind="checkedValue: name, checked: $parent.template.fieldsSelected" style="margin: 0" />
+            <div class="pull-left hue-checkbox fa" data-bind="multiCheck: '#partitionsTable', value: name, checkedValue: name, hueChecked: $parent.template.fieldsSelected"></div>
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $parent.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn, attr: {'title': name() + ' (' + type() + ')'}" style="margin-right:10px"></div>
             <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>

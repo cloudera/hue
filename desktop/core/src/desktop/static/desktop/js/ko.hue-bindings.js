@@ -5881,6 +5881,10 @@
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var selectedValues = valueAccessor();
 
+      if (allBindings().checkedValue) {
+        viewModel = ko.unwrap(allBindings().checkedValue);
+      }
+
       var updateCheckedState = function () {
         ko.utils.toggleDomNodeCssClass(element, 'fa-check', selectedValues.indexOf(viewModel) > -1);
       };
