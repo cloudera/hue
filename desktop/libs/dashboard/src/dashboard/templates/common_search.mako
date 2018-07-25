@@ -4433,7 +4433,7 @@ $(document).ready(function () {
   var setWidgetGridWidth = function () {
     if (searchViewModel && searchViewModel.isGridster()) {
       // turns out Gridster generates CSS either with single or double quotes depending on the browser
-      widgetGridWidth = typeof hueUtils.getStyleFromCSSClass('[data-sizex="1"]') !== 'undefined' ? parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width) : parseInt(hueUtils.getStyleFromCSSClass("[data-sizex='1']").width);
+      widgetGridWidth = typeof hueUtils.getStyleFromCSSClass('[data-sizex="1"]') !== 'undefined' ? parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width) : (hueUtils.getStyleFromCSSClass("[data-sizex='1']") ? parseInt(hueUtils.getStyleFromCSSClass("[data-sizex='1']").width) : null);
     }
   }
 
