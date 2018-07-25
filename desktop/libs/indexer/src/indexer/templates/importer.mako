@@ -568,7 +568,7 @@ ${ assist.assistPanel() }
 
               <label class="control-label "><div>${ _('Database') }</div></label>
               <input type="text" class="form-control input-xlarge" data-bind="value: name" placeholder="${ _('Database') }">
-              <a href="javscript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType, namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
+              <a href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType, namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
