@@ -109,7 +109,7 @@ def index(request, is_mobile=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
-
+  engine = collection.data['collection']['engine']
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
