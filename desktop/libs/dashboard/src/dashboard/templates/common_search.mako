@@ -4104,7 +4104,9 @@ function loadSearch(collection, query, initial) {
   searchViewModel.init(function(){
     $(".chosen-select").trigger("chosen:updated");
     if (searchViewModel.collection.engine() === 'report') {
-      magicSearchLayout(searchViewModel);
+      if (!searchViewModel.collectionJson.layout.length && (!self.collectionJson.gridItems || !searchViewModel.collectionJson.gridItems.length)) {
+        magicSearchLayout(searchViewModel);
+      }
     }
   });
 

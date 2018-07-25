@@ -125,6 +125,7 @@ def index(request, is_mobile=False):
     'can_edit_index': can_edit_index(request.user),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'mobile': is_mobile,
+    'is_report': collection.data['collection'].get('engine') == 'report'
   })
 
 def index_m(request):
