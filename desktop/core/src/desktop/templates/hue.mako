@@ -1855,7 +1855,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
     };
 
-    % if is_demo or (not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN) and not IS_EMBEDDED.get()):
+    % if is_demo or not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN):
       $(document).on('keyup', closeTourOnEsc);
       $(document).on('click', '.shepherd-backdrop', tour.cancel);
       tour.start();
