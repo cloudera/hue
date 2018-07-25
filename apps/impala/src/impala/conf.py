@@ -180,6 +180,26 @@ AUTH_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+DAEMON_API_PASSWORD = Config(
+  key="daemon_api_password",
+  help=_t("Password for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
+  private=True,
+  default=None)
+
+DAEMON_API_PASSWORD_SCRIPT = Config(
+  key="daemon_api_password_script",
+  help=_t("Execute this script to produce the Impala Daemon Password. This will be used when `daemon_api_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
+
+DAEMON_API_USERNAME = Config(
+  key="daemon_api_username",
+  help=_t("Username for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
+  private=True,
+  default=None)
+
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
