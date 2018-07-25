@@ -23,7 +23,6 @@
     stickyFirstColumn: true,
     headerSorting: true,
     mainScrollable: window,
-    classToRemove: 'resultTable',
     labels: {
       GO_TO_COLUMN: "Go to column:",
       PLACEHOLDER: "column name...",
@@ -83,14 +82,11 @@
 
   Plugin.prototype.destroy = function () {
     var self = this;
-    $('.table-extender-header_' + self.options.parentId).remove();
-    $('.table-extender-first-col-' + self.options.parentId).remove();
-    $('.table-extender-first-cell-' + self.options.parentId).remove();
     self.$parent.off('.tableExtender');
     self.$mainScrollable.off('.tableExtender');
     self.disposeFunctions.forEach(function (dispose) {
       dispose();
-    });
+    })
   };
 
   Plugin.prototype.setOptions = function (options) {
@@ -109,7 +105,6 @@
     var self = this;
     var $result = $('<table>');
     $result.attr('class', self.$sourceTable.attr('class'));
-    $result.removeClass(self.options.classToRemove);
     $result.attr('style', self.$sourceTable.attr('style'));
     $result.css({ 'position': 'absolute', 'top': 0, 'left': 0 });
     return $result;
@@ -128,7 +123,6 @@
   Plugin.prototype.drawHeader = function () {
     var self = this;
     var $headerTable = self.createEmptyTableClone().css('z-index', 1);
-    $headerTable.addClass('table-extender-header_' + self.options.parentId);
 
     // Clone the header
     var $sourceHeaders = self.$sourceTable.find('thead>tr th');
@@ -158,7 +152,9 @@
       }
     };
 
-    $('.table-extender-header_' + self.options.parentId).remove();
+    if (self.$headerTable) {
+      self.$headerTable.remove();
+    }
 
     self.$headerTable = $headerTable;
     self.$headerTable.appendTo(self.$parent);
@@ -176,7 +172,7 @@
     var self = this;
 
     var $firstColumnTable = self.createEmptyTableClone().css('z-index', 2);
-    $firstColumnTable.addClass('table-extender-first-col-' + self.options.parentId);
+
     // Clone the header for the first cell
     var $sourceFirstHeader = self.$sourceTable.find('thead>tr th:eq(0)');
     var $clonedFirstHeader = $sourceFirstHeader.clone();
@@ -185,7 +181,6 @@
 
     // Create a separate table for the upper left header cell only
     var $firstCellTable = $firstColumnTable.clone().css('z-index', 3);
-    $firstCellTable.addClass('table-extender-first-cell-' + self.options.parentId);
 
     $firstCellTable.find('th').click(function () {
       $sourceFirstHeader.click();
@@ -223,13 +218,17 @@
     }
 
     // Append the table for the first columns
-    $('.table-extender-first-col-' + self.options.parentId).remove();
+    if (self.$firstColumnTable) {
+      self.$firstColumnTable.remove();
+    }
     self.$firstColumnTable = $firstColumnTable;
     self.$firstColumnTable.css('left', self.$parent.scrollLeft() + 'px');
     self.$firstColumnTable.appendTo(self.$parent);
 
     // Append the table for the first cell (header of first column)
-    $('.table-extender-first-cell-' + self.options.parentId).remove();
+    if (self.$firstCellTable) {
+      self.$firstCellTable.remove();
+    }
     self.$firstCellTable = $firstCellTable;
     self.$firstCellTable.width(self.$firstColumnTable.outerWidth(true)); // Width is only known after the first col render
     self.$firstCellTable.css('left', self.$parent.scrollLeft() + 'px');
