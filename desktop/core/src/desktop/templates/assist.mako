@@ -2140,7 +2140,7 @@ from desktop.views import _ko
         self.disposals = [];
 
         self.activeType = ko.observable();
-        self.availableTypes = ko.observableArray(window.IS_EMBEDDED ? ['Impala'] : ['Hive', 'Impala', 'Pig']);
+        self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
         self.query = ko.observable().extend({ rateLimit: 400 });
         self.selectedFunction = ko.observable();
 
