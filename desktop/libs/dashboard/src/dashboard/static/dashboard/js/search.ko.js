@@ -859,9 +859,11 @@ var Collection = function (vm, collection) {
     }
 
     if (nestedFacet.aggregate) {
-      nestedFacet.aggregate.function.subscribe(function () {
-        vm.search();
-      });
+      if (nestedFacet.aggregate.function) {
+        nestedFacet.aggregate.function.subscribe(function () {
+          vm.search();
+        });
+      }
 
       nestedFacet.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(nestedFacet.field(), facet.template.fieldsAttributes());
