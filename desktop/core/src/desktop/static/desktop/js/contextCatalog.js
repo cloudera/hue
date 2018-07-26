@@ -113,6 +113,16 @@ var ContextCatalog = (function () {
             var dynamic = namespaces.dynamicClusters;
             var namespaces = namespaces[options.sourceType];
             if (namespaces) {
+              namespaces.forEach(function (namespace) {
+                namespace.computes.forEach(function (compute) {
+                  if (!compute.id && compute.crn) {
+                    compute.id = compute.crn;
+                  }
+                  if (!compute.name && compute.clusterName) {
+                    compute.name = compute.clusterName;
+                  }
+                })
+              });
               self.namespaces[options.sourceType] = { namespaces: namespaces.filter(function (namespace) {
                 return namespace.name; // Only include namespaces with a name.
               }), dynamic: dynamic };
