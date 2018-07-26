@@ -113,7 +113,11 @@
   // Add modified URL for .clearable background
   var originalClearableImgUrl = '${ static('desktop/art/clearField@2x.png') }';
   var clearableImgUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(originalClearableImgUrl) : originalClearableImgUrl;
-  document.styleSheets[0].insertRule('.clearable { background: url(' + clearableImgUrl + ') no-repeat right -10px center; }');
+
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode('.clearable { background: url(' + clearableImgUrl + ') no-repeat right -10px center; }'));
+  document.head.appendChild(style);
 % endif
   </script>
 
