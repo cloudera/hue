@@ -309,7 +309,7 @@ def get_api(request, snippet):
     cluster = None
   if not cluster and snippet.get('compute'): # Via notebook.ko.js
     cluster = snippet.get('compute').get('id')
-  if cluster and 'crn:altus:analyticdb:' in cluster:
+  if cluster and 'crn:altus:dataware:' in cluster:
     interface = 'altus-adb'
   if cluster:
     LOG.info('Selected cluster %s' % cluster)
