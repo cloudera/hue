@@ -20,6 +20,7 @@ from django.template.defaultfilters import escape, escapejs
 from desktop import conf
 from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
+from desktop.views import _ko
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from indexer.conf import ENABLE_NEW_INDEXER
@@ -296,6 +297,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
 <div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:90%;margin-left:-45%!important;z-index:1071">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <input class="input-medium hue-modal-search" type="text" placeholder="${ _('Search...') }">
     <h2 class="modal-title">${_('Row details')}</h2>
   </div>
   <div class="modal-body">
@@ -348,6 +350,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
           html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td class="multi-line-ellipsis" style="word-break: break-all"><div style="position: relative">' + hueUtils.deXSS(link) + '</div></td></tr>';
         }
       });
+      html += '<tr class="hide no-results"><td class="muted" colspan="2">${ _ko('Your search did not return any result.') }</td></tr>';
       $t.html(html);
       $t.find('.multi-line-ellipsis div').each(function(cnt, el){
         multiLineHandlers.push(new MultiLineEllipsisHandler({
@@ -370,6 +373,24 @@ from metadata.conf import has_optimizer, OPTIMIZER
       multiLineHandlers.forEach(function (multiLineEllipsisHandler) {
         multiLineEllipsisHandler.dispose();
       });
+    });
+
+    $('#rowDetailsModal .hue-modal-search').jHueDelayedInput(function () {
+      var $t = $('#rowDetailsModal').find('table');
+      $('#rowDetailsModal .no-results').addClass('hide');
+      $t.find('tr').removeClass('hide');
+      var shown = 0;
+      $t.find('tr').each(function () {
+        if ($(this).text().toLowerCase().indexOf($('#rowDetailsModal .hue-modal-search').val().toLowerCase()) == -1) {
+          $(this).addClass('hide');
+        }
+        else {
+          shown++;
+        }
+      });
+      if (shown === 0) {
+        $('#rowDetailsModal .no-results').removeClass('hide');
+      }
     });
 
     if ($.fn.editableform) {
