@@ -152,7 +152,7 @@ def get_context_computes(request, interface):
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters'] if cluster.get('status') == 'CREATED']
       )
 
-  if interface == 'oozie' or interface == 'jobs':
+  if interface == 'oozie' or interface == 'jobs' or interface == 'spark2':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn'),
@@ -164,6 +164,7 @@ def get_context_computes(request, interface):
           'type': 'altus-de'
         } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
       )
+      # TODO if interface == 'spark2' keep only SPARK type
 
   response[interface] = computes
   response['status'] = 0

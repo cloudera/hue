@@ -311,6 +311,8 @@ def get_api(request, snippet):
     cluster = snippet.get('compute').get('id')
   if cluster and 'crn:altus:dataware:' in cluster:
     interface = 'altus-adb'
+  elif cluster and 'crn:altus:dataeng:' in cluster:
+    interface = 'dataeng'
   if cluster:
     LOG.info('Selected cluster %s' % cluster)
 
@@ -336,7 +338,7 @@ def get_api(request, snippet):
     return AltusAdbApi(user=request.user, cluster_name=cluster, request=request)
   elif interface == 'dataeng':
     from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get('name'))
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster)
   elif interface == 'jdbc' or interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApi
     return JdbcApi(request.user, interpreter=interpreter)
