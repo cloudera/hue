@@ -22,6 +22,7 @@ from datetime import datetime,  timedelta
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+
 from metadata.conf import ALTUS
 from navoptapi.api_lib import ApiLib
 
@@ -125,8 +126,17 @@ class DataEngApi():
 
     return self.submit_jobs(cluster_name, [{'hiveJob': job}])
 
-  def submit_spark_job(self):
-    return _exec('dataeng', 'submitJobs')
+  def submit_spark_job(self, cluster_name, jars=None, main_class=None, arguments=None, spark_arguments=None, properties_file=None):
+    job = {
+      "jars": jars if jars else [],
+      "applicationArguments": arguments if arguments else [],
+      #"sparkArguments": "string",
+      #"propertiesFile": "string"
+    }
+    if main_class:
+      job["mainClass"] = main_class
+
+    return self.submit_jobs(cluster_name, [{'sparkJob': job}])
 
   def submit_yarn_job(self):
     return _exec('dataeng', 'submitJobs')

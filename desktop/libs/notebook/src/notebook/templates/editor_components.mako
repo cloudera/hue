@@ -978,16 +978,17 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-header-database-selection">
-  <!-- ko if: loadingContext() && isSqlDialect()  -->
+  <!-- ko if: loadingContext() && (isSqlDialect() || type() == 'spark2') -->
   <i class="fa fa-spinner fa-spin muted"></i>
   <!-- /ko -->
-  <!-- ko if: !loadingContext() && isSqlDialect() -->
+
+  <!-- ko if: !loadingContext() && (isSqlDialect() || type() == 'spark2') -->
   <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
-  <!-- ko if: availableComputes().length > 0-->
+  <!-- ko if: availableComputes().length > 0 -->
   <span class="editor-header-title">${ _('Compute') }</span>
   <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
-  <!-- ko if: availableComputes().length === 0-->
+  <!-- ko if: availableComputes().length === 0 -->
   <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
   <!-- /ko -->
   <!-- /ko -->
@@ -997,13 +998,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
 
-  <!-- ko if: availableDatabases().length > 0 -->
-  <span class="editor-header-title">${ _('Database') }</span>
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
-  <!-- /ko -->
-  <!-- ko if: availableDatabases().length === 0-->
-  <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No databases found') }</span>
-  <!-- /ko -->
+  <!-- ko if: isSqlDialect() -->
+    <!-- ko if: availableDatabases().length > 0 -->
+    <span class="editor-header-title">${ _('Database') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
+    <!-- ko if: availableDatabases().length === 0 -->
+    <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No databases found') }</span>
+    <!-- /ko -->
+    <!-- /ko -->
   <!-- /ko -->
 </script>
 
