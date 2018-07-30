@@ -22,15 +22,15 @@
       var _data = _options.transformer(valueAccessor().datum);
 
       function toggleVisibility() {
-        if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined")) {
+        if (!_data.message && ((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined")) {
           $(element).show();
           $(element).siblings(".leaflet-nodata").remove();
         }
         else {
           $(element).hide();
-          if ((_options.visible != null && _options.visible) && !_options.isLoading) {
+          if ((_data.message || (_options.visible != null && _options.visible)) && !_options.isLoading) {
             $(element).siblings(".leaflet-nodata").remove();
-            $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text("No Data Available."));
+            $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text(_data.message || window.HUE_I18n.chart.noData));
           }
         }
       }

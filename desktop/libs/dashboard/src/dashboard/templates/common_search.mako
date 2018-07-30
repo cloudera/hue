@@ -1773,24 +1773,31 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'resultset-widget' -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
-                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
-
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
           <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: $root.collection.template.chartSettings.chartSelectorType},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
-
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: $root.collection.template.chartSettings.chartSelectorType},  stacked: true, showLegend: true" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
           <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
-
+                transformer: multiSerieDataTransformerGrid, showControls: false }" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
-
+                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, forceRedraw: true}" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
           <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
-
+                transformer: multiSerieDataTransformerGrid, showControls: false }" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
           <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $root.results(), scope: $root.collection.template.chartSettings.chartScope(), snippet: $data},
-              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" />
+              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}" />
           <div class="clearfix"></div>
+          <!-- /ko -->
         <!-- /ko -->
 
        </div>
@@ -3386,7 +3393,9 @@ function pieChartDataTransformer(data) {
       obj: item
     });
   });
-  return _data;
+  return _data.filter(function (val) {
+    return val.value >= 0;
+  });
 }
 
 function _rangePieChartDataTransformer(data, isUp) {
@@ -3402,7 +3411,9 @@ function _rangePieChartDataTransformer(data, isUp) {
       obj: item
     });
   });
-  return _data;
+  return _data.filter(function (val) {
+    return val.value >= 0;
+  });
 }
 
 
@@ -3428,6 +3439,13 @@ function pieChartDataTransformerGrid(data) {
   } else if (!data.chartY) {
     chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
   } // else we just take value as is
+  if (!chartX) {
+    _data.message = window.HUE_I18n.chart.missingLegend;
+    return _data;
+  } else if (!chartY) {
+    _data.message = window.HUE_I18n.chart.missingValue;
+    return _data;
+  }
 
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
@@ -3440,7 +3458,9 @@ function pieChartDataTransformerGrid(data) {
       });
     }
   });
-  return _data;
+  return _data.filter(function (val) {
+    return val.value >= 0;
+  });
 }
 
 function _barChartDataTransformer(rawDatum, isUp) {
@@ -3808,7 +3828,11 @@ function gradientMapChartDataTransformerGrid(data) {
     chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
   } // else we just take value as is
   var _data = [];
-  if (!chartX || !chartY) {
+  if (!chartX) {
+    _data.message = window.HUE_I18n.chart.missingRegion;
+    return _data;
+  } else if (!chartY) {
+    _data.message = window.HUE_I18n.chart.missingY;
     return _data;
   }
   $(data.counts).each(function (cnt, item) {
@@ -3885,6 +3909,17 @@ function leafletMapChartDataTransformerGrid(data) {
     chartMapLabel = data.chartZ();
   } else if (!data.chartZ) {
     chartMapLabel = searchViewModel.collection.template.chartSettings.chartMapLabel();
+  }
+
+  if (!chartX) {
+    _data.message = window.HUE_I18n.chart.missingLatitude;
+    return _data;
+  } else if (!chartY) {
+    _data.message = window.HUE_I18n.chart.missingLongitude;
+    return _data;
+  } else if (!chartMapLabel) {
+    _data.message = window.HUE_I18n.chart.missingLabel;
+    return _data;
   }
 
   $(data.counts).each(function (cnt, item) {
@@ -3966,6 +4001,14 @@ function multiSerieDataTransformerGrid(rawDatum, isTimeline) {
   } else if (!rawDatum.chartY) {
     chartY = searchViewModel.collection.template.chartSettings.chartYMulti();
   } // else we just take value as is
+
+  if (!chartX) {
+    _datum.message = window.HUE_I18n.chart.missingX;
+    return _datum;
+  } else if (!chartY || !chartY.length) {
+    _datum.message = window.HUE_I18n.chart.missingY;
+    return _datum;
+  }
 
   if (chartX != null && chartY.length > 0 && rawDatum.counts.length > 0) {
     var _plottedSerie = 0;

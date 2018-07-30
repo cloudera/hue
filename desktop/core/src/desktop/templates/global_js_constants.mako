@@ -159,6 +159,17 @@
     queryBuilder: {
       insertValueHere: "${ _('Insert value here') }",
       queryRequire: "${ _('Query requires a select or aggregate.') }"
+    },
+    chart: {
+      noData: "${ _('No Data Available.') }",
+      missingLegend: "${ _('Missing legend configuration.') }",
+      missingValue: "${ _('Missing value configuration.') }",
+      missingX: "${ _('Missing x axis configuration.') }",
+      missingY: "${ _('Missing y axis configuration.') }",
+      missingLatitude: "${ _('Missing latitude configuration.') }",
+      missingLongitude: "${ _('Missing longitude configuration.') }",
+      missingLabel: "${ _('Missing label configuration.') }",
+      missingRegion: "${ _('Missing region configuration.') }",
     }
   };
 

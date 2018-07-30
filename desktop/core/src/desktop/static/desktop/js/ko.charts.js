@@ -43,9 +43,6 @@
       window.setTimeout(function(){
         var _options = valueAccessor();
         var _data = _options.transformer(_options.data);
-        _data = _data.filter(function (val) {
-          return val.value >= 0;
-        });
         $(element).css("marginLeft", "auto");
         $(element).css("marginRight", "auto");
         if (typeof _options.maxWidth != "undefined") {
@@ -76,7 +73,7 @@
                 .tooltipContent(function (key, y, e, graph) {
                   return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>'
                 });
-
+            _chart.noData(_data.message || window.HUE_I18n.chart.noData);
             var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
 
             _d3.datum(_data)
@@ -136,11 +133,9 @@
     update: function (element, valueAccessor) {
       var _options = valueAccessor();
       var _data = _options.transformer(_options.data);
-      _data = _data.filter(function (val) {
-        return val.value >= 0;
-      });
       var _chart = $(element).data("chart");
       if (_chart) {
+        _chart.noData(_data.message || window.HUE_I18n.chart.noData);
         var _d3 = d3v3.select($(element).find("svg")[0]);
         _d3.datum(_data)
               .transition().duration(150)
@@ -203,6 +198,7 @@
       var _isPivot = _options.isPivot != null ? _options.isPivot : false;
 
       if (_chart) {
+        _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
         if (_chart.multibar){
           _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
         }
@@ -273,6 +269,7 @@
       var _chart = $(element).data("chart");
       if (_chart) {
         window.setTimeout(function () {
+          _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
           if (_chart.multibar) {
             _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
           }
@@ -306,6 +303,7 @@
       var _chart = $(element).data("chart");
       if (_chart) {
         window.setTimeout(function () {
+          _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
           var _d3 = d3v3.select($(element).find("svg")[0]);
           if (_datum.length > 0 && _datum[0].values.length > 0 && typeof _datum[0].values[0].x.isValid === 'function'){
             _chart.xAxis.tickFormat(function(d) { return d3v3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
@@ -805,6 +803,7 @@
     if ($(element).is(":visible")) {
       nv.addGraph(function () {
         var _chart = nv.models.lineWithBrushChart();
+        _chart.noData(_data.message || window.HUE_I18n.chart.noData);
         $(element).data("chart", _chart);
         _chart.transitionDuration(0);
         _chart.convert = function (d) {
@@ -1036,6 +1035,7 @@
         $(element).find("svg").empty();
       }
       _chart = nv.models.multiBarWithBrushChart();
+      _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
       if (_datum.length > 0) $(element).data('chart_type', 'multibar_brush');
       _chart.onSelectRange(function (from, to) {
         huePubSub.publish('charts.state', { updating: true });
