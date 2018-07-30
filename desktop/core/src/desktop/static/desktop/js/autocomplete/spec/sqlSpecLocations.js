@@ -173,7 +173,7 @@
           { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 31, last_column: 31 }, subquery: true },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 } },
           { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 }, tables: [{ identifierChain: [{ name: 'boo' }] }] },
-          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 }, identifierChain: [{ name: 'boo' }] },
+          { type: 'alias', target: 'cte', alias: 'boo', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 } },
           { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 } },
           { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 } }
         ]
