@@ -455,10 +455,17 @@
           var details = suffix.split('/');
           if (details.length > 1 && details[1] !== '') {
             self.getColumns(details[0], details[1], function (data) {
-              autocompleteLogic(autocompleteUrl, {
-                columns: $.map(data.cols, function (item) {
+              var columns = [];
+              if (data.cols || data.extended_columns) {
+                columns = $.map(data.cols ? data.cols : data.extended_columns, function (item) {
                   return item.name
-                })
+                });
+              }
+              else if (data.columns) {
+                columns = data.columns;
+              }
+              autocompleteLogic(autocompleteUrl, {
+                columns: columns
               });
             });
           } else {
