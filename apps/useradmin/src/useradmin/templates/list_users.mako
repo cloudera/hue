@@ -17,7 +17,10 @@
 from django.template.defaultfilters import date, time
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import USERNAME_RE_RULE
 from desktop.views import commonheader, commonfooter, antixss
+
+import re
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -90,7 +93,7 @@ ${layout.menubar(section='users')}
               </td>
           %endif
           <td>
-            %if user.is_superuser or user.username == listed_user.username:
+            %if (user.is_superuser or user.username == listed_user.username) and re.match(USERNAME_RE_RULE, listed_user.username):
               <strong><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}"
                          href="${ url('useradmin.views.edit_user', username=listed_user.username) }"
                          data-row-selector="true">${listed_user.username}</a></strong>
