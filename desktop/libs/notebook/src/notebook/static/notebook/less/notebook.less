@@ -1344,4 +1344,14 @@
       text-overflow: ellipsis;
     }
   }
+
+  .nav-tabs-editor {
+    .visible-on-hover {
+      opacity: 0;
+      .hue-ease-transition(opacity);
+    }
+    li:hover .visible-on-hover {
+       opacity: 1;
+    }
+  }
 }
