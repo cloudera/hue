@@ -407,3 +407,44 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
     finally:
       for f in finish:
         f()
+
+  def test_generate_altus_action_start_cluster(self):
+
+    class TestJob():
+      XML_FILE_NAME = 'workflow.xml'
+
+      def __init__(self):
+        self.deployment_dir = '/tmp/test'
+        self.nodes = [
+            Node({'id': '1', 'type': 'hive-document', 'properties': {'jdbc_url': u"${wf:actionData('shell-31b5')['hiveserver']}", 'password': u'test'}})
+        ]
+
+    user = User.objects.get(username='test')
+    submission = Submission(user, job=TestJob(), fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
+
+    assert_true('''#!/usr/bin/env python
+
+from navoptapi.api_lib import ApiLib
+
+hostname = 'dataengapi.us-west-1.altus.cloudera.com'
+auth_key_id = 'altus_auth_key_id'
+auth_key_secret = 'altus_auth_key_secret'
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    raise e
+
+_exec('dataeng', 'listJobs', {})
+''' in submission._generate_altus_action_script(
+        service='dataeng',
+        auth_key_id='altus_auth_key_id',
+        auth_key_secret='altus_auth_key_secret'
+      )
+    )

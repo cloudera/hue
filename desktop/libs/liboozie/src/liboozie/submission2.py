@@ -29,10 +29,13 @@ from beeswax.hive_site import get_hive_site_content
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import find_variables
+from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2
+from metadata.conf import ALTUS
+from oozie.utils import convert_to_server_timezone
+
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
-from oozie.utils import convert_to_server_timezone
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
@@ -206,6 +209,18 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
+        elif action.data['type'] == 'altus':
+          service = 'dataeng' # action.data['properties'].get('script_path')
+          auth_key_id = ALTUS.AUTH_KEY_ID.get()
+          auth_key_secret = ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+          shell_script = self._generate_altus_action_script(
+            service=service,
+            auth_key_id=auth_key_id,
+            auth_key_secret=auth_key_secret
+          )
+          self._create_file(deployment_dir, action.data['name'] + '.py', shell_script)
+          self.fs.do_as_user(self.user, self.fs.copyFromLocal, os.path.join(get_desktop_root(), 'core', 'ext-py', 'navoptapi-0.1.0'), self.job.deployment_dir)
+
         elif action.data['type'] == 'impala' or action.data['type'] == 'impala-document':
           from oozie.models2 import _get_impala_url
           from impala.impala_flags import get_ssl_server_certificate
@@ -288,7 +303,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
           statements = notebook.get_data()['snippets'][0]['statement_raw']
 
           self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
-        elif action.data['type'] == 'spark':
+        elif action.data['type'] == 'spark' or action.data['type'] == 'spark-document':
           if not [f for f in action.data.get('properties').get('files', []) if f.get('value').endswith('hive-site.xml')]:
             hive_site_lib = Hdfs.join(deployment_dir + '/lib/', 'hive-site.xml')
             hive_site_content = get_hive_site_content()
@@ -511,6 +526,46 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     else:
       self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
     LOG.debug("Created/Updated %s" % (file_path,))
+
+  def _generate_altus_action_script(self, service,  auth_key_id, auth_key_secret):
+    if service == 'analyticdb' or service == 'dataware':
+      hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
+    elif service == 'dataeng':
+      hostname = ALTUS.HOSTNAME_DATAENG.get()
+    elif service == 'wa':
+      hostname = ALTUS.HOSTNAME_WA.get()
+    else:
+      hostname = ALTUS.HOSTNAME.get()
+
+    return """#!/usr/bin/env python
+
+from navoptapi.api_lib import ApiLib
+
+hostname = '%(hostname)s'
+auth_key_id = '%(auth_key_id)s'
+auth_key_secret = '%(auth_key_secret)s'
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    raise e
+
+_exec('%(service)s', '%(command)s', %(args)s)
+
+""" % {
+      'hostname': hostname,
+      'service': service,
+      'command': 'listJobs',
+      'args': {},
+      'auth_key_id': auth_key_id,
+      'auth_key_secret': auth_key_secret
+    }
 
 def create_directories(fs, directory_list=[]):
   # If needed, create the remote home, deployment and data directories
