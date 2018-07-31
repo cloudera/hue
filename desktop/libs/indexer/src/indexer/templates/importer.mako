@@ -631,7 +631,7 @@ ${ assist.assistPanel() }
               </div>
               <div class="control-group">
                 <label><div>${ _('Description') }</div>
-                   <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+                    <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
                 </label>
               </div>
               <div class="control-group" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
