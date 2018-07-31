@@ -1633,6 +1633,10 @@ def get_clusters(user):
   return OrderedDict(clusters)
 
 
+def has_multi_cluster():
+  return bool(CLUSTERS.get())
+
+
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
   help="One entry for each additional remote cluster Hue can interact with.",
