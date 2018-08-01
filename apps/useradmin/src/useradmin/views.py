@@ -549,7 +549,7 @@ def add_ldap_users(request):
   if request.method == 'POST':
     form = AddLdapUsersForm(request.POST)
     if form.is_valid():
-      username_pattern = form.cleaned_data['username_pattern']
+      username_pattern = smart_str(form.cleaned_data['username_pattern'])
       import_by_dn = form.cleaned_data['dn']
       server = form.cleaned_data.get('server')
       try:
