@@ -105,6 +105,7 @@ class Resource(object):
           smart_unicode(resp.content[:1000], errors='replace'),
           len(resp.content) > 1000 and "..." or ""
       )
+      self._client.logger.disabled = 0
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
 
     return resp
