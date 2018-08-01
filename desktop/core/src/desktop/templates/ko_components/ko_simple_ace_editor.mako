@@ -811,6 +811,8 @@ from desktop.views import _ko
               type: function () {
                 return sourceType;
               },
+              namespace: params.namespace,
+              compute: params.compute,
               database: function () {
                 return params.database && params.database() ? params.database() : 'default';
               },

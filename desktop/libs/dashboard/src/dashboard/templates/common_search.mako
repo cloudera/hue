@@ -106,6 +106,8 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
               mode: $root.collection.engine(),
               fixedPrefix: $root.collection.engine() !== 'solr' ? function() { return 'SELECT * FROM ' +  $root.collection.name() + ' WHERE '; } : undefined,
               fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
+              namespace: $root.collection.activeNamespace,
+              compute: $root.collection.activeCompute,
               database: function () { return $root.collection.name().split('.')[0] },
               singleLine: true }
             }"></div>
@@ -2193,6 +2195,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
         mode: $root.collection.engine(),
         fixedPrefix: $root.collection.engine() !== 'solr' ? function() { return 'SELECT * FROM ' +  $root.collection.name() + ' WHERE '; } : undefined,
         fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
+        namespace: $root.collection.activeNamespace,
+        compute: $root.collection.activeCompute,
         database: function () { return $root.collection.name().split('.')[0] },
         singleLine: true }
       }"></div>
