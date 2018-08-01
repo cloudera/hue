@@ -510,10 +510,14 @@ from desktop.views import _ko
 
           if (parseResult.suggestFields) {
             self.fieldAccessor().forEach(function (field) {
+              var type = field.type();
+              if (type.indexOf('<') !== -1) {
+                type = type.substring(0, type.indexOf('<'));
+              }
               syncEntries.push({
                 category: CATEGORIES.FIELD,
                 value: field.name(),
-                meta: field.type(),
+                meta: type,
                 weightAdjust: 0,
                 popular: ko.observable(false),
                 details: field
