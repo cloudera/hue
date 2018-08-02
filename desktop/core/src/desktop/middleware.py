@@ -608,6 +608,15 @@ class SpnegoMiddleware(object):
           if user:
             request.user = user
             login(request, user)
+            msg = 'Successful login for user: %s' % request.user.username
+          else:
+            msg = 'Failed login for user: %s' % request.user.username
+          request.audit = {
+            'operation': 'USER_LOGIN',
+            'username': request.user.username,
+            'operationText': msg
+          }
+          access_warn(request, msg)
           return
         except:
           LOG.exception('Unexpected error when authenticating against KDC')
