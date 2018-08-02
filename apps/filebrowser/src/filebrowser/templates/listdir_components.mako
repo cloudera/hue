@@ -2012,6 +2012,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         hideContextMenu();
       });
 
+      % if show_upload_button:
+
       // Drag and drop uploads from anywhere on filebrowser screen
       if (window.FileReader) {
         var showHoverMsg = function (msg) {
@@ -2154,6 +2156,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
         });
       }
+      % endif
 
       $("#chownForm select[name='user']").change(function () {
         if ($(this).val() == "__other__") {
