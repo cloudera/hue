@@ -1193,7 +1193,7 @@ def check_job_edition_permission(oozie_job, user):
 
 
 def has_job_edition_permission(oozie_job, user):
-  have_permission = user.is_superuser or oozie_job.user == user.username or (oozie_job.acl and user.username in oozie_job.acl.split(','))
+  have_permission = user.is_superuser or oozie_job.user == user.username and user.username in oozie_job.acl.split(',')
   if have_permission:
 	  return True
   else:
