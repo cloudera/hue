@@ -544,7 +544,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
 
   @metrics.spnego_authentication_time
-  def authenticate(self, username=None):
+  def authenticate(self, request=None, username=None):
     username = self.clean_username(username)
     username = force_username_case(username)
     is_super = False
