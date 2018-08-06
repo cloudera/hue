@@ -803,7 +803,7 @@
     if ($(element).is(":visible")) {
       nv.addGraph(function () {
         var _chart = nv.models.lineWithBrushChart();
-        _chart.noData(_data.message || window.HUE_I18n.chart.noData);
+        _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
         $(element).data("chart", _chart);
         _chart.transitionDuration(0);
         _chart.convert = function (d) {
