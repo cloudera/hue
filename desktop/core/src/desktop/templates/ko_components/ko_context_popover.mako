@@ -865,8 +865,11 @@ from metadata.conf import has_navigator
         });
 
         $('.hue-popover').on('click.contextLangRef', function (event) {
-          if (event.target.className === 'lang-ref-link') {
-            huePubSub.publish('assist.lang.ref.show.topic', $(event.target).data('target'));
+          if (event.target.className === 'hue-doc-internal-link') {
+            huePubSub.publish('assist.lang.ref.show.topic', {
+              ref: $(event.target).data('doc-ref'),
+              anchorId: $(event.target).data('doc-anchor-id')
+            });
           }
         });
       }

@@ -626,25 +626,92 @@
   overflow-x: auto;
 }
 
-.sql-docs-inline-code {
-  font-family: @font-family-monospace;
-}
+.assist-docs-details {
+  ul li {
+    margin: 8px 0;
+  }
+  .hue-doc-title {
+    color: @hue-primary-color-dark;
+    font: 15px/normal @font-family-monospace;
+    direction: ltr;
+    line-height: 18px;
+    margin-bottom: 10px;
+  }
+  .hue-doc-codeblock,
+  .hue-doc-codeph {
+    font-family: @font-family-monospace;
+    color: @cui-gray-800;
+    background: @cui-gray-050;
+    border: 1px solid @cui-gray-100;
+    border-radius: 2px;
+  }
+  .hue-doc-internal-link {
 
-.sql-docs-code-block {
-  display: block;
-  font-family: @font-family-monospace;
-  white-space: pre-wrap;
-  margin-bottom: 10px;
-  color: @cui-gray-700;
-}
+  }
+  .hue-doc-codeph {
+    padding: 0 3px;
+  }
+  .hue-doc-codeblock {
+    display: block;
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    .hue-doc-varname {
+      color: @cui-steel;
+    }
+  }
+  .hue-doc-note {
+    border: 1px solid @hue-primary-color-light;
+    padding: 4px 5px;
+    margin-bottom: 10px;
+    &:before {
+      content: 'Note:';
+      color: @cui-gray-800;
+      font-weight: 500;
+    }
+  }
+  .hue-doc-varname {
+    font-family: @font-family-monospace;
+    font-style: italic;
+  }
+  .hue-doc-ph {
 
-.sql-docs-variable {
-  font-family: @font-family-monospace;
-  color: @cui-steel;
+  }
+  .hue-doc-filepath {
+    font-family: @font-family-monospace;
+    color: @cui-gray-800;
+  }
+  .hue-doc-external-link {
+
+  }
+  .hue-doc-cmdname {
+    font-family: @font-family-monospace;
+    color: @cui-steel;
+  }
+  .hue-doc-term {
+    font-family: @font-family-monospace;
+  }
+  .hue-doc-uicontrol {
+    font-weight: 500;
+  }
+  .hue-doc-example {
+    font-family: @font-family-monospace;
+    color: @cui-steel;
+  }
+  .hue-doc-sthead {
+
+  }
+  .hue-doc-pre {
+    display: block;
+    font-family: @font-family-monospace;
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+    color: @cui-gray-700;
+  }
 }
 
 .assist-function-signature {
-  font: 14px/normal @font-family-monospace;
+  font: 15px/normal @font-family-monospace;
   direction: ltr;
   line-height: 18px;
   margin-bottom: 10px;
