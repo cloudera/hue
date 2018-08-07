@@ -2286,7 +2286,6 @@ from desktop.views import _ko
         <!-- ko if: selectedTopic -->
         <div class="assist-flex-60 assist-docs-details" data-bind="with: selectedTopic">
           <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
-          <div class="assist-function-signature blue" data-bind="html: titleMatch() || title"></div>
           <div data-bind="html: bodyMatch() || body()"></div>
         </div>
         <!-- /ko -->
@@ -2402,7 +2401,7 @@ from desktop.views import _ko
 
         self.disposals.push(function () {
           selectedSub.dispose();
-        })
+        });
         self.query = ko.observable();
         self.filteredTopics = ko.pureComputed(function () {
           var lowerCaseQuery = self.query().toLowerCase();
@@ -2455,13 +2454,12 @@ from desktop.views import _ko
 
         huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
 
-        var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (topicId) {
-          var mainTopic = topicId.split('#')[0]; // TODO: Handle subtopics
+        var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (targetTopic) {
           var topicStack = [];
           var findTopic = function (topics) {
             topics.some(function (topic) {
               topicStack.push(topic);
-              if (topic.ref === mainTopic) {
+              if (topic.ref === targetTopic.ref) {
                 while (topicStack.length) {
                   topicStack.pop().open(true);
                 }
@@ -2484,8 +2482,11 @@ from desktop.views import _ko
         });
 
         $(element).on('click.langref', function (event) {
-          if (event.target.className === 'lang-ref-link') {
-            huePubSub.publish('assist.lang.ref.panel.show.topic', $(event.target).data('target'));
+          if (event.target.className === 'hue-doc-internal-link') {
+            huePubSub.publish('assist.lang.ref.panel.show.topic', {
+              ref: $(event.target).data('doc-ref'),
+              anchorId: $(event.target).data('doc-anchor-id')
+            });
           }
         });
 
@@ -3619,12 +3620,12 @@ from desktop.views import _ko
           }
         });
 
-        huePubSub.subscribe('assist.lang.ref.show.topic', function (topicId) {
+        huePubSub.subscribe('assist.lang.ref.show.topic', function (targetTopic) {
           huePubSub.publish('right.assist.show');
           if (self.langRefTabAvailable() && self.activeTab() !== LANG_REF_TAB) {
             self.activeTab(LANG_REF_TAB);
           }
-          huePubSub.publish('assist.lang.ref.panel.show.topic', topicId)
+          huePubSub.publish('assist.lang.ref.panel.show.topic', targetTopic)
         });
 
         var updateTabs = function () {
