@@ -95,17 +95,12 @@ class SolrClient(object):
   def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None, shards=1, replication=1):
     if self.is_solr_cloud_mode():
       if self.is_solr_six_or_more():
-        if not config_name:
-          config_sets = self.list_configs()
-          if self.is_sentry_protected():
-            config_sets = [config for config in config_sets if 'Secure' in config]
-          if not config_sets:
-            raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs()))
+        config_sets = self.list_configs()
+        if not config_sets:
+          raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs()))
 
+        if not config_name or config_name not in config_sets:
           config_name_target = 'managedTemplate'
-          if self.is_sentry_protected():
-            config_name_target += 'Secure'
-
           if config_name_target in config_sets:
             config_name = config_name_target
           elif '_default' in config_sets:
@@ -113,8 +108,8 @@ class SolrClient(object):
           else:
             config_name = config_sets[0]
 
-          # Note: uniqueKey is always 'id'
-          self.api.create_config(name, config_name, immutable=False)
+        # Note: uniqueKey is always 'id'
+        self.api.create_config(name, config_name, immutable=False)
 
         self.api.create_collection2(name, config_name=name, shards=shards, replication=replication)
 
