@@ -123,6 +123,7 @@ class LdapAuthenticationForm(AuthenticationForm):
   def __init__(self, *args, **kwargs):
     super(LdapAuthenticationForm, self).__init__(*args, **kwargs)
     self.fields['server'] = ChoiceField(choices=get_server_choices())
+    self.error_messages['invalid_login'] = _t("Invalid username or password, or your LDAP groups not allowed")
 
   def authenticate(self):
     request = None

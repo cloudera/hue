@@ -504,18 +504,18 @@ class LdapBackend(object):
       connection = ldap_access.get_connection_from_server(server)
       try:
         user_info = connection.find_users(username, find_by_dn=False)
-      except LdapSearchException, e:
+      except Exception, e:
         LOG.warn("Failed to find LDAP user: %s" % e)
 
       if not user_info:
-        LOG.warn("Could not get LDAP details for users with pattern %s" % username_pattern)
-        return None
+        LOG.warn("Could not get LDAP details for users with pattern %s" % username)
+        return False
 
       ldap_info = user_info[0]
-      group_ldap_info = connection.find_groups("*", group_filter=get_find_groups_filter(ldap_info))
+      group_ldap_info = connection.find_groups("*", group_filter=get_find_groups_filter(ldap_info, server))
       for group in group_ldap_info:
         if group['name'] in login_groups:
-          allowed_group = True
+          return True
 
     else:
       #Login groups not set default to True
