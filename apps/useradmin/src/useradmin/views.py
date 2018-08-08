@@ -759,8 +759,8 @@ def import_ldap_groups(connection, group_pattern, import_members, import_members
                              import_by_dn, failed_users=failed_users)
 
 
-def get_find_groups_filter(ldap_info):
-  return _get_find_groups_filter(ldap_info)
+def get_find_groups_filter(ldap_info, server=None):
+  return _get_find_groups_filter(ldap_info, server=server)
 
 
 def sync_ldap_users(connection, failed_users=None):
@@ -902,7 +902,7 @@ def _import_ldap_users(connection, username_pattern, sync_groups=False, import_b
   return _import_ldap_users_info(connection, user_info, sync_groups, import_by_dn, server, failed_users=failed_users)
 
 
-def _get_find_groups_filter(ldap_info):
+def _get_find_groups_filter(ldap_info, server=None):
   if desktop.conf.LDAP.LDAP_SERVERS.get():
     # Choose from multiple server configs
     ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server]
@@ -970,7 +970,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         new_groups = set()
         current_ldap_groups = set()
 
-        find_groups_filter = _get_find_groups_filter(ldap_info)
+        find_groups_filter = _get_find_groups_filter(ldap_info, server=server)
 
         group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
         for group_info in group_ldap_info:

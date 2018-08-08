@@ -1179,6 +1179,14 @@ import groups from an LDAP directory.
 2.  Check the checkbox next to the group and click **Delete**.
 3.  Click **Yes** to confirm.
 
+#### Limit users can login only if they are belong to one of listed LDAP groups
+
+<pre>
+  [desktop]
+  [[ldap]]
+  login_groups=ldap_grp1,ldap_grp2,ldap_grp3
+</pre>
+
 #### Importing Groups from an LDAP Directory
 
 1.  From the **Groups** tab, click **Add/sync LDAP group**.
