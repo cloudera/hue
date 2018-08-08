@@ -1304,12 +1304,14 @@ from desktop.views import _ko
           });
           self.sources.push(self.sourceIndex[sourceType.type]);
         });
-
-        huePubSub.subscribe('assist.collections.refresh', function() {
-          DataCatalog.getEntry({ sourceType: 'solr', namespace: self.sourceIndex['solr'].activeNamespace(), compute: self.sourceIndex['solr'].activeCompute(), path: [] }).done(function (entry) {
-            entry.clearCache({ cascade: true });
+        if (self.sourceIndex['solr']) {
+          huePubSub.subscribe('assist.collections.refresh', function() {
+            var namespace = self.sourceIndex['solr'].selectedNamespace();
+            DataCatalog.getEntry({ sourceType: 'solr', namespace: namespace, compute: namespace.compute(), path: [] }).done(function (entry) {
+              entry.clearCache({ cascade: true });
+            });
           });
-        });
+        }
 
         huePubSub.subscribe('assist.db.highlight', function (catalogEntry) {
           huePubSub.publish('left.assist.show');
@@ -2120,7 +2122,7 @@ from desktop.views import _ko
                   }, params.sql)),
                   apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
-                  type: 'solr',
+                  type: 'kafka',
                   icon: 'fa-sitemap',
                   minHeight: 75
                 });
