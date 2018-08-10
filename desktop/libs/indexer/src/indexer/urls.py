@@ -57,6 +57,7 @@ urlpatterns += [
   url(r'^api/index/list/$', indexer_solr_api.list_index, name='list_index'),
   url(r'^api/indexes/list/$', indexer_solr_api.list_indexes, name='list_indexes'),
   url(r'^api/indexes/create/$', indexer_solr_api.create_index, name='create_index'),
+  url(r'^api/indexes/index/$', indexer_solr_api.index, name='index'),
   url(r'^api/indexes/sample/$', indexer_solr_api.sample_index, name='sample_index'),
   url(r'^api/indexes/config/$', indexer_solr_api.config_index, name='config_index'),
   url(r'^api/indexes/delete/$', indexer_solr_api.delete_indexes, name='delete_indexes'),
