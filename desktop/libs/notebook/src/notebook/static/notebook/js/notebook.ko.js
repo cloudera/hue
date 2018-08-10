@@ -357,7 +357,6 @@ var EditorViewModel = (function() {
     };
 
     self.loadingNamespaces = ko.observable(true);
-    self.namespaceRefreshEnabled = ko.observable(false);
     self.availableNamespaces = ko.observableArray();
     self.namespace = ko.observable();
 
@@ -365,7 +364,6 @@ var EditorViewModel = (function() {
     self.reloadNamespaces = function () {
       self.loadingNamespaces(true);
       self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
-        self.namespaceRefreshEnabled(context.dynamic);
         self.availableNamespaces(context.namespaces);
         if (!snippet.namespace || !context.namespaces.some(function (namespace) {
           if (namespace.id === snippet.namespace.id) {

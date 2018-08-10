@@ -40,6 +40,8 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.HAS_MULTI_CLUSTER = '${ conf.has_multi_cluster() }' === 'True';
+
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
