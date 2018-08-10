@@ -983,7 +983,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <!-- /ko -->
 
   <!-- ko if: !loadingContext() && (isSqlDialect() || type() == 'spark2') -->
-  <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
+  <!-- ko if: window.HAS_MULTI_CLUSTER -->
   <!-- ko if: availableComputes().length > 0 -->
   <span class="editor-header-title">${ _('Compute') }</span>
   <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
@@ -993,7 +993,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <!-- /ko -->
   <!-- /ko -->
 
-  <!-- ko if: (availableNamespaces().length > 1 || namespaceRefreshEnabled()) -->
+  <!-- ko if: window.HAS_MULTI_CLUSTER -->
   <span class="editor-header-title">${ _('Namespace') }</span>
   <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
   <!-- /ko -->

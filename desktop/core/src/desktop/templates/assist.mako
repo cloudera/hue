@@ -311,14 +311,14 @@ from desktop.views import _ko
       </a>
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
-      <!-- ko if: selectedSource().namespaceRefreshEnabled() || selectedSource().namespaces().length > 1-->
+      <!-- ko if: window.HAS_MULTI_CLUSTER-->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
       </a>
       <!-- /ko -->
-      <!-- ko if: !selectedSource().namespaceRefreshEnabled() && selectedSource().namespaces().length <= 1 -->
+      <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
@@ -861,7 +861,7 @@ from desktop.views import _ko
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredNamespaces().length"></span>)</span>
-      <!-- ko if: namespaceRefreshEnabled -->
+      <!-- ko if: window.HAS_MULTI_CLUSTER -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
       <!-- /ko -->
@@ -1442,7 +1442,7 @@ from desktop.views import _ko
               if (self.selectedSource().selectedNamespace().selectedDatabase()) {
                 return self.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name
               }
-              if (self.selectedSource().namespaceRefreshEnabled() || self.selectedSource().namespaces().length > 1) {
+              if (window.HAS_MULTI_CLUSTER) {
                 return self.selectedSource().selectedNamespace().name
               }
             }
@@ -1458,7 +1458,7 @@ from desktop.views import _ko
           if (self.selectedSource() && self.selectedSource().selectedNamespace()) {
             if (self.selectedSource().selectedNamespace().selectedDatabase()) {
               self.selectedSource().selectedNamespace().selectedDatabase(null);
-            } else if (self.selectedSource().namespaceRefreshEnabled() || self.selectedSource().namespaces().length > 1) {
+            } else if (window.HAS_MULTI_CLUSTER) {
               self.selectedSource().selectedNamespace(null)
             } else {
               self.selectedSource(null);
