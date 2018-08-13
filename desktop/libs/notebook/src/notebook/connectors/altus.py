@@ -50,9 +50,12 @@ def _exec(service, command, parameters=None):
 
   try:
     api = ApiLib(service, hostname, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
+    LOG.debug('%s : %s' % (command, parameters))
     resp = api.call_api(command, parameters)
     LOG.info(resp)
-    return resp.json()
+    json_resp = resp.json()
+    LOG.debug(json_resp )
+    return json_resp
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
 
