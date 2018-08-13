@@ -100,18 +100,20 @@ class DataEngApi(Api):
       AltusDataEngApi(self.user).terminate_job(job_id=job_id)
       response = {'status': 0}
     else:
-      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
+      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submission.')}
 
     return response
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
-        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
-        attempt_id='attempt_1499705340501_0045_m_000000_0'
-    )
+    # Currently no way to get the logs properly easily
 
-    return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
+    # logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+    #    operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+    #    attempt_id='attempt_1499705340501_0045_m_000000_0'
+    # )
+    # return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
+    return ''
 
 
   def progress(self, snippet, logs):

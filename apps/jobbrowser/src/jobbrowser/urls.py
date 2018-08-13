@@ -53,7 +53,7 @@ urlpatterns = [
 
 # V2
 urlpatterns += [
-  url(r'apps$', jobbrowser_views.apps, name='apps'),
+  url(r'apps$', jobbrowser_views.apps, name='jobbrowser.views.apps'),
 ]
 
 urlpatterns += [
