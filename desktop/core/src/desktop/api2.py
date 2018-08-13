@@ -78,7 +78,7 @@ def get_config(request):
 
 @api_error_handler
 def get_context_namespaces(request, interface):
-  response = {'dynamicClusters': False}
+  response = {}
   namespaces = []
 
   clusters = get_clusters(request.user).values()
@@ -116,7 +116,6 @@ def get_context_namespaces(request, interface):
              [_cluster for _cluster in adb_clusters if not cluster.get('namespaceCrn') and _cluster.get('status') == 'CREATED']
         ]
       )
-      response['dynamicClusters'] = True
 
   response[interface] = namespaces
   response['status'] = 0
