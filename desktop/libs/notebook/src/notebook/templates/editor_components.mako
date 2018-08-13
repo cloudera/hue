@@ -978,24 +978,25 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-header-database-selection">
-  <!-- ko if: loadingContext() && (isSqlDialect() || type() == 'spark2') -->
-  <i class="fa fa-spinner fa-spin muted"></i>
-  <!-- /ko -->
-
-  <!-- ko if: !loadingContext() && (isSqlDialect() || type() == 'spark2') -->
   <!-- ko if: window.HAS_MULTI_CLUSTER -->
-  <!-- ko if: availableComputes().length > 0 -->
-  <span class="editor-header-title">${ _('Compute') }</span>
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
-  <!-- /ko -->
-  <!-- ko if: availableComputes().length === 0 -->
-  <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
-  <!-- /ko -->
-  <!-- /ko -->
+    <!-- ko if: loadingContext() && (isSqlDialect() || type() == 'spark2') -->
+    <i class="fa fa-spinner fa-spin muted"></i>
+    <!-- /ko -->
 
-  <!-- ko if: window.HAS_MULTI_CLUSTER -->
-  <span class="editor-header-title">${ _('Namespace') }</span>
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
+    <!-- ko if: !loadingContext() && (isSqlDialect() || type() == 'spark2') -->
+    <!-- ko if: availableComputes().length > 0 -->
+    <span class="editor-header-title">${ _('Compute') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
+    <!-- ko if: availableComputes().length === 0 -->
+    <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
+    <!-- /ko -->
+    <!-- /ko -->
+
+    <!-- ko if: availableNamespaces().length > 0 -->
+    <span class="editor-header-title">${ _('Namespace') }</span>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
   <!-- /ko -->
 
   <!-- ko if: isSqlDialect() -->

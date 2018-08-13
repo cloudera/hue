@@ -139,13 +139,13 @@ class DataEngApi():
     if main_class:
       job["mainClass"] = main_class
 
-    return self.submit_jobs(cluster_name, [{'sparkJob': job}])
+    return self.submit_jobs(cluster_name, [{'sparkJob': job, 'name': None, 'failureAction': 'NONE'}]),
 
   def submit_yarn_job(self):
     return _exec('dataeng', 'submitJobs')
 
   def submit_jobs(self, cluster_name, jobs):
-    return _exec('dataeng', 'submitJobs', {'clusterName': cluster_name, 'jobs': json.dumps(jobs)})
+    return _exec('dataeng', 'submitJobs', {'clusterName': cluster_name, 'jobs': jobs})
 
   def terminate_job(self, job_id):
     return _exec('dataeng', 'terminateJob', {'jobId': job_id})
