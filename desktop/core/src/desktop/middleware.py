@@ -566,9 +566,13 @@ class SpnegoMiddleware(object):
       Negotiate. This will cause the browser to re-try the request with the
       AUTHORIZATION header set.
     """
+    view_func = resolve(request.path)[0]
+    if view_func in DJANGO_VIEW_AUTH_WHITELIST:
+      return
+
     # AuthenticationMiddleware is required so that request.user exists.
     if not hasattr(request, 'user'):
-      raise ImproperlyConfigured(
+      raise exceptions.ImproperlyConfigured(
         "The Django remote user auth middleware requires the"
         " authentication middleware to be installed.  Edit your"
         " MIDDLEWARE_CLASSES setting to insert"
