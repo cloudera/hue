@@ -49,7 +49,7 @@ class DataEngApi(Api):
           jars=snippet['properties']['jars'],
           main_class=snippet['properties']['class'],
           arguments=snippet['properties']['spark_arguments'],
-#           spark_arguments,
+          spark_arguments=snippet['properties']['spark_opts'],
 #           properties_file
       )
     else:
