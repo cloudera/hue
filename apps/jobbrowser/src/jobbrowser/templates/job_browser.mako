@@ -211,6 +211,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
                   <i class="fa fa-refresh"></i>
                 </a>
+                
+                <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.compute() && $root.compute()['type'].indexOf('altus') >= 0, click: jobs.createCluster">
+                  <i class="fa fa-plus"></i>
+                </a>
               <!-- /ko -->
 
               <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
@@ -2613,6 +2617,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
         });
       };
+
+      self.createCluster = function() {
+         $.post("/metadata/api/dataeng/create_cluster/", {
+            "cluster_name": "cluster_name",
+            "cdh_version": "CDH514",
+            "public_key": "public_key",
+            "instance_type": "m4.xlarge",
+            "environment_name": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946",
+            "workers_group_size": "3",
+            "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
+          }, function(data) {
+            console.log(ko.mapping.toJSON(data));
+            $(document).trigger("info", ko.mapping.toJSON(data));
+            self.updateJobs();
+          });
+      }
 
       self.control = function (action) {
         if (action == 'rerun') {
