@@ -2690,31 +2690,31 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && !(self.compute() && self.compute()['type'] == 'altus');
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         }
         var dataEngInterfaceCondition = function () {
           // return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
-          return self.compute() && self.compute()['type'] == 'altus';
+          return self.compute() && self.compute()['type'].indexOf('altus') >= 0;
         }
         var schedulerInterfaceCondition = function () {
-          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && !(self.compute() && self.compute()['type'] == 'altus');
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         }
         var livyInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && !(self.compute() && self.compute()['type'] == 'altus');
+          return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         }
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && !(self.compute() && self.compute()['type'] == 'altus');
+          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         }
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
+          {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
+          {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
-          {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
-          {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
         ];
 

@@ -116,7 +116,7 @@ class DataEngApi():
     return _exec('dataeng', 'listJobs', args)
 
   def describe_job(self, job_id):
-    return _exec('dataeng', 'describeJob', {'jobId', job_id})
+    return _exec('dataeng', 'describeJob', {'jobId': job_id})
 
   def submit_hive_job(self, cluster_name, script, params=None, job_xml=None):
     job = {'script': script}
