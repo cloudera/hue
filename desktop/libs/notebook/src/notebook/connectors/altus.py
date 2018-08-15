@@ -132,13 +132,14 @@ class DataEngApi():
     job = {
       "jars": jars if jars else [],
       "applicationArguments": arguments if arguments else [],
-      #"sparkArguments": "string",
       #"propertiesFile": "string"
     }
+    if spark_arguments:
+      job['sparkArguments'] = ' '.join(spark_arguments)
     if main_class:
       job["mainClass"] = main_class
 
-    return self.submit_jobs(cluster_name, [{'sparkJob': job, 'name': None, 'failureAction': 'NONE'}]),
+    return self.submit_jobs(cluster_name, [{'sparkJob': job, 'name': None, 'failureAction': 'NONE'}])
 
   def submit_yarn_job(self):
     return _exec('dataeng', 'submitJobs')
@@ -180,7 +181,7 @@ class DataEngApi():
 
     params = {
       u'additionalClusterResourceTags': [],
-      u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE',
+      u'automaticTerminationCondition': u'NONE',
       u'cdhVersion': u'CDH514',
       u'clouderaManagerPassword': u'guest',
       u'clouderaManagerUsername': u'guest',
@@ -197,11 +198,13 @@ class DataEngApi():
       u'jobs': [{
         u'failureAction': u'INTERRUPT_JOB_QUEUE',
         u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
-        u'sparkJob': {u'applicationArguments': [u'filesystems3.conf'],
+        u'sparkJob': {
+          u'applicationArguments': [u'filesystems3.conf'],
           u'jars': [u's3a://datawarehouse-customer360/ETL/envelope-0.6.0-SNAPSHOT-c6.jar'],
           u'mainClass': u'com.cloudera.labs.envelope.EnvelopeMain',
           u'sparkArguments': u'--archives=s3a://datawarehouse-customer360/ETL/filesystems3.conf'}
-        }],
+        }
+      ],
       u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
       u'publicKey': u'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuTEfNIW8LEcVgprUrourbYjoW1RaTLhfzPnnBjJrg14koQrosl+s9phrpBBLTWmQuQdvy9iC2ma//gY5nz/7e+QuaeENhhoEiZn1PDBbFakD/AOjZXIu6DTEgCrOeXsQauFZKOkcFvrBGJC0qigYU3b8Eys4cun3RQ4S9WkDW6538wOSnsm6sXcL84KqbH+ay5gTk+lz3bi/6plALZMItbRz9IulXnLM4QfCwMxXTU/IjtnT+ltZVvKsWpfvDQ3Oyu/a6gK369iXcSP0e07KAzWiv2WYX46sNzZ8+de9ho1/VMaXnI4WrooV9lxByKWD+WsXkqtctT16VfxpX8CeR romain@unreal\n',
       u'serviceType': u'SPARK',
