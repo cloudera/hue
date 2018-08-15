@@ -2061,7 +2061,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1;
+        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1 || self.type().indexOf('Altus') != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
@@ -2423,7 +2423,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
