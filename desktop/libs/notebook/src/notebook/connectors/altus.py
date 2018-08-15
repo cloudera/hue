@@ -214,8 +214,8 @@ class DataEngApi():
 
     return _exec('dataeng', 'createAWSCluster', params)
 
-  def delete_cluster(self):
-    return _exec('dataeng', 'deleteCluster')
+  def delete_cluster(self, cluster_id):
+    return _exec('dataeng', 'deleteCluster', {'clusterName': cluster_id})
 
   def describe_clusters(self):
     return _exec('dataeng', 'describeCluster')
