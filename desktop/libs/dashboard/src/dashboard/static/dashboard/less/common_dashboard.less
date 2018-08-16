@@ -660,11 +660,19 @@
     }
   }
 
-  .search-bar .form-search .selectize-control {
-    width: 220px;
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 1px;
+  .search-bar .form-search {
+    .selectize-control {
+      width: 220px;
+      display: inline-block;
+      vertical-align: top;
+      border-radius: 0 !important;
+      .selectize-input {
+        border-radius: 0 !important;
+      }
+    }
+    .simple-ace-single-line {
+      border-left: none !important;
+    }
   }
 
   #addFacetDemiModal .inline-autocomplete-container {

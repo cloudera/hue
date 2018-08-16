@@ -1847,6 +1847,7 @@ var Collection = function (vm, collection) {
 
   self.name.subscribe(function(newValue) { // New Dashboard
     if (newValue && (self.engine() == 'solr' || /^[^\.]+\.[^\.]+$/.test(newValue))) {
+      huePubSub.publish('dashboard.switch.collection');
       self.label(newValue);
       self.switchCollection();
       vm.search();
@@ -2262,7 +2263,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       self.collection.syncFields();
       if (self.collection.engine() === 'solr') {
         self.search(callback);
-      } else if (self.collection.engine() === 'report') {
+      }
+      else {
         callback();
       }
     }
