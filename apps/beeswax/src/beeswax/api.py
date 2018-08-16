@@ -49,7 +49,7 @@ from beeswax.views import authorized_get_design, authorized_get_query_history, m
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           parse_out_jobs
 from metastore.conf import FORCE_HS2_METADATA
-from metastore.views import _get_db
+from metastore.views import _get_db, _get_servername
 
 
 LOG = logging.getLogger(__name__)
@@ -670,7 +670,7 @@ def _get_sample_data(db, database, table, column, async=False):
     if async:
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
-          editor_type=db.server_name,
+          editor_type=_get_servername(db),
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,
