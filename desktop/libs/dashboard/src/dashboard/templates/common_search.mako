@@ -62,7 +62,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       </div>
     </div>
     <div class="search-bar-middle">
-      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0, submit: function() { return false }">
+      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length === 0, submit: function() { return false }">
         <!-- ko if: $root.collection.engine() == 'solr' -->
         <!-- ko if: columns().length == 0 -->
         <select data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name, disable: isSyncingCollections, selectizeOptions: { clearable: true }"></select>
@@ -91,9 +91,10 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
         <div class="search-bar-query-container">
           <div class="search-bar-collection" data-bind="visible: $root.collection.engine() != 'report'">
-            <div class="selectMask">
-              <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
-            </div>
+##             <div class="selectMask">
+##               <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
+##             </div>
+            <select data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name, disable: isSyncingCollections, selectizeOptions: { clearable: true }"></select>
           </div>
           <!-- ko if: $root.collection.engine() !== 'report' -->
           <div class="search-bar-query" data-bind="foreach: query.qs">
@@ -243,6 +244,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
 % if not is_report:
 <%dashboard:layout_toolbar>
+  <%def name="skipLayout()"></%def>
   <%def name="results()">
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ data: draggableResultset(), stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
@@ -4155,6 +4157,9 @@ function loadSearch(collection, query, initial) {
         magicSearchLayout(searchViewModel);
       }
     }
+    else {
+      queryBuilderSearchLayout(searchViewModel);
+    }
   });
 
   searchViewModel.isRetrievingResults.subscribe(function(value){
@@ -4220,6 +4225,10 @@ function loadSearch(collection, query, initial) {
   searchViewModel.collection.autorefreshSeconds.subscribe(function (value) {
     checkAutoRefresh();
   });
+
+  huePubSub.subscribe('dashboard.switch.collection', function(){
+    queryBuilderSearchLayout(searchViewModel);
+  }, 'dashboard');
 }
 
 $(document).ready(function () {
