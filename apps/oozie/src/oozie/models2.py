@@ -905,6 +905,19 @@ class Node():
 
       self.data['properties']['files'] = files
       self.data['properties']['archives'] = []
+    elif self.data['type'] == AltusAction.TYPE:
+      shell_command_name = self.data['name'] + '.sh'
+      self.data['properties']['shell_command'] = shell_command_name
+      self.data['properties']['env_var'] = []
+      self.data['properties']['arguments'] = []
+      self.data['properties']['job_properties'] = []
+      self.data['properties']['capture_output'] = True
+
+      files = [{'value': shell_command_name}, {'value': 'altus.py'}]
+
+      self.data['properties']['files'] = files
+      self.data['properties']['archives'] = []
+
 
     data = {
       'node': self.data,
@@ -977,6 +990,8 @@ class Node():
     if self.data['type'] == JavaDocumentAction.TYPE:
       node_type = JavaAction.TYPE
     elif self.data['type'] == ImpalaAction.TYPE or self.data['type'] == ImpalaDocumentAction.TYPE:
+      node_type = ShellAction.TYPE
+    elif self.data['type'] == AltusAction.TYPE:
       node_type = ShellAction.TYPE
 
     return 'editor2/gen/workflow-%s.xml.mako' % node_type
@@ -2131,6 +2146,44 @@ class SparkAction(Action):
     return [cls.FIELDS['files'], cls.FIELDS['jars']]
 
 
+
+class AltusAction(Action):
+  TYPE = 'altus'
+  FIELDS = {
+     'service': {
+          'name': 'service',
+          'label': _('Service'),
+          'value': '',
+          'help_text': _('e.g. dataeng, iam, dataware...'),
+          'type': ''
+     },
+     'command': {
+          'name': 'command',
+          'label': _('Command'),
+          'value': '',
+          'help_text': _('e.g. listClusters, listJobs...'),
+          'type': ''
+     },
+     'parameters': {
+          'name': 'parameters',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('List of parameters provided to the command. e.g. jobId=xxx'),
+     },
+     'capture_output': {
+          'name': 'capture_output',
+          'label': _('Capture output'),
+          'value': True,
+          'help_text': _('Capture output of the stdout of the command execution.'),
+          'type': ''
+     },
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['service'], cls.FIELDS['command']]
+
+
 class KillAction(Action):
   TYPE = 'kill'
   FIELDS = {
@@ -2867,6 +2920,7 @@ NODES = {
   'email-widget': EmailAction,
   'streaming-widget': StreamingAction,
   'distcp-widget': DistCpAction,
+  'altus-widget': AltusAction,
   'kill-widget': KillAction,
   'join-widget': JoinAction,
   'fork-widget': ForkNode,
