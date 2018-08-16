@@ -210,16 +210,39 @@ class Submission(object):
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
         elif action.data['type'] == 'altus':
-          service = 'dataeng' # action.data['properties'].get('script_path')
-          auth_key_id = ALTUS.AUTH_KEY_ID.get()
-          auth_key_secret = ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+          self._create_file(deployment_dir, action.data['name'] + '.sh', '''#!/usr/bin/env bash
+
+export PYTHONPATH=`pwd`
+
+echo 'Starting Altus command...'
+
+python altus.py
+
+          ''')
+
           shell_script = self._generate_altus_action_script(
-            service=service,
-            auth_key_id=auth_key_id,
-            auth_key_secret=auth_key_secret
+            service=action.data['properties'].get('service'),
+            command=action.data['properties'].get('command'),
+            arguments=dict([arg.split('=', 1) for arg in action.data['properties'].get('arguments', [])]),
+            auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+            auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
           )
-          self._create_file(deployment_dir, action.data['name'] + '.py', shell_script)
-          self.fs.do_as_user(self.user, self.fs.copyFromLocal, os.path.join(get_desktop_root(), 'core', 'ext-py', 'navoptapi-0.1.0'), self.job.deployment_dir)
+          self._create_file(deployment_dir, 'altus.py', shell_script)
+
+          ext_py_lib_path = os.path.join(get_desktop_root(), 'core', 'ext-py')
+          lib_dir_path = os.path.join(self.job.deployment_dir, 'lib')
+          libs = [
+            (os.path.join(ext_py_lib_path, 'navoptapi-0.1.0'), 'navoptapi'),
+            (os.path.join(ext_py_lib_path, 'navoptapi-0.1.0'), 'altuscli'),
+            (os.path.join(ext_py_lib_path, 'asn1crypto-0.24.0'), 'asn1crypto'),
+            (os.path.join(ext_py_lib_path, 'rsa-3.4.2'), 'rsa'),
+            (os.path.join(ext_py_lib_path, 'pyasn1-0.1.8'), 'pyasn1'),
+          ]
+          for source_path, name in libs:
+            destination_path = os.path.join(lib_dir_path, name)
+            if not self.fs.do_as_user(self.user, self.fs.exists, destination_path):
+              # Note: would be much faster to have only one zip archive
+              self.fs.do_as_user(self.user, self.fs.copyFromLocal, os.path.join(source_path, name), destination_path)
 
         elif action.data['type'] == 'impala' or action.data['type'] == 'impala-document':
           from oozie.models2 import _get_impala_url
@@ -527,7 +550,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
     LOG.debug("Created/Updated %s" % (file_path,))
 
-  def _generate_altus_action_script(self, service,  auth_key_id, auth_key_secret):
+  def _generate_altus_action_script(self, service, command, arguments, auth_key_id, auth_key_secret):
     if service == 'analyticdb' or service == 'dataware':
       hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
     elif service == 'dataeng':
@@ -543,7 +566,7 @@ from navoptapi.api_lib import ApiLib
 
 hostname = '%(hostname)s'
 auth_key_id = '%(auth_key_id)s'
-auth_key_secret = '%(auth_key_secret)s'
+auth_key_secret = '''%(auth_key_secret)s'''
 
 def _exec(service, command, parameters=None):
   if parameters is None:
@@ -554,15 +577,16 @@ def _exec(service, command, parameters=None):
     resp = api.call_api(command, parameters)
     return resp.json()
   except Exception, e:
+    print e
     raise e
 
-_exec('%(service)s', '%(command)s', %(args)s)
+print _exec('%(service)s', '%(command)s', %(args)s)
 
 """ % {
       'hostname': hostname,
       'service': service,
-      'command': 'listJobs',
-      'args': {},
+      'command': command,
+      'args': arguments,
       'auth_key_id': auth_key_id,
       'auth_key_secret': auth_key_secret
     }

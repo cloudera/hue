@@ -121,7 +121,7 @@ def test_copy_files():
     else:
       list_dir_workspace = cluster.fs.listdir(deployment_dir)
       list_dir_deployement = cluster.fs.listdir(external_deployment_dir)
-  
+
       # All destinations there
       assert_true(cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace)
       assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
@@ -129,23 +129,23 @@ def test_copy_files():
       assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
       assert_true(cluster.fs.exists(deployment_dir + '/udf5.jar'), list_dir_workspace)
       assert_true(cluster.fs.exists(deployment_dir + '/udf6.jar'), list_dir_workspace)
-  
+
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf5.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf6.jar'), list_dir_deployement)
-  
+
       stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
       stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
       stats_udf3 = cluster.fs.stats(deployment_dir + '/udf3.jar')
       stats_udf4 = cluster.fs.stats(deployment_dir + '/udf4.jar')
       stats_udf5 = cluster.fs.stats(deployment_dir + '/udf5.jar')
       stats_udf6 = cluster.fs.stats(deployment_dir + '/udf6.jar')
-  
+
       submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>", {'prop1': 'val1'})
-  
+
       assert_not_equal(stats_udf1['fileId'], cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId'])
       assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
       assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
@@ -422,13 +422,21 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
     user = User.objects.get(username='test')
     submission = Submission(user, job=TestJob(), fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
 
+    command = submission._generate_altus_action_script(
+      service='dataeng',
+      command='listClusters',
+      arguments={},
+      auth_key_id='altus_auth_key_id',
+      auth_key_secret='altus_auth_key_secret'
+    )
+
     assert_true('''#!/usr/bin/env python
 
 from navoptapi.api_lib import ApiLib
 
 hostname = 'dataengapi.us-west-1.altus.cloudera.com'
 auth_key_id = 'altus_auth_key_id'
-auth_key_secret = 'altus_auth_key_secret'
+auth_key_secret = \'\'\'altus_auth_key_secret\'\'\'
 
 def _exec(service, command, parameters=None):
   if parameters is None:
@@ -439,12 +447,10 @@ def _exec(service, command, parameters=None):
     resp = api.call_api(command, parameters)
     return resp.json()
   except Exception, e:
+    print e
     raise e
 
-_exec('dataeng', 'listJobs', {})
-''' in submission._generate_altus_action_script(
-        service='dataeng',
-        auth_key_id='altus_auth_key_id',
-        auth_key_secret='altus_auth_key_secret'
-      )
+print _exec('dataeng', 'listClusters', {})
+''' in command,
+      command
     )
