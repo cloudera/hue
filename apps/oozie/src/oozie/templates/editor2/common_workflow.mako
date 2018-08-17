@@ -643,7 +643,9 @@
         <i class="fa fa-spinner fa-spin muted"></i>
       <!-- /ko -->
       <!-- ko with: associatedDocument -->
-        <a data-bind="hueLink: absoluteUrl"><span data-bind='text: name'></span></a>
+        <a data-bind="documentContextPopover: { uuid: absoluteUrl.split('=')[1], orientation: 'right', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+          <span data-bind="text: name"></span> <i class="fa fa-info"></i>
+        </a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
@@ -655,7 +657,7 @@
           <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
         </div>
         <!-- ko if: associatedDocument -->
-          <a class="pointer" data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
+          <a data-bind="documentContextPopover: { uuid: associatedDocument().absoluteUrl.split('=')[1], orientation: 'right', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
             <i class="fa fa-external-link-square"></i>
           </a>
           <div class="clearfix"></div>

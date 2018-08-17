@@ -19,11 +19,6 @@
 import json
 import logging
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
-
 from django.http import Http404
 from django.utils.html import escape
 from django.utils.translation import ugettext as _

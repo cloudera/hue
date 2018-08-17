@@ -1970,6 +1970,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
+
 <script type="text/html" id="link-or-text${ SUFFIX }">
   <!-- ko if: typeof $data.value === 'string' -->
     <!-- ko if: $data.name.indexOf('logs') > -1 || $data.name.indexOf('trackingUrl') > -1 -->
@@ -1987,6 +1988,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <span data-bind="text: $data.value"></span>
   <!-- /ko -->
 </script>
+
 
 <script type="text/javascript">
 
