@@ -2122,7 +2122,7 @@ from desktop.views import _ko
                   }, params.sql)),
                   apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
-                  type: 'kafka',
+                  type: 'solr',
                   icon: 'fa-sitemap',
                   minHeight: 75
                 });
