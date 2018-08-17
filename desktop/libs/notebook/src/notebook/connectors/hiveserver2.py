@@ -206,6 +206,14 @@ class HS2Api(Api):
   def close_session(self, session):
     app_name = session.get('type')
     session_id = session.get('id')
+    source_method = session.get("sourceMethod")
+
+    if not session_id:
+      session = Session.objects.get_session(self.user, application=app_name)
+      decoded_guid = session.get_handle().sessionId.guid
+      session_decoded_id = "%x:%x" % struct.unpack(b"QQ", decoded_guid)
+      if source_method == "dt_logout":
+        LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
 
     query_server = get_query_server_config(name=app_name)
 

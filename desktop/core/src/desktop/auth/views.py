@@ -48,6 +48,7 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import get_profile
 from useradmin.views import ensure_home_directory, require_change_password
+from notebook.connectors.base import get_api
 
 LOG = logging.getLogger(__name__)
 
@@ -201,6 +202,15 @@ def dt_logout(request, next_page=None):
     'operation': 'USER_LOGOUT',
     'operationText': 'Logged out user: %s' % username
   }
+
+  # Close Impala session on logout
+  session_app = "impala"
+  if request.user.has_hue_permission(action='access', app=session_app):
+    session = {"type":session_app,"sourceMethod":"dt_logout"}
+    try:
+      get_api(request, session).close_session(session)
+    except Exception, e:
+      LOG.warn("Error closing Impala session: %s" % e)
 
   backends = get_backends()
   if backends:
