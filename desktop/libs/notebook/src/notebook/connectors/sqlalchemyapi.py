@@ -74,7 +74,7 @@ class SqlAlchemyApi(Api):
         'data': data if has_result_set else [],
         'meta': [{
           'name': col[0] if type(col) is dict or type(col) is tuple else col,
-          'type': col[1] if type(col) is dict or type(col) is tuple else '', #TODO: resolve
+          'type': 'String', #TODO: resolve
           'comment': ''
         } for col in metadata] if has_result_set else [],
         'type': 'table'
@@ -164,22 +164,23 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)
     response = {'status': -1}
 
     metadata, sample_data = assist.get_sample_data(database, table, column)
+    has_result_set = sample_data is not None
 
     if sample_data:
       response['status'] = 0
-      response['headers'] = [
-        col[0] if type(col) is dict or type(col) is tuple else col
-        for col in metadata]
       response['rows'] = escape_rows(sample_data)
-    else:
-      response['message'] = _('Failed to get sample data.')
+      response['full_headers'] = [{
+          'name': col[0] if type(col) is dict or type(col) is tuple else col,
+          'type': 'String', #TODO: resolve
+          'comment': ''
+        } for col in metadata] if has_result_set else []
 
     return response
 
