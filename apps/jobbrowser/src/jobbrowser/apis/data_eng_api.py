@@ -29,6 +29,9 @@ from jobbrowser.apis.base_api import Api
 LOG = logging.getLogger(__name__)
 
 
+RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
+
+
 class DataEngClusterApi(Api):
 
   def apps(self, filters):
@@ -113,12 +116,12 @@ class DataEngJobApi(Api):
     return {
       'apps': [{
         'id': app['jobId'],
-        'name': app['creationDate'],
+        'name': app['jobName'],
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
         'type': 'Altus %(jobType)s' % app,
         'user': '',
-        'progress': 100,
+        'progress': 50 if self._api_status(app['status']) == 'RUNNING' else 100,
         'duration': 10 * 3600,
         'submitted': app['creationDate'],
         'canWrite': True
@@ -133,10 +136,10 @@ class DataEngJobApi(Api):
 
     common = {
         'id': job['jobId'],
-        'name': job['jobId'],
+        'name': job['jobName'],
         'status': job['status'],
         'apiStatus': self._api_status(job['status']),
-        'progress': 50,
+        'progress': 50 if self._api_status(job['status']) == 'RUNNING' else 100,
         'duration': 10 * 3600,
         'submitted': job['creationDate'],
         'type': 'dataeng-job-%s' % job['jobType'],
@@ -162,7 +165,7 @@ class DataEngJobApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'TERMINATING']:
+    if status in RUNNING_STATES:
       return 'RUNNING'
     elif status in ['COMPLETED']:
       return 'SUCCEEDED'

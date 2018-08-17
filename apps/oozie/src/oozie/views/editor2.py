@@ -405,11 +405,11 @@ def _submit_workflow_helper(request, workflow, submit_action):
       if '/submit_single_action/' in submit_action:
         mapping['submit_single_action'] = True
 
-      if cluster.get('type') == 'altus-de':
+      if 'altus' in cluster.get('type', ''):
         notebook = {}
-        snippet = {'statement': 'SELECT 1'}
+        snippet = {'statement': 'SELECT 1', 'type': 'hive'}
         handle = DataEngApi(user=request.user, request=request, cluster_name=cluster.get('name')).execute(notebook, snippet)
-        return JsonResponse({'status': 0, 'job_id': handle.get('id'), 'type': 'workflow'}, safe=False)
+        return JsonResponse({'status': 0, 'job_id': handle.get('id'), 'type': 'Altus HIVE'}, safe=False)
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
