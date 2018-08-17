@@ -25,12 +25,10 @@ from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
 from notebook.connectors.altus import DataEngApi as AltusDataEngApi
 from notebook.connectors.base import Api, QueryError
+from jobbrowser.apis.data_eng_api import RUNNING_STATES
 
 
 LOG = logging.getLogger(__name__)
-
-
-RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
 
 
 class DataEngApi(Api):
@@ -41,7 +39,6 @@ class DataEngApi(Api):
 
 
   def execute(self, notebook, snippet):
-    statement = snippet['statement']
 
     if snippet['type'] == 'spark2':
       handle = AltusDataEngApi(self.user).submit_spark_job(
@@ -53,7 +50,11 @@ class DataEngApi(Api):
 #           properties_file
       )
     else:
+      statement = snippet['statement']
       handle = AltusDataEngApi(self.user).submit_hive_job(self.cluster_name, statement, params=None, job_xml=None)
+
+    if 'jobs' not in handle:
+      raise QueryError('Submission failure: %s' % handle)
 
     job = handle['jobs'][0]
 

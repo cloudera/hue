@@ -53,7 +53,7 @@ def _exec(service, command, parameters=None):
     resp = api.call_api(command, parameters)
     LOG.info(resp)
     json_resp = resp.json()
-    LOG.debug(json_resp )
+    LOG.debug(json_resp)
     return json_resp
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
