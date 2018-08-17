@@ -54,6 +54,7 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
+
 <script type="text/html" id="indexes-breadcrumbs">
   <h1>
     <!-- ko with: index() -->
@@ -153,8 +154,11 @@ ${ assist.assistPanel() }
               </%def>
 
               <%def name="creation()">
-                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/kafka'">
+                <a data-bind="click: function() { $root.alias.name(''); $root.alias.chosenCollections.removeAll(); $('#createAlias').modal('show'); }" class="btn">
                   <i class="fa fa-plus-circle"></i> ${ _('Create') }
+                </a>
+                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/kafka'">
+                  <i class="fa fa-cloud-download"></i> ${ _('Consume') }
                 </a>
               </%def>
             </%actionbar:render>

@@ -46,6 +46,8 @@ class KafkaApiException(Exception):
 class KafkaApi(object):
   """
   https://github.com/confluentinc/kafka-rest
+  
+  create/delete topics are not available in the REST API.
   """
 
   def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
