@@ -784,7 +784,6 @@ class Node():
     if self.data['type'] in ('hive2', 'hive-document') and not self.data['properties']['jdbc_url']:
       self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
 
-
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
       if len(links) != len(self.data['children']):
@@ -792,7 +791,17 @@ class Node():
                  % (len(links), len(self.data['children']), links, self.data['children']))
         self.data['children'] = links
 
-    if self.data['type'] == JavaDocumentAction.TYPE:
+    if self.data['type'] == AltusAction.TYPE or ('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE or self.data['type'] == 'spark-document')):
+      shell_command_name = self.data['name'] + '.sh'
+      self.data['properties']['shell_command'] = shell_command_name
+      self.data['properties']['env_var'] = []
+      self.data['properties']['arguments'] = []
+      self.data['properties']['job_properties'] = []
+      self.data['properties']['capture_output'] = True
+      self.data['properties']['files'] = [{'value': shell_command_name}, {'value': 'altus.py'}]
+      self.data['properties']['archives'] = []
+
+    elif self.data['type'] == JavaDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
       properties = notebook.get_data()['snippets'][0]['properties']
 
@@ -912,18 +921,6 @@ class Node():
 
       self.data['properties']['files'] = files
       self.data['properties']['archives'] = []
-    elif self.data['type'] == AltusAction.TYPE:
-      shell_command_name = self.data['name'] + '.sh'
-      self.data['properties']['shell_command'] = shell_command_name
-      self.data['properties']['env_var'] = []
-      self.data['properties']['arguments'] = []
-      self.data['properties']['job_properties'] = []
-      self.data['properties']['capture_output'] = True
-
-      files = [{'value': shell_command_name}, {'value': 'altus.py'}]
-
-      self.data['properties']['files'] = files
-      self.data['properties']['archives'] = []
 
 
     data = {
@@ -949,7 +946,7 @@ class Node():
         if self.data['type'] == EndNode.TYPE:
           self.data['properties']['body'] = 'View result file at %(send_result_browse_url)s' % mapping
 
-    return django_mako.render_to_string(self.get_template_name(), data)
+    return django_mako.render_to_string(self.get_template_name(mapping), data)
 
   @property
   def id(self):
@@ -992,13 +989,18 @@ class Node():
     # Backward compatibility
     _upgrade_older_node(self.data)
 
-  def get_template_name(self):
+  def get_template_name(self, mapping=None):
+    if mapping is None:
+      mapping = {}
+
     node_type = self.data['type']
     if self.data['type'] == JavaDocumentAction.TYPE:
       node_type = JavaAction.TYPE
     elif self.data['type'] == ImpalaAction.TYPE or self.data['type'] == ImpalaDocumentAction.TYPE:
       node_type = ShellAction.TYPE
     elif self.data['type'] == AltusAction.TYPE:
+      node_type = ShellAction.TYPE
+    elif mapping.get('cluster') and 'document' in node_type:
       node_type = ShellAction.TYPE
 
     return 'editor2/gen/workflow-%s.xml.mako' % node_type

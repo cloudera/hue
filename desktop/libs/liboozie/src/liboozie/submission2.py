@@ -210,7 +210,9 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
-        elif action.data['type'] == 'altus':
+        elif action.data['type'] == 'altus' or (action.data['type'] == 'spark-document' and 'altus' in self.properties.get('cluster', '')):
+          is_altus_job = 'altus' in self.properties.get('cluster', '')
+
           self._create_file(deployment_dir, action.data['name'] + '.sh', '''#!/usr/bin/env bash
 
 export PYTHONPATH=`pwd`
@@ -221,13 +223,31 @@ python altus.py
 
           ''')
 
-          shell_script = self._generate_altus_action_script(
-            service=action.data['properties'].get('service'),
-            command=action.data['properties'].get('command'),
-            arguments=dict([arg.split('=', 1) for arg in action.data['properties'].get('arguments', [])]),
-            auth_key_id=ALTUS.AUTH_KEY_ID.get(),
-            auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
-          )
+          if is_altus_job:
+            shell_script = self._generate_altus_job_action_script(
+                service='dataeng',
+                cluster=self.properties['cluster'],
+                jobs=[{
+                    'sparkJob': {
+                        'jars': [u's3a://datawarehouse-customer360/ETL/spark-examples.jar'],
+                        'mainClass': u'org.apache.spark.examples.SparkPi ',
+                        'applicationArguments': [u'10']
+                      },
+                    'name': None,
+                    'failureAction': 'NONE'
+                }],
+                auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+            )
+          else:
+            shell_script = self._generate_altus_action_script(
+                service=action.data['properties'].get('service'),
+                command=action.data['properties'].get('command'),
+                arguments=dict([arg.split('=', 1) for arg in action.data['properties'].get('arguments', [])]),
+                auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+            )
+            
           self._create_file(deployment_dir, 'altus.py', shell_script)
 
           ext_py_lib_path = os.path.join(get_desktop_root(), 'core', 'ext-py')
@@ -596,6 +616,72 @@ print _exec('%(service)s', '%(command)s', %(args)s)
       'service': service,
       'command': command,
       'args': arguments,
+      'auth_key_id': auth_key_id,
+      'auth_key_secret': auth_key_secret
+    }
+
+  def _generate_altus_job_action_script(self, service, cluster, jobs, auth_key_id, auth_key_secret):
+    if service == 'analyticdb' or service == 'dataware':
+      hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
+    elif service == 'dataeng':
+      hostname = ALTUS.HOSTNAME_DATAENG.get()
+    elif service == 'wa':
+      hostname = ALTUS.HOSTNAME_WA.get()
+    else:
+      hostname = ALTUS.HOSTNAME.get()
+
+    return """#!/usr/bin/env python
+
+import time
+
+from ast import literal_eval
+
+from navoptapi.api_lib import ApiLib
+
+hostname = '%(hostname)s'
+cluster = '%(cluster)s'
+auth_key_id = '%(auth_key_id)s'
+auth_key_secret = '''%(auth_key_secret)s'''
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    print e
+    raise e
+
+
+try:
+  handle = _exec('%(service)s', 'submitJobs', {'clusterName': cluster, 'jobs': literal_eval("%(jobs)s")})
+  
+  job_id = handle['jobs'][0]['jobId']
+  status = 'QUEUED'
+  print 'Job submitted: %%s' %% job_id
+
+  while status in ('QUEUED', 'RUNNING', 'SUBMITTING'):
+    time.sleep(5)
+
+    print 'Checking status...'
+    status = _exec('%(service)s', 'describeJob', {'jobId': job_id})['job']['status']
+
+  if status != 'COMPLETED':
+    raise Exception('Job %%s failed %%s' %% (job_id, status))
+  else:
+    print 'Job %%s completed successfully' %% job_id
+except Exception, e:
+  print e
+  raise e
+
+""" % {
+      'hostname': hostname,
+      'service': service,
+      'cluster': cluster,
+      'jobs': repr(jobs),
       'auth_key_id': auth_key_id,
       'auth_key_secret': auth_key_secret
     }
