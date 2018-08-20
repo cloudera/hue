@@ -210,8 +210,11 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
-        elif action.data['type'] == 'altus' or (action.data['type'] == 'spark-document' and 'altus' in self.properties.get('cluster', '')):
-          is_altus_job = 'altus' in self.properties.get('cluster', '')
+        elif action.data['type'] == 'altus' or \
+            (action.data['type'] == 'spark-document' and 'altus' in self.properties.get('cluster', '')) or \
+            (self.properties.get('auto-cluster') and 'document' in action.data['type']):
+          is_altus_job = 'altus' in self.properties.get('cluster', '') and action.data['type'] != 'altus'
+          is_scheduled_altus_job = self.properties.get('auto-cluster')
 
           self._create_file(deployment_dir, action.data['name'] + '.sh', '''#!/usr/bin/env bash
 
@@ -236,6 +239,14 @@ python altus.py
                     'name': None,
                     'failureAction': 'NONE'
                 }],
+                auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+            )
+          elif is_scheduled_altus_job:
+            shell_script = self._generate_altus_job_action_script(
+                service='dataeng',
+                cluster=self.properties['auto-cluster'],
+                jobs=[],
                 auth_key_id=ALTUS.AUTH_KEY_ID.get(),
                 auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
             )
@@ -559,9 +570,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       if self._do_as(self.user.username , self.fs.exists, path):
         self._do_as(self.user.username , self.fs.rmtree, path)
     except Exception, ex:
-      LOG.warn("Failed to clean up workflow deployment directory for "
-               "%s (owner %s). Caused by: %s",
-               self.job.name, self.user, ex)
+      LOG.warn("Failed to clean up workflow deployment directory for %s (owner %s). Caused by: %s", self.job.name, self.user, ex)
 
   def _is_workflow(self):
     from oozie.models2 import Workflow
@@ -630,6 +639,13 @@ print _exec('%(service)s', '%(command)s', %(args)s)
     else:
       hostname = ALTUS.HOSTNAME.get()
 
+    if type(cluster) == dict:
+      command = 'createAWSCluster'
+      arguments = cluster
+    else:
+      command = 'submitJobs'
+      arguments = {'clusterName': cluster, 'jobs': jobs}
+
     return """#!/usr/bin/env python
 
 import time
@@ -639,7 +655,7 @@ from ast import literal_eval
 from navoptapi.api_lib import ApiLib
 
 hostname = '%(hostname)s'
-cluster = '%(cluster)s'
+arguments = literal_eval("%(arguments)s")
 auth_key_id = '%(auth_key_id)s'
 auth_key_secret = '''%(auth_key_secret)s'''
 
@@ -656,32 +672,36 @@ def _exec(service, command, parameters=None):
     raise e
 
 
-try:
-  handle = _exec('%(service)s', 'submitJobs', {'clusterName': cluster, 'jobs': literal_eval("%(jobs)s")})
+try:    
+  handle = _exec('%(service)s', '%(command)s', arguments)
   
-  job_id = handle['jobs'][0]['jobId']
-  status = 'QUEUED'
-  print 'Job submitted: %%s' %% job_id
+  if 'create' in '%(command)s':
+    handle = _exec('%(service)s', 'listJobs', {'clusterCrn': handle['cluster']['crn']})
 
-  while status in ('QUEUED', 'RUNNING', 'SUBMITTING'):
-    time.sleep(5)
-
-    print 'Checking status...'
-    status = _exec('%(service)s', 'describeJob', {'jobId': job_id})['job']['status']
-
-  if status != 'COMPLETED':
-    raise Exception('Job %%s failed %%s' %% (job_id, status))
-  else:
-    print 'Job %%s completed successfully' %% job_id
+  while handle['jobs']:
+    job = handle['jobs'].pop(0)
+    status = 'QUEUED'
+    print 'Job submitted: %%(jobId)s' %% job
+  
+    while status in ('QUEUED', 'RUNNING', 'SUBMITTING'):
+      time.sleep(5)
+  
+      print 'Checking status...'
+      status = _exec('%(service)s', 'describeJob', {'jobId': job['jobId']})['job']['status']
+  
+    if status != 'COMPLETED':
+      raise Exception('Job %%s failed %%s' %% (job['jobId'], status))
+    else:
+      print 'Job %%(jobId)s completed successfully' %% job
 except Exception, e:
   print e
   raise e
 
 """ % {
-      'hostname': hostname,
       'service': service,
-      'cluster': cluster,
-      'jobs': repr(jobs),
+      'hostname': hostname,      
+      'command': command,
+      'arguments': repr(arguments),
       'auth_key_id': auth_key_id,
       'auth_key_secret': auth_key_secret
     }

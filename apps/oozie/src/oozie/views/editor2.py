@@ -721,6 +721,57 @@ def submit_coordinator(request, doc_id):
 def _submit_coordinator(request, coordinator, mapping):
   try:
     wf = coordinator.workflow
+    mapping['auto-cluster'] = {
+      u'additionalClusterResourceTags': [],
+      u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE', #'u'NONE',
+      u'cdhVersion': u'CDH514',
+      u'clouderaManagerPassword': u'guest',
+      u'clouderaManagerUsername': u'guest',
+      u'clusterName': u'analytics4', # Add time variable
+      u'computeWorkersConfiguration': {
+        u'bidUSDPerHr': 0,
+        u'groupSize': 0,
+        u'useSpot': False
+      },
+      u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',
+      u'instanceBootstrapScript': u'',
+      u'instanceType': u'm4.xlarge',
+      u'jobSubmissionGroupName': u'',
+      u'jobs': [{
+          u'failureAction': u'INTERRUPT_JOB_QUEUE',
+          u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
+          u'sparkJob': {
+            u'applicationArguments': ['5'],
+            u'jars': [u's3a://datawarehouse-customer360/ETL/spark-examples.jar'],
+            u'mainClass': u'org.apache.spark.examples.SparkPi'
+          }
+        },
+#         {
+#           u'failureAction': u'INTERRUPT_JOB_QUEUE',
+#           u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
+#           u'sparkJob': {
+#             u'applicationArguments': ['10'],
+#             u'jars': [u's3a://datawarehouse-customer360/ETL/spark-examples.jar'],
+#             u'mainClass': u'org.apache.spark.examples.SparkPi'
+#           }
+#         },
+#         {
+#           u'failureAction': u'INTERRUPT_JOB_QUEUE',
+#           u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
+#           u'sparkJob': {
+#             u'applicationArguments': [u'filesystems3.conf'],
+#             u'jars': [u's3a://datawarehouse-customer360/ETL/envelope-0.6.0-SNAPSHOT-c6.jar'],
+#             u'mainClass': u'com.cloudera.labs.envelope.EnvelopeMain',
+#             u'sparkArguments': u'--archives=s3a://datawarehouse-customer360/ETL/filesystems3.conf'
+#           }
+#         }
+      ],
+      u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
+      u'publicKey': u'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuTEfNIW8LEcVgprUrourbYjoW1RaTLhfzPnnBjJrg14koQrosl+s9phrpBBLTWmQuQdvy9iC2ma//gY5nz/7e+QuaeENhhoEiZn1PDBbFakD/AOjZXIu6DTEgCrOeXsQauFZKOkcFvrBGJC0qigYU3b8Eys4cun3RQ4S9WkDW6538wOSnsm6sXcL84KqbH+ay5gTk+lz3bi/6plALZMItbRz9IulXnLM4QfCwMxXTU/IjtnT+ltZVvKsWpfvDQ3Oyu/a6gK369iXcSP0e07KAzWiv2WYX46sNzZ8+de9ho1/VMaXnI4WrooV9lxByKWD+WsXkqtctT16VfxpX8CeR romain@unreal\\n',
+      u'serviceType': u'SPARK',
+      u'workersConfiguration': {},
+      u'workersGroupSize': u'3'
+    }
     wf_dir = Submission(request.user, wf, request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
