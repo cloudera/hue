@@ -217,7 +217,7 @@ class DataEngApi():
       u'serviceType': u'SPARK',
       u'workersConfiguration': {},
       u'workersGroupSize': u'3'
-  }
+    }
 
     return _exec('dataeng', 'createAWSCluster', params)
 
