@@ -924,6 +924,19 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       assert_equal('test2', dir_stat.group)
       assert_equal('40755', '%o' % dir_stat.mode)
 
+      # special character in username ctestë01
+      path_with_special_char = '/user/ctestë01'.decode("utf-8")
+      if cluster.fs.exists(path_with_special_char):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
+      response = c.post('/useradmin/users/new', dict(username='ctestë01', password1='test', password2='test', ensure_home_directory=True))
+      assert_true(cluster.fs.exists(path_with_special_char))
+      dir_stat = cluster.fs.stats(path_with_special_char)
+      assert_equal(u'ctestë01', dir_stat.user)
+      assert_equal(u'ctestë01', dir_stat.group)
+      assert_equal('40755', '%o' % dir_stat.mode)
+      if cluster.fs.exists(path_with_special_char):  # clean special characters
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
+
       # Ignore domain in username when importing LDAP users
       # eg: Ignore '@ad.sec.cloudera.com' when importing 'test@ad.sec.cloudera.com'
       resets.append(desktop.conf.LDAP.LDAP_URL.set_for_testing('default.example.com'))
