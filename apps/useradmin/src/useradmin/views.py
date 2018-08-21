@@ -805,6 +805,8 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
+    if not isinstance(home_directory, unicode):
+      home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
     LOG.warn("Not creating home directory of %s as his profile is empty" % user)
