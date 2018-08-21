@@ -52,7 +52,7 @@ class KafkaApi(object):
   """
 
   def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
-    self._api_url = KAFKA.API_URL.get().strip('/')
+    self._api_url = KAFKA.API_URL.get().strip('/') if KAFKA.API_URL.get() else ''
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
@@ -65,6 +65,7 @@ class KafkaApi(object):
       return json.loads(response)
     except RestException, e:
       raise KafkaApiException(e)
+
 
   def create_topic(self, name, partitions=1, replication_factor=1):
     # Create/delete topics are not available in the REST API.

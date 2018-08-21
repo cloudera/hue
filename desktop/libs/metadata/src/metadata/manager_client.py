@@ -65,6 +65,19 @@ class ManagerApi(object):
     self._root = Resource(self._client)
 
 
+  def has_service(self, service_name, cluster_name=None):
+    cluster = self._get_cluster(cluster_name)
+    try:
+      services = self._root.get('clusters/%(cluster_name)s/serviceTypes' % {
+        'cluster_name': cluster['name'],
+        'service_name': service_name
+      })['items']
+
+      return service_name in services
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
   def tools_echo(self):
     try:
       params = (
@@ -79,7 +92,7 @@ class ManagerApi(object):
 
   def get_kafka_brokers(self, cluster_name=None):
     try:
-      cluster = self._get_services(cluster_name)
+      cluster = self._get_cluster(cluster_name)
       services = self._root.get('clusters/%(name)s/services' % cluster)['items']
 
       service = [service for service in services if service['type'] == 'KAFKA'][0]
@@ -96,7 +109,7 @@ class ManagerApi(object):
 
   def get_kudu_master(self, cluster_name=None):
     try:
-      cluster = self._get_services(cluster_name)
+      cluster = self._get_cluster(cluster_name)
       services = self._root.get('clusters/%(name)s/services' % cluster)['items']
 
       service = [service for service in services if service['type'] == 'KUDU'][0]
@@ -119,7 +132,7 @@ class ManagerApi(object):
       raise ManagerApiException(e)
 
 
-  def _get_services(self, cluster_name=None):
+  def _get_cluster(self, cluster_name=None):
     clusters = self._root.get('clusters/')['items']
 
     if cluster_name is not None:
