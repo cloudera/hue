@@ -166,6 +166,7 @@ def execute(request, engine=None):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   response = _execute_notebook(request, notebook, snippet)
+  print response
 
   return JsonResponse(response)
 

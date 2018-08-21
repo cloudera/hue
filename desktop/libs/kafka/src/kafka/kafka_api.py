@@ -80,6 +80,24 @@ def list_topic(request):
   })
 
 
+@error_handler
+def create_topic(request):
+  name = request.POST.get('name')
+  partitions = request.POST.get('partitions', 1)
+  replication_factor = request.POST.get('replication_factor', 1)
+
+  status = KafkaApi().create_topic(name, partitions, replication_factor)
+
+  return JsonResponse({
+    'status': status,
+    'topic': {
+      'name': name,
+      'partitions': partitions,
+      'replication_factor': replication_factor
+    }
+  })
+
+
 def get_topics():
   if has_kafka_api():
     return KafkaApi().topics()

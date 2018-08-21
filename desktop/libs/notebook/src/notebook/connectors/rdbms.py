@@ -15,10 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 
-from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
 
 from beeswax import data_export
