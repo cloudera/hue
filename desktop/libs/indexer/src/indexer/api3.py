@@ -485,7 +485,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
   collection_name = destination['name']
   indexer = EnvelopeIndexer(request.user, request.fs)
 
-  lib_path = '/tmp/envelope-0.5.0.jar'
+  lib_path = '/tmp/envelope-0.6.0-SNAPSHOT-c6.jar'
   input_path = None
 
   if file_format['inputFormat'] == 'table':
