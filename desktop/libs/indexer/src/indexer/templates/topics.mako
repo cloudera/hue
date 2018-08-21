@@ -154,7 +154,7 @@ ${ assist.assistPanel() }
               </%def>
 
               <%def name="creation()">
-                <a data-bind="click: function() { $root.alias.name(''); $root.alias.chosenCollections.removeAll(); $('#createAlias').modal('show'); }" class="btn">
+                <a data-bind="click: function() { $root.alias.name(''); $('#createAlias').modal('show'); }" class="btn">
                   <i class="fa fa-plus-circle"></i> ${ _('Create') }
                 </a>
                 <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/kafka'">
@@ -210,6 +210,22 @@ ${ assist.assistPanel() }
                 <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
               </div>
             </form>
+          </div>
+
+          <div id="createAlias" class="modal hide fade">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+              <h2 class="modal-title">${ _('Create topic') }</h2>
+            </div>
+            <div class="modal-body">
+              <label class="margin-bottom-20">${ _('Name') } <input type="text" data-bind="textInput: alias.name" class="input-xlarge no-margin-bottom margin-left-10"></label>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+              <button class="btn btn-primary disable-feedback" data-bind="click: alias.create, enable: alias.name() !== ''">
+                  ${ _('Create') }
+              </button>
+            </div>
           </div>
 
         </div>
@@ -501,14 +517,11 @@ ${ assist.assistPanel() }
       });
 
       self.create = function () {
-        $.post("${ url('indexer:create_alias') }", {
-          "name": self.name,
-          "collections": ko.mapping.toJSON($.map(self.chosenCollections(), function (collection) {
-            return collection.name();
-          }))
+        $.post("${ url('kafka:create_topic') }", {
+          "name": self.name
         }, function (data) {
           if (data.status == 0) {
-            vm.indexes.push(ko.mapping.fromJS(data.alias));
+            vm.indexes.push(ko.mapping.fromJS(data.topic));
             huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
@@ -517,13 +530,7 @@ ${ assist.assistPanel() }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
         });
-        hueAnalytics.log('indexes', 'create_alias');
-      }
-
-      self.edit = function (alias) {
-        self.name(alias.name());
-        self.chosenCollections($.grep(vm.indexes(), function(collection) { return alias.collections().indexOf(collection.name()) != -1; }));
-        $('#createAlias').modal('show');
+        hueAnalytics.log('kafka', 'create_topic');
       }
     };
 
