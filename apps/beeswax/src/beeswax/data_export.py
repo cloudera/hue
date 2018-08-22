@@ -33,7 +33,7 @@ FETCH_SIZE = 1000
 DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
 
-def download(handle, format, db, id=None, file_name='query_result', user_agent=None):
+def download(handle, format, db, id=None, file_name='query_result', user_agent=None, callback=None):
   """
   download(query_model, format) -> HttpResponse
 
@@ -46,7 +46,7 @@ def download(handle, format, db, id=None, file_name='query_result', user_agent=N
   max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
   max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes, callback=callback)
   generator = export_csvxls.create_generator(content_generator, format)
 
   resp = export_csvxls.make_response(generator, format, file_name, user_agent=user_agent)
@@ -83,7 +83,7 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
 
 class HS2DataAdapter:
 
-  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1):
+  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None):
     self.handle = handle
     self.db = db
     self.max_rows = max_rows
@@ -92,6 +92,7 @@ class HS2DataAdapter:
     self.fetch_size = FETCH_SIZE
     self.limit_rows = max_rows > -1
     self.limit_bytes = max_bytes > -1
+    self.callback = callback
 
     self.first_fetched = True
     self.headers = None
@@ -171,4 +172,6 @@ class HS2DataAdapter:
 
       return self.headers, data
     else:
+      if self.callback:
+        self.callback()
       raise StopIteration
