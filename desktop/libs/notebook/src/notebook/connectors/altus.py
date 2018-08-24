@@ -78,7 +78,14 @@ class SdxApi():
       ...
     ]
     """
-    return _exec('sdx', 'listNamespaces')['namespaces']
+    data = _exec('sdx', 'listNamespaces', parameters={'maxItems': 500})
+    namespaces = data['namespaces']
+
+    while data.get('nextToken'):
+      data = _exec('sdx', 'listNamespaces', parameters={'startingToken': data['nextToken']})
+      namespaces.extend(data['namespaces'])
+
+    return namespaces
 
 
 class DataEngApi():

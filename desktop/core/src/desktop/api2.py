@@ -111,7 +111,7 @@ def get_context_namespaces(request, interface):
           'name': namespace.get('namespaceName'),
           'status': namespace.get('status'),
           'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
-        } for namespace in SdxApi(request.user).list_namespaces() +
+        } for namespace in SdxApi(request.user).list_namespaces() if namespace.get('status') == 'CREATED' +
              # Adding "fake" namespace for cluster without one
              [_cluster for _cluster in adb_clusters if not cluster.get('namespaceCrn') and _cluster.get('status') == 'CREATED']
         ]
@@ -148,7 +148,7 @@ def get_context_computes(request, interface):
           'status': cluster.get('status'),
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
           'type': 'altus-adb'
-        } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters'] if cluster.get('status') == 'CREATED']
+        } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters'] if cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515']
       )
 
   if interface == 'oozie' or interface == 'jobs' or interface == 'spark2':
