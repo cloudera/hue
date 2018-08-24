@@ -184,7 +184,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('queries', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
@@ -197,7 +200,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('query_plan', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
@@ -210,7 +216,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('query_profile', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON: %s' % e)
 
@@ -222,7 +231,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('query_memory', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_memory did not return valid JSON: %s' % e)
 
@@ -233,6 +245,9 @@ class ImpalaDaemonApi(object):
     }
     resp = self._root.get('cancel_query', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi kill did not return valid JSON: %s' % e)
