@@ -1409,7 +1409,7 @@ var ApiHelper = (function () {
       url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
 
       if (options.path.length > 1) {
-        url += '/' + options.path[1];
+        url += '/' + options.path[1] + '/';
       }
 
       if (options.path.length > 2) {
@@ -1616,7 +1616,7 @@ var ApiHelper = (function () {
   var QueryResult = function (sourceType, response) {
     var self = this;
     self.id = UUID();
-    self.type = sourceType;
+    self.type = response.result.type || sourceType;
     self.status = response.status || 'running';
     self.result = response.result || {};
     self.result.type = 'table';
