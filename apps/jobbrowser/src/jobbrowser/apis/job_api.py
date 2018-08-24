@@ -180,9 +180,10 @@ class YarnApi(Api):
       }
     elif app['applicationType'] == 'SPARK':
       app['logs'] = job.logs_url if hasattr(job, 'logs_url') else ''
+      app['trackingUrl'] = job.trackingUrl if hasattr(job, 'trackingUrl') else ''
       common['type'] = 'SPARK'
       common['properties'] = {
-        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems()],
+        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems() if name != "url" and name != "killUrl"],
         'executors': []
       }
       if hasattr(job, 'metrics'):
