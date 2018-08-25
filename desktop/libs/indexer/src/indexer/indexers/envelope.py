@@ -21,9 +21,10 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from notebook.models import make_notebook
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import DISABLE_HUE_3
+from hadoop.fs.hadoopfs import Hdfs
+from notebook.models import make_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ class EnvelopeIndexer(object):
       last_executed=start_time
     )
 
-    if not DISABLE_HUE_3.get(): # CDH5
+    if not DISABLE_HUE_3.config.default_value: # CDH5
       shell_command_name = "pipeline.sh"
       shell_command = """#!/bin/bash
 
@@ -76,18 +77,19 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
         files=[
             {u'value': u'%s/envelope.conf' % workspace_path},
             {u'value': hdfs_shell_cmd_path},
-            {u'value': lib_path, }
+            {u'value': lib_path}
         ]
       )
     else:
       task.add_spark_snippet(
-        clazz=None,
-        jars=lib_path,
+        clazz='com.cloudera.labs.envelope.EnvelopeMain',
+        jars=Hdfs.basename(lib_path),
         arguments=[
             u'envelope.conf'
         ],
         files=[
-            {u'path': u'%s/envelope.conf' % workspace_path, u'type': u'file'}
+            {u'path': u'%s/envelope.conf' % workspace_path, u'type': u'file'},
+            {u'path': lib_path, u'type': u'file'},
         ]
       )
 
@@ -99,7 +101,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
       if properties['streamSelection'] == 'kafka':
         input = """type = kafka
                 brokers = "%(brokers)s"
-                topics = %(topics)s
+                topic = %(topics)s
                 encoding = string
                 translator {
                     type = %(kafkaFieldType)s
@@ -153,7 +155,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
           deriver {
               type = sql
               query.literal = \"""
-                  SELECT measurement_time, number_of_vehicles FROM inputdata\"""
+                  SELECT * FROM inputdata\"""
           }
           planner {
               type = upsert
