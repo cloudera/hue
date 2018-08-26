@@ -128,7 +128,7 @@ class LdapAuthenticationForm(AuthenticationForm):
 
   def authenticate(self):
     request = None
-    username = self.cleaned_data.get('username')
+    username = self.cleaned_data.get('username') or ''
     password = self.cleaned_data.get('password')
     server = self.cleaned_data.get('server')
 
