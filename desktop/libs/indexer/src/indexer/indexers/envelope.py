@@ -65,7 +65,7 @@ class EnvelopeIndexer(object):
       last_executed=start_time
     )
 
-    if not DISABLE_HUE_3.config.default_value: # CDH5
+    if not DISABLE_HUE_3.config.default_value or True: # CDH5
       shell_command_name = "pipeline.sh"
       shell_command = """#!/bin/bash
 

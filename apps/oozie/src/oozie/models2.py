@@ -4111,6 +4111,9 @@ class WorkflowBuilder():
 
     node['properties']['uuid'] = document.uuid
 
+    notebook = Notebook(document=document)
+    node['properties']['capture_output'] = notebook.get_data()['snippets'][0]['properties']['capture_output']
+
     return node
 
   def get_shell_snippet_node(self, snippet):
@@ -4121,6 +4124,7 @@ class WorkflowBuilder():
     node['properties']['archives'] = snippet['properties'].get('archives')
     node['properties']['files'] = snippet['properties'].get('files')
     node['properties']['env_var'] = snippet['properties'].get('env_var')
+    node['properties']['capture_output'] = snippet['properties'].get('capture_output')
 
     return node
 
