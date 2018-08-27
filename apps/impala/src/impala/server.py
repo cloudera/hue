@@ -251,3 +251,33 @@ class ImpalaDaemonApi(object):
         return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi kill did not return valid JSON: %s' % e)
+
+  def get_query_backends(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_backends', params=params)
+    try:
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_backends did not return valid JSON: %s' % e)
+
+  def get_query_finstances(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_finstances', params=params)
+    try:
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_finstances did not return valid JSON: %s' % e)

@@ -122,12 +122,13 @@ class QueryApi(Api):
       'properties': {
         'memory': '',
         'profile': '',
-        'plan': ''
+        'plan': '',
+        'backends': '',
+        'finstances': ''
       }
     })
 
     return app
-
 
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
@@ -153,6 +154,10 @@ class QueryApi(Api):
       return self._memory(appid, app_type, app_property, app_filters)
     elif app_property == 'profile':
       return self._query_profile(appid)
+    elif app_property == 'backends':
+      return self._query_backends(appid)
+    elif app_property == 'finstances':
+      return self._query_finstances(appid)
     else:
       return self._query(appid)
 
@@ -167,6 +172,12 @@ class QueryApi(Api):
 
   def _query_profile(self, appid):
     return self.api.get_query_profile(query_id=appid)
+
+  def _query_backends(self, appid):
+    return self.api.get_query_backends(query_id=appid)
+
+  def _query_finstances(self, appid):
+    return self.api.get_query_finstances(query_id=appid)
 
   def _api_status_filter(self, status):
     if status == 'FINISHED':
