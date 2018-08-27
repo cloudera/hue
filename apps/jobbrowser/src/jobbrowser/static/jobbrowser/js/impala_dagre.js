@@ -42,6 +42,7 @@ function impalaDagre(id) {
 
   // Recursively build a list of edges and states that comprise the plan graph
   function build(node, parent, edges, states, colour_idx, max_node_time) {
+    if (!node["output_card"]) return;
     states.push({ "name": node["label"],
                   "detail": node["label_detail"],
                   "num_instances": node["num_instances"],

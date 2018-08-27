@@ -66,6 +66,7 @@ class QueryApi(Api):
         'user': job['effective_user'],
         'queue': job.get('resource_pool'),
         'progress': job['progress'],
+        'isRunning': job['start_time'] > job['end_time'],
         'canWrite': job in jobs['in_flight_queries'],
         'duration': self._time_in_ms_groups(re.search(r"\s*(([\d.]*)([a-z]*))(([\d.]*)([a-z]*))?(([\d.]*)([a-z]*))?", job['duration'], re.MULTILINE).groups()),
         'submitted': job['start_time'],
@@ -114,27 +115,18 @@ class QueryApi(Api):
       }
     app = apps.get('apps')[0]
     progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
+    app.update({
+      'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100 if self._api_status(app.get('status')) in ['SUCCEEDED', 'FAILED'] else 1,
+      'type': 'queries',
+      'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid),
+      'properties': {
+        'memory': '',
+        'profile': '',
+        'plan': ''
+      }
+    })
 
-    common = {
-        'id': app.get('id'),
-        'name': app.get('name'),
-        'status': app.get('status'),
-        'apiStatus': app.get('apiStatus'),
-        'user': app.get('user'),
-        'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100,
-        'duration': app.get('duration'),
-        'submitted': app.get('submitted'),
-        'type': 'queries',
-        'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid)
-    }
-
-    common['properties'] = {
-      'memory': '',
-      'profile': '',
-      'plan': ''
-    }
-
-    return common
+    return app
 
 
   def action(self, appid, action):
@@ -177,20 +169,22 @@ class QueryApi(Api):
     return self.api.get_query_profile(query_id=appid)
 
   def _api_status_filter(self, status):
-    if status in ['RUNNING', 'CREATED']:
-      return 'RUNNING'
-    elif status in ['FINISHED']:
+    if status == 'FINISHED':
       return 'COMPLETED'
-    else:
+    elif status == 'EXCEPTION':
       return 'FAILED'
+    elif status == 'RUNNING':
+      return 'RUNNING'
 
   def _api_status(self, status):
-    if status in ['RUNNING', 'CREATED']:
-      return 'RUNNING'
-    elif status in ['FINISHED']:
+    if status == 'FINISHED':
       return 'SUCCEEDED'
-    else:
+    elif status == 'EXCEPTION':
       return 'FAILED'
+    elif status == 'RUNNING':
+      return 'RUNNING'
+    else:
+      return 'PAUSED'
 
   def _get_filter_list(self, filters):
     filter_list = []
