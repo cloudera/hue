@@ -132,7 +132,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </tr>
     </thead>
     <tbody data-bind="foreach: apps">
-      <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+      <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() == 'PAUSED', 'running': apiStatus() == 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
         <td data-bind="click: function() {}, clickBubble: false">
           <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
         </td>
@@ -228,7 +228,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- ko ifnot: jobs.loadingJobs() -->
                 <!-- ko if: $root.isMini -->
                 <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
-                  <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+                  <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() === 'PAUSED', 'running': apiStatus() === 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
                     <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span class="muted">&nbsp;-&nbsp;</span><span class="muted" data-bind="text: status"></span></td>
                     <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
                     <div class="clearfix"></div>
@@ -1128,8 +1128,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Id') }</li>
           <li class="break-word"><span data-bind="text: id"></span></li>
           <!-- /ko -->
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
@@ -1137,10 +1135,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <span data-bind="text: progress"></span>%
           </li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <!-- ko if: properties.plan && properties.plan().status && properties.plan().status.length > 2 -->
+          <li class="nav-header">${ _('Status Text') }</li>
+          <li><span data-bind="text: properties.plan().status"></span></li>
+          <!-- /ko -->
           <!-- ko if: !$root.isMini() -->
           <li class="nav-header">${ _('Open Duration') }</li>
           <li><span data-bind="text: duration() && duration().toHHMMSS()"></span></li>
@@ -1241,7 +1245,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -1358,7 +1362,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {title: status}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -1969,7 +1973,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
       self.isRunning = ko.computed(function() {
-        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED';
+        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED' || job.isRunning;
       });
 
       self.user = ko.observableDefault(job.user);
@@ -1987,6 +1991,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
+      self.lastEvent = ko.observable(job.lastEvent || '');
 
       self.coordinatorActions = ko.pureComputed(function() {
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
@@ -2066,7 +2071,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
-        return self.hasKill() && self.canWrite() && (vm.interface() === 'queries' || (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED'));
+        return self.hasKill() && self.canWrite() && self.isRunning();
       });
 
       self.hasResume = ko.pureComputed(function() {

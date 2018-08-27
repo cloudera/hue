@@ -660,7 +660,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-log${ suffix }">
-  <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
+  <div class="snippet-log-container margin-bottom-10">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
       %if not IS_EMBEDDED.get():
@@ -681,7 +681,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </ul>
       %endif
       <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
-        <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+        <pre data-bind="visible: (!result.logs() || result.logs().length == 0) && jobs().length > 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
       </span>
     </div>
