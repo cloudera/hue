@@ -1181,6 +1181,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.memory || !properties.memory().mem_usage) { fetchProfile('memory'); } } }">
             ${ _('Memory') }</a>
         </li>
+        <li>
+          <a href="#queries-page-backends${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-backends${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.backends || !properties.backends().backend_states) { fetchProfile('backends'); } } }">
+            ${ _('Backends') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-finstances${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-finstances${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.finstances || !properties.finstances().backend_instances) { fetchProfile('finstances'); } } }">
+            ${ _('Instances') }</a>
+        </li>
       </ul>
 
       <div class="clearfix"></div>
@@ -1210,6 +1218,56 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
         <div class="tab-pane" id="queries-page-memory${ SUFFIX }" data-profile="mem_usage">
           <pre data-bind="text: (properties.memory && properties.memory().mem_usage) || _('The selected tab has no data')"/>
+        </div>
+        <div class="tab-pane" id="queries-page-backends${ SUFFIX }" data-profile="backends">
+          <!-- ko if: properties.backends && properties.backends().backend_states -->
+          <div id="queries-page-memory-backends-template${ SUFFIX }" style="overflow-x: scroll;">
+            <table class="table table-condensed">
+              <thead>
+              <tr>
+                <!-- ko foreach: Object.keys(properties.backends().backend_states[0]).sort() -->
+                <th data-bind="text: $data"></th>
+                <!-- /ko -->
+              </tr>
+              </thead>
+              <tbody data-bind="foreach: { data: $data.properties.backends().backend_states, minHeight: 20, container: '#queries-page-memory-backends-template${ SUFFIX }'}">
+                <tr>
+                  <!-- ko foreach: Object.keys($data).sort() -->
+                  <td data-bind="text: $parent[$data]"></td>
+                  <!-- /ko -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /ko -->
+          <!-- ko if: !properties.backends || !properties.backends().backend_states -->
+          <pre data-bind="text: _('The selected tab has no data')"/>
+          <!-- /ko -->
+        </div>
+        <div class="tab-pane" id="queries-page-finstances${ SUFFIX }" data-profile="finstances">
+          <!-- ko if: properties.finstances && properties.finstances().backend_instances -->
+          <div id="queries-page-memory-finstances-template${ SUFFIX }" style="overflow-x: scroll;">
+            <table class="table table-condensed">
+              <thead>
+              <tr>
+                <!-- ko foreach: [_('host')].concat(Object.keys($data.properties.finstances().backend_instances[0].instance_stats[0])).sort() -->
+                <th data-bind="text: $data"></th>
+                <!-- /ko -->
+              </tr>
+              </thead>
+              <tbody data-bind="foreach: { data: $data.properties.finstances().backend_instances.reduce( function(arr, instance) { instance.instance_stats.forEach(function(stats) { stats.host = instance.host; }); return arr.concat(instance.instance_stats); }, []), minHeight: 20, container: '#queries-page-memory-finstances-template${ SUFFIX }'}">
+                <tr>
+                  <!-- ko foreach: Object.keys($data).sort() -->
+                  <td data-bind="text: $parent[$data]"></td>
+                  <!-- /ko -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /ko -->
+          <!-- ko if: !properties.finstances || !properties.finstances().backend_instances -->
+          <pre data-bind="text: _('The selected tab has no data')"/>
+          <!-- /ko -->
         </div>
       </div>
     </div>

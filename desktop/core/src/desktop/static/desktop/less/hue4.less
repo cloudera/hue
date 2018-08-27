@@ -709,7 +709,7 @@ a:visited {
 }
 
 #mini_jobbrowser {
-  overflow-y: auto;
+  overflow-y: hidden;
   height: 550px;
   max-height: 550px;
   input.search-query {
@@ -728,6 +728,10 @@ a:visited {
     width: 0;
     opacity: .5;
   }
+}
+
+#mini_jobbrowser:hover {
+  overflow-y: overlay;
 }
 
 .uploadstatus {
