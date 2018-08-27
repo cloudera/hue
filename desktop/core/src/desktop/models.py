@@ -55,6 +55,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -609,6 +610,7 @@ class DocumentManager(models.Manager):
 
 
 class Document(models.Model):
+
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -671,11 +673,11 @@ class Document(models.Model):
     DocumentPermission.objects.share_to_default(self, name=name)
 
   def can_read(self, user):
-    return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
+    return is_admin(user) or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
   def can_write(self, user):
     perm = self.list_permissions('write')
-    return user.is_superuser or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+    return is_admin(user) or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
 
   def can_read_or_exception(self, user, exception_class=PopupException):
     if self.can_read(user):
@@ -1310,7 +1312,7 @@ class Document2(models.Model):
   def can_read(self, user):
     perm = self.get_permission('read')
     has_read_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or self.can_write(user) or has_read_permissions
+    return is_admin(user) or self.owner == user or self.can_write(user) or has_read_permissions
 
   def can_read_or_exception(self, user):
     if self.can_read(user):
@@ -1321,7 +1323,7 @@ class Document2(models.Model):
   def can_write(self, user):
     perm = self.get_permission('write')
     has_write_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
+    return is_admin(user) or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1871,7 +1873,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser) and self.cluster_type != ANALYTIC_DB:
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and self.cluster_type != ANALYTIC_DB:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),

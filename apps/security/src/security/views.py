@@ -20,6 +20,7 @@ import json
 from desktop.lib.django_util import render
 
 from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups, get_solr_sentry_provider
+from desktop.auth.backend import is_admin
 
 
 def hive(request):
@@ -67,4 +68,4 @@ def hdfs(request):
 
 
 def _has_impersonation_perm(user):
-  return user.is_superuser or user.has_hue_permission(action="impersonate", app="security")
+  return is_admin(user) or user.has_hue_permission(action="impersonate", app="security")

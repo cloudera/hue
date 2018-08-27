@@ -52,6 +52,7 @@ from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
 from oozie.utils import convert_to_server_timezone
 
+from desktop.auth.backend import is_admin
 
 def get_history():
   if ENABLE_V2.get():
@@ -1172,7 +1173,7 @@ def check_job_access_permission(request, job_id, **kwargs):
       LOG.exception(msg)
       raise PopupException(msg, detail=ex._headers.get('oozie-error-message'))
 
-  if request.user.is_superuser \
+  if is_admin(request.user) \
       or oozie_job.user == request.user.username \
       or has_dashboard_jobs_access(request.user):
     return oozie_job
@@ -1193,8 +1194,8 @@ def check_job_edition_permission(oozie_job, user):
 
 
 def has_job_edition_permission(oozie_job, user):
-  return user.is_superuser or oozie_job.user == user.username or (oozie_job.group and user.groups.filter(name=oozie_job.group).exists()) or (oozie_job.acl and user.username in oozie_job.acl.split(','))
+  return is_admin(user) or oozie_job.user == user.username or (oozie_job.group and user.groups.filter(name=oozie_job.group).exists()) or (oozie_job.acl and user.username in oozie_job.acl.split(','))
 
 
 def has_dashboard_jobs_access(user):
-  return user.is_superuser or user.has_hue_permission(action="dashboard_jobs_access", app=DJANGO_APPS[0])
+  return is_admin(user) or user.has_hue_permission(action="dashboard_jobs_access", app=DJANGO_APPS[0])

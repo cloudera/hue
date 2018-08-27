@@ -39,6 +39,7 @@ from metadata.optimizer_client import OptimizerApi
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -220,7 +221,7 @@ class HS2Api(Api):
 
     try:
       filters = {'id': session_id, 'application': query_server['server_name']}
-      if not self.user.is_superuser:
+      if not is_admin(self.user):
         filters['owner'] = self.user
       session = Session.objects.get(**filters)
     except Session.DoesNotExist:

@@ -48,6 +48,8 @@ from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.hue_password_policy import reset_password_policy
 
+from desktop.auth.backend import is_admin
+
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -272,6 +274,44 @@ class TestUserAdmin(BaseUserAdminTests):
            save="Save"), follow=True)
     assert_true(len(GroupPermission.objects.all()) == 1)
 
+    # Get ourselves set up with a user and a group with superuser group priv
+    cadmin = make_logged_in_client(username="supertest", is_superuser=True)
+    Group.objects.create(name="super-test-group")
+    cadmin.post('/useradmin/groups/edit/super-test-group',
+                dict(name="super-test-group",
+                     members=[User.objects.get(username="supertest").pk],
+                     permissions=[HuePermission.objects.get(app='useradmin', action='superuser').pk],
+                     save="Save"), follow=True)
+    assert_equal(len(GroupPermission.objects.all()), 2)
+
+    supertest = User.objects.get(username="supertest")
+    supertest.groups.add(Group.objects.get(name="super-test-group"))
+    supertest.is_superuser = False
+    supertest.save()
+    # Validate user is not a checked superuser
+    assert_false(supertest.is_superuser)
+    # Validate user is superuser by group
+    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser",
+                                                                                       app="useradmin"), 1)
+
+    # Make sure that a user of supergroup can access /useradmin/users
+    # Create user to try to edit
+    notused = User.objects.get_or_create(username="notused", is_superuser=False)
+    response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
+    assert_true('Hue Users - Edit user: notused' in response.content)
+
+    # Make sure we can modify permissions
+    response = cadmin.get('/useradmin/permissions/edit/useradmin/access/?is_embeddable=true')
+    assert_true('Hue Permissions - Edit app: useradmin' in response.content)
+
+    # Revoke superuser privilege from groups
+    c.post('/useradmin/permissions/edit/useradmin/superuser',
+           dict(app='useradmin',
+           priv='superuser',
+           groups=[],
+           save="Save"), follow=True)
+    assert_equal(len(GroupPermission.objects.all()), 1)
+
     # Now test that we have limited access
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
     response = c1.get('/useradmin/users')
@@ -281,6 +321,13 @@ class TestUserAdmin(BaseUserAdminTests):
     test_user = User.objects.get(username="nonadmin")
     test_user.groups.add(Group.objects.get(name='test-group'))
     test_user.save()
+
+    # Make sure that a user of nonadmin fails where supertest succeeds
+    response = c1.get("/useradmin/users/edit/notused?is_embeddable=true")
+    assert_true('You must be a superuser to add or edit another user' in response.content)
+
+    response = c1.get("/useradmin/permissions/edit/useradmin/access/?is_embeddable=true")
+    assert_true('You must be a superuser to change permissions' in response.content)
 
     # Check that we have access now
     response = c1.get('/useradmin/users')

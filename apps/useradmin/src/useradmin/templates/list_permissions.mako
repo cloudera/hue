@@ -17,6 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
+from desktop.auth.backend import is_admin
 from django.contrib.auth.models import Group
 %>
 
@@ -49,7 +50,7 @@ ${layout.menubar(section='permissions')}
           <tr class="tableRow"
               data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
           <td>
-            %if user.is_superuser:
+            %if is_admin(user):
               <strong><a title="${_('Edit permission')}"
                          href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
                          data-name="${perm.app}" data-row-selector="true">${perm.app}</a></strong>
