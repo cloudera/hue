@@ -74,6 +74,8 @@ from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkD
                               TrashPurgeForm, SetReplicationFactorForm
 
 
+from desktop.auth.backend import is_admin
+
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
 DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
@@ -214,7 +216,7 @@ def view(request, path):
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
         elif request.fs._get_scheme(path).lower() == 'hdfs':
-            if request.user.is_superuser and not _is_hdfs_superuser(request):
+            if is_admin(request.user) and not _is_hdfs_superuser(request):
                 msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                         % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
 
@@ -428,7 +430,7 @@ def listdir_paged(request, path):
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
     do_as = None
-    if request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security"):
+    if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
       do_as = request.GET.get('doas', request.user.username)
     if hasattr(request, 'doas'):
       do_as = request.doas
@@ -1060,7 +1062,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             except (IOError, WebHdfsException), e:
                 msg = _("Cannot perform operation.")
                 # TODO: Only apply this message for HDFS
-                if request.user.is_superuser and not _is_hdfs_superuser(request):
+                if is_admin(request.user) and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 if request.is_ajax():

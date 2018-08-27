@@ -28,6 +28,8 @@ try:
 except ImportError:
   from django.utils.functional import wraps
 
+from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -51,7 +53,7 @@ def hue_permission_required(action, app):
 
 def check_superuser_permission(view_func):
   def decorate(request, *args, **kwargs):
-    if not request.user.is_superuser:
+    if not is_admin(request.user):
       raise PopupException(_('You must be a superuser to perform this operation.'), error_code=401)
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)

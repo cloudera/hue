@@ -34,6 +34,7 @@ import hadoop.yarn.spark_history_server_api as spark_history_server_api
 
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.yarn_models import Application, OozieYarnJob, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
+from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -123,11 +124,11 @@ class YarnApi(JobBrowserApi):
     return int(elapsed_time.days * 86400 + elapsed_time.seconds) * 1000
 
   def filter_jobs(self, user, jobs, **kwargs):
-    check_permission = not SHARE_JOBS.get() and not user.is_superuser
+    check_permission = not SHARE_JOBS.get() and not is_admin(user)
 
     return filter(lambda job:
                   not check_permission or
-                  user.is_superuser or
+                  is_admin(user) or
                   job.user == user.username, jobs)
 
 
