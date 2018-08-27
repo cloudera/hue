@@ -29,7 +29,6 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop import conf
 from useradmin.hue_password_policy import hue_get_password_validators
 
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -79,7 +78,7 @@ class AuthenticationForm(AuthAuthenticationForm):
         expires_delta = datetime.timedelta(seconds=conf.AUTH.EXPIRES_AFTER.get())
         if user.is_active and user.last_login + expires_delta < datetime.datetime.now():
           INACTIVE_EXPIRATION_DELTA = datetime.timedelta(days=365)
-          if is_admin(user):
+          if user.is_superuser:
             if conf.AUTH.EXPIRE_SUPERUSERS.get():
               user.is_active = False
               user.last_login = datetime.datetime.now() + INACTIVE_EXPIRATION_DELTA

@@ -27,7 +27,6 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
-from desktop.auth.backend import is_admin
 
 
 class Document(models.Model):
@@ -36,7 +35,7 @@ class Document(models.Model):
                                      help_text=_t('If the document is not a submitted job but a real query, script, workflow.'))
 
   def is_editable(self, user): # Deprecated
-    return is_admin(user) or self.owner == user
+    return user.is_superuser or self.owner == user
 
   def can_edit_or_exception(self, user, exception_class=PopupException): # Deprecated
     if self.is_editable(user):

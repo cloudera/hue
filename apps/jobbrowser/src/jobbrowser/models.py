@@ -30,7 +30,6 @@ from django.utils.translation import ugettext as _
 from desktop.lib.view_util import location_to_url
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS
-from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -57,7 +56,7 @@ def can_kill_job(self, user):
   if self.status.lower() not in ('running', 'pending', 'accepted'):
     return False
 
-  if is_admin(user):
+  if user.is_superuser:
     return True
 
   if can_modify_job(user.username, self):

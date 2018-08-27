@@ -35,13 +35,12 @@ from hbase.api import HbaseApi
 from hbase.management.commands import hbase_setup
 from hbase.server.hbase_lib import get_thrift_type
 
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
 
 def has_write_access(user):
-  return is_admin(user) or user.has_hue_permission(action="write", app=DJANGO_APPS[0]) or is_impersonation_enabled()
+  return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0]) or is_impersonation_enabled()
 
 def app(request):
   return render('app.mako', request, {

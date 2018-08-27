@@ -18,7 +18,6 @@
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
-from desktop.auth.backend import is_admin
 %>
 
 %if not is_embeddable:
@@ -46,7 +45,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
       <p>${_("Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience.")}</p>
       <br/>
 
-      % if traceback and is_admin(user):
+      % if traceback and user.is_superuser:
         <a href="javascript:toggleDisplay('#traceback');" title="${ _('See the stacktrace') }">${_('More info...')}</a>
           &nbsp;|&nbsp;
         <a href="/logs" target="_new" title="${ _('View server logs') }">${_('View logs')}</a>
@@ -71,7 +70,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
           </table>
         </div>
       % else:
-        % if is_admin(user):
+        % if user.is_superuser:
           <a href="/logs" ${ not is_embeddable and 'target="_blank"'  or '' } title="${ _('View server logs') }">${_('View logs')}</a>
         % endif
       % endif

@@ -54,8 +54,6 @@ from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
 
-from desktop.auth.backend import is_admin
-
 
 LOG = logging.getLogger(__name__)
 
@@ -225,7 +223,7 @@ class Job(models.Model):
       raise e
 
   def is_editable(self, user):
-    return is_admin(user) or self.owner == user or self.doc.get().can_write(user)
+    return user.is_superuser or self.owner == user or self.doc.get().can_write(user)
 
   @property
   def data_dict(self):

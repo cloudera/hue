@@ -61,7 +61,7 @@ from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
-from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -182,7 +182,7 @@ def log_view(request):
   If it is attached to the root logger, this view will display that history,
   otherwise it will report that it can't be found.
   """
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
   hostname = socket.gethostname()
@@ -199,7 +199,7 @@ def download_log_view(request):
   """
   Zip up the log buffer and then return as a file attachment.
   """
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
   l = logging.getLogger()
@@ -279,7 +279,7 @@ def dump_config(request):
   show_private = False
   conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
 
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
   if request.GET.get("private"):
@@ -302,7 +302,7 @@ def threads(request):
   out = StringIO.StringIO()
   dump_traceback(file=out)
 
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
   if request.is_ajax():
@@ -314,7 +314,7 @@ def threads(request):
 @access_log_level(logging.WARN)
 def memory(request):
   """Dumps out server threads. Useful for debugging."""
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
   if not hasattr(settings, 'MEMORY_PROFILER'):
@@ -388,7 +388,7 @@ def index(request):
     except UserPreferences.DoesNotExist:
       pass
 
-  if is_admin(request.user) and request.COOKIES.get('hueLandingPage') != 'home' and not IS_HUE_4.get():
+  if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home' and not IS_HUE_4.get():
     return redirect(reverse('about:index'))
   else:
     if is_hue_4:
@@ -710,7 +710,7 @@ def collect_validation_messages(conf, error_list):
 
 def check_config(request):
   """Check config and view for the list of errors"""
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
   context = {
@@ -726,7 +726,7 @@ def check_config(request):
 
 def check_config_ajax(request):
   """Alert administrators about configuration problems."""
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return HttpResponse('')
 
   error_list = _get_config_errors(request)
@@ -745,7 +745,7 @@ def get_debug_level(request):
 
 @require_POST
 def set_all_debug(request):
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return JsonResponse({'status': 1, 'message': _('You must be a superuser.')})
 
   _set_all_debug()
@@ -755,7 +755,7 @@ def set_all_debug(request):
 
 @require_POST
 def reset_all_debug(request):
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     return JsonResponse({'status': 1, 'message': _('You must be a superuser.')})
 
   _reset_all_debug()

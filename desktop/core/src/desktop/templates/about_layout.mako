@@ -16,7 +16,6 @@
 
 <%!
 from django.utils.translation import ugettext as _
-from desktop.auth.backend import is_admin
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -37,7 +36,7 @@ def is_selected(section, matcher):
                   ${ _('About Hue') }
                 </a>
                </li>
-              % if is_admin(user):
+              % if user.is_superuser:
                 <li class="${is_selected(section, 'quick_start')}">
                   <a href="${ url('about:admin_wizard') }">${_('Quick start')}</a>
                 </li>

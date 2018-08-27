@@ -21,7 +21,6 @@ import logging
 from urlparse import urlparse
 from django.contrib.auth.models import User
 
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -59,7 +58,7 @@ class ProxyFS(object):
       if not filebrowser_action:
         return True
       user = rewrite_user(User.objects.get(username=self.user))
-      return user.is_authenticated() and user.is_active and (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
+      return user.is_authenticated() and user.is_active and (user.is_superuser or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
     except User.DoesNotExist:
       LOG.exception('proxyfs.has_access()')
       return False
