@@ -18,7 +18,6 @@
 
   from desktop.views import commonheader, commonfooter, _ko
   from desktop import conf
-  from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="docBrowser" file="/document_browser.mako" />
@@ -72,7 +71,7 @@
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
-        superuser: '${ is_admin(user) }' === 'True',
+        superuser: '${ user.is_superuser }' === 'True',
         i18n: {
           errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',
           errorFetchingTableFields: '${_('An error occurred fetching the table fields. Please try again.')}',

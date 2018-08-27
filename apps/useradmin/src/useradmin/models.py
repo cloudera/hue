@@ -61,6 +61,7 @@ import django.utils.timezone as dtz
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL, HueUser
 from hadoop import cluster
 
 import useradmin.conf
@@ -275,7 +276,6 @@ def update_app_permissions(**kwargs):
     if default_group:
       for new_dp in added:
         if not (new_dp.app == 'useradmin' and new_dp.action == 'access') and \
-           not (new_dp.app == 'useradmin' and new_dp.action == 'superuser') and \
            not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
            not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
            not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
@@ -300,8 +300,6 @@ def install_sample_user():
   """
   Setup the de-activated sample user with a certain id. Do not create a user profile.
   """
-  #Moved to avoid circular import with is_admin
-  from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
   user = None
 
   try:

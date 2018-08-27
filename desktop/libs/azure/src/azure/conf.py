@@ -23,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
 from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
+
 LOG = logging.getLogger(__name__)
 
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
@@ -126,8 +127,7 @@ def is_adls_enabled():
   return ('default' in AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None)
 
 def has_adls_access(user):
-  from desktop.auth.backend import is_admin
-  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser"))
+  return user.is_authenticated() and user.is_active and (user.is_superuser or user.has_hue_permission(action="adls_access", app="filebrowser"))
 
 def config_validator(user):
   res = []

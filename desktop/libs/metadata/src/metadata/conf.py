@@ -27,6 +27,7 @@ from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
 
+
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
 
@@ -63,9 +64,8 @@ def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
 def has_navigator(user):
-  from desktop.auth.backend import is_admin
   return bool(get_navigator_url() and get_navigator_auth_password()) \
-      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+      and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
 def get_security_default():

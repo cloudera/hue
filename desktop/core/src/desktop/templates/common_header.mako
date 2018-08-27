@@ -22,8 +22,6 @@ from desktop.lib.i18n import smart_unicode
 
 from metadata.conf import has_optimizer, OPTIMIZER
 
-from desktop.auth.backend import is_admin
-
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
   home_url = url('desktop_views_home2')
@@ -334,7 +332,7 @@ ${ hueIcons.symbols() }
       % endif
     % endif
     <%
-      view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
+      view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
     %>
     % if view_profile or conf.IS_HUE_4.get():
     <li class="dropdown">
@@ -353,7 +351,7 @@ ${ hueIcons.symbols() }
           % endif
         </a>
       </li>
-        % if is_admin(user):
+        % if user.is_superuser:
           <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
         % endif
       % endif
@@ -506,7 +504,7 @@ ${ hueIcons.symbols() }
                <li><a href="${url('oozie:list_oozie_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundles icon') }" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
-           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or is_admin(user):
+           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
            <% from oozie.conf import ENABLE_V2 %>
            % if not ENABLE_V2.get():
            <li class="dropdown-submenu">

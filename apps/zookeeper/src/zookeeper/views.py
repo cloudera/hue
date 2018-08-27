@@ -33,8 +33,6 @@ from zookeeper.forms import CreateZNodeForm, EditZNodeForm
 from zookeeper.rest import ZooKeeper
 from zookeeper.utils import get_cluster_or_404
 
-from desktop.auth.backend import is_admin
-
 
 def _get_global_overview():
   clusters = CLUSTERS.get()
@@ -122,7 +120,7 @@ def tree(request, id, path):
 
 
 def delete(request, id, path):
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     raise PopupException(_('You are not a superuser'))
   cluster = get_cluster_or_404(id)
 
@@ -141,7 +139,7 @@ def delete(request, id, path):
 
 
 def create(request, id, path):
-  if not is_admin(request.user):
+  if not request.user.is_superuser:
     raise PopupException(_('You are not a superuser'))
   cluster = get_cluster_or_404(id)
 
@@ -166,7 +164,7 @@ def edit_as_base64(request, id, path):
   node = zk.get(path)
 
   if request.method == 'POST':
-    if not is_admin(request.user):
+    if not request.user.is_superuser:
       raise PopupException(_('You are not a superuser'))
     form = EditZNodeForm(request.POST)
     if form.is_valid():
@@ -189,7 +187,7 @@ def edit_as_text(request, id, path):
   node = zk.get(path)
 
   if request.method == 'POST':
-    if not is_admin(request.user):
+    if not request.user.is_superuser:
       raise PopupException(_('You are not a superuser'))
     form = EditZNodeForm(request.POST)
     if form.is_valid():

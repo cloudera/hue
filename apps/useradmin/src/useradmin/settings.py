@@ -22,5 +22,4 @@ MENU_INDEX = 60
 
 PERMISSION_ACTIONS = (
   ("access_view:useradmin:edit_user", "Access to profile page on User Admin"),
-  ("superuser", "Give superuser access to members of group")
 )

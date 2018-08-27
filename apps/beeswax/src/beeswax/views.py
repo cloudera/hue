@@ -54,8 +54,6 @@ from beeswax.models import QueryHistory, SavedQuery, Session
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
-from desktop.auth.backend import is_admin
-
 
 LOG = logging.getLogger(__name__)
 
@@ -343,7 +341,7 @@ def list_query_history(request):
   DEFAULT_PAGE_SIZE = 100
   prefix = 'q-'
 
-  share_queries = is_admin(request.user)
+  share_queries = request.user.is_superuser
 
   querydict_query = request.GET.copy()
   if not share_queries:
@@ -710,7 +708,7 @@ def authorized_get_query_history(request, query_history_id, owner_only=False, mu
 
   # Some queries don't have a design so are not linked to Document Model permission
   if query_history.design is None or not query_history.design.doc.exists():
-    if not is_admin(request.user) and request.user != query_history.owner:
+    if not request.user.is_superuser and request.user != query_history.owner:
       raise PopupException(_('Permission denied to read QueryHistory %(id)s') % {'id': query_history_id})
   else:
     query_history.design.doc.get().can_read_or_exception(request.user)

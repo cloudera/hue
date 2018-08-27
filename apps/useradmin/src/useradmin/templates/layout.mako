@@ -17,7 +17,6 @@
 <%!
 from desktop import conf
 from django.utils.translation import ugettext as _
-from desktop.auth.backend import is_admin
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -56,12 +55,12 @@ def is_selected(section, matcher):
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="${ ('/' + app_name) if is_admin(user) else '' }">
+                <a href="${ ('/' + app_name) if user.is_superuser else '' }">
                   <img src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon" alt="${ _('User admin icon') }" />
                   ${ _('User Admin') }
                 </a>
               </li>
-              %if is_admin(user):
+              %if user.is_superuser:
                 <li class="${is_selected(section, 'users')}"><a href="${ url('useradmin.views.list_users') }">${_('Users')}</a></li>
                 <li class="${is_selected(section, 'groups')}"><a href="${ url('useradmin.views.list_groups') }">${_('Groups')}</a></li>
                 <li class="${is_selected(section, 'permissions')}"><a href="${ url('useradmin.views.list_permissions') }">${_('Permissions')}</a></li>

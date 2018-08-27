@@ -18,7 +18,6 @@ from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 from desktop import conf
-from desktop.auth.backend import is_admin
 %>
 
 %if not is_embeddable:
@@ -34,7 +33,7 @@ ${ commonheader(_('Error'), app_name, user, request, "40px") | n,unicode }
             <p>
               <pre>${ smart_unicode(error) }</pre>
 
-              %if traceback and is_admin(user):
+              %if traceback and user.is_superuser:
                 <textarea style="width: 100%;" rows=80 readonly="readonly">
                 ${ smart_unicode(traceback) }
                 </textarea>

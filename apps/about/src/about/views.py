@@ -26,11 +26,9 @@ from desktop.log.access import access_log_level
 from desktop.models import Settings, hue_version
 from desktop.views import collect_usage
 
-from desktop.auth.backend import is_admin
-
 
 def admin_wizard(request):
-  if is_admin(request.user):
+  if request.user.is_superuser:
     apps = appmanager.get_apps(request.user)
   else:
     apps = []
