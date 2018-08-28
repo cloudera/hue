@@ -55,7 +55,8 @@ APPS := core \
 	libs/metadata \
 	libs/notebook \
 	libs/dashboard \
-        libs/kafka
+	libs/kafka \
+	libs/tenant
 
 .PHONY: default
 default:: hue syncdb

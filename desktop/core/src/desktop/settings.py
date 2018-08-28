@@ -140,6 +140,7 @@ GTEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = [
     # The order matters
     'desktop.middleware.MetricsMiddleware',
+    'tenant_schemas.middleware.TenantMiddleware',
     'desktop.middleware.EnsureSafeMethodMiddleware',
     'desktop.middleware.AuditLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -180,7 +181,34 @@ GTEMPLATE_DIRS = (
     get_desktop_root("core/templates"),
 )
 
+
+SHARED_APPS = (
+    'tenant_schemas',  # mandatory, should always be before any django app
+    'tenant', # you must list the app where your tenant model resides in
+
+    'django.contrib.contenttypes',
+
+    # everything below here is optional
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+#     'django.contrib.messages',
+    'django.contrib.admin',
+)
+
+TENANT_APPS = (
+    'django.contrib.contenttypes',
+
+    # your tenant-specific apps
+    'desktop',
+    'useradmin',
+)
+
+TENANT_MODEL = "tenant.Client" # app.Model # To move to dedicated app and keep desktop out
+
 INSTALLED_APPS = [
+    'tenant_schemas',  # mandatory, should always be before any django app
+
     'django.contrib.auth',
     'django_openid_auth',
     'django.contrib.contenttypes',
@@ -220,8 +248,7 @@ GTEMPLATE_CONTEXT_PROCESSORS = (
   'desktop.context_processors.app_name',
 )
 
-TEMPLATES = [
-  {
+TEMPLATES = [{
     'BACKEND': 'djangomako.backends.MakoBackend',
     'DIRS': GTEMPLATE_DIRS,
     'NAME': 'mako',
@@ -229,8 +256,7 @@ TEMPLATES = [
       'context_processors': GTEMPLATE_CONTEXT_PROCESSORS,
       'loaders': GTEMPLATE_LOADERS,
     },
-  },
-  {
+  }, {
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [
       get_desktop_root("core/templates/debug_toolbar"),
@@ -239,6 +265,11 @@ TEMPLATES = [
     'APP_DIRS': True,
   },
 ]
+
+DATABASE_ROUTERS = (
+  'tenant_schemas.routers.TenantSyncRouter',
+)
+
 
 # Desktop doesn't use an auth profile module, because
 # because it doesn't mesh very well with the notion
