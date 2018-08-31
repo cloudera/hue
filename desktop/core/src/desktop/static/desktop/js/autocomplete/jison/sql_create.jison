@@ -168,34 +168,32 @@ TableDefinition_EDIT
 
 TableDefinitionRightPart
  : TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  ;
 
 TableDefinitionRightPart_EDIT
  : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment PartitionedBy_EDIT OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy SortBy_EDIT OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy ClusteredBy_EDIT OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy SkewedBy_EDIT
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   StoredAsOrBy_EDIT OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   StoredAsOrBy_EDIT OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy WithSerdeproperties_EDIT OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy HdfsLocation_EDIT OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties HdfsLocation_EDIT OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn WithReplication_EDIT OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties CachedIn WithReplication_EDIT OptionalAsSelectStatement
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement_EDIT
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
-   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached 'CURSOR'
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached 'CURSOR'
    {
      var keywords = [];
      if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10 && !$11) {
@@ -1000,10 +998,14 @@ StoredAsOrBy
    {
      $$ = parser.mergeSuggestKeywords($3, $4)
    }
- | '<hive>STORED' 'BY' QuotedValue
+ | '<hive>STORED' 'BY' QuotedValue OptionalWithSerdeproperties
   {
     $$ = { storedBy: true }
   }
+ | '<hive>STORED' 'BY' QuotedValue WithSerdeproperties_EDIT
+  {
+    $$ = { storedBy: true }
+  } 
  ;
 
 StoredAsOrBy_EDIT
@@ -1081,7 +1083,8 @@ HiveOrImpalaRowFormat_EDIT
 
 HiveRowFormat
  : HiveDelimitedRowFormat
- | '<hive>SERDE' QuotedValue
+ | '<hive>SERDE' QuotedValue OptionalWithSerdeproperties
+ | '<hive>SERDE' QuotedValue WithSerdeproperties_EDIT
  ;
 
 HiveRowFormat_EDIT
@@ -1232,22 +1235,42 @@ OptionalNullDefinedAs_EDIT
    }
  ;
 
-OptionalWithSerdeproperties
- :
- | WithSerdeproperties
+ OptionalWithSerdeproperties
+ : 
+ | ImpalaWithSerdeproperties
+ | HiveWithSerdeproperties
  ;
 
-WithSerdeproperties
- : 'WITH' '<hive>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
- | 'WITH' '<impala>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
+ImpalaWithSerdeproperties
+ :'<impala>WITH' '<impala>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
  ;
 
+HiveWithSerdeproperties
+ :'<hive>WITH' '<hive>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
+ ;
+  
 WithSerdeproperties_EDIT
- : 'WITH' 'CURSOR'
+ : HiveWithSerdeproperties_EDIT
+ | ImpalaWithSerdeproperties_EDIT
+ ;
+
+ HiveWithSerdeproperties_EDIT
+ : '<hive>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['SERDEPROPERTIES']);
    }
- | 'WITH' 'CURSOR' ParenthesizedPropertyAssignmentList
+ | '<hive>WITH' 'CURSOR' ParenthesizedPropertyAssignmentList
+   {
+     parser.suggestKeywords(['SERDEPROPERTIES']);
+   }
+ ;
+
+  ImpalaWithSerdeproperties_EDIT
+ : '<impala>WITH' 'CURSOR'
+   {
+     parser.suggestKeywords(['SERDEPROPERTIES']);
+   }
+ | '<impala>WITH' 'CURSOR' ParenthesizedPropertyAssignmentList
    {
      parser.suggestKeywords(['SERDEPROPERTIES']);
    }
@@ -1818,15 +1841,15 @@ IndexType_EDIT
 
 OptionalWithDeferredRebuild
  :
- | 'WITH' '<hive>DEFERRED' '<hive>REBUILD'
+ | '<hive>WITH' '<hive>DEFERRED' '<hive>REBUILD'
  ;
 
 OptionalWithDeferredRebuild_EDIT
- : 'WITH' 'CURSOR'
+ : '<hive>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['DEFERRED REBUILD']);
    }
- | 'WITH' '<hive>DEFERRED' 'CURSOR'
+ | '<hive>WITH' '<hive>DEFERRED' 'CURSOR'
    {
      parser.suggestKeywords(['REBUILD']);
    }

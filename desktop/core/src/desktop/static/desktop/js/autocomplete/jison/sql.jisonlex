@@ -200,6 +200,7 @@
 <hive>'VIEW'                               { return '<hive>VIEW'; }
 <hive>'WAIT'                               { return '<hive>WAIT'; }
 <hive>'WEEK'                               { return '<hive>WEEK'; }
+<hive>'WITH'                               { return '<hive>WITH'; }
 <hive>'WINDOW'                             { return '<hive>WINDOW'; }
 <hive>'YEAR'                               { return '<hive>YEAR'; }
 
@@ -508,6 +509,7 @@
 <impala>'WHENEVER'                         { return '<impala>WHENEVER'; }
 <impala>'WIDTH_BUCKET'                     { return '<impala>WIDTH_BUCKET'; }
 <impala>'WINDOW'                           { return '<impala>WINDOW'; }
+<impala>'WITH'                             { return '<impala>WITH'; }
 <impala>'WITHIN'                           { return '<impala>WITHIN'; }
 <impala>'WITHOUT'                          { return '<impala>WITHOUT'; }
 

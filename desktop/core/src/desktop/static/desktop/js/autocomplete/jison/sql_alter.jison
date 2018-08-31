@@ -607,15 +607,15 @@ AndWait_EDIT
 
 OptionalWithOverwriteTblProperties
  :
- | 'WITH' '<hive>OVERWRITE' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
+ | '<hive>WITH' '<hive>OVERWRITE' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  ;
 
 WithOverwriteTblProperties_EDIT
- : 'WITH' 'CURSOR'
+ : AnyWith 'CURSOR'
    {
      parser.suggestKeywords(['OVERWRITE TBLPROPERTIES']);
    }
- | 'WITH' '<hive>OVERWRITE' 'CURSOR'
+ | '<hive>WITH' '<hive>OVERWRITE' 'CURSOR'
    {
      parser.suggestKeywords(['TBLPROPERTIES']);
    }
@@ -641,7 +641,7 @@ AnyColumns
  ;
 
 HiveExchange
- : '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
+ : '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
  ;
 
 HiveExchange_EDIT
@@ -653,18 +653,18 @@ HiveExchange_EDIT
    {
      parser.suggestKeywords(['WITH TABLE']);
    }
- | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' 'CURSOR'
+ | '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['TABLE']);
    }
- | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' 'CURSOR'
+ | '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' '<hive>TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName_EDIT
+ | '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName_EDIT
  | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT
- | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
+ | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT '<hive>WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
  ;
 
 ExchangePartitionSpec
