@@ -104,7 +104,7 @@ class ImpalaDbms(HiveServer2Dbms):
       # Allow timeout exceptions to propagate
       raise e
     except Exception, e:
-      msg = 'Failed to invalidate `%s`' % database
+      msg = 'Failed to invalidate `%s`: %s' % (database or 'databases', e)
       raise QueryServerException(msg)
     finally:
       if handle:
