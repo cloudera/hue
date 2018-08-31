@@ -823,7 +823,7 @@ NonStartingToken
  | 'VARIANCE'
  | 'WHEN'
  | 'WHERE'
- | 'WITH'
+ | AnyWith
  ;
 
 DataDefinition
@@ -888,6 +888,12 @@ AnyTable
  : 'TABLE'
  | '<hive>TABLE'
  | '<impala>TABLE'
+ ;
+
+AnyWith
+ : 'WITH'
+ | '<hive>WITH'
+ | '<impala>WITH'
  ;
 
 DatabaseOrSchema
@@ -1455,15 +1461,15 @@ OptionalWithReplication
  ;
 
 WithReplication
- : 'WITH' '<impala>REPLICATION' '=' SignedInteger
+ : '<impala>WITH' '<impala>REPLICATION' '=' SignedInteger
  ;
 
 WithReplication_EDIT
- : 'WITH' 'CURSOR'
+ : '<impala>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['REPLICATION =']);
    }
- | 'WITH' '<impala>REPLICATION' 'CURSOR'
+ | '<impala>WITH' '<impala>REPLICATION' 'CURSOR'
    {
      parser.suggestKeywords(['=']);
    }
@@ -2033,11 +2039,11 @@ OptionalStraightJoin
  ;
 
 CommonTableExpression
- : 'WITH' WithQueries  -> $2
+ : AnyWith WithQueries  -> $2
  ;
 
 CommonTableExpression_EDIT
- : 'WITH' WithQueries_EDIT
+ : AnyWith WithQueries_EDIT
  ;
 
 WithQueries
@@ -2506,13 +2512,13 @@ GroupByClause_EDIT
 OptionalHiveGroupingSetsCubeOrRollup
  :
  | HiveGroupingSets
- | 'WITH' '<hive>CUBE'
- | 'WITH' '<hive>ROLLUP'
+ | '<hive>WITH' '<hive>CUBE'
+ | '<hive>WITH' '<hive>ROLLUP'
  ;
 
 OptionalHiveGroupingSetsCubeOrRollup_EDIT
  : HiveGroupingSets_EDIT
- | 'WITH' 'CURSOR'
+ | '<hive>WITH' 'CURSOR'
    {
      if (parser.isHive()) {
        parser.suggestKeywords(['CUBE', 'ROLLUP']);
