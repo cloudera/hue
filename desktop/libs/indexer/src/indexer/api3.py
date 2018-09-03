@@ -167,7 +167,7 @@ def guess_field_types(request):
     })
 
     # Note: Would also need to set charset to table (only supported in Hive)
-    if 'sample' in format_:
+    if 'sample' in format_ and format_['sample']:
       format_['sample'] = escape_rows(format_['sample'], nulls_only=True, encoding=encoding)
     for col in format_['columns']:
       col['name'] = smart_unicode(col['name'], errors='replace', encoding=encoding)
