@@ -69,6 +69,7 @@ class EnvelopeIndexer(object):
       shell_command_name = "pipeline.sh"
       shell_command = """#!/bin/bash
 
+export SPARK_DIST_CLASSPATH=`hadoop classpath`
 SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
       hdfs_shell_cmd_path = os.path.join(workspace_path, shell_command_name)
       self.fs.do_as_user(self.username, self.fs.create, hdfs_shell_cmd_path, data=shell_command)
