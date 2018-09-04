@@ -38,7 +38,7 @@ def _exec(service, command, parameters=None):
   if parameters is None:
     parameters = {}
 
-  if service == 'analyticdb':
+  if service == 'dataware':
     hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
   elif service == 'dataeng':
     hostname = ALTUS.HOSTNAME_DATAENG.get()
