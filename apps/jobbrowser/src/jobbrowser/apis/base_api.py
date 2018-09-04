@@ -31,6 +31,7 @@ LOG = logging.getLogger(__name__)
 def get_api(user, interface):
   from jobbrowser.apis.bundle_api import BundleApi
   from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
+  from jobbrowser.apis.data_warehouse import DataWarehouseClusterApi
   from jobbrowser.apis.livy_api import LivySessionsApi, LivyJobApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.query_api import QueryApi
@@ -49,6 +50,8 @@ def get_api(user, interface):
     return BundleApi(user)
   elif interface == 'dataeng-clusters':
     return DataEngClusterApi(user)
+  elif interface == 'dataware-clusters':
+    return DataWarehouseClusterApi(user)
   elif interface == 'dataeng-jobs':
     return DataEngJobApi(user)
   elif interface == 'livy-sessions':

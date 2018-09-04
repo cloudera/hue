@@ -131,7 +131,7 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'jobs' or interface == 'report':
+  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
@@ -141,7 +141,7 @@ def get_context_computes(request, interface):
       } for cluster in clusters if cluster.get('type') == 'direct'
     ])
 
-  if interface == 'impala' or interface == 'jobs' or interface == 'report':
+  if interface == 'impala' or interface == 'report':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn'),
@@ -152,7 +152,7 @@ def get_context_computes(request, interface):
         } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters'] if cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515']
       )
 
-  if interface == 'oozie' or interface == 'jobs' or interface == 'spark2':
+  if interface == 'oozie' or interface == 'spark2':
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       computes.extend([{
           'id': cluster.get('crn'),
@@ -165,6 +165,28 @@ def get_context_computes(request, interface):
         } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
       )
       # TODO if interface == 'spark2' keep only SPARK type
+
+  if interface == 'jobs':
+    for cluster in clusters:
+      cluster = {
+        'id': cluster.get('id'),
+        'name': cluster.get('name'),
+        'status': 'CREATED',
+        'environmentType': cluster.get('type'),
+        'serviceType': cluster.get('interface'),
+        'namespace': '',
+        'type': cluster.get('type')
+      }
+        
+      if cluster.get('type') == 'altus':
+        cluster['name'] = 'Altus DE'
+        cluster['type'] = 'altus-de'
+        computes.append(cluster)
+        cluster = cluster.copy()
+        cluster['name'] = 'Altus Data Warehouse'
+        cluster['type'] = 'altus-dw'
+
+      computes.append(cluster)
 
   response[interface] = computes
   response['status'] = 0

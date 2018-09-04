@@ -2468,7 +2468,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2771,9 +2771,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         };
         var dataEngInterfaceCondition = function () {
-          // return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
-          return self.compute() && self.compute()['type'].indexOf('altus') >= 0;
-        };
+          return self.compute() && self.compute()['type'].indexOf('altus-de') >= 0;
+        }
+        var dataWarehouseInterfaceCondition = function () {
+          return self.compute() && self.compute()['type'].indexOf('altus-dw') >= 0;
+        }
         var schedulerInterfaceCondition = function () {
           return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         };
@@ -2788,6 +2790,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
           {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
+          {'interface': 'dataware-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouseInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
@@ -2971,6 +2974,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'schedules':
           case 'bundles':
           case 'dataeng-clusters':
+          case 'dataware-clusters':
           case 'dataeng-jobs':
           case 'livy-sessions':
             self.selectInterface(h);
