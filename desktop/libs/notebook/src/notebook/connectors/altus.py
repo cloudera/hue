@@ -256,31 +256,10 @@ class AnalyticDbApi():
     else:
       command = 'createAzureCluster'
 
-    return _exec('analyticdb', command, params)
+    return _exec('dataware', command, params)
 
   def list_clusters(self):
-    """
-    e.g. returns
-    [{
-            "status": "CREATED",
-            "namespaceCrn": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:spot-ns/7bdb225f-a7a1-408e-8503-1b3a422cc039",
-            "workersGroupSize": 4,
-            "clusterName": "spot",
-            "environmentType": "AWS",
-            "secured": false,
-            "environmentCrn": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:Spot-AWS-dev2/5a6d0ced-c8af-4fa3-9b24-8c5a3ea11cf8",
-            "securityConfiguration": {
-                "enabled": false
-            },
-            "creationDate": "2018-06-01T13:14:43.530000+00:00",
-            "crn": "crn:altus:analyticdb:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:spot/70595482-6a46-4a9d-b395-56fcabe079e4",
-            "instanceType": "r4.4xlarge",
-            "cdhVersion": "CDH514"
-        },
-      ...
-    ]
-    """
-    return _exec('analyticdb', 'listClusters')
+    return _exec('dataware', 'listClusters')
 
   def submit_hue_query(self, cluster_crn, payload):
-    return _exec('analyticdb', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
+    return _exec('dataware', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
