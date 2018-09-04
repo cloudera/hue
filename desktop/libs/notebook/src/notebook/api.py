@@ -229,8 +229,9 @@ def fetch_result_data(request):
   response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
 
   # Materialize and HTML escape results
-  if response['result'].get('data') and response['result'].get('type') == 'table':
+  if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
     response['result']['data'] = escape_rows(response['result']['data'])
+    response['result']['isEscaped'] = True
 
   response['status'] = 0
 
