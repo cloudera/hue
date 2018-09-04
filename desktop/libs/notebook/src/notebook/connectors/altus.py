@@ -238,7 +238,7 @@ class AnalyticDbApi():
     params = {
       'clusterName': cluster_name,
       'cdhVersion': cdh_version,
-      'publicKey': public_key,
+      'publicKey': u'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuTEfNIW8LEcVgprUrourbYjoW1RaTLhfzPnnBjJrg14koQrosl+s9phrpBBLTWmQuQdvy9iC2ma//gY5nz/7e+QuaeENhhoEiZn1PDBbFakD/AOjZXIu6DTEgCrOeXsQauFZKOkcFvrBGJC0qigYU3b8Eys4cun3RQ4S9WkDW6538wOSnsm6sXcL84KqbH+ay5gTk+lz3bi/6plALZMItbRz9IulXnLM4QfCwMxXTU/IjtnT+ltZVvKsWpfvDQ3Oyu/a6gK369iXcSP0e07KAzWiv2WYX46sNzZ8+de9ho1/VMaXnI4WrooV9lxByKWD+WsXkqtctT16VfxpX8CeR romain@unreal\n',
       'instanceType': instance_type,
       'environmentName': environment_name,
       'workersGroupSize': workers_group_size,
@@ -263,3 +263,6 @@ class AnalyticDbApi():
 
   def submit_hue_query(self, cluster_crn, payload):
     return _exec('dataware', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
+
+  def delete_cluster(self, cluster_id):
+    return _exec('dataware', 'deleteCluster', {'clusterName': cluster_id})
