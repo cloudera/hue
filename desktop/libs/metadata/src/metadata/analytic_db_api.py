@@ -49,13 +49,13 @@ def error_handler(view_fn):
 def create_cluster(request):
   response = {'status': -1}
 
-  cluster_name = json.loads(request.POST.get('cluster_name'))
-  cdh_version = json.loads(request.POST.get('cdh_version'))
-  public_key = json.loads(request.POST.get('public_key'))
-  instance_type = json.loads(request.POST.get('instance_type', "workers_group_size"''))
-  environment_name = json.loads(request.POST.get('environment_name'))
-  workers_group_size = json.loads(request.POST.get('workers_group_size', '3'))
-  namespace_name = json.loads(request.POST.get('namespace_name', 'null'))
+  cluster_name = request.POST.get('cluster_name')
+  cdh_version = request.POST.get('cdh_version')
+  public_key = request.POST.get('public_key')
+  instance_type = request.POST.get('instance_type', "workers_group_size"'')
+  environment_name = request.POST.get('environment_name')
+  workers_group_size = request.POST.get('workers_group_size', '3')
+  namespace_name = request.POST.get('namespace_name', 'null')
 
   api = AnalyticDbApi(request.user)
   data = api.create_cluster(
