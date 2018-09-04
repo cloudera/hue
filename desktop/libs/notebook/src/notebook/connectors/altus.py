@@ -232,23 +232,31 @@ class AnalyticDbApi():
 
   def __init__(self, user): pass
 
-  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None):
-    # [--cloudera-manager-username <value>]
-    # [--cloudera-manager-password <value>]
+  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
+        cloudera_manager_username='hue', cloudera_manager_password='hue'):
 
-    params = { # cloud_provider: AWS, Azure...
+    params = {
       'clusterName': cluster_name,
       'cdhVersion': cdh_version,
       'publicKey': public_key,
       'instanceType': instance_type,
       'environmentName': environment_name,
-      'workersGroupSize': workers_group_size
+      'workersGroupSize': workers_group_size,
+      'workersConfiguration': {},
+      'clouderaManagerUsername': cloudera_manager_username,
+      'clouderaManagerPassword': cloudera_manager_password,
+      'retypedPassword': cloudera_manager_password
     }
 
     if namespace_name:
       params['namespaceName'] = namespace_name
 
-    return _exec('analyticdb', 'createAWSCluster', params)
+    if cloud_provider == 'aws':
+      command = 'createAWSCluster'
+    else:
+      command = 'createAzureCluster'
+
+    return _exec('analyticdb', command, params)
 
   def list_clusters(self):
     """
