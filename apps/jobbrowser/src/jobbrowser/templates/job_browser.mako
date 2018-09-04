@@ -2664,7 +2664,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.createCluster = function() {
-        if (self.interface().indexOf('dataeng') != -1) {
+        if (vm.interface().indexOf('dataeng') != -1) {
           $.post("/metadata/api/dataeng/create_cluster/", {
             "cluster_name": "cluster_name",
             "cdh_version": "CDH515",
@@ -2679,21 +2679,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.updateJobs();
           });
         } else {
-          self.createDataWarehouseCluster = function() {
-            $.post("/metadata/api/analytic_db/create_cluster/", {
-              "cluster_name": "cluster_name",
-              "cdh_version": "CDH515",
-              "public_key": "public_key",
-              "instance_type": "m4.xlarge",
-              "environment_name": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:jheyming-secure/b4e6d99a-261f-4ada-9b4a-576aa0af8979",
-              "workers_group_size": "3",
-              "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
-            }, function(data) {
-              console.log(ko.mapping.toJSON(data));
-              $(document).trigger("info", ko.mapping.toJSON(data));
-              self.updateJobs();
-            });
-          }
+          $.post("/metadata/api/analytic_db/create_cluster/", {
+            "cluster_name": "Analytics",
+            "cdh_version": "CDH515",
+            "public_key": "public_key",
+            "instance_type": "m4.xlarge",
+            "environment_name": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:jheyming-secure/b4e6d99a-261f-4ada-9b4a-576aa0af8979",
+            "workers_group_size": "3",
+            "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
+          }, function(data) {
+            console.log(ko.mapping.toJSON(data));
+            $(document).trigger("info", ko.mapping.toJSON(data));
+            self.updateJobs();
+          });
         }
       }
 
