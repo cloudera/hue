@@ -356,47 +356,11 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
-    self.loadingNamespaces = ko.observable(true);
-    self.availableNamespaces = ko.observableArray();
-    self.namespace = ko.observable();
+    self.namespace = ko.observable(snippet.namespace);
 
-    self.lastNamespacePromise = undefined;
-    self.reloadNamespaces = function () {
-      self.loadingNamespaces(true);
-      self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: self.type() }).done(function (context) {
-        self.availableNamespaces(context.namespaces);
-        if (!snippet.namespace || !context.namespaces.some(function (namespace) {
-          if (namespace.id === snippet.namespace.id) {
-            self.namespace(namespace);
-            return true;
-          }})) {
-          self.namespace(context.namespaces[0]);
-        }
-      }).always(function () {
-        self.loadingNamespaces(false);
-      });
-    };
-    self.reloadNamespaces();
+    self.compute = ko.observable(snippet.compute);
 
-    self.loadingComputes = ko.observable(true);
-    self.availableComputes = ko.observableArray();
-    self.compute = ko.observable();
-
-    self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: self.type() }).done(function (computes) {
-      self.availableComputes(computes);
-      if (!snippet.compute || !computes.some(function (compute) {
-        if (compute.id === snippet.compute.id) {
-          self.compute(compute);
-          return true;
-        }
-      })) {
-        self.compute(computes[0]);
-      }
-    }).always(function () {
-      self.loadingComputes(false);
-    });
-
-    self.loadingDatabases = ko.observable(false);
+    self.availableDatabases = ko.observableArray();
     self.database = ko.observable();
     var previousDatabase = null;
 
@@ -409,98 +373,8 @@ var EditorViewModel = (function() {
         previousDatabase = newValue;
       }
     });
+
     self.database(typeof snippet.database !== "undefined" && snippet.database != null ? snippet.database : null);
-    self.availableDatabases = ko.observableArray();
-
-    var updateDatabaseThrottle = -1;
-    self.updateDatabases = function () {
-      if (self.isSqlDialect()) {
-        self.loadingDatabases(true);
-        $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
-          window.clearTimeout(updateDatabaseThrottle);
-          updateDatabaseThrottle = window.setTimeout(function () {
-            DataCatalog.getEntry({
-              sourceType: self.type(),
-              namespace: self.namespace(),
-              compute: self.compute(),
-              path: [],
-              definition: {type: 'source'}
-            }).done(function (sourceEntry) {
-              sourceEntry.getChildren({silenceErrors: true}).done(function (databaseEntries) {
-                var databaseNames = [];
-                databaseEntries.forEach(function (databaseEntry) {
-                  databaseNames.push(databaseEntry.name);
-                });
-                self.availableDatabases(databaseNames);
-              }).fail(function () {
-                self.availableDatabases([]);
-              }).always(function () {
-                if (self.database() && self.availableDatabases().indexOf(self.database()) === -1) {
-                  if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf('default') !== -1) {
-                    self.database('default');
-                  } else {
-                    self.database(self.availableDatabases()[0])
-                  }
-                }
-                self.loadingDatabases(false);
-
-                huePubSub.publish('assist.set.database', {
-                  source: self.type(),
-                  namespace: self.namespace(),
-                  name: self.database()
-                });
-              });
-            });
-          }, 10);
-        });
-      } else {
-        self.availableDatabases([]);
-        self.database(undefined);
-      }
-    };
-
-    self.loadingContext = ko.pureComputed(function () {
-      return self.loadingNamespaces() || self.loadingComputes() || self.loadingDatabases();
-    });
-
-    $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
-      self.compute.subscribe(function (newCompute) {
-        // When the compute changes we set the corresponding namespace and update the databases
-        if (newCompute) {
-          var found = self.availableNamespaces().some(function (namespace) {
-            // TODO: Remove name check once compute.namespace is a namespace ID
-            if (namespace.name === newCompute.namespace || namespace.id === newCompute.namespace) {
-              if (!self.namespace() || self.namespace().id !== namespace.id) {
-                self.namespace(namespace);
-                self.updateDatabases();
-              }
-              return true;
-            }
-          });
-          if (!found && newCompute.namespace) {
-            self.namespace(newCompute.namespace);
-          }
-        }
-      });
-
-      self.namespace.subscribe(function (newNamespace) {
-        if (newNamespace) {
-          // When the namespace changes we set the corresponding compute and update the databases
-          var found = self.availableComputes().some(function (compute) {
-            if (compute.namespace === newNamespace.id) {
-              if (!self.compute() || self.compute().id !== compute.id) {
-                self.compute(compute);
-                self.updateDatabases();
-              }
-              return true;
-            }
-          });
-          if (!found) {
-            self.compute(undefined);
-          }
-        }
-      })
-    });
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
@@ -578,9 +452,6 @@ var EditorViewModel = (function() {
         self.fetchQueries();
       }
     };
-
-    self.isSqlDialect.subscribe(self.updateDatabases);
-    self.updateDatabases();
 
     huePubSub.subscribeOnce('assist.source.set', function (source) {
       if (source !== self.type()) {
@@ -3252,7 +3123,7 @@ var EditorViewModel = (function() {
     };
 
     self.isEditing = ko.observable(false);
-    self.isEditing.subscribe(function (newVal) {
+    self.isEditing.subscribe(function () {
       $(document).trigger("editingToggled");
     });
     self.toggleEditing = function () {
@@ -3342,25 +3213,6 @@ var EditorViewModel = (function() {
       withActiveSnippet(function (activeSnippet) {
         huePubSub.publish('set.active.snippet.type', activeSnippet.type());
       })
-    }, self.huePubSubId);
-
-    huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
-      self.selectedNotebook().snippets().forEach(function (snippet) {
-        if (snippet.type() === sourceType) {
-          snippet.reloadNamespaces();
-        }
-      })
-    });
-
-    huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
-      var notebook = self.selectedNotebook();
-      if (details.entry.isSource() && notebook) {
-        notebook.snippets().forEach(function (snippet) {
-          if (details.entry.getSourceType() === snippet.type()) {
-            snippet.updateDatabases();
-          }
-        });
-      }
     }, self.huePubSubId);
 
     huePubSub.subscribe('save.snippet.to.file', function() {
