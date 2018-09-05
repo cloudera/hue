@@ -2315,7 +2315,7 @@ ${ assist.assistPanel() }
       };
       self.loadSampleData = function(resp) {
         resp.columns.forEach(function (entry, i, arr) {
-          if (self.destination.outputFormat() === 'table') {
+          if (self.destination.outputFormat() === 'table' && self.source.inputFormat() != 'rdbms') {
             entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
           } else if (self.destination.outputFormat() === 'index') {
             entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
