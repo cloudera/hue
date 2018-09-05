@@ -127,6 +127,8 @@ def run_sqoop(request, source, destination, start_time):
 
   if not rdbms_all_tables_selected:
     rdbms_table_name = source['rdbmsTableName']
+  else:
+    rdbms_table_name = None
 
   if rdbms_mode == 'configRdbms' and rdbms_name == 'jdbc':
     username = ''
@@ -134,6 +136,7 @@ def run_sqoop(request, source, destination, start_time):
     url = ''
     interpreters = get_ordered_interpreters(request.user)
     key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
+
     if key:
       options = key[0]['options']
       url = options['url']
@@ -171,6 +174,7 @@ def run_sqoop(request, source, destination, start_time):
       'rdbmsUserName': rdbms_user_name,
       'passwordFilePath': password_file_path
     }
+
   if destination_type == 'file':
     success_url = '/filebrowser/view/' + destination_name
     targetDir = request.fs.fs_defaultfs + destination_name
@@ -215,6 +219,7 @@ def run_sqoop(request, source, destination, start_time):
       statement = _splitby_column_check(statement, destination_splitby_column)
   elif destination_type == 'hbase':
     success_url = '/hbase/#HBase/' + destination_table_name
+
     # Todo
   statement = '%(statement)s --num-mappers %(numMappers)s' % {
     'statement': statement,
@@ -222,9 +227,9 @@ def run_sqoop(request, source, destination, start_time):
   }
 
   task = make_notebook(
-    name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
+    name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsTableName)s to %(path)s') % {
       'rdbmsDatabaseName': rdbms_database_name,
-      'rdbmsDatabaseName': rdbms_database_name,
+      'rdbmsTableName': '*' if rdbms_all_tables_selected else rdbms_table_name,
       'path': destination_name
     },
     editor_type='sqoop1',
