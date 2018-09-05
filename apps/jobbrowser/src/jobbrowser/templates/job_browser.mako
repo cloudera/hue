@@ -79,7 +79,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </a>
 % endif
 
-  % if not is_mini:
+
+% if is_mini:
+  <ul class="nav nav-pills">
+    <!-- ko foreach: availableInterfaces -->
+      <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
+        <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
+      </li>
+    <!-- /ko -->
+  </ul>
+  <span class="pull-right">
+    <!-- ko if: availableComputes().length > 1 -->
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active clusters') }' } }"></div>
+    <!-- /ko -->
+  </span>
+% else:    
   <div class="navbar hue-title-bar">
     <div class="navbar-inner">
       <div class="container-fluid">
@@ -116,7 +130,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
   </div>
-  % endif
+% endif
 
 
   <script type="text/html" id="apps-list${ SUFFIX }">
@@ -2780,15 +2794,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         };
         var dataEngInterfaceCondition = function () {
           return self.compute() && self.compute()['type'].indexOf('altus-de') >= 0;
-        }
+        };
         var dataWarehouseInterfaceCondition = function () {
           return self.compute() && self.compute()['type'].indexOf('altus-dw') >= 0;
-        }
+        };
         var schedulerInterfaceCondition = function () {
           return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         };
+        var schedulerExtraInterfaceCondition = function () {
+          return '${ is_mini }' == 'False' && schedulerInterfaceCondition();
+        };
         var livyInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
+          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
         };
         var queryInterfaceCondition = function () {
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
@@ -2802,8 +2819,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
-          {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
-          {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
+          {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
+          {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
         ];
 
