@@ -215,10 +215,29 @@ def guess_field_types(request):
     sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
     table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
 
+    # cf. https://github.com/apache/sqoop/blob/trunk/src/java/org/apache/sqoop/hive/HiveTypes.java#L39
+    for col in table_metadata:
+      col_type = col['type'].upper().split('(')[0]
+      print col_type
+      if col_type in ('INTEGER', 'SMALLINT', 'INT'):
+        col['type'] = 'int'
+      elif col_type in ('VARCHAR', 'CHAR', 'LONGVARCHAR', 'NVARCHAR', 'NCHAR', 'LONGNVARCHAR', 'DATE', 'TIME', 'TIMESTAMP', 'CLOB'):
+        col['type'] = 'string'
+      elif col_type in ('NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE', 'REAL'):
+        col['type'] = 'double'
+      elif col_type in ('BIT', 'BOOLEAN'):
+        col['type'] = 'boolean'
+      elif col_type in ('TINYINT',):
+        col['type'] = 'tinyint'
+      elif col_type in ('BIGINT',):
+        col['type'] = 'bigint'
+      else:
+        col['type'] = 'string'
+
     format_ = {
         "sample": list(sample['rows'])[:4],
         "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            Field(col['name'], col['type']).to_dict()
             for col in table_metadata
         ]
     }
