@@ -1422,8 +1422,9 @@ def test_collect_validation_messages_extras():
 def test_db_migrations_sqlite():
   versions = ['5.' + str(i) for i in range(7, 16)]
   for version in versions:
-    name = 'hue_' + version
-    path = get_desktop_root('./core/src/desktop/test_data/' + name + '.db')
+    name = 'hue_' + version + '_' + uuid.uuid4().hex
+    file_name = 'hue_' + version + '.db'
+    path = get_desktop_root('./core/src/desktop/test_data/' + file_name)
     DATABASES[name] = {
       'ENGINE' : 'django.db.backends.sqlite3',
       'NAME' : path,
@@ -1436,15 +1437,20 @@ def test_db_migrations_sqlite():
       'ATOMIC_REQUESTS' : True,
       'CONN_MAX_AGE' : 0,
     }
-    call_command('migrate', '--fake-initial', '--database=' + name)
+    try:
+      call_command('migrate', '--fake-initial', '--database=' + name)
+    finally:
+      del DATABASES[name]
 
 def test_db_migrations_mysql():
   if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
     raise SkipTest
   versions = ['5_' + str(i) for i in range(7, 16)]
+  os.putenv('PATH', '$PATH:/usr/local/bin')
   for version in versions:
-    name = 'hue_' + version
-    path = get_desktop_root('./core/src/desktop/test_data/' + name + '_mysql.sql')
+    file_name = 'hue_' + version + '_mysql.sql'
+    name = 'hue_' + version + '_' + uuid.uuid4().hex
+    path = get_desktop_root('./core/src/desktop/test_data/' + file_name)
     DATABASES[name] = {
       'ENGINE': desktop.conf.DATABASE.ENGINE.get(),
       'NAME': name,
@@ -1458,8 +1464,9 @@ def test_db_migrations_mysql():
       'PATH': path,
       'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
     }
-    os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "DROP DATABASE %(SCHEMA)s"' % DATABASES[name])
-    os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name]) # No way to run this command with django
-    os.system('mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name])
-    call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
-    os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "DROP DATABASE %(SCHEMA)s"' % DATABASES[name])
+    try:
+      os.system('mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name]) # No way to run this command with django
+      os.system('mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name])
+      call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
+    finally:
+      del DATABASES[name]
