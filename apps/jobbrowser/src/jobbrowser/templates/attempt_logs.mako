@@ -57,8 +57,8 @@ ${ comps.menubar() }
         <div class="card-body">
           <p>
             <ul class="nav nav-tabs">
-              <li><a href="${ url('jobbrowser.views.single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tmetadata">${_('Metadata')}</a></li>
-              <li><a href="${ url('jobbrowser.views.single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tcounters">${_('Counters')}</a></li>
+              <li><a href="${ url('single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tmetadata">${_('Metadata')}</a></li>
+              <li><a href="${ url('single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tcounters">${_('Counters')}</a></li>
               <li class="active"><a href="#logs" data-toggle="tab">${_('Logs')}</a></li>
             </ul>
             <div class="tab-content">
