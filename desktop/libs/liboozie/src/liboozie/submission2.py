@@ -720,6 +720,8 @@ except Exception, e:
 
     return """#!/usr/bin/env python
 
+import urllib
+
 from navoptapi.api_lib import ApiLib
 
 hostname = '%(hostname)s'
@@ -727,7 +729,7 @@ auth_key_id = '%(auth_key_id)s'
 auth_key_secret = '''%(auth_key_secret)s'''
 query = '%(query)s'
 cluster_crn = '%(cluster_crn)s'
-payload = '%(payload)s'.replace('show+tables', urllib.quote_plus(query.replace('\n', ' ')))
+payload = '''%(payload)s'''.replace('show+tables', urllib.quote_plus(query.replace('\\n', ' ')))
 
 def _exec(service, command, parameters=None):
   if parameters is None:
