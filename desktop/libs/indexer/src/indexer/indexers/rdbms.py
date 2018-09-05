@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_str
-from librdbms.conf import DATABASES, get_database_password, get_server_choices
+from librdbms.conf import DATABASES, get_database_password, get_server_choices, get_connector_name
 from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
@@ -166,8 +166,8 @@ def run_sqoop(request, source, destination, start_time):
     if destination['sqoopJobLibPaths']:
       lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
 
-    statement = '--connect jdbc:%(rdbmsName)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
-      'rdbmsName': rdbms_name,
+    statement = '--connect jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
+      'rdbmsType': get_connector_name(rdbms_name),
       'rdbmsHost': rdbms_host,
       'rdbmsPort': rdbms_port,
       'rdbmsDatabaseName': rdbms_database_name,
