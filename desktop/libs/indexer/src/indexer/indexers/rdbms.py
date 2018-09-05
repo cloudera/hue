@@ -208,11 +208,11 @@ def run_sqoop(request, source, destination, start_time):
   elif destination_type == 'table':
     success_url = reverse('metastore:describe_table', kwargs={'database': destination_database_name, 'table': destination_table_name})
     if rdbms_all_tables_selected:
-      statement = 'import-all-tables %(statement)s --hive-import' % {
+      statement = 'import-all-tables %(statement)s --hive-import --delete-target-dir' % {
         'statement': statement
       }
     else:
-      statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import' % {
+      statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import --delete-target-dir' % {
         'statement': statement,
         'rdbmsTableName': rdbms_table_name
       }

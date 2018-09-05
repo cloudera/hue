@@ -326,7 +326,8 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
           statements = notebook.get_data()['snippets'][0]['statement_raw']
 
           self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
-        elif action.data['type'] == 'spark' or action.data['type'] == 'spark-document':
+        elif action.data['type'] in ('spark', 'spark-document') or (
+              action.data['type'] in ('sqoop', 'sqoop-document') and action.data['properties']['statement'] in '--hive-import'):
           if not [f for f in action.data.get('properties').get('files', []) if f.get('value').endswith('hive-site.xml')]:
             hive_site_lib = Hdfs.join(deployment_dir + '/lib/', 'hive-site.xml')
             hive_site_content = get_hive_site_content()
