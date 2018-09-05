@@ -286,22 +286,9 @@ ${ hueIcons.symbols() }
 
   <div id="jobsPanel" class="jobs-panel" style="display: none;">
     <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
-    <ul class="nav nav-pills">
-      % if cluster != ANALYTIC_DB:
-      <li class="active" data-interface="jobs"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
-      % endif
-      % if 'jobbrowser' in apps:
-      <% from jobbrowser.conf import ENABLE_QUERY_BROWSER %>
-      % if ENABLE_QUERY_BROWSER.get():
-        <li data-interface="queries" class="${ 'active' if cluster == ANALYTIC_DB else '' }"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'queries')">${_('Queries')}</a></li>
-      % endif
-      % endif
-      % if cluster != ANALYTIC_DB:
-        <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
-        <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
-      % endif
-    </ul>
+    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
+      ${ _('Open') } <i class="fa fa-fw fa-expand"></i>
+    </a>
     <div id="mini_jobbrowser"></div>
   </div>
 
@@ -322,11 +309,11 @@ ${ hueIcons.symbols() }
         <div class="hue-sidebar-content">
           <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
-          <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
-          <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
+            <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
+            <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: item.isCategory -->
-          <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
+            <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>
