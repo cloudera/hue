@@ -96,7 +96,7 @@ def get_context_namespaces(request, interface):
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       # Note: attaching computes to namespaces might be done via the frontend in the future
       if interface == 'impala':
-        adb_clusters =  AnalyticDbApi(request.user).list_clusters()['clusters']
+        adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
         for _cluster in adb_clusters: # Add "fake" namespace if needed
           if not _cluster.get('namespaceCrn'):
             _cluster['namespaceCrn'] = _cluster['crn']
@@ -106,16 +106,17 @@ def get_context_namespaces(request, interface):
       else:
         adb_clusters = []
 
+      sdx_namespaces = SdxApi(request.user).list_namespaces()
+      # Adding "fake" namespace for cluster without one
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn')])
+
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
           'name': namespace.get('namespaceName'),
           'status': namespace.get('status'),
           'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
-        } for namespace in SdxApi(request.user).list_namespaces() if namespace.get('status') == 'CREATED' +
-             # Adding "fake" namespace for cluster without one
-             [_cluster for _cluster in adb_clusters if not cluster.get('namespaceCrn') and _cluster.get('status') == 'CREATED']
-        ]
-      )
+        } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED'
+      ])
 
   response[interface] = namespaces
   response['status'] = 0
