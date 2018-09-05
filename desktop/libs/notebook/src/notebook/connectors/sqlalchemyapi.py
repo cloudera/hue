@@ -58,10 +58,16 @@ class SqlAlchemyApi(Api):
     guid = uuid.uuid4().hex
     connection = self.engine.connect()
     result = connection.execute(snippet['statement'])
-    CONNECTION_CACHE[guid] = {
+    cache = {
       'connection': connection,
-      'result': result
+      'result': result,
+      'meta': [{
+          'name': col[0] if type(col) is dict or type(col) is tuple else col,
+          'type': 'String', #TODO: resolve
+          'comment': ''
+        } for col in result.cursor.description]
     }
+    CONNECTION_CACHE[guid] = cache
 
     return {
       'sync': False,
@@ -71,11 +77,7 @@ class SqlAlchemyApi(Api):
       'result': {
         'has_more': True,
         'data': [],
-        'meta': [{
-          'name': col[0] if type(col) is dict or type(col) is tuple else col,
-          'type': 'String', #TODO: resolve
-          'comment': ''
-        } for col in result.cursor.description],
+        'meta': cache['meta'],
         'type': 'table'
       }
     }
@@ -92,16 +94,18 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     guid = snippet['result']['handle']['guid']
-    connection = CONNECTION_CACHE.get(guid)
-    if connection:
-      data = connection['result'].fetchmany(rows)
+    cache = CONNECTION_CACHE.get(guid)
+    if cache:
+      data = cache['result'].fetchmany(rows)
+      meta = cache['meta']
     else:
       data = []
+      meta = []
     has_result_set = data is not None
     return {
       'has_more': has_result_set and len(data) >= rows,
       'data': data if has_result_set else [],
-      'meta': [],
+      'meta': meta,
       'type': 'table'
     }
 
@@ -204,7 +208,7 @@ class SqlAlchemyApi(Api):
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)
-    response = {'status': -1}
+    response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column)
     has_result_set = sample_data is not None
