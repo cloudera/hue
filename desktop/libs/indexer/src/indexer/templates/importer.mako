@@ -1509,7 +1509,7 @@ ${ assist.assistPanel() }
       });
 
       // Rdbms
-      self.rdbmsMode = ko.observable('customRdbms');
+      self.rdbmsMode = ko.observable();
       self.rdbmsMode.subscribe(function (val) {
         self.rdbmsTypes(null);
         self.rdbmsType('');

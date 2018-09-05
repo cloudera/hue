@@ -88,7 +88,7 @@ def get_db_component(request):
   except Exception, e:
     message = _('Error accessing the database %s: %s') % (name, e)
     LOG.warn(message)
-    format['message'] = message
+    format_['message'] = message
 
   return JsonResponse(format_)
 
