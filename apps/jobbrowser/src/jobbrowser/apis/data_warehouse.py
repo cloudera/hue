@@ -50,7 +50,7 @@ class DataWarehouseClusterApi(Api):
         'duration': 1,
         'submitted': app['creationDate'],
         'canWrite': True
-      } for app in jobs['clusters']],
+      } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
       'total': len(jobs)
     }
 
