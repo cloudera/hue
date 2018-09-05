@@ -33,6 +33,7 @@ var ContextCatalog = (function () {
   var CONTEXT_CATALOG_VERSION = 4;
   var NAMESPACES_CONTEXT_TYPE = 'namespaces';
   var COMPUTES_CONTEXT_TYPE = 'computes';
+  var DISABLE_CACHE = true;
 
   var ContextCatalog = (function () {
 
@@ -64,6 +65,11 @@ var ContextCatalog = (function () {
     ContextCatalog.prototype.getSaved = function (contextType, sourceType) {
       var self = this;
       var deferred = $.Deferred();
+
+      if (DISABLE_CACHE) {
+        return deferred.reject().promise();
+      }
+
       self.getStore().getItem(sourceType + '_' + contextType).then(function (saved) {
         if (saved && saved.version === CONTEXT_CATALOG_VERSION) {
           deferred.resolve(saved.entry);
