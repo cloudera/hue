@@ -61,8 +61,9 @@ class DebugToolbarMiddleware(MiddlewareMixin):
             return
 
         # Don't render the toolbar during AJAX requests.
-        if request.is_ajax():
-            return
+        #### enable this for django_debug_panel
+        #if request.is_ajax():
+        #    return
 
         toolbar = DebugToolbar(request)
         self.__class__.debug_toolbars[threading.current_thread().ident] = toolbar
