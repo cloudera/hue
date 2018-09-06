@@ -43,42 +43,15 @@ def get_db_component(request):
 
   try:
     source = json.loads(request.POST.get('source', '{}'))
-    user = User.objects.get(username=request.user)
-    name = None
-    if source['rdbmsMode'] == 'configRdbms':
-      if source['rdbmsType'] != 'jdbc':
-        query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-        db = rdbms.get(user, query_server=query_server)
-      else:
-        interpreters = get_ordered_interpreters(request.user)
-        options = {}
-        key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
-        if key:
-          options = key[0]['options']
 
-          db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
-    else:
-      name = source['rdbmsType']
-      if name != 'jdbc':
-        query_server = {
-          'server_name': name,
-          'server_host': source['rdbmsHostname'],
-          'server_port': int(source['rdbmsPort']),
-          'username': source['rdbmsUsername'],
-          'password': source['rdbmsPassword'],
-          'options': {},
-          'alias': name
-        }
-        db = rdbms.get(user, query_server=query_server)
-      else:
-        db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
+    db = _get_db(request)
 
     if source['rdbmsType'] != 'jdbc':
       assist = Assist(db)
     else:
       assist = JdbcAssist(db)
 
-    if not source['rdbmsDatabaseName']:
+    if not source['rdbmsDatabaseName'] or (source['rdbmsMode'] == "customRdbms" and not source['rdbmsDbIsValid']):
       data = assist.get_databases()
     elif source['rdbmsDatabaseName']:
       data = assist.get_tables(source['rdbmsDatabaseName'])
@@ -86,11 +59,46 @@ def get_db_component(request):
     format_['data'] = [{'name': element, 'value': element} for element in data]
     format_['status'] = 0
   except Exception, e:
-    message = _('Error accessing the database %s: %s') % (name, e)
+    message = _('Error accessing the database: %s') % e
     LOG.warn(message)
     format_['message'] = message
 
   return JsonResponse(format_)
+
+def _get_db(request):
+  source = json.loads(request.POST.get('source', request.POST.get('fileFormat', '{}')))
+  user = User.objects.get(username=request.user)
+  name = None
+
+  if source['rdbmsMode'] == 'configRdbms':
+    if source['rdbmsType'] != 'jdbc':
+      query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+      db = rdbms.get(user, query_server=query_server)
+    else:
+      interpreters = get_ordered_interpreters(request.user)
+      options = {}
+      key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
+      if key:
+        options = key[0]['options']
+
+        db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
+  else:
+    name = source['rdbmsType']
+    if name != 'jdbc':
+      query_server = {
+        'server_name': name,
+        'server_host': source['rdbmsHostname'],
+        'server_port': int(source['rdbmsPort']),
+        'username': source['rdbmsUsername'],
+        'password': source['rdbmsPassword'],
+        'options': {},
+        'alias': name
+      }
+      db = rdbms.get(user, query_server=query_server)
+    else:
+      db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
+
+  return db
 
 def jdbc_db_list(request):
   format_ = {'data': [], 'status': 1}
@@ -105,6 +113,7 @@ def get_drivers(request):
   servers_dict = dict(get_server_choices())
   format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in servers_dict.keys()]
   format_['data'].append({'value': 'jdbc', 'name': 'JDBC'})
+#   format_['data'].append({'value': 'sqlalchemy', 'name': 'SQL Alchemy'})
   format_['status'] = 0
 
   return JsonResponse(format_)
@@ -254,21 +263,26 @@ def _splitby_column_check(statement, destination_splitby_column):
 
 class RdbmsIndexer():
 
-  def __init__(self, user, db_conf_name):
+  def __init__(self, user, db_conf_name, db=None):
     self.user = user
     self.db_conf_name = db_conf_name
+    self.db = db
 
   def guess_format(self):
     return {"type": "csv"}
 
   def get_sample_data(self, mode=None, database=None, table=None, column=None):
-    query_server = rdbms.get_query_server_config(server=self.db_conf_name)
-    db = rdbms.get(self.user, query_server=query_server)
+    if self.db:
+      db = self.db
+    else:
+      query_server = rdbms.get_query_server_config(server=self.db_conf_name)
+      db = rdbms.get(self.user, query_server=query_server)
 
-    if mode == 'configRdbms':
+    if mode == 'configRdbms' or self.db_conf_name != 'jdbc':
       assist = Assist(db)
     else:
       assist = JdbcAssist(db)
+
     response = {'status': -1}
     sample_data = assist.get_sample_data(database, table, column)
 
