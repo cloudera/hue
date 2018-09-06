@@ -855,7 +855,7 @@ class Node():
       self.data['properties']['source_path'] = action['properties']['source_path']
       self.data['properties']['destination_path'] = action['properties']['destination_path']
 
-    elif self.data['type'] == ShellDocumentAction.TYPE:
+    elif self.data['type'] == ShellAction.TYPE or self.data['type'] == ShellDocumentAction.TYPE:
       if self.data['properties'].get('uuid'):
         notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
         action = notebook.get_data()['snippets'][0]
@@ -866,8 +866,15 @@ class Node():
         self.data['properties']['capture_output'] = action['properties']['capture_output']
         self.data['properties']['arguments'] = [{'value': prop} for prop in action['properties']['arguments']]
 
-        self.data['properties']['files'] = ([{'value': action['properties']['command_path']}] if not action['properties'].get('command_path', '').startswith('/') else []) + [{'value': prop.get('path', prop)} for prop in action['properties']['files']]
+        self.data['properties']['files'] = [{'value': prop.get('path', prop)} for prop in action['properties']['files']]
         self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
+
+      # Auto ship the script if it was forgotten
+      shell_command = self.data['properties']['shell_command']
+      if '/' in shell_command and not [f for f in self.data['properties']['files'] if shell_command in f['value']]:
+        self.data['properties']['files'].append({'value': shell_command})
+        self.data['properties']['shell_command'] = Hdfs.basename(shell_command)
+
 
     elif self.data['type'] == MapReduceDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
