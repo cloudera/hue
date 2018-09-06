@@ -1999,7 +1999,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- /ko -->
     <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
       <a href="javascript:void(0);" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value), text: $data.value"></a>
-      <a href="javascript: void(0);" data-bind="storageContextPopover: { path: $root.getHDFSPath($data.value), offset: { left: 5 } }"><i class="fa fa-info"></i></a>
+      <a href="javascript: void(0);" data-bind="storageContextPopover: { path: $root.getHDFSPath($data.value), orientation: 'left', offset: { top: 5 } }"><i class="fa fa-info"></i></a>
     <!-- /ko -->
     <!-- ko ifnot: $data.name.indexOf('logs') > -1 || $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
       <span data-bind="text: $data.value"></span>
@@ -2888,20 +2888,23 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var updateJobInterval = -1;
       var updateJobsInterval = -1;
       self.job.subscribe(function(val) {
+        self.monitorJob(val);
+      });
+
+      self.monitorJob = function(job) {
         window.clearInterval(updateJobInterval);
         window.clearInterval(updateJobsInterval);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
-          if (val) {
-            if (val.apiStatus() == 'RUNNING') {
-              updateJobInterval = setInterval(val.updateJob, 5000, 'jobbrowser');
+          if (job) {
+            if (job.apiStatus() == 'RUNNING') {
+              updateJobInterval = setInterval(job.updateJob, 5000, 'jobbrowser');
             }
           }
           else {
             updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
           }
         }
-      });
-
+      }
 
       self.breadcrumbs = ko.observableArray([]);
       self.resetBreadcrumbs = function(extraCrumbs) {
@@ -3034,9 +3037,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.subscribe('submit.rerun.popup.return', function (data) {
         $.jHueNotify.info('${_('Rerun submitted.')}');
         $('#rerun-modal${ SUFFIX }').modal('hide');
+
         jobBrowserViewModel.job().apiStatus('RUNNING');
-        jobBrowserViewModel.job().updateJob();
+        jobBrowserViewModel.monitorJob(jobBrowserViewModel.job());
       }, 'jobbrowser');
+
       % if is_mini:
         huePubSub.subscribe('mini.jb.navigate', function (interface) {
           $('#jobsPanel .nav-pills li').removeClass('active');
