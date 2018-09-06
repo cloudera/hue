@@ -67,13 +67,6 @@ def zkensemble():
     LOG.warn('Failed to get Solr url')
 
 
-ENABLE_NEW_IMPORTER = Config(
-  key="enable_new_importer",
-  help=_t("Flag to turn on the new metadata importer."),
-  type=bool,
-  default=False
-)
-
 # Deprecated as always on
 ENABLE_NEW_INDEXER = Config(
   key="enable_new_indexer",
@@ -86,7 +79,7 @@ ENABLE_SCALABLE_INDEXER = Config(
   key="enable_scalable_indexer",
   help=_t("Flag to turn on the Morphline Solr indexer."),
   type=bool,
-  default=False
+  default=True
 )
 
 CONFIG_INDEXER_LIBS_PATH = Config(
@@ -100,7 +93,7 @@ ENABLE_SQOOP = Config(
   key="enable_sqoop",
   help=_t("Flag to turn on Sqoop imports."),
   type=bool,
-  default=False
+  default=True
 )
 
 ENABLE_KAFKA = Config(
