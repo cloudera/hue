@@ -42,7 +42,7 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
 from indexer.indexers.morphline import MorphlineIndexer
-from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
+from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop,  _get_db
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 
@@ -210,9 +210,13 @@ def guess_field_types(request):
         "columns": columns,
     }
   elif file_format['inputFormat'] == 'rdbms':
-    query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
-    db = rdbms.get(request.user, query_server=query_server)
-    sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
+    if file_format.get('rdbmsUsername'):
+      db = _get_db(request)
+    else:
+      query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
+      db = rdbms.get(request.user, query_server=query_server)
+
+    sample = RdbmsIndexer(request.user, file_format['rdbmsType'], db=db).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
     table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
 
     # cf. https://github.com/apache/sqoop/blob/trunk/src/java/org/apache/sqoop/hive/HiveTypes.java#L39

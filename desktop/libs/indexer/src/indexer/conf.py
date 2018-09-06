@@ -136,6 +136,7 @@ CONFIG_INDEXING_TEMPLATES_PATH = Config(
   default=os.path.join(os.path.dirname(__file__), '..', 'data', 'oozie_workspace')
   )
 
+# Unused
 SOLRCTL_PATH = Config(
   key="solrctl_path",
   help=_t("Location of the solrctl binary."),
