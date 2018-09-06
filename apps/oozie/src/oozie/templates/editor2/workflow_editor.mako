@@ -830,7 +830,11 @@ ${ utils.submit_popup_event() }
   function validateFields() {
     var _hasErrors = false;
     $("[validate]").each(function () {
-      if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
+      if ($(this).attr("validate") == "nospace" && ($(this).val().indexOf(' ') >= 0 || $.trim($(this).val()) == "")) {
+        $(this).addClass("with-errors");
+        _hasErrors = true;
+      }
+      else if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
         $(this).addClass("with-errors");
         _hasErrors = true;
       }

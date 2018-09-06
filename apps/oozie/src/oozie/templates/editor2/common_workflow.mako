@@ -1707,7 +1707,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <input type="text" data-bind="value: properties.shell_command" validate="nonempty"/>
+        <input type="text" data-bind="value: properties.shell_command" validate="nospace"/>
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.shell_command(), with_label: false} }'></span>
 
         <div class="row-fluid">
