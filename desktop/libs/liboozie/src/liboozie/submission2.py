@@ -31,15 +31,16 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import find_variables
 from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2
+from indexer.conf import CONFIG_JDBC_LIBS_PATH
 from metadata.conf import ALTUS
 from oozie.utils import convert_to_server_timezone
 
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
 
-from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
 from liboozie.credentials import Credentials
+from liboozie.oozie_api import get_oozie
 
 
 LOG = logging.getLogger(__name__)
@@ -333,6 +334,13 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
             hive_site_content = get_hive_site_content()
             if not self.fs.do_as_user(self.user, self.fs.exists, hive_site_lib) and hive_site_content:
               self.fs.do_as_user(self.user, self.fs.create, hive_site_lib, overwrite=True, permission=0700, data=smart_str(hive_site_content))
+          if action.data['type'] in ('sqoop', 'sqoop-document'):
+            if CONFIG_JDBC_LIBS_PATH.get() and CONFIG_JDBC_LIBS_PATH.get() not in self.properties.get('oozie.libpath', ''):
+              LOG.debug("Adding to oozie.libpath %s" % CONFIG_JDBC_LIBS_PATH.get())
+              paths = [CONFIG_JDBC_LIBS_PATH.get()]
+              if self.properties.get('oozie.libpath'):
+                paths.append(self.properties['oozie.libpath'])
+              self.properties['oozie.libpath'] = ','.join(paths)
 
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)

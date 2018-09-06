@@ -173,7 +173,7 @@ def run_sqoop(request, source, destination, start_time):
 
     lib_files = []
     if destination['sqoopJobLibPaths']:
-      lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
+      lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths'] if f['path']]
 
     statement = '--connect jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
       'rdbmsType': get_connector_name(rdbms_name),
