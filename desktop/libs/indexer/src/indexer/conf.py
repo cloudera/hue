@@ -84,9 +84,16 @@ ENABLE_SCALABLE_INDEXER = Config(
 
 CONFIG_INDEXER_LIBS_PATH = Config(
   key="config_indexer_libs_path",
-  help=_t("oozie workspace template for indexing:"),
+  help=_t("Filesystem directory containing Solr Morphline indexing libs."),
   type=str,
   default='/tmp/smart_indexer_lib'
+)
+
+CONFIG_JDBC_LIBS_PATH = Config(
+  key="config_jdbc_libs_path",
+  help=_t("Filesystem directory containing JDBC libs."),
+  type=str,
+  default='/user/oozie/libext/jdbc_drivers'
 )
 
 ENABLE_SQOOP = Config(
