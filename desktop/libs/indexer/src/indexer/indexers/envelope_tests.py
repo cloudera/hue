@@ -36,7 +36,7 @@ def test_generate_from_kafka_to_file_csv():
     'kafkaFieldTypes': 'int,string',
 
     'ouputFormat': 'file',
-    'path': '/tmp/output',
+    'input_path': '/tmp/output',
     'format': 'csv'
   }
 
@@ -59,12 +59,18 @@ def test_generate_from_kafka_to_file_csv():
                     enabled = true
                     milliseconds = 60000
                 }
-        
+
         }
     }
 
     outputdata {
         dependencies = [inputdata]
+
+        deriver {
+          type = sql
+          query.literal = """SELECT * from inputdata"""
+        }
+
         planner = {
           type = overwrite
         }
@@ -118,6 +124,12 @@ def test_generate_from_stream_sfdc_to_hive_table():
 
     outputdata {
         dependencies = [inputdata]
+
+        deriver {
+          type = sql
+          query.literal = """SELECT * from inputdata"""
+        }
+
           planner {
               type = append
           }
@@ -166,12 +178,18 @@ def test_generate_from_stream_kafka_to_solr_index():
                     enabled = true
                     milliseconds = 60000
                 }
-        
+
         }
     }
 
     outputdata {
         dependencies = [inputdata]
+
+        deriver {
+          type = sql
+          query.literal = """SELECT * from inputdata"""
+        }
+
         planner {
             type = upstert
         }
@@ -182,3 +200,54 @@ def test_generate_from_stream_kafka_to_solr_index():
         }
     }
 }''' in  config, config)
+
+
+def test_generate_from_file_to_kafka():
+  properties = {
+    'app_name': 'Ingest',
+
+    'inputFormat': 'file',
+    'input_path': '/tmp/output',
+    'format': 'csv',
+
+    'ouputFormat': 'stream',
+    'streamSelection': 'kafka',
+    'brokers': 'broker:9092',
+    'topics': 'kafkaTopic',
+    'kafkaFieldType': 'delimited',
+  }
+
+  config = EnvelopeIndexer(username='test').generate_config(properties)
+
+  assert_true('''steps {
+    inputdata {
+        input {
+            type = filesystem
+        path = /tmp/output
+        format = csv
+      
+        }
+    }
+
+    outputdata {
+        dependencies = [inputdata]
+
+        deriver {
+          type = sql
+          query.literal = """SELECT * from inputdata"""
+        }
+
+        
+        planner {
+            type = append
+        }
+        output {
+            type = kafka
+            brokers = "broker:9092"
+            topic = kafkaTopic
+            serializer.type = delimited
+            serializer.field.delimiter = ","
+        }
+    }
+}
+''' in  config, config)

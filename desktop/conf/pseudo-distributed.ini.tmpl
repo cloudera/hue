@@ -1379,14 +1379,17 @@
 
 [indexer]
 
-  # Flag to turn on the Solr Morphline indexer.
-  ## enable_scalable_indexer=true
-
   # Filesystem directory containing Solr Morphline indexing libs.
   ## config_indexer_libs_path=/tmp/smart_indexer_lib
 
   # Filesystem directory containing JDBC libs.
   ## config_jdbc_libs_path=/user/oozie/libext/jdbc_drivers
+
+  # Filesystem directory containing jar libs.
+  ## config_jars_libs_path=/user/oozie/libext/libs
+
+  # Flag to turn on the Solr Morphline indexer.
+  ## enable_scalable_indexer=true
 
   # Flag to turn on Sqoop ingest.
   ## enable_sqoop=true
