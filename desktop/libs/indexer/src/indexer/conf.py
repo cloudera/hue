@@ -96,6 +96,13 @@ CONFIG_JDBC_LIBS_PATH = Config(
   default='/user/oozie/libext/jdbc_drivers'
 )
 
+CONFIG_JARS_LIBS_PATH = Config(
+  key="config_jars_libs_path",
+  help=_t("Filesystem directory containing jars libs."),
+  type=str,
+  default='/user/oozie/libext/libs'
+)
+
 ENABLE_SQOOP = Config(
   key="enable_sqoop",
   help=_t("Flag to turn on Sqoop imports."),

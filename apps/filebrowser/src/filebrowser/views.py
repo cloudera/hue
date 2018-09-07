@@ -652,8 +652,7 @@ def display(request, path):
     if mode == 'binary':
         compression = 'none'
         # Read out based on meta.
-    compression, offset, length, contents =\
-    read_contents(compression, path, request.fs, offset, length)
+    compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
     # Get contents as string for text mode, or at least try
     uni_contents = None

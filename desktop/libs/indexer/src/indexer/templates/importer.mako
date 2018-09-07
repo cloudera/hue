@@ -344,55 +344,7 @@ ${ assist.assistPanel() }
             </div>
 
             <!-- ko if: createWizard.source.streamSelection() == 'kafka' -->
-              <div class="control-group">
-                <label class="control-label"><div>${ _('Topics') }</div>
-                  <select class="input-xxlarge" data-bind="options: createWizard.source.kafkaTopics,
-                         value: createWizard.source.kafkaSelectedTopics,
-                         optionsCaption: '${ _("Choose...") }'"
-                         placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
-                  ## <select data-bind="selectize: createWizard.source.kafkaTopics, value: createWizard.source.kafkaSelectedTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
-                </label>
-
-                <br/>
-
-                <div class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
-                  <label class="control-label"><div>${ _('Schema') }</div>
-                    <label class="checkbox inline-block">
-                      <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Manual')}
-                    </label>
-                    <label class="checkbox inline-block">
-                      <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Guess')}
-                    </label>
-                  </label>
-
-                  <label class="control-label" data-bind="visible: createWizard.source.kafkaSchemaManual() == 'manual'">
-                  ##<label class="control-label"><div>${ _('Encoding') }</div>
-                  ##  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldType">
-                  ##</label>
-                  <label class="control-label"><div>${ _('Type') }</div>
-                    <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
-                  </label>
-                  <label class="control-label"><div>${ _('Delimiter') }</div>
-                    <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
-                  </label>
-
-                  <br/>
-
-                  <label class="control-label"><div>${ _('Field names') }</div>
-                    <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
-                  </label>
-                  <label class="control-label"><div>${ _('Field types') }</div>
-                    <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
-                  </label>
-                </label>
-
-                <div class="control-group" data-bind="visible: createWizard.source.hasStreamSelected">
-                  <button class="btn" data-bind="click: createWizard.source.streamCheckConnection">
-                    ${_('Test')}
-                  </button>
-                </div>
-                </div>
-              </div>
+              <div data-bind="template: { name: 'kafka-topic-template', data: $data }" class="margin-top-10 field inline-block"></div>
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.streamSelection() == 'sfdc' -->
@@ -417,9 +369,9 @@ ${ assist.assistPanel() }
                 <!-- ko if: createWizard.source.streamUsername() && createWizard.source.streamPassword() && createWizard.source.streamToken() -->
                 <label class="control-label"><div>${ _('Object') }</div>
                   <select class="input-xxlarge" data-bind="options: createWizard.source.streamObjects,
-                         value: createWizard.source.streamObject,
-                         optionsCaption: '${ _("Choose...") }'"
-                         placeholder="${ _('The SFDC object to import, e.g. Account, Opportunity') }"></select>
+                        value: createWizard.source.streamObject,
+                        optionsCaption: '${ _("Choose...") }'"
+                        placeholder="${ _('The SFDC object to import, e.g. Account, Opportunity') }"></select>
                 </label>
                 <!-- /ko -->
               </div>
@@ -545,17 +497,22 @@ ${ assist.assistPanel() }
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
+
           <div class="control-group">
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
+
             <!-- ko if: outputFormat() == 'file' -->
               <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
+
             <!-- ko if: outputFormat() == 'index' -->
               <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
+
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
               <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
+
             <!-- ko if: outputFormat() == 'altus' -->
               <!-- ko if: namespaces().length > 1 -->
                 <select data-bind="selectize: namespaces, value: namespace, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
@@ -572,6 +529,14 @@ ${ assist.assistPanel() }
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
+
+            <!-- ko if: outputFormat() == 'stream' -->
+              <!-- ko with: $root -->
+                <input type="text" data-bind="value: createWizard.source.kafkaSelectedTopics">
+                ## <div data-bind="template: { name: 'kafka-topic-template' }" class="margin-top-10 field inline-block"></div>
+              <!-- /ko -->
+            <!-- /ko -->
+
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
             </span>
@@ -1033,7 +998,6 @@ ${ assist.assistPanel() }
     </div>
   </div>
 
-
 </script>
 
 
@@ -1071,7 +1035,7 @@ ${ assist.assistPanel() }
       <span data-bind="visible: showProperties">
         <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
         <label class="checkbox" data-bind="visible: $root.createWizard.destination.tableFormat() == 'kudu'">
-         <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
+          <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
         </label>
       </span>
     </span>
@@ -1245,6 +1209,57 @@ ${ assist.assistPanel() }
   <!-- /ko -->
 </script>
 
+<script type="text/html" id="kafka-topic-template">
+  <div class="control-group">
+    <label class="control-label"><div>${ _('Topics') }</div>
+      <select class="input-xxlarge" data-bind="options: createWizard.source.kafkaTopics,
+            value: createWizard.source.kafkaSelectedTopics,
+            optionsCaption: '${ _("Choose...") }'"
+            placeholder="${ _('The list of topics to consume, e.g. orders,returns') }">
+      </select>
+      ## <select data-bind="selectize: createWizard.source.kafkaTopics, value: createWizard.source.kafkaSelectedTopics" placeholder="${ _('The list of topics to consume, e.g. orders,returns') }"></select>
+    </label>
+
+    <br/>
+
+    <div class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
+      <label class="control-label"><div>${ _('Schema') }</div>
+        <label class="checkbox inline-block">
+          <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Manual')}
+        </label>
+        <label class="checkbox inline-block">
+          <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Guess')}
+        </label>
+      </label>
+
+      <label class="control-label" data-bind="visible: createWizard.source.kafkaSchemaManual() == 'manual'">
+      ##<label class="control-label"><div>${ _('Encoding') }</div>
+      ##  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldType">
+      ##</label>
+      <label class="control-label"><div>${ _('Type') }</div>
+        <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
+      </label>
+      <label class="control-label"><div>${ _('Delimiter') }</div>
+        <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
+      </label>
+
+      <br/>
+
+      <label class="control-label"><div>${ _('Field names') }</div>
+        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
+      </label>
+      <label class="control-label"><div>${ _('Field types') }</div>
+        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
+      </label>
+
+      <div class="control-group" data-bind="visible: createWizard.source.hasStreamSelected">
+        <button class="btn" data-bind="click: createWizard.source.streamCheckConnection">
+          ${_('Test')}
+        </button>
+      </div>
+    </div>
+  </div>
+</script>
 
 <script type="text/javascript">
   % if is_embeddable:
@@ -1888,6 +1903,9 @@ ${ assist.assistPanel() }
           % if ENABLE_SQOOP.get() or ENABLE_KAFKA.get():
           {'name': 'File', 'value': 'file'},
           % endif
+          % if ENABLE_KAFKA.get():
+          {'name': 'Stream', 'value': 'stream'},
+          % endif
           % if ENABLE_ALTUS.get():
           {'name': 'Altus SDX', 'value': 'altus'},
           % endif
@@ -1910,6 +1928,9 @@ ${ assist.assistPanel() }
             return false;
           }
           if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
+            return false;
+          }
+          if (format.value === 'stream' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && wizard.source.inputFormat() !== 'rdbms') {

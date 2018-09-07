@@ -26,6 +26,8 @@ from desktop.conf import DISABLE_HUE_3
 from hadoop.fs.hadoopfs import Hdfs
 from notebook.models import make_notebook
 
+from indexer.conf import CONFIG_JARS_LIBS_PATH
+
 
 LOG = logging.getLogger(__name__)
 
@@ -54,6 +56,8 @@ class EnvelopeIndexer(object):
 
   def run(self, request, collection_name, envelope, input_path, start_time=None, lib_path=None):
     workspace_path = self._upload_workspace(envelope)
+    if lib_path is None:
+      lib_path = CONFIG_JARS_LIBS_PATH.get()
 
     task = make_notebook(
       name=_('Indexing into %s') % collection_name,
@@ -70,6 +74,9 @@ class EnvelopeIndexer(object):
       shell_command = """#!/bin/bash
 
 export SPARK_DIST_CLASSPATH=`hadoop classpath`
+export SPARK_DIST_CLASSPATH=/etc/hive/conf:`hadoop classpath`
+export JAVA_HOME=/usr/java/jdk1.8.0_162
+
 SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
       hdfs_shell_cmd_path = os.path.join(workspace_path, shell_command_name)
       self.fs.do_as_user(self.username, self.fs.create, hdfs_shell_cmd_path, data=shell_command)
@@ -132,15 +139,15 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
         raise PopupException(_('Stream format of %(inputFormat)s not recognized: %(streamSelection)s') % properties)
     elif properties['inputFormat'] == 'file':
       input = """type = filesystem
-      path = %(path)s
-      format = %(format)s
+        path = %(input_path)s
+        format = %(format)s
       """ % properties
     else:
       raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
 
 
     if properties['ouputFormat'] == 'file':
-      output = """dependencies = [inputdata]
+      output = """
         planner = {
           type = overwrite
         }
@@ -152,7 +159,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
         }""" % properties
     elif properties['ouputFormat'] == 'table':
       if properties['inputFormat'] == 'stream' and properties['streamSelection'] == 'kafka':
-        output = """dependencies = [inputdata]
+        output = """
           deriver {
               type = sql
               query.literal = \"""
@@ -167,7 +174,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               table.name = "%(output_table)s"
           }""" % properties
       else:
-        output = """dependencies = [inputdata]
+        output = """
           planner {
               type = append
           }
@@ -176,7 +183,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               table.name = "%(output_table)s"
           }""" % properties
     elif properties['ouputFormat'] == 'index':
-      output = """dependencies = [inputdata]
+      output = """
         planner {
             type = upstert
         }
@@ -185,13 +192,25 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
             connection = "%(connection)s"
             collection.name = "%(collectionName)s"
         }""" % properties
+    elif properties['ouputFormat'] == 'stream':
+      output = """
+        planner {
+            type = append
+        }
+        output {
+            type = kafka
+            brokers = "%(brokers)s"
+            topic = %(topics)s
+            serializer.type = delimited
+            serializer.field.delimiter = ","
+        }""" % properties
     else:
       raise PopupException(_('Output format not recognized: %(ouputFormat)s') % properties)
 
     return """
 application {
     name = %(app_name)s
-    batch.milliseconds = 5000
+    %(batch)
     executors = 1
     executor.cores = 1
     executor.memory = 1G
@@ -205,8 +224,20 @@ steps {
     }
 
     outputdata {
+        dependencies = [inputdata]
+
+        deriver {
+          type = sql
+          query.literal = \"\"\"SELECT * from inputdata\"\"\"
+        }
+
         %(output)s
     }
 }
 
-""" % {'input': input, 'output': output, 'app_name': properties['app_name']}
+""" % {
+    'input': input,
+    'output': output,
+    'app_name': properties['app_name'],
+    'batch': 'batch.milliseconds = 5000' if properties['inputFormat'] == 'stream' else ''
+  }
