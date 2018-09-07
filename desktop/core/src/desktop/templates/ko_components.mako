@@ -25,6 +25,7 @@
 <%namespace name="koHistoryPanel" file="/ko_components/ko_history_panel.mako" />
 <%namespace name="koInlineAutocomplete" file="/ko_components/ko_inline_autocomplete.mako" />
 <%namespace name="koJobBrowserLinks" file="/ko_components/ko_job_browser_links.mako" />
+<%namespace name="koMultiClusterSidebar" file="/ko_components/ko_multi_cluster_sidebar.mako" />
 <%namespace name="koNavProperties" file="/ko_components/ko_nav_properties.mako" />
 <%namespace name="koNavTags" file="/ko_components/ko_nav_tags.mako" />
 <%namespace name="koSimpleAceEditor" file="/ko_components/ko_simple_ace_editor.mako" />
@@ -45,6 +46,7 @@
   ${ koHistoryPanel.historyPanel() }
   ${ koInlineAutocomplete.inlineAutocomplete() }
   ${ koJobBrowserLinks.jobBrowserLinks() }
+  ${ koMultiClusterSidebar.multiClusterSidebar() }
   ${ koNavProperties.navProperties() }
   ${ koNavTags.navTags() }
   ${ koSimpleAceEditor.simpleAceEditor() }
