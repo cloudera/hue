@@ -316,19 +316,22 @@ ${ hueIcons.symbols() }
     </script>
 
     <div class="hue-sidebar hue-sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
-      <div class="hue-sidebar-content">
-        <!-- ko foreach: {data: items, as: 'item'} -->
+      % if IS_MULTICLUSTER_ONLY.get():
+        <!-- ko component: { name: 'hue-multi-cluster-sidebar' } --><!-- /ko -->
+      % else:
+        <div class="hue-sidebar-content">
+          <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
-             <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
-             <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
+          <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
+          <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: item.isCategory -->
-             <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
+          <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
           <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <div class="hue-sidebar-footer-panel">
-        <div data-bind="dropzone: {
+          <!-- /ko -->
+        </div>
+        <div class="hue-sidebar-footer-panel">
+          <div data-bind="dropzone: {
             clickable: false,
             url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
             params: { dest: DROPZONE_HOME_DIR },
@@ -336,9 +339,10 @@ ${ hueIcons.symbols() }
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
             click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
-          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+            <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+          </div>
         </div>
-      </div>
+      % endif
     </div>
 
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
