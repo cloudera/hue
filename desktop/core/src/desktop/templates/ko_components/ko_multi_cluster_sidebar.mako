@@ -117,63 +117,102 @@ from desktop.views import _ko
           label: '${ _('Data Assistant') }',
           icon: 'altus-icon altus-adb-query',
           items: [{
-            label: '${ _('Editor') }',
-            url: '/editor?type=impala'
-          },{
-            label: '${ _('Catalog') }',
-            url: '/metastore/tables'
-          },{
-            label: '${ _('Dashboard') }',
-            url: '/dashboard/new_search'
-          },{
-            label: '${ _('Scheduler') }',
-            url: '/oozie/editor/workflow/new/'
-          }]
+              label: '${ _('Editor') }',
+              url: '/editor?type=impala'
+            },{
+              label: '${ _('Catalog') }',
+              url: '/metastore/tables'
+            },{
+              label: '${ _('Files') }',
+              url: '/filebrowser/view=S3A://'
+            },{
+              label: '${ _('Dashboard') }',
+              url: '/dashboard/new_search'
+            },{
+              label: '${ _('Scheduler') }',
+              url: '/oozie/editor/workflow/new/'
+            },{
+              label: '${ _('Importer') }',
+              url: '/indexer/importer'
+            }
+          ]
         }, {
           label: '${ _('Data Science') }',
           url: '/',
           icon: 'altus-icon altus-ds'
-        }]
+        }, {
+          label: '${ _('Customer 360') }',
+          url: '/',
+          icon: 'fa fa-vcard-o'
+        }
+      ]
+      }, {
+        label: '${ _('Admin') }',
+        items: [{
+            label: '${ _('Environments') }',
+            url: '/',
+            icon: 'altus-icon altus-environment'
+          },{
+            label: '${ _('IAM') }',
+            url: 'https://console.altus.cloudera.com/iam/index.html',
+            icon: 'altus-icon altus-iam',
+            items: [{
+                label: '${ _('User') }',
+                url: 'https://console.altus.cloudera.com/iam/index.html#/users'
+              },{
+                label: '${ _('Groups') }',
+                url: 'https://console.altus.cloudera.com/iam/index.html#/groups'
+              }
+            ]
+          }
+        ]
+      }, {
+        label: '${ _('Storage') }',
+        items: [{
+            label: '${ _('SDX Catalog') }',
+            url: '/',
+            icon: 'altus-icon altus-sdx'
+          },{
+            label: '${ _('Streaming') }',
+            url: '/',
+            icon: 'fa fa-sitemap'
+          },{
+            label: '${ _('Operational DB') }',
+            url: '/',
+            icon: 'altus-icon altus-adb',
+            items: [{
+                label: '${ _('Kudu') }',
+                url: '/'
+              },{
+                label: '${ _('HBase') }',
+                url: '/'
+              }
+            ]
+          }
+        ]
       }, {
         label: '${ _('Compute') }',
         items: [{
-          label: '${ _('Data Warehouse') }',
-          icon: 'altus-icon altus-dashboard',
-          items: [{
-            label: '${ _('Clusters') }',
+            label: '${ _('Data Warehouse') }',
+            icon: 'altus-icon altus-dashboard',
             url: '/'
-          }]
-        },{
-          label: '${ _('Data Engineering') }',
-          icon: 'altus-icon altus-de',
-          items: [{
-            label: '${ _('Clusters') }',
+          }, {
+            label: '${ _('Data Engineering') }',
+            icon: 'altus-icon altus-de',
+            items: [{
+                label: '${ _('Clusters') }',
+                url: '/'
+              },{
+                label: '${ _('Jobs') }',
+                url: '/'
+              }
+            ]
+          }, {
+            label: '${ _('Scheduling') }',
+            icon: 'altus-icon altus-workload',
             url: '/'
-          },{
-            label: '${ _('Jobs') }',
-            url: '/'
-          }]
-        }]
-      },
-        {
-        label: '${ _('Admin') }',
-        items: [{
-          label: '${ _('Environments') }',
-          url: '/',
-          icon: 'altus-icon altus-environment'
-        },{
-          label: '${ _('SDX Namespaces') }',
-          url: '/',
-          icon: 'altus-icon altus-sdx'
-        },{
-          label: '${ _('IAM') }',
-          url: '/',
-          icon: 'altus-icon altus-iam'
-        },{
-          label: '${ _('Support') }',
-          url: '/',
-          icon: 'fa fa-question'
-        }]
+          }
+        ]
       }
         ##  , {
         ##    label: '${ _('Icons') }',
