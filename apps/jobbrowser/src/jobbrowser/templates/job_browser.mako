@@ -2294,7 +2294,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
           lastFetchJobRequest = self._fetchJob(function (data) {
             if (vm.job().type() == 'schedule') {
-              vm.job(new Job(vm, data.app)); // Updates everything but redraw the page
+              window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
+              vm.job = ko.mapping.fromJS(data.app, {}, vm.job)
             } else {
               vm.job().fetchStatus();
               vm.job().fetchLogs(vm.job().logActive());

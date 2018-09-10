@@ -474,6 +474,26 @@ window.hueUtils = window.hueUtils || (function () {
     return highLightedText;
   };
 
+  hueUtils.dfs = function(node, callback) {
+    if (!node || typeof(node) !== 'object') {
+      return;
+    }
+    Object.keys(node).forEach(function(key) {
+      callback(node, key);
+      hueUtils.dfs(node[key], callback);
+    });
+  };
+
+  hueUtils.deleteAllEmptyStringKey = function(node) {
+    var fDeleteEmptyStringKey = function (node, key) {
+      if (node[key] || typeof(node[key]) !== 'string') {
+        return;
+      }
+      delete node[key];
+    };
+    hueUtils.dfs(node, fDeleteEmptyStringKey);
+  };
+
   return hueUtils;
 
 })();
