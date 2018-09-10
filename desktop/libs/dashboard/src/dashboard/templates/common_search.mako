@@ -2787,10 +2787,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
-                <!-- We add following conditionnal so that selectize.value is not bound twice -->
-                <!-- ko if: columns().length > 0 -->
-                <select id="settingssolrindex" class="input-xlarge" data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name"></select>
-                <!-- /ko -->
+                <div data-bind="component: { name: 'hue-drop-down', params: { value: $root.collection.name, entries: $root.initial.collections.sort(), searchable: true, linkTitle: '${ _ko('Solr index') }' } }" style="display: inline-block; padding-top: 6px;"></div>
               </div>
             </div>
             <!-- /ko -->
