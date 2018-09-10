@@ -6875,12 +6875,19 @@
       var value = typeof options.data === 'function' ? options.data() : options.data;
 
       function render() {
-        if (options.format) {
-          $element.text(moment(value).format(options.format));
+        var fMoment = moment(value);
+        var text;
+        if (!fMoment.isValid()) {
+          text = value;
+        } else {
+          if (options.format) {
+            text = fMoment.format(options.format);
+          }
+          else {
+            text = fMoment.format();
+          }
         }
-        else {
-          $element.text(moment(value));
-        }
+        $element.text(text);
       }
       render();
     }
