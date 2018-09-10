@@ -2025,7 +2025,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return self.logsByName()[self.logActive()];
       });
 
-      self.properties = ko.mapping.fromJS(job.properties || {});
+      self.properties = ko.mapping.fromJS(job.properties || { properties: '' });
       self.mainType = ko.observable(vm.interface());
       self.lastEvent = ko.observable(job.lastEvent || '');
 
