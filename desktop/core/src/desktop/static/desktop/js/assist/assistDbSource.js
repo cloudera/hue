@@ -406,7 +406,8 @@ var AssistDbNamespace = (function () {
         } else if (details.entry.getSourceType() === self.sourceType) {
           var findAndReloadInside = function (entries) {
             return entries.some(function (entry) {
-              if (entry.catalogEntry === details.entry) {
+              if (entry.catalogEntry.path.join('.') === details.entry.path.join('.')) {
+                entry.catalogEntry = details.entry;
                 entry.loadEntries();
                 return true;
               }
