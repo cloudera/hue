@@ -401,9 +401,12 @@ var AssistDbNamespace = (function () {
 
     if (!self.navigationSettings.rightAssist) {
       huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+        if (self.namespace.id !== details.entry.namespace.id || details.entry.getSourceType() !== self.sourceType) {
+          return;
+        }
         if (self.catalogEntry === details.entry) {
           self.initDatabases();
-        } else if (details.entry.getSourceType() === self.sourceType) {
+        } else {
           var findAndReloadInside = function (entries) {
             return entries.some(function (entry) {
               if (entry.catalogEntry.path.join('.') === details.entry.path.join('.')) {
