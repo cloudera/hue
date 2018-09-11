@@ -6435,6 +6435,35 @@
           }
         });
       });
+
+      it('should suggest keywords for "with s as (select * from foo join bar) select * from |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'with s as (select * from foo join bar) select * from ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: true,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true },
+            commonTableExpressions: [{ columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }] }], alias: 's' }],
+            suggestCommonTableExpressions: [{ name: 's' }]
+          }
+        });
+      });
+
+      it('should suggest keywords for "with s as (select * from foo join bar) select * from |;', function () {
+        assertAutoComplete({
+          beforeCursor: 'with s as (select * from foo join bar) select * from ',
+          afterCursor: ';',
+          expectedResult: {
+            lowerCase: true,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true },
+            commonTableExpressions: [{ columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }] }], alias: 's' }],
+            suggestCommonTableExpressions: [{ name: 's' }]
+          }
+        });
+      });
+
     });
 
     describe('Joins', function() {
