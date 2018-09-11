@@ -702,9 +702,9 @@ var SqlParseSupport = (function () {
         }
       }
 
-      if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
+      if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.result.commonTableExpressions !== 'undefined') {
         var ctes = [];
-        parser.yy.latestCommonTableExpressions.forEach(function (cte) {
+        parser.yy.result.commonTableExpressions.forEach(function (cte) {
           var suggestion = {name: cte.alias};
           if (parser.yy.result.suggestTables.prependFrom) {
             suggestion.prependFrom = true
