@@ -169,7 +169,7 @@ from desktop.views import _ko
       }, {
         label: '${ _('Storage') }',
         items: [{
-            label: '${ _('SDX Catalog') }',
+            label: '${ _('Catalog') }',
             url: '/',
             icon: 'altus-icon altus-sdx'
           },{

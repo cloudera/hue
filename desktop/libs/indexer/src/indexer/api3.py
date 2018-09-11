@@ -519,6 +519,15 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
         "kafkaFieldTypes": file_format['kafkaFieldTypes']
       }
 
+      if True:
+        properties['window'] = ''
+      else: # For "KafkaSQL"
+        properties['window'] = '''
+            window {
+                enabled = true
+                milliseconds = 60000
+            }'''
+
     if destination['outputFormat'] == 'table':
       if destination['isTargetExisting']:
         # Todo: check if format matches

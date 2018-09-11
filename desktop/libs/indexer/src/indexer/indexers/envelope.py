@@ -109,7 +109,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
       if properties['streamSelection'] == 'kafka':
         input = """type = kafka
                 brokers = "%(brokers)s"
-                topic = %(topics)s
+                topics = [%(topics)s]
                 encoding = string
                 translator {
                     type = %(kafkaFieldType)s
@@ -117,10 +117,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
                     field.names = [%(kafkaFieldNames)s]
                     field.types = [%(kafkaFieldTypes)s]
                 }
-                window {
-                    enabled = true
-                    milliseconds = 60000
-                }
+                %(window)s
         """ % properties
       elif properties['streamSelection'] == 'sfdc':
         input = """type = sfdc
@@ -210,7 +207,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
     return """
 application {
     name = %(app_name)s
-    %(batch)
+    %(batch)s
     executors = 1
     executor.cores = 1
     executor.memory = 1G

@@ -16,7 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
+import urllib
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -128,6 +130,58 @@ class ManagerApi(object):
       root = Resource(client)
 
       return root.get('/api/topics')
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def update_flume_config(self, cluster_name, config):
+    service = 'FLUME-1'
+    roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster_name, service, 'AGENT')]
+    data = {
+      u'items': [{
+        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.quote(cluster_name)).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup),
+        u'body': {
+          u'items': [
+            {u'name': u'agent_config_file', u'value': config}
+          ]
+        },
+        u'contentType': u'application/json',
+        u'method': u'PUT'
+      }]
+    }
+
+    return self.batch(
+      items=data
+    )
+
+
+  def update_and_refresh_flume(self, cluster_name, config):
+    service = 'FLUME-1'
+    roles = [role['name'] for role in self._get_roles(cluster_name, service, 'AGENT')]
+
+    self.update_flume_config(cluster_name, config)
+    self.refresh_configs(cluster_name, service, roles)
+
+
+  def refresh_configs(self, cluster_name, service=None, roles=None):
+    try:
+      if service is None:
+        return self._root.post('clusters/%(cluster_name)s/commands/refresh' % {'cluster_name': cluster_name}, contenttype="application/json")
+      elif roles is None:
+        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/commands/refresh' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+      else:
+        return self._root.post(
+            'clusters/%(cluster_name)s/services/%(service)s/commands/refresh' % {'cluster_name': cluster_name, 'service': service},
+            data=json.dump({"items": roles}),
+            contenttype="application/json"
+        )
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def batch(self, items):
+    try:
+      return self._root.post('batch', data=json.dumps(items), contenttype='application/json')
     except RestException, e:
       raise ManagerApiException(e)
 
