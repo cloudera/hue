@@ -1560,6 +1560,7 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
+# Aka 'Atus'
 ANALYTIC_DB = 'altus'
 
 
@@ -1663,7 +1664,7 @@ class ClusterConfig():
     _interpreters = get_ordered_interpreters(self.user)
 
     if self.cluster_type == ANALYTIC_DB:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala', 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
       interpreters.append({
