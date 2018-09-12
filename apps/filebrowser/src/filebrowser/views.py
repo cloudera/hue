@@ -58,6 +58,8 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.views import serve_403_error
+
+from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -495,9 +497,7 @@ def listdir_paged(request, path):
     if page:
       page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
 
-    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
-                       (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
-                        request.fs.isdir(request.fs.trash_path(path)))
+    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {

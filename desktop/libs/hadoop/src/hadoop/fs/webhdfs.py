@@ -170,10 +170,11 @@ class WebHdfs(Hdfs):
       return WebHdfs.DEFAULT_USER
 
   def trash_path(self, path=None):
-    trash_path = self.join(self.get_home_dir(), '.Trash')
+    home_dir = self.get_home_dir()
+    trash_path = self.join(home_dir, '.Trash')
     try:
       if not path:
-        path = self.get_home_dir()
+        path = home_dir
       params = self._getparams()
       params['op'] = 'GETTRASHROOT'
       headers = self._getheaders()
@@ -188,8 +189,8 @@ class WebHdfs(Hdfs):
         raise e
     return trash_path
 
-  def current_trash_path(self, path):
-    return self.join(self.trash_path(path), self.TRASH_CURRENT)
+  def current_trash_path(self, trash_path):
+    return self.join(trash_path, self.TRASH_CURRENT)
 
   def _getparams(self):
     return {
@@ -316,9 +317,9 @@ class WebHdfs(Hdfs):
 
   def _ensure_current_trash_directory(self, path):
     """Create trash directory for a user if it doesn't exist."""
-    if not self.exists(self.current_trash_path(path)):
-      self.mkdir(self.current_trash_path(path))
-    return self.current_trash_path(path)
+    trash_path = self.current_trash_path(path)
+    self.mkdir(trash_path)
+    return trash_path
 
   def _trash(self, path, recursive=False):
     """
@@ -336,11 +337,12 @@ class WebHdfs(Hdfs):
     if not recursive and self.isdir(path):
       raise IOError(errno.EISDIR, _("File %s is a directory") % path)
 
-    if path.startswith(self.trash_path(path)):
+    trash_path = self.trash_path(path)
+    if path.startswith(trash_path):
       raise IOError(errno.EPERM, _("File %s is already trashed") % path)
 
     # Make path (with timestamp suffix if necessary)
-    base_trash_path = self.join(self._ensure_current_trash_directory(path), path[1:])
+    base_trash_path = self.join(self._ensure_current_trash_directory(trash_path), path[1:])
     trash_path = base_trash_path
     while self.exists(trash_path):
       trash_path = base_trash_path + str(time.time())
