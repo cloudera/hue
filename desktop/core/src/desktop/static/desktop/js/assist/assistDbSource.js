@@ -32,8 +32,9 @@ var AssistDbSource = (function () {
     self.name = options.name;
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
-    self.initialNamespace = options.initialNamespace;
-    self.initialCompute = options.initialCompute
+    var apiHelper = ApiHelper.getInstance();
+    self.initialNamespace = options.initialNamespace || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
+    self.initialCompute = options.initialCompute || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();
@@ -133,7 +134,7 @@ var AssistDbSource = (function () {
         if (self.initialNamespace && namespace.id === self.initialNamespace.id) {
           activeNamespace = assistNamespace;
           if (self.initialCompute) {
-            activeNamespace.computes.some(function (compute) {
+            activeNamespace.namespace.computes.some(function (compute) {
               if (compute.id === self.initialCompute.id) {
                 activeCompute = compute;
               }

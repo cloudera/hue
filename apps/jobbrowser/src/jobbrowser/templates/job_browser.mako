@@ -2783,6 +2783,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       });
 
+      self.availableInterfaces.subscribe(function (newInterfaces) {
+        if (self.interface() && !newInterfaces.some(function (newInterface) {
+          return newInterface.interface === self.interface();
+        })) {
+          self.selectInterface(newInterfaces[0]);
+        }
+      });
+
       self.slasLoadedOnce = false;
       self.slasLoading = ko.observable(true);
       self.loadSlaPage = function(){
