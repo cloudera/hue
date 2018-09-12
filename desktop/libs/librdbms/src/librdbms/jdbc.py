@@ -60,6 +60,7 @@ class Jdbc():
     if 'py4j' not in sys.modules:
       raise Exception('Required py4j module is not imported.')
 
+    os.environ["PATH"] = os.environ["PATH"] + ':/usr/java/default/bin' # TODO: more generic
     classpath = os.environ.get('CLASSPATH', '')
     if DBPROXY_EXTRA_CLASSPATH.get():
       classpath = '%s:%s' % (DBPROXY_EXTRA_CLASSPATH.get(), classpath)
