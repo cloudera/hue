@@ -92,12 +92,14 @@ from desktop.views import _ko
        *                                            observable is provided.
        * @param {boolean} [params.hideDatabases] - Can be used to force hide database selection even if a database
        *                                           observable is provided.
+       * @param {function} [params.onComputeSelect] - Callback when a new compute is selected (after initial set)
        * @constructor
        */
       var HueContextSelector = function (params) {
         var self = this;
 
         self.sourceType = params.sourceType;
+        self.disposals = [];
 
         self.loadingComputes = ko.observable(false);
         self.availableComputes = ko.observableArray();
@@ -115,6 +117,12 @@ from desktop.views import _ko
               }
             })) {
               self.compute(computes[0]);
+            }
+            if (params.onComputeSelect) {
+              var computeSub = self.compute.subscribe(params.onComputeSelect);
+              self.disposals.push(function () {
+                computeSub.dispose();
+              })
             }
           }).always(function () {
             self.loadingComputes(false);
@@ -268,6 +276,13 @@ from desktop.views import _ko
         self.loadingContext = ko.pureComputed(function () {
           return self.loadingNamespaces() || self.loadingComputes() || self.loadingDatabases();
         });
+      };
+
+      HueContextSelector.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
       };
 
       ko.components.register('hue-context-selector', {

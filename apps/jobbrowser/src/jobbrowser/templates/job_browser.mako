@@ -103,6 +103,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               params: {
                 sourceType: 'jobs',
                 compute: compute,
+                onComputeSelect: onComputeSelect,
                 showDatabases: false,
                 showNamespaces: false
               }
@@ -2857,6 +2858,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
 
+      self.onComputeSelect = function () {
+        var interfaceToSet = self.interface();
+        if (!self.availableInterfaces().some(function (availableInterface) {
+          return availableInterface.interface === interfaceToSet;
+        })) {
+          interfaceToSet = self.availableInterfaces()[0].interface;
+        }
+        self.selectInterface(interfaceToSet);
+      };
+
       self.jobs = new Jobs(self);
       self.job = ko.observable();
 
@@ -2899,7 +2910,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '/' + bits.join('/');
         }
         return path;
-      }
+      };
 
       self.formatProgress = function (progress) {
         if (typeof progress === 'function') {
@@ -2911,7 +2922,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return progress;
       };
 
+      var loaded = false;
       self.load = function() {
+        if (loaded) {
+          return;
+        }
+        loaded = true;
         var h = window.location.hash;
         %if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
@@ -2941,7 +2957,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               self.selectInterface('reset');
             }
         }
-      }
+      };
     };
 
 
@@ -2999,7 +3015,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       window.onhashchange = function () {
         loadHash();
-      }
+      };
 
       huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
         jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
