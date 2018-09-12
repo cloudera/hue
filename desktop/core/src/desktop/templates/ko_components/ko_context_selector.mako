@@ -81,7 +81,7 @@ from desktop.views import _ko
        *   } --><!-- /ko -->
        *
        * @param {Object} params
-       * @param {ko.observable} params.sourceType
+       * @param {ko.observable|string} params.sourceType
        * @param {ko.observable} [params.compute]
        * @param {ko.observable} [params.namespace]
        * @param {ko.observable} [params.database]
@@ -106,7 +106,7 @@ from desktop.views import _ko
 
         if (params.compute) {
           self.loadingComputes(true);
-          self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: self.sourceType() }).done(function (computes) {
+          self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: ko.unwrap(self.sourceType) }).done(function (computes) {
             self.availableComputes(computes);
             if (!self.compute() || !computes.some(function (compute) {
               if (compute.id === self.compute().id) {
@@ -133,7 +133,7 @@ from desktop.views import _ko
         self.reloadNamespaces = function () {
           if (params.namespace) {
             self.loadingNamespaces(true);
-            self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: self.sourceType() }).done(function (context) {
+            self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: ko.unwrap(self.sourceType) }).done(function (context) {
               self.availableNamespaces(context.namespaces);
               if (!self.namespace() || !context.namespaces.some(function (namespace) {
                 if (namespace.id === self.namespace().id) {
@@ -164,7 +164,7 @@ from desktop.views import _ko
               window.clearTimeout(updateDatabaseThrottle);
               updateDatabaseThrottle = window.setTimeout(function () {
                 DataCatalog.getEntry({
-                  sourceType: self.sourceType(),
+                  sourceType: ko.unwrap(self.sourceType),
                   namespace: self.namespace(),
                   compute: self.compute(),
                   path: [],
@@ -189,7 +189,7 @@ from desktop.views import _ko
                     self.loadingDatabases(false);
 
                     huePubSub.publish('assist.set.database', {
-                      source: self.sourceType(),
+                      source: ko.unwrap(self.sourceType),
                       namespace: self.namespace(),
                       name: self.database()
                     });
@@ -197,7 +197,7 @@ from desktop.views import _ko
                 });
               }, 10);
             });
-          } else {
+          } else if (self.database) {
             self.availableDatabases([]);
             self.database(undefined);
           }
@@ -250,7 +250,7 @@ from desktop.views import _ko
         if (self.database) {
           huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
             if (details.entry.isSource()) {
-              if (self.sourceType() === details.entry.getSourceType()) {
+              if (ko.unwrap(self.sourceType) === details.entry.getSourceType()) {
                 self.updateDatabases();
               }
             }
@@ -259,7 +259,7 @@ from desktop.views import _ko
 
         if (self.namespace) {
           huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
-            if (self.sourceType() === sourceType) {
+            if (ko.unwrap(self.sourceType) === sourceType) {
               self.reloadNamespaces();
             }
           });
