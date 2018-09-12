@@ -510,7 +510,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
-              <input type="text" class="input-xlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+              <input type="text" class="input-xxlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'altus' -->
@@ -1641,7 +1641,11 @@ ${ assist.assistPanel() }
       self.rdbmsAllTablesSelected = ko.observable(false);
       self.rdbmsIsAllTables = ko.observable(false);
       self.rdbmsIsAllTables.subscribe(function(newVal) {
-        self.rdbmsTableName('');
+        if (newVal) {
+          wizard.destination.name(self.rdbmsDatabaseName());
+        } else {
+          wizard.destination.name(self.rdbmsTableName()); // To add self.rdbmsDatabaseName() would need to check for existence and/or create automatically
+        }
         self.rdbmsAllTablesSelected(newVal);
       });
       self.rdbmsDbIsValid = ko.observable(false);
