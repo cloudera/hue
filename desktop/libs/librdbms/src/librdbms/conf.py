@@ -108,7 +108,7 @@ def get_server_choices():
 
 
 def get_connector_name(name):
-  engine = DATABASES[name].ENGINE.get().split('.')[-1]
+  engine = DATABASES[name].ENGINE.get().split('.')[-1] if name in DATABASES else None
   return {
     'sqlite': 'sqlite',
     'sqlite3': 'sqlite',
