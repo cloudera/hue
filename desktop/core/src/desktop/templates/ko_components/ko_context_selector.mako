@@ -98,6 +98,8 @@ from desktop.views import _ko
       var HueContextSelector = function (params) {
         var self = this;
 
+        var apiHelper = ApiHelper.getInstance();
+
         self.sourceType = params.sourceType;
         self.disposals = [];
 
@@ -110,6 +112,9 @@ from desktop.views import _ko
           self.loadingComputes(true);
           self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: ko.unwrap(self.sourceType) }).done(function (computes) {
             self.availableComputes(computes);
+            if (!self.compute()) {
+              self.compute(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute'));
+            }
             if (!self.compute() || !computes.some(function (compute) {
               if (compute.id === self.compute().id) {
                 self.compute(compute);
@@ -118,12 +123,15 @@ from desktop.views import _ko
             })) {
               self.compute(computes[0]);
             }
-            if (params.onComputeSelect) {
-              var computeSub = self.compute.subscribe(params.onComputeSelect);
-              self.disposals.push(function () {
-                computeSub.dispose();
-              })
-            }
+            var computeSub = self.compute.subscribe(function (newCompute) {
+              if (params.onComputeSelect) {
+                params.onComputeSelect(newCompute);
+              }
+              apiHelper.setInTotalStorage('contextSelector', 'lastSelectedCompute', newCompute);
+            });
+            self.disposals.push(function () {
+              computeSub.dispose();
+            })
           }).always(function () {
             self.loadingComputes(false);
           });
@@ -143,6 +151,9 @@ from desktop.views import _ko
             self.loadingNamespaces(true);
             self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: ko.unwrap(self.sourceType) }).done(function (context) {
               self.availableNamespaces(context.namespaces);
+              if (!self.namespace()) {
+                self.namespace(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace'));
+              }
               if (!self.namespace() || !context.namespaces.some(function (namespace) {
                 if (namespace.id === self.namespace().id) {
                   self.namespace(namespace);
@@ -150,6 +161,12 @@ from desktop.views import _ko
                 }})) {
                 self.namespace(context.namespaces[0]);
               }
+              var namespaceSub = self.namespace.subscribe(function (newNamespace) {
+                apiHelper.setInTotalStorage('contextSelector', 'lastSelectedNamespace', newNamespace);
+              });
+              self.disposals.push(function () {
+                namespaceSub.dispose();
+              })
             }).always(function () {
               self.loadingNamespaces(false);
             });
@@ -214,8 +231,15 @@ from desktop.views import _ko
         self.updateDatabases();
 
         if (self.compute && self.namespace) {
+          if (!self.namespace()) {
+            self.namespace(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace'));
+          }
+          if (!self.compute()) {
+            self.compute(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute'));
+          }
+
           $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
-            self.compute.subscribe(function (newCompute) {
+            var computeSub = self.compute.subscribe(function (newCompute) {
               // When the compute changes we set the corresponding namespace and update the databases
               if (newCompute) {
                 var found = self.availableNamespaces().some(function (namespace) {
@@ -233,7 +257,11 @@ from desktop.views import _ko
                 }
               }
             });
-            self.namespace.subscribe(function (newNamespace) {
+            self.disposals.push(function () {
+              computeSub.dispose();
+            });
+
+            var namespaceSub = self.namespace.subscribe(function (newNamespace) {
               if (newNamespace) {
                 // When the namespace changes we set the corresponding compute and update the databases
                 var found = self.availableComputes().some(function (compute) {
@@ -249,6 +277,9 @@ from desktop.views import _ko
                   self.compute(undefined);
                 }
               }
+            });
+            self.disposals.push(function () {
+              namespaceSub.dispose();
             })
           });
         } else {
