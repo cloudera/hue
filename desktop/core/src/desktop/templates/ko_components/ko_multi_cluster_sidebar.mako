@@ -130,7 +130,7 @@ from desktop.views import _ko
               url: '/dashboard/new_search'
             },{
               label: '${ _('Scheduler') }',
-              url: '/oozie/editor/workflow/new/'
+              url: '/oozie/editor/coordinator/new/'
             },{
               label: '${ _('Importer') }',
               url: '/indexer/importer'
