@@ -199,6 +199,13 @@ ALTUS = ConfigSection(
   )
 )
 
+DEFAULT_PUBLIC_KEY = Config(
+  key="default_publick_key",
+  help=_t("Public key used for cluster creation."),
+  type=str,
+  default=''
+)
+
 
 def get_navigator_auth_type():
   return NAVIGATOR.AUTH_TYPE.get().lower()
