@@ -88,7 +88,7 @@ def _get_db(request):
       query_server = {
         'server_name': name,
         'server_host': source['rdbmsHostname'],
-        'server_port': int(source['rdbmsPort']),
+        'server_port': int(source['rdbmsPort'] or 3306),
         'username': source['rdbmsUsername'],
         'password': source['rdbmsPassword'],
         'options': {},
