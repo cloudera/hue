@@ -1994,11 +1994,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko if: $data.name.indexOf('logs') > -1 || $data.name.indexOf('trackingUrl') > -1 -->
       <a href="javascript:void(0);" data-bind="text: $data.value, attr: { href: $data.value }" target="_blank"></a>
     <!-- /ko -->
-    <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <!-- ko if: ($data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1) && ($data.value.startsWith('/') || $data.value.startsWith('hdfs://') || $data.value.startsWith('s3a://')) -->
       <a href="javascript:void(0);" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value), text: $data.value"></a>
       <a href="javascript: void(0);" data-bind="storageContextPopover: { path: $root.getHDFSPath($data.value), orientation: 'left', offset: { top: 5 } }"><i class="fa fa-info"></i></a>
     <!-- /ko -->
-    <!-- ko ifnot: $data.name.indexOf('logs') > -1 || $data.name.indexOf('trackingUrl') > -1 || $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <!-- ko ifnot: $data.name.indexOf('logs') > -1 || $data.name.indexOf('trackingUrl') > -1 || (($data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1) && ($data.value.startsWith('/') || $data.value.startsWith('hdfs://') || $data.value.startsWith('s3a://'))) -->
       <span data-bind="text: $data.value"></span>
     <!-- /ko -->
   <!-- /ko -->
