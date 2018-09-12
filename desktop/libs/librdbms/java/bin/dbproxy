@@ -20,6 +20,7 @@ set -e
 
 export DBPROXY_HOME=$(cd $(dirname $0)/../.. && pwd)
 
+export PATH=$PATH:/usr/java/default/bin
 export CLASSPATH=$DBPROXY_HOME/java-lib/dbproxy-1.0.jar:$CLASSPATH
 
 echo "JDBC drivers jars are expected in the CLASSPATH: '$CLASSPATH'"
