@@ -19,6 +19,7 @@
 
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from notebook.conf import ENABLE_SQL_INDEXER
 
   from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS
@@ -72,7 +73,7 @@ ${ assist.assistPanel() }
 % endif
 </style>
 
-<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
+<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); }, disabled: '${ not SHOW_UPLOAD_BUTTON.get() }' === 'True'  }">
 <div class="dz-message" data-dz-message></div>
 <div class="navbar hue-title-bar">
   <div class="navbar-inner">

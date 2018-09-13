@@ -7166,7 +7166,9 @@
   ko.bindingHandlers.dropzone = {
     init: function (element, valueAccessor) {
       var value = ko.unwrap(valueAccessor());
-
+      if (value.disabled) {
+        return;
+      }
       var options = {
         autoDiscover: false,
         maxFilesize: 5000000,

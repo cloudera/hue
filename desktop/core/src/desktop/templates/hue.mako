@@ -24,6 +24,7 @@
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
 
@@ -318,6 +319,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
         <div class="hue-sidebar-footer-panel">
+          % if SHOW_UPLOAD_BUTTON.get():
           <div data-bind="dropzone: {
             clickable: false,
             url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
@@ -328,6 +330,7 @@ ${ hueIcons.symbols() }
             click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
             <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
           </div>
+          % endif
         </div>
       % endif
     </div>
