@@ -180,15 +180,19 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               table.name = "%(output_table)s"
           }""" % properties
     elif properties['ouputFormat'] == 'index':
-      output = """
-        planner {
-            type = upstert
-        }
-        output {
-            type = solr
-            connection = "%(connection)s"
-            collection.name = "%(collectionName)s"
-        }""" % properties
+      if properties['inputFormat'] == 'stream':
+        if properties['topics'] == 'NavigatorAuditEvents':
+          output = ''
+      else:
+        output = """
+          planner {
+              type = upstert
+          }
+          output {
+              type = solr
+              connection = "%(connection)s"
+              collection.name = "%(collectionName)s"
+          }""" % properties
     elif properties['ouputFormat'] == 'stream':
       output = """
         planner {
