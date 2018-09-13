@@ -988,7 +988,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         namespace: namespace,
         availableDatabases: availableDatabases,
         database: database,
-        showDatabases: isSqlDialect()
+        hideDatabases: !isSqlDialect()
       }
     } --><!-- /ko -->
   <!-- /ko -->
