@@ -249,10 +249,28 @@ def guess_field_types(request):
   elif file_format['inputFormat'] == 'stream':
     # Note: mocked here, should come from SFDC or Kafka API or sampling job
     if file_format['streamSelection'] == 'kafka':
+      if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
+        kafkaFieldNames = [
+          'additionalInfo', 'allowed', 'collectionName', 'databaseName', 'db',
+          'DELEGATION_TOKEN_ID', 'dst', 'entityId', 'family', 'impersonator',
+          'ip', 'name', 'objectType', 'objType', 'objUsageType',
+          'operationParams', 'operationText', 'op', 'opText', 'path',
+          'perms', 'privilege', 'qualifier', 'QUERY_ID', 'resourcePath',
+          'service', 'SESSION_ID', 'solrVersion', 'src', 'status',
+          'subOperation', 'tableName', 'table', 'time', 'type',
+          'url', 'user'
+        ]
+        kafkaFieldTypes = [
+          'string'
+        ] * len(kafkaFieldNames)
+      else:
+        kafkaFieldNames = file_format.get('kafkaFieldNames', '').split(',')
+        kafkaFieldTypes = file_format.get('kafkaFieldTypes', '').split(',')
+
       data = """%(kafkaFieldNames)s
 %(data)s""" % {
-        'kafkaFieldNames': file_format.get('kafkaFieldNames', ''),
-        'data': '\n'.join([','.join(['...'] * len(file_format.get('kafkaFieldTypes', '').split(',')))] * 5)
+        'kafkaFieldNames': ','.join(kafkaFieldNames),
+        'data': '\n'.join([','.join(['...'] * len(kafkaFieldTypes))] * 5)
       }
       stream = StringIO.StringIO()
       stream.write(data)
@@ -267,8 +285,8 @@ def guess_field_types(request):
           },
         "format": file_format['format']
       })
+      type_mapping = dict(zip(kafkaFieldNames, kafkaFieldTypes))
 
-      type_mapping = dict(zip(file_format['kafkaFieldNames'].split(','), file_format['kafkaFieldTypes'].split(',')))
       for col in format_['columns']:
         col['keyType'] = type_mapping[col['name']]
         col['type'] = type_mapping[col['name']]
@@ -321,18 +339,18 @@ def importer_submit(request):
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
-  if source['inputFormat'] == 'stream' or destination['ouputFormat'] == 'stream':
-    job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
-  elif destination['ouputFormat'] == 'index':
+  if destination['ouputFormat'] == 'index':
     source['columns'] = destination['columns']
     index_name = destination["name"]
 
-    if destination['indexerRunJob']:
+    if destination['indexerRunJob'] or source['inputFormat'] == 'stream':
       _convert_format(source["format"], inverse=True)
       job_handle = _large_indexing(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
     else:
       client = SolrClient(request.user)
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
+  elif source['inputFormat'] == 'stream' or destination['ouputFormat'] == 'stream':
+    job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
   elif source['inputFormat'] == 'altus':
@@ -471,6 +489,9 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
     db = dbms.get(request.user)
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     input_path = table_metadata.path_location
+  elif file_format['inputFormat'] == 'stream':
+    pass
+    #job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % urllib.unquote(file_format["path"])
   else:
