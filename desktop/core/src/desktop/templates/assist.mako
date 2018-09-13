@@ -17,7 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
-
+from filebrowser.conf import SHOW_UPLOAD_BUTTON
 from metadata.conf import has_navigator, OPTIMIZER
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
@@ -491,6 +491,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      % if SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=' + path,
             params: { dest: path },
@@ -499,6 +500,7 @@ from desktop.views import _ko
             onComplete: function () { huePubSub.publish('assist.hdfs.refresh'); huePubSub.publish('fb.hdfs.refresh', path); } }" title="${_('Upload file')}" href="javascript:void(0)">
         <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
       </a>
+      % endif
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
@@ -506,6 +508,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-adls-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      % if SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=adl:' + path,
             params: { dest: path },
@@ -514,6 +517,7 @@ from desktop.views import _ko
             onComplete: function () { huePubSub.publish('assist.adls.refresh'); } }" title="${_('Upload file')}" href="javascript:void(0)">
         <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
       </a>
+      % endif
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.adls.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
@@ -1065,7 +1069,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); } }">
+    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: '${ not SHOW_UPLOAD_BUTTON.get() }' === 'True' }">
       <!-- ko if: availablePanels().length > 1 -->
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
