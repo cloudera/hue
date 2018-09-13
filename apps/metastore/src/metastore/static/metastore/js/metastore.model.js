@@ -36,8 +36,15 @@ var MetastoreSource = (function () {
     });
 
     // When manually changed through dropdown
-    self.namespaceChanged = function () {
-      huePubSub.publish('metastore.url.change')
+    self.namespaceChanged = function (newNamespace, previousNamespace) {
+      if (previousNamespace.database() && !self.namespace().database()) {
+        // Try to set the same database by name, if not there it will revert to 'default'
+        self.namespace().setDatabaseByName(previousNamespace.database().catalogEntry.name, function () {
+          huePubSub.publish('metastore.url.change');
+        });
+      } else {
+        huePubSub.publish('metastore.url.change');
+      }
     };
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
