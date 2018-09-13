@@ -217,7 +217,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
           <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
             <!-- ko if: item.url -->
-             <a href="javascript: void(0);" data-bind="hueLink: item.url">
+              <a href="javascript: void(0);" data-bind="hueLink: item.url">
                 <!-- ko if: item.icon -->
                 <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
                 <!-- /ko -->
