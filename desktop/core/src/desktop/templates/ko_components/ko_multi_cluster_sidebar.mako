@@ -140,10 +140,6 @@ from desktop.views import _ko
           label: '${ _('Data Science') }',
           url: '/',
           icon: 'altus-icon altus-ds'
-        }, {
-          label: '${ _('Customer 360') }',
-          url: '/',
-          icon: 'fa fa-vcard-o'
         }
       ]
       }, {
@@ -153,7 +149,7 @@ from desktop.views import _ko
             url: '/',
             icon: 'altus-icon altus-environment'
           },{
-            label: '${ _('IAM') }',
+            label: '${ _('Directory') }',
             url: 'https://console.altus.cloudera.com/iam/index.html',
             icon: 'altus-icon altus-iam',
             items: [{
