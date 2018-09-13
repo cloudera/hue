@@ -973,6 +973,21 @@ ${ assist.assistPanel() }
         <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
+        
+        <div class="btn-group" style="margin-top: 8px">
+          <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
+            ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
+          </button>
+
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu hue-main-create-dropdown">
+            <li class="dropdown-submenu">
+              <a href="#" target="_blank">${ _('Get config') }</a>
+            </li>
+          </ul>
+        </div>
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
