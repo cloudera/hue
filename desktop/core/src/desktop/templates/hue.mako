@@ -286,10 +286,12 @@ ${ hueIcons.symbols() }
   </nav>
 
   <div id="jobsPanel" class="jobs-panel" style="display: none;">
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
-      ${ _('Open') } <i class="fa fa-fw fa-expand"></i>
-    </a>
+    <div style="position: absolute; right: 0px; padding: inherit;">
+      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
+      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
+        ${ _('Open') } <i class="fa fa-fw fa-expand"></i>
+      </a>
+    </div>
     <div id="mini_jobbrowser"></div>
   </div>
 
