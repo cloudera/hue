@@ -260,7 +260,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                       <div class="inline-block pull-right"><i class="fa fa-user muted"></i> <span data-bind="text: user"></span></div>
                       <div class="clearfix"></div>
                       <div class="pull-left" data-bind="ellipsis: {data: name(), length: 40 }"></div>
-                      <div class="pull-right muted" data-bind="text: id"></div>
+                      <div class="pull-right muted" data-bind="ellipsis: {data: id(), length: 32 }"></div>
                       <div class="clearfix"></div>
                     </li>
                     <div class="status-bar status-background" data-bind="css: {'running': isRunning()}, style: {'width': progress() + '%'}"></div>
