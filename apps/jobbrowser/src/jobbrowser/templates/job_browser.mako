@@ -81,6 +81,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 % if is_mini:
+  <div class="pull-right" style="padding: 6px 10px 0 0">
+    <!-- ko component: {
+      name: 'hue-context-selector',
+      params: {
+        sourceType: 'jobs',
+        compute: compute,
+        onComputeSelect: onComputeSelect,
+        hideLabels: true
+      }
+    } --><!-- /ko -->
+  </div>
   <ul class="nav nav-pills">
     <!-- ko foreach: availableInterfaces -->
       <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
@@ -88,12 +99,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </li>
     <!-- /ko -->
   </ul>
-  <span class="pull-right">
-    <!-- ko if: availableComputes().length > 1 -->
-      <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active clusters') }' } }"></div>
-    <!-- /ko -->
-  </span>
-% else:    
+% else:
   <div class="navbar hue-title-bar">
     <div class="navbar-inner">
       <div class="container-fluid">
@@ -117,9 +123,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               params: {
                 sourceType: 'jobs',
                 compute: compute,
-                onComputeSelect: onComputeSelect,
-                showDatabases: false,
-                showNamespaces: false
+                onComputeSelect: onComputeSelect
               }
             } --><!-- /ko -->
           </div>
@@ -2778,15 +2782,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.clusterType = ko.observable();
       self.isMini = ko.observable(false);
 
-      self.availableComputes = ko.observableArray();
-      self.availableComputes.subscribe(function(newValue) {
-        if (newValue.length > 0 && !self.compute()) {
-          self.compute(self.availableComputes()[0]);
-        }
-      });
       self.compute = ko.observable();
-
-      ContextCatalog.getComputes({ sourceType: 'jobs' }).done(self.availableComputes);
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
