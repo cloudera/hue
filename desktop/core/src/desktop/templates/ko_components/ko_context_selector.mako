@@ -32,7 +32,7 @@ from desktop.views import _ko
     <div class="inline-block" style="display:none;" data-bind="visible: !loadingContext()">
       <!-- ko if: window.HAS_MULTI_CLUSTER -->
       <!-- ko if: availableComputes().length > 0 && !hideComputes -->
-      <span class="editor-header-title">${ _('Compute') }</span>
+      <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Compute') }</span><!-- /ko -->
       <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <!-- ko if: availableComputes().length === 0 && !hideComputes -->
@@ -40,7 +40,7 @@ from desktop.views import _ko
       <!-- /ko -->
 
       <!-- ko if: availableNamespaces().length > 0 && !hideNamespaces -->
-      <span class="editor-header-title">${ _('Namespace') }</span>
+      <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Namespace') }</span><!-- /ko -->
       <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <!-- ko if: availableNamespaces().length === 0 && !hideNamespaces -->
@@ -49,7 +49,7 @@ from desktop.views import _ko
       <!-- /ko -->
 
       <!-- ko if: availableDatabases().length > 0 && !hideDatabases-->
-      <span class="editor-header-title">${ _('Database') }</span>
+      <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Database') }</span><!-- /ko -->
       <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <!-- ko if: availableDatabases().length === 0  && !hideDatabases -->
@@ -107,22 +107,36 @@ from desktop.views import _ko
         self.availableComputes = ko.observableArray();
         self.compute = params.compute;
         self.hideComputes = params.hideComputes || !self.compute;
+        self.hideLabels = params.hideLabels;
 
         if (params.compute) {
           self.loadingComputes(true);
           self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: ko.unwrap(self.sourceType) }).done(function (computes) {
             self.availableComputes(computes);
-            if (!self.compute()) {
-              self.compute(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute'));
-            }
-            if (!self.compute() || !computes.some(function (compute) {
-              if (compute.id === self.compute().id) {
-                self.compute(compute);
-                return true;
+            if (!self.compute() && apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute')) {
+              var lastSelectedCompute = apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
+              var found = computes.some(function (compute) {
+                if (compute.id === lastSelectedCompute.id) {
+                  self.compute(lastSelectedCompute);
+                  return true;
+                }
+              });
+
+              // If we can't find exact match we pick first based on type
+              if (!found) {
+                computes.some(function (compute) {
+                  if (compute.type === lastSelectedCompute.type) {
+                    self.compute(compute);
+                    return true;
+                  }
+                });
               }
-            })) {
+            }
+
+            if (!self.compute()) {
               self.compute(computes[0]);
             }
+
             var computeSub = self.compute.subscribe(function (newCompute) {
               if (params.onComputeSelect) {
                 params.onComputeSelect(newCompute);
