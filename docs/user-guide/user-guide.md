@@ -383,7 +383,7 @@ The autocompleter talks to the backend to get data for tables and databases etc.
 
 We've got an extensive test suite but not every possible statement is covered, if the autocompleter can't interpret a statement it will be silent and no drop-down will appear. If you encounter a case where you think it should suggest something but doesn't or if it gives incorrect suggestions then please let us know.
 
-Leanr more about it in [Autocompleter for Hive and Impala](http://gethue.com/brand-new-autocompleter-for-hive-and-impala/).
+Learn more about it in [Autocompleter for Hive and Impala](http://gethue.com/brand-new-autocompleter-for-hive-and-impala/).
 
 ### Variables
 Variables are used to easily configure parameters in a query. They can be of two types:
@@ -1362,7 +1362,7 @@ Iport data from relational databases to HDFS file or Hive table using Apache Sqo
 
 In the past, importing data using Sqoop command line interface could be a cumbersome and inefficient process. The task expected users to have a good knowledge of Sqoop . For example they would need put together a series of required parameters with specific syntax that would result in errors easy to make. Often times getting those correctly can take a few hours of work. Now with Hue's new feature you can submityour Sqoop job in minutes. The imports run on YARN and are scheduled by Oozie. This tutorial offers a step by step guide on how to do it.
 
-Leanr more about it on the [Importing data from traditional databases into HDFS/Hive in just a few clicks
+Learn more about it on the [Importing data from traditional databases into HDFS/Hive in just a few clicks
 ](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/) post.
 
 ## Sqoop 2 Editor
