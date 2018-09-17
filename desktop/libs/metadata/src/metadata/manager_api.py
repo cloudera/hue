@@ -18,8 +18,7 @@
 
 import json
 import logging
-
-from metadata.manager_client import ManagerApi
+import os
 
 from django.http import Http404
 from django.utils.html import escape
@@ -28,9 +27,12 @@ from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
+from libzookeeper.conf import zkensemble
+from indexer.conf import config_morphline_path
 
-from metadata.conf import has_navigator
 from metadata.catalog.navigator_client import CatalogApiException
+from metadata.conf import has_navigator
+from metadata.manager_client import ManagerApi
 
 
 LOG = logging.getLogger(__name__)
@@ -75,24 +77,37 @@ def hello(request):
 def update_flume_config(request):
   api = ManagerApi(request.user)
 
-  config = '''tier1.sources = source1
+  flume_agent_config = '''tier1.sources = source1
 tier1.channels = channel1
 tier1.sinks = sink1
- 
+
 tier1.sources.source1.type = exec
-tier1.sources.source1.command = tail -F /var/log/hue/access.log
+tier1.sources.source1.command = tail -F /var/log/hue-httpd/access_log
 tier1.sources.source1.channels = channel1
- 
+
 tier1.channels.channel1.type = memory
 tier1.channels.channel1.capacity = 10000
 tier1.channels.channel1.transactionCapacity = 1000
- 
+
 # Solr Sink configuration
 tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.MorphlineSolrSink
-tier1.sinks.sink1.morphlineFile = /tmp/morphline.conf
+tier1.sinks.sink1.morphlineFile = morphlines.conf
+tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo
 tier1.sinks.sink1.channel       = channel1'''
 
-  response = api.update_and_refresh_flume(cluster_name=None, config=config)
 
-  return JsonResponse(response)
+  morphline_config = open(os.path.join(config_morphline_path(), 'hue_accesslogs_no_geo.morphline.conf')).read()
+  morphline_config = morphline_config.replace(
+    '${SOLR_COLLECTION}', 'log_analytics_demo'
+  ).replace(
+    '${ZOOKEEPER_ENSEMBLE}', '%s/solr' % zkensemble()
+  )
 
+  responses = {}
+
+  responses['agent_config_file'] = api.update_flume_config(cluster_name=None, config_name='agent_config_file', config_value=flume_agent_config)
+  responses['agent_morphlines_conf_file'] = api.update_flume_config(cluster_name=None, config_name='agent_morphlines_conf_file', config_value=morphline_config)
+
+  responses['refresh_flume'] = api.refresh_flume(cluster_name=None, restart=True)
+
+  return JsonResponse(responses)

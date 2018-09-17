@@ -40,7 +40,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document
+from desktop.models import Document, _get_apps
 from desktop.lib.parameterization import find_variables
 from desktop.views import serve_403_error
 from notebook.models import escape_rows
@@ -444,9 +444,11 @@ def execute_query(request, design_id=None, query_history_id=None):
     design = safe_get_design(request, query_type, design_id)
     query_history = None
 
+  current_app, other_apps, apps_list = _get_apps(request.user, '')
   doc = design and design.id and design.doc.get()
   context = {
     'design': design,
+    'apps': apps_list,
     'query': query_history, # Backward
     'query_history': query_history,
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
