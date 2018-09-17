@@ -1413,13 +1413,13 @@ var ApiHelper = (function () {
       }
 
       if (options.path.length > 2) {
-        url += '/stats/' + options.path.slice(2).join('/');
+        url += 'stats/' + options.path.slice(2).join('/');
       }
     }
 
     var params = {
       'format' : 'json'
-    }
+    };
 
     if (options.compute && options.compute.id) {
       params['cluster'] = options.compute.id;
@@ -1631,6 +1631,7 @@ var ApiHelper = (function () {
    * @param {string} options.sourceType
    * @param {number} [options.sampleCount] - Default 100
    * @param {string[]} options.path
+   * @param {string} [options.operation] - Default 'default'
    *
    * @return {CancellablePromise}
    */
@@ -1659,7 +1660,8 @@ var ApiHelper = (function () {
       snippet: JSON.stringify({
         type: options.sourceType
       }),
-      async: true
+      async: true,
+      operation: '"' + (options.operation || 'default') + '"'
     }, {
       silenceErrors: options.silenceErrors
     }).done(function (sampleResponse) {
