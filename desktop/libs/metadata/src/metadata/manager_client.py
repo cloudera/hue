@@ -136,10 +136,11 @@ class ManagerApi(object):
 
   def update_flume_config(self, cluster_name, config):
     service = 'FLUME-1'
-    roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster_name, service, 'AGENT')]
+    cluster = self._get_cluster(cluster_name)
+    roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
     data = {
       u'items': [{
-        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.quote(cluster_name)).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup),
+        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),
         u'body': {
           u'items': [
             {u'name': u'agent_config_file', u'value': config}
@@ -157,10 +158,11 @@ class ManagerApi(object):
 
   def update_and_refresh_flume(self, cluster_name, config):
     service = 'FLUME-1'
-    roles = [role['name'] for role in self._get_roles(cluster_name, service, 'AGENT')]
+    cluster = self._get_cluster(cluster_name)
+    roles = [role['name'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
 
-    self.update_flume_config(cluster_name, config)
-    self.refresh_configs(cluster_name, service, roles)
+    self.update_flume_config(cluster['name'], config)
+    return self.refresh_configs(cluster['name'], service, roles)
 
 
   def refresh_configs(self, cluster_name, service=None, roles=None):
@@ -168,11 +170,11 @@ class ManagerApi(object):
       if service is None:
         return self._root.post('clusters/%(cluster_name)s/commands/refresh' % {'cluster_name': cluster_name}, contenttype="application/json")
       elif roles is None:
-        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/commands/refresh' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
       else:
         return self._root.post(
-            'clusters/%(cluster_name)s/services/%(service)s/commands/refresh' % {'cluster_name': cluster_name, 'service': service},
-            data=json.dump({"items": roles}),
+            'clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service},
+            data=json.dumps({"items": roles}),
             contenttype="application/json"
         )
     except RestException, e:
@@ -190,7 +192,7 @@ class ManagerApi(object):
     clusters = self._root.get('clusters/')['items']
 
     if cluster_name is not None:
-      cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name]
+      cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name][0]
     else:
       cluster = clusters[0]
 

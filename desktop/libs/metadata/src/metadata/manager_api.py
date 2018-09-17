@@ -69,3 +69,30 @@ def hello(request):
   response = api.tools_echo()
 
   return JsonResponse(response)
+
+
+@error_handler
+def update_flume_config(request):
+  api = ManagerApi(request.user)
+
+  config = '''tier1.sources = source1
+tier1.channels = channel1
+tier1.sinks = sink1
+ 
+tier1.sources.source1.type = exec
+tier1.sources.source1.command = tail -F /var/log/hue/access.log
+tier1.sources.source1.channels = channel1
+ 
+tier1.channels.channel1.type = memory
+tier1.channels.channel1.capacity = 10000
+tier1.channels.channel1.transactionCapacity = 1000
+ 
+# Solr Sink configuration
+tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.MorphlineSolrSink
+tier1.sinks.sink1.morphlineFile = /tmp/morphline.conf
+tier1.sinks.sink1.channel       = channel1'''
+
+  response = api.update_and_refresh_flume(cluster_name=None, config=config)
+
+  return JsonResponse(response)
+
