@@ -86,15 +86,17 @@ from desktop.views import _ko
   <script type="text/html" id="catalog-entries-list-template">
     <!-- ko if: !loading() && (!catalogEntry.isField() || catalogEntry.isComplex())-->
     <div class="context-popover-inline-autocomplete">
-      <!-- ko component: {
-        name: 'inline-autocomplete',
-        params: {
-          querySpec: querySpec,
-          facets: facets,
-          knownFacetValues: knownFacetValues,
-          autocompleteFromEntries: autocompleteFromEntries
-        }
-      } --><!-- /ko -->
+      <div class="context-popover-sample-filter">
+        <!-- ko component: {
+          name: 'inline-autocomplete',
+          params: {
+            querySpec: querySpec,
+            facets: facets,
+            knownFacetValues: knownFacetValues,
+            autocompleteFromEntries: autocompleteFromEntries
+          }
+        } --><!-- /ko -->
+      </div>
     </div>
     <!-- /ko -->
 
@@ -499,14 +501,27 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="field-samples-template">
-    <div class="context-popover-inline-autocomplete">
-      <!-- ko component: {
-        name: 'inline-autocomplete',
-        params: {
-          querySpec: querySpec,
-          autocompleteFromEntries: autocompleteFromEntries
-        }
-      } --><!-- /ko -->
+    <div class="context-popover-inline-autocomplete" style="display: flex">
+      <div class="context-popover-sample-filter">
+        <!-- ko component: {
+          name: 'inline-autocomplete',
+          params: {
+            querySpec: querySpec,
+            autocompleteFromEntries: autocompleteFromEntries
+          }
+        } --><!-- /ko -->
+      </div>
+      <div class="context-popover-sample-controls">
+        <div class="margin-left-10 inline-block" data-bind="component: { name: 'hue-drop-down', params: { value: operation, entries: operations } }"></div>
+        <div class="margin-left-10 inactive-action inline-block">
+          <!-- ko if: loadingSamples -->
+          <a href="javascript:void(0);" data-bind="click: cancelRunningQueries"><i class="fa fa-stop"></i></a>
+          <!-- /ko -->
+          <!-- ko ifnot: loadingSamples -->
+          <a href="javascript:void(0);" data-bind="click: function () { loadSamples(true) }"><i class="fa fa-play"></i></a>
+          <!-- /ko -->
+        </div>
+      </div>
     </div>
 
     <table class="table table-condensed table-nowrap">
@@ -515,6 +530,15 @@ from desktop.views import _ko
         <th>${ _("Sample") }</th>
       </tr>
       </thead>
+      <!-- ko if: loadingSamples -->
+      <tbody>
+      <tr>
+        <td><!-- ko hueSpinner: { spin: true, inline: true } --><!-- /ko --></td>
+      </tr>
+      </tbody>
+      <!-- /ko -->
+
+      <!-- ko ifnot: loadingSamples -->
       <tbody data-bind="foreach: filteredColumnSamples">
       <tr>
         <td class="sample-column" data-bind="html: $data, attr: { 'title': hueUtils.html2text($data) }"></td>
@@ -532,6 +556,7 @@ from desktop.views import _ko
       </tr>
       </tbody>
       <!-- /ko -->
+      <!-- /ko -->
     </table>
   </script>
 
@@ -544,7 +569,23 @@ from desktop.views import _ko
         self.querySpec = ko.observable();
 
         self.hasErrors = ko.observable();
-        self.loading = ko.observable();
+        self.loadingSamples = ko.observable();
+
+        self.operations = [
+          {
+            label: '${ _("default") }',
+            type: 'default'
+          },{
+            label: '${ _("distinct") }',
+            type: 'distinct'
+          }
+        ];
+
+        self.operation = ko.observable(self.operations[0]);
+
+        self.operation.subscribe(function () {
+          self.loadSamples();
+        });
 
         self.columnSamples = ko.observableArray();
 
@@ -575,18 +616,25 @@ from desktop.views import _ko
           return result;
         };
 
-        self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
+        self.loadSamples();
+      }
+
+      FieldSamples.prototype.loadSamples = function (refreshCache) {
+        var self = this;
+        self.cancelRunningQueries();
+        self.loadingSamples(true);
+        self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true, refreshCache: refreshCache, operation: self.operation().type }).done(function (samples) {
           if (samples.data && samples.data.length) {
             self.columnSamples(samples.data);
           }
         }).fail(function () {
           self.hasErrors(true);
         }).always(function () {
-          self.loading(false);
+          self.loadingSamples(false);
         }));
-      }
+      };
 
-      FieldSamples.prototype.dispose = function () {
+      FieldSamples.prototype.cancelRunningQueries = function () {
         var self = this;
         while (self.cancellablePromises.length) {
           var promise = self.cancellablePromises.pop();
@@ -594,6 +642,11 @@ from desktop.views import _ko
             promise.cancel();
           }
         }
+      };
+
+      FieldSamples.prototype.dispose = function () {
+        var self = this;
+        self.cancelRunningQueries();
       };
 
       ko.components.register('field-samples', {
