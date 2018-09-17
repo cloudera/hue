@@ -39,6 +39,8 @@ PRIVILEGE_HIERARCHY = {
   'WRITE': 1,  # Not a Sentry privilege, but enables v1 and v2 cross-compatible action type
   'ALL': 2
 }
+# TODO
+# "Create", "Drop", "Alter" and "Refresh"
 
 SENTRY_OBJECTS = (
   'SERVER',
@@ -110,13 +112,19 @@ class PrivilegeChecker(object):
 
     if v1_authorizables:
       for (object, authorizable) in v1_authorizables:
-        if self._is_object_action_authorized_v1(hierarchy=self.privilege_hierarchy_v1, object=authorizable, action=action):
-          yield object
+        try:
+          if self._is_object_action_authorized_v1(hierarchy=self.privilege_hierarchy_v1, object=authorizable, action=action):
+            yield object
+        except KeyError, e:
+          LOG.warn('Skipping %s: %s' % (authorizable, e))
 
     if v2_authorizables:
       for (object, authorizable) in v2_authorizables:
-        if self._is_object_action_authorized_v2(hierarchy=self.privilege_hierarchy_v2, object=authorizable, action=action):
-          yield object
+        try:
+          if self._is_object_action_authorized_v2(hierarchy=self.privilege_hierarchy_v2, object=authorizable, action=action):
+            yield object
+        except KeyError, e:
+          LOG.warn('Skipping %s: %s' % (authorizable, e))
 
 
   def _to_sentry_authorizables(self, objects, key):
@@ -201,8 +209,7 @@ class PrivilegeChecker(object):
     # Initialize all privileges for all object levels to non-authorized by default
     privileges_applied = dict((obj, -1) for obj in SENTRY_OBJECTS)
 
-    server, db, table, column, uri = \
-      object.get('server'), object.get('db'), object.get('table'), object.get('column'), object.get('URI')
+    server, db, table, column, uri = object.get('server'), object.get('db'), object.get('table'), object.get('column'), object.get('URI')
 
     if server:  # Get server-level privilege
       if server in hierarchy:
