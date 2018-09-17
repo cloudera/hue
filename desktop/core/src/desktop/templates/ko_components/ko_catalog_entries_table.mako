@@ -84,7 +84,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="catalog-entries-list-template">
-    <!-- ko if: !loading() -->
+    <!-- ko if: !loading() && (!catalogEntry.isField() || catalogEntry.isComplex())-->
     <div class="context-popover-inline-autocomplete">
       <!-- ko component: {
         name: 'inline-autocomplete',
@@ -188,30 +188,7 @@ from desktop.views import _ko
       <!-- /ko -->
 
       <!-- ko if: !loading() && catalogEntry.isField() && !catalogEntry.isComplex() -->
-      <table class="table table-condensed table-nowrap">
-        <thead>
-          <tr>
-            <th>${ _("Sample") }</th>
-          </tr>
-        </thead>
-        <tbody data-bind="foreach: filteredColumnSamples">
-          <tr>
-            <td class="sample-column" data-bind="html: $data, attr: { 'title': hueUtils.html2text($data) }"></td>
-          </tr>
-        </tbody>
-        <!-- ko if: filteredColumnSamples().length === 0 -->
-        <tbody>
-        <tr>
-          <!-- ko ifnot: hasErrors -->
-          <td style="font-style: italic;">${ _("No entries found") }</td>
-          <!-- /ko -->
-          <!-- ko if: hasErrors -->
-          <td style="font-style: italic;">${ _("Error loading entries") }</td>
-          <!-- /ko -->
-        </tr>
-        </tbody>
-        <!-- /ko -->
-      </table>
+      <!-- ko component: { name: 'field-samples', params: { catalogEntry: catalogEntry } } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -289,9 +266,6 @@ from desktop.views import _ko
         self.entries = ko.observableArray();
         self.editableDescriptions = !!params.editableDescriptions;
         self.contextPopoverEnabled = !!params.contextPopoverEnabled;
-
-        // If the entry is a column without children
-        self.columnSamples = ko.observableArray();
         self.querySpec = ko.observable();
         self.cancellablePromises = [];
         self.loading = ko.observable(false);
@@ -321,22 +295,6 @@ from desktop.views import _ko
         });
 
         self.facets = self.catalogEntry.isField() && !self.catalogEntry.isComplex() ? [] : ['type'];
-
-        self.filteredColumnSamples = ko.pureComputed(function () {
-          if (!self.querySpec() || self.querySpec().query === '') {
-            return self.columnSamples();
-          }
-
-          return self.columnSamples().filter(function (sampleValue) {
-            if (typeof sampleValue === 'undefined' || sampleValue === null) {
-              return false;
-            }
-            return self.querySpec().text.every(function (text) {
-              var textLower = text.toLowerCase();
-              return sampleValue.toString().toLowerCase().indexOf(textLower) !== -1;
-            });
-          });
-        });
 
         self.filteredEntries = ko.pureComputed(function () {
           if (!self.querySpec() || self.querySpec().query === '') {
@@ -397,140 +355,128 @@ from desktop.views import _ko
         };
 
         window.setTimeout(function () {
-          if (self.catalogEntry.isField() && !self.catalogEntry.isComplex()) {
-            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
-              if (samples.data && samples.data.length) {
-                self.columnSamples(samples.data);
-              }
-            }).fail(function () {
-              self.hasErrors(true);
-            }).always(function () {
-              self.loading(false);
-            }));
-          } else {
-            var onClick = function (sampleEnrichedEntry, event) {
-              if (params.onClick) {
-                params.onClick(sampleEnrichedEntry.catalogEntry, event);
-              } else if (self.contextPopoverEnabled) {
-                sampleEnrichedEntry.showContextPopover(sampleEnrichedEntry, event);
-              }
-            };
-            var onRowClick = function (sampleEnrichedEntry, event) {
-              if (self.selectedEntries && $(event.target).is('td')) {
-               $(event.currentTarget).find('.hue-checkbox').trigger('click');
-              }
-              return true;
-            };
+          var onClick = function (sampleEnrichedEntry, event) {
+            if (params.onClick) {
+              params.onClick(sampleEnrichedEntry.catalogEntry, event);
+            } else if (self.contextPopoverEnabled) {
+              sampleEnrichedEntry.showContextPopover(sampleEnrichedEntry, event);
+            }
+          };
+          var onRowClick = function (sampleEnrichedEntry, event) {
+            if (self.selectedEntries && $(event.target).is('td')) {
+             $(event.currentTarget).find('.hue-checkbox').trigger('click');
+            }
+            return true;
+          };
 
-            var entriesAddedDeferred = $.Deferred();
-            var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
-              var entries = $.map(childEntries, function (entry, index) { return new SampleEnrichedEntry(index, entry, onClick, onRowClick) });
-              entries.sort(entrySort);
-              self.entries(entries);
-              entriesAddedDeferred.resolve(entries);
-            }).fail(function () {
-              self.hasErrors(true);
-              entriesAddedDeferred.reject();
-            }).always(function () {
-              self.loading(false);
-            });
+          var entriesAddedDeferred = $.Deferred();
+          var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
+            var entries = $.map(childEntries, function (entry, index) { return new SampleEnrichedEntry(index, entry, onClick, onRowClick) });
+            entries.sort(entrySort);
+            self.entries(entries);
+            entriesAddedDeferred.resolve(entries);
+          }).fail(function () {
+            self.hasErrors(true);
+            entriesAddedDeferred.reject();
+          }).always(function () {
+            self.loading(false);
+          });
 
-            if (self.catalogEntry.isTableOrView()) {
-              var joinsPromise = self.catalogEntry.getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
-                if (topJoins && topJoins.values && topJoins.values.length) {
-                  entriesAddedDeferred.done(function (entries) {
-                    var entriesIndex = {};
-                    entries.forEach(function (entry) {
-                      entriesIndex[entry.catalogEntry.path.join('.').toLowerCase()] = { joinColumnIndex: {}, entry: entry };
-                    });
-                    topJoins.values.forEach(function (topJoin) {
-                      topJoin.joinCols.forEach(function (topJoinCols) {
-                        if (topJoinCols.columns.length === 2) {
-                          if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
-                            entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[topJoinCols.columns[1].toLowerCase()] = topJoinCols.columns[1]
-                          } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
-                            entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[topJoinCols.columns[0].toLowerCase()] = topJoinCols.columns[0]
-                          }
+          if (self.catalogEntry.isTableOrView()) {
+            var joinsPromise = self.catalogEntry.getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
+              if (topJoins && topJoins.values && topJoins.values.length) {
+                entriesAddedDeferred.done(function (entries) {
+                  var entriesIndex = {};
+                  entries.forEach(function (entry) {
+                    entriesIndex[entry.catalogEntry.path.join('.').toLowerCase()] = { joinColumnIndex: {}, entry: entry };
+                  });
+                  topJoins.values.forEach(function (topJoin) {
+                    topJoin.joinCols.forEach(function (topJoinCols) {
+                      if (topJoinCols.columns.length === 2) {
+                        if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
+                          entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[topJoinCols.columns[1].toLowerCase()] = topJoinCols.columns[1]
+                        } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
+                          entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[topJoinCols.columns[0].toLowerCase()] = topJoinCols.columns[0]
                         }
-                      })
-                    });
-                    Object.keys(entriesIndex).forEach(function (key) {
-                      if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
-                        entriesIndex[key].entry.joinColumns(Object.keys(entriesIndex[key].joinColumnIndex));
                       }
                     })
+                  });
+                  Object.keys(entriesIndex).forEach(function (key) {
+                    if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
+                      entriesIndex[key].entry.joinColumns(Object.keys(entriesIndex[key].joinColumnIndex));
+                    }
                   })
+                })
+              }
+            });
+            self.cancellablePromises.push(joinsPromise);
+          }
+
+          var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
+            self.loadingNav(false);
+          });
+
+          self.cancellablePromises.push(navMetaPromise);
+          self.cancellablePromises.push(childPromise);
+
+          self.cancellablePromises.push(self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
+            if (popularEntries.length) {
+              childPromise.done(function () {
+                var entryIndex = {};
+                self.entries().forEach(function (entry) {
+                  entryIndex[entry.catalogEntry.name] = entry;
+                });
+
+                var totalCount = 0;
+                var popularityToApply = [];
+                popularEntries.forEach(function (popularEntry) {
+                  if (entryIndex[popularEntry.name] && popularEntry.navOptPopularity && popularEntry.navOptPopularity.selectColumn && popularEntry.navOptPopularity.selectColumn.columnCount > 0) {
+                    totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
+                    popularityToApply.push(function () {
+                      entryIndex[popularEntry.name].popularity(Math.round(100 * popularEntry.navOptPopularity.selectColumn.columnCount / totalCount))
+                    });
+                  }
+                });
+                var foundPopularEntries = popularityToApply.length !== 0;
+                while (popularityToApply.length) {
+                  popularityToApply.pop()();
+                }
+                if (foundPopularEntries) {
+                  self.entries().sort(entrySort);
                 }
               });
-              self.cancellablePromises.push(joinsPromise);
             }
+          }));
 
-            var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
-              self.loadingNav(false);
-            });
-
-            self.cancellablePromises.push(navMetaPromise);
-            self.cancellablePromises.push(childPromise);
-
-            self.cancellablePromises.push(self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
-              if (popularEntries.length) {
-                childPromise.done(function () {
+          if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
+            self.loadingSamples(true);
+            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (sample) {
+              childPromise.done(function () {
+                if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
                   var entryIndex = {};
                   self.entries().forEach(function (entry) {
                     entryIndex[entry.catalogEntry.name] = entry;
                   });
-
-                  var totalCount = 0;
-                  var popularityToApply = [];
-                  popularEntries.forEach(function (popularEntry) {
-                    if (entryIndex[popularEntry.name] && popularEntry.navOptPopularity && popularEntry.navOptPopularity.selectColumn && popularEntry.navOptPopularity.selectColumn.columnCount > 0) {
-                      totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
-                      popularityToApply.push(function () {
-                        entryIndex[popularEntry.name].popularity(Math.round(100 * popularEntry.navOptPopularity.selectColumn.columnCount / totalCount))
-                      });
+                  for (var i = 0; i < sample.meta.length; i++) {
+                    var name = sample.meta[i].name;
+                    if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
+                      name = name.substring(self.catalogEntry.name.length + 1);
                     }
-                  });
-                  var foundPopularEntries = popularityToApply.length !== 0;
-                  while (popularityToApply.length) {
-                    popularityToApply.pop()();
-                  }
-                  if (foundPopularEntries) {
-                    self.entries().sort(entrySort);
-                  }
-                });
-              }
-            }));
-
-            if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
-              self.loadingSamples(true);
-              self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (sample) {
-                childPromise.done(function () {
-                  if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
-                    var entryIndex = {};
-                    self.entries().forEach(function (entry) {
-                      entryIndex[entry.catalogEntry.name] = entry;
-                    });
-                    for (var i = 0; i < sample.meta.length; i++) {
-                      var name = sample.meta[i].name;
-                      if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
-                        name = name.substring(self.catalogEntry.name.length + 1);
-                      }
-                      var sampleEntry = entryIndex[name];
-                      if (sampleEntry) {
-                        sampleEntry.firstSample(sample.data[0][i]);
-                        if (sample.data.length > 1) {
-                          sampleEntry.secondSample(sample.data[1][i])
-                        }
+                    var sampleEntry = entryIndex[name];
+                    if (sampleEntry) {
+                      sampleEntry.firstSample(sample.data[0][i]);
+                      if (sample.data.length > 1) {
+                        sampleEntry.secondSample(sample.data[1][i])
                       }
                     }
                   }
-                }).always(function () {
-                  self.loadingSamples(false);
-                })
-              }).fail(function () {
+                }
+              }).always(function () {
                 self.loadingSamples(false);
-              }));
-            }
+              })
+            }).fail(function () {
+              self.loadingSamples(false);
+            }));
           }
         }, 100)
       }
@@ -549,6 +495,103 @@ from desktop.views import _ko
         viewModel: CatalogEntriesList,
         template: { element: 'catalog-entries-list-template' }
       });
+    })();
+  </script>
+
+  <script type="text/html" id="field-samples-template">
+    <div class="context-popover-inline-autocomplete">
+      <!-- ko component: {
+        name: 'inline-autocomplete',
+        params: {
+          querySpec: querySpec,
+          autocompleteFromEntries: autocompleteFromEntries
+        }
+      } --><!-- /ko -->
+    </div>
+
+    <table class="table table-condensed table-nowrap">
+      <thead>
+      <tr>
+        <th>${ _("Sample") }</th>
+      </tr>
+      </thead>
+      <tbody data-bind="foreach: filteredColumnSamples">
+      <tr>
+        <td class="sample-column" data-bind="html: $data, attr: { 'title': hueUtils.html2text($data) }"></td>
+      </tr>
+      </tbody>
+      <!-- ko if: filteredColumnSamples().length === 0 -->
+      <tbody>
+      <tr>
+        <!-- ko ifnot: hasErrors -->
+        <td style="font-style: italic;">${ _("No entries found") }</td>
+        <!-- /ko -->
+        <!-- ko if: hasErrors -->
+        <td style="font-style: italic;">${ _("Error loading samples") }</td>
+        <!-- /ko -->
+      </tr>
+      </tbody>
+      <!-- /ko -->
+    </table>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function FieldSamples (params) {
+        var self = this;
+        self.catalogEntry = params.catalogEntry;
+        self.cancellablePromises = [];
+        self.querySpec = ko.observable();
+
+        self.hasErrors = ko.observable();
+        self.loading = ko.observable();
+
+        self.columnSamples = ko.observableArray();
+
+        self.filteredColumnSamples = ko.pureComputed(function () {
+          if (!self.querySpec() || self.querySpec().query === '') {
+            return self.columnSamples();
+          }
+
+          return self.columnSamples().filter(function (sampleValue) {
+            if (typeof sampleValue === 'undefined' || sampleValue === null) {
+              return false;
+            }
+            return self.querySpec().text.every(function (text) {
+              var textLower = text.toLowerCase();
+              return sampleValue.toString().toLowerCase().indexOf(textLower) !== -1;
+            });
+          });
+        });
+
+        self.autocompleteFromEntries = function (nonPartial, partial) {
+        };
+
+        self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
+          if (samples.data && samples.data.length) {
+            self.columnSamples(samples.data);
+          }
+        }).fail(function () {
+          self.hasErrors(true);
+        }).always(function () {
+          self.loading(false);
+        }));
+      }
+
+      FieldSamples.prototype.dispose = function () {
+        var self = this;
+        while (self.cancellablePromises.length) {
+          var promise = self.cancellablePromises.pop();
+          if (promise.cancel) {
+            promise.cancel();
+          }
+        }
+      };
+
+      ko.components.register('field-samples', {
+        viewModel: FieldSamples,
+        template: { element: 'field-samples-template' }
+      })
     })();
   </script>
 </%def>
