@@ -266,3 +266,41 @@ class AnalyticDbApi():
 
   def delete_cluster(self, cluster_id):
     return _exec('dataware', 'deleteCluster', {'clusterName': cluster_id})
+
+
+class DataWarehouseAutoScaleApi():
+
+  def __init__(self, user): pass
+
+  def create_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
+    params = {
+      'clusterName': cluster_name,
+      'cdhVersion': cdh_version,
+      'cpuMinimum': cpu_minimum,
+      'cpuMaximum': cpu_maximum,
+      'memoryMinimum': memory_minimum,
+      'memoryMaximum': memory_maximum,
+    }
+
+    return _exec('dw', 'createCluster', params)
+
+  def list_clusters(self):
+    return _exec('dw', 'listClusters')
+
+  def delete_cluster(self, cluster_id):
+    return _exec('dw', 'deleteCluster', {'clusterName': cluster_id})
+
+  def describe_cluster(self, clusterName):
+    return _exec('dw', 'listClusters', {'clusterName': clusterName})
+
+  def update_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
+    params = {
+      'clusterName': cluster_name,
+      'cdhVersion': cdh_version,
+      'cpuMinimum': cpu_minimum,
+      'cpuMaximum': cpu_maximum,
+      'memoryMinimum': memory_minimum,
+      'memoryMaximum': memory_maximum,
+    }
+
+    return _exec('dw', 'updateCluster', params)
