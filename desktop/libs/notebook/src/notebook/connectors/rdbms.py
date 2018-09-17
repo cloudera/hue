@@ -149,7 +149,7 @@ class RdbmsApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     query_server = dbms.get_query_server_config(server=self.interpreter)
     db = dbms.get(self.user, query_server)
 

@@ -656,13 +656,13 @@ def get_sample_data(request, database, table, column=None):
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table, column, async=False, cluster=None):
+def _get_sample_data(db, database, table, column, async=False, cluster=None, operation=None):
   table_obj = db.get_table(database, table)
   if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
     query_server = get_query_server_config('impala', cluster=cluster)
     db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async)
+  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async, operation=operation)
   response = {'status': -1}
 
   if sample_data:

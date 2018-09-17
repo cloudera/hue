@@ -584,8 +584,9 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   async = json.loads(request.POST.get('async', 'false'))
+  operation = json.loads(request.POST.get('operation', 'default'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async, operation=operation)
   response.update(sample_data)
 
   response['status'] = 0

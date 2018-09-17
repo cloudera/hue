@@ -221,7 +221,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)

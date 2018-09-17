@@ -359,23 +359,29 @@ class HiveServer2Dbms(object):
     return resp
 
 
-  def get_sample(self, database, table, column=None, nested=None, limit=100, generate_sql_only=False):
+  def get_sample(self, database, table, column=None, nested=None, limit=100, generate_sql_only=False, operation=None):
     result = None
     hql = None
 
     # Filter on max # of partitions for partitioned tables
     column = '`%s`' % column if column else '*'
     if table.partition_keys:
-      hql = self._get_sample_partition_query(database, table, column, limit)
+      hql = self._get_sample_partition_query(database, table, column, limit, operation)
     elif self.server_name == 'impala':
       if column or nested:
         from impala.dbms import ImpalaDbms
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
-        hql = 'SELECT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
+        if operation == 'distinct':
+          hql = 'SELECT DISTINCT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
+        else:
+          hql = 'SELECT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
       else:
         hql = "SELECT * FROM `%s`.`%s` LIMIT %s;" % (database, table.name, limit)
     else:
-      hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
+      if operation == 'distinct':
+        hql = "SELECT DISTINCT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
+      else:
+        hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
       # TODO: Add nested select support for HS2
 
     if hql:
@@ -392,7 +398,7 @@ class HiveServer2Dbms(object):
     return result
 
 
-  def _get_sample_partition_query(self, database, table, column='*', limit=100):
+  def _get_sample_partition_query(self, database, table, column='*', limit=100, operation=None):
     max_parts = QUERY_PARTITIONS_LIMIT.get()
     partitions = self.get_partitions(database, table, partition_spec=None, max_parts=max_parts)
 
@@ -404,7 +410,8 @@ class HiveServer2Dbms(object):
     else:
       partition_clause = ''
 
-    return "SELECT %(column)s FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
+    prefix = "SELECT DISTINCT " if operation == 'distinct' else 'SELECT'
+    return prefix + "%(column)s FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
       {'column': column, 'database': database, 'table': table.name, 'partition_clause': partition_clause, 'limit': limit}
 
 
