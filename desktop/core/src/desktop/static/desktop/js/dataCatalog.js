@@ -1734,11 +1734,23 @@ var DataCatalog = (function () {
      * @param {boolean} [options.cachedOnly] - Default false
      * @param {boolean} [options.refreshCache] - Default false
      * @param {boolean} [options.cancellable] - Default false
+     * @oaram {string} [options.operation]
      *
      * @return {CancellablePromise}
      */
     DataCatalogEntry.prototype.getSample = function (options) {
       var self = this;
+
+      // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
+      if (options && options.operation && options.operation !== 'default') {
+        return applyCancellable(ApiHelper.getInstance().fetchSample({
+          sourceType: self.dataCatalog.sourceType,
+          compute: self.compute,
+          path: self.path,
+          silenceErrors: options && options.silenceErrors,
+          operation: options.operation
+        }), options);
+      }
 
       // Check if parent has a sample that we can reuse
       if (!self.samplePromise && self.isColumn()) {
