@@ -134,15 +134,10 @@ def run_sqoop(request, source, destination, start_time):
   destination_custom_enclosed_by_delimiter = destination['customEnclosedByDelimiter']
   destination_splitby_column = destination['rdbmsSplitByColumn']
 
-  hive_database_name, hive_table_name = 'default', destination_name
-
   if not rdbms_all_tables_selected:
     rdbms_table_name = source['rdbmsTableName']
-    if '.' in destination_name:
-      hive_database_name, hive_table_name = destination_name.split('.', 1)
   else:
     rdbms_table_name = None
-    hive_database_name = destination_name
 
   if rdbms_mode == 'configRdbms' and rdbms_name == 'jdbc':
     username = ''
@@ -224,14 +219,14 @@ def run_sqoop(request, source, destination, start_time):
     if rdbms_all_tables_selected:
       statement = 'import-all-tables %(statement)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s' % {
         'statement': statement,
-        'hive_database_name': hive_database_name
+        'hive_database_name': destination_database_name
       }
     else:
       statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s --hive-table %(hive_table_name)s' % {
         'statement': statement,
         'rdbmsTableName': rdbms_table_name,
-        'hive_database_name': hive_database_name,
-        'hive_table_name': hive_table_name
+        'hive_database_name': destination_database_name,
+        'hive_table_name': destination_table_name
       }
       statement = _splitby_column_check(statement, destination_splitby_column)
   elif destination_type == 'hbase':
