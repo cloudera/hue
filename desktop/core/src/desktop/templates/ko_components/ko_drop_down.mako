@@ -38,7 +38,7 @@ from desktop.views import _ko
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
-    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
+    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0, style: { 'overflow-y': !foreachVisible ? 'auto' : 'hidden' }">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
@@ -211,6 +211,23 @@ from desktop.views import _ko
               $(window).on('click', closeOnOutsideClick);
               $(element).find('.hue-drop-down-input').focus();
             }, 0);
+
+            // Right align the dropdown when outside the right edge
+            if (!self.fixedPosition) {
+              var $element = $(element);
+              var $dropDownMenu = $element.find('.dropdown-menu').parent();
+              var $offsetParent = $element.offsetParent();
+
+              var rightLimit = $offsetParent.offset().left + $offsetParent.width();
+
+              if ($dropDownMenu.offset().left + 160 > rightLimit) {
+                var $caret = $element.find('.fa-caret-down');
+                var caretRight = $caret.offset().left + $caret.width();
+
+                var diff = -$dropDownMenu.offset().left - 160 + caretRight;
+                $element.find('.hue-drop-down-container').css({ 'margin-left': diff + 'px' });
+              }
+            }
           } else {
             $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
             $(window).off('click', closeOnOutsideClick);
