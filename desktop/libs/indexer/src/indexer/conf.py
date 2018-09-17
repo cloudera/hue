@@ -150,6 +150,11 @@ CONFIG_INDEXING_TEMPLATES_PATH = Config(
   default=os.path.join(os.path.dirname(__file__), '..', 'data', 'oozie_workspace')
   )
 
+
+def config_morphline_path():
+  return os.path.join(os.path.dirname(__file__), '..', 'data', 'morphline')
+
+
 # Unused
 SOLRCTL_PATH = Config(
   key="solrctl_path",
