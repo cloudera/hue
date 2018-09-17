@@ -565,6 +565,14 @@ from desktop.views import _ko
         });
 
         self.autocompleteFromEntries = function (nonPartial, partial) {
+          var result = [];
+          var partialLower = partial.toLowerCase();
+          self.columnSamples().forEach(function (sample) {
+            if (sample[0].toString().toLowerCase().indexOf(partialLower) === 0) {
+              result.push(nonPartial + partial + sample[0].toString().substring(partial.length))
+            }
+          });
+          return result;
         };
 
         self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
