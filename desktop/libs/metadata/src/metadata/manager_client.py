@@ -134,7 +134,7 @@ class ManagerApi(object):
       raise ManagerApiException(e)
 
 
-  def update_flume_config(self, cluster_name, config):
+  def update_flume_config(self, cluster_name, config_name, config_value):
     service = 'FLUME-1'
     cluster = self._get_cluster(cluster_name)
     roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
@@ -143,7 +143,7 @@ class ManagerApi(object):
         u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),
         u'body': {
           u'items': [
-            {u'name': u'agent_config_file', u'value': config}
+            {u'name': config_name, u'value': config_value}
           ]
         },
         u'contentType': u'application/json',
@@ -156,13 +156,15 @@ class ManagerApi(object):
     )
 
 
-  def update_and_refresh_flume(self, cluster_name, config):
+  def refresh_flume(self, cluster_name, restart=False):
     service = 'FLUME-1'
     cluster = self._get_cluster(cluster_name)
     roles = [role['name'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
 
-    self.update_flume_config(cluster['name'], config)
-    return self.refresh_configs(cluster['name'], service, roles)
+    if restart:    
+      return self.restart_services(cluster['name'], service, roles)
+    else:
+      return self.refresh_configs(cluster['name'], service, roles)
 
 
   def refresh_configs(self, cluster_name, service=None, roles=None):
@@ -174,6 +176,22 @@ class ManagerApi(object):
       else:
         return self._root.post(
             'clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service},
+            data=json.dumps({"items": roles}),
+            contenttype="application/json"
+        )
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def restart_services(self, cluster_name, service=None, roles=None):
+    try:
+      if service is None:
+        return self._root.post('clusters/%(cluster_name)s/commands/restart' % {'cluster_name': cluster_name}, contenttype="application/json")
+      elif roles is None:
+        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+      else:
+        return self._root.post(
+            'clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service},
             data=json.dumps({"items": roles}),
             contenttype="application/json"
         )
