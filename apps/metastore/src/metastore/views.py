@@ -404,6 +404,8 @@ def drop_table(request, database):
       tables = request.POST.getlist('table_selection')
       tables_objects = [db.get_table(database, table) for table in tables]
       skip_trash = request.POST.get('skip_trash') == 'on'
+      compute = request.POST.get('compute')
+      namespace = request.POST.get('namespace')
 
       if request.POST.get('is_embeddable'):
         last_executed = json.loads(request.POST.get('start_time'), '-1')
@@ -414,6 +416,8 @@ def drop_table(request, database):
             statement=sql.strip(),
             status='ready',
             database=database,
+            namespace=namespace,
+            compute=compute,
             on_success_url='assist.db.refresh',
             is_task=True,
             last_executed=last_executed
