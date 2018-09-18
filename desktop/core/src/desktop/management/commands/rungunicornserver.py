@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
-
+import logging
 import multiprocessing
 
 import gunicorn.app.base
@@ -31,6 +31,9 @@ from django.utils.translation import ugettext as _
 
 from gunicorn import util
 from gunicorn.six import iteritems
+
+LOG = logging.getLogger(__name__)
+
 
 GUNICORN_SERVER_HELP = r"""
   Run Hue using the Gunicorn WSGI server in asynchronous mode.
@@ -51,6 +54,7 @@ def number_of_workers():
 
 
 def handler_app(environ, start_response):
+  LOG.info("calling handler app ...")
   os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
   return get_wsgi_application()
 
@@ -122,7 +126,7 @@ def rungunicornserver():
       'max_requests_jitter': None,
       'paste': None,
       'pidfile': None,
-      'preload_app': None,
+      'preload_app': None, #True if conf.GUNICORN_WORKER_CLASS.get() == 'gevent' else None,
       'proc_name': None,
       'proxy_allow_ips': None,
       'proxy_protocol': None,
@@ -150,7 +154,67 @@ def rungunicornserver():
       'worker_tmp_dir': None,
       'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else number_of_workers()
   }
+  if conf.GUNICORN_WORKER_CLASS.get():
+    patch_thread_ident()
+  LOG.info("Patching gevent monkey!!!")
   StandaloneApplication(handler_app, options).run()
+
+DB_SHARED_THREAD = """\
+DatabaseWrapper objects created in a thread can only \
+be used in that same thread.  The object with alias '{0}' \
+was created in thread id {1} and this is thread id {2}.\
+"""
+
+def patch_thread_ident():
+  # monkey patch django.
+  # This patch make sure that we use real threads to get the ident which
+  # is going to happen if we are using gevent or eventlet.
+  # -- patch taken from gunicorn
+  if getattr(patch_thread_ident, 'called', False):
+    return
+
+  try:
+    # django >= 1.8
+    from django.db.backends.base.base import BaseDatabaseWrapper
+    from django.db.utils import DatabaseError
+    LOG.info("patch_thread_ident step 1 ...")
+  except ImportError:
+    try:
+      # django < 1.8
+      from django.db.backends import BaseDatabaseWrapper, DatabaseError
+    except ImportError:
+      return
+
+  if 'validate_thread_sharing' in BaseDatabaseWrapper.__dict__:
+    try:
+      import thread
+    except ImportError:
+      return
+
+    LOG.info("patch_thread_ident step 2 ...")
+
+    _get_ident = thread.get_ident
+
+    __old__init__ = BaseDatabaseWrapper.__init__
+
+    def _init(self, *args, **kwargs):
+      __old__init__(self, *args, **kwargs)
+      self._thread_ident = _get_ident()
+
+    def _validate_thread_sharing(self):
+      if (not self.allow_thread_sharing and self._thread_ident != _get_ident()):
+        raise DatabaseError(
+                    DB_SHARED_THREAD % (
+                        self.alias, self._thread_ident, _get_ident()),
+                )
+
+    LOG.info("patch_thread_ident step 3 ...")
+
+    BaseDatabaseWrapper.__init__ = _init
+    BaseDatabaseWrapper.validate_thread_sharing = _validate_thread_sharing
+    LOG.info("patch_thread_ident step 4 ...")
+
+  patch_thread_ident.called = True
 
 if __name__ == '__main__':
     rungunicornserver()
