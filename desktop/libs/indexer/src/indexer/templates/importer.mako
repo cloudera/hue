@@ -22,7 +22,7 @@
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from notebook.conf import ENABLE_SQL_INDEXER
 
-  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE, ENABLE_FIELD_EDITOR
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -350,7 +350,7 @@ ${ assist.assistPanel() }
 
             <!-- ko if: createWizard.source.streamSelection() == 'flume' -->
               <div class="control-group">
- 
+
                 <label class="control-label"><div>${ _('Type') }</div>
                   <select class="input-medium" data-bind="selectize: createWizard.source.channelSourceTypes, value: createWizard.source.channelSourceType, optionsText: 'name', optionsValue: 'value'"></select>
                 </label>
@@ -364,7 +364,7 @@ ${ assist.assistPanel() }
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.channelSourcePath" placeholder="${ _('The path to watch and consume') }">
                 </label>
                 <!-- /ko -->
-      
+
                 <!-- ko if: createWizard.source.channelSourceType() -->
                 <input data-bind="click: function() { createWizard.source.channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
                 <!-- /ko -->
@@ -438,14 +438,14 @@ ${ assist.assistPanel() }
     </div>
 
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file'">
+    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream'">
       <!-- ko if: createWizard.isGuessingFormat -->
       <h4>${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h4>${_('Format')}</h4>
       <div class="card-body">
-        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') && createWizard.source.inputFormat() == 'file'">
+        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') && (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream')">
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
         </label>
@@ -511,8 +511,8 @@ ${ assist.assistPanel() }
 
     <!-- /ko -->
 
-    <!-- ko if: currentStep() == 2 -->
 
+    <!-- ko if: currentStep() == 2 -->
       <!-- ko with: createWizard.destination -->
 
       <div class="card step">
@@ -564,7 +564,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'flume' -->
-      
+
             <h4>${ _('Sink') }</h4>
             <div class="row-fluid">
               <div>
@@ -576,7 +576,7 @@ ${ assist.assistPanel() }
                   <select class="input-xxlarge" data-bind="selectize: ['logIndex', 'apacheLogs'], value: channelSinkPath"></select>
                 </label>
                 <!-- /ko -->
-      
+
                 <!-- ko if: channelSinkType() -->
                 <input data-bind="click: function() { channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
                 <!-- /ko -->
@@ -901,7 +901,7 @@ ${ assist.assistPanel() }
                   </li>
                 </ul>
                 <div class="config-property-add-value" style="margin-top: 5px;">
-                  <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addSqoopJobLibPath">
+                  <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;" data-bind="click: addSqoopJobLibPath">
                     <i class="fa fa-plus"></i>
                   </a>
                 </div>
@@ -914,15 +914,28 @@ ${ assist.assistPanel() }
         <!-- ko if: ['table', 'index', 'hbase'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
             <h4>
-              <!-- ko if: useFieldEditor -->
-              <a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">${_('Fields')} /</a> ${_('Editor')}
+              <!-- ko if: fieldEditorEnabled -->
+                <!-- ko if: useFieldEditor -->
+                <a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">${_('Fields')} /</a> ${_('Editor')}
+                <!-- /ko -->
+                <!-- ko ifnot: useFieldEditor -->
+                  ${_('Fields')} / <a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">${_('Editor')}</a>
+                <!-- /ko -->
               <!-- /ko -->
-              <!-- ko ifnot: useFieldEditor -->
-              ${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0, publish: 'importer.show.bulkeditor'" href="javascript:void(0)"><i class="fa fa-edit"></i></a> <!-- ko if: fieldEditorEnabled --><a class="inactive-action" href="javascript:void(0);" data-bind="toggle: useFieldEditor">/ ${_('Editor')}</a><!-- /ko -->
+              <!-- ko ifnot: fieldEditorEnabled -->
+                ${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko -->
+                <a class="inactive-action pointer" data-bind="visible: columns().length > 0, publish: 'importer.show.bulkeditor'" href="javascript:void(0)">
+                  <i class="fa fa-edit"></i>
+                </a>
               <!-- /ko -->
             </h4>
             <div class="card-body no-margin-top columns-form">
               <!-- ko if: useFieldEditor -->
+              ${ _('Language') }
+              <select>
+                <option value="sql">SQL</option>
+                <option value="morphline">Morphline</option>
+              </select>
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: fieldEditorValue,
                   placeHolder: '${ _ko('Example: SELECT a, b FROM c') }',
@@ -1019,21 +1032,6 @@ ${ assist.assistPanel() }
         <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
-        
-        <div class="btn-group" style="margin-top: 8px">
-          <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
-            ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
-          </button>
-
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu hue-main-create-dropdown">
-            <li class="dropdown-submenu">
-              <a href="#" target="_blank">${ _('Get config') }</a>
-            </li>
-          </ul>
-        </div>
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
@@ -2165,14 +2163,13 @@ ${ assist.assistPanel() }
       self.primaryKeys = ko.observableArray();
       self.primaryKeyObjects = ko.observableArray();
 
-      self.useFieldEditor = ko.observable('${ ENABLE_KAFKA.get() }' == 'True');
+      self.useFieldEditor = ko.observable(false);
       // TODO: Figure out the database to use for field editor autocomplete
       self.fieldEditorDatabase = ko.observable('default');
       // TODO: Do something with the editor value
       self.fieldEditorValue = ko.observable();
       self.fieldEditorEnabled = ko.pureComputed(function () {
-        // TODO: Decide when the editor should be enabled
-        return false; // Disabled for now
+        return '${ ENABLE_FIELD_EDITOR.get() }' == 'True';
       });
 
       self.importData = ko.observable(true);
