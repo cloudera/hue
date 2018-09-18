@@ -117,6 +117,13 @@ ENABLE_KAFKA = Config(
   default=False
 )
 
+ENABLE_FIELD_EDITOR = Config(
+  key="enable_field_editor",
+  help=_t("Flag to turn on the SQL/Morphline field editor."),
+  type=bool,
+  default=False
+)
+
 ENABLE_ENVELOPE = Config(
   key="enable_envelope",
   help=_t("Flag to turn on Envelope based jobs."),
