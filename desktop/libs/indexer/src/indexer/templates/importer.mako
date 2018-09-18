@@ -323,14 +323,16 @@ ${ assist.assistPanel() }
 
               <!-- ko if: createWizard.source.rdbmsDatabaseName -->
               <div class="control-group">
-                <!-- ko ifnot: createWizard.source.rdbmsAllTablesSelected() -->
+                <div>
+                  <label class="checkbox inline-block">
+                    <input type="checkbox" data-bind="checked: createWizard.source.rdbmsIsAllTables"> ${_('All Tables')}
+                  </label>
+                </div>
+                <!-- ko ifnot: createWizard.source.rdbmsIsAllTables() -->
                 <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
-                  <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
+                  <select id="rdbmsTableName" multiple="multiple" data-bind="selectize: createWizard.source.rdbmsTableNames, selectedObjects: createWizard.source.tables, selectedOptions: createWizard.source.tablesNames, optionsText: 'name', optionsValue: 'value'"></select>
                 </label>
                 <!-- /ko -->
-                <label class="checkbox inline-block">
-                  <input type="checkbox" data-bind="checked: createWizard.source.rdbmsIsAllTables"> ${_('All Tables')}
-                </label>
               </div>
               <!-- /ko -->
             <!-- /ko -->
@@ -472,7 +474,7 @@ ${ assist.assistPanel() }
         ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
       <!-- /ko -->
       <div class="card-body">
-        <!-- ko if: $root.createWizard.source.inputFormat() === 'table' && $root.createWizard.source.tables().length > 1 -->
+        <!-- ko if: ['table', 'rdbms'].indexOf($root.createWizard.source.inputFormat()) >= 0 && $root.createWizard.source.tables().length > 1 -->
         <ul class="nav nav-tabs" style="margin-top: -14px">
           <!-- ko foreach: $root.createWizard.source.tables -->
           <li data-bind="css: { 'active': $root.createWizard.source.selectedTableIndex() === $index() }"><a href="#" data-bind="text: name, click: function(){ $root.createWizard.source.selectedTableIndex($index()) }"></a></li>
@@ -480,7 +482,7 @@ ${ assist.assistPanel() }
         </ul>
         <!-- /ko -->
 
-        <!-- ko if: $root.createWizard.source.inputFormat() === 'table' -->
+        <!-- ko if: ['table', 'rdbms'].indexOf($root.createWizard.source.inputFormat()) >= 0 -->
         <!-- ko hueSpinner: { spin: createWizard.isGuessingFormat() || createWizard.isGuessingFieldTypes() , inline: true } --><!-- /ko -->
         <!-- /ko -->
 
@@ -596,9 +598,12 @@ ${ assist.assistPanel() }
                 ${ _('Empty name') }
               <!-- /ko -->
             </span>
-            <span class="help-inline muted" data-bind="visible: isTargetExisting() && outputFormat() != 'altus'">
+            <span class="help-inline muted" data-bind="visible: isTargetExisting() && outputFormat() != 'altus' && $parent.createWizard.source.inputFormat() !== 'rdbms' ">
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
+            </span>
+            <span class="help-inline muted" data-bind="visible: !isTargetExisting() && $parent.createWizard.source.inputFormat() === 'rdbms' && outputFormat() == 'database' ">
+              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Does not exist') } <span data-bind="text: outputFormat"></span>
             </span>
           </div>
         </div>
@@ -819,7 +824,7 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' && ['file', 'table', 'hbase'].indexOf(outputFormat()) != -1 -->
+        <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' && ['database', 'file', 'table', 'hbase'].indexOf(outputFormat()) != -1 -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
 
@@ -859,9 +864,11 @@ ${ assist.assistPanel() }
               </label>
             </div>
             <div class="control-group">
-              <label for="rdbmsSplitBy" class="control-label"><div>${ _('Split By') }</div>
-                <select id="rdbmsSplitBy" data-bind="selectize: columns, value: rdbmsSplitByColumn, optionsValue: 'name', optionsText: 'name'"></select>
-              </label>
+              <!-- ko if: !$root.createWizard.source.rdbmsAllTablesSelected() -->
+                <label for="rdbmsSplitBy" class="control-label"><div>${ _('Split By') }</div>
+                  <select id="rdbmsSplitBy" data-bind="selectize: columns, value: rdbmsSplitByColumn, optionsValue: 'name', optionsText: 'name'"></select>
+                </label>
+              <!-- /ko -->
             </div>
             <div class="control-group" data-bind="visible: outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
@@ -879,6 +886,18 @@ ${ assist.assistPanel() }
                 <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customEnclosedByDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </span>
+            <!-- ko if: outputFormat() === 'database' -->
+            <span>
+              <label class="checkbox">
+              <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
+              </label>
+              <span data-bind="visible: !useDefaultLocation()">
+                <label for="path" class="control-label"><div>${ _('External location') }</div>
+                  <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                </label>
+              </span>
+            </span>
+            <!-- /ko -->
           </span>
 
         </div>
@@ -992,7 +1011,7 @@ ${ assist.assistPanel() }
           </div>
         <!-- /ko -->
 
-        <!-- ko if: outputFormat() == 'database' -->
+        <!-- ko if: outputFormat() == 'database' && $root.createWizard.source.inputFormat() !== 'rdbms' -->
           <div class="card step">
             <h4>${_('Properties')}</h4>
             <div class="card-body">
@@ -1593,9 +1612,7 @@ ${ assist.assistPanel() }
         self.rdbmsTypes(null);
         self.rdbmsType('');
         self.rdbmsDatabaseName('');
-        self.rdbmsTableName('');
         self.rdbmsIsAllTables(false);
-        self.rdbmsAllTablesSelected(false);
         self.rdbmsJdbcDriver('');
         self.rdbmsJdbcDriverName('');
         self.rdbmsHostname('');
@@ -1656,19 +1673,14 @@ ${ assist.assistPanel() }
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
             if (resp.data) {
-              self.rdbmsTableNames(resp.data);
+              self.rdbmsTableNames(resp.data.map(function(opt) {
+                return ko.mapping.fromJS(opt);
+              }));
             }
           });
         }
       });
       self.rdbmsDatabaseNames = ko.observableArray();
-      self.rdbmsTableName = ko.observable('');
-      self.rdbmsTableName.subscribe(function (val) {
-        if (val !== '') {
-          wizard.guessFieldTypes();
-          wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
-        }
-      });
       self.rdbmsJdbcDriverNames = ko.observableArray();
       self.rdbmsJdbcDriverName = ko.observable();
       self.rdbmsJdbcDriverName.subscribe(function () {
@@ -1702,15 +1714,32 @@ ${ assist.assistPanel() }
       self.rdbmsPassword.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
-      self.rdbmsAllTablesSelected = ko.observable(false);
       self.rdbmsIsAllTables = ko.observable(false);
       self.rdbmsIsAllTables.subscribe(function(newVal) {
         if (newVal) {
           wizard.destination.name(self.rdbmsDatabaseName());
         } else {
-          wizard.destination.name(self.rdbmsTableName()); // To add self.rdbmsDatabaseName() would need to check for existence and/or create automatically
+          wizard.destination.name(self.tables()[0] && self.tables()[0].name() || ''); // To add self.rdbmsDatabaseName() would need to check for existence and/or create automatically
         }
-        self.rdbmsAllTablesSelected(newVal);
+      });
+      self.rdbmsAllTablesSelected = ko.pureComputed(function () {
+        return self.rdbmsIsAllTables() || self.tables().length > 1;
+      });
+      self.rdbmsTablesExclude = ko.pureComputed(function () {
+        var rdbmsTables = self.rdbmsTableNames();
+        var tables = self.tables();
+        if (tables.length <= 1) {
+          return [];
+        }
+        var map = tables.reduce(function (map, table) {
+          map[table.name()] = 1;
+          return map;
+        }, {});
+        return rdbmsTables.map(function (table) {
+          return table.name();
+        }).filter(function (name) {
+          return !map[name];
+        });
       });
       self.rdbmsDbIsValid = ko.observable(false);
       self.rdbmsCheckConnection = function() {
@@ -1731,9 +1760,11 @@ ${ assist.assistPanel() }
       self.tables = ko.observableArray([
         ko.mapping.fromJS({ name: '' })
       ]);
+      self.tablesNames = ko.observableArray([]);
       self.selectedTableIndex = ko.observable(0);
       self.table = ko.pureComputed(function() {
-        return self.tables().length > 0 ? self.tables()[self.selectedTableIndex()].name() : ''
+        var index = Math.min(self.selectedTableIndex(), self.tables().length - 1);
+        return self.tables().length > 0 ? self.tables()[index].name() : ''
       });
       self.tableName = ko.pureComputed(function() {
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[1] : self.table();
@@ -1895,7 +1926,7 @@ ${ assist.assistPanel() }
               self.streamObject();
         }
         if (self.inputFormat() === 'rdbms') {
-          return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.rdbmsAllTablesSelected());
+          return (self.rdbmsDatabaseName().length > 0 && self.tables().length > 0) || self.rdbmsAllTablesSelected();
         }
       });
     };
@@ -1975,34 +2006,34 @@ ${ assist.assistPanel() }
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
-        if (newValue && newValue !== 'database' && ((newValue === 'table' || newValue === 'index') && wizard.source.table().length > 0)) {
+        if (newValue && newValue !== 'database' && ((['table', 'rdbms', 'index'].indexOf(newValue) >= 0) && wizard.source.table().length > 0)) {
           self.nameChanged(self.name());
           wizard.guessFieldTypes();
           resizeElements();
         }
       });
       self.outputFormatsList = ko.observableArray([
-          {'name': 'Table', 'value': 'table'},
+          {'name': '${ _("Table") }', 'value': 'table'},
           % if ENABLE_NEW_INDEXER.get():
-          {'name': 'Search index', 'value': 'index'},
+          {'name': '${ _("Search index") }', 'value': 'index'},
           % endif
-          {'name': 'Database', 'value': 'database'},
+          {'name': '${ _("Database") }', 'value': 'database'},
           % if ENABLE_SQOOP.get() or ENABLE_KAFKA.get():
-          {'name': 'File', 'value': 'file'},
+          {'name': '${ _("Folder") }', 'value': 'file'},
           % endif
           % if ENABLE_KAFKA.get():
-          {'name': 'Stream', 'value': 'stream'},
+          {'name': '${ _("Stream") }', 'value': 'stream'},
           % endif
           % if ENABLE_ALTUS.get():
-          {'name': 'Altus SDX', 'value': 'altus'},
+          {'name': '${ _("Altus SDX") }', 'value': 'altus'},
           % endif
           % if ENABLE_SQOOP.get():
-          {'name': 'HBase Table', 'value': 'hbase'},
+          {'name': '${ _("HBase Table") }', 'value': 'hbase'},
           % endif
       ]);
       self.outputFormats = ko.pureComputed(function() {
         return $.grep(self.outputFormatsList(), function(format) {
-          if (format.value === 'database' && wizard.source.inputFormat() !== 'manual') {
+          if (format.value === 'database' && wizard.source.inputFormat() !== 'manual' && (wizard.source.inputFormat() !== 'rdbms' || !wizard.source.rdbmsAllTablesSelected())) {
             return false;
           }
           if (format.value === 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
@@ -2011,7 +2042,7 @@ ${ assist.assistPanel() }
           if (format.value === 'index' && ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'table' && ['table'].indexOf(wizard.source.inputFormat()) !== -1) {
+          if (format.value === 'table' && wizard.source.inputFormat() !== 'table' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
             return false;
           }
           if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
@@ -2020,11 +2051,16 @@ ${ assist.assistPanel() }
           if (format.value === 'stream' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'hbase' && wizard.source.inputFormat() !== 'rdbms') {
+          if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
             return false;
           }
           return true;
         })
+      });
+      self.outputFormats.subscribe(function (newValue) {
+        if (newValue.map(function (entry) { return entry.value; }).indexOf(self.outputFormat()) < 0) {
+          self.outputFormat(newValue && newValue[0].value);
+        }
       });
       wizard.prefill.target_type.subscribe(function(newValue) {
         self.outputFormat(newValue || 'table');
@@ -2342,7 +2378,12 @@ ${ assist.assistPanel() }
             return column.name().length === 0 || (self.source.inputFormat() !== 'manual' && column.partitionValue().length === 0);
           }).length === 0
         );
-        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() === 'index';
+        var isTargetAlreadyExisting;
+        if (self.destination.outputFormat() === 'database' && self.source.inputFormat() === 'rdbms') {
+          isTargetAlreadyExisting = self.destination.isTargetExisting();
+        } else {
+          isTargetAlreadyExisting = !self.destination.isTargetExisting() || self.destination.outputFormat() === 'index';
+        }
         var isValidTable = self.destination.outputFormat() !== 'table' || (
           self.destination.tableFormat() !== 'kudu' || (
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
@@ -2426,10 +2467,12 @@ ${ assist.assistPanel() }
         }, function (resp) {
           self.loadSampleData(resp);
           self.isGuessingFieldTypes(false);
+          guessFieldTypesXhr = null;
         }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
           self.isGuessingFieldTypes(false);
           viewModel.isLoading(false);
+          guessFieldTypesXhr = null;
         });
       };
       self.loadSampleData = function(resp) {
@@ -2699,7 +2742,7 @@ ${ assist.assistPanel() }
         %endif
       });
       self.previousStepVisible = ko.pureComputed(function(){
-        return self.currentStep() > 1 && self.createWizard.destination.outputFormat() !== 'database';
+        return self.currentStep() > 1 && (self.createWizard.destination.outputFormat() !== 'database' || self.createWizard.source.inputFormat() === 'rdbms');
       });
       self.nextStepVisible = ko.pureComputed(function(){
         return self.currentStep() < 3 && self.wizardEnabled();

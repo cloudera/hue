@@ -219,8 +219,8 @@ def guess_field_types(request):
       query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
       db = rdbms.get(request.user, query_server=query_server)
 
-    sample = RdbmsIndexer(request.user, file_format['rdbmsType'], db=db).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
-    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
+    sample = RdbmsIndexer(request.user, file_format['rdbmsType'], db=db).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['tableName'])
+    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['tableName'], names_only=False)
 
     # cf. https://github.com/apache/sqoop/blob/trunk/src/java/org/apache/sqoop/hive/HiveTypes.java#L39
     for col in table_metadata:
@@ -364,14 +364,14 @@ def importer_submit(request):
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
   elif source['inputFormat'] in ('stream', 'sfdc') or destination['ouputFormat'] == 'stream':
     job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
-  elif destination['ouputFormat'] == 'database':
-    job_handle = _create_database(request, source, destination, start_time)
   elif source['inputFormat'] == 'altus':
     # BDR copy or DistCP + DDL + Sentry DDL copy
     pass
   elif source['inputFormat'] == 'rdbms':
-    if destination['outputFormat'] in ('file', 'table', 'hbase'):
+    if destination['outputFormat'] in ('database', 'file', 'table', 'hbase'):
       job_handle = run_sqoop(request, source, destination, start_time)
+  elif destination['ouputFormat'] == 'database':
+    job_handle = _create_database(request, source, destination, start_time)
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
