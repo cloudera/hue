@@ -135,13 +135,15 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()}
-    elif file_format['streamSelection'] == 'sfdc':
-      sf = Salesforce(
-          username=file_format['streamUsername'],
-          password=file_format['streamPassword'],
-          security_token=file_format['streamToken']
-      )
-      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
+    elif file_format['streamSelection'] == 'flume':
+      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n"}
+  elif file_format['inputFormat'] == 'sfdc':
+    sf = Salesforce(
+        username=file_format['streamUsername'],
+        password=file_format['streamPassword'],
+        security_token=file_format['streamToken']
+    )
+    format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}    
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -284,7 +286,7 @@ def guess_field_types(request):
         "file": {
             "stream": stream,
             "name": file_format['path']
-          },
+        },
         "format": file_format['format']
       })
       type_mapping = dict(zip(kafkaFieldNames, kafkaFieldTypes))
@@ -292,26 +294,35 @@ def guess_field_types(request):
       for col in format_['columns']:
         col['keyType'] = type_mapping[col['name']]
         col['type'] = type_mapping[col['name']]
-    elif file_format['streamSelection'] == 'sfdc':
-      sf = Salesforce(
-          username=file_format['streamUsername'],
-          password=file_format['streamPassword'],
-          security_token=file_format['streamToken']
-      )
-      table_metadata = [{
-          'name': column['name'],
-          'type': column['type']
-        } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
-      ]
-      query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
-      print query
+    elif file_format['streamSelection'] == 'flume':
       format_ = {
-        "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
-        "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in table_metadata
-        ]
-       }
+          "sample": [['...']] * 4,
+          "columns": [
+              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+              for col in [{'name': 'message', 'type': 'string'}]
+          ]
+      }
+  elif file_format['streamSelection'] == 'sfdc':
+    sf = Salesforce(
+        username=file_format['streamUsername'],
+        password=file_format['streamPassword'],
+        security_token=file_format['streamToken']
+    )
+    table_metadata = [{
+        'name': column['name'],
+        'type': column['type']
+      } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
+    ]
+    query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
+    print query
+
+    format_ = {
+      "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
+      "columns": [
+          Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+          for col in table_metadata
+      ]
+    }
 
   return JsonResponse(format_)
 
@@ -351,7 +362,7 @@ def importer_submit(request):
     else:
       client = SolrClient(request.user)
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
-  elif source['inputFormat'] == 'stream' or destination['ouputFormat'] == 'stream':
+  elif source['inputFormat'] in ('stream', 'sfdc') or destination['ouputFormat'] == 'stream':
     job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
@@ -523,8 +534,10 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
       'input_path': input_path,
       'format': 'csv'
     }
-  elif file_format['inputFormat'] == 'stream':
-    if file_format['streamSelection'] == 'sfdc':
+  elif file_format['inputFormat'] == 'stream' and file_format['streamSelection'] == 'flume':
+    pass
+  elif file_format['inputFormat'] in ('stream', 'sfdc'):
+    if file_format['inputFormat'] == 'sfdc':
       properties = {
         'streamSelection': file_format['streamSelection'],
         'streamUsername': file_format['streamUsername'],
