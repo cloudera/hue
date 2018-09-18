@@ -123,6 +123,7 @@ def run_sqoop(request, source, destination, start_time):
   rdbms_name = source['rdbmsJdbcDriverName'] if source['rdbmsType'] == 'jdbc' else source['rdbmsType']
   rdbms_database_name = source['rdbmsDatabaseName']
   rdbms_all_tables_selected = source['rdbmsAllTablesSelected']
+  rdbms_exclude = source['rdbmsTablesExclude']
   destination_type = destination['outputFormat']
   destination_name = destination['name']
   destination_table_name = destination['tableName']
@@ -135,7 +136,7 @@ def run_sqoop(request, source, destination, start_time):
   destination_splitby_column = destination['rdbmsSplitByColumn']
 
   if not rdbms_all_tables_selected:
-    rdbms_table_name = source['rdbmsTableName']
+    rdbms_table_name = source['tableName']
   else:
     rdbms_table_name = None
 
@@ -176,21 +177,25 @@ def run_sqoop(request, source, destination, start_time):
       lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths'] if f['path']]
 
     statement = '--connect jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
-      'rdbmsType': get_connector_name(rdbms_name),
+      'rdbmsType': rdbms_name,
       'rdbmsHost': rdbms_host,
       'rdbmsPort': rdbms_port,
       'rdbmsDatabaseName': rdbms_database_name,
       'rdbmsUserName': rdbms_user_name,
       'passwordFilePath': password_file_path
     }
-
+  if rdbms_exclude:
+    exclude = '--exclude-tables %s' % ','.join(rdbms_exclude)
+  else:
+    exclude = ''
   if destination_type == 'file':
     success_url = '/filebrowser/view/' + destination_name
     targetDir = request.fs.fs_defaultfs + destination_name
     if rdbms_all_tables_selected:
-      statement = 'import-all-tables %(statement)s --warehouse-dir %(targetDir)s' % {
+      statement = 'import-all-tables %(statement)s --warehouse-dir %(targetDir)s %(exclude)s' % {
         'statement': statement,
-        'targetDir': targetDir
+        'targetDir': targetDir,
+        'exclude': exclude
       }
     else:
       statement = 'import %(statement)s --table %(rdbmsTableName)s --delete-target-dir --target-dir %(targetDir)s' % {
@@ -214,12 +219,13 @@ def run_sqoop(request, source, destination, start_time):
           'statement': statement
         }
       statement = _splitby_column_check(statement, destination_splitby_column)
-  elif destination_type == 'table':
+  elif destination_type == 'table' or destination_type == 'database':
     success_url = reverse('metastore:describe_table', kwargs={'database': destination_database_name, 'table': destination_table_name})
     if rdbms_all_tables_selected:
-      statement = 'import-all-tables %(statement)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s' % {
+      statement = 'import-all-tables %(statement)s --hive-import --hive-database %(hive_database_name)s %(exclude)s' % {
         'statement': statement,
-        'hive_database_name': destination_database_name
+        'hive_database_name': destination_database_name,
+        'exclude': exclude
       }
     else:
       statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s --hive-table %(hive_table_name)s' % {
