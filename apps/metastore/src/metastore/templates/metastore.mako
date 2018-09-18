@@ -1164,10 +1164,14 @@ ${ components.menubar(is_embeddable) }
       });
 
       huePubSub.subscribe('metastore.clear.selection', function () {
-        viewModel.selectedDatabases.removeAll();
-        if (viewModel.database()) {
-          viewModel.database().selectedTables.removeAll();
-        }
+        viewModel.sources().forEach(function (source) {
+          source.namespaces().forEach(function (namespace) {
+            namespace.selectedDatabases.removeAll();
+            namespace.databases().forEach(function (database) {
+              database.selectedTables.removeAll();
+            })
+          })
+        });
       }, 'metastore');
 
       viewModel.currentTab.subscribe(function(tab){
