@@ -117,6 +117,13 @@ ENABLE_KAFKA = Config(
   default=False
 )
 
+ENABLE_ENVELOPE = Config(
+  key="enable_envelope",
+  help=_t("Flag to turn on Envelope based jobs."),
+  type=bool,
+  default=False
+)
+
 ENABLE_ALTUS = Config(
   key="enable_altus",
   help=_t("Flag to turn on Altus imports."),

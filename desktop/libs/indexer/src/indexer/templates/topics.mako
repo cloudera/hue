@@ -258,11 +258,6 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-index">
-  <!-- ko if: channelSourceType() -->
-    Used to populate <span data-bind="text: channelSinkType"></span> <span data-bind="text: channelSinkPath"></span>
-    from <span data-bind="text: channelSourceType"></span> <span data-bind="text: channelSourcePath"></span>
-    via <a href="" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }">jobs <i class="fa fa-external-link"></i></a>
-  <!-- /ko -->
   <br/>
   <br/>
 
@@ -270,7 +265,7 @@ ${ assist.assistPanel() }
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Partitions')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li>
-      <a href="#index-channel" data-toggle="tab" data-bind="click: function(){ $root.tab('index-channel'); }">${_('Channel')} (<span data-bind="text: channelSourceType() ? 1 : 0"></span>)</a>
+      <a href="#index-consumer" data-toggle="tab" data-bind="click: function(){ $root.tab('index-consumer'); }">${_('Consumers')} (0)</a>
     </li>
     <li>
       <a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Permissions')} (2)</a>
@@ -320,47 +315,13 @@ ${ assist.assistPanel() }
       </div>
     </div>
 
-    <div class="tab-pane margin-top-10" id="index-channel">
+    <div class="tab-pane margin-top-10" id="index-consumer">
       <h4>${ _('Source') }</h4>
       <div class="row-fluid">
         <div>
           <label class="control-label"><div>${ _('Type') }</div>
-            <select class="input-medium" data-bind="selectize: channelSourceTypes, value: channelSourceType, optionsText: 'name', optionsValue: 'value'"></select>
+            Type
           </label>
-          <!-- ko if: ['directory', 'exec', 'syslogs'].indexOf(channelSourceType()) != -1 -->
-          <label class="control-label"><div>${ _('Hosts') }</div>
-            <select class="input-xxlarge" data-bind="selectize: channelSourceHosts, selectedOptions: channelSourceSelectedHosts" multiple="true"></select>
-          </label>
-          <!-- /ko -->
-          <!-- ko if: channelSourceType() == 'directory' -->
-          <label class="control-label"><div>${ _('Path') }</div>
-            <input type="text" class="input-xxlarge" data-bind="value: channelSourcePath" placeholder="${ _('The path to watch and consume') }">
-          </label>
-          <!-- /ko -->
-
-          <!-- ko if: channelSourceType() -->
-          <input data-bind="click: function() { channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
-          <!-- /ko -->
-        </div>
-      </div>
-
-      <br><br>
-
-      <h4>${ _('Sink') }</h4>
-      <div class="row-fluid">
-        <div>
-          <label class="control-label"><div>${ _('Type') }</div>
-            <select class="input-medium" data-bind="selectize: channelSinkTypes, value: channelSinkType, optionsText: 'name', optionsValue: 'value'"></select>
-          </label>
-          <!-- ko if: channelSinkType() == 'solr' -->
-          <label class="control-label"><div>${ _('Collection') }</div>
-            <select class="input-xxlarge" data-bind="selectize: ['logIndex', 'apacheLogs'], value: channelSinkPath"></select>
-          </label>
-          <!-- /ko -->
-
-          <!-- ko if: channelSinkType() -->
-          <input data-bind="click: function() { channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
-          <!-- /ko -->
         </div>
       </div>
     </div>
@@ -564,24 +525,6 @@ ${ assist.assistPanel() }
       self.kafkaFieldTypes.subscribe(function(newValue) {
         $.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes', newValue)
       });
-
-      self.channelSourceTypes = ko.observableArray([
-        {'name': '${ _("Directory or File") }', 'value': 'directory'},
-        {'name': '${ _("Program") }', 'value': 'exec'},
-        {'name': '${ _("Syslogs") }', 'value': 'syslogs'},
-        {'name': '${ _("HTTP") }', 'value': 'http'}
-      ]);
-      self.channelSourceType = ko.observable();
-      self.channelSourceHosts = ko.observableArray(['host1.com', 'host2.com', 'host3.com', 'host4.com']);
-      self.channelSourceSelectedHosts = ko.observableArray([]);
-      self.channelSourcePath = ko.observable('/var/log/hue/access.log');
-
-      self.channelSinkTypes = ko.observableArray([
-        {'name': '${ _("This topic") }', 'value': 'kafka'},
-        {'name': '${ _("Solr") }', 'value': 'solr'}
-      ]);
-      self.channelSinkType = ko.observable();
-      self.channelSinkPath = ko.observable();
 
       self.sample = ko.observableArray();
       self.samplePreview = ko.pureComputed(function () {
