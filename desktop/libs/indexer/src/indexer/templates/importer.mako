@@ -22,7 +22,7 @@
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from notebook.conf import ENABLE_SQL_INDEXER
 
-  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -348,35 +348,60 @@ ${ assist.assistPanel() }
               <div data-bind="template: { name: 'kafka-topic-template', data: $data }" class="margin-top-10 field inline-block"></div>
             <!-- /ko -->
 
-            <!-- ko if: createWizard.source.streamSelection() == 'sfdc' -->
+            <!-- ko if: createWizard.source.streamSelection() == 'flume' -->
               <div class="control-group">
-                <label class="control-label"><div>${ _('Username') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamUsername" placeholder="user@company.com">
+ 
+                <label class="control-label"><div>${ _('Type') }</div>
+                  <select class="input-medium" data-bind="selectize: createWizard.source.channelSourceTypes, value: createWizard.source.channelSourceType, optionsText: 'name', optionsValue: 'value'"></select>
                 </label>
-
-                <label class="control-label"><div>${ _('Password') }</div>
-                  <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.streamPassword">
-                </label>
-
-                <label class="control-label"><div>${ _('Token') }</div>
-                  <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.streamToken">
-                </label>
-
-                <label class="control-label"><div>${ _('End point URL') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamEndpointUrl">
-                </label>
-
-                <br/>
-                <!-- ko if: createWizard.source.streamUsername() && createWizard.source.streamPassword() && createWizard.source.streamToken() -->
-                <label class="control-label"><div>${ _('Object') }</div>
-                  <select class="input-xxlarge" data-bind="options: createWizard.source.streamObjects,
-                        value: createWizard.source.streamObject,
-                        optionsCaption: '${ _("Choose...") }'"
-                        placeholder="${ _('The SFDC object to import, e.g. Account, Opportunity') }"></select>
+                <!-- ko if: ['directory', 'exec', 'syslogs'].indexOf(createWizard.source.channelSourceType()) != -1 -->
+                <label class="control-label"><div>${ _('Hosts') }</div>
+                  <select class="input-xxlarge" data-bind="selectize: createWizard.source.channelSourceHosts, selectedOptions: createWizard.source.channelSourceSelectedHosts" multiple="true"></select>
                 </label>
                 <!-- /ko -->
+                <!-- ko if: createWizard.source.channelSourceType() == 'directory' -->
+                <label class="control-label"><div>${ _('Path') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.channelSourcePath" placeholder="${ _('The path to watch and consume') }">
+                </label>
+                <!-- /ko -->
+      
+                <!-- ko if: createWizard.source.channelSourceType() -->
+                <input data-bind="click: function() { createWizard.source.channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
+                <!-- /ko -->
+
               </div>
             <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- ko if: createWizard.source.inputFormat() == 'sfdc' -->
+            <div class="control-group">
+              <label class="control-label"><div>${ _('Username') }</div>
+                <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamUsername" placeholder="user@company.com">
+              </label>
+
+              <label class="control-label"><div>${ _('Password') }</div>
+                <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.streamPassword">
+              </label>
+
+              <label class="control-label"><div>${ _('Token') }</div>
+                <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.streamToken">
+              </label>
+
+              <label class="control-label"><div>${ _('End point URL') }</div>
+                <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamEndpointUrl">
+              </label>
+
+              <br/>
+              <!-- ko if: createWizard.source.streamUsername() && createWizard.source.streamPassword() && createWizard.source.streamToken() -->
+              <label class="control-label"><div>${ _('Object') }</div>
+                <select class="input-xxlarge" data-bind="options: createWizard.source.streamObjects,
+                      value: createWizard.source.streamObject,
+                      optionsCaption: '${ _("Choose...") }'"
+                      placeholder="${ _('The SFDC object to import, e.g. Account, Opportunity') }"></select>
+              </label>
+              <!-- /ko -->
+            </div>
+
           <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -536,6 +561,27 @@ ${ assist.assistPanel() }
                 <input type="text" data-bind="value: createWizard.source.kafkaSelectedTopics">
                 ## <div data-bind="template: { name: 'kafka-topic-template' }" class="margin-top-10 field inline-block"></div>
               <!-- /ko -->
+            <!-- /ko -->
+
+            <!-- ko if: outputFormat() == 'flume' -->
+      
+            <h4>${ _('Sink') }</h4>
+            <div class="row-fluid">
+              <div>
+                <label class="control-label"><div>${ _('Type') }</div>
+                  <select class="input-medium" data-bind="selectize: channelSinkTypes, value: channelSinkType, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+                <!-- ko if: channelSinkType() == 'solr' -->
+                <label class="control-label"><div>${ _('Collection') }</div>
+                  <select class="input-xxlarge" data-bind="selectize: ['logIndex', 'apacheLogs'], value: channelSinkPath"></select>
+                </label>
+                <!-- /ko -->
+      
+                <!-- ko if: channelSinkType() -->
+                <input data-bind="click: function() { channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
+                <!-- /ko -->
+              </div>
+            </div>
             <!-- /ko -->
 
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
@@ -1420,7 +1466,6 @@ ${ assist.assistPanel() }
 
       var init = function () {
         self.type = ko.observable(typeName);
-
         var types = viewModel.createWizard.fileTypes;
 
         for (var i = 0; i < types.length; i++) {
@@ -1484,7 +1529,6 @@ ${ assist.assistPanel() }
         }
         self.path('');
         resizeElements();
-        self.rdbmsMode('customRdbms');
         if (val === 'stream') {
           if (self.streamSelection() === 'kafka') {
             wizard.guessFormat();
@@ -1494,21 +1538,27 @@ ${ assist.assistPanel() }
           }
         } else if (val === 'table') {
           wizard.destination.outputFormat('altus');
+        } else if (val == 'rdbms') {
+          self.rdbmsMode('customRdbms');
         }
       });
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
+          % if ENABLE_SQOOP.get():
+          {'value': 'rdbms', 'name': 'External Database'},
+          % endif
           % if ENABLE_KAFKA.get():
           {'value': 'stream', 'name': 'Stream'},
           % endif
           % if ENABLE_ALTUS.get():
           {'value': 'table', 'name': 'Table'},
           % endif
-          % if ENABLE_SQOOP.get():
-          {'value': 'rdbms', 'name': 'External Database'},
-          % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
+          % endif
+          ## TODO: Rename to 'Connectors'
+          % if ENABLE_ENVELOPE.get():
+          {'value': 'sfdc', 'name': 'Connectors'},
           % endif
           {'value': 'manual', 'name': 'Manually'}
           ##{'value': 'text', 'name': 'Paste Text'},
@@ -1713,7 +1763,7 @@ ${ assist.assistPanel() }
       // Streams, Kafka
       self.publicStreams = ko.observable([
         {'value': 'kafka', 'name': 'Kafka Topics'},
-        {'value': 'sfdc', 'name': 'SFDC'}
+        {'value': 'flume', 'name': 'Flume Agent'}
       ]);
       self.streamSelection = ko.observable(self.publicStreams()[0]['value']);
 
@@ -1740,6 +1790,22 @@ ${ assist.assistPanel() }
         viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldSchemaPath = ko.observable('');
+
+      self.channelSourceTypes = ko.observableArray([
+        {'name': '${ _("Directory or File") }', 'value': 'directory'},
+        {'name': '${ _("Program") }', 'value': 'exec'},
+        {'name': '${ _("Syslogs") }', 'value': 'syslogs'},
+        {'name': '${ _("HTTP") }', 'value': 'http'}
+      ]);
+      self.channelSourceType = ko.observable();
+      self.channelSourceHosts = ko.observableArray(['host1.com', 'host2.com', 'host3.com', 'host4.com']);
+      self.channelSourceSelectedHosts = ko.observableArray([]);
+      self.channelSourceSelectedHosts.subscribe(function(newVal) {
+        if (newVal) {
+          viewModel.createWizard.guessFieldTypes();
+        }
+      })
+      self.channelSourcePath = ko.observable('/var/log/hue/access.log');
 
       self.streamUsername = ko.observable('');
       self.streamPassword = ko.observable('');
@@ -1819,9 +1885,12 @@ ${ assist.assistPanel() }
         if (self.inputFormat() === 'stream') {
           if (self.streamSelection() === 'kafka') {
             return self.kafkaSelectedTopics() && self.kafkaSelectedTopics().length > 0;
+          } else if (self.streamSelection() === 'flume') {
+            return self.channelSourceSelectedHosts().length > 0;
           }
-          return self.streamSelection() === 'sfdc' &&
-              self.streamUsername().length > 0 &&
+        }
+        if (self.inputFormat() === 'sfdc') {
+          return self.streamUsername().length > 0 &&
               self.streamPassword().length > 0 &&
               self.streamToken().length > 0 &&
               self.streamEndpointUrl().length > 0 &&
@@ -2096,7 +2165,7 @@ ${ assist.assistPanel() }
       self.primaryKeys = ko.observableArray();
       self.primaryKeyObjects = ko.observableArray();
 
-      self.useFieldEditor = ko.observable(false);
+      self.useFieldEditor = ko.observable('${ ENABLE_KAFKA.get() }' == 'True');
       // TODO: Figure out the database to use for field editor autocomplete
       self.fieldEditorDatabase = ko.observable('default');
       // TODO: Do something with the editor value
@@ -2154,6 +2223,14 @@ ${ assist.assistPanel() }
       ]);
       self.rdbmsSplitByColumn = ko.observableArray();
 
+      // Flume
+      self.channelSinkTypes = ko.observableArray([
+        {'name': '${ _("This topic") }', 'value': 'kafka'},
+        {'name': '${ _("Solr") }', 'value': 'solr'},
+        {'name': '${ _("HDFS") }', 'value': 'hdfs'}
+      ]);
+      self.channelSinkType = ko.observable();
+      self.channelSinkPath = ko.observable();
     };
 
     var CreateWizard = function (vm) {
@@ -2319,12 +2396,14 @@ ${ assist.assistPanel() }
             if (self.source.inputFormat() === 'stream') {
               if (self.source.streamSelection() === 'kafka') {
                 self.source.kafkaTopics(resp['topics']);
-              } else if (self.source.streamSelection() === 'sfdc') {
+              } else if (self.source.streamSelection() === 'flume') {
                 self.source.streamObjects(resp['objects']);
               }
+            } else if (self.source.inputFormat() === 'sfdc') {
+              self.source.streamObjects(resp['objects']);
             }
 
-            if (self.source.inputFormat() !== 'stream' || self.source.streamSelection() !== 'sfdc') {
+            if (self.source.inputFormat() !== 'stream') {
               self.guessFieldTypes();
             }
           }
