@@ -511,6 +511,7 @@ from desktop.views import _ko
           }
         } --><!-- /ko -->
       </div>
+      <!-- ko if: showOperations -->
       <div class="context-popover-sample-controls">
         <div class="margin-left-10 inline-block" data-bind="component: { name: 'hue-drop-down', params: { value: operation, entries: operations } }"></div>
         <div class="margin-left-10 inactive-action inline-block">
@@ -522,6 +523,7 @@ from desktop.views import _ko
           <!-- /ko -->
         </div>
       </div>
+      <!-- /ko -->
     </div>
 
     <table class="table table-condensed table-nowrap">
@@ -570,6 +572,8 @@ from desktop.views import _ko
 
         self.hasErrors = ko.observable();
         self.loadingSamples = ko.observable();
+
+        self.showOperations = self.catalogEntry.getSourceType() === 'impala' || self.catalogEntry.getSourceType() === 'hive';
 
         self.operations = [
           {
