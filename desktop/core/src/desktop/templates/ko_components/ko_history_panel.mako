@@ -66,7 +66,7 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko if: result -->
         <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated" style="height: 120px"></pre>
+        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated" style="height: 120px; overflow-y: auto;"></pre>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
