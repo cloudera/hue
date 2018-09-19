@@ -929,7 +929,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-namespaces-template">
     <div class="assist-flex-header">
       <div class="assist-inner-header">
-        ${_('Namespaces')}
+        ${_('Clusters')}
         <!-- ko template: 'assist-namespace-header-actions' --><!-- /ko -->
       </div>
     </div>
