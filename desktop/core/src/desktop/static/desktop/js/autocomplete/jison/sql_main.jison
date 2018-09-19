@@ -238,24 +238,13 @@ NonReservedKeyword
  ;
 
 NonReservedKeyword
- : '<impala>ANALYTIC'
-// | '<impala>ANTI'
- | '<impala>CURRENT'
- | '<impala>GRANT'
- | '<impala>RECOVER'
- | '<impala>ROLE'
- | '<impala>ROLES'
- | '<impala>URI'
+ : '<impala>URI'
  | '<impala>SERVER'
- | '<impala>UNKNOWN'
 // | '<impala>BROADCAST'
 // | '<impala>NOSHUFFLE'
 // | '<impala>SHUFFLE'
-// TODO: Check if following are true
  | '<impala>BLOCK_SIZE'
- | '<impala>COMPRESSION'
  | '<impala>DEFAULT'
- | '<impala>ENCODING'
  | '<impala>KEY'
  ;
 
