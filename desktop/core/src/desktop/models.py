@@ -49,7 +49,8 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY,\
+  IS_EMBEDDED
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1752,7 +1753,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
 
-    if is_s3_enabled() and has_s3_access(self.user) and self.cluster_type != ANALYTIC_DB:
+    if is_s3_enabled() and has_s3_access(self.user) and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
