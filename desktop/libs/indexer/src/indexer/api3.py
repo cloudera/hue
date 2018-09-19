@@ -253,6 +253,7 @@ def guess_field_types(request):
     if file_format['streamSelection'] == 'kafka':
       if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
         kafkaFieldNames = [
+          'id',
           'additionalInfo', 'allowed', 'collectionName', 'databaseName', 'db',
           'DELEGATION_TOKEN_ID', 'dst', 'entityId', 'family', 'impersonator',
           'ip', 'name', 'objectType', 'objType', 'objUsageType',
