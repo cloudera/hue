@@ -259,6 +259,7 @@
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
 <impala>'METADATA'                         { return '<impala>METADATA'; }
+<impala>'METHOD'                           { return '<impala>METHOD'; }
 <impala>'NULLS'                            { return '<impala>NULLS'; }
 <impala>'OFFSET'                           { return '<impala>OFFSET'; }
 <impala>'ORC'                              { return '<impala>ORC'; }
