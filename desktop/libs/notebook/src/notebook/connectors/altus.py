@@ -269,11 +269,14 @@ class AnalyticDbApi():
   def delete_cluster(self, cluster_id):
     return _exec('dataware', 'deleteCluster', {'clusterName': cluster_id})
 
+  def describe_cluster(self, cluster_id):
+    return _exec('dataware', 'describeCluster', {'clusterName': cluster_id})
+
 
 class DataWarehouse2Api():
 
   def __init__(self, user=None):
-    self._api_url = '/warehouse/api'
+    self._api_url = 'http://172.16.34.61:4747/dw'
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
@@ -293,9 +296,19 @@ class DataWarehouse2Api():
     return _exec('dw', 'createCluster', params)
 
   def list_clusters(self):
+#     {"clusters":[
+#       {"clusterName":"fake-tristan",
+#        "crn":"crn:altus:datawa44eed-a1f3-4935-89c1-71eb56889581",
+#        "creationDate":"2018-09-19T22:27:28.740Z","cdhVersion":"CDH6.3","workerCpuCores":4,"workerMemoryInGib":8,"workerReplicas":4,"workerReplicasOnline":4}]}
+
     try:
-      return self._root.post('listClusters', contenttype="application/json")
-    except:
+      clusters = self._root.post('listClusters', contenttype="application/json")
+      for cluster in clusters['clusters']:
+        cluster['workersGroupSize'] = cluster['workerReplicas']
+        cluster['instanceType'] = 'Medium'
+      return clusters
+    except Exception, e:
+      print e
       return {'clusters': [
         {'crn': 'crn1', 'clusterName': 'clusterName1', 'status': 'CREATED', 'workersGroupSize': 1, 'instanceType': 'Medium', 'cdhVersion': '6.0', 'creationDate': 'September 14, 2018 12:48 PM'}
       ]}
@@ -303,8 +316,13 @@ class DataWarehouse2Api():
   def delete_cluster(self, cluster_id):
     return _exec('dw', 'deleteCluster', {'clusterName': cluster_id})
 
-  def describe_cluster(self, clusterName):
-    return _exec('dw', 'listClusters', {'clusterName': clusterName})
+  def describe_cluster(self, cluster_id):
+    try:
+      return self._root.post('describeCluster', contenttype="application/json")
+    except:
+      return {'cluster':
+        {'crn': 'crn1', 'clusterName': 'clusterName1', 'status': 'CREATED', 'workersGroupSize': 1, 'instanceType': 'Medium', 'cdhVersion': '6.0', 'creationDate': 'September 14, 2018 12:48 PM'}
+      }
 
   def update_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
     params = {

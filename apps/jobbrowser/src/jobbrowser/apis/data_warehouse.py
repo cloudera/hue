@@ -35,6 +35,7 @@ class DataWarehouseClusterApi(Api):
   def __init__(self, user, version=1):
     super(DataWarehouseClusterApi, self).__init__(user)
 
+    self.version = version
     self.api = DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user) 
 
 
@@ -60,8 +61,27 @@ class DataWarehouseClusterApi(Api):
 
 
   def app(self, appid):
-    return {'name': 'name'}
+    handle = self.api.describe_cluster(cluster_id=appid)
 
+    cluster = handle['cluster']
+
+    common = {
+        'id': cluster['crn'],
+        'name': cluster['clusterName'],
+        'status': cluster['status'],
+        'apiStatus': self._api_status(cluster['status']),
+        'progress': 50 if self._api_status(cluster['status']) == 'RUNNING' else 100,
+        'duration': 10 * 3600,
+        'submitted': cluster['creationDate'],
+        'type': 'dataware2-cluster' if self.version == 2 else 'dataware-cluster',
+        'canWrite': True
+    }
+
+    common['properties'] = {
+      'properties': cluster
+    }
+
+    return common
 
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
