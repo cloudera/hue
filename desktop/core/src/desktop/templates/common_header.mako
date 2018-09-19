@@ -261,8 +261,8 @@ ${ hueIcons.symbols() }
     found_app = ""
     for app in app_list:
       if app in apps:
-       found_app = app
-       count += 1
+        found_app = app
+        count += 1
     return found_app, count
 %>
 % if not skip_topbar:

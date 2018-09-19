@@ -321,7 +321,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
         <div class="hue-sidebar-footer-panel">
-          % if SHOW_UPLOAD_BUTTON.get():
+          % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
           <div data-bind="dropzone: {
             clickable: false,
             url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,

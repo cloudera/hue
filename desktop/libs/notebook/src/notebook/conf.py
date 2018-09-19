@@ -137,6 +137,7 @@ ENABLE_QUERY_BUILDER = Config(
   default=True
 )
 
+# Note: requires Oozie app
 ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
