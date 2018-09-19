@@ -309,6 +309,10 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
                   <div data-bind="template: { name: 'dataeng-job-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
+                <!-- ko if: mainType() == 'dataeng-clusters' || mainType() == 'dataware-clusters' || mainType() == 'dataware2-clusters' -->
+                  <div data-bind="template: { name: 'dataware-clusters-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
                 <!-- ko if: mainType() == 'livy-sessions' -->
                   <div class="jb-panel" data-bind="template: { name: 'livy-session-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
@@ -1096,6 +1100,14 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
   <!-- ko if: type() == 'dataeng-job-HIVE' -->
     <div data-bind="template: { name: 'dataeng-job-hive-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="dataware-clusters-page${ SUFFIX }">
+  <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
+    <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
+  </button>
+
 </script>
 
 
@@ -2196,8 +2208,14 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
         else if (/oozie-\w+-B/.test(self.id())) {
           interface = 'bundles';
         }
-        else if (/[a-z0-9]{8}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{12}/.test(self.id())) {
+        else if (/altus:dataeng/.test(self.id()) && /:job:/.test(self.id())) {
           interface = 'dataeng-jobs';
+        }
+        else if (/altus:dataeng/.test(self.id()) && /:cluster:/.test(self.id())) {
+          interface = 'dataeng-clusters';
+        }
+        else if (/altus:dataware/.test(self.id()) && /:cluster:/.test(self.id())) {
+          interface = 'dataware-clusters';
         }
         else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
           interface = 'queries';
@@ -2258,6 +2276,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             else {
                crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             }
+
             vm.resetBreadcrumbs(crumbs);
             // Show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
             setTimeout(function () {
