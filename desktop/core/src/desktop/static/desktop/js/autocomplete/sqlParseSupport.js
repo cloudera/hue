@@ -2066,7 +2066,7 @@ var SqlParseSupport = (function () {
       'EOF': true,
       'UNSIGNED_INTEGER': true,
       'UNSIGNED_INTEGER_E': true,
-      'REGULAR_IDENTIFIER': true, // TODO: Indicate that an identifier was expected
+      'REGULAR_IDENTIFIER': true,
       'CURSOR': true,
       'PARTIAL_CURSOR': true,
       'HDFS_START_QUOTE': true,
@@ -2144,7 +2144,17 @@ var SqlParseSupport = (function () {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           // TODO: Only suggest alphanumeric?
-          if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
+          if (expected === 'REGULAR_IDENTIFIER') {
+            parser.yy.error.expectedIdentifier = true;
+            if (/^<[a-z]+>/.test(parser.yy.error.token)) {
+              var text = '`' + parser.yy.error.text + '`';
+              weightedExpected.push({
+                text: text,
+                distance: stringDistance(parser.yy.error.text, text, true)
+              });
+              parser.yy.error.possibleReserved = true;
+            }
+          } else if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
             if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
               expected = expected.substring(dialect.length + 2);
             } else if (/^<[a-z]+>/.test(expected)) {
