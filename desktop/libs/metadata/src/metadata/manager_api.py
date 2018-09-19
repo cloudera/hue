@@ -25,6 +25,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from libzookeeper.conf import zkensemble
@@ -64,7 +65,18 @@ def error_handler(view_fn):
   return decorator
 
 
+def admin_only_handler(view_fn):
+  def decorator(*args, **kwargs):
+    if is_admin(args[0].user):
+      return view_fn(*args, **kwargs)
+    else:
+      raise CatalogApiException('Manager API is for admins only.')
+
+  return decorator
+
+
 @error_handler
+@admin_only_handler
 def hello(request):
   api = ManagerApi(request.user)
 
@@ -74,6 +86,7 @@ def hello(request):
 
 
 @error_handler
+@admin_only_handler
 def update_flume_config(request):
   api = ManagerApi(request.user)
 
