@@ -168,22 +168,6 @@ from desktop.views import _ko
             label: '${ _('Catalog') }',
             url: '/',
             icon: 'altus-icon altus-sdx'
-          },{
-            label: '${ _('Streaming') }',
-            url: '/',
-            icon: 'fa fa-sitemap'
-          },{
-            label: '${ _('Operational DB') }',
-            url: '/',
-            icon: 'altus-icon altus-adb',
-            items: [{
-                label: '${ _('Kudu') }',
-                url: '/'
-              },{
-                label: '${ _('HBase') }',
-                url: '/'
-              }
-            ]
           }
         ]
       }, {
@@ -191,7 +175,7 @@ from desktop.views import _ko
         items: [{
             label: '${ _('Data Warehouse') }',
             icon: 'altus-icon altus-dashboard',
-            url: '/'
+            url: '/hue/jobbrowser'
           }, {
             label: '${ _('Data Engineering') }',
             icon: 'altus-icon altus-de',
@@ -203,11 +187,12 @@ from desktop.views import _ko
                 url: '/'
               }
             ]
-          }, {
-            label: '${ _('Scheduling') }',
-            icon: 'altus-icon altus-workload',
-            url: '/'
           }
+          ##, {
+          ##  label: '${ _('Scheduling') }',
+          ##  icon: 'altus-icon altus-workload',
+          ##  url: '/'
+          ##}
         ]
       }
         ##  , {

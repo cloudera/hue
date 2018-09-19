@@ -19,7 +19,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from notebook.connectors.altus import AnalyticDbApi
+from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
 
 from jobbrowser.apis.base_api import Api
 
@@ -32,10 +32,14 @@ RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
 
 class DataWarehouseClusterApi(Api):
 
-  def apps(self, filters):
-    api = AnalyticDbApi(self.user)
+  def __init__(self, user, version=1):
+    super(DataWarehouseClusterApi, self).__init__(user)
 
-    jobs = api.list_clusters()
+    self.api = DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user) 
+
+
+  def apps(self, filters):
+    jobs = self.api.list_clusters()
 
     return {
       'apps': [{
@@ -51,7 +55,7 @@ class DataWarehouseClusterApi(Api):
         'submitted': app['creationDate'],
         'canWrite': True
       } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
-      'total': len(jobs)
+      'total': len(jobs['clusters'])
     }
 
 
@@ -63,10 +67,8 @@ class DataWarehouseClusterApi(Api):
     message = {'message': '', 'status': 0}
 
     if action.get('action') == 'kill':
-      api = AnalyticDbApi(self.user)
-
       for _id in appid:
-        result = api.delete_cluster(_id)
+        result = self.api.delete_cluster(_id)
         if result.get('error'):
           message['message'] = result.get('error')
           message['status'] = -1

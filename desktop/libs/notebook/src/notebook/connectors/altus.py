@@ -27,6 +27,8 @@ from navoptapi.api_lib import ApiLib
 
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.resource import Resource
 
 
 LOG = logging.getLogger(__name__)
@@ -268,9 +270,15 @@ class AnalyticDbApi():
     return _exec('dataware', 'deleteCluster', {'clusterName': cluster_id})
 
 
-class DataWarehouseAutoScaleApi():
+class DataWarehouse2Api():
 
-  def __init__(self, user): pass
+  def __init__(self, user=None):
+    self._api_url = '/warehouse/api'
+
+    self.user = user
+    self._client = HttpClient(self._api_url, logger=LOG)
+    self._client.set_verify(False)
+    self._root = Resource(self._client)
 
   def create_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
     params = {
@@ -285,7 +293,12 @@ class DataWarehouseAutoScaleApi():
     return _exec('dw', 'createCluster', params)
 
   def list_clusters(self):
-    return _exec('dw', 'listClusters')
+    try:
+      return self._root.post('listClusters', contenttype="application/json")
+    except:
+      return {'clusters': [
+        {'crn': 'crn1', 'clusterName': 'clusterName1', 'status': 'CREATED', 'workersGroupSize': 1, 'instanceType': 'Medium', 'cdhVersion': '6.0', 'creationDate': 'September 14, 2018 12:48 PM'}
+      ]}
 
   def delete_cluster(self, cluster_id):
     return _exec('dw', 'deleteCluster', {'clusterName': cluster_id})
