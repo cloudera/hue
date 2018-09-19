@@ -375,7 +375,14 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           <!-- /ko -->
 
-          <!-- ko if: createWizard.source.inputFormat() == 'sfdc' -->
+          <!-- ko if: createWizard.source.inputFormat() == 'connector' -->
+            <div class="control-group">
+              <label class="control-label"><div>${ _('List') }</div>
+                <select data-bind="selectize: createWizard.source.connectorList, value: createWizard.source.connectorSelection, optionsText: 'name', optionsValue: 'value'" placeholder="${ _('The connector to use, e.g. SFDC, Jiras...') }"></select>
+              </label>
+            </div>
+
+            <!-- ko if: createWizard.source.connectorList() == 'sfdc' -->
             <div class="control-group">
               <label class="control-label"><div>${ _('Username') }</div>
                 <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamUsername" placeholder="user@company.com">
@@ -403,6 +410,7 @@ ${ assist.assistPanel() }
               </label>
               <!-- /ko -->
             </div>
+            <!-- /ko -->
 
           <!-- /ko -->
 
@@ -1574,7 +1582,7 @@ ${ assist.assistPanel() }
           % endif
           ## TODO: Rename to 'Connectors'
           % if ENABLE_ENVELOPE.get():
-          {'value': 'sfdc', 'name': 'Connectors'},
+          {'value': 'connector', 'name': 'Connectors'},
           % endif
           {'value': 'manual', 'name': 'Manually'}
           ##{'value': 'text', 'name': 'Paste Text'},
@@ -1788,7 +1796,13 @@ ${ assist.assistPanel() }
       });
       self.draggedQuery = ko.observable();
 
-      // Streams, Kafka
+      // Connectors
+      self.connectorList = ko.observable([
+        {'value': 'sfdc', 'name': 'Salesforce'}
+      ]);
+      self.connectorSelection = ko.observable(self.connectorList()[0]['value']);
+
+      // Streams, Kafka, Flume
       self.publicStreams = ko.observable([
         {'value': 'kafka', 'name': 'Kafka Topics'},
         {'value': 'flume', 'name': 'Flume Agent'}
@@ -1858,7 +1872,7 @@ ${ assist.assistPanel() }
       self.hasStreamSelected.subscribe(function(newValue) {
         if (newValue) {
           wizard.guessFormat();
-          if (newValue === 'kafka') {
+          if (self.streamSelection() === 'kafka') {
             wizard.destination.tableFormat('kudu');
           }
         }
@@ -2405,7 +2419,10 @@ ${ assist.assistPanel() }
         }
         var isValidTable = self.destination.outputFormat() !== 'table' || (
           self.destination.tableFormat() !== 'kudu' || (
-              $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
+              $.grep(self.destination.kuduPartitionColumns(), function(partition) {
+                return partition.columns().length > 0
+              }).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0
+          )
         );
         var validIndexFields = self.destination.outputFormat() !== 'index' || ($.grep(self.destination.columns(), function(column) {
             return ! (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column.name()) && column.name() !== '_version_');
@@ -2506,6 +2523,9 @@ ${ assist.assistPanel() }
         self.source.sampleCols(resp.sample_cols ? resp.sample_cols : resp.columns);
         self.source.sample(resp.sample);
         self.destination.columns(resp.columns);
+        if (self.destination.tableFormat() == 'kudu' && $.grep(resp.columns, function(column) { return column.name() == 'id' }).length > 0) {
+          self.destination.primaryKeys(['id']); // Auto select ID column
+        }
       };
       self.isIndexing = ko.observable(false);
       self.indexingError = ko.observable(false);
