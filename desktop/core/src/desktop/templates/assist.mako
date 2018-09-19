@@ -491,7 +491,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
-      % if SHOW_UPLOAD_BUTTON.get():
+      % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=' + path,
             params: { dest: path },
@@ -508,7 +508,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-adls-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
-      % if SHOW_UPLOAD_BUTTON.get():
+      % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=adl:' + path,
             params: { dest: path },
@@ -646,7 +646,7 @@ from desktop.views import _ko
       <span class="dropdown new-document-drop-down">
 
         <a class="inactive-action dropdown-toggle" data-toggle="dropdown" data-bind="dropdown" href="javascript:void(0);">
-             <i class="pointer fa fa-plus" title="${ _('New document') }"></i>
+          <i class="pointer fa fa-plus" title="${ _('New document') }"></i>
         </a>
         <ul class="dropdown-menu less-padding document-types" style="margin-top:3px; margin-left:-140px; width: 175px;position: absolute;" role="menu">
             % if 'beeswax' in apps:
@@ -1069,7 +1069,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: '${ not SHOW_UPLOAD_BUTTON.get() }' === 'True' }">
+    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: '${ not (hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get()) }' === 'True' }">
       <!-- ko if: availablePanels().length > 1 -->
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->

@@ -1779,7 +1779,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'indexer' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'search' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
