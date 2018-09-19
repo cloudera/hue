@@ -64,7 +64,7 @@ ShowStatement_EDIT
  | AnyShow 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
      // ROLES is considered a non-reserved keywords so we can't match it in ShowCurrentRolesStatement_EDIT
-     if ($3.identifierChain && $3.identifierChain.length === 1 && $3.identifierChain[0].name.toLowerCase() === 'roles') {
+     if (!parser.isImpala() && $3.identifierChain && $3.identifierChain.length === 1 && $3.identifierChain[0].name.toLowerCase() === 'roles') {
        parser.suggestKeywords(['CURRENT']);
        parser.yy.locations.pop();
      } else {
@@ -232,6 +232,10 @@ ShowCurrentRolesStatement_EDIT
  | AnyShow '<impala>CURRENT' 'CURSOR'
    {
      parser.suggestKeywords([ 'ROLES' ]);
+   }
+ | AnyShow 'CURSOR' '<impala>ROLES'
+   {
+     parser.suggestKeywords([ 'CURRENT' ]);
    }
  ;
 
