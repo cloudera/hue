@@ -60,7 +60,7 @@ class DataWarehouseClusterApi(Api):
 
 
   def app(self, appid):
-    return {}
+    return {'name': 'name'}
 
 
   def action(self, appid, action):
