@@ -264,11 +264,20 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
+              <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
               <div class="control-group">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here e.g. mysql.domain.com or 123.123.123.123') }">
                 </label>
               </div>
+              <!-- /ko -->
+              <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
+              <div class="control-group">
+                <label for="rdbmsHostname" class="control-label"><div>${ _('Url') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('jdbc:mysql://localhost:3306') }">
+                </label>
+              </div>
+              <!-- /ko -->
 
               <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
               <div class="control-group">
@@ -1510,13 +1519,6 @@ ${ assist.assistPanel() }
 
           if (args) {
             loadFromObj(args);
-          }
-
-          for (var i = 0; i < type.args.length; i++) {
-            self[type.args[i].name].subscribe(function() {
-              // Update the data preview when tweaking Format options on step 1
-              viewModel.createWizard.guessFieldTypes();
-            });
           }
         }
       };

@@ -29,8 +29,7 @@ from librdbms.conf import DATABASES, get_database_password, get_server_choices, 
 from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
-from notebook.connectors.jdbc import Assist as JdbcAssist
-from notebook.connectors.rdbms import Assist
+from notebook.connectors.base import get_api
 from notebook.models import make_notebook
 
 
@@ -39,22 +38,17 @@ LOG = logging.getLogger(__name__)
 
 def get_db_component(request):
   format_ = {'data': [], 'status': 1, 'message': ''}
-  db = None
-
   try:
     source = json.loads(request.POST.get('source', '{}'))
 
-    db = _get_db(request)
-
-    if source['rdbmsType'] != 'jdbc':
-      assist = Assist(db)
-    else:
-      assist = JdbcAssist(db)
+    api = _get_api(request)
 
     if not source['rdbmsDatabaseName'] or (source['rdbmsMode'] == "customRdbms" and not source['rdbmsDbIsValid']):
-      data = assist.get_databases()
+      autocomplete = api.autocomplete(None)
+      data = autocomplete['databases']
     elif source['rdbmsDatabaseName']:
-      data = assist.get_tables(source['rdbmsDatabaseName'])
+      autocomplete = api.autocomplete(None, source['rdbmsDatabaseName'])
+      data = [table['name'] for table in autocomplete['tables_meta']]
 
     format_['data'] = [{'name': element, 'value': element} for element in data]
     format_['status'] = 0
@@ -65,40 +59,38 @@ def get_db_component(request):
 
   return JsonResponse(format_)
 
-def _get_db(request):
-  source = json.loads(request.POST.get('source', request.POST.get('fileFormat', '{}')))
-  user = User.objects.get(username=request.user)
-  name = None
-
-  if source['rdbmsMode'] == 'configRdbms':
-    if source['rdbmsType'] != 'jdbc':
-      query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-      db = rdbms.get(user, query_server=query_server)
+def _get_api(request):
+  file_format = json.loads(request.POST.get('source', request.POST.get('fileFormat', '{}')))
+  options = None
+  query_server = None
+  if file_format['rdbmsMode'] == 'customRdbms':
+    type = 'custom'
+    if file_format['rdbmsType'] == 'jdbc':
+      name = file_format['rdbmsHostname']
+      interface = file_format['rdbmsType']
+      options = {'driver': file_format['rdbmsJdbcDriver'],
+                 'url': file_format['rdbmsHostname'],
+                 'user': file_format['rdbmsUsername'],
+                  'password': file_format['rdbmsPassword']
+                }
     else:
-      interpreters = get_ordered_interpreters(request.user)
-      options = {}
-      key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
-      if key:
-        options = key[0]['options']
-
-        db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
-  else:
-    name = source['rdbmsType']
-    if name != 'jdbc':
+      interface = 'rdbms'
       query_server = {
-        'server_name': name,
-        'server_host': source['rdbmsHostname'],
-        'server_port': int(source['rdbmsPort'] or 3306),
-        'username': source['rdbmsUsername'],
-        'password': source['rdbmsPassword'],
+        'server_name': file_format['rdbmsType'],
+        'server_host': file_format['rdbmsHostname'],
+        'server_port': int(file_format['rdbmsPort'] or 3306),
+        'username': file_format['rdbmsUsername'],
+        'password': file_format['rdbmsPassword'],
         'options': {},
-        'alias': name
+        'alias': file_format['rdbmsType']
       }
-      db = rdbms.get(user, query_server=query_server)
-    else:
-      db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
+      name = query_server['server_host'] + ':' + query_server['port']
+  else:
+    type = file_format['rdbmsJdbcDriverName'] and file_format['rdbmsJdbcDriverName'].lower()
+    name = type
+    interface = file_format['inputFormat']
 
-  return db
+  return get_api(request, { 'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
 
 def jdbc_db_list(request):
   format_ = {'data': [], 'status': 1}
@@ -268,38 +260,3 @@ def _splitby_column_check(statement, destination_splitby_column):
       'destinationSplitbyColumn': destination_splitby_column
     }
   return statement
-
-
-class RdbmsIndexer():
-
-  def __init__(self, user, db_conf_name, db=None):
-    self.user = user
-    self.db_conf_name = db_conf_name
-    self.db = db
-
-  def guess_format(self):
-    return {"type": "csv"}
-
-  def get_sample_data(self, mode=None, database=None, table=None, column=None):
-    if self.db:
-      db = self.db
-    else:
-      query_server = rdbms.get_query_server_config(server=self.db_conf_name)
-      db = rdbms.get(self.user, query_server=query_server)
-
-    if mode == 'configRdbms' or self.db_conf_name != 'jdbc':
-      assist = Assist(db)
-    else:
-      assist = JdbcAssist(db)
-
-    response = {'status': -1}
-    sample_data = assist.get_sample_data(database, table, column)
-
-    if sample_data:
-      response['status'] = 0
-      response['headers'] = sample_data.columns
-      response['rows'] = list(sample_data.rows())
-    else:
-      response['message'] = _('Failed to get sample data.')
-
-    return response
