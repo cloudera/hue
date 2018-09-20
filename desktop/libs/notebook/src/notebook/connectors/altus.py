@@ -16,8 +16,9 @@
 # limitations under the License.
 
 import logging
+import json
 
-from datetime import datetime,  timedelta
+from datetime import datetime, timedelta
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -276,53 +277,48 @@ class AnalyticDbApi():
 class DataWarehouse2Api():
 
   def __init__(self, user=None):
-    self._api_url = '%s/wa' % K8.API_URL.get().rstrip('/')
+    self._api_url = '%s/dw' % K8.API_URL.get().rstrip('/')
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_verify(False)
     self._root = Resource(self._client)
 
-  def create_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
-    params = {
+
+  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
+        cloudera_manager_username='hue', cloudera_manager_password='hue'):
+    data = {
       'clusterName': cluster_name,
-      'cdhVersion': cdh_version,
-      'cpuMinimum': cpu_minimum,
-      'cpuMaximum': cpu_maximum,
-      'memoryMinimum': memory_minimum,
-      'memoryMaximum': memory_maximum,
+      'cdhVersion': cdh_version or 'CDH6.3',
+      'workerCpuCores': 1,
+      'workerMemoryInGib': 1,
+      'workerReplicas': workers_group_size,
     }
 
-    return _exec('dw', 'createCluster', params)
+    return self._root.post('createCluster', data=json.dumps(data), contenttype="application/json")
+
 
   def list_clusters(self):
-#     {"clusters":[
-#       {"clusterName":"fake-tristan",
-#        "crn":"crn:altus:datawa44eed-a1f3-4935-89c1-71eb56889581",
-#        "creationDate":"2018-09-19T22:27:28.740Z","cdhVersion":"CDH6.3","workerCpuCores":4,"workerMemoryInGib":8,"workerReplicas":4,"workerReplicasOnline":4}]}
+    clusters = self._root.post('listClusters', contenttype="application/json")
+    for cluster in clusters['clusters']:
+      cluster['workersGroupSize'] = cluster['workerReplicas']
+      cluster['instanceType'] = '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
+      cluster['creationDate'] = str(datetime.now())
+    return clusters
 
-    try:
-      clusters = self._root.post('listClusters', contenttype="application/json")
-      for cluster in clusters['clusters']:
-        cluster['workersGroupSize'] = cluster['workerReplicas']
-        cluster['instanceType'] = 'Medium'
-      return clusters
-    except Exception, e:
-      print e
-      return {'clusters': [
-        {'crn': 'crn1', 'clusterName': 'clusterName1', 'status': 'CREATED', 'workersGroupSize': 1, 'instanceType': 'Medium', 'cdhVersion': '6.0', 'creationDate': 'September 14, 2018 12:48 PM'}
-      ]}
 
   def delete_cluster(self, cluster_id):
-    return _exec('dw', 'deleteCluster', {'clusterName': cluster_id})
+    data = json.dumps({'clusterName': cluster_id})
+    return self._root.post('deleteCluster', data=data, contenttype="application/json")
+
 
   def describe_cluster(self, cluster_id):
-    try:
-      return self._root.post('describeCluster', contenttype="application/json")
-    except:
-      return {'cluster':
-        {'crn': 'crn1', 'clusterName': 'clusterName1', 'status': 'CREATED', 'workersGroupSize': 1, 'instanceType': 'Medium', 'cdhVersion': '6.0', 'creationDate': 'September 14, 2018 12:48 PM'}
-      }
+    data = json.dumps({'clusterName': cluster_id})
+    cluster = self._root.post('describeCluster', data=data, contenttype="application/json")
+    cluster['creationDate'] = str(datetime.now())
+    return {'cluster': cluster}
+
 
   def update_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
     params = {

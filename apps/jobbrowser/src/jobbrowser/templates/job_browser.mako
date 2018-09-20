@@ -236,9 +236,23 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
                     <i class="fa fa-refresh"></i>
                   </a>
 
-                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.cluster() && $root.cluster()['type'].indexOf('altus') >= 0, click: jobs.createCluster">
-                    <i class="fa fa-plus"></i>
+                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.cluster() && $root.cluster()['type'].indexOf('altus') >= 0, toggle: jobs.createClusterShow">
+                    <!-- ko if: jobs.createClusterShow-->
+                      ${ _('Cancel') }
+                    <!-- /ko -->
+                    <!-- ko ifnot: jobs.createClusterShow-->
+                      ${ _('Create') }
+                    <!-- /ko -->
                   </a>
+                  
+                  <span data-bind="visible: jobs.createClusterShow">
+                    <input type="text" data-bind="clearable: jobs.createClusterName" placeholder="${_('Cluster name')}">
+                    <input type="number" data-bind="value: jobs.createClusterWorkers" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+                    
+                    <button class="btn" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </span>
                 <!-- /ko -->
 
                 <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
@@ -1104,10 +1118,45 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="dataware-clusters-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li>
+            <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
+            /
+            <span data-bind="text: properties['properties']['workerReplicas']"></span>
+          </li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': '100%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
+    </div>
+  </div>
+
+  <br>
+
   <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
     <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
   </button>
-
 </script>
 
 
@@ -2215,7 +2264,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           interface = 'dataeng-clusters';
         }
         else if (/altus:dataware/.test(self.id()) && /:cluster:/.test(self.id())) {
-          interface = 'dataware-clusters';
+          interface = 'dataware2-clusters';
         }
         else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
           interface = 'queries';
@@ -2224,7 +2273,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           interface = 'livy-sessions';
         }
 
-        interface = vm.isValidInterface(interface);
+        interface = interface.indexOf('dataeng') || interface.indexOf('dataware') ? interface : vm.isValidInterface(interface); // TODO: support multi cluster selection in isValidInterface
         vm.interface(interface);
 
         lastFetchJobRequest = self._fetchJob(function (data) {
@@ -2271,10 +2320,10 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             }
 
             if (vm.job().type() == 'SPARK_EXECUTOR') {
-               crumbs.push({'id': vm.job().id(), 'name': vm.job().properties['executor_id'](), 'type': vm.job().type()});
+              crumbs.push({'id': vm.job().id(), 'name': vm.job().properties['executor_id'](), 'type': vm.job().type()});
             }
             else {
-               crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+              crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             }
 
             vm.resetBreadcrumbs(crumbs);
@@ -2700,6 +2749,10 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
         });
       };
 
+      self.createClusterShow = ko.observable(false);
+      self.createClusterName = ko.observable('');
+      self.createClusterWorkers = ko.observable(3);
+
       self.createCluster = function() {
         if (vm.interface().indexOf('dataeng') != -1) {
           $.post("/metadata/api/dataeng/create_cluster/", {
@@ -2717,12 +2770,13 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           });
         } else {
           $.post("/metadata/api/analytic_db/create_cluster/", {
-            "cluster_name": "Analytics",
+            "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
+            "cluster_name": self.createClusterName(),
             "cdh_version": "CDH515",
             "public_key": "public_key",
             "instance_type": "m4.xlarge",
             "environment_name": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:jheyming-secure/b4e6d99a-261f-4ada-9b4a-576aa0af8979",
-            "workers_group_size": "3",
+            "workers_group_size": self.createClusterWorkers(),
             "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
@@ -2730,6 +2784,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             self.updateJobs();
           });
         }
+        self.createClusterShow(false);
       }
 
       self.control = function (action) {
