@@ -527,28 +527,27 @@ ${ assist.assistPanel() }
           </div>
 
           <div class="control-group">
-            <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-
             <!-- ko if: outputFormat() == 'file' -->
-              <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
+            <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
+            <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'index' -->
-              <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+            <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
+            <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
 
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
-              <input type="text" class="input-xxlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+            <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
+            <input type="text" class="input-xxlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'altus' -->
-              <!-- ko if: namespaces().length > 1 -->
-                <select data-bind="selectize: namespaces, value: namespace, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
-                ## <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-snowflake-o', value: namespace, entries: namespaces, labelAttribute: 'name', foreachVisible: true, searchable: true, linkTitle: '${ _ko('Namespaces') }' } }" style="display: inline-block"></div>
-              <!-- /ko -->
-              <label class="checkbox inline-block">
-                <input type="checkbox"> ${_('Copy Sentry privileges')}
-              </label>
+              <label for="collectionName" class="control-label"><div>${ _('Namespace') }</div></label>
+              <div class="namespace-selection">
+              <select data-bind="selectize: namespaces, value: targetNamespaceId, optionsValue: 'id', optionsText: 'name'" class="input-medium"></select>
+              </div>
+              <label class="checkbox inline-block"><input type="checkbox"> ${_('Copy Sentry privileges')}</label>
               <br/>
 
               <label class="control-label "><div>${ _('Database') }</div></label>
@@ -559,6 +558,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'stream' -->
+            <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
               <!-- ko with: $root -->
                 <input type="text" data-bind="value: createWizard.source.kafkaSelectedTopics">
                 ## <div data-bind="template: { name: 'kafka-topic-template' }" class="margin-top-10 field inline-block"></div>
@@ -2114,6 +2114,24 @@ ${ assist.assistPanel() }
       self.namespaces = wizard.namespaces;
       self.namespace = wizard.namespace;
       self.compute = wizard.compute;
+      self.targetNamespaceId = ko.observable(self.namespace() ? self.namespace().id : undefined);
+
+      self.namespace.subscribe(function (namespace) {
+        if (namespace && namespace.id !== self.targetNamespaceId) {
+          self.targetNamespaceId(namespace.id);
+        }
+      })
+
+      self.targetNamespaceId.subscribe(function (namespaceId) {
+        if (namespaceId && (!self.namespace() || self.namespace().id !== namespaceId)) {
+          self.namespaces().some(function (namespace) {
+            if (namespaceId === namespace.id) {
+              self.namespace(namespace);
+              return true;
+            }
+          })
+        }
+      });
 
       // UI
       self.bulkColumnNames = ko.observable('');
