@@ -965,7 +965,7 @@ ${ assist.assistPanel() }
                     maxLines: 25
                   },
                   database: fieldEditorDatabase,
-                  namepsace: namespace,
+                  namespace: namespace,
                   compute: compute,
                   mode: 'hive'
                 }}"></div>
