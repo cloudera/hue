@@ -1600,6 +1600,14 @@ IS_MULTICLUSTER_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+IS_K8_ONLY = Config(
+  key='is_k8_only',
+  default=True,
+  type=coerce_bool,
+  help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
+
 def get_clusters(user):
   clusters = []
 
