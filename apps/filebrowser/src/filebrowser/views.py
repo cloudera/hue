@@ -1064,16 +1064,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 if is_admin(request.user) and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
-                if request.is_ajax():
-                    return HttpResponseForbidden(smart_str(e))
-                else:
-                    raise PopupException(msg, detail=e)
+                raise PopupException(msg, detail=e)
             except S3FileSystemException, e:
               msg = _("S3 filesystem exception.")
-              if request.is_ajax():
-                  return HttpResponseForbidden(smart_str(e))
-              else:
-                  raise PopupException(msg, detail=e)
+              raise PopupException(msg, detail=e)
             except NotImplementedError, e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)
