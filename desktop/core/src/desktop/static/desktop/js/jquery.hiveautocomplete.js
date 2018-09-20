@@ -150,10 +150,34 @@
       $("#jHueGenericAutocomplete").css("top", $el.offset().top + $el.outerHeight() - 1).css("left", $el.offset().left).width($el.outerWidth() - 4);
     });
 
+    var validateTimeout = -1;
+    var onPathChange = function (path) {
+      window.clearTimeout(validateTimeout);
+      self.options.onPathChange(path);
+    };
+
+    var validateAndSet = function () {
+      var path = $el.val().split('.');
+      if (path.length > 1) {
+        window.clearTimeout(validateTimeout);
+        validateTimeout = window.setTimeout(function () {
+          $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
+            var target = path.pop();
+            DataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: path }).done(function (childEntries) {
+              if (childEntries.some(function (childEntry) { return childEntry.name === target })) {
+                onPathChange($el.val());
+              }
+            });
+          });
+        }, 500);
+      }
+    };
+
     var _hiveAutocompleteSelectedIndex = -1;
     var _filterTimeout = -1;
     $el.keyup(function (e) {
       window.clearTimeout(_filterTimeout);
+      validateAndSet();
       if ($.inArray(e.keyCode, [17, 38, 40, 13, 32, 191]) === -1) {
         _hiveAutocompleteSelectedIndex = -1;
         _filterTimeout = window.setTimeout(function () {
@@ -348,7 +372,7 @@
                 $el.val(item);
               }
               if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'database'){
-                self.options.onPathChange($el.val());
+                onPathChange($el.val());
               }
               $("#jHueGenericAutocomplete").hide();
               _hiveAutocompleteSelectedIndex = -1;
@@ -363,7 +387,7 @@
                 $el.val(item + ".");
               }
               if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'database') {
-                self.options.onPathChange($el.val());
+                onPathChange($el.val());
               }
               if (!self.options.skipTables) {
                 showAutocomplete();
@@ -388,7 +412,7 @@
                 $el.val($el.val() + ".");
               }
               if (self.options.pathChangeLevel === '' || self.options.pathChangeLevel === 'table') {
-                self.options.onPathChange($el.val());
+                onPathChange($el.val());
               }
               if (!self.options.skipColumns) {
                 showAutocomplete();
