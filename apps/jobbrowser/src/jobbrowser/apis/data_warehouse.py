@@ -17,11 +17,16 @@
 
 import logging
 
+from datetime import datetime
+from dateutil import parser
+
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
 
 from jobbrowser.apis.base_api import Api
+
 
 
 LOG = logging.getLogger(__name__)
@@ -50,9 +55,9 @@ class DataWarehouseClusterApi(Api):
         'apiStatus': self._api_status(app['status']),
         'type': 'Altus %(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
         'user': app['clusterName'].split('-', 1)[0],
-        'progress': 100,
+        'progress': app.get('progress', 100),
         'queue': 'group',
-        'duration': 1,
+        'duration': (datetime.now() - parser.parse(app['creationDate']).replace(tzinfo=None)).seconds * 1000,
         'submitted': app['creationDate'],
         'canWrite': True
       } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
@@ -106,7 +111,7 @@ class DataWarehouseClusterApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED']:
+    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STOPPED', 'STARTING']:
       return 'RUNNING'
     elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING']:
       return 'SUCCEEDED'
