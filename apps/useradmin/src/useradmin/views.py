@@ -635,10 +635,11 @@ def add_ldap_groups(request):
                                     import_members_recursive=import_members_recursive, sync_users=True,
                                     import_by_dn=import_by_dn, failed_users=failed_ldap_users)
       except (ldap.LDAPError, LdapBindException), e:
-        LOG.error(_("LDAP Exception: %s") % e)
-        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
       except ValidationError, e:
-        raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was a problem with some of the LDAP information: %s')) % str(e))
 
       unique_users = set()
       if is_ensuring_home_directories and groups:
