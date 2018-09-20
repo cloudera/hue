@@ -2058,7 +2058,7 @@ ${ assist.assistPanel() }
         })
       });
       self.outputFormats.subscribe(function (newValue) {
-        if (newValue.map(function (entry) { return entry.value; }).indexOf(self.outputFormat()) < 0) {
+        if (newValue.length && newValue.map(function (entry) { return entry.value; }).indexOf(self.outputFormat()) < 0) {
           self.outputFormat(newValue && newValue[0].value);
         }
       });
@@ -2303,7 +2303,9 @@ ${ assist.assistPanel() }
               return true;
             }
           })) {
-            self.compute(namespace.computes[0]);
+            if (namespace.computes.length) {
+              self.compute(namespace.computes[0]);
+            }
           }
         })
       });
