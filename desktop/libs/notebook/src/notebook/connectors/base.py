@@ -299,6 +299,14 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
+    elif snippet['type'] == 'custom':
+      interpreter = [{
+        'name': snippet['name'],
+        'type': snippet['type'],
+        'interface': snippet['interface'],
+        'options': snippet.get('options', {}),
+        'is_sql': False
+      }]
     else:
       raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
 
@@ -334,16 +342,23 @@ def get_api(request, snippet):
     return TextApi(request.user)
   elif interface == 'rdbms':
     from notebook.connectors.rdbms import RdbmsApi
-    return RdbmsApi(request.user, interpreter=snippet['type'])
+    return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
   elif interface == 'altus-adb':
     from notebook.connectors.altus_adb import AltusAdbApi
     return AltusAdbApi(user=request.user, cluster_name=cluster, request=request)
   elif interface == 'dataeng':
     from notebook.connectors.dataeng import DataEngApi
     return DataEngApi(user=request.user, request=request, cluster_name=cluster)
-  elif interface == 'jdbc' or interface == 'teradata':
-    from notebook.connectors.jdbc import JdbcApi
-    return JdbcApi(request.user, interpreter=interpreter)
+  elif interface == 'jdbc':
+    if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
+      from notebook.connectors.jdbc import JdbcApi
+      return JdbcApi(request.user, interpreter=interpreter)
+    else:
+      from notebook.connectors.jdbc_teradata import JdbcApiTeradata
+      return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'teradata':
+    from notebook.connectors.jdbc import JdbcApiTeradata
+    return JdbcApiTeradata(request.user, interpreter=interpreter)
   elif interface == 'sqlalchemy':
     from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)
@@ -374,11 +389,12 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
     self.cluster = cluster
+    self.query_server = query_server
 
   def create_session(self, lang, properties=None):
     return {

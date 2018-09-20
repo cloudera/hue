@@ -363,7 +363,7 @@ $(document).ready(function () {
           sType = "string"
           if col.type in ["TINYINT_TYPE", "SMALLINT_TYPE", "INT_TYPE", "BIGINT_TYPE", "FLOAT_TYPE", "DOUBLE_TYPE", "DECIMAL_TYPE"]:
             sType = "numeric"
-          elif col.type in ["TIMESTAMP_TYPE", "DATE_TYPE"]:
+          elif col.type in ["TIMESTAMP_TYPE", "DATE_TYPE", "DATETIME_TYPE"]:
             sType = "date"
           %>
         { "sSortDataType":"dom-text", "sType":"${ sType }"},

@@ -1806,11 +1806,11 @@ $(document).one('fetched.design', editables);
 $(document).one('fetched.query', editables);
 
 function isNumericColumn(type) {
-  return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE', 'DATETIME_TYPE']) > -1;
 }
 
 function isDateTimeColumn(type) {
-  return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE', 'DATETIME_TYPE']) > -1;
 }
 
 function isStringColumn(type) {
