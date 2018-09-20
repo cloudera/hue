@@ -244,11 +244,11 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
                       ${ _('Create') }
                     <!-- /ko -->
                   </a>
-                  
+
                   <span data-bind="visible: jobs.createClusterShow">
-                    <input type="text" data-bind="clearable: jobs.createClusterName" placeholder="${_('Cluster name')}">
-                    <input type="number" data-bind="value: jobs.createClusterWorkers" class="input-small" placeholder="${_('Size')}">${ _('workers') }
-                    
+                    <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" placeholder="${_('Cluster name')}">
+                    <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+
                     <button class="btn" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
                       <i class="fa fa-plus"></i>
                     </button>
@@ -1150,13 +1150,35 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
+    <div>
+
+    <a class="btn" title="${ _('Resize cluster') }" data-bind="visible: $root.compute() && $root.compute()['type'] == 'altus-dw2', toggle: updateClusterShow">
+      <!-- ko if: updateClusterShow-->
+        ${ _('Cancel') }
+      <!-- /ko -->
+      <!-- ko ifnot: updateClusterShow-->
+        ${ _('Resize') }
+      <!-- /ko -->
+    </a>
+
+    <span data-bind="visible: updateClusterShow">
+      <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+
+      <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
+        <i class="fa fa-refresh"></i>
+      </button>
+    </span>
+
+    </div>
   </div>
 
   <br>
 
-  <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
-    <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
-  </button>
+  <!-- ko if: mainType() == 'dataeng-clusters' || mainType() == 'dataware-clusters' -->
+    <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
+      <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
+    </button>
+  <!-- /ko -->
 </script>
 
 
@@ -2442,6 +2464,28 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             self.fetchStatus();
           });
         }
+      }
+
+      self.updateClusterShow = ko.observable(false);
+      self.updateClusterShow.subscribe(function(newVal) {
+        if (newVal) {
+          self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
+        }
+      });
+      self.updateClusterWorkers = ko.observable(3);
+
+      ## TODO Move to control
+      self.updateCluster = function() {
+        $.post("/metadata/api/analytic_db/update_cluster/", {
+          "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
+          "cluster_name": self.id(),
+          "workers_group_size": self.updateClusterWorkers(),
+        }, function(data) {
+          console.log(ko.mapping.toJSON(data));
+          $(document).trigger("info", ko.mapping.toJSON(data));
+          self.updateJob();
+        });
+        self.updateClusterShow(false);
       }
 
       self.troubleshoot = function (action) {

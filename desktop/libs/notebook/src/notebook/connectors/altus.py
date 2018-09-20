@@ -315,19 +315,14 @@ class DataWarehouse2Api():
 
   def describe_cluster(self, cluster_id):
     data = json.dumps({'clusterName': cluster_id})
-    cluster = self._root.post('describeCluster', data=data, contenttype="application/json")
-    cluster['creationDate'] = str(datetime.now())
-    return {'cluster': cluster}
+    return self._root.post('describeCluster', data=data, contenttype="application/json")
 
 
-  def update_cluster(self, cluster_name, cdh_version, cpu_minimum, cpu_maximum, memory_minimum, memory_maximum):
-    params = {
+  def update_cluster(self, cluster_name, workers_group_size):
+    data = {
       'clusterName': cluster_name,
-      'cdhVersion': cdh_version,
-      'cpuMinimum': cpu_minimum,
-      'cpuMaximum': cpu_maximum,
-      'memoryMinimum': memory_minimum,
-      'memoryMaximum': memory_maximum,
+      'workerReplicas': workers_group_size,
     }
 
-    return _exec('dw', 'updateCluster', params)
+    
+    return self._root.post('updateCluster', data=json.dumps(data), contenttype="application/json")

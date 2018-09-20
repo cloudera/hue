@@ -88,6 +88,7 @@ urlpatterns += [
 # Altus API
 urlpatterns += [
   url(r'^api/analytic_db/create_cluster/?$', analytic_db_api.create_cluster, name='create_cluster'),
+  url(r'^api/analytic_db/update_cluster/?$', analytic_db_api.update_cluster, name='update_cluster'),
 ]
 urlpatterns += [
   url(r'^api/dataeng/create_cluster/?$', dataeng_api.create_cluster, name='create_cluster'),
