@@ -199,6 +199,17 @@ ALTUS = ConfigSection(
   )
 )
 
+K8 = ConfigSection(
+  key='k8',
+  help=_t("""Configuration options for Kubernetes API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('API URL to Kubernetes API or compatible service.'),
+      default='http://provisioner.35.236.77.238.nip.io/'),
+  )
+)
+
 DEFAULT_PUBLIC_KEY = Config(
   key="default_publick_key",
   help=_t("Public key used for cluster creation."),
