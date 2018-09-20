@@ -1301,41 +1301,40 @@ ${ assist.assistPanel() }
 
     <br/>
 
-    <div class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
+    <label class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
       <label class="control-label"><div>${ _('Schema') }</div>
-        <label class="checkbox inline-block">
+        <label class="radio margin-right-10">
           <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Manual')}
         </label>
-        <label class="checkbox inline-block">
+        <label class="radio">
           <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Guess')}
         </label>
       </label>
 
-      <label class="control-label" data-bind="visible: createWizard.source.kafkaSchemaManual() == 'manual'">
+      <!-- ko if: createWizard.source.kafkaSchemaManual() == 'manual' -->
       ##<label class="control-label"><div>${ _('Encoding') }</div>
       ##  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldType">
       ##</label>
+      <br/>
       <label class="control-label"><div>${ _('Type') }</div>
         <select class="input-medium" data-bind="options: ['delimited', 'bitarray'], value: createWizard.source.kafkaFieldType"></select>
       </label>
       <label class="control-label"><div>${ _('Delimiter') }</div>
         <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaFieldDelimiter">
       </label>
-
       <br/>
-
       <label class="control-label"><div>${ _('Field names') }</div>
         <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
       </label>
+      <br/>
       <label class="control-label"><div>${ _('Field types') }</div>
         <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
       </label>
-
-      <div class="control-group" data-bind="visible: createWizard.source.hasStreamSelected">
-        <button class="btn" data-bind="click: createWizard.source.streamCheckConnection">
-          ${_('Test')}
-        </button>
-      </div>
+      <br/>
+      <label class="control-label" data-bind="visible: createWizard.source.hasStreamSelected"><div></div>
+        <button class="btn" data-bind="click: createWizard.source.streamCheckConnection">${_('Test')}</button>
+      </label>
+      <!-- /ko -->
     </div>
   </div>
 </script>
