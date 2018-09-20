@@ -43,7 +43,7 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
 from indexer.indexers.morphline import MorphlineIndexer
-from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop,  _get_db
+from indexer.indexers.rdbms import run_sqoop,  _get_api
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 
@@ -131,7 +131,7 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
   elif file_format['inputFormat'] == 'rdbms':
-    format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
+    format_ = {"type": "csv"}
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()}
@@ -213,40 +213,15 @@ def guess_field_types(request):
         "columns": columns,
     }
   elif file_format['inputFormat'] == 'rdbms':
-    if file_format.get('rdbmsUsername'):
-      db = _get_db(request)
-    else:
-      query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
-      db = rdbms.get(request.user, query_server=query_server)
-
-    sample = RdbmsIndexer(request.user, file_format['rdbmsType'], db=db).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['tableName'])
-    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['tableName'], names_only=False)
-
-    # cf. https://github.com/apache/sqoop/blob/trunk/src/java/org/apache/sqoop/hive/HiveTypes.java#L39
-    for col in table_metadata:
-      col_type = col['type'].upper().split('(')[0]
-      print col_type
-      if col_type in ('INTEGER', 'SMALLINT', 'INT'):
-        col['type'] = 'int'
-      elif col_type in ('VARCHAR', 'CHAR', 'LONGVARCHAR', 'NVARCHAR', 'NCHAR', 'LONGNVARCHAR', 'DATE', 'TIME', 'TIMESTAMP', 'CLOB'):
-        col['type'] = 'string'
-      elif col_type in ('NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE', 'REAL'):
-        col['type'] = 'double'
-      elif col_type in ('BIT', 'BOOLEAN'):
-        col['type'] = 'boolean'
-      elif col_type in ('TINYINT',):
-        col['type'] = 'tinyint'
-      elif col_type in ('BIGINT',):
-        col['type'] = 'bigint'
-      else:
-        col['type'] = 'string'
+    api = _get_api(request)
+    sample = api.get_sample_data(None, database=file_format['rdbmsDatabaseName'], table=file_format['tableName'])
 
     format_ = {
-        "sample": list(sample['rows'])[:4],
-        "columns": [
-            Field(col['name'], col['type']).to_dict()
-            for col in table_metadata
-        ]
+      "sample": list(sample['rows'])[:4],
+      "columns": [
+          Field(col['name'], col['type']).to_dict()
+          for col in sample['full_headers']
+      ]
     }
   elif file_format['inputFormat'] == 'stream':
     # Note: mocked here, should come from SFDC or Kafka API or sampling job

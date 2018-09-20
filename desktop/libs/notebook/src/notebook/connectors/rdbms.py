@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from desktop.lib.i18n import force_unicode
 
@@ -37,14 +38,14 @@ def query_error_handler(func):
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
       else:
-        raise QueryError(message)
+        raise QueryError, message, sys.exc_info()[2]
   return decorator
 
 
 class RdbmsApi(Api):
 
   def _execute(self, notebook, snippet):
-    query_server = dbms.get_query_server_config(server=self.interpreter)
+    query_server = self._get_query_server()
     db = dbms.get(self.user, query_server)
 
     db.use(snippet['database'])  # TODO: only do the use on the first statement in a multi query
@@ -122,7 +123,7 @@ class RdbmsApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    query_server = dbms.get_query_server_config(server=self.interpreter)
+    query_server = self._get_query_server()
     db = dbms.get(self.user, query_server)
 
     assist = Assist(db)
@@ -150,11 +151,11 @@ class RdbmsApi(Api):
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
-    query_server = dbms.get_query_server_config(server=self.interpreter)
+    query_server = self._get_query_server()
     db = dbms.get(self.user, query_server)
 
     assist = Assist(db)
-    response = {'status': -1}
+    response = {'status': -1, 'result': {}}
 
     sample_data = assist.get_sample_data(database, table, column)
 
@@ -174,7 +175,7 @@ class RdbmsApi(Api):
 
   @query_error_handler
   def explain(self, notebook, snippet):
-    query_server = dbms.get_query_server_config(server=self.interpreter)
+    query_server = self._get_query_server()
     db = dbms.get(self.user, query_server)
 
     db.use(snippet['database'])
@@ -200,6 +201,12 @@ class RdbmsApi(Api):
       'explanation': explanation,
       'statement': snippet['statement'],
     }
+
+  def _get_query_server(self):
+    if self.query_server:
+      return self.query_server
+    else:
+      return dbms.get_query_server_config(server=self.interpreter)
 
 
 class Assist():
