@@ -159,7 +159,7 @@ class LdapAuthenticationForm(AuthenticationForm):
             get_ldap_connection(conf.LDAP)
         except Exception as e:
           LOG.error("LDAP Exception: %s" % smart_str(e))
-          raise ValidationError(_("LDAP server %s Error: %s").encode('utf-8') % (server_key, str(e)))
+          raise ValidationError(smart_str(_("LDAP server %s Error: %s")) % (server_key, str(e)))
 
         raise ValidationError(
           self.error_messages['invalid_login'])
