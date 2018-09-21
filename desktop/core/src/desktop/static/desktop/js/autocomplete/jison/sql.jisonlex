@@ -498,6 +498,7 @@
 <impala>'UPDATE_FN'                        { return '<impala>UPDATE_FN'; }
 <impala>'UPSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('UPSERT', yylloc); return '<impala>UPSERT'; }
 <impala>'URI'                              { return '<impala>URI'; }
+<impala>'USER'                             { return '<impala>USER'; }
 <impala>'USING'                            { return '<impala>USING'; }
 <impala>'VALUE_OF'                         { return '<impala>VALUE_OF'; }
 <impala>'VARBINARY'                        { return '<impala>VARBINARY'; }
@@ -514,6 +515,7 @@
 <impala>'ARRAY'                            { return 'ARRAY'; }
 <impala>'DEFAULT'                          { return '<impala>DEFAULT'; }
 <impala>'MAP'                              { return 'MAP'; }
+<impala>'OWNER'                            { return '<impala>OWNER'; }
 <impala>'STRUCT'                           { return 'STRUCT'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }
 <impala>\[NOSHUFFLE\]                      { return '<impala>NOSHUFFLE'; }
