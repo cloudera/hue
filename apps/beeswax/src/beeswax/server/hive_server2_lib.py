@@ -486,8 +486,8 @@ class HiveServerClient:
 
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
     LOG.info(
-        '%s: use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
-        self.query_server['server_name'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
+        '%s: server_host=%s, use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
+        self.query_server['server_name'], self.query_server['server_host'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
     )
 
     self.use_sasl = use_sasl
@@ -522,6 +522,8 @@ class HiveServerClient:
     if self.query_server['server_name'] == 'impala':
       from ImpalaService import ImpalaHiveServer2Service
       thrift_class = ImpalaHiveServer2Service
+
+    LOG.debug('Using host_name %(server_host)s' % query_server)
 
     self._client = thrift_util.get_client(
         thrift_class.Client,
@@ -604,7 +606,7 @@ class HiveServerClient:
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
-    self.coordinator_host = self._client.get_coordinator_host()
+    self.coordinator_host = '' #self._client.get_coordinator_host()
 
     if res.status is not None and res.status.statusCode not in (TStatusCode.SUCCESS_STATUS,):
       if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
