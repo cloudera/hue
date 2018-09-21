@@ -39,6 +39,7 @@ from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
 from desktop.conf import CLUSTER_ID
+from notebook.connectors.altus import DataWarehouse2Api
 
 
 LOG = logging.getLogger(__name__)
@@ -86,6 +87,14 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
       cluster_config = Cluster(user=None).get_config(cluster)
   else:
     cluster_config = None
+    
+  # Safeguard
+  if not cluster or cluster == 'localhost':
+    api = DataWarehouse2Api(None)
+    clusters = api.list_clusters()
+    cluster_config = {'server_host': clusters['clusters'][0]['coordinatorEndpoint']['publicHost'], 'name': cluster}
+    LOG.debug("Cluster was localhost: %s" % repr(cluster_config))
+
 
   if name == 'impala':
     from impala.dbms import get_query_server_config as impala_query_server_config
