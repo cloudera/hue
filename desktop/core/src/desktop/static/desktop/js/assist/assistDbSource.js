@@ -119,6 +119,10 @@ var AssistDbSource = (function () {
     var self = this;
     self.loading(true);
 
+    if (refresh) {
+      ContextCatalog.getComputes({ sourceType: self.sourceType, clearCache: true });
+    }
+
     return ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: refresh }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
