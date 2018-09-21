@@ -80,8 +80,8 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   LOG.debug("Query cluster: %s" % cluster)
   if cluster and cluster != CLUSTER_ID.get():
     if cluster and 'altus:dataware:k8s' in cluster:
-      name = re.search('cluster:(.+?)/', cluster).group(1)
-      cluster_config = {'server_host': 'impala-coordinator' + name, 'name': cluster}
+      cluster_name = re.search('cluster:(.+?)/', cluster).group(1)
+      cluster_config = {'server_host': 'impala-coordinator' + cluster_name, 'name': cluster}
     else:
       cluster_config = Cluster(user=None).get_config(cluster)
   else:
