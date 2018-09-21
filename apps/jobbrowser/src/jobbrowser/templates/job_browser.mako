@@ -323,8 +323,12 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
                   <div data-bind="template: { name: 'dataeng-job-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
-                <!-- ko if: mainType() == 'dataeng-clusters' || mainType() == 'dataware-clusters' || mainType() == 'dataware2-clusters' -->
+                <!-- ko if: mainType() == 'dataeng-clusters' || mainType() == 'dataware-clusters' -->
                   <div data-bind="template: { name: 'dataware-clusters-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'dataware2-clusters' -->
+                  <div data-bind="template: { name: 'dataware2-clusters-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: mainType() == 'livy-sessions' -->
@@ -1131,6 +1135,43 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': '100%'}"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
+    </div>
+  </div>
+
+  <br>
+
+  <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
+    <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
+  </button>
+
+</script>
+
+
+<script type="text/html" id="dataware2-clusters-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li>
             <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
@@ -1176,14 +1217,6 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
 
     </div>
   </div>
-
-  <br>
-
-  <!-- ko if: mainType() == 'dataeng-clusters' || mainType() == 'dataware-clusters' -->
-    <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
-      <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
-    </button>
-  <!-- /ko -->
 </script>
 
 
@@ -2290,8 +2323,11 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
         else if (/altus:dataeng/.test(self.id()) && /:cluster:/.test(self.id())) {
           interface = 'dataeng-clusters';
         }
-        else if (/altus:dataware/.test(self.id()) && /:cluster:/.test(self.id())) {
+        else if (/altus:dataware:k8/.test(self.id()) && /:cluster:/.test(self.id())) {
           interface = 'dataware2-clusters';
+        }
+        else if (/altus:dataware/.test(self.id()) && /:cluster:/.test(self.id())) {
+          interface = 'dataware-clusters';
         }
         else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
           interface = 'queries';
