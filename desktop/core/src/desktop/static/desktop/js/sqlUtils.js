@@ -68,8 +68,8 @@ var SqlUtils = (function () {
     SYSTEM_TIME: true, SYSTEM_USER: true, TABLE: true, TABLES: true, TABLESAMPLE: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true,
     TIMEZONE_HOUR: true, TIMEZONE_MINUTE: true, TINYINT: true, TO: true, TRAILING: true, TRANSLATE_REGEX: true, TRANSLATION: true, TREAT: true, TRIGGER: true, TRIM_ARRAY: true,
     TRUE: true, TRUNCATE: true, UESCAPE: true, UNBOUNDED: true, UNCACHED: true, UNION: true, UNIQUE: true, UNKNOWN: true, UNNEST: true, UPDATE: true, UPDATE_FN: true, UPSERT: true,
-    USE: true, USING: true, VALUE_OF: true, VALUES: true, VARBINARY: true, VARCHAR: true, VARYING: true, VERSIONING: true, VIEW: true, WHEN: true, WHENEVER: true, WHERE: true,
-    WIDTH_BUCKET: true, WINDOW: true, WITH: true, WITHIN: true, WITHOUT: true
+    USE: true, USER: true, USING: true, VALUE_OF: true, VALUES: true, VARBINARY: true, VARCHAR: true, VARYING: true, VERSIONING: true, VIEW: true, WHEN: true, WHENEVER: true,
+    WHERE: true, WIDTH_BUCKET: true, WINDOW: true, WITH: true, WITHIN: true, WITHOUT: true
   };
 
   var autocompleteFilter = function (filter, entries) {
