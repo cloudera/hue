@@ -134,7 +134,7 @@ var ContextCatalog = (function () {
               });
               self.namespaces[options.sourceType] = { namespaces: namespaces.filter(function (namespace) {
                 return namespace.name; // Only include namespaces with a name.
-              }), dynamic: dynamic };
+              }), dynamic: dynamic, hueTimestamp: Date.now() };
               deferred.resolve(self.namespaces[options.sourceType]);
               if (notifyForRefresh) {
                 huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
@@ -170,10 +170,16 @@ var ContextCatalog = (function () {
      * @param {Object} options
      * @param {string} options.sourceType
      * @param {boolean} [options.silenceErrors] - Default False
+     * @param {boolean} [options.clearCache] - Default False
      * @return {Promise}
      */
     ContextCatalog.prototype.getComputes = function (options) {
       var self = this;
+
+      if (options.clearCache) {
+        self.computePromises[options.sourceType] = undefined;
+        self.computes[options.sourceType] = undefined;
+      }
 
       if (self.computePromises[options.sourceType]) {
         return self.computePromises[options.sourceType];
