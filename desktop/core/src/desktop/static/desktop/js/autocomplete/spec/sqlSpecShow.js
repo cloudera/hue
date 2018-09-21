@@ -1185,7 +1185,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CREATE VIEW', 'CURRENT ROLES', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']
+            suggestKeywords: ['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CREATE VIEW', 'CURRENT ROLES', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'GRANT USER', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']
           }
         });
       });
@@ -1573,6 +1573,45 @@
         });
       });
 
+      it('should handle "SHOW GRANT ROLE boo ON DATABASE baa;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT ROLE boo ON DATABASE baa;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SHOW GRANT USER boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT USER boo;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SHOW GRANT USER boo ON DATABASE baa;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT USER boo ON DATABASE baa;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest keywords for "SHOW GRANT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ',
@@ -1580,7 +1619,58 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ROLE']
+            suggestKeywords: ['ROLE', 'USER']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SHOW GRANT ROLE usr |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT ROLE usr ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SHOW GRANT USER usr ON |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT USER usr ON ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DATABASE', 'SERVER', 'TABLE', 'URI']
+          }
+        });
+      });
+
+      it('should suggest databases for "SHOW GRANT ROLE usr ON DATABASE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT ROLE usr ON DATABASE ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: {}
+          }
+        });
+      });
+
+      it('should suggest tables for "SHOW GRANT USER usr ON TABLE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT USER usr ON TABLE ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
           }
         });
       });
