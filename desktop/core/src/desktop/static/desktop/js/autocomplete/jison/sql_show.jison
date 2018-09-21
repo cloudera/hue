@@ -56,7 +56,7 @@ ShowStatement_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS', 'VIEWS']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
+       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'CREATE VIEW', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
      } else {
        parser.suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
      }
@@ -70,7 +70,7 @@ ShowStatement_EDIT
      } else {
        parser.addTablePrimary($3);
        if (parser.isImpala()) {
-         parser.suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'FILES IN', 'PARTITIONS', 'RANGE PARTITIONS', 'TABLE STATS']);
+         parser.suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'CREATE VIEW', 'FILES IN', 'PARTITIONS', 'RANGE PARTITIONS', 'TABLE STATS']);
        }
      }
    }

@@ -1638,6 +1638,19 @@
           });
         });
 
+        it('should handle "ALTER TABLE db.tbl SET OWNER USER boo; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE db.tbl SET OWNER USER boo; ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest databases for "ALTER TABLE db.tbl RENAME TO |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE db.tbl RENAME TO  ',
@@ -1708,7 +1721,7 @@
               suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN',
                 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS',
                 'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION',
-                'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
+                'SET OWNER', 'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
             }
           });
         });
@@ -1720,7 +1733,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
+              suggestKeywords: ['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'OWNER ROLE', 'OWNER USER', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
             }
           });
         });
@@ -2247,6 +2260,18 @@
           });
         });
 
+        it('should suggest keywords for "ALTER TABLE bar SET OWNER |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET OWNER ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ROLE', 'USER']
+            }
+          });
+        });
+
         it('should suggest keywords for "ALTER TABLE bar SET ROW |"', function() {
          assertAutoComplete({
            beforeCursor: 'ALTER TABLE bar SET ROW ',
@@ -2481,6 +2506,19 @@
           });
         });
 
+        it('should handle "ALTER VIEW db.foo SET OWNER ROLE boo; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW db.tbl SET OWNER ROLE boo; ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest keywords for "ALTER VIEW boo |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER VIEW boo ',
@@ -2488,7 +2526,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AS', 'RENAME TO']
+              suggestKeywords: ['AS', 'RENAME TO', 'SET OWNER']
             }
           });
         });
@@ -2513,6 +2551,30 @@
             expectedResult: {
               lowerCase: false,
               suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER VIEW boo SET |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo SET ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OWNER ROLE', 'OWNER USER']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER VIEW db.boo SET OWNER|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW db.boo SET OWNER ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ROLE', 'USER']
             }
           });
         });

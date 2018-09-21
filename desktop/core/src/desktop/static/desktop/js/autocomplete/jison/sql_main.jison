@@ -237,13 +237,11 @@ NonReservedKeyword
  ;
 
 NonReservedKeyword
- : '<impala>URI'
- | '<impala>SERVER'
-// | '<impala>BROADCAST'
-// | '<impala>NOSHUFFLE'
-// | '<impala>SHUFFLE'
- | '<impala>DEFAULT'
+ : '<impala>DEFAULT'
  | '<impala>KEY'
+ | '<impala>OWNER'
+ | '<impala>SERVER'
+ | '<impala>URI'
  ;
 
 NonReservedKeyword
@@ -605,6 +603,7 @@ NonStartingToken
  | '<impala>OVER'
  | '<impala>OVERLAPS'
  | '<impala>OVERLAY'
+ | '<impala>OWNER'
  | '<impala>PARQUET'
  | '<impala>PARTITIONED'
  | '<impala>PARTITIONS'
@@ -702,6 +701,7 @@ NonStartingToken
  | '<impala>UNNEST'
  | '<impala>UPDATE_FN'
  | '<impala>URI'
+ | '<impala>USER'
  | '<impala>USING'
  | '<impala>VALUE_OF'
  | '<impala>VARBINARY'
@@ -986,6 +986,11 @@ HiveOrImpalaTerminated
 HiveRoleOrUser
  : '<hive>ROLE'
  | '<hive>USER'
+ ;
+
+ImpalaRoleOrUser
+ : '<impala>ROLE'
+ | '<impala>USER'
  ;
 
 SingleQuotedValue
@@ -3817,6 +3822,7 @@ ArbitraryFunctionName
  | 'MAP'
  | '<impala>REPLACE'
  | 'TRUNCATE'
+ | '<impala>USER'
  ;
 
 ArbitraryFunctionRightPart
