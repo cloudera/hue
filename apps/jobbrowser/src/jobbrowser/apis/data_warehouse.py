@@ -53,7 +53,7 @@ class DataWarehouseClusterApi(Api):
         'name': '%(clusterName)s' % app,
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
-        'type': 'Altus %(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
+        'type': 'Altus %(workersGroupSize)sX %(instanceType)s %(cdhVersion)s' % app,
         'user': app['clusterName'].split('-', 1)[0],
         'progress': app.get('progress', 100),
         'queue': 'group',
