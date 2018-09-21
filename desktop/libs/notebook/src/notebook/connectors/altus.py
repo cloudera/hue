@@ -310,7 +310,9 @@ class DataWarehouse2Api():
 
   def delete_cluster(self, cluster_id):
     data = json.dumps({'clusterName': cluster_id})
-    return self._root.post('deleteCluster', data=data, contenttype="application/json")
+    return {
+      'result': self._root.post('deleteCluster', data=data, contenttype="application/json")
+    }
 
 
   def describe_cluster(self, cluster_id):
