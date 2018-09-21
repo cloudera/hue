@@ -92,7 +92,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   if not cluster or cluster == 'localhost':
     api = DataWarehouse2Api(None)
     clusters = api.list_clusters()
-    cluster_config = {'server_host': clusters['clusters'][0]['coordinatorEndpoint']['publicHost'], 'name': cluster}
+    cluster_config = {'server_host': clusters['clusters'][0]['coordinatorEndpoint']['publicHost'], 'name': clusters['clusters'][0]['name']}
     LOG.debug("Cluster was localhost: %s" % repr(cluster_config))
 
 
