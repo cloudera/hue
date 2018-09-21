@@ -1153,7 +1153,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
     </div>
     <div>
 
-    <a class="btn" title="${ _('Refresh') }" data-bind="click: updateJob">
+    <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { updateJob(); properties['properties']['workerReplicasOnline'].valueHasMutated(); }">
       <i class="fa fa-refresh"></i>
     </a>
 
