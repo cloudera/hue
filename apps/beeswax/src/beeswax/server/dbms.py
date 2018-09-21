@@ -65,7 +65,7 @@ def get(user, query_server=None, cluster=None):
       # Avoid circular dependency
       from beeswax.server.hive_server2_lib import HiveServerClientCompatible
 
-      if query_server['server_name'] == 'impala':
+      if query_server['server_name'].startswith('impala'):
         from impala.dbms import ImpalaDbms
         from impala.server import ImpalaServerClient
         DBMS_CACHE[user.username][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(ImpalaServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
@@ -332,7 +332,7 @@ class HiveServer2Dbms(object):
 
 
   def execute_statement(self, hql):
-    if self.server_name == 'impala':
+    if self.server_name.startswith('impala'):
       query = hql_query(hql, QUERY_TYPES[1])
     else:
       query = hql_query(hql, QUERY_TYPES[0])
@@ -373,7 +373,7 @@ class HiveServer2Dbms(object):
 
   def cancel_operation(self, query_handle):
     resp = self.client.cancel_operation(query_handle)
-    if self.client.query_server['server_name'] == 'impala':
+    if self.client.query_server['server_name'].startswith('impala'):
       resp = self.client.close_operation(query_handle)
     return resp
 
@@ -386,7 +386,7 @@ class HiveServer2Dbms(object):
     column = '`%s`' % column if column else '*'
     if table.partition_keys:
       hql = self._get_sample_partition_query(database, table, column, limit, operation)
-    elif self.server_name == 'impala':
+    elif self.server_name.startswith('impala'):
       if column or nested:
         from impala.dbms import ImpalaDbms
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
@@ -451,7 +451,7 @@ class HiveServer2Dbms(object):
 
 
   def analyze_table(self, database, table):
-    if self.server_name == 'impala':
+    if self.server_name.startswith('impala'):
       hql = 'COMPUTE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
       table_obj = self.get_table(database, table)
@@ -467,7 +467,7 @@ class HiveServer2Dbms(object):
 
 
   def analyze_table_columns(self, database, table):
-    if self.server_name == 'impala':
+    if self.server_name.startswith('impala'):
       hql = 'COMPUTE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
       table_obj = self.get_table(database, table)
@@ -482,7 +482,7 @@ class HiveServer2Dbms(object):
   def get_table_stats(self, database, table):
     stats = []
 
-    if self.server_name == 'impala':
+    if self.server_name.startswith('impala'):
       hql = 'SHOW TABLE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
 
       query = hql_query(hql)
@@ -500,7 +500,7 @@ class HiveServer2Dbms(object):
 
 
   def get_table_columns_stats(self, database, table, column):
-    if self.server_name == 'impala':
+    if self.server_name.startswith('impala'):
       hql = 'SHOW COLUMN STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
       hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` `%(column)s`' % {'database': database, 'table': table, 'column': column}
@@ -513,7 +513,7 @@ class HiveServer2Dbms(object):
       self.close(handle)
       data = list(result.rows())
 
-      if self.server_name == 'impala':
+      if self.server_name.startswith('impala'):
         if column == -1: # All the columns
           return [self._extract_impala_column(col) for col in data]
         else:
@@ -880,7 +880,7 @@ class HiveServer2Dbms(object):
 
 
   def get_partition(self, db_name, table_name, partition_spec, generate_ddl_only=False):
-    if partition_spec and self.server_name == 'impala': # partition_spec not supported
+    if partition_spec and self.server_name.startswith('impala'): # partition_spec not supported
       partition_query = " AND ".join(partition_spec.split(','))
     else:
       table = self.get_table(db_name, table_name)
