@@ -98,7 +98,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   try:
     LOG.debug("Query cluster mapping %s: %s %s" % (cluster, repr(cluster_config), socket.gethostbyaddr(cluster_config['server_host'])))
   except Exception, e:
-    LOG.debug('Failed to get cluster %s host: %s "%s"' % (cluster, e, cluster_config['server_host']))
+    LOG.debug('Failed to get cluster %s host: %s "%s"' % (cluster, e, cluster_config))
 
 
   if name == 'impala':
