@@ -1177,10 +1177,14 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
             /
             <span data-bind="text: properties['properties']['workerReplicas']"></span>
+            <!-- ko if: status() == 'SCALING_UP' || status() == 'SCALING_DOWN' -->
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            <!-- /ko -->
           </li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
-              <div class="bar" data-bind="style: {'width': '100%'}"></div>
+            ##<div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': status() == 'SCALING_UP' || status() == 'SCALING_DOWN', 'progress-success': status() == 'ONLINE', 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': Math.min(properties['properties']['workerReplicas'](), properties['properties']['workerReplicasOnline']()) / Math.max(properties['properties']['workerReplicasOnline'](), properties['properties']['workerReplicas']()) * 100 + '%'}"></div>
             </div>
           </li>
           <li class="nav-header">${ _('Impalad') }</li>
@@ -1194,18 +1198,18 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
     </div>
     <div>
 
-    <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { updateJob(); properties['properties']['workerReplicasOnline'].valueHasMutated(); }">
+    <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
       <i class="fa fa-refresh"></i>
     </a>
 
-    <a class="btn" title="${ _('Resize cluster') }" data-bind="visible: $root.compute() && $root.compute()['type'] == 'altus-dw2', toggle: updateClusterShow">
+    <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.compute() && $root.compute()['type'] == 'altus-dw2', toggle: updateClusterShow">
       <!-- ko if: updateClusterShow-->
         ${ _('Cancel') }
       <!-- /ko -->
       <!-- ko ifnot: updateClusterShow-->
         ${ _('Resize') }
       <!-- /ko -->
-    </a>
+    </button>
 
     <span data-bind="visible: updateClusterShow">
       <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
