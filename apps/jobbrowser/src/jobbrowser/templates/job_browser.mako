@@ -1142,8 +1142,8 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': '100%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
+          <li class="nav-header">${ _('Impalad') }</li>
+          <li><span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span></li>
         </ul>
       </div>
     </div>
@@ -1151,6 +1151,10 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
       <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
     <div>
+
+    <a class="btn" title="${ _('Refresh') }" data-bind="click: updateJob">
+      <i class="fa fa-refresh"></i>
+    </a>
 
     <a class="btn" title="${ _('Resize cluster') }" data-bind="visible: $root.compute() && $root.compute()['type'] == 'altus-dw2', toggle: updateClusterShow">
       <!-- ko if: updateClusterShow-->
