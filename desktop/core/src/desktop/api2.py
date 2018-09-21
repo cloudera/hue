@@ -160,6 +160,7 @@ def get_context_computes(request, interface):
           'name': cluster.get('clusterName'),
           'status': cluster.get('status'),
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
+          'impalad_host': IS_K8_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
           'type': 'altus-dw'
         } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or IS_K8_ONLY.get()]
       )
