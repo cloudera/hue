@@ -958,11 +958,15 @@ ${ assist.assistPanel() }
             </h4>
             <div class="card-body no-margin-top columns-form">
               <!-- ko if: useFieldEditor -->
-              ${ _('Language') }
-              <select>
-                <option value="sql">SQL</option>
-                <option value="morphline">Morphline</option>
-              </select>
+              <div class="control-group" style="margin-bottom: 5px;">
+                <label class="control-label"><div style="width: initial">${ _('Language') }</div>
+                  <select>
+                    <option value="sql">SQL</option>
+                    <option value="morphline">Morphline</option>
+                  </select>
+                </label>
+              </div>
+
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: fieldEditorValue,
                   placeHolder: '${ _ko('Example: SELECT a, b FROM c') }',
