@@ -19,6 +19,7 @@ import logging
 import re
 import threading
 import time
+import socket
 
 from django.urls import reverse
 from django.utils.encoding import force_unicode
@@ -93,7 +94,8 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
     api = DataWarehouse2Api(None)
     clusters = [_cluster for _cluster in api.list_clusters()['clusters'] if _cluster['status'] == 'ONLINE']
     cluster_config = {'server_host': clusters[0]['coordinatorEndpoint']['publicHost'], 'name': clusters[0]['name']}
-    LOG.debug("Cluster was localhost: %s" % repr(cluster_config))
+
+  LOG.debug("Query cluster mapping %s: %s %s" % (cluster, repr(cluster_config), socket.gethostbyaddr(cluster_config['server_host'])))
 
 
   if name == 'impala':
