@@ -523,7 +523,7 @@ class HiveServerClient:
       from ImpalaService import ImpalaHiveServer2Service
       thrift_class = ImpalaHiveServer2Service
 
-    LOG.debug('Using host_name %(server_host)s' % query_server)
+    LOG.debug('Using %s for host_name %s' % (thrift_class, query_server['server_host']))
 
     self._client = thrift_util.get_client(
         thrift_class.Client,
