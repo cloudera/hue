@@ -1143,7 +1143,8 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             </div>
           </li>
           <li class="nav-header">${ _('Impalad') }</li>
-          <li><span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span></li>
+          <li>
+            <span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span></li>
         </ul>
       </div>
     </div>

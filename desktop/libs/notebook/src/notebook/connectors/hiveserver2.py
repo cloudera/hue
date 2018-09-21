@@ -168,7 +168,7 @@ class HS2Api(Api):
 
     reuse_session = session is not None
     if not reuse_session:
-      session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
+      session = dbms.get(self.user, query_server=get_query_server_config(name=lang, cluster=self.cluster)).open_session(self.user)
 
     response = {
       'type': lang,
@@ -238,7 +238,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     statement = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
