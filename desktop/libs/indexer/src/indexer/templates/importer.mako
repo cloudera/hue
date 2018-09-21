@@ -2059,7 +2059,7 @@ ${ assist.assistPanel() }
           if (format.value === 'index' && ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'table' && wizard.source.inputFormat() !== 'table' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
+          if (format.value === 'table' && (wizard.source.inputFormat() === 'table' || (wizard.source.inputFormat() === 'rdbms' && wizard.source.rdbmsAllTablesSelected()))) {
             return false;
           }
           if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
