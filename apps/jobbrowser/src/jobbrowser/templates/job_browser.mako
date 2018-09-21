@@ -1172,7 +1172,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
-          <li class="nav-header">${ _('Progress') }</li>
+          <li class="nav-header">${ _('Workers Online') }</li>
           <li>
             <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
             /
@@ -1189,7 +1189,11 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           </li>
           <li class="nav-header">${ _('Impalad') }</li>
           <li>
-            <span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span></li>
+            <a href="#" data-bind="attr: { 'href': properties['properties']['coordinatorEndpoint']['publicHost']() + ':25000' }">
+              <span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span>
+              <i class="fa fa-external-link fa-fw"></i>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
