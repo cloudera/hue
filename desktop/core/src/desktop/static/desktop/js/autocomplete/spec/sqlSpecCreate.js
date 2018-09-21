@@ -1085,9 +1085,9 @@
         });
       });
 
-      it('should suggest keywords for "CREATE TABLE foo (id INT, some FLOAT, bar |"', function () {
+      it('should suggest keywords for "CREATE TABLE foo (id INT, `some` FLOAT, bar |"', function () {
         assertAutoComplete({
-          beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
+          beforeCursor: 'CREATE TABLE foo (id INT, `some` FLOAT, bar ',
           afterCursor: '',
           containsKeywords: ['BOOLEAN'],
           expectedResult: {
