@@ -301,6 +301,7 @@ class DataWarehouse2Api():
   def list_clusters(self):
     clusters = self._root.post('listClusters', contenttype="application/json")
     for cluster in clusters['clusters']:
+      cluster['clusterName'] = cluster['name']
       cluster['workersGroupSize'] = cluster['workerReplicas']
       cluster['instanceType'] = '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
       cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
@@ -317,7 +318,9 @@ class DataWarehouse2Api():
 
   def describe_cluster(self, cluster_id):
     data = json.dumps({'clusterName': cluster_id})
-    return self._root.post('describeCluster', data=data, contenttype="application/json")
+    data = self._root.post('describeCluster', data=data, contenttype="application/json")
+    data['cluster']['clusterName'] = data['cluster']['name']
+    return data
 
 
   def update_cluster(self, cluster_name, workers_group_size):
