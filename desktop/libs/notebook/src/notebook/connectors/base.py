@@ -328,7 +328,7 @@ def get_api(request, snippet):
     interface = 'dataeng'
 
   if cluster:
-    LOG.info('Selected cluster %s' % cluster)
+    LOG.info('Selected cluster %s interface %s' % (cluster, interface))
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
