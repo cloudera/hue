@@ -1602,7 +1602,7 @@ IS_MULTICLUSTER_ONLY = Config(
 
 IS_K8_ONLY = Config(
   key='is_k8_only',
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
@@ -1610,24 +1610,22 @@ IS_K8_ONLY = Config(
 
 def get_clusters(user):
   clusters = []
+  cluster_config = CLUSTERS.get()
 
   # Get core standalone config if there
-  apps = appmanager.get_apps_dict(user)
-  if 'beeswax' in apps: # and not IS_MULTICLUSTER_ONLY.get():
-    from beeswax.conf import HIVE_SERVER_HOST
+  if not IS_MULTICLUSTER_ONLY.get() or [cluster_config for i in cluster_config if i == 'Default']:
     clusters.append(
       (CLUSTER_ID.get(), {
         'id': CLUSTER_ID.get(),
         'name': CLUSTER_ID.get(),
         'type': 'direct',
         'interface': 'all',
-        'server_host': HIVE_SERVER_HOST.get()
+        'server_host': 'all'
         }
       )
     )
 
   # Get additional remote multi clusters
-  cluster_config = CLUSTERS.get()
   clusters.extend([
     (i, {
       'id': i,
@@ -1635,7 +1633,7 @@ def get_clusters(user):
       'type': cluster_config[i].TYPE.get(),
       'interface': cluster_config[i].INTERFACE.get() or 'hive',
       'server_host': cluster_config[i].SERVER_HOST.get()
-    }) for i in cluster_config if cluster_config[i].NAME.get() != 'default'
+    }) for i in cluster_config if i != 'Default'
   ])
 
   return OrderedDict(clusters)

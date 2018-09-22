@@ -17,8 +17,8 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.models import ANALYTIC_DB
   from desktop.views import commonheader, commonfooter, _ko
+
   from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
 %>
 
@@ -1206,7 +1206,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
       <i class="fa fa-refresh"></i>
     </a>
 
-    <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.compute() && $root.compute()['type'] == 'altus-dw2', toggle: updateClusterShow">
+    <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
       <!-- ko if: updateClusterShow-->
         ${ _('Cancel') }
       <!-- /ko -->
@@ -2953,7 +2953,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var dataEngInterfaceCondition = function () {
           return self.cluster() && self.cluster()['type'] == 'altus-de';
@@ -2965,7 +2965,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
           return self.cluster() && self.cluster()['type'] == 'altus-dw2';
         };
         var schedulerInterfaceCondition = function () {
-          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var schedulerExtraInterfaceCondition = function () {
           return '${ is_mini }' == 'False' && schedulerInterfaceCondition();

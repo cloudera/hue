@@ -50,6 +50,9 @@ def _exec(service, command, parameters=None):
   else:
     hostname = ALTUS.HOSTNAME.get()
 
+  if not ALTUS.AUTH_KEY_ID.get() or not ALTUS.AUTH_KEY_SECRET.get():
+    raise PopupException('Altus API is not configured.')
+
   try:
     api = ApiLib(service, hostname, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
     LOG.debug('%s : %s' % (command, parameters))
