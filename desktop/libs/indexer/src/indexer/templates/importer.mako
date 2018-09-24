@@ -318,6 +318,7 @@ ${ assist.assistPanel() }
               <div class="control-group">
                 <label for="rdbmsJdbcDriverName" class="control-label"><div>${ _('Options') }</div>
                   <select id="rdbmsJdbcDriverName" data-bind="selectize: createWizard.source.rdbmsJdbcDriverNames, value: createWizard.source.rdbmsJdbcDriverName, optionsText: 'name', optionsValue: 'value'"></select>
+                  <!-- ko hueSpinner: { spin: createWizard.source.isFetchingDriverNames, inline: true } --><!-- /ko -->
                 </label>
               </div>
               <!-- /ko -->
@@ -326,6 +327,7 @@ ${ assist.assistPanel() }
               <div class="control-group input-append">
                 <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
                   <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
+                  <!-- ko hueSpinner: { spin: createWizard.source.isFetchingDatabaseNames, inline: true } --><!-- /ko -->
                 </label>
               </div>
               <!-- /ko -->
@@ -340,6 +342,7 @@ ${ assist.assistPanel() }
                 <!-- ko ifnot: createWizard.source.rdbmsIsAllTables() -->
                 <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
                   <select id="rdbmsTableName" multiple="multiple" data-bind="selectize: createWizard.source.rdbmsTableNames, selectedObjects: createWizard.source.tables, selectedOptions: createWizard.source.tablesNames, optionsText: 'name', optionsValue: 'value'"></select>
+                  <!-- ko hueSpinner: { spin: createWizard.source.isFetchingTableNames, inline: true } --><!-- /ko -->
                 </label>
                 <!-- /ko -->
               </div>
@@ -1662,26 +1665,33 @@ ${ assist.assistPanel() }
         self.path('');
         resizeElements();
         if(self.rdbmsMode() === 'configRdbms' && val !== 'jdbc') {
+          self.isFetchingDatabaseNames(true);
           $.post("${ url('indexer:get_db_component') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
             if (resp.data) {
               self.rdbmsDatabaseNames(resp.data);
             }
+          }).always(function(){
+            self.isFetchingDatabaseNames(false);
           });
         } else if(self.rdbmsMode() === 'configRdbms' && val === 'jdbc') {
+          self.isFetchingDriverNames(true);
           $.post("${ url('indexer:jdbc_db_list') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
             if (resp.data) {
               self.rdbmsJdbcDriverNames(resp.data);
             }
+          }).always(function() {
+            self.isFetchingDriverNames(false);
           });
         }
       });
       self.rdbmsDatabaseName = ko.observable('');
       self.rdbmsDatabaseName.subscribe(function (val) {
         if (val !== '') {
+          self.isFetchingTableNames(true);
           $.post("${ url('indexer:get_db_component') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
@@ -1690,26 +1700,34 @@ ${ assist.assistPanel() }
                 return ko.mapping.fromJS(opt);
               }));
             }
+          }).always(function(){
+            self.isFetchingTableNames(false);
           });
         }
       });
       self.rdbmsDatabaseNames = ko.observableArray();
+      self.isFetchingDatabaseNames = ko.observable(false);
       self.rdbmsJdbcDriverNames = ko.observableArray();
+      self.isFetchingDriverNames = ko.observable(false);
       self.rdbmsJdbcDriverName = ko.observable();
       self.rdbmsJdbcDriverName.subscribe(function () {
         self.rdbmsDatabaseNames([]);
+        self.isFetchingDatabaseNames(true);
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
         }, function (resp) {
           if (resp.data) {
             self.rdbmsDatabaseNames(resp.data);
           }
+        }).always(function(){
+          self.isFetchingDatabaseNames(false);
         });
       });
       self.rdbmsJdbcDriver = ko.observable('');
       self.rdbmsJdbcDriver.subscribe(function () {
         self.rdbmsDatabaseNames([]);
       });
+      self.isFetchingTableNames = ko.observable(false);
       self.rdbmsTableNames = ko.observableArray();
       self.rdbmsHostname = ko.observable('');
       self.rdbmsHostname.subscribe(function () {
@@ -1756,6 +1774,8 @@ ${ assist.assistPanel() }
       });
       self.rdbmsDbIsValid = ko.observable(false);
       self.rdbmsCheckConnection = function() {
+        self.isFetchingDatabaseNames(true);
+        self.rdbmsDatabaseName(''); // Need to clear or else get_db_component will return list of tables
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
         }, function (resp) {
@@ -1766,6 +1786,8 @@ ${ assist.assistPanel() }
             $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
             self.rdbmsDbIsValid(false);
           }
+        }).always(function(){
+          self.isFetchingDatabaseNames(false);
         });
       };
 
@@ -2511,6 +2533,7 @@ ${ assist.assistPanel() }
           self.isGuessingFieldTypes(false);
           guessFieldTypesXhr = null;
         }).fail(function (xhr) {
+          self.loadSampleData({sample_cols: [], columns: [], sample: []});
           $(document).trigger("error", xhr.responseText);
           self.isGuessingFieldTypes(false);
           viewModel.isLoading(false);
