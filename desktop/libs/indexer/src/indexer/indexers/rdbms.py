@@ -66,25 +66,25 @@ def _get_api(request):
   if file_format['rdbmsMode'] == 'customRdbms':
     type = 'custom'
     if file_format['rdbmsType'] == 'jdbc':
-      name = file_format['rdbmsHostname']
+      name = file_format['rdbmsHostname'] # We make sure it's unique as name is the cache key
       interface = file_format['rdbmsType']
       options = {'driver': file_format['rdbmsJdbcDriver'],
                  'url': file_format['rdbmsHostname'],
                  'user': file_format['rdbmsUsername'],
-                  'password': file_format['rdbmsPassword']
+                 'password': file_format['rdbmsPassword']
                 }
     else:
       interface = 'rdbms'
       query_server = {
         'server_name': file_format['rdbmsType'],
         'server_host': file_format['rdbmsHostname'],
-        'server_port': int(file_format['rdbmsPort'] or 3306),
+        'server_port': int(file_format['rdbmsPort'] or '3306'),
         'username': file_format['rdbmsUsername'],
         'password': file_format['rdbmsPassword'],
         'options': {},
         'alias': file_format['rdbmsType']
       }
-      name = query_server['server_host'] + ':' + query_server['port']
+      name = 'rdbms:%(server_name)s://%(server_host)s:%(server_port)s' % query_server # We make sure it's unique as name is the cache key
   else:
     type = file_format['rdbmsJdbcDriverName'] and file_format['rdbmsJdbcDriverName'].lower()
     name = type
@@ -155,11 +155,18 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_port = DATABASES[rdbms_name].PORT.get()
       rdbms_user_name = DATABASES[rdbms_name].USER.get()
       rdbms_password = get_database_password(rdbms_name)
+      url = "jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s" % {
+        'rdbmsType': rdbms_name,
+        'rdbmsHost': rdbms_host,
+        'rdbmsPort': rdbms_port,
+        'rdbmsDatabaseName': rdbms_database_name,
+      }
     else:
       rdbms_host = source['rdbmsHostname']
       rdbms_port = source['rdbmsPort']
       rdbms_user_name = source['rdbmsUsername']
       rdbms_password = source['rdbmsPassword']
+      url = rdbms_host
 
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
     request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0700, data=smart_str(rdbms_password))
@@ -168,10 +175,8 @@ def run_sqoop(request, source, destination, start_time):
     if destination['sqoopJobLibPaths']:
       lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths'] if f['path']]
 
-    statement = '--connect jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
-      'rdbmsType': rdbms_name,
-      'rdbmsHost': rdbms_host,
-      'rdbmsPort': rdbms_port,
+    statement = '--connect %(url)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
+      'url': url,
       'rdbmsDatabaseName': rdbms_database_name,
       'rdbmsUserName': rdbms_user_name,
       'passwordFilePath': password_file_path
@@ -231,7 +236,7 @@ def run_sqoop(request, source, destination, start_time):
     success_url = '/hbase/#HBase/' + destination_table_name
 
     # Todo
-  statement = '%(statement)s --num-mappers %(numMappers)s' % {
+  statement = '%(statement)s --num-mappers %(numMappers)s --verbose' % {
     'statement': statement,
     'numMappers': destination_mappers_num
   }
