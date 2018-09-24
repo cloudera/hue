@@ -166,7 +166,7 @@ class JdbcApi(Api):
 
     sample_data, description = assist.get_sample_data(database, table, column)
 
-    if sample_data:
+    if sample_data or description:
       response['status'] = 0
       response['headers'] = [col[0] for col in description] if description else []
       response['full_headers'] = [{
@@ -174,7 +174,7 @@ class JdbcApi(Api):
         'type': col[1],
         'comment': ''
       } for col in description]
-      response['rows'] = sample_data
+      response['rows'] = sample_data if sample_data else []
     else:
       response['message'] = _('Failed to get sample data.')
 
