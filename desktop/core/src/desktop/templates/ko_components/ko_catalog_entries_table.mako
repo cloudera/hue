@@ -582,6 +582,12 @@ from desktop.views import _ko
           },{
             label: '${ _("distinct") }',
             type: 'distinct'
+          },{
+            label: '${ _("max") }',
+            type: 'max'
+          },{
+            label: '${ _("min") }',
+            type: 'min'
           }
         ];
 
