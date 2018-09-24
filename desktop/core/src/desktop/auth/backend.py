@@ -323,7 +323,7 @@ class PamBackend(DesktopBackendBase):
   """
 
   @metrics.pam_authentication_time
-  def authenticate(self, username, password):
+  def authenticate(self, request=None, username=None, password=None):
     username = force_username_case(username)
 
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
