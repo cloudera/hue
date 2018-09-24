@@ -373,6 +373,10 @@ class HiveServer2Dbms(object):
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
         if operation == 'distinct':
           hql = 'SELECT DISTINCT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
+        elif operation == 'max':
+          hql = 'SELECT max(%s) FROM %s;' % (select_clause, from_clause)
+        elif operation == 'min':
+          hql = 'SELECT min(%s) FROM %s;' % (select_clause, from_clause)
         else:
           hql = 'SELECT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
       else:
@@ -380,6 +384,10 @@ class HiveServer2Dbms(object):
     else:
       if operation == 'distinct':
         hql = "SELECT DISTINCT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
+      if operation == 'max':
+        hql = "SELECT max(%s) FROM `%s`.`%s`;" % (column, database, table.name)
+      if operation == 'min':
+        hql = "SELECT min(%s) FROM `%s`.`%s`;" % (column, database, table.name)
       else:
         hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
       # TODO: Add nested select support for HS2
@@ -410,9 +418,17 @@ class HiveServer2Dbms(object):
     else:
       partition_clause = ''
 
-    prefix = "SELECT DISTINCT " if operation == 'distinct' else 'SELECT'
-    return prefix + "%(column)s FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
-      {'column': column, 'database': database, 'table': table.name, 'partition_clause': partition_clause, 'limit': limit}
+    if operation == 'distinct':
+      prefix = 'SELECT DISTINCT %s' % column
+    elif operation == 'max':
+      prefix = 'SELECT max(%s)' % column
+    elif operation == 'min':
+      prefix = 'SELECT min(%s)' % column
+    else:
+      prefix = 'SELECT %s' % column
+
+    return prefix + " FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
+      {'database': database, 'table': table.name, 'partition_clause': partition_clause, 'limit': limit}
 
 
   def analyze_table(self, database, table):
