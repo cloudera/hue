@@ -3466,6 +3466,7 @@ var EditorViewModel = (function() {
           type: 'catalogEntry',
           catalogEntry: field.catalogEntry
         },
+        onSampleClick: field.value,
         showInAssistEnabled: true,
         sourceType: self.editorType(),
         orientation: 'bottom',
