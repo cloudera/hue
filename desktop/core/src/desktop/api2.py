@@ -167,28 +167,46 @@ def get_context_computes(request, interface):
       # TODO if interface == 'spark2' keep only SPARK type
 
   if interface == 'jobs':
-    for cluster in clusters:
-      cluster = {
-        'id': cluster.get('id'),
-        'name': cluster.get('name'),
-        'status': 'CREATED',
-        'environmentType': cluster.get('type'),
-        'serviceType': cluster.get('interface'),
-        'namespace': '',
-        'type': cluster.get('type')
-      }
-        
-      if cluster.get('type') == 'altus':
-        cluster['name'] = 'Altus DE'
-        cluster['type'] = 'altus-de'
-        computes.append(cluster)
-        cluster = cluster.copy()
-        cluster['name'] = 'Altus Data Warehouse'
-        cluster['type'] = 'altus-dw'
-
-      computes.append(cluster)
+    return get_context_clusters(request, interface) # TODO remove when UI changed
 
   response[interface] = computes
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def get_context_clusters(request, interface):
+  response = {}
+  clusters = []
+
+  cluster_configs = get_clusters(request.user).values()
+
+  for cluster in cluster_configs:
+    cluster = {
+      'id': cluster.get('id'),
+      'name': cluster.get('name'),
+      'status': 'CREATED',
+      'environmentType': cluster.get('type'),
+      'serviceType': cluster.get('interface'),
+      'namespace': '',
+      'type': cluster.get('type')
+    }
+
+    if cluster.get('type') == 'altus':
+      cluster['name'] = 'Altus DE'
+      cluster['type'] = 'altus-de'
+      clusters.append(cluster)
+      cluster = cluster.copy()
+      cluster['name'] = 'Altus Data Warehouse'
+      cluster['type'] = 'altus-dw'
+    elif cluster.get('type') == 'altusv2':
+      cluster['name'] = 'Data Warehouse'
+      cluster['type'] = 'altus-dw2'
+
+    clusters.append(cluster)
+
+  response[interface] = clusters
   response['status'] = 0
 
   return JsonResponse(response)
