@@ -367,7 +367,7 @@ from metadata.conf import has_navigator
             <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, formatted: true, dialect: getSourceType() }"></div>
             <!-- /ko -->
             <!-- ko ifnot: $parent.viewSqlVisible -->
-            <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } } --><!-- /ko -->
+            <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry, onSampleClick: $parent.onSampleClick } } --><!-- /ko -->
             <!-- /ko -->
           <!-- /ko -->
         </div>
@@ -535,6 +535,8 @@ from metadata.conf import has_navigator
         self.hasErrors = ko.observable(false);
         self.activePromises = [];
         self.errorText = ko.observable();
+
+        self.onSampleClick = options.popover.onSampleClick;
 
         self.analysis = ko.observable();
         self.comment = ko.observable();
@@ -1255,6 +1257,7 @@ from metadata.conf import has_navigator
         self.compute = params.compute;
         self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
+        self.onSampleClick = params.onSampleClick;
         var orientation = params.orientation || 'bottom';
         self.contents = null;
         self.resizeHelper = new ResizeHelper(orientation, self.leftAdjust, self.topAdjust);

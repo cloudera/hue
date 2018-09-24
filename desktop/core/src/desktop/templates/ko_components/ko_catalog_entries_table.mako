@@ -190,7 +190,7 @@ from desktop.views import _ko
       <!-- /ko -->
 
       <!-- ko if: !loading() && catalogEntry.isField() && !catalogEntry.isComplex() -->
-      <!-- ko component: { name: 'field-samples', params: { catalogEntry: catalogEntry } } --><!-- /ko -->
+      <!-- ko component: { name: 'field-samples', params: { catalogEntry: catalogEntry, onSampleClick: onSampleClick } } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -268,6 +268,7 @@ from desktop.views import _ko
         self.entries = ko.observableArray();
         self.editableDescriptions = !!params.editableDescriptions;
         self.contextPopoverEnabled = !!params.contextPopoverEnabled;
+        self.onSampleClick = params.onSampleClick;
         self.querySpec = ko.observable();
         self.cancellablePromises = [];
         self.loading = ko.observable(false);
@@ -543,7 +544,12 @@ from desktop.views import _ko
       <!-- ko ifnot: loadingSamples -->
       <tbody data-bind="foreach: filteredColumnSamples">
       <tr>
+        <!-- ko if: typeof $parent.onSampleClick === 'function' -->
+        <td class="sample-column pointer" data-bind="html: $data, attr: { 'title': hueUtils.html2text($data) }, click: $parent.sampleClick"></td>
+        <!-- /ko -->
+        <!-- ko ifnot: typeof $parent.onSampleClick === 'function' -->
         <td class="sample-column" data-bind="html: $data, attr: { 'title': hueUtils.html2text($data) }"></td>
+        <!-- /ko -->
       </tr>
       </tbody>
       <!-- ko if: filteredColumnSamples().length === 0 -->
@@ -567,6 +573,8 @@ from desktop.views import _ko
       function FieldSamples (params) {
         var self = this;
         self.catalogEntry = params.catalogEntry;
+        self.onSampleClick = params.onSampleClick;
+
         self.cancellablePromises = [];
         self.querySpec = ko.observable();
 
@@ -574,6 +582,11 @@ from desktop.views import _ko
         self.loadingSamples = ko.observable();
 
         self.showOperations = self.catalogEntry.getSourceType() === 'impala' || self.catalogEntry.getSourceType() === 'hive';
+
+        self.sampleClick = function (html) {
+          self.onSampleClick(hueUtils.html2text(html));
+          huePubSub.publish('context.popover.hide');
+        };
 
         self.operations = [
           {
