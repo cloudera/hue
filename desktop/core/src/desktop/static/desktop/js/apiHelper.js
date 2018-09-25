@@ -1319,7 +1319,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: '"' + (options.compute ? options.compute.id : '') + '"'
+        cluster: ko.mapping.toJSON(options.compute)
       },
       timeout: options.timeout
     }).success(function (data) {
