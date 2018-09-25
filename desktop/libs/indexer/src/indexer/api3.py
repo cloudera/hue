@@ -46,6 +46,7 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import run_sqoop,  _get_api
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
+from indexer.indexers.flume import FlumeIndexer
 
 
 LOG = logging.getLogger(__name__)
@@ -481,6 +482,8 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
     db = dbms.get(request.user)
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     input_path = table_metadata.path_location
+  elif file_format['inputFormat'] == 'stream' and file_format['streamSelection'] == 'flume':
+    return FlumeIndexer(user=request.user).start(collection_name, file_format, destination)
   elif file_format['inputFormat'] == 'stream':
     return _envelope_job(request, file_format, destination, start_time=start_time, lib_path=lib_path)
   elif file_format['inputFormat'] == 'file':
