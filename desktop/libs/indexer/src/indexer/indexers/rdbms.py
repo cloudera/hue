@@ -86,7 +86,11 @@ def _get_api(request):
       }
       name = 'rdbms:%(server_name)s://%(server_host)s:%(server_port)s' % query_server # We make sure it's unique as name is the cache key
   else:
-    type = file_format['rdbmsJdbcDriverName'] and file_format['rdbmsJdbcDriverName'].lower()
+    if file_format['rdbmsType'] == 'jdbc':
+      type = file_format['rdbmsJdbcDriverName'] and file_format['rdbmsJdbcDriverName'].lower()
+    else:
+      type = file_format['rdbmsType']
+      query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     name = type
     interface = file_format['inputFormat']
 
