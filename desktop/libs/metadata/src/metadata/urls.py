@@ -79,8 +79,9 @@ urlpatterns += [
 
 # Manager API
 urlpatterns += [
-  url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='hello'),
-  url(r'^api/manager/update_flume_config/?$', metadata_manager_api.update_flume_config, name='update_flume_config'),
+  url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='manager_hello'),
+  url(r'^api/manager/get_hosts/?$', metadata_manager_api.get_hosts, name='manager_hosts'),
+  url(r'^api/manager/update_flume_config/?$', metadata_manager_api.update_flume_config, name='manager_update_flume_config'),
 ]
 
 

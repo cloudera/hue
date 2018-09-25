@@ -334,7 +334,7 @@ def importer_submit(request):
 
     if destination['indexerRunJob'] or source['inputFormat'] == 'stream':
       _convert_format(source["format"], inverse=True)
-      job_handle = _large_indexing(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
+      job_handle = _large_indexing(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'], destination=destination)
     else:
       client = SolrClient(request.user)
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
@@ -454,7 +454,7 @@ def _create_table(request, source, destination, start_time=-1):
   return notebook.execute(request, batch=False)
 
 
-def _large_indexing(request, file_format, collection_name, query=None, start_time=None, lib_path=None):
+def _large_indexing(request, file_format, collection_name, query=None, start_time=None, lib_path=None, destination=None):
   indexer = MorphlineIndexer(request.user, request.fs)
 
   unique_field = indexer.get_unique_field(file_format)
@@ -482,7 +482,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'stream':
-    return _envelope_job(request, file_format, collection_name, start_time=start_time, lib_path=lib_path)
+    return _envelope_job(request, file_format, destination, start_time=start_time, lib_path=lib_path)
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % urllib.unquote(file_format["path"])
   else:
