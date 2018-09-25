@@ -1836,6 +1836,19 @@ ${ assist.assistPanel() }
         {'value': 'flume', 'name': 'Flume Agent'}
       ]);
       self.streamSelection = ko.observable(self.publicStreams()[0]['value']);
+      self.streamSelection.subscribe(function(newValue) {
+        if (newValue == 'flume') {
+          $.post("${ url('metadata:manager_hosts') }", {
+            "service": "flume"
+          }, function (resp) {
+            if (resp.status === 0 && resp.hosts) {
+              self.channelSourceHosts(resp.hosts);
+            } else {
+              $(document).trigger("error", "${ _('Error getting hosts') }" + resp.message);
+            }
+          });
+        }
+      });
 
       self.kafkaTopics = ko.observableArray();
       self.kafkaSelectedTopics = ko.observable(''); // Currently designed just for one
@@ -1868,7 +1881,7 @@ ${ assist.assistPanel() }
         {'name': '${ _("HTTP") }', 'value': 'http'}
       ]);
       self.channelSourceType = ko.observable();
-      self.channelSourceHosts = ko.observableArray(['host1.com', 'host2.com', 'host3.com', 'host4.com']);
+      self.channelSourceHosts = ko.observableArray();
       self.channelSourceSelectedHosts = ko.observableArray([]);
       self.channelSourceSelectedHosts.subscribe(function(newVal) {
         if (newVal) {

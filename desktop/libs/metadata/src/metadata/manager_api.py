@@ -76,11 +76,23 @@ def admin_only_handler(view_fn):
 
 
 @error_handler
-@admin_only_handler
 def hello(request):
   api = ManagerApi(request.user)
 
   response = api.tools_echo()
+
+  return JsonResponse(response)
+
+
+@error_handler
+def get_hosts(request):
+  response = {
+    'status': 0
+  }
+  api = ManagerApi(request.user)
+
+  if request.POST.get('service', '').lower() == 'flume':
+    response['hosts'] = api.get_flume_agents()
 
   return JsonResponse(response)
 
