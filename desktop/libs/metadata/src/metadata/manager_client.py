@@ -94,15 +94,10 @@ class ManagerApi(object):
 
   def get_kafka_brokers(self, cluster_name=None):
     try:
-      cluster = self._get_cluster(cluster_name)
-      services = self._root.get('clusters/%(name)s/services' % cluster)['items']
 
-      service = [service for service in services if service['type'] == 'KAFKA'][0]
-      broker_hosts = self._get_roles(cluster['name'], service['name'], 'KAFKA_BROKER')
-      broker_hosts_ids = [broker_host['hostRef']['hostId'] for broker_host in broker_hosts]
+      hosts = self._get_hosts('KAFKA', 'KAFKA_BROKER', cluster_name=cluster_name)
 
-      hosts = self._root.get('hosts')['items']
-      brokers_hosts = [host['hostname'] + ':9092' for host in hosts if host['hostId'] in broker_hosts_ids]
+      brokers_hosts = [host['hostname'] + ':9092' for host in hosts]
 
       return ','.join(brokers_hosts)
     except RestException, e:
@@ -154,6 +149,25 @@ class ManagerApi(object):
     return self.batch(
       items=data
     )
+
+
+  def get_flume_agents(self, cluster_name=None):
+    return [host['hostname'] for host in self._get_hosts('FLUME', 'AGENT', cluster_name=cluster_name)]
+
+
+  def _get_hosts(self, service_name, role_name, cluster_name=None):
+    try:
+      cluster = self._get_cluster(cluster_name)
+      services = self._root.get('clusters/%(name)s/services' % cluster)['items']
+
+      service = [service for service in services if service['type'] == service_name][0]
+      hosts = self._get_roles(cluster['name'], service['name'], role_name)
+      hosts_ids = [host['hostRef']['hostId'] for host in hosts]
+
+      hosts = self._root.get('hosts')['items']
+      return [host for host in hosts if host['hostId'] in hosts_ids]
+    except RestException, e:
+      raise ManagerApiException(e)
 
 
   def refresh_flume(self, cluster_name, restart=False):
