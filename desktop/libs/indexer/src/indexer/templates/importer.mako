@@ -1915,6 +1915,8 @@ ${ assist.assistPanel() }
           wizard.guessFormat();
           if (self.streamSelection() === 'kafka') {
             wizard.destination.tableFormat('kudu');
+          } else {
+            wizard.destination.tableFormat('text');
           }
         }
       });
@@ -2102,7 +2104,7 @@ ${ assist.assistPanel() }
           if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'stream' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'stream' && ['file', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
@@ -2606,6 +2608,9 @@ ${ assist.assistPanel() }
             self.isIndexing(false);
           } else if (resp.on_success_url) {
             $.jHueNotify.info("${ _('Creation success.') }");
+            if (resp.pubSubUrl) {
+              huePubSub.publish(notebook.pubSubUrl);
+            }
             huePubSub.publish('open.link', resp.on_success_url);
           } else {
             self.showCreate(true);
