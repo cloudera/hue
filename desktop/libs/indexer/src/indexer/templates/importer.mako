@@ -1663,6 +1663,8 @@ ${ assist.assistPanel() }
       self.rdbmsType = ko.observable(null);
       self.rdbmsType.subscribe(function (val) {
         self.path('');
+        self.rdbmsDatabaseNames([]);
+        self.rdbmsDatabaseName('');
         resizeElements();
         if(self.rdbmsMode() === 'configRdbms' && val !== 'jdbc') {
           self.isFetchingDatabaseNames(true);
@@ -1712,6 +1714,7 @@ ${ assist.assistPanel() }
       self.rdbmsJdbcDriverName = ko.observable();
       self.rdbmsJdbcDriverName.subscribe(function () {
         self.rdbmsDatabaseNames([]);
+        self.rdbmsDatabaseName('');
         self.isFetchingDatabaseNames(true);
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
@@ -1775,6 +1778,7 @@ ${ assist.assistPanel() }
       self.rdbmsDbIsValid = ko.observable(false);
       self.rdbmsCheckConnection = function() {
         self.isFetchingDatabaseNames(true);
+        self.rdbmsDatabaseNames([]);
         self.rdbmsDatabaseName(''); // Need to clear or else get_db_component will return list of tables
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
