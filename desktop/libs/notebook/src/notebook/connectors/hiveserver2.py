@@ -272,7 +272,7 @@ class HS2Api(Api):
   @query_error_handler
   def check_status(self, notebook, snippet):
     response = {}
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     handle = self._get_handle(snippet)
     operation = db.get_operation_status(handle)
@@ -293,7 +293,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     handle = self._get_handle(snippet)
     try:
@@ -341,7 +341,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def cancel(self, notebook, snippet):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     handle = self._get_handle(snippet)
     db.cancel_operation(handle)
@@ -350,7 +350,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     handle = self._get_handle(snippet)
     return db.get_log(handle, start_over=startFrom == 0)
@@ -362,7 +362,7 @@ class HS2Api(Api):
       from impala import conf as impala_conf
 
     if (snippet['type'] == 'hive' and beeswax_conf.CLOSE_QUERIES.get()) or (snippet['type'] == 'impala' and impala_conf.CLOSE_QUERIES.get()):
-      db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+      db = self._get_db(snippet, cluster=self.cluster)
 
       try:
         handle = self._get_handle(snippet)
@@ -380,7 +380,7 @@ class HS2Api(Api):
   @query_error_handler
   def download(self, notebook, snippet, format, user_agent=None):
     try:
-      db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+      db = self._get_db(snippet, cluster=self.cluster)
       handle = self._get_handle(snippet)
       # Test handle to verify if still valid
       db.fetch(handle, start_over=True, rows=1)
@@ -480,7 +480,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def explain(self, notebook, snippet):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
     response = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
 
@@ -502,7 +502,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     handle = self._get_handle(snippet)
     max_rows = DOWNLOAD_ROW_LIMIT.get()
@@ -514,7 +514,7 @@ class HS2Api(Api):
 
 
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     response = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
@@ -538,7 +538,7 @@ class HS2Api(Api):
 
 
   def export_large_data_to_hdfs(self, notebook, snippet, destination):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     response = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
@@ -572,7 +572,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def statement_risk(self, notebook, snippet):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     response = self._get_current_statement(db, snippet)
     query = response['statement']
@@ -583,7 +583,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     response = self._get_current_statement(db, snippet)
     query = response['statement']
@@ -594,7 +594,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def statement_similarity(self, notebook, snippet, source_platform):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
 
     response = self._get_current_statement(db, snippet)
     query = response['statement']
@@ -745,11 +745,11 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def get_browse_query(self, snippet, database, table, partition_spec=None):
-    db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+    db = self._get_db(snippet, cluster=self.cluster)
     table = db.get_table(database, table)
     if table.is_impala_only:
       snippet['type'] = 'impala'
-      db = self._get_db(snippet, cluster=snippet.get('selectedCompute'))
+      db = self._get_db(snippet, cluster=self.cluster)
 
     if partition_spec is not None:
       decoded_spec = urllib.unquote(partition_spec)
