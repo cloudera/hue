@@ -314,11 +314,11 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog API
+  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API
   if cluster == 'undefined':
     cluster = None
   if not cluster and snippet.get('compute'): # Via notebook.ko.js
-    cluster = snippet.get('compute').get('id')
+    cluster = snippet['compute']
 
   if cluster and 'altus:dataware:k8s' in cluster:
     interface = 'hiveserver2'
@@ -349,10 +349,10 @@ def get_api(request, snippet):
     return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
   elif interface == 'altus-adb':
     from notebook.connectors.altus_adb import AltusAdbApi
-    return AltusAdbApi(user=request.user, cluster_name=cluster, request=request)
+    return AltusAdbApi(user=request.user, cluster_name=cluster.get('id'), request=request)
   elif interface == 'dataeng':
     from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster)
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get('id'))
   elif interface == 'jdbc':
     if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
       from notebook.connectors.jdbc import JdbcApi
