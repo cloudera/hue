@@ -80,20 +80,14 @@ def get(user, query_server=None, cluster=None):
 
 def get_query_server_config(name='beeswax', server=None, cluster=None):
   LOG.debug("Query cluster: %s" % cluster)
-  if cluster and cluster != CLUSTER_ID.get():
-    if cluster and 'altus:dataware:k8s' in cluster:
-      cluster_name = re.search('cluster:(.+?)/', cluster).group(1)
-      cluster_config = {'server_host': 'impala-coordinator' + cluster_name, 'name': cluster}
+
+  if cluster and cluster.get('id') != CLUSTER_ID.get():
+    if 'altus:dataware:k8s' in cluster['id']:
+      cluster_config = {'server_host': cluster['compute_end_point'], 'name': cluster['name']}
     else:
-      cluster_config = Cluster(user=None).get_config(cluster)
+      cluster_config = Cluster(user=None).get_config(cluster) # Direct cluster
   else:
     cluster_config = None
-    
-  # Safeguard
-  if not cluster or cluster == 'localhost':
-    api = DataWarehouse2Api(None)
-    clusters = [_cluster for _cluster in api.list_clusters()['clusters'] if _cluster['status'] == 'ONLINE']
-    cluster_config = {'server_host': clusters[0]['coordinatorEndpoint']['publicHost'], 'name': clusters[0]['name']}
 
   try:
     LOG.debug("Query cluster mapping %s: %s %s" % (cluster, repr(cluster_config), socket.gethostbyaddr(cluster_config['server_host'])))
