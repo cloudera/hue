@@ -86,8 +86,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       name: 'hue-context-selector',
       params: {
         sourceType: 'jobs',
-        compute: compute,
-        onComputeSelect: onComputeSelect,
+        cluster: cluster,
+        onClusterSelect: onClusterSelect,
         hideLabels: true
       }
     } --><!-- /ko -->
@@ -122,8 +122,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               name: 'hue-context-selector',
               params: {
                 sourceType: 'jobs',
-                compute: compute,
-                onComputeSelect: onComputeSelect
+                cluster: cluster,
+                onClusterSelect: onClusterSelect
               }
             } --><!-- /ko -->
           </div>
@@ -236,7 +236,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <i class="fa fa-refresh"></i>
                   </a>
 
-                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.compute() && $root.compute()['type'].indexOf('altus') >= 0, click: jobs.createCluster">
+                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.cluster() && $root.cluster()['type'].indexOf('altus') >= 0, click: jobs.createCluster">
                     <i class="fa fa-plus"></i>
                   </a>
                 <!-- /ko -->
@@ -2782,29 +2782,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.clusterType = ko.observable();
       self.isMini = ko.observable(false);
 
-      self.compute = ko.observable();
+      self.cluster = ko.observable();
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var dataEngInterfaceCondition = function () {
-          return self.compute() && self.compute()['type'].indexOf('altus-de') >= 0;
+          return self.cluster() && self.cluster()['type'].indexOf('altus-de') >= 0;
         };
         var dataWarehouseInterfaceCondition = function () {
-          return self.compute() && self.compute()['type'].indexOf('altus-dw') >= 0;
+          return self.cluster() && self.cluster()['type'].indexOf('altus-dw') >= 0;
         };
         var schedulerInterfaceCondition = function () {
-          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var schedulerExtraInterfaceCondition = function () {
           return '${ is_mini }' == 'False' && schedulerInterfaceCondition();
         };
         var livyInterfaceCondition = function () {
-          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
+          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
 
         var interfaces = [
@@ -2908,7 +2908,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
 
-      self.onComputeSelect = function () {
+      self.onClusterSelect = function () {
         var interfaceToSet = self.interface();
         if (!self.availableInterfaces().some(function (availableInterface) {
           return availableInterface.interface === interfaceToSet;
@@ -2932,7 +2932,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         window.clearInterval(updateJobsInterval);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (job) {
-            if (job.apiStatus() == 'RUNNING') {
+            if (job.apiStatus() === 'RUNNING') {
               updateJobInterval = setInterval(job.updateJob, 5000, 'jobbrowser');
             }
           }

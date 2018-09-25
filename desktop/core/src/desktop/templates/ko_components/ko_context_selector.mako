@@ -31,6 +31,15 @@ from desktop.views import _ko
 
     <div class="inline-block" style="display:none;" data-bind="visible: !loadingContext()">
       <!-- ko if: window.HAS_MULTI_CLUSTER -->
+      <!-- ko if: availableClusters().length > 0 && !hideClusters -->
+      <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Cluster') }</span><!-- /ko -->
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: cluster, entries: availableClusters, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active cluster') }' } }" style="display: inline-block"></div>
+      <!-- /ko -->
+      <!-- ko if: availableClusters().length === 0 && !hideClusters -->
+      <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No clusters found') }</span>
+      <!-- /ko -->
+
+
       <!-- ko if: availableComputes().length > 0 && !hideComputes -->
       <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Compute') }</span><!-- /ko -->
       <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
@@ -82,10 +91,13 @@ from desktop.views import _ko
        *
        * @param {Object} params
        * @param {ko.observable|string} params.sourceType
+       * @param {ko.observable} [params.cluster]
        * @param {ko.observable} [params.compute]
        * @param {ko.observable} [params.namespace]
        * @param {ko.observable} [params.database]
        * @param {ko.observableArray} [params.availableDatabases]
+       * @param {boolean} [params.hideClusters] - Can be used to force hide cluster selection even if a cluster
+       *                                          observable is provided.
        * @param {boolean} [params.hideComputes] - Can be used to force hide compute selection even if a compute
        *                                          observable is provided.
        * @param {boolean} [params.hideNamespaces] - Can be used to force hide namespace selection even if a namespace
@@ -93,6 +105,7 @@ from desktop.views import _ko
        * @param {boolean} [params.hideDatabases] - Can be used to force hide database selection even if a database
        *                                           observable is provided.
        * @param {function} [params.onComputeSelect] - Callback when a new compute is selected (after initial set)
+       * @param {function} [params.onClusterSelect] - Callback when a new cluster is selected (after initial set)
        * @constructor
        */
       var HueContextSelector = function (params) {
@@ -102,12 +115,63 @@ from desktop.views import _ko
 
         self.sourceType = params.sourceType;
         self.disposals = [];
+        self.hideLabels = params.hideLabels;
+
+        self.loadingClusters = ko.observable(false);
+        self.availableClusters = ko.observableArray();
+        self.cluster = params.cluster;
+        self.hideClusters = params.hideClusters || !self.cluster;
+
+        if (self.cluster) {
+          self.loadingClusters(true);
+          self.lastClustersPromise = ContextCatalog.getClusters({ sourceType: ko.unwrap(self.sourceType) }).done(function (clusters) {
+            self.availableClusters(clusters);
+            if (!self.cluster() && apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCluster')) {
+              var lastSelectedCluster = apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCluster');
+              var found = clusters.some(function (cluster) {
+                if (cluster.id === lastSelectedCluster.id) {
+                  self.cluster(lastSelectedCluster);
+                  return true;
+                }
+              });
+
+              // If we can't find exact match we pick first based on type
+              if (!found) {
+                clusters.some(function (cluster) {
+                  if (cluster.type === lastSelectedCluster.type) {
+                    self.cluster(cluster);
+                    return true;
+                  }
+                });
+              }
+            }
+
+            if (!self.cluster()) {
+              self.cluster(clusters[0]);
+            }
+
+            var clustersSub = self.cluster.subscribe(function (newCluster) {
+              if (params.onClusterSelect) {
+                params.onClusterSelect(newCluster);
+              }
+              apiHelper.setInTotalStorage('contextSelector', 'lastSelectedCluster', newCluster);
+
+              // TODO: Adjust computes and namespaces when cluster changes?
+            });
+            self.disposals.push(function () {
+              clustersSub.dispose();
+            })
+          }).always(function () {
+            self.loadingClusters(false);
+          });
+        } else {
+          self.lastClustersPromise = $.Deferred().resolve().promise();
+        }
 
         self.loadingComputes = ko.observable(false);
         self.availableComputes = ko.observableArray();
         self.compute = params.compute;
         self.hideComputes = params.hideComputes || !self.compute;
-        self.hideLabels = params.hideLabels;
 
         if (params.compute) {
           self.loadingComputes(true);
@@ -319,7 +383,7 @@ from desktop.views import _ko
         }
 
         self.loadingContext = ko.pureComputed(function () {
-          return self.loadingNamespaces() || self.loadingComputes() || self.loadingDatabases();
+          return self.loadingClusters() || self.loadingNamespaces() || self.loadingComputes() || self.loadingDatabases();
         });
       };
 

@@ -2046,6 +2046,18 @@ var ApiHelper = (function () {
     return self.simpleGet(url, undefined, options);
   };
 
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchContextClusters = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/clusters/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
+  };
+
   ApiHelper.prototype.getClusterConfig = function (data) {
     return $.post(FETCH_CONFIG, data);
   };
