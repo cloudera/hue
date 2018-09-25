@@ -166,9 +166,6 @@ def get_context_computes(request, interface):
       )
       # TODO if interface == 'spark2' keep only SPARK type
 
-  if interface == 'jobs':
-    return get_context_clusters(request, interface) # TODO remove when UI changed
-
   response[interface] = computes
   response['status'] = 0
 

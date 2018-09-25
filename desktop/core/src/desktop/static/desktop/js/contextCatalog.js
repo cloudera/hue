@@ -44,6 +44,9 @@ var ContextCatalog = (function () {
 
       self.computes = {};
       self.computePromises = {};
+
+      self.clusters = {};
+      self.clusterPromises = {};
     }
 
     ContextCatalog.prototype.getStore = function () {
@@ -202,6 +205,39 @@ var ContextCatalog = (function () {
       return self.computePromises[options.sourceType];
     };
 
+    /**
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {boolean} [options.silenceErrors] - Default False
+     * @return {Promise}
+     */
+    ContextCatalog.prototype.getClusters = function (options) {
+      var self = this;
+
+      if (self.clusterPromises[options.sourceType]) {
+        return self.clusterPromises[options.sourceType];
+      }
+
+      if (self.clusters[options.sourceType]) {
+        self.clusterPromises[options.sourceType] = $.Deferred().resolve(self.clusters[options.sourceType]).promise();
+        return self.clusterPromises[options.sourceType];
+      }
+
+      var deferred = $.Deferred();
+      self.clusterPromises[options.sourceType] = deferred.promise();
+
+      ApiHelper.getInstance().fetchContextClusters(options).done(function (clusters) {
+        if (clusters && clusters[options.sourceType]) {
+          self.clusters[options.sourceType] = clusters[options.sourceType];
+          deferred.resolve(self.clusters[options.sourceType])
+        } else {
+          deferred.reject();
+        }
+      });
+
+      return self.clusterPromises[options.sourceType];
+    };
+
     return ContextCatalog;
   })();
 
@@ -209,6 +245,7 @@ var ContextCatalog = (function () {
     var contextCatalog = new ContextCatalog();
 
     return {
+
       /**
        * @param {Object} options
        * @param {string} options.sourceType
@@ -219,6 +256,7 @@ var ContextCatalog = (function () {
       getNamespaces: function (options) {
         return contextCatalog.getNamespaces(options);
       },
+
       /**
        * @param {Object} options
        * @param {string} options.sourceType
@@ -227,6 +265,16 @@ var ContextCatalog = (function () {
        */
       getComputes: function (options) {
         return contextCatalog.getComputes(options);
+      },
+
+      /**
+       * @param {Object} options
+       * @param {string} options.sourceType // TODO: rename?
+       * @param {boolean} [options.silenceErrors] - Default False
+       * @return {Promise}
+       */
+      getClusters: function (options) {
+        return contextCatalog.getClusters(options);
       }
     }
   })();
