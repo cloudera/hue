@@ -27,7 +27,7 @@ SUFFIX = is_mini and "-mini" or ""
 %>
 
 % if not is_embeddable:
-${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
+${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <%namespace name="assist" file="/assist.mako" />
 % endif
 
@@ -108,7 +108,15 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
             <li class="app-header">
               <a href="/${app_name}">
                 <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
-                ${ _('Data Warehouse') }
+                <!-- ko if: !$root.cluster() || $root.cluster()['type'].indexOf("altus") == -1 -->
+                  ${ _('Job Browser') }
+                <!-- /ko -->
+                <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
+                  ${ _('Data Warehouse') }
+                <!-- /ko -->
+                <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-de") !== -1 -->
+                  ${ _('Data Engineering') }
+                <!-- /ko -->
               </a>
             </li>
             <!-- ko foreach: availableInterfaces -->
@@ -1165,9 +1173,7 @@ ${ commonheader("Data Warehouse", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
-          <li class="nav-header">${ _('Name') }</li>
-          <li><span data-bind="text: name"></span></li>
+          <li><span class="break-word" data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
           <li class="nav-header">${ _('Status') }</li>

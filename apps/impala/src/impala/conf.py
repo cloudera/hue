@@ -204,33 +204,32 @@ DAEMON_API_USERNAME = Config(
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
   # import in method to avoid circular dependency
-  return None
-#   from beeswax.design import hql_query
-#   from beeswax.server import dbms
-#   from beeswax.server.dbms import get_query_server_config
-# 
-#   res = []
-#   try:
-#     try:
-#       if not 'test' in sys.argv: # Avoid tests hanging
-#         query_server = get_query_server_config(name='impala')
-#         server = dbms.get(user, query_server)
-#         query = hql_query("SELECT 'Hello World!';")
-#         handle = server.execute_and_wait(query, timeout_sec=10.0)
-# 
-#         if handle:
-#           server.fetch(handle, rows=100)
-#           server.close(handle)
-#     except StructuredThriftTransportException, ex:
-#       if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
-#         msg = "Failed to authenticate to Impalad, check authentication configurations."
-#         LOG.exception(msg)
-#         res.append((NICE_NAME, _(msg)))
-#       else:
-#         raise ex
-#   except Exception, ex:
-#     msg = "No available Impalad to send queries to."
-#     LOG.exception(msg)
-#     res.append((NICE_NAME, _(msg)))
-# 
-#   return res
+  from beeswax.design import hql_query
+  from beeswax.server import dbms
+  from beeswax.server.dbms import get_query_server_config
+
+  res = []
+  try:
+    try:
+      if not 'test' in sys.argv: # Avoid tests hanging
+        query_server = get_query_server_config(name='impala')
+        server = dbms.get(user, query_server)
+        query = hql_query("SELECT 'Hello World!';")
+        handle = server.execute_and_wait(query, timeout_sec=10.0)
+
+        if handle:
+          server.fetch(handle, rows=100)
+          server.close(handle)
+    except StructuredThriftTransportException, ex:
+      if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
+        msg = "Failed to authenticate to Impalad, check authentication configurations."
+        LOG.exception(msg)
+        res.append((NICE_NAME, _(msg)))
+      else:
+        raise ex
+  except Exception, ex:
+    msg = "No available Impalad to send queries to."
+    LOG.exception(msg)
+    res.append((NICE_NAME, _(msg)))
+
+  return res
