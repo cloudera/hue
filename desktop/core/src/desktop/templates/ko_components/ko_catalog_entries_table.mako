@@ -158,7 +158,7 @@ from desktop.views import _ko
           <th><span data-bind="text: catalogEntry.getSourceType() !== 'solr' ? '${ _ko("Column") }' : '${ _ko("Field") }'"></span> (<span data-bind="text: filteredEntries().length"></span>)</th>
           <th>${ _("Type") }</th>
           <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
-          <th colspan="2">${ _("Sample") } <!-- ko if: loadingSamples --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
+          <th colspan="2">${ _("Sample") } <!-- ko if: loadingSamples() || sampleRefreshEnabled() --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <!-- ko if: sampleRefreshEnabled --><a class="inactive-action" href="javascript: void(0);" data-bind="toggle: sampleRefreshEnabled"><i class="fa fa-stop"></i></a><!-- /ko --></th>
         </tr>
         </thead>
         <!-- ko if: filteredEntries().length -->
@@ -190,7 +190,11 @@ from desktop.views import _ko
       <!-- /ko -->
 
       <!-- ko if: !loading() && catalogEntry.isField() && !catalogEntry.isComplex() -->
-      <!-- ko component: { name: 'field-samples', params: { catalogEntry: catalogEntry, onSampleClick: onSampleClick } } --><!-- /ko -->
+      <!-- ko component: { name: 'field-samples', params: {
+          catalogEntry: catalogEntry,
+          onSampleClick: onSampleClick,
+          refreshSampleInterval: refreshSampleInterval
+        }} --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -271,10 +275,23 @@ from desktop.views import _ko
         self.onSampleClick = params.onSampleClick;
         self.querySpec = ko.observable();
         self.cancellablePromises = [];
+        self.lastSamplePromise = undefined;
+        self.fetchSampleTimeout = -1;
         self.loading = ko.observable(false);
         self.loadingNav = ko.observable(false);
         self.loadingSamples = ko.observable(false);
         self.hasErrors = ko.observable(false);
+        self.refreshSampleInterval = params.refreshSampleInterval;
+        self.sampleRefreshEnabled = ko.observable(!!params.refreshSampleInterval);
+
+        self.sampleRefreshEnabled.subscribe(function (newVal) {
+          if (!newVal) {
+            window.clearTimeout(self.fetchSampleTimeout);
+            if (self.lastSamplePromise && self.lastSamplePromise.cancel) {
+              self.lastSamplePromise.cancel();
+            }
+          }
+        });
 
         // TODO: Can be computed based on contents (instead of always suggesting all col types etc.)
         self.knownFacetValues = ko.pureComputed(function () {
@@ -451,41 +468,61 @@ from desktop.views import _ko
             }
           }));
 
-          if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
+          if (self.catalogEntry.isTableOrView() || self.catalogEntry.isComplex()) {
             self.loadingSamples(true);
-            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (sample) {
-              childPromise.done(function () {
-                if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
-                  var entryIndex = {};
-                  self.entries().forEach(function (entry) {
-                    entryIndex[entry.catalogEntry.name] = entry;
-                  });
-                  for (var i = 0; i < sample.meta.length; i++) {
-                    var name = sample.meta[i].name;
-                    if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
-                      name = name.substring(self.catalogEntry.name.length + 1);
-                    }
-                    var sampleEntry = entryIndex[name];
-                    if (sampleEntry) {
-                      sampleEntry.firstSample(sample.data[0][i]);
-                      if (sample.data.length > 1) {
-                        sampleEntry.secondSample(sample.data[1][i])
+
+            var firstSampleFetch = true;
+
+            var fetchSamples = function () {
+              window.clearInterval(self.fetchSampleTimeout);
+              self.lastSamplePromise = self.catalogEntry.getSample({
+                silenceErrors: true,
+                cancellable: true,
+                refreshCache: !firstSampleFetch
+              }).done(function (sample) {
+                childPromise.done(function () {
+                  if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
+                    var entryIndex = {};
+                    self.entries().forEach(function (entry) {
+                      entryIndex[entry.catalogEntry.name] = entry;
+                    });
+                    for (var i = 0; i < sample.meta.length; i++) {
+                      var name = sample.meta[i].name;
+                      if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
+                        name = name.substring(self.catalogEntry.name.length + 1);
+                      }
+                      var sampleEntry = entryIndex[name];
+                      if (sampleEntry) {
+                        sampleEntry.firstSample(sample.data[0][i]);
+                        if (sample.data.length > 1) {
+                          sampleEntry.secondSample(sample.data[1][i])
+                        }
                       }
                     }
                   }
-                }
-              }).always(function () {
+                }).always(function () {
+                  self.loadingSamples(false);
+                  firstSampleFetch = false;
+                  if (self.refreshSampleInterval && self.sampleRefreshEnabled()) {
+                    self.fetchSampleTimeout = window.setTimeout(fetchSamples, self.refreshSampleInterval);
+                  }
+                })
+              }).fail(function () {
                 self.loadingSamples(false);
-              })
-            }).fail(function () {
-              self.loadingSamples(false);
-            }));
+              });
+            };
+
+            fetchSamples();
           }
         }, 100)
       }
 
       CatalogEntriesList.prototype.dispose = function () {
         var self = this;
+        window.clearTimeout(self.fetchSampleTimeout);
+        if (self.lastSamplePromise && self.lastSamplePromise.cancel) {
+          self.lastSamplePromise.cancel();
+        }
         while (self.cancellablePromises.length) {
           var promise = self.cancellablePromises.pop();
           if (promise.cancel) {
@@ -510,7 +547,8 @@ from desktop.views import _ko
         selectedEntries: selectedEntries,
         editableDescriptions: editableDescriptions,
         contextPopoverEnabled: contextPopoverEnabled,
-        onSampleClick: onSampleClick
+        onSampleClick: onSampleClick,
+        refreshSampleInterval: refreshSampleInterval
       }} --><!-- /ko -->
     <!-- /ko -->
     </div>
@@ -529,7 +567,8 @@ from desktop.views import _ko
        *   sourceType: sourceType,
        *   namespace: ko.observable({ id: 'default' }),
        *   compute: ko.observable({ id: 'default' }),
-       *   path: ko.observable('default.foo')
+       *   path: ko.observable('default.foo'),
+       *   refreshSampleInterval: 3000
        * }}" />
        *
        * @param params
@@ -546,6 +585,7 @@ from desktop.views import _ko
         self.namespace = params.namespace;
         self.compute = params.compute;
         self.path = params.path;
+        self.refreshSampleInterval = params.refreshSampleInterval;
 
         self.pollTimeout = -1;
         self.pollCount = 0;
@@ -583,7 +623,6 @@ from desktop.views import _ko
               refreshCache: self.pollCount > 0,
               cancellable: true
             }).done(function (sourceMeta) {
-              if (self.catalogEntry.)
               if (sourceMeta.notFound) {
                 self.pollForSourceMeta();
               } else {
@@ -657,10 +696,10 @@ from desktop.views import _ko
       <div class="context-popover-sample-controls">
         <div class="margin-left-10 inline-block" data-bind="component: { name: 'hue-drop-down', params: { value: operation, entries: operations } }"></div>
         <div class="margin-left-10 inactive-action inline-block">
-          <!-- ko if: loadingSamples -->
-          <a href="javascript:void(0);" data-bind="click: cancelRunningQueries"><i class="fa fa-stop"></i></a>
+          <!-- ko if: loadingSamples() || refreshSampleEnabled() -->
+          <a href="javascript:void(0);" data-bind="click: function () { refreshSampleEnabled(false); cancelRunningQueries() }"><i class="fa fa-stop"></i></a>
           <!-- /ko -->
-          <!-- ko ifnot: loadingSamples -->
+          <!-- ko if: !loadingSamples() && !refreshSampleEnabled() -->
           <a href="javascript:void(0);" data-bind="click: function () { loadSamples(true) }"><i class="fa fa-play"></i></a>
           <!-- /ko -->
         </div>
@@ -674,7 +713,7 @@ from desktop.views import _ko
         <th>${ _("Sample") }</th>
       </tr>
       </thead>
-      <!-- ko if: loadingSamples -->
+      <!-- ko if: loadingSamples() && (!refreshSampleEnabled() || (refreshSampleEnabled() && columnSamples().length === 0))  -->
       <tbody>
       <tr>
         <td><!-- ko hueSpinner: { spin: true, inline: true } --><!-- /ko --></td>
@@ -682,7 +721,7 @@ from desktop.views import _ko
       </tbody>
       <!-- /ko -->
 
-      <!-- ko ifnot: loadingSamples -->
+      <!-- ko if: !loadingSamples() || (refreshSampleEnabled() && columnSamples().length > 0)  -->
       <tbody data-bind="foreach: filteredColumnSamples">
       <tr>
         <!-- ko if: typeof $parent.onSampleClick === 'function' -->
@@ -715,6 +754,9 @@ from desktop.views import _ko
         var self = this;
         self.catalogEntry = params.catalogEntry;
         self.onSampleClick = params.onSampleClick;
+        self.refreshSampleInterval = params.refreshSampleInterval;
+        self.refreshSampleTimeout = -1;
+        self.refreshSampleEnabled = ko.observable(!!self.refreshSampleInterval);
 
         self.cancellablePromises = [];
         self.querySpec = ko.observable();
@@ -785,6 +827,7 @@ from desktop.views import _ko
 
       FieldSamples.prototype.loadSamples = function (refreshCache) {
         var self = this;
+        window.clearTimeout(self.refreshSampleTimeout);
         self.cancelRunningQueries();
         self.loadingSamples(true);
         self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true, refreshCache: refreshCache, operation: self.operation().type }).done(function (samples) {
@@ -795,11 +838,17 @@ from desktop.views import _ko
           self.hasErrors(true);
         }).always(function () {
           self.loadingSamples(false);
+          if (self.refreshSampleTimeout && self.refreshSampleEnabled()) {
+            self.refreshSampleTimeout = window.setTimeout(function () {
+              self.loadSamples(true);
+            }, self.refreshSampleInterval);
+          }
         }));
       };
 
       FieldSamples.prototype.cancelRunningQueries = function () {
         var self = this;
+        window.clearTimeout(self.refreshSampleTimeout);
         while (self.cancellablePromises.length) {
           var promise = self.cancellablePromises.pop();
           if (promise.cancel) {
