@@ -501,6 +501,147 @@ from desktop.views import _ko
     })();
   </script>
 
+  <script type="text/html" id="polling-catalog-entries-list-template">
+    <div>
+    <!-- ko hueSpinner: { spin: !catalogEntryExists(), inline: true } --><!-- /ko -->
+    <!-- ko if: catalogEntryExists -->
+      <!-- ko component: { name: 'catalog-entries-list', params: {
+        catalogEntry: catalogEntry(),
+        selectedEntries: selectedEntries,
+        editableDescriptions: editableDescriptions,
+        contextPopoverEnabled: contextPopoverEnabled,
+        onSampleClick: onSampleClick
+      }} --><!-- /ko -->
+    <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+
+      /**
+       * This is the same as the 'catalog-entries-list' component with the difference that this
+       * one waits until a catalog entry exists.
+       *
+       * Example usage:
+       *
+       * <div data-bind="component: { name: 'polling-catalog-entries-list', params: {
+       *   sourceType: sourceType,
+       *   namespace: ko.observable({ id: 'default' }),
+       *   compute: ko.observable({ id: 'default' }),
+       *   path: ko.observable('default.foo')
+       * }}" />
+       *
+       * @param params
+       * @constructor
+       */
+
+      function PollingCatalogEntriesList(params) {
+        var self = this;
+        self.selectedEntries = params.selectedEntries;
+        self.editableDescriptions = params.editableDescriptions;
+        self.contextPopoverEnabled = params.contextPopoverEnabled;
+        self.onSampleClick = params.onSampleClick;
+        self.sourceType = params.sourceType;
+        self.namespace = params.namespace;
+        self.compute = params.compute;
+        self.path = params.path;
+
+        self.pollTimeout = -1;
+        self.pollCount = 0;
+
+        self.disposals = [];
+
+        self.lastPollSourceMetaPromise = undefined;
+
+        self.catalogEntryExists = ko.observable(false);
+        self.catalogEntry = ko.observable();
+
+        self.intialize();
+
+        if (ko.isObservable(self.path)) {
+          var pathSub = self.path.subscribe(function (newValue) {
+            if (newValue) {
+              self.intialize();
+            }
+          });
+          self.disposals.push(function () {
+            pathSub.dispose();
+          });
+        }
+      }
+
+      PollingCatalogEntriesList.prototype.pollForSourceMeta = function () {
+        var self = this;
+        window.clearTimeout(self.pollTimeout);
+
+        var pollInternal = function () {
+          self.pollCount++;
+          if (self.catalogEntry()) {
+            self.lastPollSourceMetaPromise = self.catalogEntry().getSourceMeta({
+              silenceErrors: true,
+              refreshCache: self.pollCount > 0,
+              cancellable: true
+            }).done(function (sourceMeta) {
+              if (self.catalogEntry.)
+              if (sourceMeta.notFound) {
+                self.pollForSourceMeta();
+              } else {
+                self.catalogEntryExists(true);
+              }
+            }).fail(function () {
+              self.pollForSourceMeta();
+            })
+          }
+        };
+
+        if (self.pollCount === 0) {
+          pollInternal();
+        } else {
+          self.pollTimeout = window.setTimeout(pollInternal, Math.min(1000 * self.pollCount, 3000));
+        }
+
+      };
+
+      PollingCatalogEntriesList.prototype.intialize = function () {
+        var self = this;
+        self.pollCount = 0;
+        window.clearTimeout(self.pollTimeout);
+        self.catalogEntryExists(false);
+
+        if (self.lastPollSourceMetaPromise && self.lastPollSourceMetaPromise.cancel) {
+          self.lastPollSourceMetaPromise.cancel();
+        }
+
+        DataCatalog.getEntry({
+          sourceType: ko.unwrap(self.sourceType),
+          namespace: ko.unwrap(self.namespace),
+          compute: ko.unwrap(self.compute),
+          path: ko.unwrap(self.path)
+        }).done(function (catalogEntry) {
+          self.catalogEntry(catalogEntry);
+          self.pollForSourceMeta();
+        })
+      };
+
+      PollingCatalogEntriesList.prototype.dispose = function () {
+        var self = this;
+        window.clearTimeout(self.pollTimeout);
+        if (self.lastPollSourceMetaPromise && self.lastPollSourceMetaPromise.cancel) {
+          self.lastPollSourceMetaPromise.cancel();
+        }
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
+
+      ko.components.register('polling-catalog-entries-list', {
+        viewModel: PollingCatalogEntriesList,
+        template: { element: 'polling-catalog-entries-list-template' }
+      });
+    })();
+  </script>
+
   <script type="text/html" id="field-samples-template">
     <div class="context-popover-inline-autocomplete" style="display: flex">
       <div class="context-popover-sample-filter">
