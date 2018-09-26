@@ -19,12 +19,12 @@ import logging
 import re
 import threading
 import time
-import socket
 
 from django.urls import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.conf import CLUSTER_ID
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
@@ -39,8 +39,6 @@ from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
-from desktop.conf import CLUSTER_ID
-from notebook.connectors.altus import DataWarehouse2Api
 
 
 LOG = logging.getLogger(__name__)
@@ -83,17 +81,12 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
 
   if cluster and cluster.get('id') != CLUSTER_ID.get():
     if 'altus:dataware:k8s' in cluster['id']:
-      cluster_config = {'server_host': cluster['compute_end_point'], 'name': cluster['name']}
+      compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
+      cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
     else:
-      cluster_config = Cluster(user=None).get_config(cluster) # Direct cluster
+      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster
   else:
     cluster_config = None
-
-  try:
-    LOG.debug("Query cluster mapping %s: %s %s" % (cluster, repr(cluster_config), socket.gethostbyaddr(cluster_config['server_host'])))
-  except Exception, e:
-    LOG.debug('Failed to get cluster %s host: %s "%s"' % (cluster, e, cluster_config))
-
 
   if name == 'impala':
     from impala.dbms import get_query_server_config as impala_query_server_config

@@ -606,7 +606,7 @@ class HiveServerClient:
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
-    self.coordinator_host = '' #self._client.get_coordinator_host()
+    self.coordinator_host = self._client.get_coordinator_host()
 
     if res.status is not None and res.status.statusCode not in (TStatusCode.SUCCESS_STATUS,):
       if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
