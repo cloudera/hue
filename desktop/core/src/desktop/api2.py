@@ -106,6 +106,7 @@ def get_context_namespaces(request, interface):
             _cluster['id'] = _cluster['crn']
             _cluster['namespaceName'] = _cluster['clusterName']
             _cluster['name'] = _cluster['clusterName']
+            _cluster['compute_end_point'] = '%(publicHost)s' % _cluster['coordinatorEndpoint'] if IS_K8_ONLY.get() else '',
       else:
         adb_clusters = []
 

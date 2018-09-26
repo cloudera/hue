@@ -320,15 +320,16 @@ def get_api(request, snippet):
   if not cluster and snippet.get('compute'): # Via notebook.ko.js
     cluster = snippet['compute']
 
-  if cluster and 'altus:dataware:k8s' in cluster:
+  cluster_name = cluster.get('id') if cluster else None
+
+  if cluster and 'altus:dataware:k8s' in cluster_name:
     interface = 'hiveserver2'
-  elif cluster and 'crn:altus:dataware:' in cluster:
+  elif cluster and 'crn:altus:dataware:' in cluster_name:
     interface = 'altus-adb'
-  elif cluster and 'crn:altus:dataeng:' in cluster:
+  elif cluster and 'crn:altus:dataeng:' in cluster_name:
     interface = 'dataeng'
 
-  if cluster:
-    LOG.info('Selected cluster %s interface %s' % (cluster, interface))
+  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
@@ -349,10 +350,10 @@ def get_api(request, snippet):
     return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
   elif interface == 'altus-adb':
     from notebook.connectors.altus_adb import AltusAdbApi
-    return AltusAdbApi(user=request.user, cluster_name=cluster.get('id'), request=request)
+    return AltusAdbApi(user=request.user, cluster_name=cluster_name, request=request)
   elif interface == 'dataeng':
     from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get('id'))
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
   elif interface == 'jdbc':
     if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
       from notebook.connectors.jdbc import JdbcApi

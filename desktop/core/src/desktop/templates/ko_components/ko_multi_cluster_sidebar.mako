@@ -154,10 +154,10 @@ from desktop.views import _ko
             icon: 'altus-icon altus-iam',
             items: [{
                 label: '${ _('User') }',
-                url: 'https://console.altus.cloudera.com/iam/index.html#/users'
+                url: '/hue/useradmin/users/'
               },{
                 label: '${ _('Groups') }',
-                url: 'https://console.altus.cloudera.com/iam/index.html#/groups'
+                url: '/hue/useradmin/groups/'
               }
             ]
           }
@@ -169,6 +169,23 @@ from desktop.views import _ko
             url: '/',
             icon: 'altus-icon altus-sdx'
           }
+##           },{
+##             label: '${ _('Streaming') }',
+##             url: '/',
+##             icon: 'fa fa-sitemap'
+##           },{
+##             label: '${ _('Operational DB') }',
+##             url: '/',
+##             icon: 'altus-icon altus-adb',
+##             items: [{
+##                 label: '${ _('Kudu') }',
+##                 url: '/'
+##               },{
+##                 label: '${ _('HBase') }',
+##                 url: '/'
+##               }
+##             ]
+##           }
         ]
       }, {
         label: '${ _('Compute') }',
