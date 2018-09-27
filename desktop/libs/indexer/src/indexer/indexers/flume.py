@@ -47,7 +47,7 @@ class FlumeIndexer(object):
 
     responses['refresh_flume'] = api.refresh_flume(cluster_name=None, restart=True)
 
-    if file_format['ouputFormat'] == 'index':
+    if destination['ouputFormat'] == 'index':
       responses['pubSubUrl'] = 'assist.collections.refresh'
       responses['on_success_url'] = reverse('search:browse', kwargs={'name': destination_name})
 
@@ -60,9 +60,11 @@ class FlumeIndexer(object):
     if source['channelSourceType'] == 'directory':
       agent_source = '''
   tier1.sources.source1.type = exec
-  tier1.sources.source1.command = tail -F /var/log/hue-httpd/access_log
+  tier1.sources.source1.command = tail -F %(directory)s
   tier1.sources.source1.channels = channel1
-      '''
+      ''' % {
+       'directory': source['channelSourcePath']
+    }
     else:
       raise PopupException(_('Input format not recognized: %(channelSourceType)s') % source)
 
@@ -97,12 +99,16 @@ class FlumeIndexer(object):
   a1.sinks.k1.serializer.serdeSeparator = '\t'
   a1.sinks.k1.serializer.fieldnames =id,,msg'''
     elif destination['ouputFormat'] == 'kafka':
+      manager = ManagerApi()
       agent_sink = '''
       tier1.sinks.sink1.type = org.apache.flume.sink.kafka.KafkaSink
 tier1.sinks.sink1.topic = hueAccessLogs
-tier1.sinks.sink1.brokerList = spark2-envelope515-1.gce.cloudera.com:9092,spark2-envelope515-2.gce.cloudera.com:9092,spark2-envelope515-3.gce.cloudera.com:9092
+tier1.sinks.sink1.brokerList = %(brokers)s
 tier1.sinks.sink1.channel = channel1
-tier1.sinks.sink1.batchSize = 20'''
+tier1.sinks.sink1.batchSize = 20''' % {
+      'brokers': manager.get_kafka_brokers()
+    }
+
     elif destination['ouputFormat'] == 'index':
       # Morphline file
       configs.append(self.generate_morphline_config(destination))
@@ -121,6 +127,7 @@ tier1.sinks.sink1.batchSize = 20'''
   tier1.channels = channel1
   tier1.sinks = sink1
 
+  %(sources)s
 
   tier1.channels.channel1.type = memory
   tier1.channels.channel1.capacity = 10000
@@ -140,7 +147,7 @@ tier1.sinks.sink1.batchSize = 20'''
     # TODO manage generic config, cf. MorphlineIndexer
     morphline_config = open(os.path.join(config_morphline_path(), 'hue_accesslogs_no_geo.morphline.conf')).read()
     morphline_config = morphline_config.replace(
-      '${SOLR_COLLECTION}', 'log_analytics_demo'
+      '${SOLR_COLLECTION}', destination['name']
     ).replace(
       '${ZOOKEEPER_ENSEMBLE}', '%s/solr' % zkensemble()
     )
