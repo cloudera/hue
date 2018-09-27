@@ -32,7 +32,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
 from kafka.kafka_api import get_topics
-from librdbms.server import dbms as rdbms
 from metadata.manager_client import ManagerApi
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -43,7 +42,7 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
 from indexer.indexers.morphline import MorphlineIndexer
-from indexer.indexers.rdbms import run_sqoop,  _get_api
+from indexer.indexers.rdbms import run_sqoop, _get_api
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
@@ -144,7 +143,7 @@ def guess_format(request):
         password=file_format['streamPassword'],
         security_token=file_format['streamToken']
     )
-    format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}    
+    format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -272,11 +271,28 @@ def guess_field_types(request):
         col['keyType'] = type_mapping[col['name']]
         col['type'] = type_mapping[col['name']]
     elif file_format['streamSelection'] == 'flume':
+      if 'hue-httpd/access_log' in file_format['channelSourcePath']:
+        columns = [
+          {'name': 'id', 'type': 'string', 'unique': True},
+          {'name': 'client_ip', 'type': 'string'},
+          {'name': 'time', 'type': 'date'},
+          {'name': 'request', 'type': 'string'},
+          {'name': 'code', 'type': 'plong'},
+          {'name': 'bytes', 'type': 'plong'},
+          {'name': 'method', 'type': 'string'},
+          {'name': 'url', 'type': 'string'},
+          {'name': 'protocol', 'type': 'string'},
+          {'name': 'app', 'type': 'string'},
+          {'name': 'subapp', 'type': 'string'}
+        ]
+      else:
+        columns = [{'name': 'message', 'type': 'string'}]
+
       format_ = {
-          "sample": [['...']] * 4,
+          "sample": [['...'] * len(columns)] * 4,
           "columns": [
-              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-              for col in [{'name': 'message', 'type': 'string'}]
+              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string'), unique=col.get('unique')).to_dict()
+              for col in columns
           ]
       }
   elif file_format['streamSelection'] == 'sfdc':
