@@ -138,7 +138,7 @@ from desktop.views import _ko
               // If we can't find exact match we pick first based on type
               if (!found) {
                 clusters.some(function (cluster) {
-                  if (cluster.type === lastSelectedCluster.type) {
+                  if (lastSelectedCluster && cluster.type === lastSelectedCluster.type) {
                     self.cluster(cluster);
                     return true;
                   }
@@ -192,7 +192,7 @@ from desktop.views import _ko
 
                 // If we can't find exact match we pick first based on type
                 if (!computes.some(function (compute) {
-                  if (compute.type === lastSelectedCompute.type) {
+                  if (lastSelectedCluster && compute.type === lastSelectedCompute.type) {
                     self.compute(compute);
                     return true;
                   }
