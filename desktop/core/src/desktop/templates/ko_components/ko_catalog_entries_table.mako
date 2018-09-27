@@ -84,7 +84,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="catalog-entries-list-template">
-    <!-- ko if: !loading() && (!catalogEntry.isField() || catalogEntry.isComplex())-->
+    <!-- ko if: !loading() && (!catalogEntry().isField() || catalogEntry().isComplex())-->
     <div class="context-popover-inline-autocomplete">
       <div class="context-popover-sample-filter">
         <!-- ko component: {
@@ -102,7 +102,7 @@ from desktop.views import _ko
 
     <div class="catalog-entries-list-container">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
-      <!-- ko if: !loading() && catalogEntry.isSource() -->
+      <!-- ko if: !loading() && catalogEntry().isSource() -->
       <table id="entryTable" class="table table-condensed table-nowrap">
         <thead>
           <tr>
@@ -115,7 +115,7 @@ from desktop.views import _ko
         <tbody data-bind="foreach: filteredEntries">
           <tr data-bind="click: onRowClick">
             <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
-            <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
+            <td><a href="javascript: void(0);" data-bind="text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }"></a></td>
             <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
           </tr>
         </tbody>
@@ -126,12 +126,12 @@ from desktop.views import _ko
       </table>
       <!-- /ko -->
 
-      <!-- ko if: !loading() && catalogEntry.isDatabase() -->
+      <!-- ko if: !loading() && catalogEntry().isDatabase() -->
       <table id="entryTable" class="table table-condensed table-nowrap">
         <thead>
         <tr>
           <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
-          <th data-bind="text: catalogEntry.getSourceType() !== 'solr' ? '${ _ko("Table") }' : '${ _ko("Collection") }'"></th>
+          <th data-bind="text: catalogEntry().getSourceType() !== 'solr' ? '${ _ko("Table") }' : '${ _ko("Collection") }'"></th>
           <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
         </tr>
         </thead>
@@ -139,7 +139,7 @@ from desktop.views import _ko
         <tbody data-bind="foreach: filteredEntries">
         <tr data-bind="click: onRowClick">
           <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
-          <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
+          <td><a href="javascript: void(0);" data-bind="text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }"></a></td>
           <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
         </tr>
         </tbody>
@@ -150,12 +150,12 @@ from desktop.views import _ko
       </table>
       <!-- /ko -->
 
-      <!-- ko if: !loading() && (catalogEntry.isTableOrView() || catalogEntry.isComplex()) -->
+      <!-- ko if: !loading() && (catalogEntry().isTableOrView() || catalogEntry().isComplex()) -->
       <table class="table table-condensed table-nowrap">
         <thead>
         <tr>
           <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
-          <th><span data-bind="text: catalogEntry.getSourceType() !== 'solr' ? '${ _ko("Column") }' : '${ _ko("Field") }'"></span> (<span data-bind="text: filteredEntries().length"></span>)</th>
+          <th><span data-bind="text: catalogEntry().getSourceType() !== 'solr' ? '${ _ko("Column") }' : '${ _ko("Field") }'"></span> (<span data-bind="text: filteredEntries().length"></span>)</th>
           <th>${ _("Type") }</th>
           <th>${ _("Description") } <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
           <th colspan="2">${ _("Sample") } <!-- ko if: loadingSamples() || sampleRefreshEnabled() --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <!-- ko if: sampleRefreshEnabled --><a class="inactive-action" href="javascript: void(0);" data-bind="toggle: sampleRefreshEnabled"><i class="fa fa-stop"></i></a><!-- /ko --></th>
@@ -165,9 +165,9 @@ from desktop.views import _ko
         <tbody data-bind="foreach: filteredEntries">
         <tr data-bind="click: onRowClick">
           <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
-          <td class="name-column" data-bind="attr: { 'title': catalogEntry.name + ' - ${ _ko("Click for more details") }' }">
+          <td class="name-column" data-bind="attr: { 'title': catalogEntry().name + ' - ${ _ko("Click for more details") }' }">
             <a href="javascript: void(0);" data-bind="click: onClick">
-              <span data-bind="text: catalogEntry.name"></span>
+              <span data-bind="text: catalogEntry().name"></span>
               <!-- ko if: isKey -->
               &nbsp;<i class="fa fa-key" data-bind="tooltip: { title: keyText, html: true }"></i>
               <!-- /ko -->
@@ -176,7 +176,7 @@ from desktop.views import _ko
               <!-- /ko -->
             </a>
           </td>
-          <td class="type-column" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
+          <td class="type-column" data-bind="text: catalogEntry().getType(), attr: { 'title': catalogEntry().getRawType() }"></td>
           <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
           <td class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
           <td class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
@@ -189,7 +189,7 @@ from desktop.views import _ko
       </table>
       <!-- /ko -->
 
-      <!-- ko if: !loading() && catalogEntry.isField() && !catalogEntry.isComplex() -->
+      <!-- ko if: !loading() && catalogEntry().isField() && !catalogEntry().isComplex() -->
       <!-- ko component: { name: 'field-samples', params: {
           catalogEntry: catalogEntry,
           onSampleClick: onSampleClick,
@@ -205,25 +205,25 @@ from desktop.views import _ko
       function SampleEnrichedEntry(index, catalogEntry, onClick, onRowClick) {
         var self = this;
         self.index = index;
-        self.catalogEntry = catalogEntry;
+        self.catalogEntry = ko.isObservable(catalogEntry) ? catalogEntry : ko.observable(catalogEntry);
         self.popularity = ko.observable(0);
         self.firstSample = ko.observable();
         self.secondSample = ko.observable();
         self.onClick = onClick;
         self.onRowClick = onRowClick;
-        self.comment = self.catalogEntry.getCommentObservable();
+        self.comment = self.catalogEntry().getCommentObservable();
         self.joinColumns = ko.observableArray();
 
         self.isKey = ko.pureComputed(function () {
-          return self.catalogEntry.isPrimaryKey() || self.catalogEntry.isPartitionKey() || self.joinColumns().length;
+          return self.catalogEntry().isPrimaryKey() || self.catalogEntry().isPartitionKey() || self.joinColumns().length;
         });
 
         self.keyText = ko.pureComputed(function () {
           var keys = [];
-          if (self.catalogEntry.isPrimaryKey()) {
+          if (self.catalogEntry().isPrimaryKey()) {
             keys.push('${ _("Primary key") }')
           }
-          if (self.catalogEntry.isPartitionKey()) {
+          if (self.catalogEntry().isPartitionKey()) {
             keys.push('${ _("Partition key") }')
           }
           if (self.joinColumns().length) {
@@ -243,7 +243,7 @@ from desktop.views import _ko
         huePubSub.publish('context.popover.show', {
           data: {
             type: 'catalogEntry',
-            catalogEntry: entry.catalogEntry
+            catalogEntry: entry.catalogEntry()
           },
           orientation: 'right',
           source: {
@@ -258,16 +258,16 @@ from desktop.views import _ko
 
       SampleEnrichedEntry.prototype.saveComment = function () {
         var self = this;
-        if (self.comment() !== self.catalogEntry.getResolvedComment()) {
-          self.catalogEntry.setComment(self.comment()).done(self.comment).fail(function () {
-            self.comment(self.catalogEntry.getResolvedComment());
+        if (self.comment() !== self.catalogEntry().getResolvedComment()) {
+          self.catalogEntry().setComment(self.comment()).done(self.comment).fail(function () {
+            self.comment(self.catalogEntry().getResolvedComment());
           })
         }
       };
 
       function CatalogEntriesList(params) {
         var self = this;
-        self.catalogEntry = params.catalogEntry;
+        self.catalogEntry = ko.isObservable(params.catalogEntry) ? params.catalogEntry : ko.observable(params.catalogEntry);
         self.selectedEntries = params.selectedEntries;
         self.entries = ko.observableArray();
         self.editableDescriptions = !!params.editableDescriptions;
@@ -295,15 +295,15 @@ from desktop.views import _ko
 
         // TODO: Can be computed based on contents (instead of always suggesting all col types etc.)
         self.knownFacetValues = ko.pureComputed(function () {
-          if (self.catalogEntry.isDatabase()) {
+          if (self.catalogEntry().isDatabase()) {
             return { 'type': { 'table': -1, 'view': -1 } };
-          } else if (self.catalogEntry.isTableOrView()) {
+          } else if (self.catalogEntry().isTableOrView()) {
             var typeIndex = { 'type': {} };
 
             // Issue with filteredEntries is that it's not updated in time when typing,
             // i.e. type:| doesn't automatically open the suggestion list.
             self.entries().forEach(function (entry) {
-              var type = entry.catalogEntry.getType().toLowerCase();
+              var type = entry.catalogEntry().getType().toLowerCase();
               if (!typeIndex['type'][type]) {
                 typeIndex['type'][type] = 1;
               } else {
@@ -314,7 +314,7 @@ from desktop.views import _ko
           }
         });
 
-        self.facets = self.catalogEntry.isField() && !self.catalogEntry.isComplex() ? [] : ['type'];
+        self.facets = self.catalogEntry().isField() && !self.catalogEntry().isComplex() ? [] : ['type'];
 
         self.filteredEntries = ko.pureComputed(function () {
           if (!self.querySpec() || self.querySpec().query === '') {
@@ -329,18 +329,18 @@ from desktop.views import _ko
             var match = true;
 
             if (!isFacetMatch) {
-              if (entry.catalogEntry.isField()) {
-                match = !!facets['type'][entry.catalogEntry.getType().toLowerCase()];
-              } else if (entry.catalogEntry.isTableOrView()) {
-                match = (facets['type']['table'] && entry.catalogEntry.isTable()) || (facets['type']['view'] && entry.catalogEntry.isView()) ;
+              if (entry.catalogEntry().isField()) {
+                match = !!facets['type'][entry.catalogEntry().getType().toLowerCase()];
+              } else if (entry.catalogEntry().isTableOrView()) {
+                match = (facets['type']['table'] && entry.catalogEntry().isTable()) || (facets['type']['view'] && entry.catalogEntry().isView()) ;
               }
             }
 
             if (match && !isTextMatch) {
               match = self.querySpec().text.every(function (text) {
                 var textLower = text.toLowerCase();
-                return entry.catalogEntry.name.toLowerCase().indexOf(textLower) !== -1
-                  || entry.catalogEntry.getResolvedComment().toLowerCase().indexOf(textLower) !== -1;
+                return entry.catalogEntry().name.toLowerCase().indexOf(textLower) !== -1
+                  || entry.catalogEntry().getResolvedComment().toLowerCase().indexOf(textLower) !== -1;
               });
             }
 
@@ -352,18 +352,16 @@ from desktop.views import _ko
           var result = [];
           var partialLower = partial.toLowerCase();
           self.entries().forEach(function (entry) {
-            if (entry.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
-              result.push(nonPartial + partial + entry.catalogEntry.name.substring(partial.length))
+            if (entry.catalogEntry().name.toLowerCase().indexOf(partialLower) === 0) {
+              result.push(nonPartial + partial + entry.catalogEntry().name.substring(partial.length))
             }
           });
           return result;
         };
 
-        self.loading(true);
-
         var entrySort = function (a, b) {
-          var aIsKey = a.catalogEntry.isPrimaryKey() || a.catalogEntry.isPartitionKey();
-          var bIsKey = b.catalogEntry.isPrimaryKey() || b.catalogEntry.isPartitionKey();
+          var aIsKey = a.catalogEntry().isPrimaryKey() || a.catalogEntry().isPartitionKey();
+          var bIsKey = b.catalogEntry().isPrimaryKey() || b.catalogEntry().isPartitionKey();
           if (aIsKey && !bIsKey) {
             return -1;
           }
@@ -374,23 +372,29 @@ from desktop.views import _ko
           return (b.popularity() - a.popularity()) || (a.index - b.index);
         };
 
-        window.setTimeout(function () {
-          var onClick = function (sampleEnrichedEntry, event) {
-            if (params.onClick) {
-              params.onClick(sampleEnrichedEntry.catalogEntry, event);
-            } else if (self.contextPopoverEnabled) {
-              sampleEnrichedEntry.showContextPopover(sampleEnrichedEntry, event);
-            }
-          };
-          var onRowClick = function (sampleEnrichedEntry, event) {
-            if (self.selectedEntries && $(event.target).is('td')) {
-             $(event.currentTarget).find('.hue-checkbox').trigger('click');
-            }
-            return true;
-          };
+        var onClick = function (sampleEnrichedEntry, event) {
+          if (params.onClick) {
+            params.onClick(sampleEnrichedEntry.catalogEntry(), event);
+          } else if (self.contextPopoverEnabled) {
+            sampleEnrichedEntry.showContextPopover(sampleEnrichedEntry, event);
+          } else {
+            self.catalogEntry(sampleEnrichedEntry.catalogEntry());
+          }
+        };
+
+        var onRowClick = function (sampleEnrichedEntry, event) {
+          if (self.selectedEntries && $(event.target).is('td')) {
+           $(event.currentTarget).find('.hue-checkbox').trigger('click');
+          }
+          return true;
+        };
+
+        var loadEntries = function () {
+          self.loading(true);
 
           var entriesAddedDeferred = $.Deferred();
-          var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
+
+          var childPromise = self.catalogEntry().getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
             var entries = $.map(childEntries, function (entry, index) { return new SampleEnrichedEntry(index, entry, onClick, onRowClick) });
             entries.sort(entrySort);
             self.entries(entries);
@@ -402,13 +406,13 @@ from desktop.views import _ko
             self.loading(false);
           });
 
-          if (self.catalogEntry.isTableOrView()) {
-            var joinsPromise = self.catalogEntry.getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
+          if (self.catalogEntry().isTableOrView()) {
+            var joinsPromise = self.catalogEntry().getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
               if (topJoins && topJoins.values && topJoins.values.length) {
                 entriesAddedDeferred.done(function (entries) {
                   var entriesIndex = {};
                   entries.forEach(function (entry) {
-                    entriesIndex[entry.catalogEntry.path.join('.').toLowerCase()] = { joinColumnIndex: {}, entry: entry };
+                    entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = { joinColumnIndex: {}, entry: entry };
                   });
                   topJoins.values.forEach(function (topJoin) {
                     topJoin.joinCols.forEach(function (topJoinCols) {
@@ -432,19 +436,19 @@ from desktop.views import _ko
             self.cancellablePromises.push(joinsPromise);
           }
 
-          var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
+          var navMetaPromise = self.catalogEntry().loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
             self.loadingNav(false);
           });
 
           self.cancellablePromises.push(navMetaPromise);
           self.cancellablePromises.push(childPromise);
 
-          self.cancellablePromises.push(self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
+          self.cancellablePromises.push(self.catalogEntry().loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
             if (popularEntries.length) {
               childPromise.done(function () {
                 var entryIndex = {};
                 self.entries().forEach(function (entry) {
-                  entryIndex[entry.catalogEntry.name] = entry;
+                  entryIndex[entry.catalogEntry().name] = entry;
                 });
 
                 var totalCount = 0;
@@ -468,14 +472,14 @@ from desktop.views import _ko
             }
           }));
 
-          if (self.catalogEntry.isTableOrView() || self.catalogEntry.isComplex()) {
+          if (self.catalogEntry().isTableOrView() || self.catalogEntry().isComplex()) {
             self.loadingSamples(true);
 
             var firstSampleFetch = true;
 
             var fetchSamples = function () {
               window.clearInterval(self.fetchSampleTimeout);
-              self.lastSamplePromise = self.catalogEntry.getSample({
+              self.lastSamplePromise = self.catalogEntry().getSample({
                 silenceErrors: true,
                 cancellable: true,
                 refreshCache: !firstSampleFetch
@@ -484,12 +488,12 @@ from desktop.views import _ko
                   if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
                     var entryIndex = {};
                     self.entries().forEach(function (entry) {
-                      entryIndex[entry.catalogEntry.name] = entry;
+                      entryIndex[entry.catalogEntry().name] = entry;
                     });
                     for (var i = 0; i < sample.meta.length; i++) {
                       var name = sample.meta[i].name;
-                      if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
-                        name = name.substring(self.catalogEntry.name.length + 1);
+                      if (name.toLowerCase().indexOf(self.catalogEntry().name.toLowerCase() + '.') === 0) {
+                        name = name.substring(self.catalogEntry().name.length + 1);
                       }
                       var sampleEntry = entryIndex[name];
                       if (sampleEntry) {
@@ -514,7 +518,9 @@ from desktop.views import _ko
 
             fetchSamples();
           }
-        }, 100)
+        };
+
+        window.setTimeout(loadEntries, 100)
       }
 
       CatalogEntriesList.prototype.dispose = function () {
@@ -543,7 +549,7 @@ from desktop.views import _ko
     <!-- ko hueSpinner: { spin: !catalogEntryExists(), inline: true } --><!-- /ko -->
     <!-- ko if: catalogEntryExists -->
       <!-- ko component: { name: 'catalog-entries-list', params: {
-        catalogEntry: catalogEntry(),
+        catalogEntry: catalogEntry,
         selectedEntries: selectedEntries,
         editableDescriptions: editableDescriptions,
         contextPopoverEnabled: contextPopoverEnabled,
@@ -752,7 +758,7 @@ from desktop.views import _ko
     (function () {
       function FieldSamples (params) {
         var self = this;
-        self.catalogEntry = params.catalogEntry;
+        self.catalogEntry = ko.isObservable(params.catalogEntry) ? params.catalogEntry : ko.observable(params.catalogEntry);
         self.onSampleClick = params.onSampleClick;
         self.refreshSampleInterval = params.refreshSampleInterval;
         self.refreshSampleTimeout = -1;
@@ -764,7 +770,7 @@ from desktop.views import _ko
         self.hasErrors = ko.observable();
         self.loadingSamples = ko.observable();
 
-        self.showOperations = self.catalogEntry.getSourceType() === 'impala' || self.catalogEntry.getSourceType() === 'hive';
+        self.showOperations = self.catalogEntry().getSourceType() === 'impala' || self.catalogEntry().getSourceType() === 'hive';
 
         self.sampleClick = function (html) {
           self.onSampleClick(hueUtils.html2text(html));
@@ -830,7 +836,7 @@ from desktop.views import _ko
         window.clearTimeout(self.refreshSampleTimeout);
         self.cancelRunningQueries();
         self.loadingSamples(true);
-        self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true, refreshCache: refreshCache, operation: self.operation().type }).done(function (samples) {
+        self.cancellablePromises.push(self.catalogEntry().getSample({ silenceErrors: true, cancellable: true, refreshCache: refreshCache, operation: self.operation().type }).done(function (samples) {
           if (samples.data && samples.data.length) {
             self.columnSamples(samples.data);
           }
