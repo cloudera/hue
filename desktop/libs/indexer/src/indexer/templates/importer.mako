@@ -1892,7 +1892,7 @@ ${ assist.assistPanel() }
           viewModel.createWizard.guessFieldTypes();
         }
       })
-      self.channelSourcePath = ko.observable('/var/log/hue/access.log');
+      self.channelSourcePath = ko.observable('/var/log/hue-httpd/access_log');
 
       self.streamUsername = ko.observable('');
       self.streamPassword = ko.observable('');
