@@ -1518,10 +1518,13 @@ from metadata.conf import has_navigator
 
         var sourceType = params.data.sourceType && params.data.sourceType.toLowerCase();
 
-        if (!sourceType && self.isCatalogEntry) {
+        if (!sourceType || sourceType === 'hive') {
           huePubSub.publish('cluster.config.get.config', function (clusterConfig) {
-            if (clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['editor']) {
-              sourceType = clusterConfig['app_config']['editor']['default_sql_interpreter'];
+            if (clusterConfig) {
+              var defaultEditor = clusterConfig['default_sql_interpreter'];
+              if (!sourceType || (sourceType === 'hive' && defaultEditor === 'impala')) {
+                sourceType = defaultEditor;
+              }
             }
           });
         }
