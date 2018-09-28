@@ -174,17 +174,22 @@ from desktop.views import _ko
         });
 
         var refreshThrottle = -1;
-        var namespaceRefreshSub = huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
-          if (ko.unwrap(self.sourceType) === sourceType) {
+
+        var refresh = function (sourceType) {
+          if (!sourceType || ko.unwrap(self.sourceType) === sourceType) {
             window.clearTimeout(refreshThrottle);
             refreshThrottle = window.setTimeout(function () {
-              TYPES.forEach(self.reload);
+              TYPES.forEach(self.reload.bind(self));
             }, 100)
           }
-        });
+        };
+
+        var namespaceRefreshSub = huePubSub.subscribe('context.catalog.namespaces.refreshed', refresh);
+        var contextCatalogRefreshSub = huePubSub.subscribe('context.catalog.refreshed', refresh);
         self.disposals.push(function () {
           window.clearTimeout(refreshThrottle);
           namespaceRefreshSub.remove();
+          contextCatalogRefreshSub.remove();
         });
 
         self.loadingDatabases = ko.observable(false);
