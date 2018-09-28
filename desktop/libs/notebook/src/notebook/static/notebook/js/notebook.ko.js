@@ -2425,8 +2425,12 @@ var EditorViewModel = (function() {
         self.creatingSessionLocks.push(session.type());
       }
 
+      var compute = null;
       $.each(self.getSnippets(session.type()), function(index, snippet) {
         snippet.status('loading');
+        if (index == 0) {
+          compute = snippet.compute();
+        }
       });
 
       var fail = function (message) {
@@ -2441,7 +2445,8 @@ var EditorViewModel = (function() {
 
       $.post("/notebook/api/create_session", {
         notebook: ko.mapping.toJSON(self.getContext()),
-        session: ko.mapping.toJSON(session) // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
+        session: ko.mapping.toJSON(session), // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
+        cluster: ko.mapping.toJSON(compute ? compute : '')
       }, function (data) {
         if (data.status == 0) {
           ko.mapping.fromJS(data.session, {}, session);
