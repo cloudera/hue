@@ -33,16 +33,15 @@ from desktop.views import _ko
       <!-- ko if: window.HAS_MULTI_CLUSTER -->
       <!-- ko if: availableClusters().length > 0 && !hideClusters -->
       <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Cluster') }</span><!-- /ko -->
-      <div data-bind="component: { name: 'hue-drop-down', params: { value: cluster, entries: availableClusters, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active cluster') }' } }" style="display: inline-block"></div>
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: cluster, onSelect: onClusterSelect, entries: availableClusters, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active cluster') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <!-- ko if: availableClusters().length === 0 && !hideClusters -->
       <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No clusters found') }</span>
       <!-- /ko -->
 
-
       <!-- ko if: availableComputes().length > 0 && !hideComputes -->
       <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Compute') }</span><!-- /ko -->
-      <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, onSelect: onComputeSelect, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <!-- ko if: availableComputes().length === 0 && !hideComputes -->
       <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
@@ -50,7 +49,7 @@ from desktop.views import _ko
 
       <!-- ko if: availableNamespaces().length > 0 && !hideNamespaces -->
       <!-- ko ifnot: hideLabels --><span class="editor-header-title">${ _('Namespace') }</span><!-- /ko -->
-      <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, onSelect: onNamespaceSelect, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <!-- ko if: availableNamespaces().length === 0 && !hideNamespaces -->
       <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No namespaces found') }</span>
@@ -69,6 +68,41 @@ from desktop.views import _ko
 
   <script type="text/javascript">
     (function () {
+
+      var TYPES_INDEX = {
+        cluster: {
+          name: 'cluster',
+          loading: 'loadingClusters',
+          available: 'availableClusters',
+          hide: 'hideClusters',
+          lastPromise: 'lastClustersPromise',
+          contextCatalogFn: 'getClusters',
+          totalStorageId: 'lastSelectedCluster',
+          onSelect: 'onClusterSelect'
+        },
+        compute: {
+          name: 'compute',
+          loading: 'loadingComputes',
+          available: 'availableComputes',
+          hide: 'hideComputes',
+          lastPromise: 'lastComputesPromise',
+          contextCatalogFn: 'getComputes',
+          totalStorageId: 'lastSelectedCompute',
+          onSelect: 'onComputeSelect'
+        },
+        namespace: {
+          name: 'namespace',
+          loading: 'loadingNamespaces',
+          available: 'availableNamespaces',
+          hide: 'hideNamespaces',
+          lastPromise: 'lastNamespacesPromise',
+          contextCatalogFn: 'getNamespaces',
+          totalStorageId: 'lastSelectedNamespace',
+          onSelect: 'onNamespaceSelect'
+        }
+      };
+
+      var TYPES = Object.keys(TYPES_INDEX).map(function (key) { return TYPES_INDEX[key] });
 
       /**
        * This is a component for compute, namespace and database selection. All parameters are optional except the
@@ -106,165 +140,50 @@ from desktop.views import _ko
        *                                           observable is provided.
        * @param {function} [params.onComputeSelect] - Callback when a new compute is selected (after initial set)
        * @param {function} [params.onClusterSelect] - Callback when a new cluster is selected (after initial set)
+       * @param {function} [params.onNamespaceSelect] - Callback when a new namespace is selected (after initial set)
        * @constructor
        */
       var HueContextSelector = function (params) {
         var self = this;
 
-        var apiHelper = ApiHelper.getInstance();
+        self.apiHelper = ApiHelper.getInstance();
 
         self.sourceType = params.sourceType;
         self.disposals = [];
         self.hideLabels = params.hideLabels;
 
-        self.loadingClusters = ko.observable(false);
-        self.availableClusters = ko.observableArray();
-        self.cluster = params.cluster;
-        self.hideClusters = params.hideClusters || !self.cluster;
-
-        if (self.cluster) {
-          self.loadingClusters(true);
-          self.lastClustersPromise = ContextCatalog.getClusters({ sourceType: ko.unwrap(self.sourceType) }).done(function (clusters) {
-            self.availableClusters(clusters);
-            if (!self.cluster() && apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCluster')) {
-              var lastSelectedCluster = apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCluster');
-              var found = clusters.some(function (cluster) {
-                if (cluster.id === lastSelectedCluster.id) {
-                  self.cluster(lastSelectedCluster);
-                  return true;
-                }
-              });
-
-              // If we can't find exact match we pick first based on type
-              if (!found) {
-                clusters.some(function (cluster) {
-                  if (lastSelectedCluster && cluster.type === lastSelectedCluster.type) {
-                    self.cluster(cluster);
-                    return true;
-                  }
-                });
-              }
+        TYPES.forEach(function (type) {
+          self[type.name] = params[type.name];
+          self[type.loading] = ko.observable(false);
+          self[type.available] = ko.observableArray();
+          self[type.hide] = params[type.hide] || !self[type.name];
+          self[type.lastPromise] = undefined;
+          self[type.onSelect] = function (selectedVal, previousVal) {
+            if (params[type.onSelect]) {
+              params[type.onSelect](selectedVal, previousVal);
             }
+            self.apiHelper.setInTotalStorage('contextSelector', type.totalStorageId, selectedVal);
 
-            if (!self.cluster()) {
-              self.cluster(clusters[0]);
+            if (selectedVal && type === TYPES_INDEX.compute) {
+              self.setMatchingNamespace(selectedVal);
+            } else if (selectedVal && type === TYPES_INDEX.namespace) {
+              self.setMatchingCompute(selectedVal);
             }
+          };
+          self.reload(type);
+        });
 
-            var clustersSub = self.cluster.subscribe(function (newCluster) {
-              if (params.onClusterSelect) {
-                params.onClusterSelect(newCluster);
-              }
-              apiHelper.setInTotalStorage('contextSelector', 'lastSelectedCluster', newCluster);
-
-              // TODO: Adjust computes and namespaces when cluster changes?
-            });
-            self.disposals.push(function () {
-              clustersSub.dispose();
-            })
-          }).always(function () {
-            self.loadingClusters(false);
-          });
-        } else {
-          self.lastClustersPromise = $.Deferred().resolve().promise();
-        }
-
-        self.loadingComputes = ko.observable(false);
-        self.availableComputes = ko.observableArray();
-        self.compute = params.compute;
-        self.hideComputes = params.hideComputes || !self.compute;
-
-        self.lastComputesPromise = undefined;
-        self.reloadComputes = function () {
-          if (params.compute) {
-            self.loadingComputes(true);
-            self.lastComputesPromise = ContextCatalog.getComputes({ sourceType: ko.unwrap(self.sourceType) }).done(function (computes) {
-              self.availableComputes(computes);
-
-              if (!self.compute()) {
-                self.compute(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute'));
-              }
-
-              if (!self.compute() || !computes.some(function (compute) {
-                if (compute.id === self.compute().id) {
-                  self.compute(compute);
-                  return true;
-                }})) {
-
-                // If we can't find exact match we pick first based on type
-                if (!computes.some(function (compute) {
-                  if (lastSelectedCluster && compute.type === lastSelectedCompute.type) {
-                    self.compute(compute);
-                    return true;
-                  }
-                })) {
-                  self.compute(computes[0]);
-                }
-              }
-
-              var computeSub = self.compute.subscribe(function (newCompute) {
-                if (params.onComputeSelect) {
-                  params.onComputeSelect(newCompute);
-                }
-                apiHelper.setInTotalStorage('contextSelector', 'lastSelectedCompute', newCompute);
-              });
-              self.disposals.push(function () {
-                computeSub.dispose();
-              })
-            }).always(function () {
-              self.loadingComputes(false);
-            });
-          } else {
-            self.lastComputesPromise = $.Deferred().resolve().promise();
+        var refreshThrottle = -1;
+        var namespaceRefreshSub = huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+          if (ko.unwrap(self.sourceType) === sourceType) {
+            window.clearTimeout(refreshThrottle);
+            refreshThrottle = window.setTimeout(function () {
+              TYPES.forEach(self.reload);
+            }, 100)
           }
-        };
-        self.reloadComputes();
-
-        self.loadingNamespaces = ko.observable(false);
-        self.availableNamespaces = ko.observableArray();
-        self.namespace = params.namespace;
-        self.hideNamespaces = params.hideNamespaces || !self.namespace;
-
-        self.lastNamespacePromise = undefined;
-        self.reloadNamespaces = function () {
-          if (params.namespace) {
-            self.loadingNamespaces(true);
-            self.lastNamespacePromise = ContextCatalog.getNamespaces({ sourceType: ko.unwrap(self.sourceType) }).done(function (context) {
-              self.availableNamespaces(context.namespaces);
-              if (!self.namespace()) {
-                self.namespace(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace'));
-              }
-              if (!self.namespace() || !context.namespaces.some(function (namespace) {
-                if (namespace.id === self.namespace().id) {
-                  self.namespace(namespace);
-                  return true;
-                }})) {
-                self.namespace(context.namespaces[0]);
-              }
-              var namespaceSub = self.namespace.subscribe(function (newNamespace) {
-                apiHelper.setInTotalStorage('contextSelector', 'lastSelectedNamespace', newNamespace);
-              });
-              self.disposals.push(function () {
-                namespaceSub.dispose();
-              })
-            }).always(function () {
-              self.loadingNamespaces(false);
-            });
-          } else {
-            self.lastNamespacePromise = $.Deferred().resolve().promise();
-          }
-        };
-        self.reloadNamespaces();
-
-        var refreshNamespacesThrottle = -1;
-        var namespaceRefreshSub = huePubSub.subscribe('context.catalog.namespaces.refreshed', function () {
-          window.clearTimeout(refreshNamespacesThrottle);
-          refreshNamespacesThrottle = window.setTimeout(function () {
-            self.reloadComputes();
-            self.reloadNamespaces();
-          }, 100)
         });
         self.disposals.push(function () {
-          window.clearTimeout(refreshNamespacesThrottle);
+          window.clearTimeout(refreshThrottle);
           namespaceRefreshSub.remove();
         });
 
@@ -273,132 +192,166 @@ from desktop.views import _ko
         self.database = params.database;
         self.hideDatabases = params.hideDatabases || !self.database;
 
-        var updateDatabaseThrottle = -1;
-        self.updateDatabases = function () {
-          if (!self.hideDatabases) {
-            self.loadingDatabases(true);
-            $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
-              window.clearTimeout(updateDatabaseThrottle);
-              updateDatabaseThrottle = window.setTimeout(function () {
-                DataCatalog.getEntry({
-                  sourceType: ko.unwrap(self.sourceType),
-                  namespace: self.namespace(),
-                  compute: self.compute(),
-                  path: [],
-                  definition: { type: 'source' }
-                }).done(function (sourceEntry) {
-                  sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
-                    var databaseNames = [];
-                    databaseEntries.forEach(function (databaseEntry) {
-                      databaseNames.push(databaseEntry.name);
-                    });
-                    self.availableDatabases(databaseNames);
-                  }).fail(function () {
-                    self.availableDatabases([]);
-                  }).always(function () {
-                    if (self.database() && self.availableDatabases().indexOf(self.database()) === -1) {
-                      if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf('default') !== -1) {
-                        self.database('default');
-                      } else {
-                        self.database(self.availableDatabases()[0])
-                      }
-                    }
-                    self.loadingDatabases(false);
+        self.reloadDatabaseThrottle = -1;
 
-                    huePubSub.publish('assist.set.database', {
-                      source: ko.unwrap(self.sourceType),
-                      namespace: self.namespace(),
-                      name: self.database()
-                    });
-                  });
-                });
-              }, 10);
-            });
-          } else if (self.database) {
-            self.availableDatabases([]);
-            self.database(undefined);
-          }
-        };
-
-        self.updateDatabases();
-
-        if (self.compute && self.namespace) {
-          if (!self.namespace()) {
-            self.namespace(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace'));
-          }
-          if (!self.compute()) {
-            self.compute(apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute'));
-          }
-
-          $.when(self.lastNamespacePromise, self.lastComputesPromise).done(function () {
-            var computeSub = self.compute.subscribe(function (newCompute) {
-              // When the compute changes we set the corresponding namespace and update the databases
-              if (newCompute) {
-                var found = self.availableNamespaces().some(function (namespace) {
-                  // TODO: Remove name check once compute.namespace is a namespace ID
-                  if (namespace.name === newCompute.namespace || namespace.id === newCompute.namespace) {
-                    if (!self.namespace() || self.namespace().id !== namespace.id) {
-                      self.namespace(namespace);
-                      self.updateDatabases();
-                    }
-                    return true;
-                  }
-                });
-                if (!found && newCompute.namespace) {
-                  self.namespace(newCompute.namespace);
-                }
-              }
-            });
-            self.disposals.push(function () {
-              computeSub.dispose();
-            });
-
-            var namespaceSub = self.namespace.subscribe(function (newNamespace) {
-              if (newNamespace) {
-                // When the namespace changes we set the corresponding compute and update the databases
-                var found = self.availableComputes().some(function (compute) {
-                  if (compute.namespace === newNamespace.id) {
-                    if (!self.compute() || self.compute().id !== compute.id) {
-                      self.compute(compute);
-                      self.updateDatabases();
-                    }
-                    return true;
-                  }
-                });
-                if (!found) {
-                  self.compute(undefined);
-                }
-              }
-            });
-            self.disposals.push(function () {
-              namespaceSub.dispose();
-            })
-          });
-        } else {
-          self.updateDatabases();
-        }
+        self.reloadDatabases();
 
         if (self.database) {
           huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
             if (details.entry.isSource()) {
               if (ko.unwrap(self.sourceType) === details.entry.getSourceType()) {
-                self.updateDatabases();
+                self.reloadDatabases();
               }
             }
           });
         }
 
-        if (self.namespace) {
-          huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
-            if (ko.unwrap(self.sourceType) === sourceType) {
-              self.reloadNamespaces();
+        self.loadingContext = ko.pureComputed(function () {
+          return self[TYPES_INDEX.cluster.loading]() || self[TYPES_INDEX.namespace.loading]() || self[TYPES_INDEX.compute.loading]() || self.loadingDatabases();
+        });
+      };
+
+      HueContextSelector.prototype.setMatchingNamespace = function (compute) {
+        var self = this;
+        if (self[TYPES_INDEX.namespace.name]) {
+          // Select the first corresponding namespace when a compute is selected (unless selected)
+          self[TYPES_INDEX.namespace.lastPromise].done(function () {
+            if (!self[TYPES_INDEX.namespace.name]() || self[TYPES_INDEX.namespace.name]().id !== compute.namespace) {
+              var found = self[TYPES_INDEX.namespace.available]().some(function (namespace) {
+                if (compute.namespace === namespace.id) {
+                  self[TYPES_INDEX.namespace.name](namespace);
+                  self.apiHelper.setInTotalStorage('contextSelector', TYPES_INDEX.namespace.totalStorageId, namespace);
+                  return true;
+                }
+              });
+
+              if (!found) {
+                // This can happen when a compute refers to a namespace that isn't returned by the namespaces call
+                // TODO: What should we do?
+                self[TYPES_INDEX.namespace.name](undefined);
+              }
+            }
+          })
+        }
+      };
+
+      HueContextSelector.prototype.setMatchingCompute = function (namespace) {
+        var self = this;
+        if (self[TYPES_INDEX.compute.name]) {
+          // Select the first corresponding compute when a namespace is selected (unless selected)
+          self[TYPES_INDEX.compute.lastPromise].done(function () {
+            if (!self[TYPES_INDEX.compute.name]() || self[TYPES_INDEX.compute.name]().namespace !== namespace.id) {
+              var found = self[TYPES_INDEX.compute.available]().some(function (compute) {
+                if (namespace.id === compute.namespace) {
+                  self[TYPES_INDEX.compute.name](compute);
+                  self.apiHelper.setInTotalStorage('contextSelector', TYPES_INDEX.compute.totalStorageId, namespace);
+                  return true;
+                }
+              });
+
+              if (!found) {
+                // This can happen when a namespace refers to a compute that isn't returned by the computes call
+                // TODO: What should we do?
+                self[TYPES_INDEX.compute.name](undefined);
+              }
             }
           });
         }
+      };
 
-        self.loadingContext = ko.pureComputed(function () {
-          return self.loadingClusters() || self.loadingNamespaces() || self.loadingComputes() || self.loadingDatabases();
-        });
+      HueContextSelector.prototype.reload = function (type) {
+        var self = this;
+        if (self[type.name]) {
+          self[type.loading](true);
+          self[type.lastPromise] = ContextCatalog[type.contextCatalogFn]({
+            sourceType: ko.unwrap(self.sourceType)
+          }).done(function (available) {
+            // Namespaces response differs slightly from the others
+            if (type === TYPES_INDEX.namespace) {
+              available = available.namespaces;
+            }
+            self[type.available](available);
+            if (!self[type.name]() && self.apiHelper.getFromTotalStorage('contextSelector', type.totalStorageId)) {
+              var lastSelected = self.apiHelper.getFromTotalStorage('contextSelector', type.totalStorageId);
+              var found = available.some(function (other) {
+                if (other.id === lastSelected.id) {
+                  self[type.name](other);
+                  return true;
+                }
+              });
+
+              // If we can't find the last selected cluster or compute we try to find by type
+              if (!found && lastSelected && (type === TYPES_INDEX.cluster || type === TYPES_INDEX.compute)) {
+                available.some(function (other) {
+                  if (lastSelected && other.type === lastSelected.type) {
+                    self[type.name](other);
+                    return true;
+                  }
+                })
+              }
+            }
+
+            if (!self[type.name]() && available.length) {
+              self[type.name](available[0]);
+            }
+
+            // Namespace is leading, update compute to match once/if available
+            if (self[type.name]() && type === TYPES_INDEX.namespace) {
+              self.setMatchingCompute(self[type.name]());
+            }
+          }).always(function () {
+            self[type.loading](false);
+          });
+        } else {
+          self[type.lastPromise] = $.Deferred().resolve().promise();
+        }
+      };
+
+      HueContextSelector.prototype.reloadDatabases = function () {
+        var self = this;
+        if (self.database && !self.hideDatabases) {
+          self.loadingDatabases(true);
+          $.when(self[TYPES_INDEX.namespace.lastPromise], self[TYPES_INDEX.compute.lastPromise]).done(function () {
+            window.clearTimeout(self.reloadDatabaseThrottle);
+            self.reloadDatabaseThrottle = window.setTimeout(function () {
+              DataCatalog.getEntry({
+                sourceType: ko.unwrap(self.sourceType),
+                namespace: self[TYPES_INDEX.namespace.name](),
+                compute: self[TYPES_INDEX.compute.name](),
+                path: [],
+                definition: { type: 'source' }
+              }).done(function (sourceEntry) {
+                sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
+                  var databaseNames = [];
+                  databaseEntries.forEach(function (databaseEntry) {
+                    databaseNames.push(databaseEntry.name);
+                  });
+                  self.availableDatabases(databaseNames);
+                }).fail(function () {
+                  self.availableDatabases([]);
+                }).always(function () {
+                  if (self.database() && self.availableDatabases().indexOf(self.database()) === -1) {
+                    if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf('default') !== -1) {
+                      self.database('default');
+                    } else {
+                      self.database(self.availableDatabases()[0])
+                    }
+                  }
+                  self.loadingDatabases(false);
+
+                  huePubSub.publish('assist.set.database', {
+                    source: ko.unwrap(self.sourceType),
+                    namespace: self[TYPES_INDEX.namespace.name](),
+                    name: self.database()
+                  });
+                });
+              });
+            }, 10);
+          });
+        } else if (self.database) {
+          self.availableDatabases([]);
+          self.database(undefined);
+        }
       };
 
       HueContextSelector.prototype.dispose = function () {
