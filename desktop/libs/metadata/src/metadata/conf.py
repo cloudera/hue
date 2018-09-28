@@ -199,14 +199,14 @@ ALTUS = ConfigSection(
   )
 )
 
-K8 = ConfigSection(
-  key='k8',
+K8S = ConfigSection(
+  key='k8s',
   help=_t("""Configuration options for Kubernetes API"""),
   members=dict(
     API_URL=Config(
       key='api_url',
       help=_t('API URL to Kubernetes API or compatible service.'),
-      default='http://provisioner.35.236.77.238.nip.io/'),
+      default='http://provisioner.com/'),
   )
 )
 

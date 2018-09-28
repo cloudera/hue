@@ -1600,8 +1600,8 @@ IS_MULTICLUSTER_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
-IS_K8_ONLY = Config(
-  key='is_k8_only',
+IS_K8S_ONLY = Config(
+  key='is_k8s_only',
   default=False,
   type=coerce_bool,
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
