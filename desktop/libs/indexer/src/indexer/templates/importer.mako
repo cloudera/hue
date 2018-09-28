@@ -1732,6 +1732,7 @@ ${ assist.assistPanel() }
       });
       self.isFetchingTableNames = ko.observable(false);
       self.rdbmsTableNames = ko.observableArray();
+
       self.rdbmsHostname = ko.observable('');
       self.rdbmsHostname.subscribe(function () {
         self.rdbmsDatabaseNames([]);
@@ -1753,7 +1754,7 @@ ${ assist.assistPanel() }
         if (newVal) {
           wizard.destination.name(self.rdbmsDatabaseName());
         } else {
-          wizard.destination.name(self.tables()[0] && self.tables()[0].name() || ''); // To add self.rdbmsDatabaseName() would need to check for existence and/or create automatically
+          wizard.destination.name(self.tables()[0] && self.tables()[0].name() || '');
         }
       });
       self.rdbmsAllTablesSelected = ko.pureComputed(function () {
@@ -1799,6 +1800,15 @@ ${ assist.assistPanel() }
       self.tables = ko.observableArray([
         ko.mapping.fromJS({ name: '' })
       ]);
+      self.tables.subscribe(function(newVal) {
+        if (newVal.length == 0) {
+          wizard.destination.name('');
+        } else if (newVal.length == 1) {
+          wizard.destination.name(self.tables()[0].name() || ''); // TODO: db prefix and check if DB exists
+        } else {
+          wizard.destination.name(self.rdbmsDatabaseName());
+        }
+      });
       self.tablesNames = ko.observableArray([]);
       self.selectedTableIndex = ko.observable(0);
       self.table = ko.pureComputed(function() {
