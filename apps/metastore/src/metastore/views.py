@@ -694,4 +694,4 @@ def _get_db(user, source_type=None, cluster=None):
 
 
 def _get_servername(db):
-  return 'hive' if db.server_name == 'beeswax' else db.server_name
+  return 'hive' if db.server_name == 'beeswax' else db.server_name.rsplit('-', 1)[0]
