@@ -1417,15 +1417,14 @@ var ApiHelper = (function () {
       }
     }
 
-    var params = {
-      'format' : 'json'
-    };
+    url += '?format=json';
+    data = {};
 
-    if (options.compute && options.compute.id) {
-      params['cluster'] = options.compute.id;
+    if (options.compute) {
+      data['cluster'] = ko.mapping.toJSON(options.compute);
     }
 
-    var request = self.simpleGet(url, params, {
+    var request = self.simplePost(url, data, {
       silenceErrors: options.silenceErrors,
       successCallback: function (response) {
         if (options.path.length === 1) {
