@@ -381,7 +381,6 @@ var EditorViewModel = (function() {
     };
 
     self.namespace = ko.observable(snippet.namespace);
-
     self.compute = ko.observable(snippet.compute);
 
     self.availableDatabases = ko.observableArray();
