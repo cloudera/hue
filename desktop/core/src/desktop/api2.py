@@ -93,7 +93,7 @@ def get_context_namespaces(request, interface):
 
   if interface == 'hive' or interface == 'impala' or interface == 'report':
     # From Altus SDX
-    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
       # Note: attaching computes to namespaces might be done via the frontend in the future
       if interface == 'impala':
         if IS_K8S_ONLY.get():
@@ -155,7 +155,7 @@ def get_context_computes(request, interface):
     else:
       dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
 
-    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
@@ -167,7 +167,7 @@ def get_context_computes(request, interface):
       )
 
   if interface == 'oozie' or interface == 'spark2':
-    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
