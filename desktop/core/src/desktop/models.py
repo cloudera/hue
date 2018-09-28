@@ -49,7 +49,7 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1919,7 +1919,7 @@ class Cluster():
 
     if len(self.clusters) == 1:
       self.data = self.clusters.values()[0]
-    elif IS_K8_ONLY.get():
+    elif IS_K8S_ONLY.get():
       self.data = self.clusters['AltusV2']
       self.data['type'] = 'altus' # To show simplified UI
     elif IS_MULTICLUSTER_ONLY.get():
