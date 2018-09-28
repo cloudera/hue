@@ -314,7 +314,7 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API
+  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
   if cluster == 'undefined':
     cluster = None
   if not cluster and snippet.get('compute'): # Via notebook.ko.js
