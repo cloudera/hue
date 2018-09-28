@@ -148,7 +148,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
         response = parse_tree
         # If column or nested type is scalar/primitive, add sample of values
         if parser.is_scalar_type(parse_tree['type']):
-          sample = _get_sample_data(db, database, table, column)
+          sample = _get_sample_data(db, database, table, column, cluster=cluster)
           if 'rows' in sample:
             response['sample'] = sample['rows']
       else:
@@ -649,10 +649,12 @@ def clear_history(request):
 @error_handler
 def get_sample_data(request, database, table, column=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
-  response = _get_sample_data(db, database, table, column)
+  response = _get_sample_data(db, database, table, column, cluster=cluster)
   return JsonResponse(response)
 
 
@@ -675,7 +677,8 @@ def _get_sample_data(db, database, table, column, async=False, cluster=None, ope
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,
-          is_task=False
+          is_task=False,
+          compute=cluster if cluster else None
       )
       response['result'] = notebook.execute(request=MockedDjangoRequest(user=db.client.user), batch=False)
       if table_obj.is_impala_only:
@@ -749,7 +752,9 @@ def get_functions(request):
 @error_handler
 def analyze_table(request, database, table, columns=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
   table_obj = db.get_table(database, table)
@@ -776,7 +781,8 @@ def analyze_table(request, database, table, columns=None):
 @error_handler
 def get_table_stats(request, database, table, column=None):
   app_name = get_app_name(request)
-  cluster = json.loads(request.GET.get('cluster', '{}'))
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
   query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
@@ -798,7 +804,9 @@ def get_table_stats(request, database, table, column=None):
 @error_handler
 def get_top_terms(request, database, table, column, prefix=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
