@@ -22,6 +22,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_multi_cluster
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
@@ -314,11 +315,14 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
-  if cluster == 'undefined':
+  if has_multi_cluster():
+    cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
+    if cluster == 'undefined':
+      cluster = None
+    if not cluster and snippet.get('compute'): # Via notebook.ko.js
+      cluster = snippet['compute']
+  else:
     cluster = None
-  if not cluster and snippet.get('compute'): # Via notebook.ko.js
-    cluster = snippet['compute']
 
   cluster_name = cluster.get('id') if cluster else None
 

@@ -1319,7 +1319,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: ko.mapping.toJSON(options.compute)
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       },
       timeout: options.timeout
     }).success(function (data) {
@@ -1660,7 +1660,8 @@ var ApiHelper = (function () {
         type: options.sourceType
       }),
       async: true,
-      operation: '"' + (options.operation || 'default') + '"'
+      operation: '"' + (options.operation || 'default') + '"',
+      cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
     }, {
       silenceErrors: options.silenceErrors
     }).done(function (sampleResponse) {
