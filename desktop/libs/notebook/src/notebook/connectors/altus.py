@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from metadata.conf import ALTUS, K8
+from metadata.conf import ALTUS, K8S
 from navoptapi.api_lib import ApiLib
 
 
@@ -280,7 +280,7 @@ class AnalyticDbApi():
 class DataWarehouse2Api():
 
   def __init__(self, user=None):
-    self._api_url = '%s/dw' % K8.API_URL.get().rstrip('/')
+    self._api_url = '%s/dw' % K8S.API_URL.get().rstrip('/')
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)

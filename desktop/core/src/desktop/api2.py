@@ -40,7 +40,7 @@ from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
 from desktop.lib.django_util import JsonResponse
-from desktop.conf import get_clusters, IS_K8_ONLY
+from desktop.conf import get_clusters, IS_K8S_ONLY
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
@@ -96,7 +96,7 @@ def get_context_namespaces(request, interface):
     if [cluster for cluster in clusters if cluster['type'] == 'altus']:
       # Note: attaching computes to namespaces might be done via the frontend in the future
       if interface == 'impala':
-        if IS_K8_ONLY.get():
+        if IS_K8S_ONLY.get():
           adb_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
         else:
           adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
@@ -106,24 +106,24 @@ def get_context_namespaces(request, interface):
             _cluster['id'] = _cluster['crn']
             _cluster['namespaceName'] = _cluster['clusterName']
             _cluster['name'] = _cluster['clusterName']
-            _cluster['compute_end_point'] = '%(publicHost)s' % _cluster['coordinatorEndpoint'] if IS_K8_ONLY.get() else '',
+            _cluster['compute_end_point'] = '%(publicHost)s' % _cluster['coordinatorEndpoint'] if IS_K8S_ONLY.get() else '',
       else:
         adb_clusters = []
 
-      if IS_K8_ONLY.get():
+      if IS_K8S_ONLY.get():
         sdx_namespaces = []
       else:
         sdx_namespaces = SdxApi(request.user).list_namespaces()
 
       # Adding "fake" namespace for cluster without one
-      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8_ONLY.get() and _cluster['status'] == 'ONLINE')])
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and _cluster['status'] == 'ONLINE')])
 
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
           'name': namespace.get('namespaceName'),
           'status': namespace.get('status'),
           'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
-        } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED' or IS_K8_ONLY.get()
+        } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED' or IS_K8S_ONLY.get()
       ])
 
   response[interface] = namespaces
@@ -150,7 +150,7 @@ def get_context_computes(request, interface):
     ])
 
   if interface == 'impala' or interface == 'report':
-    if IS_K8_ONLY.get():
+    if IS_K8S_ONLY.get():
       dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
     else:
       dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
@@ -161,9 +161,9 @@ def get_context_computes(request, interface):
           'name': cluster.get('clusterName'),
           'status': cluster.get('status'),
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-          'compute_end_point': IS_K8_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
+          'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
           'type': 'altus-dw'
-        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8_ONLY.get() and cluster['status'] == 'ONLINE')]
+        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and cluster['status'] == 'ONLINE')]
       )
 
   if interface == 'oozie' or interface == 'spark2':
