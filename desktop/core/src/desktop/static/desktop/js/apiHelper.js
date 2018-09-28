@@ -1579,7 +1579,8 @@ var ApiHelper = (function () {
     var waitForAvailable = function () {
       var request = self.simplePost('/notebook/api/check_status', {
         notebook: options.notebookJson,
-        snippet: options.snippetJson
+        snippet: options.snippetJson,
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       }, {
         silenceErrors: options.silenceErrors
       }).done(function (response) {
@@ -1649,7 +1650,8 @@ var ApiHelper = (function () {
       if (notebookJson) {
         self.simplePost('/notebook/api/cancel_statement', {
           notebook: notebookJson,
-          snippet: snippetJson
+          snippet: snippetJson,
+          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
         }, { silenceErrors:  options.silenceErrors });
       }
     };
