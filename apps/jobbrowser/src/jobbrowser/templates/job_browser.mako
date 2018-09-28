@@ -81,7 +81,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 % if is_mini:
-  <div class="pull-right" style="padding: 6px 10px 0 0">
+  <div class="mini-jb-context-selector">
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
