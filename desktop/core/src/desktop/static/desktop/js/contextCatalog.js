@@ -47,6 +47,26 @@ var ContextCatalog = (function () {
 
       self.clusters = {};
       self.clusterPromises = {};
+
+      var addPubSubs = function () {
+        if (typeof huePubSub !== 'undefined') {
+          huePubSub.subscribe('context.catalog.refresh', function () {
+            self.namespaces = {};
+            self.namespacePromises = {};
+
+            self.computes = {};
+            self.computePromises = {};
+
+            self.clusters = {};
+            self.clusterPromises = {};
+            huePubSub.publish('context.catalog.refreshed');
+          })
+        } else {
+          window.setTimeout(addPubSubs, 100);
+        }
+      };
+
+      addPubSubs();
     }
 
     ContextCatalog.prototype.getStore = function () {
