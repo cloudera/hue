@@ -46,7 +46,7 @@ from desktop.views import _ko
           <li class="divider"></li>
           <!-- /ko -->
           <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { var previous = $parent.value(); $parent.value($data); $parent.onChanged($data, previous); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { var previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -56,7 +56,7 @@ from desktop.views import _ko
           <li class="divider"></li>
           <!-- /ko -->
           <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { var previous = $parent.value(); $parent.value($data); $parent.onChanged($data, previous); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { var previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -166,7 +166,7 @@ from desktop.views import _ko
         self.foreachVisible = params.foreachVisible || false;
         self.linkTitle = params.linkTitle || '${ _('Selected entry') }';
         self.fixedPosition = !!params.fixedPosition;
-        self.onChanged = params.onChanged || function () {};
+        self.onSelect = params.onSelect || function () {};
 
         self.inputPlaceHolder = ko.pureComputed(function () {
           return self.value() && typeof self.value() === 'object' ? self.value()[self.labelAttribute] : self.value();
@@ -186,7 +186,7 @@ from desktop.views import _ko
         self.onEnter = function (value) {
           var previous = self.value();
           self.value(value);
-          self.onChanged(value, previous);
+          self.onSelect(value, previous);
           self.dropDownVisible(false);
         };
 
