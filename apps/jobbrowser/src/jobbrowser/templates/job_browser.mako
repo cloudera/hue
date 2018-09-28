@@ -2866,6 +2866,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             console.log(ko.mapping.toJSON(data));
             $(document).trigger("info", ko.mapping.toJSON(data));
             self.updateJobs();
+            huePubSub.publish('context.catalog.refresh');
           });
         } else {
           $.post("/metadata/api/analytic_db/create_cluster/", {
@@ -2881,10 +2882,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             console.log(ko.mapping.toJSON(data));
             $(document).trigger("info", ko.mapping.toJSON(data));
             self.updateJobs();
+            huePubSub.publish('context.catalog.refresh');
           });
         }
         self.createClusterShow(false);
-      }
+      };
 
       self.control = function (action) {
         if (action == 'rerun') {
