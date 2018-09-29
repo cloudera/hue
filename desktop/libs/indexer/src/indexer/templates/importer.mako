@@ -618,7 +618,7 @@ ${ assist.assistPanel() }
                 ${ _('Empty name') }
               <!-- /ko -->
             </span>
-            <span class="help-inline muted" data-bind="visible: isTargetExisting() && outputFormat() != 'altus' && $parent.createWizard.source.inputFormat() !== 'rdbms' ">
+            <span class="help-inline muted" data-bind="visible: isTargetExisting() && outputFormat() != 'altus'">
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
@@ -1362,6 +1362,55 @@ ${ assist.assistPanel() }
     </div>
   </div>
 </script>
+
+
+<div id="showCommandsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px; margin-left:-510px!important">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Commands')}</h2>
+  </div>
+  <div class="modal-body">
+    <div class="editor-help two-pane">
+      <div class="tab-content">
+        <div class="tab-pane active" id="help-editor-syntax">
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#help-editor-syntax-comment" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-comment\']').tab('show'); }">
+                ${ _('Commands')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-click" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-click\']').tab('show'); }">
+                ${ _('Shell')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-multiquery" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-multiquery\']').tab('show'); }">
+                ${ _('REST')}
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="help-editor-syntax-comment">
+              <div data-bind="text: createWizard.commands">
+              </div>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-click">
+              <ul class="nav help-list-spacing">
+              </ul>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-multiquery">              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
+
 
 <script type="text/javascript">
   % if is_embeddable:
