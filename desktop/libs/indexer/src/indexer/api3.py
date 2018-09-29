@@ -612,9 +612,9 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
   properties["ouputFormat"] = destination['ouputFormat']
   properties["streamSelection"] = file_format["streamSelection"]
 
-  envelope = indexer.generate_config(properties)
+  configs = indexer.generate_config(properties)
 
-  return indexer.run(request, collection_name, envelope, input_path, start_time=start_time, lib_path=lib_path)
+  return indexer.run(request, collection_name, configs, input_path, start_time=start_time, lib_path=lib_path)
 
 
 def _create_solr_collection(user, fs, client, destination, index_name, kwargs):

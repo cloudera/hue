@@ -26,7 +26,8 @@ from desktop.conf import DISABLE_HUE_3
 from hadoop.fs.hadoopfs import Hdfs
 from notebook.models import make_notebook
 
-from indexer.conf import CONFIG_JARS_LIBS_PATH
+from indexer.conf import CONFIG_JARS_LIBS_PATH, config_morphline_path
+from libzookeeper.conf import zkensemble
 
 
 LOG = logging.getLogger(__name__)
@@ -40,22 +41,24 @@ class EnvelopeIndexer(object):
     self.username = username
 
 
-  def _upload_workspace(self, envelope):
+  def _upload_workspace(self, configs):
     from oozie.models2 import Job
 
     hdfs_workspace_path = Job.get_workspace(self.username)
-    hdfs_envelope_path = os.path.join(hdfs_workspace_path, "envelope.conf")
 
     # Create workspace on hdfs
     self.fs.do_as_user(self.username, self.fs.mkdir, hdfs_workspace_path)
 
-    self.fs.do_as_user(self.username, self.fs.create, hdfs_envelope_path, data=envelope)
+    for config_name, config_content in configs.iteritems():
+      hdfs_config_path = os.path.join(hdfs_workspace_path, config_name)
+      self.fs.do_as_user(self.username, self.fs.create, hdfs_config_path, data=config_content)
 
     return hdfs_workspace_path
 
 
-  def run(self, request, collection_name, envelope, input_path, start_time=None, lib_path=None):
-    workspace_path = self._upload_workspace(envelope)
+  def run(self, request, collection_name, configs, input_path, start_time=None, lib_path=None):
+    workspace_path = self._upload_workspace(configs)
+
     if lib_path is None:
       lib_path = CONFIG_JARS_LIBS_PATH.get()
 
@@ -105,9 +108,18 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
 
 
   def generate_config(self, properties):
+    configs = {
+    }
+
     if properties['inputFormat'] == 'stream':
       if properties['streamSelection'] == 'kafka':
         if properties['topics'] == 'NavigatorAuditEvents':
+          morphline_config = open(os.path.join(config_morphline_path(), 'navigator_topic.morphline.conf')).read()
+          configs['navigator_topic.morphline.conf'] = morphline_config.replace(
+            '${SOLR_COLLECTION}', 'empty'
+          ).replace(
+            '${ZOOKEEPER_ENSEMBLE}', '%s/solr' % zkensemble()
+          )
           input = """
               type = kafka
               brokers = "%(brokers)s"
@@ -240,7 +252,13 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               table.name = "%(output_table)s"
           }""" % properties
     elif properties['ouputFormat'] == 'index':
-      if True: # Workaround until envelope solr output is official
+      if True: # Workaround until envelope Solr output is official
+        morphline_config = open(os.path.join(config_morphline_path(), 'navigator_topic.morphline.conf')).read()
+        configs['navigator_topic.morphline.conf'] = morphline_config.replace(
+          '${SOLR_COLLECTION}', properties['collectionName']
+        ).replace(
+          '${ZOOKEEPER_ENSEMBLE}', '%s/solr' % zkensemble()
+        )
         output = """
             // Load events to a Solr index
             // TODO: Move this to a SolrOutput step, when this is available
@@ -304,7 +322,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
     else:
       raise PopupException(_('Output format not recognized: %(ouputFormat)s') % properties)
 
-    return """
+    configs['envelope.conf'] = """
 application {
     name = %(app_name)s
     %(batch)s
@@ -336,3 +354,5 @@ steps {
     'app_name': properties['app_name'],
     'batch': 'batch.milliseconds = 5000' if properties['inputFormat'] == 'stream' else ''
   }
+
+    return configs
