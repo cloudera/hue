@@ -2472,11 +2472,7 @@ ${ assist.assistPanel() }
         if (self.destination.outputFormat() === 'database' && self.source.inputFormat() === 'rdbms') {
           isTargetAlreadyExisting = self.destination.isTargetExisting();
         } else {
-          isTargetAlreadyExisting = !self.destination.isTargetExisting()
-            || self.destination.outputFormat() === 'index'
-            ## Authorize submission but should check if schema is compatible
-            || (self.source.inputFormat() === 'stream' && self.destination.outputFormat() === 'table' && self.destination.tableFormat() === 'kudu')
-          ;
+          isTargetAlreadyExisting = !self.destination.isTargetExisting() || self.destination.outputFormat() === 'index';
         }
         var isValidTable = self.destination.outputFormat() !== 'table' || (
           self.destination.tableFormat() !== 'kudu' || (
