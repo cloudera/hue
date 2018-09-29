@@ -260,7 +260,11 @@ def run_sqoop(request, source, destination, start_time):
     is_task=True
   )
 
-  return task.execute(request, batch=False)
+  if request.POST.get('options'):
+    return {'status': 0, 'commands': task.get_str()}
+  else:
+    return task.execute(request, batch=False)
+
 
 def _splitby_column_check(statement, destination_splitby_column):
   if destination_splitby_column:
