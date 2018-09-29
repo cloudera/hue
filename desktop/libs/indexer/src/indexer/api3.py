@@ -22,8 +22,10 @@ import urllib
 import StringIO
 
 from urlparse import urlparse
+
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 from simple_salesforce.api import Salesforce
 
 from desktop.lib import django_mako
@@ -46,6 +48,7 @@ from indexer.indexers.rdbms import run_sqoop, _get_api
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
+from indexer.models import _save_pipeline
 
 
 LOG = logging.getLogger(__name__)
@@ -660,3 +663,20 @@ def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
         shards=destination['indexerNumShards'],
         replication=destination['indexerReplicationFactor']
     )
+
+@api_error_handler
+@require_POST
+# @check_document_modify_permission()
+def save_pipeline(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+
+  notebook_doc, save_as = _save_pipeline(notebook, request.user)
+
+  response['status'] = 0
+  response['save_as'] = save_as
+  response.update(notebook_doc.to_dict())
+  response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
+
+  return JsonResponse(response)
