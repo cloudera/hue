@@ -77,7 +77,7 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', server=None, cluster=None):
-  LOG.debug("Query cluster: %s" % cluster)
+  LOG.debug("Query cluster %s: %s" % (name, cluster))
 
   if cluster and cluster.get('id') != CLUSTER_ID.get():
     if 'altus:dataware:k8s' in cluster['id']:
