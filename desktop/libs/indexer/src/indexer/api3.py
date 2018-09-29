@@ -355,7 +355,7 @@ def importer_submit(request):
     else:
       client = SolrClient(request.user)
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
-  elif source['inputFormat'] in ('stream', 'sfdc') or destination['ouputFormat'] == 'stream':
+  elif source['inputFormat'] in ('stream', 'connector') or destination['ouputFormat'] == 'stream':
     job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
   elif source['inputFormat'] == 'altus':
     # BDR copy or DistCP + DDL + Sentry DDL copy
@@ -531,26 +531,27 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
     }
   elif file_format['inputFormat'] == 'stream' and file_format['streamSelection'] == 'flume':
     pass
-  elif file_format['inputFormat'] in ('stream', 'sfdc'):
-    if file_format['inputFormat'] == 'sfdc':
-      properties = {
-        'streamSelection': file_format['streamSelection'],
-        'streamUsername': file_format['streamUsername'],
-        'streamPassword': file_format['streamPassword'],
-        'streamToken': file_format['streamToken'],
-        'streamEndpointUrl': file_format['streamEndpointUrl'],
-        'streamObject': file_format['streamObject'],
-      }
-    elif file_format['streamSelection'] == 'kafka':
+  elif file_format['inputFormat'] == 'stream':
+    if file_format['streamSelection'] == 'kafka':
       manager = ManagerApi()
       properties = {
         "brokers": manager.get_kafka_brokers(),
         "topics": file_format['kafkaSelectedTopics'],
         "kafkaFieldType": file_format['kafkaFieldType'],
         "kafkaFieldDelimiter": file_format['kafkaFieldDelimiter'],
-        "kafkaFieldNames": file_format['kafkaFieldNames'],
-        "kafkaFieldTypes": file_format['kafkaFieldTypes']
       }
+
+      if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
+        schema_fields = MorphlineIndexer.get_kept_field_list(file_format['sampleCols'])
+        properties.update({
+          "kafkaFieldNames": ','.join([_field['name'] for _field in schema_fields]),
+          "kafkaFieldTypes": ','.join([_field['type'] for _field in schema_fields])
+        })
+      else:
+        properties.update({
+          "kafkaFieldNames": file_format['kafkaFieldNames'],
+          "kafkaFieldTypes": file_format['kafkaFieldTypes']
+        })
 
       if True:
         properties['window'] = ''
@@ -560,43 +561,48 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
                 enabled = true
                 milliseconds = 60000
             }'''
+  elif file_format['inputFormat'] == 'connector':
+    # sfdc
+    properties = {
+      'streamSelection': file_format['streamSelection'],
+      'streamUsername': file_format['streamUsername'],
+      'streamPassword': file_format['streamPassword'],
+      'streamToken': file_format['streamToken'],
+      'streamEndpointUrl': file_format['streamEndpointUrl'],
+      'streamObject': file_format['streamObject'],
+    }
 
-    if destination['outputFormat'] == 'table':
-      if destination['isTargetExisting']:
-        # Todo: check if format matches
-        pass
-      else:
-        sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).get_str()
-        print sql
+  if destination['outputFormat'] == 'table':
+    if destination['isTargetExisting']: # Todo: check if format matches
+      pass
+    else:
+      destination['importData'] = False # Avoid LOAD DATA
       if destination['tableFormat'] == 'kudu':
-        manager = ManagerApi()
-        properties["output_table"] = "impala::%s" % collection_name
-        properties["kudu_master"] = manager.get_kudu_master()
-      else:
-        properties['output_table'] = collection_name
-    elif destination['outputFormat'] == 'file':
-      properties['path'] = file_format["path"]
-      if file_format['inputFormat'] == 'stream':
-        properties['format'] = 'csv'
-      else:
-        properties['format'] = file_format['tableFormat'] # or csv
-    elif destination['outputFormat'] == 'index':
-      properties['collectionName'] = collection_name
-      properties['connection'] = SOLR_URL.get()
-# No needed anymore
-#       if destination['isTargetExisting']:
-#         # Todo: check if format matches
-#         pass
-#       else:
-#         client = SolrClient(request.user)
-#         kwargs = {}
-#         _create_solr_collection(request.user, request.fs, client, destination, collection_name, kwargs)
+        properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase    
+      # Create table
+      SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).execute(request)
 
-  if destination['outputFormat'] == 'stream':
+    if destination['tableFormat'] == 'kudu':
+      manager = ManagerApi()
+      properties["output_table"] = "impala::%s" % collection_name
+      properties["kudu_master"] = manager.get_kudu_master()
+    else:
+      properties['output_table'] = collection_name
+  elif destination['outputFormat'] == 'stream':
     manager = ManagerApi()
     properties['brokers'] = manager.get_kafka_brokers()
     properties['topics'] = file_format['kafkaSelectedTopics']
     properties['kafkaFieldDelimiter'] = file_format['kafkaFieldDelimiter']
+  elif destination['outputFormat'] == 'file':
+    properties['path'] = file_format["path"]
+    if file_format['inputFormat'] == 'stream':
+      properties['format'] = 'csv'
+    else:
+      properties['format'] = file_format['tableFormat'] # or csv
+  elif destination['outputFormat'] == 'index':
+    properties['collectionName'] = collection_name
+    properties['connection'] = SOLR_URL.get()
+
 
   properties["app_name"] = 'Data Ingest'
   properties["inputFormat"] = file_format['inputFormat']
