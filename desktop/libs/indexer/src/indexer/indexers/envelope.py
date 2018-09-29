@@ -115,7 +115,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               //group.id = nav-envelope
               encoding = bytearray
               parameter.auto.offset.reset = earliest
-              
+
               translator {
                 type = morphline
                 encoding.key = UTF8
@@ -165,8 +165,47 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
       raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
 
 
+    extra_step = ''
+    properties['output_deriver'] = """
+        deriver {
+          type = sql
+          query.literal = \"\"\"SELECT * from inputdata\"\"\"
+        }"""
+
+    if properties['inputFormat'] == 'stream' and properties['topics'] == 'NavigatorAuditEvents': # Kudu does not support upper case names
+      properties['output_deriver'] = """
+          deriver {
+            type = sql
+            query.literal = \"\"\"
+                SELECT concat_ws('-', time,  service, user) as id,
+                -- timeDate todo
+                additionalInfo as additionalinfo, allowed,
+                collectionName as collectionname,
+                databaseName as databasename, db,
+                DELEGATION_TOKEN_ID as delegation_token_id, dst,
+                entityId as entityid, time, family, impersonator, ip, name,
+                objectType as objecttype,
+                objType as objtype,
+                objUsageType as objusagetype, op,
+                operationParams as operationparams,
+                operationText as operationtext,
+                opText as optext, path, perms, privilege, qualifier,
+                QUERY_ID as query_id,
+                resourcePath as resourcepath, service,
+                SESSION_ID as session_id,
+                solrVersion as solrversion, src, status,
+                subOperation as suboperation,
+                tableName as tablename,
+                `table` as `table`, type, url, user
+                FROM inputdata
+            \"\"\"
+          }"""
+
+
     if properties['ouputFormat'] == 'file':
       output = """
+        %(output_deriver)s
+
         planner = {
           type = overwrite
         }
@@ -177,13 +216,10 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
           header = true
         }""" % properties
     elif properties['ouputFormat'] == 'table':
-      if properties['inputFormat'] == 'stream' and properties['streamSelection'] == 'kafka':
+      if properties['inputFormat'] == 'stream' and properties['streamSelection'] == 'kafka': # TODO: look at table output type instead and merge
         output = """
-          deriver {
-              type = sql
-              query.literal = \"""
-                  SELECT * FROM inputdata\"""
-          }
+          %(output_deriver)s
+
           planner {
               type = upsert
           }
@@ -194,6 +230,8 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
           }""" % properties
       else:
         output = """
+         %(output_deriver)s
+
           planner {
               type = append
           }
@@ -202,11 +240,45 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               table.name = "%(output_table)s"
           }""" % properties
     elif properties['ouputFormat'] == 'index':
-      if properties['inputFormat'] == 'stream':
-        if properties['topics'] == 'NavigatorAuditEvents':
-          output = ''
+      if True: # Workaround until envelope solr output is official
+        output = """
+            // Load events to a Solr index
+            // TODO: Move this to a SolrOutput step, when this is available
+            deriver {
+              type = morphline
+              step.name = kafkaInput
+              morphline.file = ${vars.morphline.file}
+              morphline.id = ${vars.morphline.solr.indexer}
+              field.names = ${vars.json.field.names}
+              field.types = ${vars.json.field.types}
+            }
+          """ % properties
+        extra_step = """
+          solrOutput {
+            dependencies = [outputdata]
+
+            deriver {
+              type = sql
+              query.literal = \"\"\"
+                SELECT *
+                FROM outputdata LIMIT 0
+                \"\"\"
+            }
+
+            planner = {
+              type = append
+            }
+
+            output = {
+              type = log
+              path = ${vars.hdfs.basedir}
+              format = csv
+            }
+          }""" % properties
       else:
         output = """
+          %(output_deriver)s
+
           planner {
               type = upstert
           }
@@ -217,6 +289,8 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
           }""" % properties
     elif properties['ouputFormat'] == 'stream':
       output = """
+        %(output_deriver)s
+
         planner {
             type = append
         }
@@ -249,15 +323,16 @@ steps {
     outputdata {
         dependencies = [inputdata]
 
-
-
         %(output)s
     }
+
+    %(extra_step)s
 }
 
 """ % {
     'input': input,
     'output': output,
+    'extra_step': extra_step,
     'app_name': properties['app_name'],
     'batch': 'batch.milliseconds = 5000' if properties['inputFormat'] == 'stream' else ''
   }
