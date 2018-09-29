@@ -249,7 +249,10 @@ class HS2Api(Api):
       if statement.get('statement_id') == 0:
         if query.database and not statement['statement'].lower().startswith('set'):
           db.use(query.database)
-      handle = db.client.query(query, with_multiple_session=True)
+      if True:
+        handle = db.execute_and_wait(query=query, timeout_sec=5)
+      else:
+        handle = db.client.query(query, with_multiple_session=True)
     except QueryServerException, ex:
       raise QueryError(ex.message, handle=statement)
 
