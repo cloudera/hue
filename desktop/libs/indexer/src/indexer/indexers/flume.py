@@ -65,6 +65,18 @@ class FlumeIndexer(object):
       ''' % {
        'directory': source['channelSourcePath']
     }
+    elif source['channelSourceType'] == 'kafka':
+      agent_source = '''
+  tier1.sources.source1.type = org.apache.flume.source.kafka.KafkaSource
+  tier1.sources.source1.channels = channel1
+  tier1.sources.source1.batchSize = 5000
+  tier1.sources.source1.batchDurationMillis = 2000
+  tier1.sources.source1.kafka.bootstrap.servers = localhost:9092
+  tier1.sources.source1.kafka.topics = test1, test2
+  tier1.sources.source1.kafka.consumer.group.id = custom.g.id
+      ''' % {
+       'directory': source['channelSourcePath']
+    }
     else:
       raise PopupException(_('Input format not recognized: %(channelSourceType)s') % source)
 

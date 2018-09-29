@@ -107,33 +107,55 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
   def generate_config(self, properties):
     if properties['inputFormat'] == 'stream':
       if properties['streamSelection'] == 'kafka':
-        input = """type = kafka
-                brokers = "%(brokers)s"
-                topics = [%(topics)s]
-                encoding = string
-                translator {
-                    type = %(kafkaFieldType)s
-                    delimiter = "%(kafkaFieldDelimiter)s"
-                    field.names = [%(kafkaFieldNames)s]
-                    field.types = [%(kafkaFieldTypes)s]
-                }
-                %(window)s
-        """ % properties
-      elif properties['streamSelection'] == 'sfdc':
-        input = """type = sfdc
-            mode = fetch-all
-            sobject = %(streamObject)s
-            sfdc: {
-              partner: {
-                username = "%(streamUsername)s"
-                password = "%(streamPassword)s"
-                token = "%(streamToken)s"
-                auth-endpoint = "%(streamEndpointUrl)s"
+        if properties['topics'] == 'NavigatorAuditEvents':
+          input = """
+              type = kafka
+              brokers = "%(brokers)s"
+              topics = [%(topics)s]
+              //group.id = nav-envelope
+              encoding = bytearray
+              parameter.auto.offset.reset = earliest
+              
+              translator {
+                type = morphline
+                encoding.key = UTF8
+                encoding.message = UTF8
+                morphline.file = "navigator_topic.morphline.conf"
+                morphline.id = "nav-json-input"
+                field.names = [%(kafkaFieldNames)s]
+                field.types = [%(kafkaFieldTypes)s]
               }
-            }
-  """ % properties
+              %(window)s
+          """ % properties
+        else:
+          input = """type = kafka
+                  brokers = "%(brokers)s"
+                  topics = [%(topics)s]
+                  encoding = string
+                  translator {
+                      type = %(kafkaFieldType)s
+                      delimiter = "%(kafkaFieldDelimiter)s"
+                      field.names = [%(kafkaFieldNames)s]
+                      field.types = [%(kafkaFieldTypes)s]
+                  }
+                  %(window)s
+          """ % properties
       else:
         raise PopupException(_('Stream format of %(inputFormat)s not recognized: %(streamSelection)s') % properties)
+    elif properties['inputFormat'] == 'connector':
+      # sfdc
+      input = """type = sfdc
+          mode = fetch-all
+          sobject = %(streamObject)s
+          sfdc: {
+            partner: {
+              username = "%(streamUsername)s"
+              password = "%(streamPassword)s"
+              token = "%(streamToken)s"
+              auth-endpoint = "%(streamEndpointUrl)s"
+            }
+          }
+""" % properties
     elif properties['inputFormat'] == 'file':
       input = """type = filesystem
         path = %(input_path)s
@@ -227,10 +249,7 @@ steps {
     outputdata {
         dependencies = [inputdata]
 
-        deriver {
-          type = sql
-          query.literal = \"\"\"SELECT * from inputdata\"\"\"
-        }
+
 
         %(output)s
     }

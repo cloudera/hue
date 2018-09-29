@@ -317,7 +317,7 @@ def get_api(request, snippet):
   # Multi cluster
   if has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
-    if cluster == 'undefined':
+    if cluster == '""' or cluster == 'undefined':
       cluster = None
     if not cluster and snippet.get('compute'): # Via notebook.ko.js
       cluster = snippet['compute']
