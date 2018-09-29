@@ -618,7 +618,7 @@ ${ assist.assistPanel() }
                 ${ _('Empty name') }
               <!-- /ko -->
             </span>
-            <span class="help-inline muted" data-bind="visible: isTargetExisting() && outputFormat() != 'altus' && $parent.createWizard.source.inputFormat() !== 'rdbms' ">
+            <span class="help-inline muted" data-bind="visible: isTargetExisting() && outputFormat() != 'altus'">
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
@@ -1405,49 +1405,9 @@ ${ assist.assistPanel() }
             </div>
             <div class="tab-pane" id="help-editor-syntax-click">
               <ul class="nav help-list-spacing">
-                <li>
-                  <b>${ _('Double Click')}</b>
-                  <div>${ _('Double clicking the row number selects all rows.')}</div>
-                </li>
-                <li>
-                  <b>${ _('Drag & Drop')}</b>
-                  <div>${ _('Dragging and dropping a table name from the assistant onto the editor inserts sample queries in the editor.')}</div>
-                </li>
-                <li>
-                  <b>${ _('Right Click')}</b>
-                  <div>${ _('Right clicking on an element of a query will bring up the appropriate browser for that element.')}</div>
-                  <div>${ _('Clickable items are highlighted on mouse hover.')}</div>
-                  <div><span class="muted">${ _('e.g.: function, column, table names, SELECT *') }</span></div>
-                </li>
-                <li>
-                  <b>${ _('Single Click')}</b>
-                  <div>${ _('Single clicking the row number selects the whole row.')}</div>
-                </li>
               </ul>
             </div>
-            <div class="tab-pane" id="help-editor-syntax-multiquery">
-              <div>${ _('Multiple queries can be embedded in a single editor and separated via semicolon.')}</div>
-              <div>${ _('The cursor points to the query that will be executed.')}</div>
-              
-            </div>
-            <div class="tab-pane" id="help-editor-syntax-variable">
-              <span>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</span>
-              <ul class="nav help-list-spacing">
-                <li>
-                  <div class="margin-top-20"><b>${ _('Single Valued')}</b><span class="muted padding-left-20">${ _('${variable_name}')}</span></div>
-                  
-                  <div>${ _('The variable can have a default value.')}</div>
-                  
-                </li>
-                <li>
-                  <div class="margin-top-30"><b>${ _('Multi Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value1, variable_value2,...}')}</span></div>
-                  
-                  <div>${ _('The displayed text can be changed.')}</div>
-                  
-                </li>
-                <span>${ _('For values that are not textual, omit the quotes.')}</span>
-               
-              </ul>
+            <div class="tab-pane" id="help-editor-syntax-multiquery">              
             </div>
           </div>
         </div>
