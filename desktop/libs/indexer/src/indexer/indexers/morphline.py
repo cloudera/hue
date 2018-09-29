@@ -130,6 +130,7 @@ class MorphlineIndexer(object):
     return file_format.get_fields() if file_format else {'columns': []}
 
   # Breadth first ordering of fields
+  @classmethod
   def get_field_list(self, field_data, is_converting_types=False):
     fields = []
 
@@ -148,8 +149,9 @@ class MorphlineIndexer(object):
 
     return fields
 
-  def get_kept_field_list(self, field_data):
-    return [field for field in self.get_field_list(field_data) if field['keep']]
+  @classmethod
+  def get_kept_field_list(cls, field_data):
+    return [field for field in cls.get_field_list(field_data) if field['keep']]
 
   def get_unique_field(self, format_):
     unique_fields = [column['name'] for column in format_['columns'] if column['unique']]
