@@ -636,7 +636,7 @@ except ImportError, e:
         </div>
         <div class="tab-pane active" id="help-editor-syntax">
           <ul class="nav nav-tabs">
-           <li class="active">
+            <li class="active">
               <a href="#help-editor-syntax-comment" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-comment\']').tab('show'); }">
                 ${ _('Comments')}
               </a>

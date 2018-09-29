@@ -1075,6 +1075,15 @@ ${ assist.assistPanel() }
         <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
+        
+        % if ENABLE_ENVELOPE.get():
+        <button class="btn disable-feedback" data-bind="click: createWizard.showCommands, enable: createWizard.readyToIndex()">
+          ${ _('Show Commands') }
+        </button>
+        <button class="btn disable-feedback" data-bind="click: createWizard.indexFile">
+          ${ _('Save') }
+        </button>
+        % endif
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
@@ -1362,6 +1371,94 @@ ${ assist.assistPanel() }
     </div>
   </div>
 </script>
+
+<div id="showCommandsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px; margin-left:-510px!important">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Commands')}</h2>
+  </div>
+  <div class="modal-body">
+    <div class="editor-help two-pane">
+      <div class="tab-content">
+        <div class="tab-pane active" id="help-editor-syntax">
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#help-editor-syntax-comment" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-comment\']').tab('show'); }">
+                ${ _('Commands')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-click" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-click\']').tab('show'); }">
+                ${ _('Shell')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-multiquery" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-multiquery\']').tab('show'); }">
+                ${ _('REST')}
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="help-editor-syntax-comment">
+              <div data-bind="text: createWizard.commands">
+              </div>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-click">
+              <ul class="nav help-list-spacing">
+                <li>
+                  <b>${ _('Double Click')}</b>
+                  <div>${ _('Double clicking the row number selects all rows.')}</div>
+                </li>
+                <li>
+                  <b>${ _('Drag & Drop')}</b>
+                  <div>${ _('Dragging and dropping a table name from the assistant onto the editor inserts sample queries in the editor.')}</div>
+                </li>
+                <li>
+                  <b>${ _('Right Click')}</b>
+                  <div>${ _('Right clicking on an element of a query will bring up the appropriate browser for that element.')}</div>
+                  <div>${ _('Clickable items are highlighted on mouse hover.')}</div>
+                  <div><span class="muted">${ _('e.g.: function, column, table names, SELECT *') }</span></div>
+                </li>
+                <li>
+                  <b>${ _('Single Click')}</b>
+                  <div>${ _('Single clicking the row number selects the whole row.')}</div>
+                </li>
+              </ul>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-multiquery">
+              <div>${ _('Multiple queries can be embedded in a single editor and separated via semicolon.')}</div>
+              <div>${ _('The cursor points to the query that will be executed.')}</div>
+              
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-variable">
+              <span>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</span>
+              <ul class="nav help-list-spacing">
+                <li>
+                  <div class="margin-top-20"><b>${ _('Single Valued')}</b><span class="muted padding-left-20">${ _('${variable_name}')}</span></div>
+                  
+                  <div>${ _('The variable can have a default value.')}</div>
+                  
+                </li>
+                <li>
+                  <div class="margin-top-30"><b>${ _('Multi Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value1, variable_value2,...}')}</span></div>
+                  
+                  <div>${ _('The displayed text can be changed.')}</div>
+                  
+                </li>
+                <span>${ _('For values that are not textual, omit the quotes.')}</span>
+               
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
+
 
 <script type="text/javascript">
   % if is_embeddable:
@@ -2612,7 +2709,11 @@ ${ assist.assistPanel() }
           return o.name;
         });
       });
-      self.indexFile = function () {
+      self.commands = ko.observable([]);
+      self.showCommands = function() {
+        self.indexFile({show: true});
+      };
+      self.indexFile = function (options) {
         if (!self.readyToIndex()) {
           return;
         }
@@ -2726,7 +2827,8 @@ ${ assist.assistPanel() }
         $.post("${ url('indexer:importer_submit') }", {
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination),
-          "start_time": ko.mapping.toJSON((new Date()).getTime())
+          "start_time": ko.mapping.toJSON((new Date()).getTime()),
+          "options": ko.mapping.toJSON(options || {})
         }, function (resp) {
           self.indexingStarted(false);
           if (resp.status === 0) {
@@ -2742,6 +2844,9 @@ ${ assist.assistPanel() }
                 $.jHueNotify.warn("${ _('Skipped records: ') }" + resp.errors.join(', '));
               }
               huePubSub.publish('open.link', resp.on_success_url);
+            } else if (resp.commands) {
+              self.commands(resp.commands);
+              $('#showCommandsModal').modal('show');
             }
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
