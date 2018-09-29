@@ -224,7 +224,6 @@ def guess_field_types(request):
       ]
     }
   elif file_format['inputFormat'] == 'stream':
-    # Note: mocked here, should come from SFDC or Kafka API or sampling job
     if file_format['streamSelection'] == 'kafka':
       if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
         kafkaFieldNames = [
@@ -244,6 +243,7 @@ def guess_field_types(request):
         kafkaFieldNames.append('timeDate')
         kafkaFieldTypes.append('date')
       else:
+        # Note: mocked here, should come from SFDC or Kafka API or sampling job
         kafkaFieldNames = file_format.get('kafkaFieldNames', '').split(',')
         kafkaFieldTypes = file_format.get('kafkaFieldTypes', '').split(',')
 
@@ -295,27 +295,30 @@ def guess_field_types(request):
               for col in columns
           ]
       }
-  elif file_format['streamSelection'] == 'sfdc':
-    sf = Salesforce(
-        username=file_format['streamUsername'],
-        password=file_format['streamPassword'],
-        security_token=file_format['streamToken']
-    )
-    table_metadata = [{
-        'name': column['name'],
-        'type': column['type']
-      } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
-    ]
-    query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
-    print query
-
-    format_ = {
-      "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
-      "columns": [
-          Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-          for col in table_metadata
+  elif file_format['inputFormat'] == 'connector':
+    if file_format['connectorSelection'] == 'sfdc':
+      sf = Salesforce(
+          username=file_format['streamUsername'],
+          password=file_format['streamPassword'],
+          security_token=file_format['streamToken']
+      )
+      table_metadata = [{
+          'name': column['name'],
+          'type': column['type']
+        } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
       ]
-    }
+      query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
+      print query
+  
+      format_ = {
+        "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in table_metadata
+        ]
+      }
+  else:
+    raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
   return JsonResponse(format_)
 
