@@ -78,7 +78,7 @@ ${ fb_components.menubar() }
           <!-- /ko -->
 
           <!-- ko ifnot: $root.isViewing -->
-            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-eye"></i> ${_('View file')}</a></li>
+            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-reply"></i> ${_('View file')}</a></li>
           <!-- /ko -->
 
           <!-- ko if: $root.isViewing -->

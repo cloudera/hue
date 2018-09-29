@@ -394,7 +394,7 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <!-- ko if: createWizard.source.connectorList() == 'sfdc' -->
+            <!-- ko if: createWizard.source.connectorSelection() == 'sfdc' -->
             <div class="control-group">
               <label class="control-label"><div>${ _('Username') }</div>
                 <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.streamUsername" placeholder="user@company.com">
