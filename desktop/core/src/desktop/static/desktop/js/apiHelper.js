@@ -1273,7 +1273,8 @@ var ApiHelper = (function () {
 
     if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
       var data = {
-        flush_all: options.invalidate === 'invalidateAndFlush'
+        flush_all: options.invalidate === 'invalidateAndFlush',
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       };
 
       if (options.path && options.path.length > 0) {
