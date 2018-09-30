@@ -166,7 +166,7 @@ def alter_database(request, database):
 def get_database_metadata(request, database, cluster=None):
   response = {'status': -1, 'data': ''}
 
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type')
   cluster = cluster or json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -174,6 +174,12 @@ def get_database_metadata(request, database, cluster=None):
   try:
     db_metadata = db.get_database(database)
     response['status'] = 0
+    if not db_metadata.get('owner_name'):
+      db_metadata['owner_name'] = ''
+    if not db_metadata.get('owner_type'):
+      db_metadata['owner_type'] = ''
+    if not db_metadata.get('parameters'):
+      db_metadata['parameters'] = ''
     db_metadata['hdfs_link'] = location_to_url(db_metadata['location'])
     response['data'] = db_metadata
   except Exception, ex:
@@ -259,8 +265,9 @@ def show_tables(request, database=None):
 
 def get_table_metadata(request, database, table):
   cluster = json.loads(request.POST.get('cluster', '{}'))
+  source_type = request.POST.get('source_type')
 
-  db = _get_db(user=request.user, cluster=cluster)
+  db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
   response = {'status': -1, 'data': ''}
   try:
     table_metadata = db.get_table(database, table)
