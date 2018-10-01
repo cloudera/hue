@@ -1083,7 +1083,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
         <!-- ko if: parseError -->
-          <!-- ko if: $parent.compatibilityTargetPlatform() == $parent.type() && $parent.compatibilitySourcePlatform() == $parent.type() -->
+          <!-- ko if: $parent.compatibilityTargetPlatform().value === $parent.type() && $parent.compatibilitySourcePlatform().value === $parent.type() -->
             <div class="optimizer-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-exclamation"></i>
             </div>
@@ -1092,29 +1092,29 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- /ko -->
           <!-- /ko -->
           ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
-          <!-- ko if: $parent.compatibilityTargetPlatform() != $parent.type() || $parent.type() != $parent.compatibilitySourcePlatform() -->
+          <!-- ko if: $parent.compatibilityTargetPlatform().value !== $parent.type() || $parent.type() !== $parent.compatibilitySourcePlatform().value -->
             <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
-              <span class="optimizer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+              <span class="optimizer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform().name"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
             <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform() != $parent.type() || $parent.compatibilitySourcePlatform() != $parent.type()) -->
+        <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform().value !== $parent.type() || $parent.compatibilitySourcePlatform().value !== $parent.type()) -->
           <!-- ko if: queryError.encounteredString().length == 0 -->
             <div class="optimizer-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-check"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
             <span class="optimizer-explanation alert-success alert-neutral">
-              ${ _('The ') } <select data-bind="options: $parent.compatibilitySourcePlatforms, optionsText: 'name', value: $parent.compatibilitySourcePlatform, optionsValue: 'value'" class="input-medium"></select>
-              <!-- ko if: $parent.compatibilitySourcePlatform() == $parent.type() -->
-                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
-                <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform()); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span></a>.
+              ${ _('The ') } <div data-bind="component: { name: 'hue-drop-down', params: { value: $parent.compatibilitySourcePlatform, entries: $parent.compatibilitySourcePlatforms, labelAttribute: 'name' } }" style="display: inline-block"></div>
+              <!-- ko if: $parent.compatibilitySourcePlatform().value === $parent.type() -->
+                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
+                <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform().value); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span></a>.
               <!-- /ko -->
-              <!-- ko if: $parent.compatibilitySourcePlatform() != $parent.type() -->
-                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
+              <!-- ko if: $parent.compatibilitySourcePlatform().value !== $parent.type() -->
+                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
               <!-- /ko -->
             </span>
           <!-- /ko -->
@@ -1124,7 +1124,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-exclamation"></i>
           </div>
           <!-- ko if: $parent.showOptimizer -->
-            <span class="optimizer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+            <span class="optimizer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
@@ -1889,7 +1889,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- ko if: HAS_OPTIMIZER -->
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { hasSuggestion(null); compatibilitySourcePlatform(type()); compatibilityTargetPlatform(type() == 'hive' ? 'impala' : 'hive'); queryCompatibility(); }, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
+          <a href="javascript:void(0)" data-bind="click: checkCompatibility, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
