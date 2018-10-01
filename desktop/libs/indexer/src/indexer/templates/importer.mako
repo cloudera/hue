@@ -1392,7 +1392,7 @@ ${ assist.assistPanel() }
           </ul>
           <div class="tab-content">
             <div class="tab-pane active" id="help-editor-syntax-comment">
-              <div data-bind="text: createWizard.commands">
+              <div data-bind="text: createWizard.commands" style="white-space: pre-wrap;">
               </div>
             </div>
             <div class="tab-pane" id="help-editor-syntax-click">

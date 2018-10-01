@@ -489,7 +489,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
 
   client = SolrClient(user=request.user)
 
-  if not client.exists(collection_name): # if destination['isTargetExisting']:
+  if not client.exists(collection_name) and not request.POST.get('options'): # if destination['isTargetExisting']:
     client.create_index(
       name=collection_name,
       fields=request.POST.get('fields', schema_fields),
@@ -505,7 +505,12 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'stream' and file_format['streamSelection'] == 'flume':
-    return FlumeIndexer(user=request.user).start(collection_name, file_format, destination)
+    indexer = FlumeIndexer(user=request.user)
+    if request.POST.get('options'):
+      configs = indexer.generate_config(file_format, destination)
+      return {'status': 0, 'commands': configs[-1]}
+    else:
+      return indexer.start(collection_name, file_format, destination)
   elif file_format['inputFormat'] == 'stream':
     return _envelope_job(request, file_format, destination, start_time=start_time, lib_path=lib_path)
   elif file_format['inputFormat'] == 'file':
@@ -550,8 +555,8 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
       if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
         schema_fields = MorphlineIndexer.get_kept_field_list(file_format['sampleCols'])
         properties.update({
-          "kafkaFieldNames": ','.join([_field['name'] for _field in schema_fields]),
-          "kafkaFieldTypes": ','.join([_field['type'] for _field in schema_fields])
+          "kafkaFieldNames": ', '.join([_field['name'] for _field in schema_fields]),
+          "kafkaFieldTypes": ', '.join([_field['type'] for _field in schema_fields])
         })
       else:
         properties.update({
@@ -617,7 +622,10 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
 
   configs = indexer.generate_config(properties)
 
-  return indexer.run(request, collection_name, configs, input_path, start_time=start_time, lib_path=lib_path)
+  if request.POST.get('options'):
+    return {'status': 0, 'commands': configs['envelope.conf']}
+  else:
+    return indexer.run(request, collection_name, configs, input_path, start_time=start_time, lib_path=lib_path)
 
 
 def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
