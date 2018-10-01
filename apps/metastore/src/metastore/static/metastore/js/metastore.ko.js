@@ -32,6 +32,7 @@ var MetastoreViewModel = (function () {
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
     self.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
+    self.appConfig = ko.observable();
 
     self.source = ko.observable();
     self.sources = ko.observableArray();
