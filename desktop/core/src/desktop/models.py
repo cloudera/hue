@@ -1820,7 +1820,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'security' in self.apps and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
