@@ -698,102 +698,6 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="metastore-permissions-tab">
-  <div class="acl-panel-content" style="height: 988px;">
-    <div class="pull-right">
-      <input class="input-medium no-margin" type="text" placeholder="Search privileges..."> &nbsp;
-      <a class="btn pointer">
-        <i class="fa fa-plus-circle"></i> Add role
-      </a>
-    </div>
-    <h4 style="margin-top: 4px;">Privileges &nbsp;</h4>
-
-    <div class="acl-block-title">
-      <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerFraud</span></a>
-    </div>
-    <div>
-      <div class="acl-block acl-block-airy">
-        <span class="muted" title="3 months ago">TABLE</span>
-        <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-        </span>
-        <br>
-        server=<span>server1</span>
-        <span>
-          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
-        </span>
-        <span>
-          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
-        </span>
-        <span style="display: none;">
-          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
-        </span>
-        <i class="fa fa-long-arrow-right"></i> action=INSERT
-      </div>
-
-      <div class="acl-block acl-block-airy">
-        <span class="muted" title="3 months ago">TABLE</span>
-        <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-        </span>
-        <br>
-        server=server1
-        <span>
-          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
-        </span>
-        <span>
-          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
-        </span>
-        <span style="display: none;">
-          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
-        </span>
-
-        <i class="fa fa-long-arrow-right"></i> action=<span>SELECT</span>
-      </div>
-    </div>
-
-    <div class="acl-block acl-actions">
-      <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
-      <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
-      <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
-      <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
-    </div>
-
-    <div class="acl-block-title">
-      <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerAccess</span></a>
-    </div>
-    <div>
-      <div class="acl-block acl-block-airy">
-        <span class="muted" title="3 months ago">TABLE</span>
-
-        <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-        </span>
-        <br>
-
-        server=server1
-
-          <span>
-            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
-          </span>
-          <span>
-            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
-          </span>
-          <span style="display: none;">
-            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
-          </span>
-
-        <i class="fa fa-long-arrow-right"></i> action=<span>ALL</span>
-      </div>
-      <div class="acl-block acl-actions">
-        <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
-        <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
-        <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
-        <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
-      </div>
-    </div>
-  </div>
-</script>
 
 <script type="text/html" id="metastore-queries-tab">
   <br/>
@@ -829,6 +733,7 @@ ${ components.menubar(is_embeddable) }
   </div>
 </script>
 
+
 <script type="text/html" id="metastore-view-sql-tab">
   <div style="padding: 5px 15px">
     <!-- ko hueSpinner: { spin: loadingViewSql, inline: true } --><!-- /ko -->
@@ -837,6 +742,7 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
   </div>
 </script>
+
 
 <script type="text/html" id="metastore-details-tab">
   <!-- ko with: tableDetails -->
@@ -907,7 +813,6 @@ ${ components.menubar(is_embeddable) }
     <!-- ko if: $root.optimizerEnabled() -->
       <li data-bind="css: { 'active': $root.currentTab() === 'relationships' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('relationships'); }">${_('Relationships')} (<span data-bind="text: topJoins().length"></span>)</a></li>
 ##       <!-- ko if: $root.database().table().optimizerDetails() -->
-##       <li data-bind="css: { 'active': $root.currentTab() === 'permissions' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('permissions'); }">${_('Permissions')}</a></li>
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'queries' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'joins' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
 ##       <!-- /ko -->
@@ -915,14 +820,26 @@ ${ components.menubar(is_embeddable) }
 ##       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-      <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a></li>
+    <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a>
+    </li>
     <!-- /ko -->
-    <li data-bind="css: { 'active': $root.currentTab() === 'sample' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('sample'); }">${_('Sample')} (<span data-bind="text: samples.rows().length"></span>)</a></li>
+    <li data-bind="css: { 'active': $root.currentTab() === 'sample' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('sample'); }">${_('Sample')} (<span data-bind="text: samples.rows().length"></span>)</a>
+    </li>
     <!-- ko if: catalogEntry.isView() -->
-    <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('viewSql'); }">${ _('View SQL') }</a></li>
+    <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('viewSql'); }">${ _('View SQL') }</a>
+    </li>
     <!-- /ko -->
-    <li data-bind="css: { 'active' : $root.currentTab() === 'details' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('details'); }">${ _('Details') }</a></li>
-    <li data-bind="css: { 'active' : $root.currentTab() === 'privileges' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a></li>
+    <li data-bind="css: { 'active' : $root.currentTab() === 'details' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('details'); }">${ _('Details') }</a>
+    </li>
+    <!-- ko if: $root.appConfig() && $root.appConfig()['browser'] && $root.appConfig()['browser']['interpreter_names'].indexOf('security') !== -1 -->
+    <li data-bind="css: { 'active' : $root.currentTab() === 'privileges' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a>
+    </li>
+    <!-- /ko -->
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -941,10 +858,6 @@ ${ components.menubar(is_embeddable) }
 
       <!-- ko if: $root.currentTab() === 'sample' -->
         <!-- ko template: 'metastore-sample-tab' --><!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: $root.currentTab() === 'permissions' -->
-        <!-- ko template: 'metastore-permissions-tab' --><!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: $root.optimizerEnabled() && $root.currentTab() === 'queries' -->
@@ -1275,6 +1188,11 @@ ${ components.menubar(is_embeddable) }
       };
 
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
+
+      huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+        viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+      });
+      huePubSub.publish('cluster.config.get.config');
 
       if (location.getParameter('refresh') === 'true') {
         DataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, compute: viewModel.source().namespace().compute, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {
