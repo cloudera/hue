@@ -25,6 +25,30 @@ var EditorViewModel = (function() {
     ]
   };
 
+  var COMPATIBILITY_SOURCE_PLATFORMS ={
+    teradata: { name: 'Teradata', value: 'teradata' },
+    oracle: { name: 'Oracle', value: 'oracle' },
+    netezza: { name: 'Netezza', value: 'netezza' },
+    impala: { name: 'Impala', value: 'impala' },
+    hive: { name: 'Hive', value: 'hive' },
+    db2: { name: 'DB2', value: 'db2' },
+    greenplum: { name: 'Greenplum', value: 'greenplum' },
+    mysql: { name: 'MySQL', value: 'mysql' },
+    postgresql: { name: 'PostgreSQL', value: 'postgresql' },
+    informix: { name: 'Informix', value: 'informix' },
+    sqlserver: { name: 'SQL Server', value: 'sqlserver' },
+    sybase: { name: 'Sybase', value: 'sybase' },
+    access: { name: 'Access', value: 'access' },
+    firebird: { name: 'Firebird', value: 'firebird' },
+    ansisql: { name: 'ANSISQL', value: 'ansisql' },
+    generic: { name: 'Generic', value: 'generic' }
+  };
+
+  var COMPATIBILITY_TARGET_PLATFORMS ={
+    impala: { name: 'Impala', value: 'impala' },
+    hive: { name: 'Hive', value: 'hive' }
+  };
+
   var Result = function (snippet, result) {
     var self = this;
 
@@ -1127,37 +1151,26 @@ var EditorViewModel = (function() {
     self.hasSuggestion = ko.observable(null);
 
     self.compatibilityCheckRunning = ko.observable(false);
-    self.compatibilitySourcePlatform = ko.observable(self.type());
+
+    self.compatibilitySourcePlatforms = [];
+    Object.keys(COMPATIBILITY_SOURCE_PLATFORMS).forEach(function (key) {
+      self.compatibilitySourcePlatforms.push(COMPATIBILITY_SOURCE_PLATFORMS[key]);
+    });
+
+    self.compatibilitySourcePlatform = ko.observable(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
     self.compatibilitySourcePlatform.subscribe(function(newValue) {
-      if (newValue != self.type()) {
+      if (newValue && newValue.value !== self.type()) {
         self.hasSuggestion(null);
-        self.compatibilityTargetPlatform(self.type());
+        self.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
         self.queryCompatibility();
       }
     });
-    self.compatibilitySourcePlatforms = ko.observableArray([
-      {'name': 'Teradata', 'value': 'teradata'},
-      {'name': 'Oracle', 'value': 'oracle'},
-      {'name': 'Netezza', 'value': 'netezza'},
-      {'name': 'Impala', 'value': 'impala'},
-      {'name': 'Hive', 'value': 'hive'},
-      {'name': 'DB2', 'value': 'db2'},
-      {'name': 'Greenplum', 'value': 'greenplum'},
-      {'name': 'MySQL', 'value': 'mysql'},
-      {'name': 'PostgreSQL', 'value': 'postgresql'},
-      {'name': 'Informix', 'value': 'informix'},
-      {'name': 'SQL Server', 'value': 'sqlserver'},
-      {'name': 'Sybase', 'value': 'sybase'},
-      {'name': 'Access', 'value': 'access'},
-      {'name': 'Firebird', 'value': 'firebird'},
-      {'name': 'ANSISQL', 'value': 'ansisql'},
-      {'name': 'Generic', 'value': 'generic'}
-    ]);
-    self.compatibilityTargetPlatform = ko.observable(self.type());
-    self.compatibilityTargetPlatforms = ko.observableArray([
-      {'name': 'Impala', 'value': 'impala'},
-      {'name': 'Hive', 'value': 'hive'}
-    ]);
+
+    self.compatibilityTargetPlatforms = [];
+    Object.keys(COMPATIBILITY_TARGET_PLATFORMS).forEach(function (key) {
+      self.compatibilityTargetPlatforms.push(COMPATIBILITY_TARGET_PLATFORMS[key]);
+    });
+    self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
 
     self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
     self.showOptimizer.subscribe(function (newValue) {
@@ -1282,12 +1295,10 @@ var EditorViewModel = (function() {
         if (self.statement_raw()) {
           window.setTimeout(function(){
             self.checkComplexity();
-            //self.querySyntaxCompatibility();
           }, 2000);
         }
         self.delayedStatement.subscribe(function () {
           self.checkComplexity();
-          //self.querySyntaxCompatibility(); Off for now
         });
       }
     }
@@ -1628,10 +1639,10 @@ var EditorViewModel = (function() {
 
     var lastCompatibilityRequest;
 
-    self.querySyntaxCompatibility = function () {
-      self.compatibilitySourcePlatform(self.type());
-      self.compatibilityTargetPlatform(self.type());
-
+    self.checkCompatibility = function () {
+      self.hasSuggestion(null);
+      self.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
+      self.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[self.type() === 'hive' ? 'impala' : 'hive']);
       self.queryCompatibility();
     };
 
@@ -1646,10 +1657,10 @@ var EditorViewModel = (function() {
       lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
-        sourcePlatform: self.compatibilitySourcePlatform(),
-        targetPlatform: self.compatibilityTargetPlatform()
+        sourcePlatform: self.compatibilitySourcePlatform().value,
+        targetPlatform: self.compatibilityTargetPlatform().value
       }, function (data) {
-        if (data.status == 0) {
+        if (data.status === 0) {
           self.aceErrorsHolder([]);
           self.aceWarningsHolder([]);
           self.suggestion(ko.mapping.fromJS(data.query_compatibility));
@@ -1679,6 +1690,7 @@ var EditorViewModel = (function() {
             });
             self.status('with-optimizer-report');
           }
+          self.showOptimizer(true);
           self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
