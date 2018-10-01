@@ -500,7 +500,7 @@ var EditorViewModel = (function() {
     };
 
     if (!self.database()) {
-      huePubSub.publish("assist.get.database.callback", { source: self.type(), callback: function (databaseDef) {
+      huePubSub.publish('assist.get.database.callback', { source: self.type(), callback: function (databaseDef) {
         self.handleAssistSelection(databaseDef);
       }});
     }

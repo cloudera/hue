@@ -319,7 +319,7 @@ var AssistDbNamespace = (function () {
           self.selectedDatabase().loadEntries()
         }
         if (!self.navigationSettings.rightAssist) {
-          ApiHelper.getInstance().setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
+          ApiHelper.getInstance().setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
           huePubSub.publish('assist.database.set', {
             sourceType: self.sourceType,
             namespace: self.namespace,
@@ -342,7 +342,7 @@ var AssistDbNamespace = (function () {
         self.selectedDatabaseChanged();
         return;
       }
-      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', 'default');
+      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
       if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
         self.selectedDatabase(self.dbIndex[lastSelectedDb]);
         self.selectedDatabaseChanged();
