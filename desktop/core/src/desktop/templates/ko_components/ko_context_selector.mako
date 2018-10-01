@@ -335,9 +335,10 @@ from desktop.views import _ko
                 }).fail(function () {
                   self.availableDatabases([]);
                 }).always(function () {
-                  if (self.database() && self.availableDatabases().indexOf(self.database()) === -1) {
-                    if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf('default') !== -1) {
-                      self.database('default');
+                  if (!self.database() || self.availableDatabases().indexOf(self.database()) === -1) {
+                    var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + ko.unwrap(self.sourceType) + '_' + self[TYPES_INDEX.namespace.name]().id, 'lastSelectedDb', 'default');
+                    if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf(lastSelectedDb) !== -1) {
+                      self.database(lastSelectedDb);
                     } else {
                       self.database(self.availableDatabases()[0])
                     }

@@ -1365,10 +1365,11 @@ from desktop.views import _ko
                         name: assistDbSource.selectedNamespace().selectedDatabase().name
                       })
                     } else {
+                      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id, 'lastSelectedDb', 'default');
                       deferred.resolve({
                         sourceType: source,
                         namespace: assistDbSource.selectedNamespace().namespace,
-                        name: 'default'
+                        name: lastSelectedDb
                       })
                     }
                   });

@@ -49,10 +49,11 @@ var MetastoreSource = (function () {
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       self.lastLoadNamespacesDeferred.done(function () {
+        var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
         huePubSub.publish('assist.set.database', {
           source: self.type,
           namespace: self.namespace().namespace,
-          name: null
+          name: lastSelectedDb
         });
       });
     });
