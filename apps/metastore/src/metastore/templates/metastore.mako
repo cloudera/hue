@@ -181,7 +181,7 @@ ${ components.menubar(is_embeddable) }
         </td>
         <td title="${_('Query partition data')}">
           <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function() { queryAndWatch(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
+            <a data-bind="click: function() { queryAndWatchUrl(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
           <!-- /ko -->
           <!-- ko if: ! IS_HUE_4 -->
             <a data-bind="attr: { 'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a>
@@ -516,7 +516,7 @@ ${ components.menubar(is_embeddable) }
       <h4 class="entries-table-header">${ _('Tables') }</h4>
       <div class="actionbar-actions" data-bind="visible: tables().length > 0">
         <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { onTableClick(selectedTables()[0].catalogEntry()); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
-        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry().path.join('/') + '/', $root.source().type) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry().path.join('/'); }, disable: selectedTables().length !== 1">
+        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { queryAndWatch(selectedTables()[0].catalogEntry()) }, disable: selectedTables().length !== 1">
           <i class="fa fa-play fa-fw"></i> ${_('Query')}
         </button>
         % if has_write_access:
@@ -1009,7 +1009,7 @@ ${ components.menubar(is_embeddable) }
               <!-- ko with: table -->
               % if USE_NEW_EDITOR.get():
                 <!-- ko if: IS_HUE_4 -->
-                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch('/notebook/browse/' + catalogEntry.path.join('/') + '/', $root.source().type); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
+                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch(catalogEntry); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
                 <!-- /ko -->
                 <!-- ko if: ! IS_HUE_4 -->
                 <a class="btn btn-default" data-bind="attr: { 'href': '/notebook/browse/' + catalogEntry.path.join('/') }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
@@ -1126,10 +1126,12 @@ ${ components.menubar(is_embeddable) }
     });
   }
 
-  function queryAndWatch(url, sourceType) {
+  function queryAndWatchUrl(url, sourceType, namespaceId, computeId) {
     $.post(url, {
       format: "json",
-      sourceType: sourceType
+      sourceType: sourceType,
+      namespace: namespaceId,
+      compute: computeId
     },function(resp) {
       if (resp.history_uuid) {
         huePubSub.publish('open.editor.query', resp.history_uuid);
@@ -1139,6 +1141,15 @@ ${ components.menubar(is_embeddable) }
     }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);
     });
+  }
+
+  function queryAndWatch(catalogEntry) {
+    if (!IS_HUE_4) {
+      location.href = '/notebook/browse/' + catalogEntry.path.join('/')
+    } else {
+      queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getSourceType(),
+              catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute && catalogEntry.compute.id)
+    }
   }
 
   (function () {
