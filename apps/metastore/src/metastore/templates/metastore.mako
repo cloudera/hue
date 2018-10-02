@@ -546,7 +546,7 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="namespace" data-bind="value: catalogEntry.namespace.id"/>
         <input type="hidden" name="compute" data-bind="value: catalogEntry.compute.id"/>
     % else:
-      <form data-bind="attr: { 'action': '/metastore/tables/drop/' +catalogEntry. name }" method="POST">
+      <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }" method="POST">
     % endif
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
@@ -557,7 +557,7 @@ ${ components.menubar(is_embeddable) }
         <ul data-bind="foreach: selectedTables">
           <!-- ko if: $index() <= 9 -->
           <li>
-            <span data-bind="text: catalogEntry.name"></span>
+            <span data-bind="text: catalogEntry().name"></span>
           </li>
           <!-- /ko -->
         </ul>
@@ -573,7 +573,7 @@ ${ components.menubar(is_embeddable) }
         <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <!-- ko foreach: selectedTables -->
-      <input type="hidden" name="table_selection" data-bind="value: catalogEntry.name" />
+      <input type="hidden" name="table_selection" data-bind="value: catalogEntry().name" />
       <!-- /ko -->
     </form>
   </div>
