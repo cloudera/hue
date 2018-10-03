@@ -1613,10 +1613,11 @@ var ApiHelper = (function () {
    *
    * @constructor
    */
-  var QueryResult = function (sourceType, response) {
+  var QueryResult = function (sourceType, compute, response) {
     var self = this;
     self.id = UUID();
     self.type = response.result.type || sourceType;
+    self.compute = compute;
     self.status = response.status || 'running';
     self.result = response.result || {};
     self.result.type = 'table';
@@ -1629,6 +1630,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
    * @param {number} [options.sampleCount] - Default 100
    * @param {string[]} options.path
    * @param {string} [options.operation] - Default 'default'
@@ -1666,7 +1668,7 @@ var ApiHelper = (function () {
     }, {
       silenceErrors: options.silenceErrors
     }).done(function (sampleResponse) {
-      var queryResult = new QueryResult(options.sourceType, sampleResponse);
+      var queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
 
       notebookJson = JSON.stringify({ type: options.sourceType });
       snippetJson = JSON.stringify(queryResult);
