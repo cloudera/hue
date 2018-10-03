@@ -83,7 +83,6 @@ urlpatterns += [
   url(r'^api/query/clear_history/?$', beeswax_api.clear_history, name='clear_history'),
 
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/?$', beeswax_api.describe_table, name='describe_table'),
-  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/(?P<cluster>.+)$', beeswax_api.describe_table, name='describe_table'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/indexes/?$', beeswax_api.get_indexes, name='get_indexes'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data_column'),
