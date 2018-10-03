@@ -34,12 +34,15 @@ from impala import dbms
 
 LOG = logging.getLogger(__name__)
 
-
 @require_POST
 @error_handler
 def invalidate(request):
+  cluster = {'id': request.POST.get('cluster', 'default')}
+
+  # TODO: create cluster_config for get_query_server_config
+
   query_server = dbms.get_query_server_config()
-  db = beeswax_dbms.get(request.user, query_server=query_server)
+  db = beeswax_dbms.get(request.user, query_server=query_server, cluster=cluster)
 
   response = {'status': 0, 'message': ''}
 
