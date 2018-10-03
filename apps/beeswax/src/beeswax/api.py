@@ -672,6 +672,7 @@ def _get_sample_data(db, database, table, column, async=False, cluster=None, ope
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
           # impala has compute name appended to server name (impala/dbms.py - get_query_server_config)
           editor_type='impala' if _get_servername(db).startswith('impala') else _get_servername(db),
+          compute=cluster.get('id') if cluster else None,
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,
