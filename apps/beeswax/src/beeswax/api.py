@@ -670,7 +670,8 @@ def _get_sample_data(db, database, table, column, async=False, cluster=None, ope
     if async:
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
-          editor_type=_get_servername(db),
+          # impala has compute name appended to server name (impala/dbms.py - get_query_server_config)
+          editor_type='impala' if _get_servername(db).startswith('impala') else _get_servername(db),
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,
