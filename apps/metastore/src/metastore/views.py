@@ -158,9 +158,10 @@ def alter_database(request, database):
   return JsonResponse(response)
 
 
-def get_database_metadata(request, database, cluster=None):
+def get_database_metadata(request, database):
   response = {'status': -1, 'data': ''}
   source_type = request.POST.get('source_type', 'hive')
+  cluster = {'id': request.GET.get('cluster', 'default')}
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
