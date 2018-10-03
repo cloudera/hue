@@ -1419,6 +1419,7 @@ var ApiHelper = (function () {
 
     var params = {
       'format' : 'json'
+      //'source_type': options.sourceType // TODO: Blows up server-side with 'impala'
     };
 
     if (options.compute && options.compute.id) {
