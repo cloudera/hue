@@ -715,6 +715,7 @@ var DataCatalog = (function () {
         } else {
           invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
             sourceType: self.getSourceType(),
+            compute: self.compute,
             invalidate: invalidate,
             path: self.path,
             silenceErrors: options.silenceErrors

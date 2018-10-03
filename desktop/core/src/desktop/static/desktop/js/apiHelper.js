@@ -1265,6 +1265,7 @@ var ApiHelper = (function () {
    * @param {string} options.sourceType
    * @param {string} options.invalidate - 'invalidate' or 'invalidateAndFlush'
    * @param {string[]} [options.path]
+   * @param {ContextCompute} [options.compute]
    * @param {boolean} [options.silenceErrors]
    */
   ApiHelper.prototype.invalidateSourceMetadata = function (options) {
@@ -1273,7 +1274,8 @@ var ApiHelper = (function () {
 
     if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
       var data = {
-        flush_all: options.invalidate === 'invalidateAndFlush'
+        flush_all: options.invalidate === 'invalidateAndFlush',
+        cluster: options.compute && options.compute.id
       };
 
       if (options.path && options.path.length > 0) {
