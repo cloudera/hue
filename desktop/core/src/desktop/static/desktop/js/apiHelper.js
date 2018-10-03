@@ -1658,7 +1658,8 @@ var ApiHelper = (function () {
     self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
       notebook: {},
       snippet: JSON.stringify({
-        type: options.sourceType
+        type: options.sourceType,
+        compute: options.compute
       }),
       async: true,
       operation: '"' + (options.operation || 'default') + '"'
