@@ -18,6 +18,7 @@
 ## Main views are inherited from Beeswax.
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
@@ -37,10 +38,9 @@ LOG = logging.getLogger(__name__)
 @require_POST
 @error_handler
 def invalidate(request):
-  cluster = {'id': request.POST.get('cluster', 'default')}
+  cluster = json.loads(request.POST.get('cluster', '{}'))
 
   # TODO: create cluster_config for get_query_server_config
-
   query_server = dbms.get_query_server_config()
   db = beeswax_dbms.get(request.user, query_server=query_server, cluster=cluster)
 
