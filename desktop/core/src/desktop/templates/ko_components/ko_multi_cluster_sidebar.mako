@@ -139,12 +139,49 @@ from desktop.views import _ko
         }, {
           label: '${ _('Data Science') }',
           url: '/',
-          icon: 'altus-icon altus-ds'
+          icon: 'altus-icon altus-ds',
+          items: [{
+              label: '${ _('Projects') }',
+              url: '/editor?type=impala'
+            },{
+              label: '${ _('Sessions') }',
+              url: '/metastore/tables'
+            },{
+              label: '${ _('Experiments') }',
+              url: '/filebrowser/view=S3A://'
+            },{
+              label: '${ _('Models') }',
+              url: '/dashboard/new_search'
+            },{
+              label: '${ _('Jobs') }',
+              url: '/oozie/editor/coordinator/new/'
+            },{
+              label: '${ _('Settings') }',
+              url: '/indexer/importer'
+            }
+          ]
+        }, {
+          label: '${ _('Data Flow') }',
+          url: '/',
+          icon: 'altus-icon altus-workload'
+        }, {
+          label: '${ _('Data Stewart') }',
+          url: '/',
+          icon: 'altus-icon altus-adb'
         }
       ]
+   
       }, {
         label: '${ _('Admin') }',
         items: [{
+            label: '${ _('Clusters') }',
+            url: '/hue/jobbrowser',
+            icon: 'altus-icon altus-de'
+          },{
+            label: '${ _('Catalog') }',
+            url: '/',
+            icon: 'altus-icon altus-sdx'
+          },{
             label: '${ _('Environments') }',
             url: '/',
             icon: 'altus-icon altus-environment'
@@ -162,13 +199,7 @@ from desktop.views import _ko
             ]
           }
         ]
-      }, {
-        label: '${ _('Storage') }',
-        items: [{
-            label: '${ _('Catalog') }',
-            url: '/',
-            icon: 'altus-icon altus-sdx'
-          }
+      }
 ##           },{
 ##             label: '${ _('Streaming') }',
 ##             url: '/',
@@ -186,32 +217,63 @@ from desktop.views import _ko
 ##               }
 ##             ]
 ##           }
-        ]
-      }, {
-        label: '${ _('Compute') }',
-        items: [{
-            label: '${ _('Data Warehouse') }',
-            icon: 'altus-icon altus-dashboard',
-            url: '/hue/jobbrowser'
-          }, {
-            label: '${ _('Data Engineering') }',
-            icon: 'altus-icon altus-de',
-            items: [{
-                label: '${ _('Clusters') }',
-                url: '/'
-              },{
-                label: '${ _('Jobs') }',
-                url: '/'
-              }
-            ]
-          }
+
           ##, {
           ##  label: '${ _('Scheduling') }',
           ##  icon: 'altus-icon altus-workload',
           ##  url: '/'
           ##}
-        ]
-      }
+
+        
+##      }, {
+##        label: '${ _('Admin') }',
+##        items: [{
+##            label: '${ _('Environments') }',
+##            url: '/',
+##            icon: 'altus-icon altus-environment'
+##          },{
+##            label: '${ _('Directory') }',
+##            url: 'https://console.altus.cloudera.com/iam/index.html',
+##            icon: 'altus-icon altus-iam',
+##            items: [{
+##                label: '${ _('User') }',
+##                url: '/hue/useradmin/users/'
+##              },{
+##                label: '${ _('Groups') }',
+##                url: '/hue/useradmin/groups/'
+##              }
+##            ]
+##          }
+##        ]
+##      }, {
+##        label: '${ _('Storage') }',
+##        items: [{
+##            label: '${ _('Catalog') }',
+##            url: '/',
+##            icon: 'altus-icon altus-sdx'
+##          }
+##        ]
+##      }, {
+##        label: '${ _('Compute') }',
+##        items: [{
+##            label: '${ _('Data Warehouse') }',
+##            icon: 'altus-icon altus-dashboard',
+##            url: '/hue/jobbrowser'
+##          }, {
+##            label: '${ _('Data Engineering') }',
+##            icon: 'altus-icon altus-de',
+##            items: [{
+##                label: '${ _('Clusters') }',
+##                url: '/'
+##              },{
+##                label: '${ _('Jobs') }',
+##                url: '/'
+##              }
+##            ]
+##          }
+##        ]
+##       }
+
         ##  , {
         ##    label: '${ _('Icons') }',
         ##    items: [{label: 'altus-adb-cluster', url: '/', icon: 'altus-icon altus-adb-cluster'},
