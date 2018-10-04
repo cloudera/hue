@@ -170,6 +170,16 @@ from desktop.views import _ko
               self.setMatchingCompute(selectedVal);
             }
           };
+          if (self[type.name]) {
+            huePubSub.subscribe('context.selector.set.' + type.name, function (id) {
+              self[type.available]().some(function (instance) {
+                if (instance.id === id) {
+                  self[type.name](instance);
+                  return true;
+                }
+              });
+            });
+          }
           self.reload(type);
         });
 
