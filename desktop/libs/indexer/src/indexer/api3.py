@@ -140,13 +140,18 @@ def guess_format(request):
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()}
     elif file_format['streamSelection'] == 'flume':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n"}
-  elif file_format['inputFormat'] == 'sfdc':
-    sf = Salesforce(
-        username=file_format['streamUsername'],
-        password=file_format['streamPassword'],
-        security_token=file_format['streamToken']
-    )
-    format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
+  elif file_format['inputFormat'] == 'connector':
+    if file_format['connectorSelection'] == 'sfdc':
+      sf = Salesforce(
+          username=file_format['streamUsername'],
+          password=file_format['streamPassword'],
+          security_token=file_format['streamToken']
+      )
+      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
+    else:
+        raise PopupException(_('Input format %(inputFormat)s connector not recognized: $(connectorSelection)s') % file_format)
+  else:
+    raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -312,7 +317,7 @@ def guess_field_types(request):
       ]
       query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
       print query
-  
+
       format_ = {
         "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
         "columns": [
@@ -592,7 +597,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
     else:
       destination['importData'] = False # Avoid LOAD DATA
       if destination['tableFormat'] == 'kudu':
-        properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase    
+        properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase
       # Create table
       SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).execute(request)
 
