@@ -1275,7 +1275,7 @@ var ApiHelper = (function () {
     if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
       var data = {
         flush_all: options.invalidate === 'invalidateAndFlush',
-        cluster: options.compute && options.compute.id
+        cluster: JSON.stringify(options.compute)
       };
 
       if (options.path && options.path.length > 0) {
@@ -1393,8 +1393,8 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ContextCompute} [options.compute]
    *
+   * @param {ContextCompute} options.compute
    * @param {string[]} options.path
    *
    * @return {CancellablePromise}
@@ -1419,16 +1419,13 @@ var ApiHelper = (function () {
       }
     }
 
-    var params = {
-      'format' : 'json'
+    var data = {
+      format: 'json',
+      cluster: JSON.stringify(options.compute)
       //'source_type': options.sourceType // TODO: Blows up server-side with 'impala'
     };
 
-    if (options.compute && options.compute.id) {
-      params['cluster'] = options.compute.id;
-    }
-
-    var request = self.simpleGet(url, params, {
+    var request = self[options.path.length === 1 ? 'simplePost' : 'simpleGet'](url, data, {
       silenceErrors: options.silenceErrors,
       successCallback: function (response) {
         if (options.path.length === 1) {
@@ -1507,6 +1504,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
    * @param {string[]} options.path
    *
    * @return {CancellablePromise}
@@ -1984,7 +1982,7 @@ var ApiHelper = (function () {
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string} options.computeId
+   * @param {ContextCompute} options.compute
    * @param {string} options.queryId
    * @return {CancellablePromise}
    */
@@ -2007,7 +2005,7 @@ var ApiHelper = (function () {
       tries++;
       cancellablePromises.pop(); // Remove the last one
       cancellablePromises.push(deferred, self.simplePost(url, {
-        'cluster_id': '"' + options.computeId + '"',
+        'cluster': JSON.stringify(options.compute),
         'query_id': '"' + options.queryId + '"'
       }, options).done(function (response) {
         if (response && response.data) {

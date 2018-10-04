@@ -671,7 +671,7 @@ def _get_sample_data(db, database, table, column, async=False, cluster=None, ope
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
           editor_type=_get_servername(db),
-          compute=cluster.get('id') if cluster else None,
+          compute=cluster,
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,
@@ -776,7 +776,8 @@ def analyze_table(request, database, table, columns=None):
 @error_handler
 def get_table_stats(request, database, table, column=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.GET.get('cluster', '{}'))
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}

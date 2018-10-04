@@ -155,7 +155,7 @@ def browse(request, database, table, partition_spec=None):
   statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
   editor_type = snippet['type']
   namespace = request.POST.get('namespace', 'default')
-  compute = request.POST.get('compute', 'default')
+  compute = json.loads(request.POST.get('cluster', '{}'))
 
   if request.method == 'POST':
     notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute',

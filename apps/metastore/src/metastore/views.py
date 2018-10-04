@@ -161,7 +161,8 @@ def alter_database(request, database):
 def get_database_metadata(request, database):
   response = {'status': -1, 'data': ''}
   source_type = request.POST.get('source_type', 'hive')
-  cluster = {'id': request.GET.get('cluster', 'default')}
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
@@ -268,7 +269,7 @@ def get_table_metadata(request, database, table):
 
 def describe_table(request, database, table):
   app_name = get_app_name(request)
-  cluster = {'id': request.GET.get('cluster', 'default')}
+  cluster = json.loads(request.GET.get('cluster', '{}'))
 
   db = _get_db(user=request.user, cluster=cluster)
 
@@ -405,7 +406,7 @@ def drop_table(request, database):
       tables = request.POST.getlist('table_selection')
       tables_objects = [db.get_table(database, table) for table in tables]
       skip_trash = request.POST.get('skip_trash') == 'on'
-      compute = request.POST.get('compute')
+      cluster = json.loads(request.POST.get('cluster', '{}'))
       namespace = request.POST.get('namespace')
 
       if request.POST.get('is_embeddable'):
@@ -418,7 +419,7 @@ def drop_table(request, database):
             status='ready',
             database=database,
             namespace=namespace,
-            compute=compute,
+            compute=cluster,
             on_success_url='assist.db.refresh',
             is_task=True,
             last_executed=last_executed

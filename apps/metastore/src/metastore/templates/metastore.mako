@@ -544,7 +544,7 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="start_time" value=""/>
         <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
         <input type="hidden" name="namespace" data-bind="value: catalogEntry.namespace.id"/>
-        <input type="hidden" name="compute" data-bind="value: catalogEntry.compute.id"/>
+        <input type="hidden" name="cluster" data-bind="value: JSON.stringify(catalogEntry.compute)"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }" method="POST">
     % endif
@@ -1126,12 +1126,12 @@ ${ components.menubar(is_embeddable) }
     });
   }
 
-  function queryAndWatchUrl(url, sourceType, namespaceId, computeId) {
+  function queryAndWatchUrl(url, sourceType, namespaceId, compute) {
     $.post(url, {
       format: "json",
       sourceType: sourceType,
       namespace: namespaceId,
-      compute: computeId
+      cluster: compute
     },function(resp) {
       if (resp.history_uuid) {
         huePubSub.publish('open.editor.query', resp.history_uuid);
@@ -1148,7 +1148,7 @@ ${ components.menubar(is_embeddable) }
       location.href = '/notebook/browse/' + catalogEntry.path.join('/')
     } else {
       queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getSourceType(),
-              catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute && catalogEntry.compute.id)
+              catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute)
     }
   }
 
