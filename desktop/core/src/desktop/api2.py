@@ -88,7 +88,7 @@ def get_context_namespaces(request, interface):
       'name': cluster['name'],
       'status': 'CREATED',
       'computes': [cluster]
-    } for cluster in clusters if cluster.get('type') == 'direct'
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
   ])
 
   if interface == 'hive' or interface == 'impala' or interface == 'report':
@@ -146,7 +146,7 @@ def get_context_computes(request, interface):
         'namespace': cluster['id'],
         'interface': interface,
         'type': cluster['type']
-      } for cluster in clusters if cluster.get('type') == 'direct'
+      } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
     ])
 
   if interface == 'impala' or interface == 'report':
