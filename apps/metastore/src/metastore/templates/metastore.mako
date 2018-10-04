@@ -356,6 +356,10 @@ ${ components.menubar(is_embeddable) }
             <input type="hidden" name="is_embeddable" value="true"/>
             <input type="hidden" name="start_time" value=""/>
             <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
+            <!-- ko with: catalogEntry -->
+            <input type="hidden" name="namespace" data-bind="value: namespace.id"/>
+            <input type="hidden" name="cluster" data-bind="value: JSON.stringify(compute)"/>
+            <!-- /ko -->
         % else:
           <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
         % endif
@@ -367,7 +371,7 @@ ${ components.menubar(is_embeddable) }
             <div class="modal-body">
               <ul data-bind="foreach: selectedDatabases">
                 <li>
-                  <span data-bind="text: catalogEntry.name"></span>
+                  <span data-bind="text: catalogEntry().name"></span>
                 </li>
               </ul>
             </div>
@@ -377,7 +381,7 @@ ${ components.menubar(is_embeddable) }
               <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
             </div>
             <!-- ko foreach: selectedDatabases -->
-            <input type="hidden" name="database_selection" data-bind="value: catalogEntry.name" />
+            <input type="hidden" name="database_selection" data-bind="value: catalogEntry().name" />
             <!-- /ko -->
           </form>
         </div>
