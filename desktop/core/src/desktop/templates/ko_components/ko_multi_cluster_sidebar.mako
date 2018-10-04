@@ -114,7 +114,8 @@ from desktop.views import _ko
           url: '/',
           icon: 'fa fa-home'
         }, {
-          label: '${ _('Data Assistant') }',
+          ##label: '${ _('Data Assistant') }',
+          label: '${ _('Data Warehouse') }',
           icon: 'altus-icon altus-adb-query',
           items: [{
               label: '${ _('Editor') }',
@@ -126,12 +127,12 @@ from desktop.views import _ko
               label: '${ _('Files') }',
               url: '/filebrowser/view=S3A://'
             },{
-              label: '${ _('Dashboard') }',
-              url: '/dashboard/new_search'
-            },{
-              label: '${ _('Scheduler') }',
-              url: '/oozie/editor/coordinator/new/'
-            },{
+##              label: '${ _('Dashboard') }',
+##              url: '/dashboard/new_search'
+##            },{
+##              label: '${ _('Scheduler') }',
+##              url: '/oozie/editor/coordinator/new/'
+##            },{
               label: '${ _('Importer') }',
               url: '/indexer/importer'
             }
@@ -174,7 +175,7 @@ from desktop.views import _ko
       }, {
         label: '${ _('Admin') }',
         items: [{
-            label: '${ _('Clusters') }',
+            label: '${ _('Engines') }',
             url: '/hue/jobbrowser',
             icon: 'altus-icon altus-de'
           },{
