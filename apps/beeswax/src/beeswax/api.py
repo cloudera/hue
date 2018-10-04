@@ -673,7 +673,6 @@ def _get_sample_data(db, database, table, column, async=False, cluster=None, ope
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
           editor_type=_get_servername(db),
-          compute=cluster,
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,

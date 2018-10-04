@@ -106,18 +106,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="nav-collapse">
           <ul class="nav">
             <li class="app-header">
+              <!-- ko ifnot: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
               <a href="/${app_name}">
                 <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
                 <!-- ko if: !$root.cluster() || $root.cluster()['type'].indexOf("altus") == -1 -->
                   ${ _('Job Browser') }
                 <!-- /ko -->
-                <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
-                  ${ _('Data Warehouse') }
+                <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-engines") !== -1 -->
+                  ${ _('Clusters') }
                 <!-- /ko -->
                 <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-de") !== -1 -->
                   ${ _('Data Engineering') }
                 <!-- /ko -->
               </a>
+              <!-- /ko -->
+              <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
+                <span>
+                  <a data-bind="click: function() { huePubSub.publish('context.selector.set.cluster', 'engines'); }">
+                    <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
+                    ${ _('Clusters') }
+                  </a>
+                  > gke_gcp-eng-dsdw_us-west2-b_impala-demo
+                </span>
+              <!-- /ko -->
             </li>
             <!-- ko foreach: availableInterfaces -->
               <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
@@ -233,6 +244,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
                 <!-- ko ifnot: $root.isMini -->
                 <!-- ko if: $root.interface() !== 'schedules' && $root.interface() !== 'bundles' -->
+
+                  <!-- ko if: $root.interface() && $root.interface().indexOf('engines') === -1 && $root.interface().indexOf('cluster') === -1 -->
                   ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
                   <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
                     <option value="days">${_('days')}</option>
@@ -243,19 +256,41 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
                     <i class="fa fa-refresh"></i>
                   </a>
+                  <!-- /ko -->
 
                   <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.cluster() && $root.cluster()['type'].indexOf('altus') >= 0, toggle: jobs.createClusterShow">
-                    <!-- ko if: jobs.createClusterShow-->
+                    <!-- ko if: jobs.createClusterShow -->
                       ${ _('Cancel') }
                     <!-- /ko -->
-                    <!-- ko ifnot: jobs.createClusterShow-->
-                      ${ _('Create') }
+                    <!-- ko if: !jobs.createClusterShow() && $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
+                      ${ _('Add Service') }
+                    <!-- /ko -->
+                    <!-- ko if: !jobs.createClusterShow() && $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
+                      ${ _('Create / Register') }
                     <!-- /ko -->
                   </a>
 
                   <span data-bind="visible: jobs.createClusterShow">
-                    <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" placeholder="${_('Cluster name')}">
-                    <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+                    <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Name')}">
+                    <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+                    <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
+                      ${ _('workers') }
+                      <select class="input-medium">
+                        <option>Data Warehouse</option>
+                        <option>IoT</option>
+                        <option>Auditing</option>
+                        <option>Troubleshooting</option>
+                      </select>
+                    <!-- /ko -->
+                    <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
+                      ${ _('nodes') }
+                      Environment
+                      <select>
+                        <option>AWS-finance-secure</option>
+                        <option>GCE-east</option>
+                        <option>OpenShift-prem</option>
+                      </select>
+                    <!-- /ko -->
 
                     <button class="btn" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
                       <i class="fa fa-plus"></i>
@@ -337,6 +372,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
                 <!-- ko if: mainType() == 'dataware2-clusters' -->
                   <div data-bind="template: { name: 'dataware2-clusters-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'engines' -->
+                  <div data-bind="template: { name: 'engines-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: mainType() == 'livy-sessions' -->
@@ -1163,6 +1202,74 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
   </button>
 
+</script>
+
+
+<script type="text/html" id="engines-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span class="break-word" data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('Workers Online') }</li>
+          <li>
+            <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
+            /
+            <span data-bind="text: properties['properties']['workerReplicas']"></span>
+            <!-- ko if: status() == 'SCALING_UP' || status() == 'SCALING_DOWN' -->
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            <!-- /ko -->
+          </li>
+          <li>
+            ##<div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': status() == 'SCALING_UP' || status() == 'SCALING_DOWN', 'progress-success': status() == 'ONLINE', 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': Math.min(properties['properties']['workerReplicas'](), properties['properties']['workerReplicasOnline']()) / Math.max(properties['properties']['workerReplicasOnline'](), properties['properties']['workerReplicas']()) * 100 + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Impalad') }</li>
+          <li>
+            <a href="#" data-bind="attr: { 'href': properties['properties']['coordinatorEndpoint']['publicHost']() + ':25000' }">
+              <span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span>
+              <i class="fa fa-external-link fa-fw"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
+    </div>
+    <div>
+
+    <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
+      <i class="fa fa-refresh"></i>
+    </a>
+
+    <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
+      <!-- ko if: updateClusterShow-->
+        ${ _('Cancel') }
+      <!-- /ko -->
+      <!-- ko ifnot: updateClusterShow-->
+        ${ _('Resize') }
+      <!-- /ko -->
+    </button>
+
+    <span data-bind="visible: updateClusterShow">
+      <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+
+      <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
+        <i class="fa fa-refresh"></i>
+      </button>
+    </span>
+
+    </div>
+  </div>
 </script>
 
 
@@ -2298,6 +2405,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var lastUpdateJobRequest = null;
 
       self._fetchJob = function (callback) {
+        if (vm.interface() == 'engines') {
+          huePubSub.publish('context.selector.set.cluster', 'AltusV2');
+          return;
+        }
+
         return $.post("/jobbrowser/api/job/" + vm.interface(), {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
@@ -2527,7 +2639,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
         }
       });
-      self.updateClusterWorkers = ko.observable(3);
+      self.updateClusterWorkers = ko.observable(1);
 
       ## TODO Move to control
       self.updateCluster = function() {
@@ -2653,7 +2765,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters', 'dataware2-clusters', 'engines'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2966,6 +3078,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var dataEngInterfaceCondition = function () {
           return self.cluster() && self.cluster()['type'] == 'altus-de';
         };
+        var enginesInterfaceCondition = function () {
+          return self.cluster() && self.cluster()['type'] == 'altus-engines';
+        };
         var dataWarehouseInterfaceCondition = function () {
           return self.cluster() && self.cluster()['type'] == 'altus-dw';
         };
@@ -2990,7 +3105,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataware-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouseInterfaceCondition},
-          {'interface': 'dataware2-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouse2InterfaceCondition},
+          {'interface': 'dataware2-clusters', 'label': '${ _ko('Services') }', 'condition': dataWarehouse2InterfaceCondition},
+          {'interface': 'engines-cluster-permissions', 'label': '${ _ko('Permissions') }', 'condition': dataWarehouse2InterfaceCondition},
+          {'interface': 'engines', 'label': '${ _ko('Engines') }', 'condition': enginesInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
@@ -3176,6 +3293,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'dataeng-clusters':
           case 'dataware-clusters':
           case 'dataware2-clusters':
+          case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
             self.selectInterface(h);
