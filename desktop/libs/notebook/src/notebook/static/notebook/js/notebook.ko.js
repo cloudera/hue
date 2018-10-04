@@ -1860,11 +1860,11 @@ var EditorViewModel = (function() {
                 self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
               }
             } else if (self.status() === 'available') {
-              if (self.type() === 'impala') {
+              if (self.type() === 'impala' && self.compute() && self.compute().crn && self.compute().crn.indexOf('altus') !== -1) {
 
-                // TODO: Use real compute and query ID
+                // TODO: Use real query ID
                 huePubSub.publish('assist.update.execution.analysis', {
-                  computeId: '6bfa86a8-55a2-4466-9003-2b222a9be137', // TODO: Compute ID ?
+                  compute: self.compute(),
                   queryId: '56433486cd84d475:3a86f97000000000'
                 });
 

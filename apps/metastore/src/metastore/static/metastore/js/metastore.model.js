@@ -949,7 +949,8 @@ var MetastoreTable = (function () {
       $.post('/tables/drop/' + self.database.catalogEntry.name, {
         table_selection: ko.mapping.toJSON([self.name]),
         skip_trash: 'off',
-        is_embeddable: true
+        is_embeddable: true,
+        cluster: JSON.stringify(self.database.catalogEntry.compute)
       }, function(resp) {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp.history_uuid);

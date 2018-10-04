@@ -3220,7 +3220,7 @@ from desktop.views import _ko
           self.loadingExecutionAnalysis(true);
           lastExecutionAnalysisPromise = ApiHelper.getInstance().fetchQueryExecutionAnalysis({
             silenceErrors: true,
-            computeId: details.computeId,
+            compute: details.compute,
             queryId: details.queryId
           }).done(function (response) {
             self.executionAnalysis(response.query)
