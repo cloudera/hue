@@ -276,6 +276,17 @@ from desktop.views import _ko
               available = available.namespaces;
             }
             self[type.available](available);
+
+            // In some cases we could have a namespace or compute without the name attribute, or the name might have changed.
+            if (self[type.name]() && !self[type.name]().name) {
+              available.some(function (other) {
+                if (other !== self[type.name]() && other.id === self[type.name]().id) {
+                  self[type.name](other);
+                  return true;
+                }
+              });
+            }
+
             if (!self[type.name]() && self.apiHelper.getFromTotalStorage('contextSelector', type.totalStorageId)) {
               var lastSelected = self.apiHelper.getFromTotalStorage('contextSelector', type.totalStorageId);
               var found = available.some(function (other) {
