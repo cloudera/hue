@@ -1612,29 +1612,31 @@ def get_clusters(user):
   clusters = []
   cluster_config = CLUSTERS.get()
 
-  # Get core standalone config if there
-  if not IS_MULTICLUSTER_ONLY.get() or [cluster_config for i in cluster_config if i == 'Default']:
-    clusters.append(
-      (CLUSTER_ID.get(), {
-        'id': CLUSTER_ID.get(),
-        'name': CLUSTER_ID.get(),
-        'type': 'direct',
-        'interface': 'all',
-        'server_host': 'all'
+  for i in cluster_config:
+    if i != 'Default':
+      # Get additional remote multi clusters
+      clusters.append(
+        (i, {
+          'id': i,
+          'name': cluster_config[i].NAME.get() or i,
+          'type': cluster_config[i].TYPE.get(),
+          'interface': cluster_config[i].INTERFACE.get() or 'hive',
+          'server_host': cluster_config[i].SERVER_HOST.get()
         }
       )
-    )
-
-  # Get additional remote multi clusters
-  clusters.extend([
-    (i, {
-      'id': i,
-      'name': cluster_config[i].NAME.get() or i,
-      'type': cluster_config[i].TYPE.get(),
-      'interface': cluster_config[i].INTERFACE.get() or 'hive',
-      'server_host': cluster_config[i].SERVER_HOST.get()
-    }) for i in cluster_config if i != 'Default'
-  ])
+      )
+    elif not IS_MULTICLUSTER_ONLY.get() or i == 'Default':
+      # Get core standalone config if there
+      clusters.append(
+        (CLUSTER_ID.get(), {
+          'id': CLUSTER_ID.get(),
+          'name': CLUSTER_ID.get(),
+          'type': 'direct',
+          'interface': 'all',
+          'server_host': 'all'
+          }
+        )
+      )
 
   return OrderedDict(clusters)
 
