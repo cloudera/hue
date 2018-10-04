@@ -83,13 +83,14 @@ def get_context_namespaces(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  namespaces.extend([{
-      'id': cluster['id'],
-      'name': cluster['name'],
-      'status': 'CREATED',
-      'computes': [cluster]
-    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
-  ])
+  if not IS_K8S_ONLY.get(): 
+    namespaces.extend([{
+        'id': cluster['id'],
+        'name': cluster['name'],
+        'status': 'CREATED',
+        'computes': [cluster]
+      } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+    ])
 
   if interface == 'hive' or interface == 'impala' or interface == 'report':
     # From Altus SDX
@@ -139,7 +140,7 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
+  if not IS_K8S_ONLY.get() and (interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report'):
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
