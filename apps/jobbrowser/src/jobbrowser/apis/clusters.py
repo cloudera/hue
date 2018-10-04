@@ -23,7 +23,7 @@ from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
+from notebook.connectors.altus import DataWarehouse2Api
 
 from jobbrowser.apis.base_api import Api
 
@@ -35,17 +35,27 @@ LOG = logging.getLogger(__name__)
 RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
 
 
-class DataWarehouseClusterApi(Api):
+class ClusterApi(Api):
 
   def __init__(self, user, version=1):
-    super(DataWarehouseClusterApi, self).__init__(user)
+    super(ClusterApi, self).__init__(user)
 
     self.version = version
-    self.api = DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user) 
+    self.api = DataWarehouse2Api(self.user) 
 
 
   def apps(self, filters):
-    jobs = self.api.list_clusters()
+    #jobs = self.api.list_clusters()
+
+    return {
+      u'status': 0,
+      u'total': 3,
+      u'apps': [
+        {u'status': u'ONLINE', u'name': u'Internal EDH', u'submitted': u'2018-10-04 08:34:39.128886', u'queue': u'group', u'user': u'jo0', u'canWrite': True, u'duration': 0, u'progress': u'1 / 1', u'type': u'GKE 100 nodes 100CPU 20TB', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:jo0/cbf7bbb1-f956-45e4-a269-d239efbc9996', u'apiStatus': u'RUNNING'},
+        {u'status': u'ONLINE', u'name': u'gke_gcp-eng-dsdw_us-west2-b_impala-demo', u'submitted': u'2018-10-04 08:34:39.128881', u'queue': u'group', u'user': u'r0', u'canWrite': True, u'duration': 0, u'progress': u'1 / 1', u'type': u'GKE 4 nodes 16CPU 64GB', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:r0/0da5e627-ee33-45c5-9179-cc6b95008d2e', u'apiStatus': u'RUNNING'},
+        {u'status': u'ONLINE', u'name': u'DW-fraud', u'submitted': u'2018-10-04 08:34:39.128881', u'queue': u'group', u'user': u'r0', u'canWrite': True, u'duration': 0, u'progress': u'1 / 1', u'type': u'OpenShift 50 nodes 30CPU 2TB', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:r0/0da5e627-ee33-45c5-9179-cc6b95008d2e', u'apiStatus': u'RUNNING'},
+      ]
+    }
 
     return {
       'apps': [{
@@ -53,7 +63,7 @@ class DataWarehouseClusterApi(Api):
         'name': '%(clusterName)s' % app,
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
-        'type': '%(instanceType)s' % app, #'Altus %(workersGroupSize)sX %(instanceType)s %(cdhVersion)s' % app,
+        'type': 'Altus %(workersGroupSize)sX %(instanceType)s %(cdhVersion)s' % app,
         'user': app['clusterName'].split('-', 1)[0],
         'progress': app.get('progress', 100),
         'queue': 'group',

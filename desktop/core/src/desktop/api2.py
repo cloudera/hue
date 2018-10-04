@@ -82,7 +82,7 @@ def get_context_namespaces(request, interface):
   namespaces = []
 
   clusters = get_clusters(request.user).values()
-
+ 
   namespaces.extend([{
       'id': cluster['id'],
       'name': cluster['name'],

@@ -288,6 +288,17 @@ class DataWarehouse2Api():
     self._root = Resource(self._client)
 
 
+  def list_k8_clusters(self):
+    clusters = self._root.post('listClusters', contenttype="application/json")
+    for cluster in clusters['clusters']:
+      cluster['clusterName'] = cluster['name']
+      cluster['workersGroupSize'] = cluster['workerReplicas']
+      cluster['instanceType'] = '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
+      cluster['creationDate'] = str(datetime.now())
+    return clusters
+
+
   def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
         cloudera_manager_username='hue', cloudera_manager_password='hue'):
     data = {
@@ -306,7 +317,7 @@ class DataWarehouse2Api():
     for cluster in clusters['clusters']:
       cluster['clusterName'] = cluster['name']
       cluster['workersGroupSize'] = cluster['workerReplicas']
-      cluster['instanceType'] = '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['instanceType'] = 'Data Warehouse'# '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
       cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
       cluster['creationDate'] = str(datetime.now())
     return clusters
@@ -334,3 +345,5 @@ class DataWarehouse2Api():
 
     
     return self._root.post('updateCluster', data=json.dumps(data), contenttype="application/json")
+
+
