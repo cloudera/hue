@@ -272,6 +272,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
                   <span data-bind="visible: jobs.createClusterShow">
                     <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Name')}">
+                      Environment 
+                      <select>
+                        <option>GCE-west</option>
+                        <option>AWS-finance-secure</option>
+                        <option>OpenShift-prem</option>
+                      </select>
                     <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
                     <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
                       ${ _('workers') }
@@ -284,12 +290,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <!-- /ko -->
                     <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
                       ${ _('nodes') }
-                      Environment
-                      <select>
-                        <option>AWS-finance-secure</option>
-                        <option>GCE-east</option>
-                        <option>OpenShift-prem</option>
-                      </select>
                     <!-- /ko -->
 
                     <button class="btn" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
