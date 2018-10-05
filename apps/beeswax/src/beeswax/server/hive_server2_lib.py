@@ -919,12 +919,14 @@ class HiveServerClient:
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
     (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, with_multiple_session=with_multiple_session)
 
-    return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
-                                 guid=res.operationHandle.operationId.guid,
-                                 operation_type=res.operationHandle.operationType,
-                                 has_result_set=res.operationHandle.hasResultSet,
-                                 modified_row_count=res.operationHandle.modifiedRowCount,
-                                 session_guid=session.guid)
+    return HiveServerQueryHandle(
+        secret=res.operationHandle.operationId.secret,
+        guid=res.operationHandle.operationId.guid,
+        operation_type=res.operationHandle.operationType,
+        has_result_set=res.operationHandle.hasResultSet,
+        modified_row_count=res.operationHandle.modifiedRowCount,
+        session_guid=session.guid
+    )
 
 
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):

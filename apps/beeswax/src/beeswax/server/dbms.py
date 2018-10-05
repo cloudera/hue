@@ -79,14 +79,7 @@ def get(user, query_server=None, cluster=None):
 def get_query_server_config(name='beeswax', server=None, cluster=None):
   LOG.debug("Query cluster %s: %s" % (name, cluster))
 
-  if cluster and cluster.get('id') != CLUSTER_ID.get():
-    if 'altus:dataware:k8s' in cluster['id']:
-      compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
-      cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
-    else:
-      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster
-  else:
-    cluster_config = None
+  cluster_config = get_cluster_config(cluster)
 
   if name == 'impala':
     from impala.dbms import get_query_server_config as impala_query_server_config
@@ -124,6 +117,19 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
+
+
+def get_cluster_config(cluster=None):
+  if cluster and cluster.get('id') != CLUSTER_ID.get():
+    if 'altus:dataware:k8s' in cluster['id']:
+      compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
+      cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
+    else:
+      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster
+  else:
+    cluster_config = None
+
+  return cluster_config
 
 
 class QueryServerException(Exception):
