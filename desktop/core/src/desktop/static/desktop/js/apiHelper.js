@@ -1395,6 +1395,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {ContextCompute} options.compute
+   * @param {string} options.sourceType
    * @param {string[]} options.path
    *
    * @return {CancellablePromise}
@@ -1421,11 +1422,11 @@ var ApiHelper = (function () {
 
     var data = {
       format: 'json',
-      cluster: JSON.stringify(options.compute)
-      //'source_type': options.sourceType // TODO: Blows up server-side with 'impala'
+      cluster: JSON.stringify(options.compute),
+      source_type: options.sourceType
     };
 
-    var request = self[options.path.length === 1 ? 'simplePost' : 'simpleGet'](url, data, {
+    var request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
       silenceErrors: options.silenceErrors,
       successCallback: function (response) {
         if (options.path.length === 1) {
