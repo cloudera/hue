@@ -26,6 +26,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 
 from beeswax.api import error_handler
+from beeswax.server.dbms import get_cluster_config
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
 from beeswax.views import authorized_get_query_history
@@ -39,17 +40,17 @@ LOG = logging.getLogger(__name__)
 @error_handler
 def invalidate(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
+  database = request.POST.get('database', None)
+  table = request.POST.get('table', None)
+  flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
 
-  # TODO: create cluster_config for get_query_server_config
-  query_server = dbms.get_query_server_config()
-  db = beeswax_dbms.get(request.user, query_server=query_server, cluster=cluster)
+  cluster_config = get_cluster_config(cluster)
+  query_server = dbms.get_query_server_config(cluster_config=cluster_config)
+  db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
-  database = request.POST.get('database', None)
-  flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
-
-  db.invalidate(database=database, flush_all=flush_all)
+  db.invalidate(database=database, table=table, flush_all=flush_all)
   response['message'] = _('Successfully invalidated metadata')
 
   return JsonResponse(response)
