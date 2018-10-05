@@ -1452,6 +1452,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string[]} options.path
+   * @param {ContextCompute} options.compute
    *
    * @return {CancellablePromise}
    */
@@ -1462,7 +1463,10 @@ var ApiHelper = (function () {
     // TODO: No sourceType needed?
     var request = $.ajax({
       url: '/metastore/table/' + options.path.join('/') + '/partitions',
-      data: { format: 'json' },
+      data: {
+        format: 'json',
+        cluster: JSON.stringify(options.compute)
+      },
       success: function (response) {
         if (!self.successResponseIsError(response)) {
           if (!response) {
