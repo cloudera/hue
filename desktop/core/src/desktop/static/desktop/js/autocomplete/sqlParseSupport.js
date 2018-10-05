@@ -1498,6 +1498,17 @@ var SqlParseSupport = (function () {
       if (!parser.isImpala()) {
         return;
       }
+      // Don't add if already there except for SELECT
+      if (identifier !== 'SELECT' && parser.yy.allLocations) {
+        for (var i = parser.yy.allLocations.length - 1; i >= 0; i--) {
+          if (parser.yy.allLocations[i] && parser.yy.allLocations[i].type === 'statement') {
+            break;
+          }
+          if (parser.yy.allLocations[i] && parser.yy.allLocations[i].type === 'statementType') {
+            return;
+          }
+        }
+      }
       var loc = {
         type: 'statementType',
         location: adjustLocationForCursor(location),
