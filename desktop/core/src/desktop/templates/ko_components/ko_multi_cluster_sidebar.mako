@@ -162,13 +162,41 @@ from desktop.views import _ko
             }
           ]
         }, {
-          label: '${ _('Data Flow') }',
+          label: '${ _('Data Engineering') }',
           url: '/',
-          icon: 'altus-icon altus-workload'
+          icon: 'altus-icon altus-workload',
+          items: [{
+              label: '${ _('Ingest') }',
+              url: '/editor?type=impala'
+            },{
+              label: '${ _('Transform') }',
+              url: '/metastore/tables'
+            },{
+              label: '${ _('Streams') }',
+              url: '/metastore/tables'
+            },{
+              label: '${ _('Schedule') }',
+              url: '/filebrowser/view=S3A://'
+            }
+          ]
         }, {
           label: '${ _('Data Stewart') }',
           url: '/',
-          icon: 'altus-icon altus-adb'
+          icon: 'altus-icon altus-adb',
+          items: [{
+              label: '${ _('Catalog') }',
+              url: '/editor?type=impala'
+            },{
+              label: '${ _('Security') }',
+              url: '/editor?type=impala'
+            },{
+              label: '${ _('Audit') }',
+              url: '/metastore/tables'
+            },{
+              label: '${ _('BDR') }',
+              url: '/filebrowser/view=S3A://'
+            }
+          ]
         }
       ]
    
