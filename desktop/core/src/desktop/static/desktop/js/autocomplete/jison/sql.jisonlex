@@ -316,7 +316,7 @@
 <impala>'FUSION'                           { return '<impala>FUSION'; }
 <impala>'GET'                              { return '<impala>GET'; }
 <impala>'GLOBAL'                           { return '<impala>GLOBAL'; }
-<impala>'GRANT'                            { return '<impala>GRANT'; }
+<impala>'GRANT'                            { parser.determineCase(yytext); parser.addStatementTypeLocation('GRANT', yylloc); return '<impala>GRANT'; }
 <impala>'GROUP'                            { return '<impala>GROUP'; }
 <impala>'GROUPING'                         { return '<impala>GROUPING'; }
 <impala>'GROUPS'                           { return '<impala>GROUPS'; }

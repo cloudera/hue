@@ -890,6 +890,19 @@
     });
 
     describe('Impala specific', function () {
+
+      it('should report locations for "GRANT CREATE ON DATABASE foo TO ROLE bar;"', function () {
+        assertLocations({
+          beforeCursor: 'GRANT CREATE ON DATABASE foo TO ROLE bar;',
+          dialect: 'impala',
+          expectedLocations: [
+            { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 41 } },
+            { type: 'statementType', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 6 }, identifier: 'GRANT' },
+            { type: 'database', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 29 }, identifierChain: [{ name: 'foo' }] }
+          ]
+        });
+      });
+
       it('should report locations for "SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60; |"', function () {
         assertLocations({
           dialect: 'impala',
