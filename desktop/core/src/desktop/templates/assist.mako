@@ -26,7 +26,7 @@ from dashboard.conf import HAS_SQL_ENABLED
 
 from desktop import appmanager
 from desktop import conf
-from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS, IS_MULTICLUSTER_ONLY
+from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
