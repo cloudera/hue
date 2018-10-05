@@ -185,6 +185,9 @@ HiveObjectSpecification_EDIT
 
 ImpalaObjectSpecification
  : 'DATABASE' RegularOrBacktickedIdentifier
+   {
+     parser.addDatabaseLocation(@2, [ { name: $2 } ]);
+   }
  | '<impala>TABLE' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($2);
