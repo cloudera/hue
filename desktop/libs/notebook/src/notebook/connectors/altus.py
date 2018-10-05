@@ -334,6 +334,7 @@ class DataWarehouse2Api():
     data = json.dumps({'clusterName': cluster_id})
     data = self._root.post('describeCluster', data=data, contenttype="application/json")
     data['cluster']['clusterName'] = data['cluster']['name']
+    data['cluster']['cdhVersion'] = 'Data Warehouse'
     return data
 
 
