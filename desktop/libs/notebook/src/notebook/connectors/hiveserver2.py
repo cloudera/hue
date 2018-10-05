@@ -195,7 +195,7 @@ class HS2Api(Api):
     except Exception, e:
       LOG.warn('Failed to decode session handle: %s' % e)
 
-    if lang == 'impala':
+    if lang == 'impala' and session:
       http_addr = _get_impala_server_url(session)
       response['http_addr'] = http_addr
 
