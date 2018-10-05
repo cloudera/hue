@@ -69,7 +69,7 @@ from desktop.views import _ko
             icon:'altus-icon altus-ds'
           },
           dataFlow: {
-            label: 'Data Flow',
+            label: 'Data Engineering',
             icon:'altus-icon altus-workload'
           },
           navigator: {
