@@ -1202,7 +1202,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="dataware2-clusters-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1238,80 +1237,97 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
-    </div>
-    <div>
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position:relative;">
+      <div style="position: absolute; top: 0; right: 0">
+        <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
+          <i class="fa fa-refresh"></i>
+        </a>
 
-    <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
-      <i class="fa fa-refresh"></i>
-    </a>
-
-    <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
-      <!-- ko if: updateClusterShow-->
-        ${ _('Cancel') }
-      <!-- /ko -->
-      <!-- ko ifnot: updateClusterShow-->
-        ${ _('Resize') } <i class="fa fa-exchange fa-rotate-90"></i>
-      <!-- /ko -->
-    </button>
-
-    <span data-bind="visible: updateClusterShow">
-      <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
-
-      <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-        <i class="fa fa-check"></i>
-      </button>
-    </span>
-
-    <br/>
-
-    <div class="acl-panel-content" style="height: 988px;">
-      <h4 style="margin-top: 4px;">Privileges &nbsp;</h4>
-
-      <div class="acl-block-title">
-        <i class="fa fa-cube muted"></i> <a class="pointer"><span>admin</span></a>
+        <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
+          <!-- ko if: updateClusterShow-->
+            ${ _('Cancel') }
+          <!-- /ko -->
+          <!-- ko ifnot: updateClusterShow-->
+            ${ _('Resize') } <i class="fa fa-exchange fa-rotate-90"></i>
+          <!-- /ko -->
+        </button>
       </div>
-      <div>
-        <div class="acl-block acl-block-airy">
-          <span class="muted" title="3 months ago">CLUSTER</span>
-          <span>
-            <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-          </span>
-          <br>
-          server=<span>server1</span>
-          <span>
-            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
-          </span>
-          <i class="fa fa-long-arrow-right"></i> action=ALL
+      <span data-bind="visible: updateClusterShow">
+        <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+
+        <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
+          <i class="fa fa-check"></i>
+        </button>
+      </span>
+
+      <div class="acl-panel-content">
+        <h4>Privileges</h4>
+
+        <div class="acl-block-title">
+          <i class="fa fa-cube muted"></i> <a class="pointer"><span>admin</span></a>
         </div>
-      </div>
-
-      <div class="acl-block-title">
-        <i class="fa fa-cube muted"></i> <a class="pointer"><span>eng</span></a>
-      </div>
-      <div>
-        <div class="acl-block acl-block-airy">
-          <span class="muted" title="3 months ago">CLUSTER</span>
-          <span>
-            <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-          </span>
-          <br>
-          server=server1
-          <span>
-            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
-          </span>
-          <i class="fa fa-long-arrow-right"></i> action=<span>ACCESS</span>
+        <div>
+          <div class="acl-block acl-block-airy">
+            <span class="muted" title="3 months ago">CLUSTER</span>
+            <span>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+            </span>
+            <br>
+            server=<span>server1</span>
+            <span>
+              <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+            </span>
+            <i class="fa fa-long-arrow-right"></i> action=ALL
+          </div>
         </div>
-      </div>
 
-      <div class="acl-block acl-actions">
-        <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
-        <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
-        <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
-        <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
-      </div>
+        <div class="acl-block-title">
+          <i class="fa fa-cube muted"></i> <a class="pointer"><span>eng</span></a>
+        </div>
+        <div>
+          <div class="acl-block acl-block-airy">
+            <span class="muted" title="3 months ago">CLUSTER</span>
+            <span>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+            </span>
+            <br>
+            server=server1
+            <span>
+              <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+            </span>
+            <i class="fa fa-long-arrow-right"></i> action=<span>ACCESS</span>
+          </div>
+        </div>
 
+        <div class="acl-block acl-actions">
+          <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+          <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+          <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+          <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+        </div>
+
+        <div class="wxm-poc margin-top-10" style="clear: both;">
+          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+            <h4>Trend</h4>
+            <img src="${ static('desktop/art/wxm_fake/trend.svg') }" style="height: 440px"/>
+          </div>
+          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+            <h4>Outliers</h4>
+            <img src="${ static('desktop/art/wxm_fake/outliers.svg') }" style="height: 440px"/>
+          </div>
+          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+            <h4>Statement Types</h4>
+            <img src="${ static('desktop/art/wxm_fake/statement_types.svg') }" style="height: 440px"/>
+          </div>
+          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+            <h4>Duration</h4>
+            <img src="${ static('desktop/art/wxm_fake/duration.svg') }" style="height: 440px"/>
+          </div>
+          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+            <h4>Memory Utilization</h4>
+            <img src="${ static('desktop/art/wxm_fake/memory.svg') }" style="height: 440px"/>
+          </div>
+        </div>
       </div>
     </div>
   </div>
