@@ -306,7 +306,7 @@ def describe_table(request, database, table):
     LOG.exception("Describe table error")
     raise PopupException(_("DB Error"), detail=e.message if hasattr(e, 'message') and e.message else e)
 
-  if request.GET.get("format", "html") == "json":
+  if request.POST.get("format", "html") == "json":
     return JsonResponse({
         'status': 0,
         'name': table.name,
