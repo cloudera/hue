@@ -272,12 +272,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
                   <span data-bind="visible: jobs.createClusterShow">
                     <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Name')}">
-                      Environment 
-                      <select>
-                        <option>GCE-west</option>
-                        <option>AWS-finance-secure</option>
-                        <option>OpenShift-prem</option>
-                      </select>
                     <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
                     <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
                       ${ _('workers') }
@@ -290,6 +284,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <!-- /ko -->
                     <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
                       ${ _('nodes') }
+                      Environment
+                      <select>
+                        <option>AWS-finance-secure</option>
+                        <option>GCE-east</option>
+                        <option>OpenShift-prem</option>
+                      </select>
                     <!-- /ko -->
 
                     <button class="btn" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
@@ -372,10 +372,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
                 <!-- ko if: mainType() == 'dataware2-clusters' -->
                   <div data-bind="template: { name: 'dataware2-clusters-page${ SUFFIX }' }"></div>
-                <!-- /ko -->
-
-                <!-- ko if: mainType() == 'engines' -->
-                  <div data-bind="template: { name: 'engines-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: mainType() == 'livy-sessions' -->
@@ -1205,82 +1201,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="engines-page${ SUFFIX }">
-
-  <div class="row-fluid">
-    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
-      <div class="sidebar-nav">
-        <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li><span class="break-word" data-bind="text: id"></span></li>
-          <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
-          <li class="nav-header">${ _('Workers Online') }</li>
-          <li>
-            <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
-            /
-            <span data-bind="text: properties['properties']['workerReplicas']"></span>
-            <!-- ko if: status() == 'SCALING_UP' || status() == 'SCALING_DOWN' -->
-              <i class="fa fa-spinner fa-spin fa-fw"></i>
-            <!-- /ko -->
-          </li>
-          <li>
-            ##<div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': status() == 'SCALING_UP' || status() == 'SCALING_DOWN', 'progress-success': status() == 'ONLINE', 'progress-danger': apiStatus() === 'FAILED'}">
-              <div class="bar" data-bind="style: {'width': Math.min(properties['properties']['workerReplicas'](), properties['properties']['workerReplicasOnline']()) / Math.max(properties['properties']['workerReplicasOnline'](), properties['properties']['workerReplicas']()) * 100 + '%'}"></div>
-            </div>
-          </li>
-          <li class="nav-header">${ _('Impalad') }</li>
-          <li>
-            <a href="#" data-bind="attr: { 'href': properties['properties']['coordinatorEndpoint']['publicHost']() + ':25000' }">
-              <span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span>
-              <i class="fa fa-external-link fa-fw"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
-    </div>
-    <div>
-
-    <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
-      <i class="fa fa-refresh"></i>
-    </a>
-
-    <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
-      <!-- ko if: updateClusterShow-->
-        ${ _('Cancel') }
-      <!-- /ko -->
-      <!-- ko ifnot: updateClusterShow-->
-        ${ _('Resize') }
-      <!-- /ko -->
-    </button>
-
-    <span data-bind="visible: updateClusterShow">
-      <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
-
-      <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-        <i class="fa fa-refresh"></i>
-      </button>
-    </span>
-
-    </div>
-  </div>
-</script>
-
-
 <script type="text/html" id="dataware2-clusters-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li><span class="break-word" data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
           <li class="nav-header">${ _('Status') }</li>
@@ -1307,6 +1233,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <i class="fa fa-external-link fa-fw"></i>
             </a>
           </li>
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span class="break-word" data-bind="text: id"></span></li>
         </ul>
       </div>
     </div>
@@ -1324,7 +1252,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         ${ _('Cancel') }
       <!-- /ko -->
       <!-- ko ifnot: updateClusterShow-->
-        ${ _('Resize') }
+        ${ _('Resize') } <i class="fa fa-exchange fa-rotate-90"></i>
       <!-- /ko -->
     </button>
 
@@ -1332,10 +1260,59 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
 
       <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-        <i class="fa fa-refresh"></i>
+        <i class="fa fa-check"></i>
       </button>
     </span>
 
+    <br/>
+
+    <div class="acl-panel-content" style="height: 988px;">
+      <h4 style="margin-top: 4px;">Privileges &nbsp;</h4>
+
+      <div class="acl-block-title">
+        <i class="fa fa-cube muted"></i> <a class="pointer"><span>admin</span></a>
+      </div>
+      <div>
+        <div class="acl-block acl-block-airy">
+          <span class="muted" title="3 months ago">CLUSTER</span>
+          <span>
+            <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          </span>
+          <br>
+          server=<span>server1</span>
+          <span>
+            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+          </span>
+          <i class="fa fa-long-arrow-right"></i> action=ALL
+        </div>
+      </div>
+
+      <div class="acl-block-title">
+        <i class="fa fa-cube muted"></i> <a class="pointer"><span>eng</span></a>
+      </div>
+      <div>
+        <div class="acl-block acl-block-airy">
+          <span class="muted" title="3 months ago">CLUSTER</span>
+          <span>
+            <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          </span>
+          <br>
+          server=server1
+          <span>
+            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+          </span>
+          <i class="fa fa-long-arrow-right"></i> action=<span>ACCESS</span>
+        </div>
+      </div>
+
+      <div class="acl-block acl-actions">
+        <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+        <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+        <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+        <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+      </div>
+
+      </div>
     </div>
   </div>
 </script>
