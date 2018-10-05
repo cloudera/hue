@@ -1461,40 +1461,35 @@ var ApiHelper = (function () {
     var deferred = $.Deferred();
 
     // TODO: No sourceType needed?
-    var request = $.ajax({
-      url: '/metastore/table/' + options.path.join('/') + '/partitions',
-      data: {
-        format: 'json',
-        cluster: JSON.stringify(options.compute)
-      },
-      success: function (response) {
-        if (!self.successResponseIsError(response)) {
-          if (!response) {
-            response = {};
-          }
-          response.hueTimestamp = Date.now();
-          deferred.resolve(response);
-        } else {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(response);
+    var request = $.post('/metastore/table/' + options.path.join('/') + '/partitions', {
+      format: 'json',
+      cluster: JSON.stringify(options.compute)
+    }).done(function (response) {
+      if (!self.successResponseIsError(response)) {
+        if (!response) {
+          response = {};
         }
-      },
-      error: function (response) {
-        // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
-        if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
-          deferred.resolve({
-            hueTimestamp: Date.now(),
-            partition_keys_json: [],
-            partition_values_json: []
-          })
-        } else {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(response);
-        }
+        response.hueTimestamp = Date.now();
+        deferred.resolve(response);
+      } else {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(response);
+      }
+    }).fail(function (response) {
+      // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
+      if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
+        deferred.resolve({
+          hueTimestamp: Date.now(),
+          partition_keys_json: [],
+          partition_values_json: []
+        })
+      } else {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(response);
       }
     });
 
