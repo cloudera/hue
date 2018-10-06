@@ -579,6 +579,9 @@ if not desktop.conf.DATABASE_LOGGING.get():
 # For performance reasons and to avoid searching in huge fields, we also truncate to a max length
 DOCUMENT2_SEARCH_MAX_LENGTH = 2000
 
+# To avoid performace issue, config check will display warning when Document2 over this size
+DOCUMENT2_MAX_ENTRIES = 100000
+
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 def show_toolbar(request):
