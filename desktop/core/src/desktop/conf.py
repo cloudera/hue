@@ -1776,9 +1776,23 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
+  from beeswax.models import Session
   from desktop.lib import i18n
+  from desktop.models import Document2 # Avoid cyclic loop
+  from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
 
   res = []
+
+  doc2_count = Document2.objects.filter(is_history=True).count()
+  if doc2_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('DOCUMENT2_CLEANUP_WARNING', unicode(_('Desktop Document2 has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
+
+  session_count = Session.objects.filter(status_code__gte=-10000).count()
+  if session_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('SESSION_CLEANUP_WARNING', unicode(_('Desktop Session has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
+
   if not get_secret_key():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
