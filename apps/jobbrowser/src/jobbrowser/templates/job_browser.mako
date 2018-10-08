@@ -132,7 +132,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </li>
             <!-- ko foreach: availableInterfaces -->
               <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
-                <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
+                <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label, visible: label"></a>
               </li>
             <!-- /ko -->
           </ul>
@@ -232,14 +232,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <!-- ko if: !$root.isMini() && interface() == 'queries' -->
                   ${ _('Impala queries from') }
                 <!-- /ko -->
+                <!-- ko if: interface() != 'dataware2-clusters' && interface() != 'engines' -->
                 <input type="text" class="input-large" data-bind="clearable: jobs.textFilter, valueUpdate: 'afterkeydown'" placeholder="${_('Filter by id, name, user...')}" />
-                <!-- ko if: jobs.statesValuesFilter -->
-                <span data-bind="foreach: jobs.statesValuesFilter">
-                  <label class="checkbox">
-                    <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
-                    <div class="inline-block" data-bind="text: name, toggle: checked"></div>
-                  </label>
-                </span>
+                  <!-- ko if: jobs.statesValuesFilter -->
+                  <span data-bind="foreach: jobs.statesValuesFilter">
+                    <label class="checkbox">
+                      <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                      <div class="inline-block" data-bind="text: name, toggle: checked"></div>
+                    </label>
+                  </span>
+                  <!-- /ko -->
                 <!-- /ko -->
 
                 <!-- ko ifnot: $root.isMini -->
@@ -258,29 +260,33 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   </a>
                   <!-- /ko -->
 
-                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.cluster() && $root.cluster()['type'].indexOf('altus') >= 0, toggle: jobs.createClusterShow">
+                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.interface() == 'dataware2-clusters', toggle: jobs.createClusterShow">
                     <!-- ko if: jobs.createClusterShow -->
                       ${ _('Cancel') }
                     <!-- /ko -->
                     <!-- ko if: !jobs.createClusterShow() && $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
-                      ${ _('Add Service') }
+                      ${ _('Add Warehouse') }
                     <!-- /ko -->
                     <!-- ko if: !jobs.createClusterShow() && $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
                       ${ _('Create / Register') }
                     <!-- /ko -->
                   </a>
 
-                  <span data-bind="visible: jobs.createClusterShow">
-                    <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Name')}">
-                    <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
-                    <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
-                      ${ _('workers') }
-                      <select class="input-medium">
-                        <option>Data Warehouse</option>
-                        <option>IoT</option>
-                        <option>Auditing</option>
-                        <option>Troubleshooting</option>
+                  <span data-bind="visible: jobs.createClusterShow() && $root.interface() == 'dataware2-clusters'">
+                    <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" class="input-medium" placeholder="${_('Name')}">
+                    <!-- ko if: $root.interface() == 'dataware2-clusters' -->
+                      <span data-bind="visible: jobs.createClusterShowWorkers">
+                        <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+                        ${ _('workers') }
+                      </span>
+                      <select class="input-small" data-bind="visible: !jobs.createClusterShowWorkers()">
+                        <option>X-Small</option>
+                        <option>Small</option>
+                        <option>Medium</option>
+                        <option>Large</option>
+                        <option>x-Large</option>
                       </select>
+                      <input type="checkbox" data-bind="checked: jobs.createClusterShowWorkers">
                     <!-- /ko -->
                     <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
                       ${ _('nodes') }
@@ -1206,8 +1212,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
           <li class="nav-header">${ _('Workers Online') }</li>
@@ -1225,6 +1229,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': Math.min(properties['properties']['workerReplicas'](), properties['properties']['workerReplicasOnline']()) / Math.max(properties['properties']['workerReplicasOnline'](), properties['properties']['workerReplicas']()) * 100 + '%'}"></div>
             </div>
           </li>
+          <li class="nav-header">${ _('Auto pause') }</li>
+          <li><i class="fa fa-check fa-fw"></i></li>
+          <li class="nav-header">${ _('Auto resize') }</li>
+          <li><i class="fa fa-check fa-fw"></i></li>
           <li class="nav-header">${ _('Impalad') }</li>
           <li>
             <a href="#" data-bind="attr: { 'href': properties['properties']['coordinatorEndpoint']['publicHost']() + ':25000' }">
@@ -2758,7 +2766,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters', 'dataware2-clusters', 'engines'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2767,7 +2775,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2785,7 +2793,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2955,7 +2963,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.createClusterShow = ko.observable(false);
       self.createClusterName = ko.observable('');
-      self.createClusterWorkers = ko.observable(3);
+      self.createClusterWorkers = ko.observable(1);
+      self.createClusterShowWorkers = ko.observable(false);
 
       self.createCluster = function() {
         if (vm.interface().indexOf('dataeng') != -1) {
@@ -2985,6 +2994,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
+            self.createClusterName('');
+            self.createClusterWorkers(1);
             $(document).trigger("info", ko.mapping.toJSON(data));
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
@@ -3098,9 +3109,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataware-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouseInterfaceCondition},
-          {'interface': 'dataware2-clusters', 'label': '${ _ko('Services') }', 'condition': dataWarehouse2InterfaceCondition},
-          {'interface': 'engines-cluster-permissions', 'label': '${ _ko('Permissions') }', 'condition': dataWarehouse2InterfaceCondition},
-          {'interface': 'engines', 'label': '${ _ko('Engines') }', 'condition': enginesInterfaceCondition},
+          {'interface': 'dataware2-clusters', 'label': '${ _ko('Warehouses') }', 'condition': dataWarehouse2InterfaceCondition},
+          {'interface': 'engines', 'label': '${ _ko('') }', 'condition': enginesInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
