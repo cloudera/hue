@@ -110,6 +110,10 @@ from desktop.views import _ko
       // TODO: Fetch menu from the backend
       var FIXED_CATEGORIES = [{
         items: [{
+##          label: '${ _('Home') }',
+##          url: '/',
+##          icon: 'fa fa-home'
+
           label: '${ _('Data Warehouse') }',
           icon: 'altus-icon altus-adb-query',
           items: [{
@@ -119,9 +123,12 @@ from desktop.views import _ko
               label: '${ _('Catalog') }',
               url: '/metastore/tables'
             },{
-              label: '${ _('Files') }',
-              url: '/filebrowser/view=S3A://'
+              label: '${ _('Warehouses') }',
+              url: '/hue/jobbrowser',
             },{
+##              label: '${ _('Files') }',
+##              url: '/filebrowser/view=S3A://'
+##            },{
 ##              label: '${ _('Dashboard') }',
 ##              url: '/dashboard/new_search'
 ##            },{
@@ -132,62 +139,119 @@ from desktop.views import _ko
               url: '/indexer/importer'
             }
           ]
-        }, {
-          label: '${ _('Data Science') }',
-          url: '/',
-          icon: 'altus-icon altus-ds',
-          items: [{
-              label: '${ _('Projects') }',
-              url: '/editor?type=impala'
-            },{
-              label: '${ _('Sessions') }',
-              url: '/metastore/tables'
-            },{
-              label: '${ _('Experiments') }',
-              url: '/filebrowser/view=S3A://'
-            },{
-              label: '${ _('Models') }',
-              url: '/dashboard/new_search'
-            },{
-              label: '${ _('Jobs') }',
-              url: '/oozie/editor/coordinator/new/'
-            },{
-              label: '${ _('Settings') }',
-              url: '/indexer/importer'
-            }
-          ]
-        }
-      ]
-   
-      }, {
-        label: '${ _('Admin') }',
-        items: [{
-            label: '${ _('Engines') }',
-            url: '/hue/jobbrowser',
-            icon: 'altus-icon altus-de'
-          },{
-            label: '${ _('Catalog') }',
+          }, {
+            label: '${ _('Data Science') }',
             url: '/',
-            icon: 'altus-icon altus-sdx'
-          },{
-            label: '${ _('Environments') }',
-            url: '/',
-            icon: 'altus-icon altus-environment'
-          },{
-            label: '${ _('Directory') }',
-            url: 'https://console.altus.cloudera.com/iam/index.html',
-            icon: 'altus-icon altus-iam',
+            icon: 'altus-icon altus-ds',
             items: [{
-                label: '${ _('User') }',
-                url: '/hue/useradmin/users/'
+                label: '${ _('Projects') }',
+                url: '/editor?type=impala'
               },{
-                label: '${ _('Groups') }',
-                url: '/hue/useradmin/groups/'
+                label: '${ _('Sessions') }',
+                url: '/metastore/tables'
+              },{
+                label: '${ _('Experiments') }',
+                url: '/filebrowser/view=S3A://'
+              },{
+                label: '${ _('Models') }',
+                url: '/dashboard/new_search'
+              },{
+                label: '${ _('Jobs') }',
+                url: '/oozie/editor/coordinator/new/'
+              },{
+                label: '${ _('Settings') }',
+                url: '/indexer/importer'
+              }
+            ]
+          }, {
+            label: '${ _('Admin') }',
+            url: '/',
+            icon: 'altus-icon altus-de',
+            items: [{
+                label: '${ _('Clusters') }',
+                url: '/hue/jobbrowser',
+              },{
+                label: '${ _('Catalog') }',
+                url: '/',
+              },{
+                label: '${ _('Environments') }',
+                url: '/',
+              },{
+                label: '${ _('Directory') }',
+                url: 'https://console.altus.cloudera.com/iam/index.html',
               }
             ]
           }
         ]
-      }
+      }];
+
+##        }, {
+##          label: '${ _('Data Engineering') }',
+##          url: '/',
+##          icon: 'altus-icon altus-workload',
+##          items: [{
+##              label: '${ _('Ingest') }',
+##              url: '/editor?type=impala'
+##            },{
+##              label: '${ _('Transform') }',
+##              url: '/metastore/tables'
+##            },{
+##              label: '${ _('Streams') }',
+##              url: '/metastore/tables'
+##            },{
+##              label: '${ _('Schedule') }',
+##              url: '/filebrowser/view=S3A://'
+##            }
+##          ]
+##        }, {
+##          label: '${ _('Data Stewart') }',
+##          url: '/',
+##          icon: 'altus-icon altus-adb',
+##          items: [{
+##              label: '${ _('Catalog') }',
+##              url: '/editor?type=impala'
+##            },{
+##              label: '${ _('Security') }',
+##              url: '/editor?type=impala'
+##            },{
+##              label: '${ _('Audit') }',
+##              url: '/metastore/tables'
+##            },{
+##              label: '${ _('BDR') }',
+##              url: '/filebrowser/view=S3A://'
+##            }
+##          ]
+
+##      }, {
+##        label: '${ _('Admin') }',
+##        items: [{
+##            label: '${ _('Engines') }',
+##            url: '/hue/jobbrowser',
+##            icon: 'altus-icon altus-de'
+##          },{
+##            label: '${ _('Catalog') }',
+##            url: '/',
+##            icon: 'altus-icon altus-sdx'
+##          },{
+##            label: '${ _('Environments') }',
+##            url: '/',
+##            icon: 'altus-icon altus-environment'
+##          },{
+##            label: '${ _('Directory') }',
+##            url: 'https://console.altus.cloudera.com/iam/index.html',
+##            icon: 'altus-icon altus-iam',
+##            items: [{
+##                label: '${ _('User') }',
+##                url: '/hue/useradmin/users/'
+##              },{
+##                label: '${ _('Groups') }',
+##                url: '/hue/useradmin/groups/'
+##              }
+##            ]
+##          }
+##        ]
+##      }
+
 ##           },{
 ##             label: '${ _('Streaming') }',
 ##             url: '/',
@@ -212,7 +276,7 @@ from desktop.views import _ko
           ##  url: '/'
           ##}
 
-        
+
 ##      }, {
 ##        label: '${ _('Admin') }',
 ##        items: [{
@@ -286,7 +350,6 @@ from desktop.views import _ko
         ##      {label: 'altus-sql-editor', url: '/', icon: 'altus-icon altus-sql-editor'},
         ##      {label: 'altus-feedback', url: '/', icon: 'altus-icon altus-feedback'}]
         ##  }
-      ];
 
       var MultiClusterSidebar = function MultiClusterSidebar() {
         var self = this;
