@@ -78,7 +78,7 @@
                 children: [
                   {displayName: "Editor", url: "/editor/?type=impala", icon: "editor"},
                   {displayName: "Catalog", url: "/metastore/tables", icon: "tables"},
-                  {displayName: "Warehouses", url: "/hue/jobbrowser", icon: "yarn"},
+                  {displayName: "Warehouses", url: "/hue/jobbrowser", icon: "hi-as-navopt"},
                   {displayName: "Importer", url: "/indexer/importer", icon: "hdfs"}
                 ]
               }
