@@ -187,13 +187,14 @@ ${ hueIcons.symbols() }
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
-            <img src="${ static('desktop/art/cloudera-dwx.svg') }" style="height: 18px;">
+            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px;">
           % else:
             <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
           % endif
         </a>
         % endif
 
+        % if not IS_MULTICLUSTER_ONLY.get():
         <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
@@ -210,6 +211,7 @@ ${ hueIcons.symbols() }
             <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
         </div>
+        % endif
 
         <script type="text/html" id="quick-create-item-template">
           <!-- ko if: item.dividerAbove -->
