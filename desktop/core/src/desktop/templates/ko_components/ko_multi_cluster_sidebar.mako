@@ -110,11 +110,6 @@ from desktop.views import _ko
       // TODO: Fetch menu from the backend
       var FIXED_CATEGORIES = [{
         items: [{
-          label: '${ _('Home') }',
-          url: '/',
-          icon: 'fa fa-home'
-        }, {
-          ##label: '${ _('Data Assistant') }',
           label: '${ _('Data Warehouse') }',
           icon: 'altus-icon altus-adb-query',
           items: [{
@@ -159,42 +154,6 @@ from desktop.views import _ko
             },{
               label: '${ _('Settings') }',
               url: '/indexer/importer'
-            }
-          ]
-        }, {
-          label: '${ _('Data Engineering') }',
-          url: '/',
-          icon: 'altus-icon altus-workload',
-          items: [{
-              label: '${ _('Ingest') }',
-              url: '/editor?type=impala'
-            },{
-              label: '${ _('Transform') }',
-              url: '/metastore/tables'
-            },{
-              label: '${ _('Streams') }',
-              url: '/metastore/tables'
-            },{
-              label: '${ _('Schedule') }',
-              url: '/filebrowser/view=S3A://'
-            }
-          ]
-        }, {
-          label: '${ _('Data Stewart') }',
-          url: '/',
-          icon: 'altus-icon altus-adb',
-          items: [{
-              label: '${ _('Catalog') }',
-              url: '/editor?type=impala'
-            },{
-              label: '${ _('Security') }',
-              url: '/editor?type=impala'
-            },{
-              label: '${ _('Audit') }',
-              url: '/metastore/tables'
-            },{
-              label: '${ _('BDR') }',
-              url: '/filebrowser/view=S3A://'
             }
           ]
         }
