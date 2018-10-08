@@ -187,7 +187,7 @@ ${ hueIcons.symbols() }
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
-            <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; margin-top: -6px">
+            <img src="${ static('desktop/art/cloudera-dwx.svg') }" style="height: 18px;">
           % else:
             <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
           % endif
