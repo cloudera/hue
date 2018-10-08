@@ -20,6 +20,7 @@
 <%namespace name="koContextPopover" file="/ko_components/ko_context_popover.mako" />
 <%namespace name="koContextSelector" file="/ko_components/ko_context_selector.mako" />
 <%namespace name="koDropDown" file="/ko_components/ko_drop_down.mako" />
+<%namespace name="koDwSidebar" file="/ko_components/ko_dw_sidebar.mako" />
 <%namespace name="koFavoriteApp" file="/ko_components/ko_favorite_app.mako" />
 <%namespace name="koGlobalSearch" file="/ko_components/ko_global_search.mako" />
 <%namespace name="koHistoryPanel" file="/ko_components/ko_history_panel.mako" />
@@ -41,6 +42,7 @@
   ${ koContextPopover.contextPopover() }
   ${ koContextSelector.contextSelector() }
   ${ koDropDown.dropDown() }
+  ${ koDwSidebar.dwSidebar() }
   ${ koFavoriteApp.favoriteApp() }
   ${ koGlobalSearch.globalSearch() }
   ${ koHistoryPanel.historyPanel() }
