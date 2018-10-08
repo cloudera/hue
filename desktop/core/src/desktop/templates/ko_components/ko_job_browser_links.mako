@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from desktop.conf import IS_EMBEDDED
+from desktop.conf import IS_EMBEDDED, IS_MULTICLUSTER_ONLY
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
@@ -29,7 +29,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
       <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
-        <span>${ _('Queries') if IS_EMBEDDED.get() else _('Jobs') }</span>
+        <span>${ _('Queries') if IS_EMBEDDED.get() or IS_MULTICLUSTER_ONLY.get() else _('Jobs') }</span>
       </a>
       <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Jobs preview')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
