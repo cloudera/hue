@@ -116,16 +116,19 @@ from desktop.views import _ko
 
           label: '${ _('Data Warehouse') }',
           icon: 'altus-icon altus-adb-query',
-          items: [{
-              label: '${ _('Editor') }',
-              url: '/editor?type=impala'
-            },{
-              label: '${ _('Catalog') }',
-              url: '/metastore/tables'
-            },{
-              label: '${ _('Warehouses') }',
-              url: '/hue/jobbrowser',
-            },{
+          url: '/editor?type=impala'
+##          items: []
+##          {
+##              label: '${ _('Editor') }',
+##              url: '/editor?type=impala'
+##            },{
+##              label: '${ _('Catalog') }',
+##              url: '/metastore/tables'
+##            },{
+##              label: '${ _('Warehouses') }',
+##              url: '/hue/jobbrowser',
+##            },{
+
 ##              label: '${ _('Files') }',
 ##              url: '/filebrowser/view=S3A://'
 ##            },{
@@ -135,52 +138,53 @@ from desktop.views import _ko
 ##              label: '${ _('Scheduler') }',
 ##              url: '/oozie/editor/coordinator/new/'
 ##            },{
-              label: '${ _('Importer') }',
-              url: '/indexer/importer'
-            }
-          ]
+
+##              label: '${ _('Importer') }',
+##              url: '/indexer/importer'
+##            }
+##          ]
           }, {
             label: '${ _('Data Science') }',
             url: '/',
-            icon: 'altus-icon altus-ds',
-            items: [{
-                label: '${ _('Projects') }',
-                url: '/editor?type=impala'
-              },{
-                label: '${ _('Sessions') }',
-                url: '/metastore/tables'
-              },{
-                label: '${ _('Experiments') }',
-                url: '/filebrowser/view=S3A://'
-              },{
-                label: '${ _('Models') }',
-                url: '/dashboard/new_search'
-              },{
-                label: '${ _('Jobs') }',
-                url: '/oozie/editor/coordinator/new/'
-              },{
-                label: '${ _('Settings') }',
-                url: '/indexer/importer'
-              }
-            ]
+            icon: 'altus-icon altus-ds'
+##            items: [{
+##                label: '${ _('Projects') }',
+##                url: '/editor?type=impala'
+##              },{
+##                label: '${ _('Sessions') }',
+##                url: '/metastore/tables'
+##              },{
+##                label: '${ _('Experiments') }',
+##                url: '/filebrowser/view=S3A://'
+##              },{
+##                label: '${ _('Models') }',
+##                url: '/dashboard/new_search'
+##              },{
+##                label: '${ _('Jobs') }',
+##                url: '/oozie/editor/coordinator/new/'
+##              },{
+##                label: '${ _('Settings') }',
+##                url: '/indexer/importer'
+##              }
+##            ]
           }, {
             label: '${ _('Admin') }',
             url: '/',
-            icon: 'altus-icon altus-de',
-            items: [{
-                label: '${ _('Clusters') }',
-                url: '/hue/jobbrowser',
-              },{
-                label: '${ _('Catalog') }',
-                url: '/',
-              },{
-                label: '${ _('Environments') }',
-                url: '/',
-              },{
-                label: '${ _('Directory') }',
-                url: 'https://console.altus.cloudera.com/iam/index.html',
-              }
-            ]
+            icon: 'altus-icon altus-de'
+##            items: [{
+##                label: '${ _('Clusters') }',
+##                url: '/hue/jobbrowser',
+##              },{
+##                label: '${ _('Catalog') }',
+##                url: '/',
+##              },{
+##                label: '${ _('Environments') }',
+##                url: '/',
+##              },{
+##                label: '${ _('Directory') }',
+##                url: 'https://console.altus.cloudera.com/iam/index.html',
+##              }
+##            ]
           }
         ]
       }];

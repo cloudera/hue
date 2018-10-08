@@ -72,13 +72,17 @@
         huePubSub.subscribe('set.current.app.name', function (appName) {
           window.clearTimeout(throttle);
           throttle = window.setTimeout(function () {
-            self.items([
-              {displayName:"Apps", isCategory:true, children: [{displayName: "Editor", url: "/editor/?type=impala", icon: "editor"}]},
-              {displayName:"Apps", isCategory:true, children: [{displayName: "Catalog", url: "/metastore/tables", icon: "editor"}]},
-              {displayName:"Apps", isCategory:true, children: [{displayName: "Warehouses", url: "/hue/jobbrowser", icon: "editor"}]},
-              {displayName:"Apps", isCategory:true, children: [{displayName: "Importer", url: "/indexer/importer", icon: "editor"}]}
-              ]
-            );
+            self.items([{
+                displayName:"Apps",
+                isCategory:true,
+                children: [
+                  {displayName: "Editor", url: "/editor/?type=impala", icon: "editor"},
+                  {displayName: "Catalog", url: "/metastore/tables", icon: "tables"},
+                  {displayName: "Warehouses", url: "/hue/jobbrowser", icon: "yarn"},
+                  {displayName: "Importer", url: "/indexer/importer", icon: "hdfs"}
+                ]
+              }
+            ]);
             self.items().some(function (item) {
               return item.children.some(function (child) {
                 if (child.url.indexOf(appName.replace('_', '/')) !== -1) {
