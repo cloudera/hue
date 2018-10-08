@@ -31,14 +31,22 @@
         <!-- /ko -->
         <!-- ko foreach: children -->
         <!-- ko if: $component.collapsed -->
-        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, tooltip: { placement: 'right' }"><span class="sidebar-icon with-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span><span class="sidebar-item-name" data-bind="text: displayName"></span></a>
+        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, tooltip: { placement: 'right' }">
+          <span class="sidebar-icon with-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
+          <span class="sidebar-item-name" data-bind="text: displayName"></span>
+        </a>
         <!-- /ko -->
         <!-- ko ifnot: $component.collapsed -->
-        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }"><span class="sidebar-icon without-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span><span class="sidebar-item-name" data-bind="text: displayName"></span></a>
+        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }">
+          <span class="sidebar-icon without-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
+          <span class="sidebar-item-name" data-bind="text: displayName"></span>
+        </a>
         <!-- /ko -->
         <!-- /ko -->
       </div>
-      <a class="sidebar-action-button" role="button" data-bind="toggle: collapsed"><span aria-hidden="true" class="fa" data-bind="css: { 'fa-angle-double-right': collapsed, 'fa-angle-double-left': !collapsed() }"></span></a>
+      <a class="sidebar-action-button" role="button" data-bind="toggle: collapsed">
+        <span aria-hidden="true" class="fa" data-bind="css: { 'fa-angle-double-right': collapsed, 'fa-angle-double-left': !collapsed() }"></span>
+      </a>
     </div>
   </script>
 
@@ -64,6 +72,13 @@
         huePubSub.subscribe('set.current.app.name', function (appName) {
           window.clearTimeout(throttle);
           throttle = window.setTimeout(function () {
+            self.items([
+              {displayName:"Apps", isCategory:true, children: [{displayName: "Editor", url: "/editor/?type=impala", icon: "editor"}]},
+              {displayName:"Apps", isCategory:true, children: [{displayName: "Catalog", url: "/metastore/tables", icon: "editor"}]},
+              {displayName:"Apps", isCategory:true, children: [{displayName: "Warehouses", url: "/hue/jobbrowser", icon: "editor"}]},
+              {displayName:"Apps", isCategory:true, children: [{displayName: "Importer", url: "/indexer/importer", icon: "editor"}]}
+              ]
+            );
             self.items().some(function (item) {
               return item.children.some(function (child) {
                 if (child.url.indexOf(appName.replace('_', '/')) !== -1) {
