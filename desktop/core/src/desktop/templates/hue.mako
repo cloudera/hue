@@ -337,6 +337,10 @@ ${ hueIcons.symbols() }
       % endif
     </div>
 
+    % if IS_MULTICLUSTER_ONLY.get():
+    <div class="hue-dw-sidebar-container collapsed" data-bind="component: { name: 'hue-dw-sidebar', params: { items: items } }"></div>
+    % endif
+
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
       <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
       <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
@@ -1682,6 +1686,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
       var sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
       ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
+    % if IS_MULTICLUSTER_ONLY.get():
+      ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+    % endif
+
     })(onePageViewModel, topNavViewModel);
 
     huePubSub.publish('cluster.config.get.config');
