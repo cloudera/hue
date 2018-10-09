@@ -81,6 +81,9 @@
         var throttle = -1;
         huePubSub.subscribe('set.current.app.name', function (appName) {
           window.clearTimeout(throttle);
+          if (!appName) {
+            return;
+          }
           throttle = window.setTimeout(function () {
             self.items().some(function (item) {
               return item.children.some(function (child) {
