@@ -1269,71 +1269,82 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </span>
 
       <div class="acl-panel-content">
-        <h4>Privileges</h4>
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#servicesLoad" data-toggle="tab">Load</a></li>
+          <li><a href="#servicesPrivileges" data-toggle="tab">Privileges</a></li>
+          <li><a href="#servicesTroubleshooting" data-toggle="tab">Troubleshooting</a></li>
+        </ul>
 
-        <div class="acl-block-title">
-          <i class="fa fa-cube muted"></i> <a class="pointer"><span>admin</span></a>
-        </div>
-        <div>
-          <div class="acl-block acl-block-airy">
-            <span class="muted" title="3 months ago">CLUSTER</span>
-            <span>
-              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-            </span>
-            <br>
-            server=<span>server1</span>
-            <span>
-              <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
-            </span>
-            <i class="fa fa-long-arrow-right"></i> action=ALL
+        <div class="tab-content">
+          <div class="tab-pane active" id="servicesLoad">
+            <div class="wxm-poc" style="clear: both;">
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Trend</h4>
+                <img src="${ static('desktop/art/wxm_fake/trend.svg') }" style="height: 440px"/>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div class="acl-block-title">
-          <i class="fa fa-cube muted"></i> <a class="pointer"><span>eng</span></a>
-        </div>
-        <div>
-          <div class="acl-block acl-block-airy">
-            <span class="muted" title="3 months ago">CLUSTER</span>
-            <span>
-              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-            </span>
-            <br>
-            server=server1
-            <span>
-              <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
-            </span>
-            <i class="fa fa-long-arrow-right"></i> action=<span>ACCESS</span>
+          <div class="tab-pane" id="servicesPrivileges">
+            <div class="acl-block-title">
+              <i class="fa fa-cube muted"></i> <a class="pointer"><span>admin</span></a>
+            </div>
+            <div>
+              <div class="acl-block acl-block-airy">
+                <span class="muted" title="3 months ago">CLUSTER</span>
+                <span>
+                  <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+                </span>
+                <br>
+                server=<span>server1</span>
+                <span>
+                  <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+                </span>
+                <i class="fa fa-long-arrow-right"></i> action=ALL
+              </div>
+            </div>
+            <div class="acl-block-title">
+              <i class="fa fa-cube muted"></i> <a class="pointer"><span>eng</span></a>
+            </div>
+            <div>
+              <div class="acl-block acl-block-airy">
+                <span class="muted" title="3 months ago">CLUSTER</span>
+                <span>
+                  <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+                </span>
+                <br>
+                server=server1
+                <span>
+                  <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+                </span>
+                <i class="fa fa-long-arrow-right"></i> action=<span>ACCESS</span>
+              </div>
+            </div>
+            <div class="acl-block acl-actions">
+              <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+              <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+              <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+              <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+            </div>
           </div>
-        </div>
-
-        <div class="acl-block acl-actions">
-          <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
-          <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
-          <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
-          <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
-        </div>
-
-        <div class="wxm-poc margin-top-10" style="clear: both;">
-          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-            <h4>Trend</h4>
-            <img src="${ static('desktop/art/wxm_fake/trend.svg') }" style="height: 440px"/>
-          </div>
-          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-            <h4>Outliers</h4>
-            <img src="${ static('desktop/art/wxm_fake/outliers.svg') }" style="height: 440px"/>
-          </div>
-          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-            <h4>Statement Types</h4>
-            <img src="${ static('desktop/art/wxm_fake/statement_types.svg') }" style="height: 440px"/>
-          </div>
-          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-            <h4>Duration</h4>
-            <img src="${ static('desktop/art/wxm_fake/duration.svg') }" style="height: 440px"/>
-          </div>
-          <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-            <h4>Memory Utilization</h4>
-            <img src="${ static('desktop/art/wxm_fake/memory.svg') }" style="height: 440px"/>
+          <div class="tab-pane" id="servicesTroubleshooting">
+            <div class="wxm-poc" style="clear: both;">
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Outliers</h4>
+                <img src="${ static('desktop/art/wxm_fake/outliers.svg') }" style="height: 440px"/>
+              </div>
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Statement Types</h4>
+                <img src="${ static('desktop/art/wxm_fake/statement_types.svg') }" style="height: 440px"/>
+              </div>
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Duration</h4>
+                <img src="${ static('desktop/art/wxm_fake/duration.svg') }" style="height: 440px"/>
+              </div>
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Memory Utilization</h4>
+                <img src="${ static('desktop/art/wxm_fake/memory.svg') }" style="height: 440px"/>
+              </div>
+            </div>
           </div>
         </div>
       </div>
