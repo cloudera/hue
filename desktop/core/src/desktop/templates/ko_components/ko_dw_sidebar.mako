@@ -66,7 +66,7 @@
             { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' }
           ]
         }]);
-        self.collapsed = ko.observable(true);
+        self.collapsed = ko.observable();
         self.collapsed.subscribe(function (newVal) {
           if (newVal) {
             $(element).addClass('collapsed')
@@ -74,6 +74,7 @@
             $(element).removeClass('collapsed')
           }
         });
+        ApiHelper.getInstance().withTotalStorage('sidebar', 'collapsed', self.collapsed, false);
 
         self.activeUrl = ko.observable();
 
