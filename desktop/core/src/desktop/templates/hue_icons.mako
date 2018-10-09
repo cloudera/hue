@@ -374,7 +374,7 @@
     <!-- ko case: 'tables' --><i class="fa fa-fw fa-table"></i><!-- /ko -->
     <!-- ko case: 'text' --><i class="fa fa-fw fa-i-cursor"></i><!-- /ko -->
     <!-- ko case: 'yarn' --><svg class="hi hi-fw"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
-    <!-- ko case: 'warehouses' --><svg class="hi hi-fw"><use xlink:href="#hi-navopt"></use></svg><!-- /ko -->
+    <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster"></i><!-- /ko -->
     <!-- ko case: $else --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- /ko -->
   </script>
