@@ -16,9 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import json
 import logging
 import urllib
+import urllib2
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -79,6 +81,75 @@ class ManagerApi(object):
     except RestException, e:
       raise ManagerApiException(e)
 
+
+  def get_spark_history_server_url(self, cluster_name=None):
+    service_name = "SPARK_ON_YARN"
+    shs_role_type = "SPARK_YARN_HISTORY_SERVER"
+
+    try:
+      cluster = self._get_cluster(cluster_name)
+      services = self._root.get('clusters/%(cluster_name)s/services' % {
+        'cluster_name': cluster['name'],
+        'service_name': service_name
+      })['items']
+
+      service_display_names = [service['displayName'] for service in services if service['type'] == service_name]
+
+
+      if service_display_names:
+        spark_service_display_name = service_display_names[0]
+
+        servers = self._root.get('clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles' % {
+          'cluster_name': cluster['name'],
+          'spark_service_display_name': spark_service_display_name
+        })['items']
+
+        shs_server_names = [server['name'] for server in servers if server['type'] == shs_role_type]
+        shs_server_name = shs_server_names[0] if shs_server_names else None
+        shs_server_hostRef = [server['hostRef'] for server in servers if server['type'] == shs_role_type]
+        shs_server_hostId = shs_server_hostRef[0]['hostId'] if shs_server_hostRef else None
+
+        if shs_server_name and shs_server_hostId:
+          shs_server_configs = self._root.get('clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles/%(shs_server_name)s/config' % {
+            'cluster_name': cluster['name'],
+            'spark_service_display_name': spark_service_display_name,
+            'shs_server_name': shs_server_name
+          }, params={'view': 'full'})['items']
+
+          shs_ui_port = None
+          shs_ssl_port = None
+          shs_ssl_enabled = None
+          for config in shs_server_configs:
+            if 'relatedName' in config and 'default' in config:
+              if config['relatedName'] == 'spark.history.ui.port':
+                shs_ui_port = config['default']
+              if config['relatedName'] == 'spark.ssl.historyServer.port':
+                shs_ssl_port = config['default']
+              if config['relatedName'] == 'spark.ssl.historyServer.enabled':
+                shs_ssl_enabled = config['default']
+          shs_ui_host = self._root.get('hosts/%(hostId)s' % {'hostId': shs_server_hostId})
+          shs_ui_hostname = shs_ui_host['hostname'] if shs_ui_host else None
+
+          return self.assemble_shs_url(shs_ui_hostname, shs_ui_port, shs_ssl_port, shs_ssl_enabled)
+
+    except Exception, e:
+      LOG.warn("Check Spark history server via ManangerAPI: %s" % e)
+
+    return None
+
+  def assemble_shs_url(self, shs_ui_hostname, shs_ui_port=None, shs_ssl_port=None, shs_ssl_enabled=None):
+    if not shs_ui_hostname or not shs_ui_port or not shs_ssl_port or not shs_ssl_enabled:
+      LOG.warn("Spark conf not found!")
+      return None
+
+    protocol = 'https' if shs_ssl_enabled.lower() == 'true' else 'http'
+    shs_url = '%(protocol)s://%(hostname)s:%(port)s' % {
+      'protocol': protocol,
+      'hostname': shs_ui_hostname,
+      'port': shs_ssl_port if shs_ssl_enabled.lower() == 'true' else shs_ui_port,
+    }
+
+    return shs_url
 
   def tools_echo(self):
     try:
