@@ -55,7 +55,17 @@
 
       var DwSidebar = function DwSidebar(params, element) {
         var self = this;
-        self.items = params.items;
+        // self.items =  params.items; // TODO: Once we have the proper apps in cluster config.
+        self.items = ko.observableArray([{
+          displayName:"Apps",
+          isCategory:true,
+          children: [
+            {displayName: "Editor", url: "/editor/?type=impala", icon: "editor"},
+            {displayName: "Catalog", url: "/metastore/tables", icon: "tables"},
+            {displayName: "Warehouses", url: "/hue/jobbrowser", icon: "hi-as-navopt"},
+            {displayName: "Importer", url: "/indexer/importer", icon: "hdfs"}
+          ]
+        }]);
         self.collapsed = ko.observable(true);
         self.collapsed.subscribe(function (newVal) {
           if (newVal) {
@@ -72,17 +82,6 @@
         huePubSub.subscribe('set.current.app.name', function (appName) {
           window.clearTimeout(throttle);
           throttle = window.setTimeout(function () {
-            self.items([{
-                displayName:"Apps",
-                isCategory:true,
-                children: [
-                  {displayName: "Editor", url: "/editor/?type=impala", icon: "editor"},
-                  {displayName: "Catalog", url: "/metastore/tables", icon: "tables"},
-                  {displayName: "Warehouses", url: "/hue/jobbrowser", icon: "hi-as-navopt"},
-                  {displayName: "Importer", url: "/indexer/importer", icon: "hdfs"}
-                ]
-              }
-            ]);
             self.items().some(function (item) {
               return item.children.some(function (child) {
                 if (child.url.indexOf(appName.replace('_', '/')) !== -1) {
