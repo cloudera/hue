@@ -57,13 +57,13 @@
         var self = this;
         // self.items =  params.items; // TODO: Once we have the proper apps in cluster config.
         self.items = ko.observableArray([{
-          displayName:"Apps",
-          isCategory:true,
+          displayName: 'Apps',
+          isCategory: true,
           children: [
-            {displayName: "Editor", url: "/editor/?type=impala", icon: "editor"},
-            {displayName: "Catalog", url: "/metastore/tables", icon: "tables"},
-            {displayName: "Warehouses", url: "/hue/jobbrowser", icon: "hi-as-navopt"},
-            {displayName: "Importer", url: "/indexer/importer", icon: "hdfs"}
+            { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
+            { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
+            { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' },
+            { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' }
           ]
         }]);
         self.collapsed = ko.observable(true);
