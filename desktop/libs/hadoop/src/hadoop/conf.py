@@ -118,6 +118,23 @@ MR_CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+
+def get_spark_history_server_from_cm():
+  from metadata.conf import MANAGER
+  from metadata.manager_client import ManagerApi
+
+  if MANAGER.API_URL.get():
+    return ManagerApi().get_spark_history_server_url()
+  return None
+
+def get_spark_history_server_url():
+  """
+    Try to get Spark history server URL from Cloudera Manager API, otherwise give default URL
+  """
+  url = get_spark_history_server_from_cm()
+  return url if url else 'http://localhost:18088'
+
+
 YARN_CLUSTERS = UnspecifiedConfigSection(
   "yarn_clusters",
   help="One entry for each Yarn cluster",
@@ -151,7 +168,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   default='http://localhost:19888',
                   help="URL of the HistoryServer API"),
       SPARK_HISTORY_SERVER_URL=Config("spark_history_server_url",
-                  default='http://localhost:18088',
+                  dynamic_default=get_spark_history_server_url,
                   help="URL of the Spark History Server"),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
@@ -195,7 +212,27 @@ def config_validator(user):
   else:
     res.extend(test_yarn_configurations(user))
 
+  if get_spark_history_server_from_cm():
+    status = test_spark_configuration(user)
+    if status != 'OK':
+      res.append(("Spark_history_server", "Spark job can't retrieve logs of driver and executors without "
+                  "a running Spark history server"))
+
   return res
+
+
+def test_spark_configuration(user):
+  import hadoop.yarn.spark_history_server_api as spark_hs_api
+
+  status = None
+
+  try:
+    spark_hs_api.get_history_server_api().applications()
+    status = 'OK'
+  except:
+    LOG.exception('failed to get spark history server status')
+
+  return status
 
 
 def test_yarn_configurations(user):
