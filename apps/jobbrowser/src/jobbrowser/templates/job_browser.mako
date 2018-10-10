@@ -1246,13 +1246,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position:relative;">
+
+
       <div style="position: absolute; top: 0; right: 0">
-        <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
-          <i class="fa fa-refresh"></i>
-        </a>
-        <a class="btn" title="${ _('Pause') }">
-          <i class="fa fa-pause"></i>
-        </a>
+        <span data-bind="visible: updateClusterShow">
+          <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+
+          <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
+            <i class="fa fa-check"></i>
+          </button>
+        </span>
 
         <button class="btn" title="${ _('Resize warehouse') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
           <!-- ko if: updateClusterShow-->
@@ -1263,13 +1266,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
         </button>
 
-        <span data-bind="visible: updateClusterShow">
-          <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+        <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
+          <i class="fa fa-refresh"></i>
+        </a>
 
-          <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-            <i class="fa fa-check"></i>
-          </button>
-        </span>
+        <a class="btn" title="${ _('Pause') }">
+          <i class="fa fa-pause"></i>
+        </a>
       </div>
 
       <div class="acl-panel-content">
