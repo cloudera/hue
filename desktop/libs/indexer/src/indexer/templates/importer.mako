@@ -1999,6 +1999,25 @@ ${ assist.assistPanel() }
       self.nameChanged = function(name) {
         var exists = false;
 
+        var checkDbEntryExists = function () {
+          wizard.computeSetDeferred.done(function () {
+            DataCatalog.getEntry({
+              sourceType: self.sourceType,
+              compute: wizard.compute(),
+              namespace: wizard.namespace(),
+              path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [self.databaseName()],
+            }).done(function (catalogEntry) {
+              catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
+                self.isTargetExisting(!sourceMeta.notFound);
+                self.isTargetChecking(false);
+              }).fail(function () {
+                self.isTargetExisting(false);
+                self.isTargetChecking(false);
+              })
+            });
+          })
+        };
+
         if (name.length === 0) {
           self.isTargetExisting(false);
           self.isTargetChecking(false);
@@ -2008,15 +2027,7 @@ ${ assist.assistPanel() }
           if (self.tableName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
-
-            // TODO: Use DataCatalog.getEntry...
-            $.get("/" + (self.sourceType === 'hive' ? 'beeswax' : self.sourceType) + "/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
-              self.isTargetExisting(data.code !== 500 && data.code !== 404);
-              self.isTargetChecking(false);
-            }).fail(function () {
-              self.isTargetExisting(false);
-              self.isTargetChecking(false);
-            });
+            checkDbEntryExists();
           } else {
             self.isTargetExisting(false);
             self.isTargetChecking(false);
@@ -2027,14 +2038,7 @@ ${ assist.assistPanel() }
           if (self.databaseName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
-            // TODO: Use DataCatalog.getEntry...
-            $.get("/" + (self.sourceType === 'hive' ? 'beeswax' : self.sourceType) + "/api/autocomplete/" + self.databaseName(), function (data) {
-              self.isTargetExisting(data.tables_meta && data.tables_meta.length > 0);
-              self.isTargetChecking(false);
-            }).fail(function () {
-              self.isTargetExisting(false);
-              self.isTargetChecking(false);
-            });
+            checkDbEntryExists();
           } else {
             self.isTargetExisting(false);
             self.isTargetChecking(false);
@@ -2352,6 +2356,8 @@ ${ assist.assistPanel() }
       self.namespace = ko.observable();
       self.compute = ko.observable();
 
+      self.computeSetDeferred = $.Deferred();
+
       ContextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
         self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
@@ -2386,6 +2392,7 @@ ${ assist.assistPanel() }
             }
           }
         })
+        self.computeSetDeferred.resolve();
       });
 
       self.fileType = ko.observable();
