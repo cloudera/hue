@@ -1,4 +1,4 @@
-version: 0.4.12.{build}
+version: 0.4.15.{build}
 environment:
   global:
     # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
@@ -8,14 +8,6 @@ environment:
 
   matrix:
     # http://www.appveyor.com/docs/installed-software#python
-    - PYTHON_ROOT: "C:\\Python26"
-      PYTHON_ARCH: "32"
-      PYTHON_VERSION: "2.6.x"
-
-    - PYTHON_ROOT: "C:\\Python26-x64"
-      PYTHON_ARCH: "64"
-      PYTHON_VERSION: "2.6.x"
-
     - PYTHON_ROOT: "C:\\Python27"
       PYTHON_ARCH: "32"
       PYTHON_VERSION: "2.7.x"
@@ -56,13 +48,21 @@ environment:
       PYTHON_ARCH: "64"
       PYTHON_VERSION: "3.6.x"
 
+    - PYTHON_ROOT: "C:\\Python37"
+      PYTHON_ARCH: "32"
+      PYTHON_VERSION: "3.7.x"
+
+    - PYTHON_ROOT: "C:\\Python37-x64"
+      PYTHON_ARCH: "64"
+      PYTHON_VERSION: "3.7.x"
+
 install:
   - "SET PATH=%PYTHON_ROOT%;%PYTHON_ROOT%\\Scripts;%PATH%"
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Upgrade pip to the latest version
-  - "python appveyor\\run_pip.py install --disable-pip-version-check --upgrade pip"
+  #- "python appveyor\\run_pip.py install --disable-pip-version-check --upgrade pip"
 
   # Install requirements for running tests and building artifacts
   - "%CMD_IN_ENV% pip install --upgrade -r dev-requirements.txt"
