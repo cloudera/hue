@@ -233,29 +233,66 @@ input[type='password']::-ms-reveal {
   border-radius: 0 !important;
 }
 
-.hue-ace-location {
-  position: absolute;
-  background-color: @hue-primary-color-light;
-  border: 1px solid @hue-primary-color-light;
-  border-radius: 1px;
-  margin-left: -1px;
-  margin-top: -1px;
-}
-
-.ace_gutter-cell {
-  border-right: 1px solid transparent;
-  &.ace-active-gutter-decoration {
-    background-color: @hue-primary-color-light !important;
-    border-right: 1px solid @hue-primary-color-dark;
-  }
-  &.ace_error {
-    background-color: @cui-pink-010 !important;
-    border-right: 1px solid @cui-red-700;
-    border-left: none!important;
-  }
-}
-
 .ace-hue {
+  .ace_gutter-cell {
+    border-right: 1px solid transparent;
+
+    &.ace-active-gutter-decoration {
+      background-color: @hue-primary-color-light;
+      border-right: 1px solid @hue-primary-color-dark;
+    }
+
+    &.ace_error {
+      background-color: @cui-pink-010;
+      border-right: 1px solid @cui-red-700;
+      border-left: none;
+    }
+  }
+
+  .hue-ace-location {
+    position: absolute;
+    background-color: @hue-primary-color-light;
+    border: 1px solid @hue-primary-color-light;
+    border-radius: 1px;
+    margin-left: -1px;
+    margin-top: -1px;
+  }
+
+  .ace_marker-layer {
+    .ace_error-line {
+      background-color: @cui-pink-050 !important;
+      opacity: 0.5;
+      z-index: 6;
+    }
+  }
+}
+
+.ace-hue-dark {
+  .ace_gutter-cell {
+    border-right: 1px solid transparent;
+
+    &.ace-active-gutter-decoration {
+      background-color: @cui-blue-gray-700;
+      color: @cui-blue-gray-100;
+      border-right: 1px solid @cui-blue-gray-600;
+    }
+
+    &.ace_error {
+      background-color: @cui-pink-010;
+      border-right: 1px solid @cui-red-700;
+      border-left: none;
+    }
+  }
+
+  .hue-ace-location {
+    position: absolute;
+    background-color: @cui-blue-gray-700;
+    border: 1px solid @cui-blue-gray-700;
+    border-radius: 1px;
+    margin-left: -1px;
+    margin-top: -1px;
+  }
+
   .ace_marker-layer {
     .ace_error-line {
       background-color: @cui-pink-050 !important;
