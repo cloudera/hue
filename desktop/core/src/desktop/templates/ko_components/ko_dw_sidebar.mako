@@ -62,7 +62,7 @@
           children: [
             { displayName: 'Editor', url: '/editor/?type=hive', icon: 'editor' },
             { displayName: 'Dashboard', url: '/jobbrowser#!workflows', icon: 'tables' },
-            { displayName: 'Workflows', url: '/oozie/editor/workflow/new', icon: 'tables' },
+            { displayName: 'Workflows', url: '/oozie/editor/workflow/new', icon: 'workflows' },
             { displayName: 'Service', url: '/hue/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
           ]
         }]);
