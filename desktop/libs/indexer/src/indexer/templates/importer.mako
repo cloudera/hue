@@ -2067,20 +2067,22 @@ ${ assist.assistPanel() }
         var exists = false;
 
         var checkDbEntryExists = function () {
-          DataCatalog.getEntry({
-            sourceType: self.sourceType,
-            compute: wizard.compute(),
-            namespace: wizard.namespace(),
-            path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [self.databaseName()],
-          }).done(function (catalogEntry) {
-            catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
-              self.isTargetExisting(!sourceMeta.notFound);
-              self.isTargetChecking(false);
-            }).fail(function () {
-              self.isTargetExisting(false);
-              self.isTargetChecking(false);
-            })
-          });
+          wizard.computeSetDeferred.done(function () {
+            DataCatalog.getEntry({
+              sourceType: self.sourceType,
+              compute: wizard.compute(),
+              namespace: wizard.namespace(),
+              path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [self.databaseName()],
+            }).done(function (catalogEntry) {
+              catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
+                self.isTargetExisting(!sourceMeta.notFound);
+                self.isTargetChecking(false);
+              }).fail(function () {
+                self.isTargetExisting(false);
+                self.isTargetChecking(false);
+              })
+            });
+          })
         };
 
         if (name.length === 0) {
@@ -2421,6 +2423,8 @@ ${ assist.assistPanel() }
       self.namespace = ko.observable();
       self.compute = ko.observable();
 
+      self.computeSetDeferred = $.Deferred();
+
       ContextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
         self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
@@ -2455,6 +2459,7 @@ ${ assist.assistPanel() }
             }
           }
         })
+        self.computeSetDeferred.resolve();
       });
 
       self.fileType = ko.observable();
