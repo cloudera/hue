@@ -168,6 +168,10 @@ from desktop.views import _ko
 ##              }
 ##            ]
           }, {
+            label: '${ _('Data Engineering') }',
+            url: '/',
+            icon: 'altus-icon altus-sdx'
+          }, {
             label: '${ _('Admin') }',
             url: '/',
             icon: 'altus-icon altus-de'

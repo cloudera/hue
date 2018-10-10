@@ -60,10 +60,10 @@
           displayName: 'Apps',
           isCategory: true,
           children: [
-            { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
-            { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
-            { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
-            { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' }
+            { displayName: 'Editor', url: '/editor/?type=hive', icon: 'editor' },
+            { displayName: 'Dashboard', url: '/jobbrowser#!workflows', icon: 'tables' },
+            { displayName: 'Workflows', url: '/oozie/editor/workflow/new', icon: 'tables' },
+            { displayName: 'Service', url: '/hue/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
           ]
         }]);
         self.collapsed = ko.observable();
