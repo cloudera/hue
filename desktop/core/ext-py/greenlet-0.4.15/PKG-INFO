@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: greenlet
-Version: 0.4.12
+Version: 0.4.15
 Summary: Lightweight in-process concurrent programming
 Home-page: https://github.com/python-greenlet/greenlet
 Author: Alexey Borzenkov
@@ -83,5 +83,6 @@ Classifier: Programming Language :: Python :: 3.3
 Classifier: Programming Language :: Python :: 3.4
 Classifier: Programming Language :: Python :: 3.5
 Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
 Classifier: Operating System :: OS Independent
 Classifier: Topic :: Software Development :: Libraries :: Python Modules
