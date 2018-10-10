@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 def get_query_server_config(cluster_config=None):
   query_server = {
-      'server_name': 'impala' + ('-' + cluster_config.get('name') if cluster_config else ''),
+      'server_name': _get_server_name(cluster_config),
       'server_host': conf.SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
       'server_port': conf.SERVER_PORT.get() if not cluster_config else 21050,
       'principal': conf.IMPALA_PRINCIPAL.get(),
@@ -50,6 +50,10 @@ def get_query_server_config(cluster_config=None):
   LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
+
+
+def _get_server_name(cluster_config):
+  return 'impala' + ('-' + cluster_config.get('name') if cluster_config else '')
 
 
 class ImpalaDbms(HiveServer2Dbms):
