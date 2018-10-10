@@ -4865,7 +4865,8 @@
         aceErrorsSub.dispose();
       });
 
-      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+      var darkThemeEnabled = ApiHelper.getInstance().getFromTotalStorage('ace', 'dark.theme.enabled', false);
+      editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
       var editorOptions = {
         enableSnippets: true,
@@ -4884,6 +4885,14 @@
       };
 
       editor.customMenuOptions = {
+        setEnableDarkTheme: function (enabled) {
+          darkThemeEnabled = enabled;
+          ApiHelper.getInstance().setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
+        },
+        getEnableDarkTheme: function () {
+          return darkThemeEnabled;
+        },
         setEnableAutocompleter: function (enabled) {
           editor.setOption('enableBasicAutocompletion', enabled);
           snippet.getApiHelper().setInTotalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
