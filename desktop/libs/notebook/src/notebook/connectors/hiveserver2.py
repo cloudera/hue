@@ -60,6 +60,7 @@ except ImportError, e:
 
 try:
   from impala import api   # Force checking if Impala is enabled
+  from impala.dbms import _get_server_name
   from impala.conf import CONFIG_WHITELIST as impala_settings
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException, _get_impala_server_url
 except ImportError, e:
@@ -848,7 +849,9 @@ DROP TABLE IF EXISTS `%(table)s`;
     total_records, total_size, msg = None, None, None
 
     query_id = self._get_impala_query_id(snippet)
-    session = Session.objects.get_session(self.user, application='impala')
+    application = _get_server_name(snippet.get('compute', {}))
+    session = Session.objects.get_session(self.user, application=application)
+
     server_url = _get_impala_server_url(session)
     if query_id:
       LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
