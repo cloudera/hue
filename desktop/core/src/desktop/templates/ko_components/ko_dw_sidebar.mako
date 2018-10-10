@@ -62,8 +62,8 @@
           children: [
             { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
             { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
-            { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' },
-            { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' }
+            { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
+            { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' }
           ]
         }]);
         self.collapsed = ko.observable();

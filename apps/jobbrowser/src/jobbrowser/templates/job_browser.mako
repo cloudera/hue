@@ -1250,8 +1250,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
           <i class="fa fa-refresh"></i>
         </a>
+        <a class="btn" title="${ _('Pause') }">
+          <i class="fa fa-pause"></i>
+        </a>
 
-        <button class="btn" title="${ _('Resize cluster') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
+        <button class="btn" title="${ _('Resize warehouse') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
           <!-- ko if: updateClusterShow-->
             ${ _('Cancel') }
           <!-- /ko -->
@@ -1259,14 +1262,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             ${ _('Resize') } <i class="fa fa-exchange fa-rotate-90"></i>
           <!-- /ko -->
         </button>
-      </div>
-      <span data-bind="visible: updateClusterShow">
-        <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
 
-        <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-          <i class="fa fa-check"></i>
-        </button>
-      </span>
+        <span data-bind="visible: updateClusterShow">
+          <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+
+          <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
+            <i class="fa fa-check"></i>
+          </button>
+        </span>
+      </div>
 
       <div class="acl-panel-content">
         <ul class="nav nav-tabs">
@@ -1279,7 +1283,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
               <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-                <h4>Trend</h4>
                 <img src="${ static('desktop/art/wxm_fake/trend.svg') }" style="height: 440px"/>
               </div>
             </div>
@@ -2661,7 +2664,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           "workers_group_size": self.updateClusterWorkers(),
         }, function(data) {
           console.log(ko.mapping.toJSON(data));
-          $(document).trigger("info", ko.mapping.toJSON(data));
+          ## $(document).trigger("info", ko.mapping.toJSON(data));
           self.updateJob();
         });
         self.updateClusterShow(false);
