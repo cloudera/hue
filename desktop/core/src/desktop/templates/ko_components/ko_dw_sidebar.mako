@@ -69,6 +69,7 @@
 ##            { displayName: 'Dashboard', url: '/jobbrowser#!workflows', icon: 'tables' },
 ##            { displayName: 'Workflows', url: '/oozie/editor/workflow/new', icon: 'workflows' },
 ##            { displayName: 'Service', url: '/hue/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
+
           ]
         }]);
         self.collapsed = ko.observable();
@@ -93,7 +94,7 @@
           throttle = window.setTimeout(function () {
             self.items().some(function (item) {
               return item.children.some(function (child) {
-                if (child.url.indexOf(appName.replace('_', '/')) !== -1) {
+                if (location.href.indexOf(child.url) !== -1) {
                   if (self.activeUrl !== child.url) {
                     self.activeUrl(child.url);
                   }
