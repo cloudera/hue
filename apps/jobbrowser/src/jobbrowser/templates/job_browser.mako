@@ -1250,7 +1250,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div style="position: absolute; top: 0; right: 0">
         <span data-bind="visible: updateClusterShow">
-          <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-small" placeholder="${_('Size')}">${ _('workers') }
+          <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">${ _('workers') }
 
           <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
             <i class="fa fa-check"></i>
