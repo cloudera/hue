@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, IS_K8_ONLY
+  from desktop.conf import IS_EMBEDDED, IS_K8S_ONLY
   from desktop.models import hue_version
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -55,7 +55,7 @@
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
   window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
-  window.IS_K8_ONLY = '${ IS_K8_ONLY.get() }' === 'True';
+  window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
 
   window.HUE_I18n = {
     autocomplete: {
