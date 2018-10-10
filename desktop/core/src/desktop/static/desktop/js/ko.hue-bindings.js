@@ -5445,6 +5445,16 @@
       });
 
       editor.commands.addCommand({
+        name: 'switchTheme',
+        bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
+        exec: function () {
+          darkThemeEnabled = !darkThemeEnabled;
+          ApiHelper.getInstance().setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
+        }
+      });
+
+      editor.commands.addCommand({
         name: "new",
         bindKey: {win: "Ctrl-e", mac: "Command-e"},
         exec: function () {
