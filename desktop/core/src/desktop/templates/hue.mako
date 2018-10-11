@@ -341,7 +341,7 @@ ${ hueIcons.symbols() }
     </div>
 
     % if IS_MULTICLUSTER_ONLY.get():
-    <div class="hue-dw-sidebar-container collapsed" data-bind="component: { name: 'hue-dw-sidebar', params: { items: items } }"></div>
+    <div class="hue-dw-sidebar-container collapsed" data-bind="component: { name: 'hue-dw-sidebar', params: { items: items, pocClusterMode: pocClusterMode } }"></div>
     % endif
 
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
@@ -1584,6 +1584,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var self = this;
 
         self.items = ko.observableArray();
+
+        self.pocClusterMode = topNavViewModel.pocClusterMode;
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           var items = [];
