@@ -187,7 +187,8 @@ ${ hueIcons.symbols() }
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
-            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px;">
+            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() === 'dw'">
+            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
           % else:
             <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
           % endif
@@ -1482,6 +1483,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }, 0);
           }
         });
+
+        // TODO: Drop. Just for PoC
+        self.pocClusterMode = ko.observable();
+        ApiHelper.getInstance().withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw')
+        huePubSub.subscribe('set.multi.cluster.mode', self.pocClusterMode);
 
         self.onePageViewModel.currentApp.subscribe(function () {
           self.leftNavVisible(false);
