@@ -3013,7 +3013,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             console.log(ko.mapping.toJSON(data));
             self.createClusterName('');
             self.createClusterWorkers(1);
-            $(document).trigger("info", ko.mapping.toJSON(data));
+            ##$(document).trigger("info", ko.mapping.toJSON(data));
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
           });
