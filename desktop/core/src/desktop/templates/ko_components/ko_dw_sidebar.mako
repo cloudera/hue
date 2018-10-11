@@ -55,23 +55,33 @@
 
       var DwSidebar = function DwSidebar(params, element) {
         var self = this;
+        self.pocClusterMode = params.pocClusterMode;
         // self.items =  params.items; // TODO: Once we have the proper apps in cluster config.
-        self.items = ko.observableArray([{
-          displayName: 'Apps',
-          isCategory: true,
-          children: [
-            { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
-            { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
-            { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
-            { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' }
 
-##            { displayName: 'Editor', url: '/editor/?type=hive', icon: 'editor' },
-##            { displayName: 'Dashboard', url: '/jobbrowser#!workflows', icon: 'dashboard' },
-##            { displayName: 'Workflows', url: '/oozie/editor/workflow/new', icon: 'workflows' },
-##            { displayName: 'Service', url: '/hue/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
+        self.items = ko.pureComputed(function () {
+          var appCategory = {
+            displayName: 'Apps',
+            isCategory: true
+          };
+          if (self.pocClusterMode() === 'dw') {
+            appCategory.children = [
+              { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
+              { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
+              { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
+              { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' }
+            ]
+          } else { // DE mode
+            appCategory.children = [
+              { displayName: 'Editor', url: '/editor/?type=hive', icon: 'editor' },
+              { displayName: 'Dashboard', url: '/jobbrowser/#!workflows', icon: 'tables' },
+              { displayName: 'Workflows', url: '/oozie/editor/workflow/new', icon: 'workflows' },
+              { displayName: 'Service', url: '/hue/jobbrowser/#!dataware2-clusters', icon: 'warehouses' }
+            ]
+          }
 
-          ]
-        }]);
+          return [ appCategory ];
+        });
+
         self.collapsed = ko.observable();
         self.collapsed.subscribe(function (newVal) {
           if (newVal) {
