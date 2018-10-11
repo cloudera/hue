@@ -188,7 +188,7 @@ ${ hueIcons.symbols() }
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
             <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() === 'dw'">
-            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
+            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 22px; margin-top:3px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
           % else:
             <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
           % endif
