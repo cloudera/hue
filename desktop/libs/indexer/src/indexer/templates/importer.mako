@@ -136,7 +136,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         %endif
-        <div class="content-panel">
+        <div class="content-panel importer-droppable">
           <div class="content-panel-inner">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
           </div>
@@ -2886,7 +2886,7 @@ ${ assist.assistPanel() }
 
       $(window).on('resize', resizeElements);
 
-      $('.content-panel').droppable({
+      $('.importer-droppable').droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
           var text = ui.helper.text();
