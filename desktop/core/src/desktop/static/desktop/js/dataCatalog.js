@@ -710,7 +710,7 @@ var DataCatalog = (function () {
       var invalidate = options.invalidate || 'cache';
 
       if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
-        if (window.IS_K8_ONLY) {
+        if (window.IS_K8S_ONLY) {
           invalidate = 'invalidateAndFlush';
         }
         if (self.dataCatalog.invalidatePromise) {
