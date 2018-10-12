@@ -993,6 +993,7 @@ from desktop.views import _ko
             params: {
               querySpec: filter.querySpec,
               facets: [],
+              placeHolder: sourceType === 'solr' || sourceType === 'kafka' ? '${_('Filter sources...')}' : '${_('Filter databases...')}',
               knownFacetValues: {},
               autocompleteFromEntries: autocompleteFromEntries
             }
