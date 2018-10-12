@@ -1971,7 +1971,7 @@ ${ assist.assistPanel() }
       });
       self.streamEndpointUrl = ko.observable('https://login.salesforce.com/services/Soap/u/42.0');
       self.streamObjects = ko.observableArray();
-      self.streamObject = ko.observable('');
+      self.streamObject = ko.observable();
       self.streamObject.subscribe(function(newValue) {
         if (newValue) {
           wizard.guessFieldTypes();
@@ -2598,11 +2598,12 @@ ${ assist.assistPanel() }
               } else if (self.source.streamSelection() === 'flume') {
                 self.source.streamObjects(resp['objects']);
               }
-            } else if (self.source.inputFormat() === 'sfdc') {
+            } else if (self.source.inputFormat() === 'connector') {
+              // Assumes selectectedConnector == 'sfdc'
               self.source.streamObjects(resp['objects']);
             }
 
-            if (self.source.inputFormat() !== 'stream') {
+            if (self.source.inputFormat() !== 'stream' && self.source.inputFormat() !== 'connector') {
               self.guessFieldTypes();
             }
           }
