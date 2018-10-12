@@ -384,7 +384,9 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       huePubSub.subscribe('app.gained.focus', function (app) {
         if (app === 'security_hdfs') {
-          window.location.hash = viewModel.lastHash;
+          window.setTimeout(function () {
+            window.location.hash = viewModel.lastHash;
+          }, 0);
         }
       }, 'security_hdfs');
 
