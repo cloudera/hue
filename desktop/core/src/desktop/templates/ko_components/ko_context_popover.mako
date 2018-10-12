@@ -208,6 +208,39 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="context-partition-details">
+    <div class="context-popover-flex-fill" style="overflow: auto;">
+      <div class="context-popover-inner-content">
+        <div style="position: absolute; right: 6px; top: 8px;">
+          <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
+        </div>
+        <!-- ko with: data -->
+        <div class="context-popover-flex-header blue"><span data-bind="text: originalName"></span></div>
+        <div class="context-popover-flex-attributes">
+          <div class="context-popover-attribute"><div>${ _('Created') }</div><div data-bind="text: created"></div></div>
+        </div>
+        <!-- ko if: description -->
+        <div class="context-popover-doc-description" data-bind="html: description"></div>
+        <!-- /ko -->
+        <div class="context-popover-flex-fill">
+          <table id="partitionsTable" class="table table-condensed table-nowrap">
+            <thead>
+            <tr>
+              <th>${ _('Values') }</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: colValues">
+              <tr>
+                <td data-bind="text: $data"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- /ko -->
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="context-popover-template">
     <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
@@ -886,6 +919,24 @@ from metadata.conf import has_navigator
         huePubSub.publish('context.popover.hide');
       };
 
+      function PartitionContext(data) {
+        var self = this;
+        self.disposals = [];
+
+        self.data = data;
+        self.loading = ko.observable(false);
+        self.hasErrors = ko.observable(false);
+        self.errorText = ko.observable();
+        self.template = 'context-partition-details';
+      }
+
+      PartitionContext.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
+
       function DocumentContext(data) {
         var self = this;
         self.disposals = [];
@@ -1494,6 +1545,7 @@ from metadata.conf import has_navigator
                 || params.data.type.toLowerCase() === 'view';
 
         self.isDocument = params.data.type.toLowerCase() === 'hue';
+        self.isPartition = params.data.type.toLowerCase() === 'partition';
 
         self.close = params.globalSearch.close.bind(params.globalSearch);
 
@@ -1541,6 +1593,8 @@ from metadata.conf import has_navigator
           });
         } else if (self.isDocument) {
           self.contents(new DocumentContext(params.data));
+        } else if (self.isPartition) {
+          self.contents(new PartitionContext(params.data));
         }
       };
 

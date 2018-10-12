@@ -83,7 +83,7 @@ from desktop.views import _ko
       <div class="global-search-preview" style="overflow: auto;">
           <div class="global-search-close-preview"><a class="pointer inactive-action" data-bind="click: function () { $parent.selectedIndex(undefined); }"><i class="fa fa-fw fa-times"></i></a></div>
           <!-- ko switch: type -->
-            <!-- ko case: ['database', 'document', 'field', 'table', 'view']  -->
+            <!-- ko case: ['database', 'document', 'field', 'table', 'view', 'partition']  -->
               <!-- ko component: { name: 'context-popover-contents-global-search', params: { data: data, globalSearch: $parent } } --><!-- /ko -->
             <!-- /ko -->
             <!-- ko case: $default -->
