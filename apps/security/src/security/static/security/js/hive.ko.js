@@ -829,7 +829,7 @@ var HiveViewModel = (function () {
     self.availableActions = function(scope) {
       var actions = ['SELECT', 'INSERT', 'ALL'];
       var databaseActions = ['CREATE'];
-      var tableActions = ['REFRESH', 'ALTER', 'DROP'];
+      var tableActions = ['REFRESH']; //, 'ALTER', 'DROP'];
       switch (scope) {
         case 'SERVER':
         case 'DATABASE':
