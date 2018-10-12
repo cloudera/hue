@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from simple_salesforce.api import Salesforce
+from simple_salesforce.exceptions import SalesforceRefusedRequest
 
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
@@ -43,12 +44,12 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
+from indexer.models import _save_pipeline
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
-from indexer.models import _save_pipeline
 
 
 LOG = logging.getLogger(__name__)
@@ -149,7 +150,7 @@ def guess_format(request):
       )
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
     else:
-        raise PopupException(_('Input format %(inputFormat)s connector not recognized: $(connectorSelection)s') % file_format)
+      raise PopupException(_('Input format %(inputFormat)s connector not recognized: $(connectorSelection)s') % file_format)
   else:
     raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
@@ -318,15 +319,22 @@ def guess_field_types(request):
       query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
       print query
 
+      try:
+        records = sf.query_all(query)
+      except SalesforceRefusedRequest, e:
+        raise PopupException(message=str(e))
+
       format_ = {
-        "sample": [row.values()[1:] for row in sf.query_all(query)['records']],
+        "sample": [row.values()[1:] for row in records['records']],
         "columns": [
             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in table_metadata
         ]
       }
+    else:
+      raise PopupException(_('Connector format not recognized: %(connectorSelection)s') % file_format)
   else:
-    raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
+      raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
   return JsonResponse(format_)
 
