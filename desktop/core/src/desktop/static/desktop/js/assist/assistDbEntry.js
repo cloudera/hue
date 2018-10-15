@@ -52,8 +52,21 @@ var AssistDbEntry = (function () {
 
     self.hasErrors = ko.observable(false);
 
+    self.iconClass = '';
+    if (!self.navigationSettings.rightAssist) {
+      if (self.sourceType === 'solr') {
+        self.iconClass = 'fa-search';
+      } else if (self.sourceType === 'kafka') {
+        self.iconClass = 'fa-sitemap';
+      } else if (self.catalogEntry.isView()) {
+        self.iconClass = 'fa-eye';
+      } else {
+        self.iconClass = 'fa-table';
+      }
+    }
+
     self.open.subscribe(function(newValue) {
-      if (newValue && self.entries().length == 0) {
+      if (newValue && self.entries().length === 0) {
         self.loadEntries();
       }
     });
@@ -431,18 +444,15 @@ var AssistDbEntry = (function () {
     if (IS_NEW_INDEXER_ENABLED) {
       if (IS_HUE_4) {
         huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
-      }
-      else {
+      } else {
         window.open('/indexer/indexes/' + definitionName);
       }
-    }
-    else {
+    } else {
       var hash = '#edit/' + definitionName;
       if (IS_HUE_4) {
         if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
           window.location.hash = hash;
-        }
-        else {
+        } else {
           huePubSub.subscribeOnce('app.gained.focus', function (app) {
             if (app === 'indexes') {
               window.setTimeout(function () {
@@ -452,8 +462,7 @@ var AssistDbEntry = (function () {
           });
           huePubSub.publish('open.link', '/indexer');
         }
-      }
-      else {
+      } else {
         window.open('/indexer/' + hash);
       }
     }
