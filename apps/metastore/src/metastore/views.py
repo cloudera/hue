@@ -29,7 +29,7 @@ from django.views.decorators.http import require_http_methods
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, get_cluster_config
+from desktop.models import Document2, get_cluster_config, _get_apps
 
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery
@@ -76,8 +76,10 @@ def databases(request):
 
   db = _get_db(user=request.user)
   databases = db.get_databases(search_filter)
+  apps_list = _get_apps(request.user, '')
 
   return render("metastore.mako", request, {
+    'apps': apps_list,
     'breadcrumbs': [],
     'database': None,
     'databases': databases,
@@ -235,7 +237,9 @@ def show_tables(request, database=None):
         'search_filter': search_filter
     })
   else:
+    apps_list = _get_apps(request.user, '')
     resp = render("metastore.mako", request, {
+    'apps': apps_list,
     'breadcrumbs': [],
     'database': None,
     'partitions': [],
@@ -299,6 +303,7 @@ def describe_table(request, database, table):
     })
   else:  # Render HTML
     renderable = "metastore.mako"
+    apps_list = _get_apps(request.user, '')
 
     partitions = None
     if app_name != 'impala' and table.partition_keys:
@@ -308,6 +313,7 @@ def describe_table(request, database, table):
         LOG.exception('Table partitions could not be retrieved')
 
     return render(renderable, request, {
+      'apps': apps_list,
       'breadcrumbs': [{
           'name': database,
           'url': reverse('metastore:show_tables', kwargs={'database': database})
@@ -551,7 +557,9 @@ def describe_partitions(request, database, table):
       'partition_values_json': massaged_partitions,
     })
   else:
+    apps_list = _get_apps(request.user, '')
     return render("metastore.mako", request, {
+      'apps': apps_list,
       'breadcrumbs': [{
             'name': database,
             'url': reverse('metastore:show_tables', kwargs={'database': database})
