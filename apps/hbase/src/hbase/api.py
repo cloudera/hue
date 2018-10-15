@@ -27,7 +27,7 @@ from desktop.lib import thrift_util
 from desktop.lib.exceptions_renderable import PopupException
 
 from hbase import conf
-from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http
+from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http, get_thrift_transport
 from hbase.server.hbase_lib import get_thrift_type, get_client_type
 
 
@@ -99,7 +99,7 @@ class HbaseApi(object):
         kerberos_principal=_security['kerberos_principal_short_name'],
         use_sasl=_security['use_sasl'],
         timeout_seconds=30,
-        transport=conf.THRIFT_TRANSPORT.get(),
+        transport=get_thrift_transport(),
         transport_mode='http' if is_using_thrift_http() else 'socket',
         http_url=('https://' if is_using_thrift_ssl() else 'http://') + target['host'] + ':' + str(target['port'])
     )
