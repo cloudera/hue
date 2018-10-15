@@ -900,32 +900,42 @@ var EditorViewModel = (function() {
     if (vm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
-    self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : defaultShowLogs);
-    self.progress = ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
-    self.jobs = ko.observableArray(typeof snippet.jobs != "undefined" && snippet.jobs != null ? snippet.jobs : []);
+    self.showLogs = ko.observable(typeof snippet.showLogs !== "undefined" && snippet.showLogs != null ? snippet.showLogs : defaultShowLogs);
+    self.progress = ko.observable(typeof snippet.progress !== "undefined" && snippet.progress != null ? snippet.progress : 0);
+    self.jobs = ko.observableArray(typeof snippet.jobs !== "undefined" && snippet.jobs != null ? snippet.jobs : []);
 
-    self.ddlNotification = ko.observable();
-    self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-    window.setTimeout(function () {
-      self.delayedDDLNotification.subscribe(function (val) {
-        var match = self.statement().match(/(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i);
-        var path = [];
+    var executeNextTimeout = -1;
+    var refreshTimeouts = {};
+    self.onDdlExecute = function () {
+      if (self.result.handle() && self.result.handle().has_more_statements) {
+        window.clearTimeout(executeNextTimeout);
+        executeNextTimeout = setTimeout(function () {
+          self.execute(true); // Execute next, need to wait as we disabled fast click
+        }, 1000);
+      }
+      var match = self.statement().match(/(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i);
+      var path = [];
+      if (match) {
+        path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+      } else {
+        match = self.statement().match(/(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i);
         if (match) {
           path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-        } else {
-          match = self.statement().match(/(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i);
-          if (match) {
-            path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-          } else if (self.database()) {
-            path.push(self.database());
-          }
+        } else if (self.database()) {
+          path.push(self.database());
         }
-        ignoreNextAssistDatabaseUpdate = true;
-        DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: path }).done(function (entry) {
-          entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
-        });
-      });
-    }, 0);
+      }
+
+      if (path.length) {
+        window.clearTimeout(refreshTimeouts[path.join('.')]);
+        refreshTimeouts[path.join('.')] = window.setTimeout(function () {
+          ignoreNextAssistDatabaseUpdate = true;
+          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: path }).done(function (entry) {
+            entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+          });
+        }, 5000);
+      }
+    };
 
     self.progress.subscribe(function (val) {
       $(document).trigger("progress", {data: val, snippet: self});
@@ -1407,7 +1417,7 @@ var EditorViewModel = (function() {
 
     self.execute = function (automaticallyTriggered) {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (!automaticallyTriggered && (self.status() == 'running' || self.status() == 'loading')) { // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
+      if (!automaticallyTriggered && (self.status() === 'running' || self.status() === 'loading')) { // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
         self.cancel();
       } else if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
@@ -1499,7 +1509,7 @@ var EditorViewModel = (function() {
           notebook.parentSavedQueryUuid(data.history_parent_uuid);
         }
 
-        if (data.status == 0) {
+        if (data.status === 0) {
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
           if (data.handle.sync) {
@@ -1524,7 +1534,7 @@ var EditorViewModel = (function() {
           if (vm.editorMode()) {
             if (vm.isNotificationManager()) { // Update task status
               var tasks = $.grep(notebook.history(), function(row) { return row.uuid() == notebook.uuid()});
-              if (tasks.length == 1) {
+              if (tasks.length === 1) {
                 tasks[0].status(self.status());
                 self.result.logs(data.message);
               }
@@ -1716,7 +1726,7 @@ var EditorViewModel = (function() {
 
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
-        if (self.status() == 'available') {
+        if (self.status() === 'available') {
           startLongOperationTimeout();
           self.isFetchingData = true;
           hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
@@ -1728,7 +1738,7 @@ var EditorViewModel = (function() {
           }, function (data) {
             stopLongOperationTimeout();
             data = JSON.bigdataParse(data);
-            if (data.status == 0) {
+            if (data.status === 0) {
               self.loadData(data.result, rows);
             } else {
               self._ajaxError(data, function() {self.isFetchingData = false; self.fetchResultData(rows, startOver); });
@@ -1883,13 +1893,7 @@ var EditorViewModel = (function() {
                   if (self.lastExecutedStatement()) {
                     self.checkDdlNotification();
                   } else {
-                    self.ddlNotification(Math.random());
-                  }
-
-                  if (self.result.handle().has_more_statements) {
-                    setTimeout(function () {
-                      self.execute(true); // Execute next, need to wait as we disabled fast click
-                    }, 1000);
+                    self.onDdlExecute();
                   }
                 }
               }
@@ -1927,9 +1931,9 @@ var EditorViewModel = (function() {
 
     self.checkDdlNotification = function() {
       if (self.lastExecutedStatement() && /CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
-        self.ddlNotification(Math.random());
+        self.onDdlExecute();
       }
-    }
+    };
 
     self.isCanceling = ko.observable(false);
 
