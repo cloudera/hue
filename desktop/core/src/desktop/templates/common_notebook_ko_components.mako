@@ -576,17 +576,12 @@ except ImportError, e:
         <div class="tab-pane" id="help-editor-shortcut" style="min-height: 500px">
           <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           <div class="clearfix"></div>
-          <!-- ko if: activeCategory() &&  activeCategory().filteredShortcuts().length === 0 -->
-          <div class="margin-top-30 margin-left-10">
-            <em>${ _('No matches found for your search.') }</em>
-          </div>
-          <!-- /ko -->
+          <!-- ko ifnot: query -->
           <ul class="nav nav-tabs" data-bind="foreach: categories">
-            <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
+            <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
           </ul>
           <div class="tab-content" data-bind="with: activeCategory">
             <div class="tab-pane active">
-              <!-- ko if: filteredShortcuts().length > 0 -->
               <table class="table table-condensed">
                 <thead>
                   <tr>
@@ -595,17 +590,49 @@ except ImportError, e:
                     <th>${ _('Action')}</th>
                   </tr>
                 </thead>
-                <tbody data-bind="foreach: filteredShortcuts">
+                <tbody data-bind="foreach: shortcuts">
                   <tr>
-                    <td data-bind="text: shortcut"></td>
-                    <td data-bind="text: macShortcut"></td>
-                    <td data-bind="text: description"></td>
+                    <td data-bind="text: shortcut" style="width: 25%;"></td>
+                    <td data-bind="text: macShortcut" style="width: 25%;"></td>
+                    <td data-bind="text: description" style="width: 50%;"></td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+          <!-- /ko -->
+          <!-- ko if: query -->
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="javascript:void(0);">${ _('Search result')}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active">
+              <!-- ko if: filteredShortcuts().length -->
+              <table class="table table-condensed">
+                <thead>
+                <tr>
+                  <th>${ _('Windows/Linux')}</th>
+                  <th>${ _('Mac')}</th>
+                  <th>${ _('Action')}</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: filteredShortcuts">
+                <tr>
+                  <td data-bind="text: shortcut" style="width: 25%;"></td>
+                  <td data-bind="text: macShortcut" style="width: 25%;"></td>
+                  <td data-bind="text: description" style="width: 50%;"></td>
+                </tr>
+                </tbody>
+              </table>
+              <!-- /ko -->
+              <!-- ko ifnot: filteredShortcuts().length -->
+              <div>
+                <em>${ _('No shortcuts found.') }</em>
+              </div>
               <!-- /ko -->
             </div>
           </div>
+          <!-- /ko -->
         </div>
         <div class="tab-pane active" id="help-editor-syntax">
           <ul class="nav nav-tabs">
@@ -863,33 +890,23 @@ except ImportError, e:
 
         self.activeCategory = ko.observable(self.categories[0]);
 
-        self.categories.forEach(function (category) {
-          category.filteredShortcuts = ko.pureComputed(function () {
-            var query = (self.query() || '').toLowerCase();
-            if (query !== '') {
-              var result = $.grep(category.shortcuts, function (shortcut) {
-                return shortcut.description.toLowerCase().indexOf(query) !== -1;
-              });
-              return result;
-            } else {
-              return category.shortcuts;
-            }
-          });
-
-          category.filteredShortcuts.subscribe(function (newVal) {
-            if (category === self.activeCategory() && newVal.length === 0) {
-              self.categories.every(function (category) {
-                if (category.filteredShortcuts().length > 0) {
-                  self.activeCategory(category);
-                  return false;
-                }
-                return true;
+        self.filteredShortcuts = ko.pureComputed(function () {
+          var query = (self.query() || '').toLowerCase();
+          if (query !== '') {
+            var result = [];
+            self.categories.forEach(function (category) {
+              category.shortcuts.forEach(function (shortcut) {
+                if (shortcut.description.toLowerCase().indexOf(query) !== -1 ||
+                  shortcut.shortcut.toLowerCase().indexOf(query) !== -1 ||
+                  shortcut.macShortcut.toLowerCase().indexOf(query) !== -1) {
+                  result.push(shortcut);
+                };
               })
-            }
-          })
-
+            });
+            return result;
+          }
+          return [];
         });
-
       }
 
       ko.components.register('aceKeyboardShortcuts', {
