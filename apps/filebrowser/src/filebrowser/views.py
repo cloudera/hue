@@ -364,7 +364,7 @@ def listdir(request, path):
         'breadcrumbs': breadcrumbs,
         'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
-        'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
+        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'cwd_set': True,
         'is_superuser': request.user.username == request.fs.superuser,
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
@@ -511,7 +511,7 @@ def listdir_paged(request, path):
         'files': page.object_list if page else [],
         'page': _massage_page(page, paginator) if page else {},
         'pagesize': pagesize,
-        'home_directory': home_dir_path and request.fs.isdir(home_dir_path) or None,
+        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'descending': descending_param,
         # The following should probably be deprecated
         'cwd_set': True,
