@@ -22,6 +22,7 @@ var AssistDbSource = (function () {
    * @param {ContextNamespace} [options.initialNamespace] - Optional initial namespace to use
    * @param {ContextCompute} [options.initialCompute] - Optional initial compute to use
    * @param {string} options.name
+   * @param {boolean} options.nonSqlType - Optional, default false
    * @param {Object} options.navigationSettings
    * @constructor
    */
@@ -31,6 +32,7 @@ var AssistDbSource = (function () {
     self.sourceType = options.type;
     self.name = options.name;
     self.i18n = options.i18n;
+    self.nonSqlType = options.nonSqlType;
     self.navigationSettings = options.navigationSettings;
     var apiHelper = ApiHelper.getInstance();
     self.initialNamespace = options.initialNamespace || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
@@ -67,9 +69,19 @@ var AssistDbSource = (function () {
       return result;
     };
 
+    var ensureDbSet = function () {
+      if (self.nonSqlType) {
+        if (!self.selectedNamespace().selectedDatabase()) {
+          self.selectedNamespace().selectedDatabase(self.selectedNamespace().databases()[0]);
+        }
+      }
+    };
+
     self.selectedNamespace.subscribe(function (namespace) {
       if (namespace && !namespace.loaded() && !namespace.loading()) {
-        namespace.initDatabases();
+        namespace.initDatabases(ensureDbSet);
+      } else {
+        ensureDbSet();
       }
     });
 
@@ -99,6 +111,7 @@ var AssistDbSource = (function () {
               sourceType: self.sourceType,
               namespace: newNamespace,
               i18n: self.i18n,
+              nonSqlType: self.nonSqlType,
               navigationSettings: self.navigationSettings
             }));
           }
@@ -132,6 +145,7 @@ var AssistDbSource = (function () {
           sourceType: self.sourceType,
           namespace: namespace,
           i18n: self.i18n,
+          nonSqlType: self.nonSqlType,
           navigationSettings: self.navigationSettings
         });
 
@@ -217,6 +231,7 @@ var AssistDbNamespace = (function () {
    * @param {Object} options.i18n
    * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace
+   * @param {boolean} options.nonSqlType - Optional, default false
    * @param {Object} options.navigationSettings
    * @constructor
    */
@@ -226,6 +241,7 @@ var AssistDbNamespace = (function () {
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
     self.sourceType = options.sourceType;
+    self.nonSqlType = options.nonSqlType;
 
     self.namespace = options.namespace;
     // TODO: Compute selection in assist?
@@ -235,7 +251,6 @@ var AssistDbNamespace = (function () {
     }
     self.name = options.namespace.name;
 
-    self.catalogEntry;
     self.dbIndex = {};
     self.databases = ko.observableArray();
     self.selectedDatabase = ko.observable();
@@ -284,7 +299,7 @@ var AssistDbNamespace = (function () {
 
     self.selectedDatabase.subscribe(function () {
       var db = self.selectedDatabase();
-      if (HAS_OPTIMIZER && db && !db.popularityIndexSet && self.sourceType !== 'solr') {
+      if (HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
         db.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
           var applyPopularity = function () {
             db.entries().forEach(function (entry) {
@@ -382,7 +397,7 @@ var AssistDbNamespace = (function () {
             dbs.push(database);
           });
 
-          if (!hasNavMeta && self.sourceType !== 'solr') {
+          if (!hasNavMeta && !self.nonSqlType) {
             self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
           }
           self.databases(dbs);

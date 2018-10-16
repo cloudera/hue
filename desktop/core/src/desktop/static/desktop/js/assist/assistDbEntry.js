@@ -159,7 +159,7 @@ var AssistDbEntry = (function () {
     var types = {};
     if (self.parent === null) { // Only find facets on the DB level
       self.entries().forEach(function (tableEntry) {
-        if (self.assistDbNamespace.sourceType !== 'solr') {
+        if (!self.assistDbNamespace.nonSqlType) {
           if (tableEntry.catalogEntry.isTable()) {
             types.table =  types.table ? types.table + 1 : 1;
           } else if (tableEntry.catalogEntry.isView()) {
@@ -343,7 +343,7 @@ var AssistDbEntry = (function () {
           self.hasErrors(true);
         });
 
-        if (self.assistDbNamespace.sourceType !== 'solr') {
+        if (!self.assistDbNamespace.nonSqlType) {
           self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
         }
       } else {
@@ -363,7 +363,7 @@ var AssistDbEntry = (function () {
       loadEntriesDeferred.resolve([]);
     };
 
-    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && self.assistDbNamespace.sourceType !== 'solr') {
+    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && !self.assistDbNamespace.nonSqlType) {
       self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
         loadEntriesDeferred.done(function () {
           if (!self.hasErrors()) {
