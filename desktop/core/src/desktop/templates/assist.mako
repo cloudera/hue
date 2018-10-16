@@ -89,8 +89,6 @@ from desktop.views import _ko
     <!-- ko if: typeof catalogEntry !== 'undefined' -->
       <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
       <!-- ko switch: sourceType -->
-      <!-- ko case: 'kafka' -->
-      <!-- /ko -->
       <!-- ko case: 'solr' -->
         <!-- ko if: catalogEntry.isTableOrView() -->
         <li><a href="javascript:void(0);" data-bind="click: openInIndexer"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
@@ -339,19 +337,6 @@ from desktop.views import _ko
         <!-- ko with: selectedDatabase -->
           <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
         <!-- /ko -->
-      <!-- /ko -->
-    <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="assist-solr-inner-panel">
-    <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-    <!-- ko with: selectedSource -->
-      <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' }--><!-- /ko -->
-      <!-- ko with: selectedNamespace -->
-        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-        <!-- ko with: selectedDatabase -->
-          <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
-        <!-- /ko-->
       <!-- /ko -->
     <!-- /ko -->
   </script>
@@ -1205,7 +1190,8 @@ from desktop.views import _ko
 
         self.visible = ko.observable(options.visible || true);
         options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
-        self.templateName = 'assist-' + self.type + '-inner-panel';
+
+        self.templateName = 'assist-' + (['solr', 'kafka'].indexOf(self.type) !== -1 ? 'sql' : self.type) + '-inner-panel';
 
         var loadWhenVisible = function () {
           if (! self.visible()) {
@@ -1232,6 +1218,8 @@ from desktop.views import _ko
        * @param {boolean} options.navigationSettings.openItem
        * @param {boolean} options.navigationSettings.showStats
        * @param {boolean} options.navigationSettings.pinEnabled
+       * @param {boolean} [options.isSolr] - Detfault false;
+       * @param {boolean} [options.isStreams] - Detfault false;
        * @constructor
        **/
       function AssistDbPanel(options) {
@@ -1242,15 +1230,18 @@ from desktop.views import _ko
         self.initialized = false;
         self.initalizing = false;
 
+        self.isStreams = options.isStreams;
+        self.isSolr = options.isSolr;
+
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
 
-          if (options.isSolr) {
+          if (self.isSolr) {
             options.sourceTypes = [{
               type: 'solr',
               name: 'solr'
             }];
-          } else if (options.isKafka) {
+          } else if (self.isStreams) {
             options.sourceTypes = [{
               type: 'kafka',
               name: 'kafka'
@@ -1296,10 +1287,16 @@ from desktop.views import _ko
             i18n: self.i18n,
             type: sourceType.type,
             name: sourceType.name,
+            nonSqlType: sourceType.type === 'solr' || sourceType.type === 'kafka',
             navigationSettings: options.navigationSettings
           });
           self.sources.push(self.sourceIndex[sourceType.type]);
         });
+
+        if (self.sources().length === 1) {
+          self.selectedSource(self.sources()[0]);
+        }
+
         if (self.sourceIndex['solr']) {
           huePubSub.subscribe('assist.collections.refresh', function() {
             var namespace = self.sourceIndex['solr'].selectedNamespace();
@@ -1334,7 +1331,7 @@ from desktop.views import _ko
           }, 0);
         });
 
-        if (!options.isSolr) {
+        if (!self.isSolr && !self.isStreams) {
           huePubSub.subscribe('assist.set.database', function (databaseDef) {
             if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
               return;
@@ -1418,7 +1415,7 @@ from desktop.views import _ko
           });
         }
 
-        if (options.isSolr) {
+        if (self.isSolr || self.isStreams) {
           if (self.sources().length === 1) {
             self.selectedSource(self.sources()[0]);
             self.selectedSource().loadNamespaces().done(function () {
@@ -1434,7 +1431,10 @@ from desktop.views import _ko
         }
 
         self.breadcrumb = ko.computed(function () {
-          if (self.selectedSource()) {
+          if (self.isStreams && self.selectedSource()) {
+            return self.selectedSource().name;
+          }
+          if (!self.isSolr && self.selectedSource()) {
             if (self.selectedSource().selectedNamespace()) {
               if (self.selectedSource().selectedNamespace().selectedDatabase()) {
                 return self.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name
@@ -1451,6 +1451,10 @@ from desktop.views import _ko
 
       AssistDbPanel.prototype.back = function () {
         var self = this;
+        if (self.isStreams) {
+          self.selectedSource(null);
+          return;
+        }
         if (self.selectedSource()) {
           if (self.selectedSource() && self.selectedSource().selectedNamespace()) {
             if (self.selectedSource().selectedNamespace().selectedDatabase()) {
@@ -1471,8 +1475,10 @@ from desktop.views import _ko
         if (self.initialized) {
           return;
         }
-        if (self.options.isSolr) {
+        if (self.isSolr) {
           self.selectedSource(self.sourceIndex['solr']);
+        } else if (self.isStreams) {
+            self.selectedSource(self.sourceIndex['kafka']);
         } else {
           var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
           if (!self.selectedSource()) {
@@ -1918,7 +1924,7 @@ from desktop.views import _ko
           window.setTimeout(function () {
             window.location.hash = hash;
           }, 0);
-        }
+        };
 
         self.lastClickeHBaseEntry = null;
         self.HBaseLoaded = false;
@@ -2111,19 +2117,19 @@ from desktop.views import _ko
               }
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('kafka') != -1) {
-                var kafkaPanel = new AssistInnerPanel({
+                var streamsPanel = new AssistInnerPanel({
                   panelData: new AssistDbPanel($.extend({
                     apiHelper: self.apiHelper,
                     i18n: i18nCollections,
-                    isKafka: true
+                    isStreams: true
                   }, params.sql)),
                   apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
-                  type: 'solr',
+                  type: 'kafka',
                   icon: 'fa-sitemap',
                   minHeight: 75
                 });
-                panels.push(kafkaPanel);
+                panels.push(streamsPanel);
               }
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
@@ -3475,6 +3481,7 @@ from desktop.views import _ko
             initialCompute: collection.activeCompute,
             type: collection.engine(),
             name: collection.engine(),
+            nonSqlType: true,
             navigationSettings: navigationSettings
           });
 
