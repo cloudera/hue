@@ -73,6 +73,7 @@ var AssistDbSource = (function () {
       if (self.nonSqlType) {
         if (!self.selectedNamespace().selectedDatabase()) {
           self.selectedNamespace().selectedDatabase(self.selectedNamespace().databases()[0]);
+          self.selectedNamespace().selectedDatabaseChanged();
         }
       }
     };
