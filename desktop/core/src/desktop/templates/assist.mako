@@ -295,8 +295,8 @@ from desktop.views import _ko
       <!-- ko if: selectedSource().selectedNamespace().selectedDatabase() -->
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
-        <i class="fa fa-database assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')' }"></span>
+        <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() +  (nonSqlType ? '' : ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')') }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
@@ -1232,6 +1232,7 @@ from desktop.views import _ko
 
         self.isStreams = options.isStreams;
         self.isSolr = options.isSolr;
+        self.nonSqlType = self.isSolr || self.isStreams;
 
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
