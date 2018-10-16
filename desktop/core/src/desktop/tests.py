@@ -23,6 +23,7 @@ import StringIO
 import subprocess
 import sys
 import time
+import uuid
 
 import proxy.conf
 import tempfile
