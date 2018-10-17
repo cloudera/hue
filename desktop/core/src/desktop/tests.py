@@ -1446,6 +1446,11 @@ def test_db_migrations_sqlite():
 def test_db_migrations_mysql():
   if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
     raise SkipTest
+  try:
+    subprocess.check_output('which mysql', shell=True)
+  except:
+    LOG.warn('mysql not installed')
+    raise SkipTest
   versions = ['5_' + str(i) for i in range(7, 16)]
   os.putenv('PATH', '$PATH:/usr/local/bin')
   for version in versions:
