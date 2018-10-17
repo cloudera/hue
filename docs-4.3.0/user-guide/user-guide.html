@@ -1,0 +1,1369 @@
+<link rel="stylesheet" href="../css/bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+
+<div class="row-fluid doc-title">
+  <h1><a href=../index.html>Doc</a> > Hue User Guide</h1>
+</div>
+
+<div class="row-fluid">
+  <div class="span3">
+
+<div class="toc">
+<ul>
+<li><a href="#concept">Concept</a><ul>
+<li><a href="#interface">Interface</a><ul>
+<li><a href="#top-search">Top search</a></li>
+<li><a href="#left-assist">Left assist</a></li>
+<li><a href="#right-assist">Right assist</a></li>
+<li><a href="#sample-popup">Sample popup</a></li>
+<li><a href="#charting">Charting</a></li>
+</ul>
+</li>
+<li><a href="#data-importer">Data Importer</a><ul>
+<li><a href="#sql-tables">SQL Tables</a></li>
+<li><a href="#indexing">Indexing</a></li>
+<li><a href="#traditional-databases">Traditional Databases</a></li>
+</ul>
+</li>
+<li><a href="#documents">Documents</a><ul>
+<li><a href="#sharing">Sharing</a></li>
+<li><a href="#import-export">Import / Export</a></li>
+</ul>
+</li>
+<li><a href="#changing-the-language">Changing the language</a></li>
+</ul>
+</li>
+<li><a href="#editors-notebook">Editors / Notebook</a><ul>
+<li><a href="#concepts">Concepts</a><ul>
+<li><a href="#running-queries">Running Queries</a></li>
+<li><a href="#downloading-and-exporting-query-results">Downloading and Exporting Query Results</a></li>
+<li><a href="#advanced-query-settings">Advanced Query Settings</a></li>
+<li><a href="#autocomplete">Autocomplete</a></li>
+<li><a href="#variables">Variables</a></li>
+<li><a href="#syntax-checker">Syntax checker</a></li>
+<li><a href="#query-assist">Query Assist</a></li>
+<li><a href="#risk-alerts">Risk Alerts</a></li>
+<li><a href="#presentation-mode">Presentation Mode</a></li>
+</ul>
+</li>
+<li><a href="#sql">SQL</a><ul>
+<li><a href="#hive">Hive</a></li>
+<li><a href="#impala">Impala</a></li>
+<li><a href="#mysql">MySQL</a></li>
+<li><a href="#oracle">Oracle</a></li>
+<li><a href="#ksql-kafka-sql">KSQL / Kafka SQL</a></li>
+<li><a href="#solr-sql">Solr SQL</a></li>
+<li><a href="#presto">Presto</a></li>
+<li><a href="#postgresql">PostgreSQL</a></li>
+<li><a href="#redshift">Redshift</a></li>
+<li><a href="#bigquery">BigQuery</a></li>
+<li><a href="#aws-athena">AWS Athena</a></li>
+<li><a href="#spark-sql">Spark SQL</a></li>
+<li><a href="#phoenix">Phoenix</a></li>
+<li><a href="#kylin">Kylin</a></li>
+<li><a href="#others">Others</a></li>
+</ul>
+</li>
+<li><a href="#jobs">Jobs</a><ul>
+<li><a href="#mapreduce">MapReduce</a></li>
+<li><a href="#java">Java</a></li>
+<li><a href="#pig">Pig</a></li>
+<li><a href="#sqoop">Sqoop</a></li>
+<li><a href="#shell">Shell</a></li>
+<li><a href="#distcp">DistCp</a></li>
+<li><a href="#spark">Spark</a><ul>
+<li><a href="#batch">Batch</a></li>
+<li><a href="#interactive">Interactive</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sdk">SDK</a></li>
+</ul>
+</li>
+<li><a href="#dashboards">Dashboards</a><ul>
+<li><a href="#concepts_1">Concepts</a><ul>
+<li><a href="#importing">Importing</a></li>
+<li><a href="#browsing">Browsing</a></li>
+<li><a href="#querying">Querying</a></li>
+</ul>
+</li>
+<li><a href="#databases">Databases</a><ul>
+<li><a href="#solr">Solr</a><ul>
+<li><a href="#autocomplete_1">Autocomplete</a></li>
+<li><a href="#more-like-this">More Like This</a></li>
+</ul>
+</li>
+<li><a href="#sql_1">SQL</a></li>
+</ul>
+</li>
+<li><a href="#reports">Reports</a></li>
+<li><a href="#sdk_1">SDK</a></li>
+</ul>
+</li>
+<li><a href="#browsers">Browsers</a><ul>
+<li><a href="#tables">Tables</a></li>
+<li><a href="#files">Files</a><ul>
+<li><a href="#file-systems">File systems</a><ul>
+<li><a href="#hdfs">HDFS</a></li>
+<li><a href="#s3">S3</a></li>
+<li><a href="#adls">ADLS</a></li>
+</ul>
+</li>
+<li><a href="#files-and-directories">Files and Directories</a><ul>
+<li><a href="#creating-directories">Creating Directories</a></li>
+<li><a href="#changing-directories">Changing Directories</a></li>
+<li><a href="#creating-files">Creating Files</a></li>
+<li><a href="#uploading-files">Uploading Files</a></li>
+<li><a href="#downloading-files">Downloading Files</a></li>
+</ul>
+</li>
+<li><a href="#uploading-zip-archives">Uploading Zip Archives</a></li>
+<li><a href="#trash-folder">Trash Folder</a></li>
+<li><a href="#changing-owner-group-or-permissions">Changing Owner, Group, or Permissions</a></li>
+<li><a href="#viewing-and-editing-files">Viewing and Editing Files</a></li>
+</ul>
+</li>
+<li><a href="#indexes-collections">Indexes / Collections</a></li>
+<li><a href="#sentry-permissions">Sentry Permissions</a><ul>
+<li><a href="#sql_2">SQL</a></li>
+<li><a href="#solr_1">Solr</a></li>
+</ul>
+</li>
+<li><a href="#jobs_1">Jobs</a><ul>
+<li><a href="#dashboard">Dashboard</a></li>
+<li><a href="#viewing-job-information">Viewing Job Information</a></li>
+<li><a href="#types">Types</a><ul>
+<li><a href="#yarn-spark-mapreduce">YARN (Spark, MapReduce)</a></li>
+<li><a href="#impala-queries">Impala Queries</a></li>
+<li><a href="#workflow-schedules-oozie">Workflow / Schedules (Oozie)</a></li>
+<li><a href="#livy-spark">Livy / Spark</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#scheduler">Scheduler</a><ul>
+<li><a href="#workflows">Workflows</a><ul>
+<li><a href="#action-nodes">Action Nodes</a></li>
+<li><a href="#control-nodes">Control Nodes</a></li>
+</ul>
+</li>
+<li><a href="#schedules">Schedules</a><ul>
+<li><a href="#editing-a-coordinator">Editing a Coordinator</a></li>
+<li><a href="#creating-a-dataset">Creating a Dataset</a></li>
+<li><a href="#editing-a-dataset">Editing a Dataset</a></li>
+</ul>
+</li>
+<li><a href="#bundles">Bundles</a><ul>
+<li><a href="#creating-a-bundle">Creating a Bundle</a></li>
+<li><a href="#editing-a-bundle">Editing a Bundle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#contrib">Contrib</a><ul>
+<li><a href="#sdk_2">SDK</a></li>
+<li><a href="#hbase-browser">HBase Browser</a><ul>
+<li><a href="#smartview">SmartView</a></li>
+<li><a href="#adding-data">Adding Data</a></li>
+<li><a href="#mutating-data">Mutating Data</a></li>
+<li><a href="#smart-searchbar">Smart Searchbar</a></li>
+</ul>
+</li>
+<li><a href="#sqoop-1-importer">Sqoop 1 Importer</a></li>
+<li><a href="#sqoop-2-editor">Sqoop 2 Editor</a><ul>
+<li><a href="#creating-a-new-job">Creating a New Job</a></li>
+<li><a href="#running-a-job">Running a Job</a></li>
+<li><a href="#creating-a-new-connection">Creating a New Connection</a></li>
+<li><a href="#editing-a-connection">Editing a Connection</a></li>
+<li><a href="#removing-a-connection">Removing a Connection</a></li>
+<li><a href="#filtering-sqoop-jobs">Filtering Sqoop Jobs</a></li>
+</ul>
+</li>
+<li><a href="#zookeeper-browser">ZooKeeper Browser</a></li>
+<li><a href="#git">Git</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p></div>
+  <div class="span9"></p>
+<h1 id="concept">Concept</h1>
+<p>Hue consists in 4 apps in a single page interface that allow the users to perform data
+analyses without losing any context. The goal is to promote self service and stay simple like Excel
+so that 80% of the user can find, explore and query data and become more data driven.</p>
+<p><strong>1. Find or import your data</strong></p>
+<p>Use the left metadata assists to browse your existing data without losing your editor. The top search will look through your saved queries and matching tables, columns and databases. Objects can be tagged for a quick retrieval or assigning a more “humane” name. If the data does not exist yet, just drag &amp; drop it to trigger the Create Table wizard and to import it in just two steps.</p>
+<p><strong>2. Query your data</strong></p>
+<p>When you found your data, the Editor's autocomplete is extremely powerful as they support 90-100% of the language syntax and will highlight any syntax or logical error. The right assistant provides quick previews of the datasets, which columns or JOINs are popular and recommendations on how to type optimized queries. After the querying, refine your results before exporting to S3/HDFS/ADLS or downloaded as CSV/Excel.</p>
+<p><strong> 4 applications</strong></p>
+<ul>
+<li>Editor: The goal of Hue's Editor is to make data querying easy and productive. It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search &amp; tagging of data and query assistance.</li>
+<li>Browsers: Hue's Browsers let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.</li>
+<li>Dashboard: Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag &amp; drops and clicks.</li>
+<li>Scheduler: The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.</li>
+</ul>
+<p>Each app of Hue can be extended to support your own languages or apps as detailed in the <a href="../sdk/sdk.html">SDK</a>.</p>
+<h2 id="interface">Interface</h2>
+<p>The layout simplifies the interface and is now single page app, and this makes things snappier and unifies the apps together.</p>
+<p><img alt="image" src="images/hue-4-interface-concept.png" /></p>
+<p>From top to bottom we have:</p>
+<ul>
+<li>A completely redesigned top bar, with a quick action (big blue button), a global search and a notification area on the right</li>
+<li>A collapsible hamburger menu that offers links to the various apps and a quick way to import data</li>
+<li>An extended quick browse on the left</li>
+<li>The main app area, where the fun is ;)</li>
+<li>A right Assistant panel for the current application. It's now enabled for the editors, and in case of Hive for instance, it offers you a live help, a quick browse for the used tables in your query, and much more: if your Hue instance is connected to a SQL Optimizer service like Cloudera Navigator Optimizer, it can offer suggestions on your queries!</li>
+<li>Various applications have been grouped into 4 main conceptual areas:</li>
+</ul>
+<p>Learn more on the <a href="http://gethue.com/the-hue-4-user-interface-in-detail/">The Hue 4 user interface in detail</a>.</p>
+<h3 id="top-search">Top search</h3>
+<p>The new search bar is always accessible on the top of screen, and it offers a document search and metadata search too if Hue is configured to access a metadata server like Cloudera Navigator.</p>
+<p><strong> Embedded Search &amp; Tagging </strong></p>
+<p>Have you ever struggled to remember table names related to your project? Does it take much too long to find those columns or views? Hue now lets you easily search for any table, view, or column across all databases in the cluster. With the ability to search across tens of thousands of tables, you're able to quickly find the tables that are relevant for your needs for faster data discovery.</p>
+<p>In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.</p>
+<p>Through an integration with Cloudera Navigator, existing tags and indexed objects show up automatically in Hue, any additional tags you add appear back in Cloudera Navigator, and the familiar Cloudera Navigator search syntax is supported.</p>
+<p>A top search bar now appears. The autocomplete offers a list of facets and prefills the top values. Pressing enter lists the available objects, which can be opened and explored further in the sample popup, the assist or directly into the table browser app.</p>
+<p><strong> Granular Search </strong></p>
+<p>By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.</p>
+<p>Example of searches:</p>
+<ul>
+<li>table:customer → Find the customer table</li>
+<li>table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance'</li>
+<li>owner:admin type:field usage → List all the fields created by the admin user that matches the usage string</li>
+<li>parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with <code>b</code> of the table <code>web_logs</code> in the database <code>default</code>.</li>
+</ul>
+<p>Learn more on the <a href="https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/">Search and Tagging</a>.</p>
+<h3 id="left-assist">Left assist</h3>
+<p>Data where you need it when you need it</p>
+<p>You can now find your Hue documents, HDFS and S3 files and more in the left assist panel, right-clicking items will show a list of actions, you can also drag-and-drop a file to get the path in your editor and more.</p>
+<h3 id="right-assist">Right assist</h3>
+<p>This assistant content depends on the context of the application selected and will display the current tables or available UDFs.</p>
+<h3 id="sample-popup">Sample popup</h3>
+<p>This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.</p>
+<h3 id="charting">Charting</h3>
+<p>These visualizations are convenient for plotting chronological data or when subsets of rows have the same attribute: they will be stacked together.</p>
+<ul>
+<li>Pie</li>
+<li>Bar/Line with pivot</li>
+<li>Timeline</li>
+<li>Scattered plot</li>
+<li>Maps (Marker and Gradient)</li>
+</ul>
+<h2 id="data-importer">Data Importer</h2>
+<p>The goal of the importer is to allow ad hoc queries on data not yet in the clusters thereby expedite self-service analytics.</p>
+<p>If you want to import your own data instead of installing the sample
+tables, open the importer from the left menu or from the little <code>+</code> in the left assist.</p>
+<p>If you've ever struggled with creating new SQL tables from files, you'll be happy to learn that this is now much easier. The wizard has been revamped to two simple steps and also offers more formats. Now users just need to:</p>
+<ol>
+<li>Select a source type</li>
+<li>Select the type of object for the destination</li>
+</ol>
+<p>And that's it!</p>
+<p>To learn more, watch the video on <a href="http://gethue.com/import-data-to-be-queried-via-the-self-service-drag-drop-create-table-wizard/">Data Import Wizard</a>.</p>
+<h3 id="sql-tables">SQL Tables</h3>
+<p>Although you can create tables by executing the appropriate Hive HQL DDL
+query commands, it is easier to create a table using the create table wizard.</p>
+<p><strong>From a File</strong></p>
+<p>If you've ever struggled with creating new SQL tables from files, you'll be happy to learn that this is now much easier. With the latest Hue release, you can now create these in an ad hoc way and thereby expedite self-service analytics. The wizard has been revamped to two simple steps and also offers more formats. Now users just need to:</p>
+<ol>
+<li>In the Importer Manager selects source from a 'File'</li>
+<li>Select the type of table</li>
+</ol>
+<p>Files can be dragged &amp; dropped, selected from HDFS or S3 (if configured), and their formats are automatically detected. The wizard also assists when performing advanced functionalities like table partitioning, Kudu tables, and nested types.</p>
+<p><strong>Manually</strong></p>
+<ol>
+<li>In the Importer Manager selects 'Manually'</li>
+<li>Follow the instructions in the wizard to create the table. The basic
+    steps are:<ul>
+<li>Name the table.</li>
+<li>Choose the record format.</li>
+<li>Configure record serialization by specifying delimiters for
+    columns, collections, and map keys.</li>
+<li>Choose the file format.</li>
+<li>Specify the location for your table's data.</li>
+<li>Specify the columns, providing a name and selecting the type for
+    each column.</li>
+<li>Specify partition columns, providing a name and selecting the
+    type for each column.</li>
+</ul>
+</li>
+</ol>
+<h3 id="indexing">Indexing</h3>
+<p>In the past, indexing data into Solr to then explore it with a <a href="http://gethue.com/search-dashboards/">Dynamic Dashboard</a> has been quite difficult. The task involved writing a Solr schema and a Morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue's new feature you can start your YARN indexing job in minutes. This tutorial offers a step by step guide on how to do it.</p>
+<p><a href="http://gethue.com/easy-indexing-of-data-into-solr/">Read more about it here</a>.</p>
+<h3 id="traditional-databases">Traditional Databases</h3>
+<p>Read more about <a href="http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/">ingesting data from traditional databases</a>.</p>
+<h2 id="documents">Documents</h2>
+<p>Similarly to Google Doc, queries, workflows... can be saved and shared with other.</p>
+<h3 id="sharing">Sharing</h3>
+<p>Sharing happens on the main page or via the top right menu of the application. Users and groups with Read or Write permissions can be selected.</p>
+<h3 id="import-export">Import / Export</h3>
+<p>Via the Home page, saved documents can be exported for backups or transferring to another Hue.</p>
+<h2 id="changing-the-language">Changing the language</h2>
+<p>The language is automatically detected from the Browser or OS. English, Spanish, French, German, Korean, Japanese and Chinese are supported.</p>
+<p>The language can be manual set by a user in the "My Profile" page. Please go to My Profile &gt; Step2 Profile and Groups &gt; Language Preference and choose the language you want.</p>
+<h1 id="editors-notebook">Editors / Notebook</h1>
+<p>The goal of Hue's Editor is to make data querying easy and productive.</p>
+<p>It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search &amp; tagging of data and query assistance.</p>
+<p>The <a href="http://gethue.com/custom-sql-query-editors/">custom SQL Editor page</a> also describes the configuration steps. Any editor can be <code>starred</code>
+next to its name so that it becomes the default editor and the landing page when logging in.</p>
+<p>First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:</p>
+<pre>
+[librdbms]
+  [[databases]]
+    [[[postgresql]]]
+    nice_name=PostgreSQL
+    name=music
+    engine=postgresql_psycopg2
+    port=5432
+    user=hue
+    password=hue
+    options={}
+</pre>
+
+<p>Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:</p>
+<pre>
+[notebook]
+  [[interpreters]]
+    [[[postgresql]]]
+    name=PostgreSQL
+    interface=rdbms
+</pre>
+
+<h2 id="concepts">Concepts</h2>
+<h3 id="running-queries">Running Queries</h3>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: To run a query, you must be logged
+in to Hue as a user that also has a Unix user account on the remote
+server.</p>
+<ol>
+<li>To execute a portion of the query, highlight one or more query
+    statements.</li>
+<li>Click <strong>Execute</strong>. The Query Results window appears with the results
+    of your query.<ul>
+<li>To view a log of the query execution, toggle the <strong>Log</strong> caret on the
+    left of the progress bar. You can use the information in this tab
+    to debug your query.</li>
+<li>To view the columns of the query, expand the <strong>Columns</strong> icon. Clicking
+    on the column label will scroll to the column. Names and types can be filtered.</li>
+<li>To expand a row, double click on it or click on the row number.</li>
+<li>To lock a row, click on the lock icon in the row number column.</li>
+<li>Search either by clicking on the magnifier icon on the results tab, or pressing Ctrl/Cmd + F</li>
+<li><a href="http://gethue.com/new-features-in-the-sql-results-grid-in-hive-and-impala/">See more how to refine your results</a>.</li>
+</ul>
+</li>
+<li>
+<p>If there are multiple statements in the query (separated by semi-colons), click Next in the
+    Multi-statement query pane to execute the remaining statements.</p>
+</li>
+</ol>
+<p>When you have multiple statements it's enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.</p>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: Use CTRL/Cmd + ENTER to execute queries.</p>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: Under the logs panel, you can view any
+MapReduce or <a href="#impala-queries">Impala jobs</a> that the query generated.</p>
+<h3 id="downloading-and-exporting-query-results">Downloading and Exporting Query Results</h3>
+<p>To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query. </p>
+<p><img alt="image" src="images/note.jpg" /> Two of them offer great scalability:
+1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
+2.  Export to a table. You can choose an already existing table or a new one. In the export icon, choose Export and then Table.</p>
+<p><img alt="image" src="images/note.jpg" /> Two of them offer limited scalability:
+1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
+2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.</p>
+<p>Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+<pre>
+  [beeswax]
+  # A limit to the number of rows that can be downloaded from a query before it is truncated.
+  # A value of -1 means there will be no limit.
+  download_row_limit=-1</p>
+<p># A limit to the number of bytes that can be downloaded from a query before it is truncated.
+  # A value of -1 means there will be no limit.
+  download_bytes_limit=-1
+</pre></p>
+<p>In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
+<pre>
+  [desktop]
+  # Global setting to allow or disable end user downloads in all Hue.
+  # e.g. Query result in Editors and Dashboards, file in File Browser...
+  enable_download=false
+</pre></p>
+<p>The download feature in the file browser can be disabled separately with the following options in your hue.ini:
+<pre>
+[filebrowser]
+show_download_button=false
+</pre></p>
+<p><a id="advancedQuerySettings"></a></p>
+<h3 id="advanced-query-settings">Advanced Query Settings</h3>
+<p>The pane to the top of the Editor lets you specify the following
+options:</p>
+<table>
+<tr><td>DATABASE</td><td>The database containing the table definitions.</td></tr>
+<tr><td>SETTINGS</td><td>Override the Hive and Hadoop default settings. To configure a new
+setting:
+
+<ol>
+<li> Click Add.
+<li> For Key, enter a Hive or Hadoop configuration variable name.
+<li> For Value, enter the value you want to use for the variable.
+
+For example, to override the directory where structured Hive query logs
+are created, you would enter hive.querylog.location for Key, and a
+path for Value.
+</ol>
+
+To view the default settings, click the Settings tab at the top of
+the page. For information about Hive configuration variables, see:
+[http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
+For information about Hadoop configuration variables, see:
+[http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml](http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml).</td></tr>
+<tr><td>FILE RESOURCES</td><td>Make files locally accessible at query execution time available on the
+Hadoop cluster. Hive uses the Hadoop Distributed Cache to distribute the
+added files to all machines in the cluster at query execution time.
+
+<ol>
+<li>  Click Add to configure a new setting.
+<li>   From the Type drop-down menu, choose one of the following:
+<ul>
+   <li>jar - Adds the specified resources to the Java classpath.
+   <li>archive - Unarchives the specified resources when
+        distributing them.
+    <li>file - Adds the specified resources to the distributed
+        cache. Typically, this might be a transform script (or similar)
+        to be executed.
+
+<li>   For Path, enter the path to the file or click
+    ![image](images/browse.png) to browse and select the file.
+</ol>
+
+![image](images/note.jpg) Note: It is not necessary to specify files
+used in a transform script if the files are available in the same path
+on all machines in the Hadoop cluster.</td></tr>
+<tr><td>USER-DEFINED FUNCTIONS</td><td>Specify user-defined functions. Click Add to configure a new
+setting. Specify the function name in the Name field, and specify
+the class name for Classname.
+
+You *must* specify a JAR file for the user-defined functions in FILE RESOURCES.
+
+To include a user-defined function in a query, add a $ (dollar sign)
+before the function name in the query. For example, if MyTable is a
+user-defined function name in the query, you would type: SELECT $MyTable
+</td></tr>
+<tr><td>PARAMETERIZATION</td><td>Indicate that a dialog box should display to enter parameter values when
+a query containing the string $parametername is executed. Enabled by
+default.</td></tr>
+</table>
+
+<h3 id="autocomplete">Autocomplete</h3>
+<p>To make your SQL editing experience better we've created a  new autocompleter for Hue 3.11. The old one had some limitations and was only aware of parts of the statement being edited. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.</p>
+<p>The result is improved completion throughout. We now have completion for more than just SELECT statements, it will help you with the other DDL and DML statements too, INSERT, CREATE, ALTER, DROP etc.</p>
+<p><strong>Smart column suggestions</strong></p>
+<p>If multiple tables appear in the FROM clause, including derived and joined tables, it will merge the columns from all the tables and add the proper prefixes where needed. It also knows about your aliases, lateral views and complex types and will include those. It will now automatically backtick any reserved words or exotic column names where needed to prevent any mistakes.</p>
+<p><strong>Smart keyword completion</strong></p>
+<p>The new autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.</p>
+<p><strong>UDFs</strong></p>
+<p>The improved autocompleter will now suggest functions, for each function suggestion an additional panel is added in the autocomplete dropdown showing the documentation and the signature of the function. The autocompleter know about the expected types for the arguments and will only suggest the columns or functions that match the argument at the cursor position in the argument list.</p>
+<p><strong>Sub-queries, correlated or not</strong></p>
+<p>When editing subqueries it will only make suggestions within the scope of the subquery. For correlated subqueries the outside tables are also taken into account.</p>
+<p><strong>All about quality</strong></p>
+<p>We've fine-tuned the live autocompletion for a better experience and we've introduced some options under the editor settings where you can turn off live autocompletion or disable the autocompleter altogether (if you're adventurous). To access these settings open the editor and focus on the code area, press CTRL + , (or on Mac CMD + ,) and the settings will appear.</p>
+<p>The autocompleter talks to the backend to get data for tables and databases etc. by default it will timeout after 5 seconds but once it has been fetched it's cached for the next time around. The timeout can be adjusted in the Hue server configuration.</p>
+<p>We've got an extensive test suite but not every possible statement is covered, if the autocompleter can't interpret a statement it will be silent and no drop-down will appear. If you encounter a case where you think it should suggest something but doesn't or if it gives incorrect suggestions then please let us know.</p>
+<p>Learn more about it in <a href="http://gethue.com/brand-new-autocompleter-for-hive-and-impala/">Autocompleter for Hive and Impala</a>.</p>
+<h3 id="variables">Variables</h3>
+<p>Variables are used to easily configure parameters in a query. They can be of two types:</p>
+<p><b>Single Valued</b>
+<pre>
+select * from web_logs where country_code = "${country_code}"
+</pre>
+The variable can have a default value.
+<pre>
+select * from web_logs where country_code = "${country_code=US}"
+</pre>
+<b>Multi Valued</b>
+<pre>
+select * from web_logs where country_code = "${country_code=CA, FR, US}"
+</pre>
+In addition, the displayed text for multi valued variables can be changed.
+<pre>
+select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
+</pre>
+For values that are not textual, omit the quotes.
+<pre>
+select * from boolean_table where boolean_column = ${boolean_column}
+</pre></p>
+<h3 id="syntax-checker">Syntax checker</h3>
+<p>A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.</p>
+<h3 id="query-assist">Query Assist</h3>
+<p>Read more about the <a href="https://blog.cloudera.com/blog/2017/08/new-in-cloudera-enterprise-5-12-hue-4-interface-and-query-assistant/">Query Assistant with Navigator Optimizer Integration
+</a>.</p>
+<h3 id="risk-alerts">Risk Alerts</h3>
+<p>The autocompleter will suggest popular tables, columns, filters, joins, group by, order by etc. based on metadata from Navigator Optimizer. A new “Popular” tab has been added to the autocomplete result dropdown which will be shown when there are popular suggestions available.</p>
+<p><strong>Risk and suggestions</strong></p>
+<p>While editing, Hue will run your queries through Navigator Optimizer in the background to identify potential risks that could affect the performance of your query. If a risk is identified an exclamation mark is shown above the query editor and suggestions on how to improve it is displayed in the lower part of the right assistant panel.</p>
+<h3 id="presentation-mode">Presentation Mode</h3>
+<p>Turns a list of semi-colon separated queries into an interactive presentation. It is great for doing demos or basic reporting.</p>
+<h2 id="sql">SQL</h2>
+<p>Use the query editor with any <a href="http://gethue.com/custom-sql-query-editors/">JDBC</a> or Django-compatible database.</p>
+<h3 id="hive">Hive</h3>
+<p><strong>Tez</strong></p>
+<p>An external contribution provided support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:</p>
+<pre><code>[beeswax]
+max_number_of_sessions=10
+</code></pre>
+<h3 id="impala">Impala</h3>
+<p>The Hive Editor enables you to perform queries on Apache Hive, a
+data warehousing system designed to work with Hadoop. For information
+about Hive. You can
+create Hive databases, tables and partitions, load data, create, run,
+and manage queries, and download the results in a Microsoft Office Excel
+worksheet file or a comma-separated values file.</p>
+<p>Hive Editor is installed and configured as part of Hue. For information
+about installing and configuring Hue, see the Hue Installation
+manual.</p>
+<p>Hive Editor assumes an existing Hive installation. The Hue installation
+instructions include the configuration necessary for hive to access
+Hive. You can view the current Hive configuration from the <strong>Settings</strong>
+tab in the Hive Editor.</p>
+<p>By default, a Hive Editor user can see the saved queries for all users -
+both his/her own queries and those of other Hive Editor users. To restrict
+viewing saved queries to the query owner and Hue administrators, set the
+share_saved_queries property under the [beeswax] section in the Hue
+configuration file to false.</p>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: The Hive Editor used to be known as Beeswax.
+<img alt="image" src="images/note.jpg" /> <strong>Note</strong>: The <a href="#impala-queries">Job Browser</a> integrates nicely with the Impala Query Editor.</p>
+<h3 id="mysql">MySQL</h3>
+<h3 id="oracle">Oracle</h3>
+<h3 id="ksql-kafka-sql">KSQL / Kafka SQL</h3>
+<h3 id="solr-sql">Solr SQL</h3>
+<p>With Solr 5+, query collections like we would query a regular Hive or Impala table.</p>
+<p><a href="http://gethue.com/sql-editor-for-solr-sql/">Read more about it here</a>.</p>
+<p>As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support of:</p>
+<ul>
+<li>SELECT *</li>
+<li>WHERE close with a LIKE</li>
+<li>resultset pagination</li>
+</ul>
+<p>which prevents a SQL UX experience comparable to the standard other databases (but we track it in <a href="https://issues.cloudera.org/browse/HUE-3686">HUE-3686</a>).</p>
+<h3 id="presto">Presto</h3>
+<h3 id="postgresql">PostgreSQL</h3>
+<h3 id="redshift">Redshift</h3>
+<h3 id="bigquery">BigQuery</h3>
+<h3 id="aws-athena">AWS Athena</h3>
+<h3 id="spark-sql">Spark SQL</h3>
+<h3 id="phoenix">Phoenix</h3>
+<h3 id="kylin">Kylin</h3>
+<p>Apache Kylin is an open-source online analytical processing (OLAP) engine.
+See how to configure the <a href="http://gethue.com/using-hue-to-interact-with-apache-kylin/">Kylin Query Editor</a>.</p>
+<h3 id="others">Others</h3>
+<p>Extend with JDBC or your own <a href="../sdk/sdk.html#sql">connectors</a>.</p>
+<h2 id="jobs">Jobs</h2>
+<p>The Editor application enables you to create and submit jobs to
+the cluster. You can include variables with your jobs to enable
+you and other users to enter values for the variables when they run your
+job.</p>
+<p>All job design settings except Name and Description support the use of
+variables of the form $variable_name. When you run the job, a dialog
+box will appear to enable you to specify the values of the variables.</p>
+<table>
+<tr><td>Name</td><td>Identifies the job and its collection of properties and parameters.</td></tr>
+<tr><td>Description</td><td>A description of the job. The description is displayed in the dialog box
+that appears if you specify variables for the job.</td></tr>
+<tr><td>Advanced</td><td>Advanced settings:<ul><li>Is shared- Indicate whether to share the action with all users.<li>Oozie parameters - parameters to pass to Oozie</td></tr>
+<tr><td>Prepare</td><td>Specifies paths to create or delete before starting the workflow job.</td></tr>
+<tr><td>Params</td><td>Parameters to pass to a script or command. The parameters are expressed
+using the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr152/">JSP 2.0 Specification (JSP.2.3) Expression
+Language</a>,
+allowing variables, functions, and complex expressions as parameters.</td></tr>
+<tr><td>Job Properties</td><td>Job properties. To set a property value, click <b>Add Property</b>.<ol><li>Property name -  a configuration property name. This field provides autocompletion, so you can type the first few characters of a property name and then select the one you want from the drop-down
+    list.<li>Valuethe property value.</td></tr>
+<tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
+<tr><td>Archives</td><td>Files to pass to the job. Archives to pass to the job. Equivalent to the Hadoop -archives option.</td></tr></table>
+
+<h3 id="mapreduce">MapReduce</h3>
+<p>A MapReduce job design consists of MapReduce functions written in Java.
+You can create a MapReduce job design from existing mapper and reducer
+classes without having to write a main Java class. You must specify the
+mapper and reducer classes as well as other MapReduce properties in the
+Job Properties setting.</p>
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the classes that
+implement the Mapper and Reducer functions.</td></tr>
+</table>
+
+<h3 id="java">Java</h3>
+<p>A Java job design consists of a main class written in Java.</p>
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
+<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
+<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
+<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
+</table>
+
+<h3 id="pig">Pig</h3>
+<p>A Pig job design consists of a Pig script.</p>
+<table>
+<tr><td>Script name</td><td>Script name or path to the Pig script.</td></tr>
+</table>
+
+<h3 id="sqoop">Sqoop</h3>
+<p>A Sqoop job design consists of a Sqoop command.</p>
+<table>
+<tr><td>Command</td><td>The Sqoop command.</td></tr>
+</table>
+
+<h3 id="shell">Shell</h3>
+<p>A Shell job design consists of a shell command.</p>
+<table>
+<tr><td>Command</td><td>The shell command.</td></tr>
+<tr><td>Capture output</td><td>Indicate whether to capture the output of the command.</td></tr>
+</table>
+
+<p><a href="http://gethue.com/use-the-shell-action-in-oozie/">Read more about it here</a>.</p>
+<h3 id="distcp">DistCp</h3>
+<p>A DistCp job design consists of a DistCp command.</p>
+<h3 id="spark">Spark</h3>
+<h4 id="batch">Batch</h4>
+<p>This is a quick way to submit any Jar or Python jar/script to a cluster via the Scheduler or Editor.</p>
+<p>How to run Spark jobs with Spark on YARN? This often requires trial and error in order to make it work.</p>
+<p>Hue is leveraging Apache Oozie to submit the jobs. It focuses on the yarn-client mode, as Oozie is already running the spark-summit command in a MapReduce2 task in the cluster. You can read more about the Spark modes here.</p>
+<p><a href="http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/">Here is how to get started successfully</a>.
+And how to use the <a href="http://gethue.com/use-the-spark-action-in-oozie/">Spark Action</a>.</p>
+<h4 id="interactive">Interactive</h4>
+<p>Hue relies on <a href="http://livy.io/">Livy</a> for the interactive Scala, Python and R snippets.</p>
+<p>Livy got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io. Here is a tutorial on how to use a notebook to perform some Bike Data analysis.</p>
+<p>Read more about it:</p>
+<ul>
+<li><a href="http://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark-2-2/">How to use the Livy Spark REST Job Server API for doing some interactive Spark with curl</a></li>
+<li><a href="http://gethue.com/how-to-use-the-livy-spark-rest-job-server-api-for-submitting-batch-jar-python-and-streaming-spark-jobs/">How to use the Livy Spark REST Job Server API for submitting batch jar, Python and Streaming Jobs</a></li>
+</ul>
+<p>Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is up and running:</p>
+<pre>
+[spark]
+  # Host address of the Livy Server.
+  livy_server_host=localhost
+
+[notebook]
+
+## Show the notebook menu or not
+ show_notebooks=true
+
+[[interpreters]]
+    # Define the name and how to connect and execute the language.
+
+[[[hive]]]
+      # The name of the snippet.
+      name=Hive
+      # The backend connection to use to communicate with the server.
+      interface=hiveserver2
+
+[[[spark]]]
+     name=Scala
+     interface=livy
+
+[[[pyspark]]]
+      name=PySpark
+      interface=livy
+</pre>
+
+<h2 id="sdk">SDK</h2>
+<p>Read more about extending <a href="../sdk/sdk.html#spark-livy">connectors</a>.</p>
+<h1 id="dashboards">Dashboards</h1>
+<p>Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag &amp; drops and clicks.</p>
+<p>Read more about <a href="http://gethue.com/search-dashboards/">Dashboards</a>.</p>
+<h2 id="concepts_1">Concepts</h2>
+<p>Simply drag &amp; drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.</p>
+<h3 id="importing">Importing</h3>
+<p>Any CSV file can be dragged &amp; dropped and ingested into an index in a few clicks via the Data Import Wizard [link]. The indexed data is immediately queryable and its facets/dimensions will be very fast to explore.</p>
+<h3 id="browsing">Browsing</h3>
+<p>The Collection browser got polished in the last releases and provide more information on the columns. The left metadata assist of Hue 4 makes it handy to list them and peak at their content via the sample popup.</p>
+<h3 id="querying">Querying</h3>
+<p>The search box support live prefix filtering of field data and comes with a Solr syntax autocomplete in order to make the querying intuitive and quick. Any field can be inspected for its top values of statistic. This analysis happens very fast as the data is indexed.</p>
+<h2 id="databases">Databases</h2>
+<h3 id="solr">Solr</h3>
+<h4 id="autocomplete_1">Autocomplete</h4>
+<p>The top search bar offers a <a href="http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/">full autocomplete</a> on all the values of the index.</p>
+<h4 id="more-like-this">More Like This</h4>
+<p>The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.</p>
+<h3 id="sql_1">SQL</h3>
+<h2 id="reports">Reports</h2>
+<p>This is work in progress but dashboards will soon offer a classic reporting option.</p>
+<h2 id="sdk_1">SDK</h2>
+<p>Read more about extending <a href="../sdk/sdk.html#dashboard">connectors</a>.</p>
+<h1 id="browsers">Browsers</h1>
+<p>Hue's Browsers powers your Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.</p>
+<h2 id="tables">Tables</h2>
+<p>The Table Browser enables you to manage the databases,
+tables, and partitions of the metastore shared by
+the Hive and Impala. You can use Metastore
+Manager to perform the following operations:</p>
+<ul>
+<li>Databases<ul>
+<li>Select a database</li>
+<li>Create a database</li>
+<li>Drop databases</li>
+</ul>
+</li>
+<li>
+<p>Tables</p>
+<ul>
+<li>Create tables</li>
+<li>Browse tables</li>
+<li>Drop tables</li>
+<li>Browse table data and metadata (columns, partitions...)</li>
+<li>Import data into a table</li>
+<li><a href="http://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/">Filter, Sort and Browse Partitions</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="files">Files</h2>
+<p>The File Browser application lets you browse and manipulate files and
+directories in the Hadoop Distributed File System (HDFS), S3 or ADLS.
+With File Browser, you can:</p>
+<ul>
+<li>Create files and directories, upload and download files, upload zip
+    archives, and rename, move, and delete files and directories. You
+    can also change a file's or directory's owner, group, and
+    permissions. See <a href="#filesAndDirectories">Files and Directories</a>.</li>
+<li>Search for files, directories, owners, and groups. See <a href="#searching">Searching
+    for Files and Directories</a>.</li>
+<li>View and edit files as text or binary. See <a href="#viewAndEdit">Viewing and Editing
+    Files</a>.</li>
+</ul>
+<h3 id="file-systems">File systems</h3>
+<h4 id="hdfs">HDFS</h4>
+<h4 id="s3">S3</h4>
+<p>Hue can be setup to read and write to a configured S3 account, and users get autocomplete capabilities and can directly query from and save data to S3 without any intermediate moving/copying to HDFS.</p>
+<p><a href="http://gethue.com/introducing-s3-support-in-hue/">Read more about it</a>.</p>
+<p><strong> Create Hive Tables Directly From S3</strong>
+Hue's Metastore Import Data Wizard can create external Hive tables directly from data directories in S3. This allows S3 data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse.</p>
+<p>To create an external Hive table from S3, navigate to the Metastore app, select the desired database and then click the “Create a new table from a file” icon in the upper right.</p>
+<p>Enter the table name and optional description, and in the “Input File or Directory” filepicker, select the S3A filesystem and navigate to the parent directory containing the desired data files and click the “Select this folder” button. The “Load Data” dropdown should automatically select the “Create External Table” option which indicates that this table will directly reference an external data directory.</p>
+<p>Choose your input files' delimiter and column definition options and finally click “Create Table” when you're ready to create the Hive table. Once created, you should see the newly created table details in the Metastore.</p>
+<p><strong>Save Query Results to S3</strong></p>
+<p>Now that we have created external Hive tables created from our S3 data, we can jump into either the Hive or Impala editor and start querying the data directly from S3 seamlessly. These queries can join tables and objects that are backed either by S3, HDFS, or both. Query results can then easily be saved back to S3.</p>
+<p><strong> S3 Configuration </strong></p>
+<p><a href="../admin-manual/manual.html#s3">Hue S3 Documentation</a>.</p>
+<h4 id="adls">ADLS</h4>
+<p>Learn more about it on the <a href="http://gethue.com/browsing-adls-data-querying-it-with-sql-and-exporting-the-results-back-in-hue-4-2/">ADLS integration post</a>.</p>
+<p>Users gets autocomplete capabilities and more:</p>
+<p><strong> Exploring ADLS in Hue's file browser </strong>
+Once Hue is successfully configured to connect to ADLS, we can view all accessible folders within the account by clicking on the ADLS root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to ADLS.</p>
+<p><strong> Create Hive Tables Directly From ADLS </strong>
+Hue's table browser import wizard can create external Hive tables directly from files in ADLS. This allows ADLS data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse. To create an external Hive table from ADLS, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on ADLS.</p>
+<p><strong> Save Query Results to ADLS </strong>
+Now that we have created external Hive tables created from our ADLS data, we can jump into either the Hive or Impala editor and start querying the data directly from ADLS seamlessly. These queries can join tables and objects that are backed either by ADLS, HDFS, or both. Query results can then easily be saved back to ADLS.</p>
+<p><strong> ADLS Configuration </strong></p>
+<p><a href="../admin-manual/manual.html#adls">Hue ADLS Documentation</a>.</p>
+<p><a id="fileAndDirectories"></a></p>
+<h3 id="files-and-directories">Files and Directories</h3>
+<p>You can use File Browser to view the input and output files of your
+MapReduce jobs. Typically, you can save your output files in /tmp or in
+your home directory if your system administrator set one up for you. You
+must have the proper permissions to manipulate other user's files.</p>
+<h4 id="creating-directories">Creating Directories</h4>
+<ol>
+<li>In the File Browser window, select <strong>New &gt; Directory</strong>.</li>
+<li>In the <strong>Create Directory</strong> dialog box, enter a directory name and
+    then click <strong>Submit</strong>.</li>
+</ol>
+<h4 id="changing-directories">Changing Directories</h4>
+<ul>
+<li>Click the directory name or parent directory dots in the <strong>File
+    Browser</strong> window.</li>
+<li>Click the <img alt="image" src="images/edit.png" /> icon, type a directory name, and
+    press <strong>Enter</strong>.</li>
+</ul>
+<p>To change to your home directory, click <strong>Home</strong> in the path field at
+the top of the <strong>File Browser</strong> window.</p>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>:</p>
+<p>The <strong>Home</strong> button is disabled if you do not have a home directory. Ask
+a Hue administrator to create a home directory for you.</p>
+<h4 id="creating-files">Creating Files</h4>
+<ol>
+<li>In the File Browser window, select <strong>New &gt; File</strong>.</li>
+<li>In the <strong>Create File</strong> dialog box, enter a file name and then click
+    <strong>Submit</strong>.</li>
+</ol>
+<h4 id="uploading-files">Uploading Files</h4>
+<p>You can upload text and binary files to the HDFS.</p>
+<ol>
+<li>In the <strong>File Browser</strong> window, browse to the directory where you
+    want to upload the file.</li>
+<li>Select <strong>Upload &gt; Files</strong>.</li>
+<li>In the box that opens, click <strong>Upload a File</strong> to browse to and
+    select the file(s) you want to upload, and then click <strong>Open</strong>.</li>
+</ol>
+<h4 id="downloading-files">Downloading Files</h4>
+<p>You can download text and binary files to the HDFS.</p>
+<ol>
+<li>In the <strong>File Browser</strong> window, check the checkbox next to the file
+    you want to download.</li>
+<li>Click the <strong>Download</strong> button.</li>
+</ol>
+<h3 id="uploading-zip-archives">Uploading Zip Archives</h3>
+<p>You can extract zip archives to the HDFS. The archive is
+extracted to a directory named archivename.</p>
+<ol>
+<li>In the <strong>File Browser</strong> window, browse to the directory where you
+    want to upload the archive.</li>
+<li>Select <strong>Upload &gt; Zip file</strong>.</li>
+<li>In the box that opens, click <strong>Upload a zip file</strong> to browse to and
+    select the archive you want to upload, and then click <strong>Open</strong>.</li>
+</ol>
+<h3 id="trash-folder">Trash Folder</h3>
+<p>File Browser supports the HDFS trash folder (<em>home directory</em>/.Trash) to
+contain files and directories before they are permanently deleted. Files
+in the folder have the full path of the deleted files (in order to be
+able to restore them if needed) and checkpoints. The length of time a
+file or directory stays in the trash depends on HDFS properties.</p>
+<p>In the <strong>File Browser</strong> window, click <img alt="image" src="images/fbtrash.png" />.</p>
+<h3 id="changing-owner-group-or-permissions">Changing Owner, Group, or Permissions</h3>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>:</p>
+<p>Only the Hadoop superuser can change a file's or directory's owner,
+group, or permissions. The user who starts Hadoop is the Hadoop
+superuser. The Hadoop superuser account is not necessarily the same as a
+Hue superuser account. If you create a Hue user (in User Admin) with the
+same user name and password as the Hadoop superuser, then that Hue user
+can change a file's or directory's owner, group, or permissions.</p>
+<p><strong>Owner or Group</strong></p>
+<ol>
+<li>In the <strong>File Browser</strong> window, check the checkbox next to the
+    select the file or directory whose owner or group you want to
+    change.</li>
+<li>Choose <strong>Change Owner/Group</strong> from the Options menu.</li>
+<li>In the <strong>Change Owner/Group</strong> dialog box:<ul>
+<li>Choose the new user from the <strong>User</strong> drop-down menu.</li>
+<li>Choose the new group from the <strong>Group</strong> drop-down menu.</li>
+<li>Check the <strong>Recursive</strong> checkbox to propagate the change.</li>
+</ul>
+</li>
+<li>
+<p>Click <strong>Submit</strong> to make the changes.</p>
+</li>
+</ol>
+<p><strong>Permissions</strong></p>
+<ol>
+<li>In the <strong>File Browser</strong> window, check the checkbox next to the file
+    or directory whose permissions you want to change.</li>
+<li>Click the <strong>Change Permissions</strong> button.</li>
+<li>In the <strong>Change Permissions</strong> dialog box, select the permissions you
+    want to assign and then click <strong>Submit</strong>.</li>
+</ol>
+<h3 id="viewing-and-editing-files">Viewing and Editing Files</h3>
+<p>You can view and edit files as text or binary.</p>
+<p><strong>View</strong></p>
+<ol>
+<li>In the <strong>File Browser</strong> window, click the file you want to view.
+    File Browser displays the first 4,096 bytes of the file in the
+    <strong>File Viewer</strong> window.<ul>
+<li>If the file is larger than 4,096 bytes, use the Block navigation
+    buttons (First Block, Previous Block, Next Block, Last Block) to
+    scroll through the file block by block. The <strong>Viewing Bytes</strong>
+    fields show the range of bytes you are currently viewing.</li>
+<li>To switch the view from text to binary, click <strong>View as Binary</strong>
+    to view a hex dump.</li>
+<li>To switch the view from binary to text, click <strong>View as Text</strong>.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Edit</strong></p>
+<ol>
+<li>If you are viewing a text file, click <strong>Edit File</strong>. File Browser
+    displays the contents of the file in the <strong>File Editor</strong> window.</li>
+<li>Edit the file and then click <strong>Save</strong> or <strong>Save As</strong> to save the
+    file.</li>
+</ol>
+<h2 id="indexes-collections">Indexes / Collections</h2>
+<h2 id="sentry-permissions">Sentry Permissions</h2>
+<p>Sentry roles and privileges can directly be edited in the Security interface.</p>
+<h3 id="sql_2">SQL</h3>
+<p><a href="http://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/">Hive UI</a>.</p>
+<h3 id="solr_1">Solr</h3>
+<p><a href="http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/">Solr</a> privileges can be edited directly via the interface.</p>
+<p>For listing collections, query and creating collection:</p>
+<pre><code>Admin=*-&gt;action=*
+Collection=*-&gt;action=*
+Schema=*-&gt;action=*
+Config=*-&gt;action=*
+</code></pre>
+<h2 id="jobs_1">Jobs</h2>
+<p>The Job Browser application lets you to examine multiple types of jobs
+jobs running in the cluster. Job Browser presents the job and
+tasks in layers. The top layer is a list of jobs, and you can link to a
+list of that job's tasks. You can then view a task's attempts and the
+properties of each attempt, such as state, start and end time, and
+output size. To troubleshoot failed jobs, you can also view the logs of
+each attempt.</p>
+<p>If there are jobs running, then the Job Browser list appears.</p>
+<h3 id="dashboard">Dashboard</h3>
+<ul>
+<li>To filter the jobs by their state (such as <strong>Running</strong> or
+    <strong>Completed</strong>), choose a state from the <strong>Job status</strong> drop-down
+    menu.</li>
+<li>To filter by a user who ran the jobs, enter the user's name in the
+    <strong>User Name</strong> query box.</li>
+<li>To filter by job name, enter the name in the <strong>Text</strong> query box.</li>
+<li>To clear the filters, choose <strong>All States</strong> from the <strong>Job status</strong>
+    drop-down menu and delete any text in the <strong>User Name</strong> and <strong>Text</strong>
+    query boxes.</li>
+</ul>
+<h3 id="viewing-job-information">Viewing Job Information</h3>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: At any level you can view the log
+for an object by clicking the <img alt="image" src="images/log.png" /> icon in the Logs
+column.</p>
+<p><strong>To view job information for an individual job:</strong></p>
+<ol>
+<li>In the <strong>Job Browser</strong> window, click <strong>View</strong> at the right of the
+    job you want to view. This shows the <strong>Job</strong> page for the job, with
+    the recent tasks associated with the job are displayed in the
+    <strong>Tasks</strong> tab.</li>
+<li>Click the <strong>Metadata</strong> tab to view the metadata for this job.</li>
+<li>Click the <strong>Counters</strong> tab to view the counter metrics for the job.</li>
+</ol>
+<p><strong>To view details about the tasks associated with the job:</strong></p>
+<ol>
+<li>In the <strong>Job</strong> window, click the <strong>View All Tasks</strong> link at the
+    right just above the <strong>Recent Tasks</strong> list. This lists all the tasks
+    associated with the job.</li>
+<li>Click <strong>Attempts</strong> to the right of a task to view the attempts for
+    that task.</li>
+</ol>
+<p><strong>To view information about an individual task:</strong></p>
+<ol>
+<li>In the <strong>Job</strong> window, click the <strong>View</strong> link to the right of the
+    task. The attempts associated with the task are displayed.</li>
+<li>Click the <strong>Metadata</strong> tab to view metadata for this task. The
+    metadata associated with the task is displayed.</li>
+<li>To view the Hadoop counters for a task, click the <strong>Counters</strong> tab.
+    The counters associated with the task are displayed.</li>
+<li>To return to the <strong>Job</strong> window for this job, click the job number
+    in the status panel at the left of the window.</li>
+</ol>
+<p><strong>To view details about a task attempt:</strong></p>
+<ol>
+<li>In the <strong>Job Task</strong> window, click the <strong>View</strong> link to the right of
+    the task attempt. The metadata associated with the attempt is
+    displayed under the <strong>Metadata</strong> tab.</li>
+<li>To view the Hadoop counters for the task attempt, click the
+    <strong>Counters</strong> tab. The counters associated with the attempt are
+    displayed.</li>
+<li>To view the logs associated with the task attempt, click the
+    <strong>Logs</strong> tab. The logs associated with the task attempt are
+    displayed.</li>
+<li>To return to the list of tasks for the current job, click the task
+    number in the status panel at the left of the window.</li>
+</ol>
+<h3 id="types">Types</h3>
+<h4 id="yarn-spark-mapreduce">YARN (Spark, MapReduce)</h4>
+<h4 id="impala-queries">Impala Queries</h4>
+<p>There are three ways to access the new browser:</p>
+<p>Best: Click on the query ID after executing a SQL query in the editor. This will open the mini job browser overlay at the current query. Having the query execution information side by side the SQL editor is especially helpful to understand the performance characteristics of your queries.
+Open the mini job browser overlay and navigate to the queries tab.
+Open the job browser and navigate to the queries tab.</p>
+<p>Query capabilities</p>
+<ul>
+<li>Display the list of currently running queries on the user's current Impala coordinator and a certain number of completed queries based on your configuration (25 by default).</li>
+<li>Display the summary report which shows physical timing and memory information of each operation of the explain plan. You can quickly find bottlenecks in the execution of the query which you can resolve by replacing expensive operations, repartitioning, changing file format or moving data.</li>
+<li>Display the query plan which is a condensed version of the summary report in graphical form</li>
+<li>Display the memory profile which contains information about the memory usage during the execution of the query. You can use this to determine if the memory available to your query is sufficient.</li>
+<li>Display the profile which gives you physical execution of the query in great detail. This view is used to analyze data exchange between the various operator and the performance of the IO (disk, network, CPU). You can use this to reorganize the location of your data (on disk, in memory, different partitions or file formats).</li>
+<li>Manually close an opened query.</li>
+</ul>
+<p>Read more about it on <a href="http://gethue.com/browsing-impala-query-execution-within-the-sql-editor/">Browsing Impala Query Execution within the SQL Editor
+</a>.</p>
+<h4 id="workflow-schedules-oozie">Workflow / Schedules (Oozie)</h4>
+<p>List submitted workflows, schedules and bundles.</p>
+<h4 id="livy-spark">Livy / Spark</h4>
+<p>List Livy sessions and submitted statements.</p>
+<h1 id="scheduler">Scheduler</h1>
+<p>The application lets you build workflows and then schedule them to run regularly automatically.
+A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.</p>
+<p>The Oozie Editor/Dashboard application allows you to define Oozie
+workflow, coordinator, and bundle applications, run workflow,
+coordinator, and bundle jobs, and view the status of jobs. For
+information about Oozie, see <a href="https://oozie.apache.org/docs/">Oozie
+Documentation</a>.</p>
+<p>A workflow application is a collection of actions arranged in a directed
+acyclic graph (DAG). It includes two types of nodes:</p>
+<ul>
+<li>Control flow - start, end, fork, join, decision, and kill</li>
+<li>Action - Jobs</li>
+</ul>
+<p>A coordinator application allows you to define and execute recurrent and
+interdependent workflow jobs. The coordinator application defines the
+conditions under which the execution of workflows can occur.</p>
+<p>A bundle application allows you to batch a set of coordinator
+applications.</p>
+<h2 id="workflows">Workflows</h2>
+<p>In the Workflow Editor you can easily perform operations on Oozie action
+and control nodes.</p>
+<h3 id="action-nodes">Action Nodes</h3>
+<p>The Workflow Editor supports dragging and dropping action nodes. As you
+move the action over other actions and forks, highlights indicate active
+areas. If there are actions in the workflow, the active areas are the
+actions themselves and the areas above and below the actions. If you
+drop an action on an existing action, a fork and join is added to the
+workflow.</p>
+<ul>
+<li>Add actions to the workflow by clicking an action
+    <img alt="image" src="images/action.png" /> button and drop the action on the
+    workflow. The Edit Node screen displays.<ol>
+<li>Set the action properties and click <strong>Done</strong>. Each action in a
+    workflow must have a unique name.</li>
+</ol>
+</li>
+<li>
+<p>Copy an action by clicking the <img alt="image" src="images/copy.png" /> <strong>Copy</strong>
+    button.</p>
+</li>
+<li>
+<p>The action is opened in the Edit Node screen.</p>
+</li>
+<li>
+<p>Edit the action properties and click <strong>Done</strong>. The action is added
+    to the end of the workflow.</p>
+</li>
+<li>
+<p>Delete an action by clicking the <img alt="image" src="images/trash.png" /> button.</p>
+</li>
+<li>Edit an action by clicking the <img alt="image" src="images/edit.png" /> button.</li>
+<li>Change the position of an action by left-clicking and dragging an
+    action to a new location.</li>
+</ul>
+<h3 id="control-nodes">Control Nodes</h3>
+<ul>
+<li>Create a fork and join by dropping an action on top of another
+    action.</li>
+<li>Remove a fork and join by dragging a forked action and dropping it
+    above the fork.</li>
+<li>Convert a fork to a decision by clicking the
+    <img alt="image" src="images/convert.png" /> button.</li>
+<li>To edit a decision:<ol>
+<li>Click the <img alt="image" src="images/edit.png" /> button.</li>
+<li>Fill in the predicates that determine which action to perform
+    and select the default action from the drop-down list.</li>
+<li>Click <strong>Done</strong>.</li>
+</ol>
+</li>
+</ul>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: worfklows.xml and their job.properties
+cab also directly be selected and executed via the File Browser.</p>
+<h2 id="schedules">Schedules</h2>
+<p>In Coordinator Manager you create Oozie coordinator applications and
+submit them for execution.</p>
+<h3 id="editing-a-coordinator">Editing a Coordinator</h3>
+<p>In the Coordinator Editor you specify coordinator properties and the
+datasets on which the workflow scheduled by the coordinator will operate
+by stepping through screens in a wizard. You can also advance to
+particular steps and revisit steps by clicking the Step "tabs" above the
+screens. The following instructions walk you through the wizard.</p>
+<ol>
+<li>Type a name, select the workflow, check the <strong>Is shared checkbox</strong>
+    to share the job, and click <strong>Next</strong>. If the Coordinator Editor was
+    opened after scheduling a workflow, the workflow will be set.</li>
+<li>Select how many times the coordinator will run for each specified
+    unit, the start and end times of the coordinator, the timezone of
+    the start and end times, and click <strong>Next</strong>. Times must be expressed
+    as UTC times. For example, to run at 10 pm PST, specify a start time
+    of 6 am UTC of the following day (+8 hours) and set the Timezone
+    field to America/Los_Angeles.</li>
+<li>Click <strong>Add</strong> to select an input dataset and click <strong>Next</strong>. If no
+    datasets exist, follow the procedure in <a href="#creatingDataset">Creating a
+    Dataset</a>.</li>
+<li>Click <strong>Add</strong> to select an output dataset. Click <strong>Save
+    coordinator</strong> or click <strong>Next</strong> to specify advanced settings.</li>
+<li>To share the coordinator with all users, check the <strong>Is</strong><strong>shared</strong>
+    checkbox.</li>
+<li>Fill in parameters to pass to Oozie, properties that determine how
+    long a coordinator will wait before timing out, how many
+    coordinators can run and wait concurrently, and the coordinator
+    execution policy.</li>
+<li>Click <strong>Save coordinator</strong>.</li>
+</ol>
+<h3 id="creating-a-dataset">Creating a Dataset</h3>
+<ol>
+<li>In the Coordinator Editor, do one of the following:<ul>
+<li>Click <strong>here</strong> in the Inputs or Outputs pane at the top of the
+    editor.</li>
+<li>In the pane at the left, click the <strong>Create new</strong> link. Proceed
+    with <a href="#editingDataset">Editing a Dataset</a>.</li>
+</ul>
+</li>
+</ol>
+<h3 id="editing-a-dataset">Editing a Dataset</h3>
+<ol>
+<li>Type a name for the dataset.</li>
+<li>In the Start and Frequency fields, specify when and how often the
+    dataset will be available.</li>
+<li>In the URI field, specify a URI template for the location of the
+    dataset. To construct URIs and URI paths containing dates and
+    timestamps, you can specify the variables
+    ${YEAR},${MONTH},${DAY},${HOUR},${MINUTE}. For example:
+    hdfs://foo:9000/usr/app/stats/${YEAR}/${MONTH}/data.</li>
+<li>In the Instance field, click a button to choose a default, single,
+    or range of data instances. For example, if frequency==DAY, a window
+    of the last rolling 5 days (not including today) would be expressed
+    as start: -5 and end: -1. Check the advanced checkbox to display a
+    field where you can specify a coordinator <a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html">EL
+    function</a>.</li>
+<li>Specify the timezone of the start date.</li>
+<li>In the Done flag field, specify the flag that identifies when input
+    datasets are no longer ready.</li>
+</ol>
+<h2 id="bundles">Bundles</h2>
+<p>A bundle consists in a collection of schedules.</p>
+<h3 id="creating-a-bundle">Creating a Bundle</h3>
+<ol>
+<li>Click the <strong>Create</strong> button at the top right.</li>
+<li>In the Name field, type a name.</li>
+<li>In the Kick off time field, choose a kick off time.</li>
+<li>Check the Is shared checkbox to allow all users to access the
+    workflow.</li>
+<li>Click <strong>Save</strong>. The Bundle Editor opens. Proceed with <a href="#editingBundle">Editing a
+    Bundle</a>.</li>
+</ol>
+<h3 id="editing-a-bundle">Editing a Bundle</h3>
+<p>In the Bundle Editor, you specify properties by stepping through screens
+in a wizard. You can also advance to particular steps and revisit steps
+by clicking the Step "tabs" above the screens. The following
+instructions walk you through the wizard.</p>
+<ol>
+<li>Click <strong>Add</strong> to select a coordinator that the bundle will kick off.</li>
+<li>Choose the kick off time. The time must be expressed as a UTC time.
+    For example, to run at 10 pm PST, specify a start time of 6 am UTC
+    of the following day (+8 hours).</li>
+<li>To share the bundle with all users, check the <strong>Is shared</strong>
+    checkbox.</li>
+<li>Click <strong>Next</strong> to specify advanced settings or click <strong>Save
+    bundle</strong>.</li>
+<li>Fill in parameters to pass to Oozie.</li>
+<li>Click <strong>Save bundle</strong>.</li>
+</ol>
+<h1 id="contrib">Contrib</h1>
+<p>Those modules are not active enough to be officially maintained in the core Hue but those
+are pretty functional and should still fit your needs. Any <a href="https://github.com/cloudera/hue/wiki">contribution</a> is welcomed!</p>
+<h2 id="sdk_2">SDK</h2>
+<p>Check the <a href="../sdk/sdk.html#new-application">SDK guide</a> or contact the community about how to build your own custom app.</p>
+<h2 id="hbase-browser">HBase Browser</h2>
+<p>We'll take a look at the new <a href="http://gethue.com/the-web-ui-for-hbase-hbase-browser">HBase Browser App</a>.</p>
+<p>Prerequisites before using the app:</p>
+<p>1. Have HBase and Thrift Service 1 initiated (Thrift can be configured)</p>
+<p>2. Configure your list of HBase Clusters in
+<a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L467">hue.ini</a>
+to point to your Thrift IP/Port</p>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: With just a few changes in the <a href="https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py">Python API</a>,
+the HBase browser could be compatible with Apache Kudu.</p>
+<h3 id="smartview">SmartView</h3>
+<p>The smartview is the view that you land on when you first enter a table.
+On the left hand side are the row keys and hovering over a row reveals a
+list of controls on the right. Click a row to select it, and once
+selected you can perform batch operations, sort columns, or do any
+amount of standard database operations. To explore a row, simple scroll
+to the right. By scrolling, the row should continue to lazily-load cells
+until the end.</p>
+<h3 id="adding-data">Adding Data</h3>
+<p>To initially populate the table, you can insert a new row or bulk upload
+CSV/TSV/etc. type data into your table.</p>
+<p>On the right hand side of a row is a '+' sign that lets you insert
+columns into your
+row</p>
+<h3 id="mutating-data">Mutating Data</h3>
+<p>To edit a cell, simply click to edit inline.</p>
+<p>If you need more control or data about your cell, click “Full Editor” to
+edit.</p>
+<p>In the full editor, you can view cell history or upload binary data to
+the cell. Binary data of certain MIME Types are detected, meaning you
+can view and edit images, PDFs, JSON, XML, and other types directly in
+your browser!</p>
+<p>Hovering over a cell also reveals some more controls (such as the delete
+button or the timestamp). Click the title to select a few and do batch
+operations:</p>
+<p>If you need some sample data to get started and explore, check out this
+howto create <a href="http://gethue.com/hadoop-tutorial-how-to-create-example-tables-in-hbase">HBase table
+tutorial</a>.</p>
+<h3 id="smart-searchbar">Smart Searchbar</h3>
+<p>The "Smart Searchbar" is a sophisticated tool that helps you zero-in on
+your data. The smart search supports a number of operations. The most
+basic ones include finding and scanning row keys. Here I am selecting
+two row keys with:</p>
+<pre><code>domain.100, domain.200
+</code></pre>
+<p>Submitting this query gives me the two rows I was looking for. If I want
+to fetch rows after one of these, I have to do a scan. This is as easy
+as writing a '+' followed by the number of rows you want to fetch.</p>
+<pre><code>domain.100, domain.200 +5
+</code></pre>
+<p>Fetches domain.100 and domain.200 followed by the next 5 rows. If you're
+ever confused about your results, you can look down below and the query
+bar and also click in to edit your query.</p>
+<p>The Smart Search also supports column filtering. On any row, I can
+specify the specific columns or families I want to retrieve. With:</p>
+<pre><code>domain.100[column_family:]
+</code></pre>
+<p>I can select a bare family, or mix columns from different families like
+so:</p>
+<pre><code>domain.100[family1:, family2:, family3:column_a]
+</code></pre>
+<p>Doing this will restrict my results from one row key to the columns I
+specified. If you want to restrict column families only, the same effect
+can be achieved with the filters on the right. Just click to toggle a
+filter.</p>
+<p>Finally, let's try some more complex column filters. I can query for
+bare columns:</p>
+<pre><code>domain.100[column_a]
+</code></pre>
+<p>This will multiply my query over all column families. I can also do
+prefixes and scans:</p>
+<p>domain.100[family: prefix* +3]</p>
+<p>This will fetch me all columns that start with prefix* limited to 3
+results. Finally, I can filter on range:</p>
+<pre><code>domain.100[family: column1 to column100]
+</code></pre>
+<p>This will fetch me all columns in 'family:' that are lexicographically
+&gt;= column1 but &lt;= column100. The first column ('column1') must be a
+valid column, but the second can just be any string for comparison.</p>
+<p>The Smart Search also supports prefix filtering on rows. To select a
+prefixed row, simply type the row key followed by a star *. The prefix
+should be highlighted like any other searchbar keyword. A prefix scan is
+performed exactly like a regular scan, but with a prefixed row.</p>
+<pre><code>domain.10* +10
+</code></pre>
+<p>Finally, as a new feature, you can also take full advantage of the
+<a href="denied:about:blank">HBase filtering</a>language, by typing your filter
+string between curly braces. HBase Browser autocompletes your filters
+for you so you don't have to look them up every time. You can apply
+filters to rows or scans.</p>
+<pre><code>domain.1000 {ColumnPrefixFilter('100-') AND ColumnCountGetFilter(3)}
+</code></pre>
+<p>This doc only covers a few basic features of the Smart Search. You can
+take advantage of the full querying language by referring to the help
+menu when using the app. These include column prefix, bare columns,
+column range, etc. Remember that if you ever need help with the
+searchbar, you can use the help menu that pops up while typing, which
+will suggest next steps to complete your query.</p>
+<h2 id="sqoop-1-importer">Sqoop 1 Importer</h2>
+<p>Iport data from relational databases to HDFS file or Hive table using Apache Sqoop 1. It enables us to bring large amount of data into the cluster in just few clicks via interactive UI. This Sqoop connector was added to the existing import data wizard of Hue.</p>
+<p>In the past, importing data using Sqoop command line interface could be a cumbersome and inefficient process. The task expected users to have a good knowledge of Sqoop . For example they would need put together a series of required parameters with specific syntax that would result in errors easy to make. Often times getting those correctly can take a few hours of work. Now with Hue's new feature you can submityour Sqoop job in minutes. The imports run on YARN and are scheduled by Oozie. This tutorial offers a step by step guide on how to do it.</p>
+<p>Learn more about it on the <a href="http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/">Importing data from traditional databases into HDFS/Hive in just a few clicks
+</a> post.</p>
+<h2 id="sqoop-2-editor">Sqoop 2 Editor</h2>
+<p>The Sqoop UI enables transfering data from a relational database
+to Hadoop and vice versa. The UI lives uses Apache Sqoop to do this.
+See the <a href="http://sqoop.apache.org/docs/1.99.2/index.html">Sqoop Documentation</a> for more details on Sqoop.</p>
+<h3 id="creating-a-new-job">Creating a New Job</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>In the Name field, enter a name.</li>
+<li>Choose the type of job: import or export.
+   The proceeding form fields will change depending on which type is chosen.</li>
+<li>Select a connection, or create one if it does not exist.</li>
+<li>Fill in the rest of the fields for the job.
+   For importing, the "Table name", "Storage type", "Output format", and "Output directory" are necessary at a minimum.
+   For exporting, the "Table name" and "Input directory" are necessary at a minimum.</li>
+<li>Click <strong>save</strong> to finish.</li>
+</ol>
+<h3 id="running-a-job">Running a Job</h3>
+<p>There's a status on each of the items in the job list indicating
+the last time a job was ran. The progress of the job should dynamically
+update. There's a progress bar at the bottom of each item on the job list
+as well.</p>
+<ol>
+<li>In the list of jobs, click on the name of the job.</li>
+<li>On the left hand side of the job editor, there should be a panel containing actions.
+   Click <strong>Run</strong>.</li>
+</ol>
+<h3 id="creating-a-new-connection">Creating a New Connection</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>At the connection field, click the link titled <strong>Add a new connection</strong>.</li>
+<li>Fill in the displayed fields.</li>
+<li>Click <strong>save</strong> to finish.</li>
+</ol>
+<h3 id="editing-a-connection">Editing a Connection</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>At the connection field, select the connection by name that should be edited.</li>
+<li>Click <strong>Edit</strong>.</li>
+<li>Edit the any of the fields.</li>
+<li>Click <strong>save</strong> to finish.</li>
+</ol>
+<h3 id="removing-a-connection">Removing a Connection</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>At the connection field, select the connection by name that should be deleted.</li>
+<li>Click <strong>Delete</strong>.</li>
+</ol>
+<p>NOTE: If this does not work, it's like because a job is using that connection.
+      Make sure not jobs are using the connection that will be deleted.</p>
+<h3 id="filtering-sqoop-jobs">Filtering Sqoop Jobs</h3>
+<p>The text field in the top, left corner of the Sqoop Jobs page enables fast filtering
+of sqoop jobs by name.</p>
+<h2 id="zookeeper-browser">ZooKeeper Browser</h2>
+<p>The main two features are:</p>
+<ul>
+<li>Listing of the ZooKeeper cluster stats and clients</li>
+<li>Browsing and edition of the ZNode hierarchy</li>
+</ul>
+<p>ZooKeeper Browser requires the <a href="https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest">ZooKeeper
+REST</a>
+service to be running. Here is how to setup this one:</p>
+<p>First get and build ZooKeeper:</p>
+<pre>
+git clone https://github.com/apache/zookeeper
+cd zookeeper
+ant
+Buildfile: /home/hue/Development/zookeeper/build.xml
+
+init:
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/classes
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/lib
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/package/lib
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/test/lib
+
+...
+</pre>
+
+<p>And start the REST service:</p>
+<pre>
+cd src/contrib/rest
+nohup ant run&
+</pre>
+
+<p>If ZooKeeper and the REST service are not on the same machine as Hue, go
+update the <a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L581">Hue
+settings</a>
+and specify the correct hostnames and ports:</p>
+<pre>
+    [zookeeper]
+
+[[clusters]]
+
+[[[default]]]
+          # Zookeeper ensemble. Comma separated list of Host/Port.
+          # e.g. localhost:2181,localhost:2182,localhost:2183
+          ## host_ports=localhost:2181
+
+# The URL of the REST contrib service
+          ## rest_url=http://localhost:9998
+</pre>
+
+<h2 id="git">Git</h2>
+<p>A basic read only version is done <a href="https://issues.cloudera.org/browse/HUE-951">HUE-951</a>.</p>
+<p></div>
+</div></p>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.treed.js"></script>
+<script src="../js/jquery.highlight.js"></script>
+<script src="../js/hue-docs.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+gtag('config', 'UA-37637545-1');
+</script>

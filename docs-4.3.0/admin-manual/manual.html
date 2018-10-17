@@ -1,0 +1,1297 @@
+<link rel="stylesheet" href="../css/bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="../css/docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+
+<div class="row-fluid doc-title">
+  <h1><a href=../index.html>Doc</a> > Hue Administration Guide</h1>
+</div>
+
+<div class="row-fluid">
+  <div class="span3">
+
+<div class="toc">
+<ul>
+<li><a href="#installation">Installation</a><ul>
+<li><a href="#dependencies">Dependencies</a><ul>
+<li><a href="#ubuntu">Ubuntu</a><ul>
+<li><a href="#install-oracle-jdk">Install Oracle JDK</a></li>
+<li><a href="#if-you-want-to-run-the-unit-tests">If you want to run the unit tests</a></li>
+</ul>
+</li>
+<li><a href="#centosrhel">CentOS/RHEL</a></li>
+<li><a href="#macos">MacOS</a><ul>
+<li><a href="#fix-openssl-errors">Fix openssl errors</a></li>
+</ul>
+</li>
+<li><a href="#centosoracleredhat-6x">Centos/Oracle/RedHat 6.x</a><ul>
+<li><a href="#centos-6869-os">CentOS 6.8/6.9 OS</a></li>
+<li><a href="#redhat-6869-os">RedHat 6.8/6.9 OS</a></li>
+<li><a href="#oracle-6869-os">Oracle 6.8/6.9 OS</a></li>
+<li><a href="#install-oracle-instant-client">Install Oracle Instant Client</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#build">Build</a></li>
+<li><a href="#docker">Docker</a></li>
+<li><a href="#troubleshooting-the-tarball-installation">Troubleshooting the tarball Installation</a></li>
+<li><a href="#starting-the-server">Starting the server</a></li>
+</ul>
+</li>
+<li><a href="#configuration">Configuration</a><ul>
+<li><a href="#reference-architecture">Reference Architecture</a><ul>
+<li><a href="#load-balancers">Load Balancers</a></li>
+<li><a href="#proxy">Proxy</a></li>
+</ul>
+</li>
+<li><a href="#quick-start-wizard">Quick Start Wizard</a></li>
+<li><a href="#configuration_1">Configuration</a><ul>
+<li><a href="#web-server-configuration">Web Server Configuration</a></li>
+<li><a href="#specifying-the-http-port">Specifying the HTTP port</a></li>
+<li><a href="#specifying-the-secret-key">Specifying the Secret Key</a></li>
+<li><a href="#disabling-some-apps">Disabling some apps</a></li>
+<li><a href="#authentication">Authentication</a><ul>
+<li><a href="#username-password">Username / Password</a></li>
+<li><a href="#ldap">LDAP</a></li>
+<li><a href="#saml">SAML</a></li>
+<li><a href="#openid-connect">OpenId Connect</a></li>
+<li><a href="#multiple-authentication-backends">Multiple Authentication Backends</a></li>
+</ul>
+</li>
+<li><a href="#reset-a-password">Reset a password</a></li>
+<li><a href="#change-your-maps-look-and-feel">Change your maps look and feel</a></li>
+<li><a href="#configure-a-proxy">Configure a Proxy</a></li>
+<li><a href="#configuring-ssl">Configuring SSL</a></li>
+<li><a href="#sasl">SASL</a></li>
+<li><a href="#user-admin-configuration">User Admin Configuration</a></li>
+<li><a href="#banner">Banner</a></li>
+<li><a href="#splash-screen">Splash Screen</a></li>
+<li><a href="#custom-logo">Custom Logo</a></li>
+<li><a href="#storing-passwords-in-file-script">Storing passwords in file script</a></li>
+<li><a href="#idle-session-timeout">Idle session timeout</a></li>
+<li><a href="#auditing">Auditing</a></li>
+</ul>
+</li>
+<li><a href="#configuration-for-external-services">Configuration for external services</a><ul>
+<li><a href="#hadoop-and-other-services">Hadoop and other services</a><ul>
+<li><a href="#hadoop-configuration">Hadoop Configuration</a></li>
+<li><a href="#configure-oozie">Configure Oozie</a></li>
+<li><a href="#hive-configuration">Hive Configuration</a></li>
+<li><a href="#hive-and-impala-high-availability-ha">Hive and Impala High Availability (HA)</a></li>
+</ul>
+</li>
+<li><a href="#firewall">Firewall</a></li>
+<li><a href="#files-and-object-store">Files and Object Store</a><ul>
+<li><a href="#hdfs-cluster">HDFS Cluster</a></li>
+<li><a href="#s3">S3</a></li>
+<li><a href="#adls">ADLS</a></li>
+</ul>
+</li>
+<li><a href="#yarn-mr2-cluster">Yarn (MR2) Cluster</a></li>
+<li><a href="#impala-configuration">Impala Configuration</a></li>
+<li><a href="#hive-configuration_1">Hive Configuration</a></li>
+<li><a href="#jdbc">JDBC</a></li>
+<li><a href="#oozie-configuration">Oozie Configuration</a></li>
+<li><a href="#solr-configuration">Solr Configuration</a></li>
+<li><a href="#hbase-configuration">HBase Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#administration">Administration</a><ul>
+<li><a href="#configuration-validation">Configuration Validation</a></li>
+<li><a href="#server-logs">Server Logs</a></li>
+<li><a href="#threads">Threads</a></li>
+<li><a href="#metrics">Metrics</a></li>
+<li><a href="#user-management">User management</a><ul>
+<li><a href="#ldap_1">LDAP</a></li>
+<li><a href="#users">Users</a><ul>
+<li><a href="#adding-a-user">Adding a User</a></li>
+<li><a href="#deleting-a-user">Deleting a User</a></li>
+<li><a href="#editing-a-user">Editing a User</a></li>
+<li><a href="#importing-users-from-an-ldap-directory">Importing Users from an LDAP Directory</a></li>
+<li><a href="#syncing-users-and-groups-with-an-ldap-directory">Syncing Users and Groups with an LDAP Directory</a></li>
+</ul>
+</li>
+<li><a href="#groups">Groups</a><ul>
+<li><a href="#adding-a-group">Adding a Group</a></li>
+<li><a href="#adding-users-to-a-group">Adding Users to a Group</a></li>
+<li><a href="#deleting-a-group">Deleting a Group</a></li>
+<li><a href="#limit-users-can-login-only-if-they-are-belong-to-one-of-listed-ldap-groups">Limit users can login only if they are belong to one of listed LDAP groups</a></li>
+<li><a href="#importing-groups-from-an-ldap-directory">Importing Groups from an LDAP Directory</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#process-hierarchy">Process Hierarchy</a></li>
+<li><a href="#logging">Logging</a><ul>
+<li><a href="#viewing-recent-log-messages">Viewing Recent Log Messages</a></li>
+</ul>
+</li>
+<li><a href="#troubleshooting">Troubleshooting</a><ul>
+<li><a href="#instrumentation-enabled">Instrumentation enabled:</a><ul>
+<li><a href="#instrumentation-not-enabled">Instrumentation not enabled:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#database">Database</a><ul>
+<li><a href="#inspecting-the-database">Inspecting the Database</a></li>
+<li><a href="#backing-up-the-database">Backing up the Database</a></li>
+<li><a href="#configuring-to-access-another-database">Configuring to Access Another Database</a></li>
+<li><a href="#configuring-to-store-data-in-mysql">Configuring to Store Data in MySQL</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#using-hue">Using Hue</a><ul>
+<li><a href="#supported-browsers">Supported Browsers</a></li>
+<li><a href="#feedback">Feedback</a></li>
+<li><a href="#reporting-bugs">Reporting Bugs</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p></div>
+  <div class="span9"></p>
+<h1 id="installation">Installation</h1>
+<p>The following instructions describe how to install the Hue tarball on a
+multi-node cluster. You need to also install Hadoop and its satellite components
+(Oozie, Hive...) and update some Hadoop configuration files before running Hue.</p>
+<p>Hue consists of a web service that runs on a special node in your cluster.
+Choose one node where you want to run Hue. This guide refers to that node as
+the <em>Hue Server</em>. For optimal performance, this should be one of the nodes
+within your cluster, though it can be a remote node as long as there are no
+overly restrictive firewalls. For small clusters of less than 10 nodes,
+you can use your existing master node as the Hue Server.</p>
+<p>You can download the Hue tarball here:
+<a href="https://github.com/cloudera/hue/releases">https://github.com/cloudera/hue/releases</a></p>
+<h2 id="dependencies">Dependencies</h2>
+<p>Hue employs some Python modules which use native code and requires
+certain development libraries be installed on your system. To install from the
+tarball, you'll need these library development packages and tools installed on your system:</p>
+<ul>
+<li>Python 2.7</li>
+<li><a href="https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html">MySQL InnoDB or PostgreSQL or Oracle</a></li>
+</ul>
+<h3 id="ubuntu">Ubuntu</h3>
+<pre><code>sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
+</code></pre>
+<h4 id="install-oracle-jdk">Install Oracle JDK</h4>
+<pre><code>sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+</code></pre>
+<h4 id="if-you-want-to-run-the-unit-tests">If you want to run the unit tests</h4>
+<pre><code>sudo apt-get install libtidy-0.99-0
+</code></pre>
+<h3 id="centosrhel">CentOS/RHEL</h3>
+<pre><code>sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make  mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
+</code></pre>
+<ul>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora">Oracle JDK</a></li>
+<li>mvn (from <a href="https://gist.github.com/sebsto/19b99f1fa1f32cae5d00"><code>apache-maven</code></a> package or maven3 tarball)</li>
+<li>libtidy (for unit tests only)</li>
+<li>openssl-devel (for version 7+)</li>
+</ul>
+<h3 id="macos">MacOS</h3>
+<ul>
+<li>Xcode command line tools</li>
+<li>Oracle's JDK 1.7+</li>
+<li>maven (Homebrew)</li>
+<li>mysql (Homebrew)</li>
+<li>gmp (Homebrew)</li>
+<li>openssl (Homebrew)</li>
+<li><a href="http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html">Oracle Instant Client</a></li>
+</ul>
+<h4 id="fix-openssl-errors">Fix openssl errors</h4>
+<p>Required for MacOS 10.11+</p>
+<pre><code>export LDFLAGS=-L/usr/local/opt/openssl/lib &amp;&amp; export CPPFLAGS=-I/usr/local/opt/openssl/include
+</code></pre>
+<h3 id="centosoracleredhat-6x">Centos/Oracle/RedHat 6.x</h3>
+<p>Installing Python 2.7:</p>
+<h4 id="centos-6869-os">CentOS 6.8/6.9 OS</h4>
+<p>Check your OS Version:</p>
+<pre><code>cat /etc/redhat-release
+</code></pre>
+<p>Make sure "/etc/redhat-release" contains "CentOS 6.8 or 6.9" version. These instructions are tested on CentOS 6.8 and 6.9 versions only. It may or may not work on previous CentOS 6 series OS.</p>
+<pre><code>yum install -y centos-release-SCL
+yum install -y scl-utils
+yum install -y python27
+</code></pre>
+<h4 id="redhat-6869-os">RedHat 6.8/6.9 OS</h4>
+<p>Check your OS Version</p>
+<pre><code>cat /etc/redhat-release
+</code></pre>
+<p>Make sure <code>/etc/redhat-release</code> contains "RedHat 6.8 or 6.9" version. These instructions are tested on RedHat 6.8 and 6.9 versions only. It may or may not work on previous RedHat 6 series OS.</p>
+<pre><code>wget http://mirror.infra.cloudera.com/centos/6/extras/x86_64/Packages/centos-release-scl-rh-2-3.el6.centos.noarch.rpm
+rpm -ivh centos-release-scl-rh-2-3.el6.centos.noarch.rpm
+yum install -y scl-utils
+yum install -y python27
+</code></pre>
+<h4 id="oracle-6869-os">Oracle 6.8/6.9 OS</h4>
+<p>Check your OS Version</p>
+<pre><code>cat /etc/redhat-release
+</code></pre>
+<p>Make sure <code>/etc/redhat-release</code> contains "Oracle 6.8 or 6.9" version. These instructions are tested on Oracle 6.8 and 6.9 versions only. It may or may not work on previous Oracle 6 series OS.</p>
+<pre><code>wget -O /etc/yum.repos.d/public-yum-ol6.repo http://yum.oracle.com/public-yum-ol6.repo
+</code></pre>
+<p>Set the value of the enabled parameter for the software_collections repository to 1: for file <code>/etc/yum.repos.d/public-yum-ol6.repo</code></p>
+<pre><code>[ol6_software_collections]
+name=Software Collection Library release 3.0 packages for Oracle Linux 6 (x86_64)
+baseurl=http://yum.oracle.com/repo/OracleLinux/OL6/SoftwareCollections/x86_64/
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+gpgcheck=1
+enabled=1
+</code></pre>
+<p>for more details, refer to this link: <a href="https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html">https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html</a></p>
+<pre><code>yum install -y scl-utils
+yum install -y python27
+</code></pre>
+<h4 id="install-oracle-instant-client">Install Oracle Instant Client</h4>
+<p>Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add</p>
+<pre><code>export ORACLE_HOME=/usr/local/share/oracle
+export VERSION=11.2.0.4.0
+export ARCH=x86_64
+export DYLD_LIBRARY_PATH=$ORACLE_HOME
+export LD_LIBRARY_PATH=$ORACLE_HOME
+</code></pre>
+<p>and then</p>
+<pre><code>source ~/.bash_profile
+sudo mkdir -p $ORACLE_HOME
+sudo chmod 775 $ORACLE_HOME
+</code></pre>
+<p>then unzip the content of both downloaded zip files into the newly created $ORACLE_HOME in a way that the 'sdk' folder is at the same level with the other files and then</p>
+<pre><code>ln -s libclntsh.dylib.11.1 libclntsh.dylib
+ln -s libocci.dylib.11.1 libocci.dylib
+</code></pre>
+<p>and finally</p>
+<pre><code>cd sdk
+unzip ottclasses.zip
+</code></pre>
+<h2 id="build">Build</h2>
+<p>Configure <code>$PREFIX</code> with the path where you want to install Hue by running:</p>
+<pre><code>PREFIX=/usr/share make install
+cd /usr/share/hue
+</code></pre>
+<p>You can install Hue anywhere on your system, and run Hue as a non-root user.</p>
+<p>It is a good practice to create a new user for Hue and either install Hue in
+that user's home directory, or in a directory within <code>/usr/share</code>.</p>
+<h2 id="docker">Docker</h2>
+<p>Alternatively to building Hue, a <a href="Hue Docker image">http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/</a> is available.</p>
+<h2 id="troubleshooting-the-tarball-installation">Troubleshooting the tarball Installation</h2>
+<p>.Q: I moved my Hue installation from one directory to another and now Hue no
+longer functions correctly.</p>
+<p>A: Due to the use of absolute paths by some Python packages, you must run a
+series of commands if you move your Hue installation. In the new location, run:</p>
+<pre><code>rm app.reg
+rm -r build
+make apps
+</code></pre>
+<p>.Q: Why does "make install" compile other pieces of software?</p>
+<p>A: In order to ensure that Hue is stable on a variety of distributions and
+architectures, it installs a Python virtual environment which includes its
+dependencies. This ensures that the software can depend on specific versions
+of various Python libraries and you don't have to be concerned about missing
+software components.</p>
+<h2 id="starting-the-server">Starting the server</h2>
+<p>After your cluster is running with the plugins enabled, you can start Hue on
+your Hue Server by running:</p>
+<pre><code>build/env/bin/supervisor
+</code></pre>
+<p>This will start several subprocesses, corresponding to the different Hue
+components. Your Hue installation is now running.</p>
+<h1 id="configuration">Configuration</h1>
+<h2 id="reference-architecture">Reference Architecture</h2>
+<ul>
+<li>3 Hues and 1 Load Balancer</li>
+<li>Databases: MySQL InnoDB, PostgreSQL, Oracle</li>
+<li>LDAP</li>
+<li>Monitoring</li>
+<li>Impala HA</li>
+<li>HiveServer2 HA</li>
+<li>Downloads</li>
+</ul>
+<p><a href="http://gethue.com/performance-tuning/">Read more about it here</a>.</p>
+<h3 id="load-balancers">Load Balancers</h3>
+<p>Hue is often run with:</p>
+<ul>
+<li>Cherrypy with Httpd</li>
+<li><a href="http://gethue.com/how-to-run-hue-with-the-apache-server/">Apache mod Python</a></li>
+<li><a href="Using NGINX to speed up Hue">NGINX</a></li>
+</ul>
+<h3 id="proxy">Proxy</h3>
+<p>A Web proxy lets you centralize all the access to a certain URL and prettify the address (e.g. ec2-54-247-321-151.compute-1.amazonaws.com --&gt; demo.gethue.com).</p>
+<p><a href="http://gethue.com/i-put-a-proxy-on-hue/">Here is one way to do it</a>.</p>
+<h2 id="quick-start-wizard">Quick Start Wizard</h2>
+<p>The Quick Start wizard allows you to perform the following Hue setup
+operations by clicking the tab of each step or sequentially by clicking
+Next in each screen:</p>
+<ol>
+<li><strong>Check Configuration</strong> validates your Hue configuration. It will
+    note any potential misconfiguration and provide hints as to how to
+    fix them. You can edit the configuration file described in the next
+    section or use Cloudera Manager, if installed, to manage your
+    changes.</li>
+<li><strong>Examples</strong> contains links to install examples into the Hive,
+    Impala, MapReduce, Spark, Oozie, Solr Dashboard and Pig Editor applications.</li>
+<li><strong>Users</strong> contains a link to the User Admin application to create or
+    import users and a checkbox to enable and disable collection of
+    usage information.</li>
+<li><strong>Go!</strong> - displays the Hue home screen, which contains links to the
+    different categories of applications supported by Hue: Query,
+    Hadoop, and Workflow.</li>
+</ol>
+<h2 id="configuration_1">Configuration</h2>
+<p>Displays a list of the installed Hue applications and their
+configuration. The location of the folder containing the Hue
+configuration files is shown at the top of the page. Hue configuration
+settings are in the hue.ini configuration file.</p>
+<p>Click the tabs under <strong>Configuration Sections and Variables</strong> to see the
+settings configured for each application. For information on configuring
+these settings, see Hue Configuration in the Hue installation manual.</p>
+<p>Hue ships with a default configuration that will work for
+pseudo-distributed clusters.  If you are running on a real cluster, you must
+make a few changes to the <code>hue.ini</code> configuration file (<code>/etc/hue/hue.ini</code> when installed from the
+package version) or <code>pseudo-distributed.ini</code> in <code>desktop/conf</code> when in development mode).
+The following sections describe the key configuration options you must make to configure Hue.</p>
+<div class="note">
+To list all available configuration options, run:
+
+$ /usr/share/hue/build/env/bin/hue config_help | less
+
+<p>This commands outlines the various sections and options in the configuration,
+and provides help and information on the default values.
+</div></p>
+<div class="note">
+To view the current configuration from within Hue, open:
+
+http://<hue>/hue/dump_config
+</div>
+
+<div class="note">
+Hue loads and merges all of the files with extension `.ini`
+located in the `/etc/hue` directory.  Files that are alphabetically later
+take precedence.
+</div>
+
+<h3 id="web-server-configuration">Web Server Configuration</h3>
+<p>These configuration variables are under the <code>[desktop]</code> section in
+the <code>hue.ini</code> configuration file.</p>
+<h3 id="specifying-the-http-port">Specifying the HTTP port</h3>
+<p>Hue uses CherryPy web server.  You can use the following options to
+change the IP address and port that the web server listens on.
+The default setting is port 8888 on all configured IP addresses.</p>
+<pre><code># Webserver listens on this address and port
+http_host=0.0.0.0
+http_port=8888
+</code></pre>
+<h3 id="specifying-the-secret-key">Specifying the Secret Key</h3>
+<p>For security, you should also specify the secret key that is used for secure
+hashing in the session store. Enter a long series of random characters
+(30 to 60 characters is recommended).</p>
+<pre><code>secret_key=jFE93j;2[290-eiw.KEiwN2s3['d;/.q[eIW^y#e=+Iei*@Mn&lt;qW5o
+</code></pre>
+<p>NOTE: If you don't specify a secret key, your session cookies will not be
+secure. Hue will run but it will also display error messages telling you to
+set the secret key.</p>
+<h3 id="disabling-some-apps">Disabling some apps</h3>
+<p>In the Hue ini configuration file, in the [desktop] section, you can enter the names of the app to hide:</p>
+<pre>
+[desktop]
+# Comma separated list of apps to not load at server startup.
+app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie,indexer
+</pre>
+
+<p><a href="http://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/">Read more about it here</a>.</p>
+<h3 id="authentication">Authentication</h3>
+<p>By default, the first user who logs in to Hue can choose any
+username and password and becomes an administrator automatically.  This
+user can create other user and administrator accounts. User information is
+stored in the Django database in the Django backend.</p>
+<p>The authentication system is pluggable. For more information, see the
+<a href="sdk/sdk.html">Hue SDK Documentation</a>.</p>
+<p>List of some of the possible authentications:</p>
+<h4 id="username-password">Username / Password</h4>
+<h4 id="ldap">LDAP</h4>
+<h4 id="saml">SAML</h4>
+<p><a href="http://gethue.com/updated-saml-2-0-support/">Read more about it</a>.</p>
+<h4 id="openid-connect">OpenId Connect</h4>
+<h4 id="multiple-authentication-backends">Multiple Authentication Backends</h4>
+<p>For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or Hue safety valve in Cloudera Manager with a list containing first the LdapBackend followed by either the ModelBackend or custom AllowFirstUserDjangoBackend (permits first login and relies on user model for all subsequent authentication):</p>
+<pre>
+[desktop]
+  [[auth]]
+  backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
+</pre>
+
+<p>This tells Hue to first check against the configured LDAP directory service, and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.</p>
+<p><a href="http://gethue.com/configuring-hue-multiple-authentication-backends-and-ldap/">Read more about it here</a>.</p>
+<h3 id="reset-a-password">Reset a password</h3>
+<p><strong>Programmatically</strong></p>
+<p>When a Hue administrator loses their password, a more programmatic approach is required to secure the administrator again. Hue comes with a wrapper around the python interpreter called the “shell” command. It loads all the libraries required to work with Hue at a programmatic level. To start the Hue shell, type the following command from the Hue installation root.</p>
+<p>Then:</p>
+<pre><code>cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+build/env/bin/hue shell
+</code></pre>
+<p>The following is a small script, that can be executed within the Hue shell, to change the password for a user named “example”:</p>
+<pre><code>from django.contrib.auth.models import User
+user = User.objects.get(username='example')
+user.set_password('some password')
+user.save()
+</code></pre>
+<p>The script can also be invoked in the shell by using input redirection (assuming the script is in a file named script.py):</p>
+<pre><code>build/env/bin/hue shell &lt; script.py
+</code></pre>
+<p>How to make a certain user a Hue admin</p>
+<pre><code>build/env/bin/hue  shell
+</code></pre>
+<p>Then set these properties to true:</p>
+<pre><code>from django.contrib.auth.models import User
+
+a = User.objects.get(username='hdfs')
+a.is_staff = True
+a.is_superuser = True
+a.set_password('my_secret')
+a.save()
+</code></pre>
+<p><strong> Via a command</strong></p>
+<p>Go on the Hue machine, then in the Hue home directory and either type:</p>
+<p>To change the password of the currently logged in Unix user:</p>
+<pre><code>build/env/bin/hue changepassword
+</code></pre>
+<p>If you don't remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):</p>
+<pre><code>build/env/bin/hue createsuperuser
+</code></pre>
+<p><a href="http://gethue.com/password-management-in-hue/">Read more about it here</a>.</p>
+<div class="note">
+Above works with the `AllowFirstUserBackend`, it might be different if another backend is used.
+</div>
+
+<h3 id="change-your-maps-look-and-feel">Change your maps look and feel</h3>
+<p>The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:</p>
+<pre>
+[desktop]
+leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+</pre>
+
+<p><a href="http://gethue.com/change-your-maps-look-and-feel/">Read more about it here</a>.</p>
+<h3 id="configure-a-proxy">Configure a Proxy</h3>
+<p>We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:</p>
+<pre>
+  [desktop]
+  # Enable X-Forwarded-Host header if the load balancer requires it.
+  use_x_forwarded_host=false
+
+# Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
+  secure_proxy_ssl_header=false
+</pre>
+
+<h3 id="configuring-ssl">Configuring SSL</h3>
+<p>You can configure Hue to serve over HTTPS.</p>
+<ol>
+<li>
+<p>Configure Hue to use your private key by adding the following
+options to the <code>hue.ini</code> configuration file:</p>
+<p>ssl_certificate=/path/to/certificate
+ssl_private_key=/path/to/key</p>
+</li>
+<li>
+<p>Ideally, you would have an appropriate key signed by a Certificate Authority.
+If you're just testing, you can create a self-signed key using the <code>openssl</code>
+command that may be installed on your system:</p>
+</li>
+</ol>
+<p>Create a key:</p>
+<pre><code>openssl genrsa 1024 &gt; host.key
+</code></pre>
+<p>Create a self-signed certificate:</p>
+<pre><code>openssl req -new -x509 -nodes -sha1 -key host.key &gt; host.cert
+</code></pre>
+<div class="note">
+Self-signed Certificates and File Uploads
+
+To upload files using the Hue File Browser over HTTPS requires
+using a proper SSL Certificate.  Self-signed certificates don't
+work.
+</div>
+
+<p>Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers 
+having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.</p>
+<p>DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:
+<pre>
+  [desktop]
+  ssl_cipher_list=DEFAULT:!DES:!3DES
+</pre></p>
+<h3 id="sasl">SASL</h3>
+<p>When getting a bigger result set from Hive/Impala or bigger files like images from HBase, the response requires to increase
+the buffer size of SASL lib for thrift sasl communication.</p>
+<pre>
+  [desktop]
+  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication,
+  # default value is 2097152 (2 MB), which equals to (2 * 1024 * 1024)
+  sasl_max_buffer=2097152
+</pre>
+
+<h3 id="user-admin-configuration">User Admin Configuration</h3>
+<p>In the <code>[useradmin]</code> section of the configuration file, you can
+<em>optionally</em> specify the following:</p>
+<p>default_user_group::
+  The name of a default group that is suggested when creating a
+  user manually. If the LdapBackend or PamBackend are configured
+  for doing user authentication, new users will automatically be
+  members of the default group.</p>
+<h3 id="banner">Banner</h3>
+<p>You can add a custom banner to the Hue Web UI by applying HTML directly to the property, banner_top_html. For example:</p>
+<pre><code>banner_top_html=&lt;H4&gt;My company's custom Hue Web UI banner&lt;/H4&gt;
+</code></pre>
+<h3 id="splash-screen">Splash Screen</h3>
+<p>You can customize a splash screen on the login page by applying HTML directly to the property, login_splash_html. For example:</p>
+<pre><code>[desktop]
+[[custom]]
+login_splash_html=WARNING: You are required to have authorization before you proceed.
+</code></pre>
+<h3 id="custom-logo">Custom Logo</h3>
+<p>There is also the possibility to change the logo for further personalization.</p>
+<pre><code>[desktop]
+[[custom]]
+# SVG code to replace the default Hue logo in the top bar and sign in screen
+# e.g. &lt;image xlink:href="/static/desktop/art/hue-logo-mini-white.png" x="0" y="0" height="40" width="160" /&gt;
+logo_svg=
+</code></pre>
+<p>You can go crazy and write there any SVG code you want. Please keep in mind your SVG should be designed to fit in a 160×40 pixels space. To have the same ‘hearts logo’ you can see above, you can type this code</p>
+<pre><code>[desktop]
+[[custom]]
+logo_svg='&lt;g&gt;&lt;path stroke="null" id="svg_1" d="m44.41215,11.43463c-4.05017,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35797,11.71793 16.891,22.23443 18.41163,23.95773c1.5181,-1.36927 22.7696,-12.43803 18.4129,-23.96533z" fill="#ffffff"/&gt; &lt;path stroke="null" id="svg_2" d="m98.41246,10.43463c-4.05016,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35796,11.71793 16.891,22.23443 18.41164,23.95773c1.5181,-1.36927 22.76959,-12.43803 18.41289,-23.96533z" fill="#FF5A79"/&gt; &lt;path stroke="null" id="svg_3" d="m154.41215,11.43463c-4.05016,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35796,11.71793 16.891,22.23443 18.41164,23.95773c1.5181,-1.36927 22.76959,-12.43803 18.41289,-23.96533z" fill="#ffffff"/&gt; &lt;/g&gt;'
+</code></pre>
+<p>Read more about it in <a href="http://gethue.com/hue-with-a-custom-logo/">Hue with a custom logo</a> post.</p>
+<h3 id="storing-passwords-in-file-script">Storing passwords in file script</h3>
+<p>This <a href="http://gethue.com/storing-passwords-in-script-rather-than-hue-ini-files/">article details how to store passwords in a script</a> launched from the OS rather than have clear text passwords in the hue*.ini files.</p>
+<p>Some passwords go in Hue ini configuration file making them easily visible to Hue admin user or by users of cluster management software. You can use the password_script feature to prevent passwords from being visible.</p>
+<h3 id="idle-session-timeout">Idle session timeout</h3>
+<p>Hue now offers a new property, idle_session_timeout, that can be configured in the hue.ini file:</p>
+<pre>
+[desktop]
+[[auth]]
+idle_session_timeout=600
+</pre>
+
+<p>When idle_session_timeout is set, users will automatically be logged out after N (e.g. – 600) seconds of inactivity and be prompted to login again:</p>
+<p><a href="http://gethue.com/introducing-the-new-login-modal-and-idle-session-timeout/">Read more about it here</a>.</p>
+<h3 id="auditing">Auditing</h3>
+<p>Read more about <a href="http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/">Auditing User Administration Operations with Hue and Cloudera Navigator</a>.</p>
+<h2 id="configuration-for-external-services">Configuration for external services</h2>
+<p>These configuration variables are under the <code>[hadoop]</code> section in
+the <code>hue.ini</code> configuration file.</p>
+<h3 id="hadoop-and-other-services">Hadoop and other services</h3>
+<p>Depending on which apps you need, you need to make sure that some Hadoop services
+are already setup (that way Hue can talk to them).</p>
+<pre>
+|-------------|--------------------------------------------------------|
+|  Component  | Applications                                           |
+|-------------|--------------------------------------------------------|
+|  Editor     | SQL (Hive, Impala, any database...), Pig, Spark...     |
+|  Browsers   | YARN, Oozie, Impala, HBase, Livy                       |
+|  Scheduler  | Oozie                                                  |
+|  Dashboard  | Solr, SQL (Impala, Hive...)                            |
+|-------------|--------------------------------------------------------|
+</pre>
+
+<h5 id="hadoop-configuration">Hadoop Configuration</h5>
+<p>You need to enable WebHdfs or run an HttpFS server. To turn on WebHDFS,
+add this to your <code>hdfs-site.xml</code> and <em>restart</em> your HDFS cluster.
+Depending on your setup, your <code>hdfs-site.xml</code> might be in <code>/etc/hadoop/conf</code>.</p>
+<pre><code>&lt;property&gt;
+  &lt;name&gt;dfs.webhdfs.enabled&lt;/name&gt;
+  &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<p>You also need to add this to <code>core-site.xml</code>.</p>
+<pre><code>&lt;property&gt;
+  &lt;name&gt;hadoop.proxyuser.hue.hosts&lt;/name&gt;
+  &lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.proxyuser.hue.groups&lt;/name&gt;
+  &lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<p>If you place your Hue Server outside the Hadoop cluster, you can run
+an HttpFS server to provide Hue access to HDFS. The HttpFS service requires
+only one port to be opened to the cluster.</p>
+<p>Also add this in <code>httpfs-site.xml</code> which might be in <code>/etc/hadoop-httpfs/conf</code>.</p>
+<pre><code>&lt;property&gt;
+  &lt;name&gt;httpfs.proxyuser.hue.hosts&lt;/name&gt;
+  &lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;httpfs.proxyuser.hue.groups&lt;/name&gt;
+  &lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<h4 id="configure-oozie">Configure Oozie</h4>
+<p>Hue submits MapReduce jobs to Oozie as the logged in user. You need to
+configure Oozie to accept the <code>hue</code> user to be a proxyuser. Specify this in
+your <code>oozie-site.xml</code> (even in a non-secure cluster), and restart Oozie:</p>
+<pre><code>&lt;property&gt;
+    &lt;name&gt;oozie.service.ProxyUserService.proxyuser.hue.hosts&lt;/name&gt;
+    &lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;oozie.service.ProxyUserService.proxyuser.hue.groups&lt;/name&gt;
+    &lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<h4 id="hive-configuration">Hive Configuration</h4>
+<p>Hue's Hive SQL Editor application helps you use Hive to query your data.
+It depends on a Hive Server 2 running in the cluster. Please read
+this section to ensure a proper integration.</p>
+<p>Your Hive data is stored in HDFS, normally under <code>/user/hive/warehouse</code>
+(or any path you specify as <code>hive.metastore.warehouse.dir</code> in your
+<code>hive-site.xml</code>).  Make sure this location exists and is writable by
+the users whom you expect to be creating tables.  <code>/tmp</code> (on the local file
+system) must be world-writable (1777), as Hive makes extensive use of it.</p>
+<div class="note">
+  In `hue.ini`, modify `hive_conf_dir` to point to the
+  directory containing `hive-site.xml`.
+</div>
+
+<h4 id="hive-and-impala-high-availability-ha">Hive and Impala High Availability (HA)</h4>
+<p>HiveServer2 and Impala support High Availability through a “load balancer”.
+One caveat is that Hue’s underlying Thrift libraries reuse TCP connections in a
+pool, a single user session may not have the same Impala or Hive TCP connection.
+If a TCP connection is balanced away from the previously selected  HiveServer2
+or Impalad instance, the user session and its queries can be lost and trigger
+the “Results have expired” or “Invalid session Id” errors.</p>
+<p>To prevent sessions from being lost, you need configure the load balancer with
+“source” algorithm to ensure each Hue instance sends all traffic to a single
+HiveServer2/Impalad instance. Yes, this is not true load balancing, but a
+configuration for failover High Availability. HiveSever2 or Impala coordinators
+already distribute the work across the cluster so this is not an issue.</p>
+<p>To enable an optimal load distribution that works for everybody, you can create
+multiple profiles in our load balancer, per port for Hue clients and non-Hue
+clients like Hive or Impala. You can configure non-Hue clients to distribute loads
+with “roundrobin” or “leastconn” and configure Hue clients with “source”
+(source IP Persistence) on dedicated ports, for example, 10015 for Hive beeline
+commands, 10016 for Hue, 21051 for Hue-Impala interactions while 25003 for Impala shell.</p>
+<p>You can configure the HaProxy to have two different ports associated with
+different load balancing algorithms. Here is a sample configuration (haproxy.cfg)
+for Hive and Impala HA on a secure cluster.</p>
+<pre>
+frontend hiveserver2_front
+bind *:10015 ssl crt /path/to/cert_key.pem
+mode tcp
+option tcplog
+default_backend hiveserver2
+backend hiveserver2
+    balance                     roundrobin
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+
+frontend  hivejdbc_front
+    bind                        *:10016 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             hivejdbc
+backend hivejdbc
+    balance                     source
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+</pre>
+And here is an example for impala HA configuration on a secure cluster.
+<pre>
+frontend  impala_front
+    bind                        *:25003 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    default_backend             impala
+backend impala
+    balance                     leastconn
+    mode                        tcp
+    server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
+
+<p>frontend  impalajdbc_front
+    bind                        *:21051 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             impalajdbc
+backend impalajdbc
+    balance                     source
+    mode                        tcp
+    server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
+</pre></p>
+<p>Note: “check” is required at end of each line to ensure HaProxy can detect any
+unreachable Impalad/HiveServer2 server, so HA failover can be successful. Without
+ TCP check, you may hit the “TSocket reads 0 byte” error when the
+Impalad/HiveServer2 server Hue tries to connect is down.</p>
+<p>After editing the /etc/haproxy/haproxy.cfg file, run following commands to
+restart HaProxy service and check the service restarts successfully.</p>
+<pre>
+service haproxy restart
+service haproxy status
+</pre>
+
+<p>Also we need add following blocks into hue.ini.
+<pre>
+[impala]
+server_port=21051</p>
+<p>[beeswax]
+hive_server_port=10016
+</pre>
+Read more about it in the <a href="http://gethue.com/how-to-opti&#10;mally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients">How to optimally configure your Analytic Database for
+High Availability with Hue and other SQL clients</a> post.</p>
+<h3 id="firewall">Firewall</h3>
+<p>Hue currently requires that the machines within your cluster can connect to
+each other freely over TCP. The machines outside your cluster must be able to
+open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
+to interact with the system.</p>
+<h3 id="files-and-object-store">Files and Object Store</h3>
+<h4 id="hdfs-cluster">HDFS Cluster</h4>
+<p>Hue supports one HDFS cluster. That cluster should be defined
+under the <code>[[[default]]]</code> sub-section.</p>
+<p>fs_defaultfs::
+  This is the equivalence of <code>fs.defaultFS</code> (aka <code>fs.default.name</code>) in
+  Hadoop configuration.</p>
+<p>webhdfs_url::
+  You can also set this to be the HttpFS url. The default value is the HTTP
+  port on the NameNode.</p>
+<p>hadoop_conf_dir::
+  This is the configuration directory of the HDFS, typically
+  <code>/etc/hadoop/conf</code>.</p>
+<h4 id="s3">S3</h4>
+<p>Hue’s filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.</p>
+<p>Read more about it in the <a href="../user-guide/user-guide.html#s3">S3 User Documentation</a>.</p>
+<p>In order to add an S3 account to Hue, you’ll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: <a href="http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html">AWSCredentials</a></p>
+<p>These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:</p>
+<pre>
+[aws]
+[[aws_accounts]]
+[[[default]]]
+access_key_id_script=/path/to/access_key_script
+secret_access_key_script= /path/to/secret_key_script
+allow_environment_credentials=false
+region=us-east-1
+</pre>
+
+<p>Alternatively (but not recommended for production or secure environments), you can set the access_key_id and secret_access_key values to the plain-text values of your keys:</p>
+<pre>
+[aws]
+[[aws_accounts]]
+[[[default]]]
+access_key_id=s3accesskeyid
+secret_access_key=s3secretaccesskey
+allow_environment_credentials=false
+region=us-east-1
+</pre>
+
+<p>The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to ‘us-east-1’.</p>
+<div class="note">
+Using Ceph
+
+New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
+</div>
+
+<h4 id="adls">ADLS</h4>
+<p>Hue’s file browser can now allow users to explore, manage, and upload data in an ADLS, in addition to HDFS and S3.</p>
+<p>Read more about it in the <a href="../user-guide/user-guide.html#adls">ADLS User Documentation</a>.</p>
+<p>In order to add an ADLS account to Hue, you’ll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
+These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:</p>
+<pre>
+[adls]
+[[azure_accounts]]
+[[[default]]]
+client_id_script=/path/to/client_id_script.sh
+client_secret_script=/path/to/client_secret_script.sh
+tenant_id_script=/path/to/tenant_id_script.sh
+
+[[adls_clusters]]
+[[[default]]]
+fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+webhdfs_url=https://<account_name>.azuredatalakestore.net
+</pre>
+
+<p>Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:</p>
+<pre>
+[adls]
+[[azure_account]]
+[[[default]]]
+client_id=adlsclientid
+client_secret=adlsclientsecret
+tenant_id=adlstenantid
+
+[[adls_clusters]]
+[[[default]]]
+fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+webhdfs_url=https://<account_name>.azuredatalakestore.net
+</pre>
+
+<h3 id="yarn-mr2-cluster">Yarn (MR2) Cluster</h3>
+<p>Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the <code>[[[default]]]</code> and <code>[[[ha]]]</code> sub-sections.</p>
+<p>resourcemanager_host::
+  The host running the ResourceManager.</p>
+<p>resourcemanager_port::
+  The port for the ResourceManager REST service.</p>
+<p>logical_name::
+  NameNode logical name.</p>
+<p>submit_to::
+   To enable the section, set to True.</p>
+<h3 id="impala-configuration">Impala Configuration</h3>
+<p>In the <code>[impala]</code> section of the configuration file, you can
+<em>optionally</em> specify the following:</p>
+<p>server_host::
+  The hostname or IP that the Impala Server should bind to. By
+  default it binds to <code>localhost</code>, and therefore only serves local
+  IPC clients.</p>
+<p><a href="http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/">LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
+</a>.</p>
+<h3 id="hive-configuration_1">Hive Configuration</h3>
+<p>In the <code>[beeswax]</code> section of the configuration file, you can
+<em>optionally</em> specify the following:</p>
+<p>beeswax_server_host::
+  The hostname or IP that the Hive Server should bind to. By
+  default it binds to <code>localhost</code>, and therefore only serves local
+  IPC clients.</p>
+<p>hive_conf_dir::
+  The directory containing your <code>hive-site.xml</code> Hive
+  configuration file.</p>
+<h3 id="jdbc">JDBC</h3>
+<p>Use the query editor with any <a href="http://gethue.com/custom-sql-query-editors/">JDBC</a> or Django-compatible database.</p>
+<h3 id="oozie-configuration">Oozie Configuration</h3>
+<p>In the <code>[liboozie]</code> section of the configuration file, you should
+specify:</p>
+<p>oozie_url::
+  The URL of the Oozie service. It is the same as the <code>OOZIE_URL</code>
+  environment variable for Oozie.</p>
+<h3 id="solr-configuration">Solr Configuration</h3>
+<p>In the <code>[search]</code> section of the configuration file, you should
+specify:</p>
+<p>solr_url::
+  The URL of the Solr service.</p>
+<h3 id="hbase-configuration">HBase Configuration</h3>
+<p>In the <code>[hbase]</code> section of the configuration file, you should
+specify:</p>
+<p>hbase_clusters::
+  Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".</p>
+<h1 id="administration">Administration</h1>
+<p>Now that you've installed and started Hue, you can feel free to skip ahead
+to the &lt;<usage,Using Hue>&gt; section. Administrators may want to refer to this
+section for more details about managing and operating a Hue installation.</p>
+<h2 id="configuration-validation">Configuration Validation</h2>
+<p>Hue can detect certain invalid configuration.</p>
+<p>To view the configuration of a running Hue instance, navigate to
+<code>http://myserver:8888/hue/dump_config</code>, also accessible through the About
+application.</p>
+<h2 id="server-logs">Server Logs</h2>
+<p>Displays the Hue Server log and allows you to download the log to your
+local system in a zip file.</p>
+<h2 id="threads">Threads</h2>
+<p>Read more on the <a href="http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/">Threads and Metrics pages
+ blog post</a></p>
+<p>Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using 'desktop/debug/threads'</p>
+<h2 id="metrics">Metrics</h2>
+<p>Read more on the <a href="http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/">Threads and Metrics pages
+ blog post</a></p>
+<p>Hue uses the <strong>PyFormance</strong> Python library to collect the metrics. These metrics are represented as gauge, counters, meter, rate of events over time, histogram, statistical distribution of values. A REST API endpoint '/desktop/metrics/' to get all the metrics dump as json is also exposed</p>
+<p>The below metrics of most concern to us are displayed on the page:</p>
+<ul>
+<li>requests.active</li>
+<li>requests.exceptions</li>
+<li>requests.response-time</li>
+<li>threads.daemon</li>
+<li>threads.total</li>
+<li>users</li>
+<li>users.active</li>
+</ul>
+<p>One of the most useful ones are the percentiles of response time of requests and the count of active users.
+Admins can either filter a particular property in all the metrics or select a particular metric for all properties</p>
+<h2 id="user-management">User management</h2>
+<p>The User Admin application lets a superuser add, delete, and manage Hue
+users and groups, and configure group permissions. Superusers can add
+users and groups individually, or import them from an LDAP directory.
+Group permissions define the Hue applications visible to group members
+when they log into Hue and the application features available to them.</p>
+<p>Click the <strong>User Admin</strong> icon in the top right navigation bar under your username.</p>
+<h3 id="ldap_1">LDAP</h3>
+<p><a href="http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/">LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
+</a>.</p>
+<h3 id="users">Users</h3>
+<p>The User Admin application provides two levels of user privileges:
+superusers and users.</p>
+<ul>
+<li>Superusers — The first user who logs into Hue after its initial
+    installation becomes the first superuser. Superusers have
+    permissions to perform administrative functions:<ul>
+<li>Add and delete users</li>
+<li>Add and delete groups</li>
+<li>Assign permissions to groups</li>
+<li>Change a user into a superuser</li>
+<li>Import users and groups from an LDAP server</li>
+</ul>
+</li>
+<li>
+<p>Users — can change their name, e-mail address, and password and log
+    in to Hue and run Hue applications, subject to the permissions
+    provided by the Hue groups to which they belong.</p>
+</li>
+</ul>
+<h4 id="adding-a-user">Adding a User</h4>
+<ol>
+<li>In the <strong>User Admin</strong> page, click <strong>Add User</strong>.</li>
+<li>In the <strong>Credentials</strong> screen, add required information about the
+    user. Once you provide the required information you can click the
+    wizard step tabs to set other information.</li>
+</ol>
+<p><table>
+<tr><td>Username</td><td>  A user name that contains only letters, numbers, and underscores;
+    blank spaces are not allowed and the name cannot begin with a
+    number. The user name is used to log into Hue and in file
+    permissions and job submissions. This is a required field.
+</td></tr>
+<tr><td>Password and Password confirmation</td><td>    A password for the user. This is a required field.</td></tr>
+<tr><td>Create home directory</td><td>   Indicate whether to create a directory named /user/username in HDFS.
+    For non-superusers, the user and group of the directory are
+    username. For superusers, the user and group are username and
+    supergroup.</td></tr></table></p>
+<ol>
+<li>Click <strong>Add User</strong> to save the information you specified and close
+    the <strong>Add User</strong> wizard or click <strong>Next</strong>.</li>
+<li>In the <strong>Names and Groups</strong> screen, add optional information.</li>
+</ol>
+<table>
+<tr><td>First name and Last name</td><td> The user's first and last name.
+</td></tr>
+<tr><td>E-mail address</td><td>The user's e-mail address. The e-mail address is used by the Job
+    Designer and Beeswax applications to send users an e-mail message
+    after certain actions have occurred. The Job Designer sends an
+    e-mail message after a job has completed. Beeswax sends a message
+    after a query has completed. If an e-mail address is not specified,
+    the application will not attempt to email the user.</td></tr>
+<tr><td>Groups</td><td> The groups to which the user belongs. By default, a user is assigned
+    to the **default** group, which allows access to all applications.
+    See [Permissions](#permissions).</td></tr></table>
+
+<ol>
+<li>Click <strong>Add User</strong> to save the information you specified and close
+    the <strong>Add User</strong> wizard or click <strong>Next</strong>.</li>
+<li>In the <strong>Advanced</strong> screen, add status information.</li>
+</ol>
+<table>
+<tr><td>Active</td><td> Indicate that the user is enabled and allowed to log in. Default: checked.</td></tr>
+<tr><td>Superuser status</td><td> Assign superuser privileges to the user.</td></tr></table>
+
+<ol>
+<li>Click <strong>Add User</strong> to save the information you specified and close
+    the <strong>Add User</strong> wizard.</li>
+</ol>
+<h4 id="deleting-a-user">Deleting a User</h4>
+<ol>
+<li>Check the checkbox next to the user name and click <strong>Delete</strong>.</li>
+<li>Click <strong>Yes</strong> to confirm.</li>
+</ol>
+<h4 id="editing-a-user">Editing a User</h4>
+<ol>
+<li>Click the user you want to edit in the <strong>Hue Users</strong> list.</li>
+<li>Make the changes to the user and then click <strong>Update user</strong>.</li>
+</ol>
+<h4 id="importing-users-from-an-ldap-directory">Importing Users from an LDAP Directory</h4>
+<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>:</p>
+<p>Importing users from an LDAP directory does not import any password
+information. You must add passwords manually in order for a user to log
+in.</p>
+<p>To add a user from an external LDAP directory:</p>
+<ol>
+<li>Click <strong>Add/sync LDAP user</strong>.</li>
+<li>Specify the user properties:</li>
+</ol>
+<table>
+<tr><td>Username</td><td>The user name.</td></tr>
+<tr><td>Distinguished name</td><td>Indicate that Hue should use a full distinguished name for the user.
+    This imports the user's first and last name, username, and email,
+    but does not store the user password.</td></tr>
+    <tr><td>Create home directory</td><td> Indicate that Hue should create a home directory for the user in
+    HDFS.</td></tr></table>
+
+<ol>
+<li>
+<p>Click <strong>Add/sync user</strong>.</p>
+<p>If the user already exists in the User Admin, the user information
+in User Admin is synced with what is currently in the LDAP
+directory.</p>
+</li>
+</ol>
+<h4 id="syncing-users-and-groups-with-an-ldap-directory">Syncing Users and Groups with an LDAP Directory</h4>
+<p>You can sync the Hue user database with the current state of the LDAP
+directory using the <strong>Sync LDAP users/groups</strong> function. This updates
+the user and group information for the already imported users and
+groups. It does not import any new users or groups.</p>
+<ol>
+<li>Click <strong>Sync LDAP users/groups</strong>.</li>
+<li>The <strong>Create Home Directories</strong> checkbox creates home directories in
+    HDFS for existing imported members that don't have home directories.</li>
+<li>In the <strong>Sync LDAP users and groups</strong> dialog, click <strong>Sync</strong> to
+    perform the sync.</li>
+</ol>
+<h3 id="groups">Groups</h3>
+<p>Superusers can add and delete groups, configure group permissions, and
+assign users to group memberships.</p>
+<h4 id="adding-a-group">Adding a Group</h4>
+<p>You can add groups, and delete the groups you've added. You can also
+import groups from an LDAP directory.</p>
+<ol>
+<li>In the <strong>User Admin</strong> window, click <strong>Groups</strong> and then click <strong>Add
+    Group</strong>.</li>
+<li>Specify the group properties:</li>
+</ol>
+<table>
+<tr><td>Name</td><td> The name of the group. Group names can only be letters, numbers, and
+    underscores; blank spaces are not allowed.</td></tr>
+<tr><td>Members</td><td>The users in the group. Check user names or check Select all.</td></tr>
+    <tr><td>Permissions</td><td>The applications the users in the group can access. Check
+    application names or check Select all.</td></tr></table>
+
+<ol>
+<li>Click <strong>Add group</strong>.</li>
+</ol>
+<h4 id="adding-users-to-a-group">Adding Users to a Group</h4>
+<ol>
+<li>In the <strong>User Admin</strong> window, click <strong>Groups</strong>.</li>
+<li>Click the group.</li>
+<li>To add users to the group, check the names in the list provided or
+    check <strong>Select All</strong>.</li>
+<li>Click <strong>Update group</strong>.</li>
+</ol>
+<h4 id="deleting-a-group">Deleting a Group</h4>
+<ol>
+<li>Click <strong>Groups</strong>.</li>
+<li>Check the checkbox next to the group and click <strong>Delete</strong>.</li>
+<li>Click <strong>Yes</strong> to confirm.</li>
+</ol>
+<h4 id="limit-users-can-login-only-if-they-are-belong-to-one-of-listed-ldap-groups">Limit users can login only if they are belong to one of listed LDAP groups</h4>
+<pre>
+  [desktop]
+  [[ldap]]
+  login_groups=ldap_grp1,ldap_grp2,ldap_grp3
+</pre>
+
+<h4 id="importing-groups-from-an-ldap-directory">Importing Groups from an LDAP Directory</h4>
+<ol>
+<li>From the <strong>Groups</strong> tab, click <strong>Add/sync LDAP group</strong>.</li>
+<li>Specify the group properties:</li>
+</ol>
+<table>
+<tr><td>Name</td><td> The name of the group.</td></tr>
+<tr><td>Distinguished name</td><td> Indicate that Hue should use a full distinguished name for the
+    group.</td></tr>
+    <tr><td>Import new members</td><td>  Indicate that Hue should import the members of the group.</td></tr>
+        <tr><td>Import new members from all subgroups</td><td>
+    Indicate that Hue should import the members of the subgroups.</td></tr>
+            <tr><td>Create home directories</td><td> Indicate that Hue should create home directories in HDFS for the
+    imported members.</td></tr>
+</table>
+
+<ol>
+<li>Click <strong>Add/sync group</strong>.</li>
+</ol>
+<p><a id="permissions"></a>
+Permissions</p>
+<hr />
+<p>Permissions for Hue applications are granted to groups, with users
+gaining permissions based on their group membership. Group permissions
+define the Hue applications visible to group members when they log into
+Hue and the application features available to them.</p>
+<ol>
+<li>Click <strong>Permissions</strong>.</li>
+<li>Click the application for which you want to assign permissions.</li>
+<li>Check the checkboxes next to the groups you want to have permission
+    for the application. Check <strong>Select all</strong> to select all groups.</li>
+<li>Click <strong>Update permission</strong>. The new groups will appear in the
+    Groups column in the <strong>Hue Permissions</strong> list.</li>
+</ol>
+<p><a href="http://gethue.com/how-to-manage-permissions-in-hue/">Read more about it here</a>.</p>
+<h2 id="process-hierarchy">Process Hierarchy</h2>
+<p>A script called <code>supervisor</code> manages all Hue processes. The supervisor is a
+watchdog process -- its only purpose is to spawn and monitor other processes.
+A standard Hue installation starts and monitors the following processes:</p>
+<ul>
+<li><code>runcpserver</code> - a web server based on CherryPy that provides the core web
+functionality of Hue</li>
+</ul>
+<p>If you have installed other applications into your Hue instance, you may see
+other daemons running under the supervisor as well.</p>
+<p>You can see the supervised processes running in the output of <code>ps -f -u hue</code>:</p>
+<pre><code>UID        PID  PPID  C STIME TTY          TIME CMD
+hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
+</code></pre>
+<p>Note that the supervisor automatically restarts these processes if they fail for
+any reason. If the processes fail repeatedly within a short time, the supervisor
+itself shuts down.</p>
+<h2 id="logging">Logging</h2>
+<p>The Hue logs are found in <code>/var/log/hue</code>, or in a <code>logs</code> directory under your
+Hue installation root. Inside the log directory you can find:</p>
+<ul>
+<li>An <code>access.log</code> file, which contains a log for all requests against the Hue
+web server.</li>
+<li>A <code>supervisor.log</code> file, which contains log information for the supervisor
+process.</li>
+<li>A <code>supervisor.out</code> file, which contains the stdout and stderr for the
+supervisor process.</li>
+<li>A <code>.log</code> file for each supervised process described above, which contains
+the logs for that process.</li>
+<li>A <code>.out</code> file for each supervised process described above, which contains
+the stdout and stderr for that process.</li>
+</ul>
+<p>If users on your cluster have problems running Hue, you can often find error
+messages in these log files. If you are unable to start Hue from the init
+script, the <code>supervisor.log</code> log file can often contain clues.</p>
+<h3 id="viewing-recent-log-messages">Viewing Recent Log Messages</h3>
+<p>In addition to logging <code>INFO</code> level messages to the <code>logs</code> directory, the Hue
+web server keeps a small buffer of log messages at all levels in memory. You can
+view these logs by visiting <code>http://myserver:8888/hue/logs</code>. The <code>DEBUG</code> level
+messages shown can sometimes be helpful in troubleshooting issues.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>To troubleshoot why Hue is slow or consuming high memory, admin can enable instrumentation by setting the <code>instrumentation</code> flag to True.
+ <pre>
+[desktop]
+instrumentation=true
+</pre>
+ If <code>django_debug_mode</code> is enabled, instrumentation is automatically enabled. This flag appends the response time and the total peak memory used since Hue started for every logged request.</p>
+<h5 id="instrumentation-enabled">Instrumentation enabled:</h5>
+<pre>
+[17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
+</pre>
+
+<h5 id="instrumentation-not-enabled">Instrumentation not enabled:</h5>
+<pre>
+[23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
+</pre>
+
+<h2 id="database">Database</h2>
+<p>Hue requires a SQL database to store small amounts of data, including user
+account information as well as history of job submissions and Hive queries.
+By default, Hue is configured to use the embedded database SQLite for this
+purpose, and should require no configuration or management by the administrator.
+However, MySQL is the recommended database to use. This section contains
+instructions for configuring Hue to access MySQL and other databases.</p>
+<h3 id="inspecting-the-database">Inspecting the Database</h3>
+<p>The default SQLite database used by Hue is located in: <code>/usr/share/hue/desktop/desktop.db</code>.
+You can inspect this database from the command line using the <code>sqlite3</code>
+program or typing `/usr/share/hue/build/env/bin/hue dbshell'. For example:</p>
+<pre><code>sqlite3 /usr/share/hue/desktop/desktop.db
+SQLite version 3.6.22
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; select username from auth_user;
+admin
+test
+sample
+sqlite&gt;
+</code></pre>
+<p>It is strongly recommended that you avoid making any modifications to the
+database directly using SQLite, though this trick can be useful for management
+or troubleshooting.</p>
+<h3 id="backing-up-the-database">Backing up the Database</h3>
+<p>If you use the default SQLite database, then copy the <code>desktop.db</code> file to
+another node for backup. It is recommended that you back it up on a regular
+schedule, and also that you back it up before any upgrade to a new version of
+Hue.</p>
+<h3 id="configuring-to-access-another-database">Configuring to Access Another Database</h3>
+<p>Although SQLite is the default database type, some advanced users may prefer
+to have Hue access an alternate database type. Note that if you elect to
+configure Hue to use an external database, upgrades may require more manual
+steps in the future.</p>
+<p>The following instructions are for MySQL, though you can also configure Hue to
+work with other common databases such as PostgreSQL and Oracle.</p>
+<div class="note">
+Note that Hue has only been tested with SQLite and MySQL database backends.
+</div>
+
+<h3 id="configuring-to-store-data-in-mysql">Configuring to Store Data in MySQL</h3>
+<p>To configure Hue to store data in MySQL:</p>
+<ol>
+<li>
+<p>Create a new database in MySQL and grant privileges to a Hue user to manage
+   this database.</p>
+<p>mysql&gt; create database hue;
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; grant all on hue.* to 'hue'@'localhost' identified by 'secretpassword';
+Query OK, 0 rows affected (0.00 sec)</p>
+</li>
+<li>
+<p>Shut down Hue if it is running.</p>
+</li>
+<li>
+<p>To migrate your existing data to MySQL, use the following command to dump the
+   existing database data to a text file. Note that using the ".json" extension
+   is required.</p>
+<p>/usr/share/hue/build/env/bin/hue dumpdata &gt; $some-temporary-file.json</p>
+</li>
+<li>
+<p>Open the <code>hue.ini</code> file in a text editor. Directly below the
+   <code>[[database]]</code> line, add the following options (and modify accordingly for
+   your MySQL setup):</p>
+<p>host=localhost
+port=3306
+engine=mysql
+user=hue
+password=secretpassword
+name=hue</p>
+</li>
+<li>
+<p>As the Hue user, configure Hue to load the existing data and create the
+   necessary database tables:</p>
+<p>/usr/share/hue/build/env/bin/hue syncdb --noinput
+mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
+/usr/share/hue/build/env/bin/hue loaddata $temporary-file-containing-dumped-data.json</p>
+</li>
+</ol>
+<p>Your system is now configured and you can start the Hue server as normal.</p>
+<h1 id="using-hue">Using Hue</h1>
+<p>After installation, you can use Hue by navigating to <code>http://myserver:8888/</code>.</p>
+<p>The link:user-guide/index.html[user guide] will help users go through the various installed applications.</p>
+<h2 id="supported-browsers">Supported Browsers</h2>
+<p>The two latest LTS versions of each browsers:</p>
+<ul>
+<li>Edge</li>
+<li>Safari</li>
+<li>Chrome</li>
+<li>Firefox</li>
+</ul>
+<h2 id="feedback">Feedback</h2>
+<p>Your feedback is welcome. The best way to send feedback is to join the
+https://groups.google.com/a/cloudera.org/group/hue-user[mailing list], and
+send e-mail, to mailto:hue-user@cloudera.org[hue-user@cloudera.org].</p>
+<h2 id="reporting-bugs">Reporting Bugs</h2>
+<p>If you find that something doesn't work, it'll often be helpful to include logs
+from your server. Please include the
+logs as a zip (or cut and paste the ones that look relevant) and send those with
+your bug reports.</p>
+<p></div>
+</div></p>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.treed.js"></script>
+<script src="../js/jquery.highlight.js"></script>
+<script src="../js/hue-docs.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+gtag('config', 'UA-37637545-1');
+</script>
