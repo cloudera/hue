@@ -82,7 +82,7 @@ def get_context_namespaces(request, interface):
   namespaces = []
 
   clusters = get_clusters(request.user).values()
- 
+
   namespaces.extend([{
       'id': cluster['id'],
       'name': cluster['name'],
@@ -138,6 +138,7 @@ def get_context_computes(request, interface):
   computes = []
 
   clusters = get_clusters(request.user).values()
+  has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type']]
 
   if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
     computes.extend([{
@@ -149,13 +150,13 @@ def get_context_computes(request, interface):
       } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
     ])
 
-  if interface == 'impala' or interface == 'report':
-    if IS_K8S_ONLY.get():
-      dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
-    else:
-      dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
+  if has_altus_clusters:
+    if interface == 'impala' or interface == 'report':
+      if IS_K8S_ONLY.get():
+        dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+      else:
+        dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
 
-    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
@@ -166,8 +167,7 @@ def get_context_computes(request, interface):
         } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and cluster['status'] == 'ONLINE')]
       )
 
-  if interface == 'oozie' or interface == 'spark2':
-    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
+    if interface == 'oozie' or interface == 'spark2':
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
