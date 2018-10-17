@@ -1222,30 +1222,30 @@ def test_make_log_links():
 
   # JobBrowser
   assert_equal(
-      """<a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """<a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('job_201306261521_0058')
   )
   assert_equal(
-      """Hadoop Job IDs executed by Pig: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """Hadoop Job IDs executed by Pig: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('Hadoop Job IDs executed by Pig: job_201306261521_0058')
   )
   assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058')
   )
   assert_equal(
-      """- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058')
   )
   assert_equal(
-      """ Logging error messages to: <a href="/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002""",
+      """ Logging error messages to: <a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002""",
       LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002')
   )
   assert_equal(
-      """ pig-<a href="/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""",
+      """ pig-<a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""",
       LinkJobLogs._make_links(' pig-job_201307091553_0028.log')
   )
   assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI""",
+      """MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI""",
       LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI')
   )
