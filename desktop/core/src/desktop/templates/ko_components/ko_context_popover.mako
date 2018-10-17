@@ -915,7 +915,7 @@ from metadata.conf import has_navigator
 
       LangRefContext.prototype.openInRightAssist = function () {
         var self = this;
-        huePubSub.publish('assist.lang.ref.show.topic', self.topicId);
+        huePubSub.publish('assist.lang.ref.show.topic', { ref: self.topicId });
         huePubSub.publish('context.popover.hide');
       };
 
