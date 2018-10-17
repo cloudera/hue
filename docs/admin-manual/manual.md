@@ -70,13 +70,15 @@ tarball, you'll need these library development packages and tools installed on y
 ### MacOS
 
 * Xcode command line tools
-* Oracle's JDK 1.7+
-* maven (Homebrew)
-* mysql (Homebrew)
-* gmp (Homebrew)
-* openssl (Homebrew)
+* [Homebrew](https://brew.sh)
 * [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
 
+#### Install Dependencies via Homebrew
+
+    brew install mysql maven gmp openssl libffi && brew cask install java8
+
+#### Install Xcode command line tools 
+    sudo xcode-select --install
 
 #### Fix openssl errors
 Required for MacOS 10.11+
