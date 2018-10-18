@@ -775,7 +775,9 @@ from desktop.views import _ko
         'solrFormula': SolrFormulaAutocompleter,
         'solrQuery':  SolrQueryAutocompleter,
         'impalaQuery': SqlAutocompleter3,
-        'hiveQuery': SqlAutocompleter3
+        'hiveQuery': SqlAutocompleter3,
+        'impala': SqlAutocompleter3,
+        'hive': SqlAutocompleter3
       };
 
       var SimpleAceEditor = function (params, element) {
@@ -807,11 +809,14 @@ from desktop.views import _ko
             throw new Error('Could not find autocompleter for "' + params.autocomplete.type + '"');
           }
 
-          var sourceType = params.autocomplete.type.substring(0, params.autocomplete.type.indexOf('Query'));
+          var sourceType = params.autocomplete.type.indexOf('Query') !== -1 ? params.autocomplete.type.replace('Query', '') : params.autocomplete.type;
 
           var autocompleteArgs = {
             editor: function() { return editor },
             snippet: {
+              autocompleteSettings: {
+                temporaryOnly: params.temporaryOnly
+              },
               type: function () {
                 return sourceType;
               },

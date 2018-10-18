@@ -981,8 +981,8 @@ ${ assist.assistPanel() }
 
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: fieldEditorValue,
-                  placeHolder: '${ _ko('Example: SELECT a, b FROM c') }',
-                  autocomplete: { type: 'hiveQuery' },
+                  placeHolder: '${ _ko('Example: SELECT field_1 FROM input') }',
+                  autocomplete: { type: sourceType },
                   lines: 5,
                   aceOptions: {
                     minLines: 10,
@@ -991,7 +991,8 @@ ${ assist.assistPanel() }
                   database: fieldEditorDatabase,
                   namespace: namespace,
                   compute: compute,
-                  mode: 'hive'
+                  temporaryOnly: true,
+                  mode: sourceType
                 }}"></div>
               <!-- /ko -->
               <!-- ko ifnot: useFieldEditor -->
@@ -1610,6 +1611,47 @@ ${ assist.assistPanel() }
       self.namespace = wizard.namespace;
       self.compute = wizard.compute;
 
+      var refreshThrottle = -1;
+      var sampleColSubDisposals = [];
+      var refreshTemporaryTable = function (sampleCols) {
+        window.clearTimeout(refreshThrottle);
+        window.setTimeout(function () {
+          while (sampleColSubDisposals.length) {
+            sampleColSubDisposals.pop()();
+          }
+          var temporaryColumns = [];
+          sampleCols.forEach(function (sampleCol) {
+            var col = {
+              name: sampleCol.name(),
+              type: sampleCol.type()
+            };
+            temporaryColumns.push(col);
+            var colNameSub = sampleCol.name.subscribe(function () {
+              refreshTemporaryTable(self.sampleCols())
+            });
+            var colTypeSub = sampleCol.type.subscribe(function () {
+              refreshTemporaryTable(self.sampleCols())
+            });
+            sampleColSubDisposals.push(function () {
+              colNameSub.dispose();
+              colTypeSub.dispose();
+            })
+          });
+          var handle = DataCatalog.addTemporaryTable({
+            sourceType: self.sourceType,
+            namespace: self.namespace(),
+            compute: self.compute(),
+            name: 'input',
+            columns: temporaryColumns
+          });
+          sampleColSubDisposals.push(function () {
+            handle.delete();
+          })
+        }, 500)
+      };
+
+
+      self.sampleCols.subscribe(refreshTemporaryTable);
       self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
 
       self.inputFormat.subscribe(function(val) {
