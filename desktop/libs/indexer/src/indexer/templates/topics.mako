@@ -316,10 +316,12 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane margin-top-10" id="index-consumer">
-      <h4>${ _('Source') }</h4>
       <div class="row-fluid">
         <div>
-          <label class="control-label"><div>${ _('Type') }</div>
+          <label class="control-label"><div>${ _('Consumer 1') }</div>
+            Type
+          </label>
+          <label class="control-label"><div>${ _('Consumer 2') }</div>
             Type
           </label>
         </div>
