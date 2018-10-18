@@ -27,6 +27,7 @@ from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
 
+
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
 
@@ -69,11 +70,9 @@ def has_navigator(user):
 
 
 def get_security_default():
-  '''Get default security value from Hadoop'''
-  from hadoop import cluster # Avoid dependencies conflicts
-  cluster = cluster.get_yarn()
-
-  return cluster.SECURITY_ENABLED.get()
+  from libsentry.conf import is_enabled
+  
+  return is_enabled()
 
 
 def get_optimizer_password_script():
