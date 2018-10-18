@@ -401,6 +401,13 @@ var DataCatalog = (function () {
         path: ['default']
       });
 
+      var addEntryMeta = function (entry, sourceMeta) {
+        entry.sourceMeta = sourceMeta || entry.definition;
+        entry.sourceMetaPromise = $.Deferred().resolve(entry.sourceMeta).promise();
+        entry.navigatorMeta = { comment: '' };
+        entry.navigatorMetaPromise = $.Deferred().resolve(entry.navigatorMeta).promise();
+      };
+
       if (!self.temporaryEntries[databaseIdentifier]) {
         var databaseDeferred = $.Deferred();
         self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
@@ -415,6 +422,7 @@ var DataCatalog = (function () {
             type: 'database'
           }
         });
+        addEntryMeta(databaseEntry);
         identifiersToClean.push(databaseIdentifier);
         databaseEntry.childrenPromise = $.Deferred().resolve([]).promise();
         databaseDeferred.resolve(databaseEntry);
@@ -454,6 +462,13 @@ var DataCatalog = (function () {
           if (options.columns) {
             var childEntries = [];
             var index = 0;
+            addEntryMeta(tableEntry, {
+              columns: [],
+              extended_columns: [],
+              comment: '',
+              notFound: false,
+              is_view: false
+            });
             options.columns.forEach(function (column) {
               var columnPath = path.concat(column.name);
               var columnIdentifier = generateEntryCacheId({
@@ -478,7 +493,16 @@ var DataCatalog = (function () {
                   type: column.type
                 }
               });
+              tableEntry.sourceMeta.columns.push(column.name);
+              tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
               columnDeferred.resolve(columnEntry);
+              addEntryMeta(columnEntry, {
+                comment: '',
+                name: column.name,
+                notFount: false,
+                sample: [],
+                type: column.type
+              });
 
               childEntries.push(columnEntry)
             });
