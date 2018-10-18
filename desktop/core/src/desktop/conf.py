@@ -1612,21 +1612,8 @@ def get_clusters(user):
   clusters = []
   cluster_config = CLUSTERS.get()
 
-  for i in cluster_config:
-    # Get additional remote multi clusters
-    clusters.append(
-      (i, {
-          'id': i,
-          'name': cluster_config[i].NAME.get() or i,
-          'type': cluster_config[i].TYPE.get(),
-          'interface': cluster_config[i].INTERFACE.get() or 'hive',
-          'server_host': cluster_config[i].SERVER_HOST.get()
-        }
-      )
-    )
-
-  # Get traditional services in regular ini too
-  if not IS_MULTICLUSTER_ONLY.get():
+  # Get core standalone config if there
+  if not IS_MULTICLUSTER_ONLY.get() or [cluster_config for i in cluster_config if i == 'Default']:
     clusters.append(
       (CLUSTER_ID.get(), {
         'id': CLUSTER_ID.get(),
@@ -1637,6 +1624,17 @@ def get_clusters(user):
         }
       )
     )
+
+  # Get additional remote multi clusters
+  clusters.extend([
+    (i, {
+      'id': i,
+      'name': cluster_config[i].NAME.get() or i,
+      'type': cluster_config[i].TYPE.get(),
+      'interface': cluster_config[i].INTERFACE.get() or 'hive',
+      'server_host': cluster_config[i].SERVER_HOST.get()
+    }) for i in cluster_config if i != 'Default'
+  ])
 
   return OrderedDict(clusters)
 
