@@ -20,6 +20,9 @@
 
       var subject = new AutocompleteResults({
         snippet: {
+          autocompleteSettings: {
+            temporaryOnly: false
+          },
           type: function () {
             return 'hive';
           },
@@ -413,6 +416,9 @@
 
         return new SqlAutocompleter3({
           snippet: {
+            autocompleteSettings: {
+              temporaryOnly: false
+            }
             type: function () {
               return dialect;
             },

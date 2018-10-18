@@ -99,6 +99,7 @@ var AutocompleteResults = (function () {
     self.apiHelper = ApiHelper.getInstance();
     self.snippet = options.snippet;
     self.editor = options.editor;
+    self.temporaryOnly = options.snippet.autocompleteSettings && options.snippet.autocompleteSettings.temporaryOnly;
 
     self.sortOverride = null;
 
@@ -268,14 +269,16 @@ var AutocompleteResults = (function () {
     self.handleValues(colRefDeferred);
     self.activeDeferrals.push(self.handlePaths());
 
-    self.activeDeferrals.push(self.handleJoins());
-    self.activeDeferrals.push(self.handleJoinConditions());
-    self.activeDeferrals.push(self.handleAggregateFunctions());
-    self.activeDeferrals.push(self.handleGroupBys(columnsDeferred));
-    self.activeDeferrals.push(self.handleOrderBys(columnsDeferred));
-    self.activeDeferrals.push(self.handleFilters());
-    self.activeDeferrals.push(self.handlePopularTables(tablesDeferred));
-    self.activeDeferrals.push(self.handlePopularColumns(columnsDeferred));
+    if (!self.temporaryOnly) {
+      self.activeDeferrals.push(self.handleJoins());
+      self.activeDeferrals.push(self.handleJoinConditions());
+      self.activeDeferrals.push(self.handleAggregateFunctions());
+      self.activeDeferrals.push(self.handleGroupBys(columnsDeferred));
+      self.activeDeferrals.push(self.handleOrderBys(columnsDeferred));
+      self.activeDeferrals.push(self.handleFilters());
+      self.activeDeferrals.push(self.handlePopularTables(tablesDeferred));
+      self.activeDeferrals.push(self.handlePopularColumns(columnsDeferred));
+    }
 
     $.when.apply($, self.activeDeferrals).always(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
@@ -326,7 +329,7 @@ var AutocompleteResults = (function () {
   AutocompleteResults.prototype.loadDatabases = function () {
     var self = this;
     var databasesDeferred = $.Deferred();
-    DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [] }).done(function (entry) {
+    DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], temporaryOnly: self.temporaryOnly }).done(function (entry) {
       self.cancellablePromises.push(entry.getChildren({ silenceErrors: true, cancellable: true }).done(function (databases) {
         databasesDeferred.resolve(databases);
       }).fail(databasesDeferred.reject));
@@ -544,7 +547,7 @@ var AutocompleteResults = (function () {
 
         var database = suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase;
 
-        DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ database ]}).done(function (dbEntry) {
+        DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ database ], temporaryOnly: self.temporaryOnly }).done(function (dbEntry) {
           self.cancellablePromises.push(dbEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (tableEntries) {
             var tableSuggestions = [];
 
@@ -1364,7 +1367,7 @@ var AutocompleteResults = (function () {
         && self.parseResult.suggestTables.identifierChain.length === 1
         && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
 
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ db ]}).done(function (entry) {
+      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ db ], temporaryOnly: self.temporaryOnly }).done(function (entry) {
         self.cancellablePromises.push(entry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
           var totalPopularity = 0;
           var popularityIndex = {};
@@ -1587,7 +1590,7 @@ var AutocompleteResults = (function () {
         }
       }
 
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: fetchedPath }).done(function (catalogEntry) {
+      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: fetchedPath, temporaryOnly: self.temporaryOnly }).done(function (catalogEntry) {
         self.cancellablePromises.push(catalogEntry.getSourceMeta({ silenceErrors: true, cancellable: true }).done(function (sourceMeta) {
           if (self.snippet.type() === 'hive'
               && typeof sourceMeta.extended_columns !== 'undefined'
@@ -1617,7 +1620,7 @@ var AutocompleteResults = (function () {
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (path.length > 1 && (self.snippet.type() === 'impala' || self.snippet.type() === 'hive')) {
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [] }).done(function (catalogEntry) {
+      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], temporaryOnly: self.temporaryOnly }).done(function (catalogEntry) {
         self.cancellablePromises.push(catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (databaseEntries) {
           var firstIsDb = databaseEntries.some(function (dbEntry) {
             return hueUtils.equalIgnoreCase(dbEntry.name, path[0]);
@@ -1645,8 +1648,8 @@ var SqlAutocompleter3 = (function () {
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
-   * @param {string) [options.fixedPrefix] - Optional prefix to always use on parse
-   * @param {string) [options.fixedPostfix] - Optional postfix to always use on parse
+   * @param {string} [options.fixedPrefix] - Optional prefix to always use on parse
+   * @param {string} [options.fixedPostfix] - Optional postfix to always use on parse
    * @constructor
    */
   function SqlAutocompleter3(options) {

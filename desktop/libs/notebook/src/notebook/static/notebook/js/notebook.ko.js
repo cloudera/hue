@@ -325,6 +325,10 @@ var EditorViewModel = (function() {
           || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
     });
 
+    self.autocompleteSettings = {
+      temporaryOnly: false
+    };
+
     // Ace stuff
     self.aceCursorPosition = ko.observable(notebook.isHistory() ? snippet.aceCursorPosition : null);
 
