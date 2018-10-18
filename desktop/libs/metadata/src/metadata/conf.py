@@ -70,8 +70,9 @@ def has_navigator(user):
 
 
 def get_security_default():
+  '''Get if Sentry is available so that we filter the objects or not'''
   from libsentry.conf import is_enabled
-  
+
   return is_enabled()
 
 
