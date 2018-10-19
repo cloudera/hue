@@ -1690,7 +1690,7 @@ for x in sys.stdin:
       }, follow=True)
       resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context[0]['query'].id}), follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=180.0)
-      resp = self.client.get("/hue/metastore/databases/")
+      resp = self.client.get("/metastore/databases/")
       assert_true(db_name in resp.context[0]["databases"], resp)
 
       # Test for accented characters in 'comment'
@@ -1702,7 +1702,7 @@ for x in sys.stdin:
       }, follow=True)
       resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context[0]['query'].id}), follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=180.0)
-      resp = self.client.get("/hue/metastore/databases/")
+      resp = self.client.get("/metastore/databases/")
       assert_true(db_name_accent in resp.context[0]['databases'], resp)
     finally:
       make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
