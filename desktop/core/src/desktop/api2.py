@@ -25,7 +25,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 from django.core import management
-
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
@@ -760,8 +760,9 @@ def import_documents(request):
 
   stdout = StringIO.StringIO()
   try:
-    management.call_command('loaddata', f.name, verbosity=2, traceback=True, stdout=stdout)
-    Document.objects.sync()
+    with transaction.atomic(): # We wrap both commands to commit loaddata & sync
+      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout, commit=False) # We need to use commit=False because commit=True will close the connection and make Document.objects.sync fail.
+      Document.objects.sync()
 
     if request.POST.get('redirect'):
       return redirect(request.POST.get('redirect'))
