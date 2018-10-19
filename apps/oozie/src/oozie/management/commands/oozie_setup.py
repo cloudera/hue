@@ -363,7 +363,8 @@ class Command(BaseCommand):
     LOG.info(_("Installing examples..."))
 
     if ENABLE_V2.get():
-      management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
+      with transaction.atomic():
+        management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2, commit=False)
 
     if IS_HUE_4.get():
       # Install editor oozie examples without doc1 link
