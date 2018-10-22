@@ -1619,6 +1619,25 @@ ${ assist.assistPanel() }
           while (sampleColSubDisposals.length) {
             sampleColSubDisposals.pop()();
           }
+          if (!self.sampleCols().length) {
+            return;
+          }
+
+          var tableName = 'input';
+          switch (self.inputFormat()) {
+            case 'stream':
+              if (self.streamSelection() === 'kafka' && self.kafkaSelectedTopics()) {
+                tableName = self.kafkaSelectedTopics();
+              }
+              break;
+            case 'file' :
+              tableName = self.path().split('/').pop();
+              break;
+            case 'table':
+            case 'rdbms':
+              tableName = self.tableName();
+          }
+
           var temporaryColumns = [];
           sampleCols.forEach(function (sampleCol) {
             var col = {
@@ -1641,7 +1660,7 @@ ${ assist.assistPanel() }
             sourceType: self.sourceType,
             namespace: self.namespace(),
             compute: self.compute(),
-            name: 'input',
+            name: tableName,
             columns: temporaryColumns
           });
           sampleColSubDisposals.push(function () {
