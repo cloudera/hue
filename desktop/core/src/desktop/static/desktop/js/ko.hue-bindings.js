@@ -4024,7 +4024,102 @@
     }
   };
 
-  var AceLocationHandler = (function () {
+  // TODO: Move worker logic and location handling out of hue-bindings
+  window.WorkerHandler = (function () {
+    var registered = false;
+
+    var attachEntryResolver = function (location, sourceType, namespace, compute) {
+      location.resolveCatalogEntry = function(options) {
+        if (!options) {
+          options = {};
+        }
+        if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
+          DataCatalog.applyCancellable(location.resolvePathPromise, options);
+          return location.resolvePathPromise;
+        }
+
+        if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
+          if (!location.resolvePathPromise) {
+            location.resolvePathPromise = $.Deferred().reject().promise();
+          }
+          return location.resolvePathPromise;
+        }
+
+        var promise = SqlUtils.resolveCatalogEntry({
+          sourceType: sourceType,
+          namespace: namespace,
+          compute: compute,
+          cancellable: options.cancellable,
+          cachedOnly: options.cachedOnly,
+          identifierChain: location.identifierChain || location.colRef.identifierChain,
+          tables: location.tables || (location.colRef && location.colRef.tables)
+        });
+
+        if (!options.cachedOnly) {
+          location.resolvePathPromise = promise;
+        }
+        return promise;
+      }
+    };
+
+    return {
+      registerWorkers: function () {
+        if (!registered && window.Worker) {
+          // It can take a while before the worker is active
+          var whenWorkerIsReady = function (worker, message) {
+            if (!worker.isReady) {
+              window.clearTimeout(worker.pingTimeout);
+              worker.postMessage({ ping: true });
+              worker.pingTimeout = window.setTimeout(function () {
+                whenWorkerIsReady(worker, message);
+              }, 500);
+            } else {
+              worker.postMessage(message);
+            }
+          };
+
+          // For syntax checking
+          var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
+          aceSqlSyntaxWorker.onmessage = function (e) {
+            if (e.data.ping) {
+              aceSqlSyntaxWorker.isReady = true;
+            } else {
+              huePubSub.publish('ace.sql.syntax.worker.message', e);
+            }
+          };
+
+          huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
+            whenWorkerIsReady(aceSqlSyntaxWorker, message);
+          });
+
+          // For location marking
+          var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
+          aceSqlLocationWorker.onmessage = function (e) {
+            if (e.data.ping) {
+              aceSqlLocationWorker.isReady = true;
+            } else {
+              if (e.data.locations) {
+                e.data.locations.forEach(function (location) {
+                  attachEntryResolver(location, e.data.sourceType, e.data.namespace, e.data.compute);
+                })
+              }
+              huePubSub.publish('ace.sql.location.worker.message', e);
+            }
+          };
+
+          huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
+            whenWorkerIsReady(aceSqlLocationWorker, message);
+          });
+
+          registered = true;
+        }
+      }
+    }
+
+  })();
+
+
+  window.AceLocationHandler = (function () {
 
     var STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
