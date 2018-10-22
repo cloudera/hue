@@ -38,10 +38,6 @@ from desktop.models import DefaultConfiguration
 from metadata.optimizer_client import OptimizerApi
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name
-import pylibmc
-
-mc = pylibmc.Client(["127.0.0.1"], binary=True, behaviors={"tcp_nodelay": True, "ketama": True})
-mc_pool = pylibmc.ClientPool(mc, 4)
 
 
 LOG = logging.getLogger(__name__)
@@ -259,12 +255,6 @@ class HS2Api(Api):
   @query_error_handler
   def check_status(self, notebook, snippet):
     response = {}
-    try:
-      guid = snippet['result']['handle']['guid']
-      session_guid = snippet['result']['handle']['session_guid']
-    except KeyError:
-      raise Exception('Operation has no valid handle attached')
-
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
@@ -272,12 +262,6 @@ class HS2Api(Api):
     status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
 
     if status.index in (QueryHistory.STATE.failed.index, QueryHistory.STATE.expired.index):
-      # when status is failed or expired is called, the query must be finished
-      with mc_pool.reserve(True) as cache:
-        cache.delete(session_guid)
-        cache.delete(guid)
-        LOG.debug('check_status: Removed session_guid %s from busy session. Operation handle guid %s' % (session_guid, guid))
-
       if operation.errorMessage and 'transition from CANCELED to ERROR' in operation.errorMessage: # Hive case on canceled query
         raise QueryExpired()
       elif  operation.errorMessage and re.search('Cannot validate serde: org.apache.hive.hcatalog.data.JsonSerDe', str(operation.errorMessage)):
