@@ -981,7 +981,7 @@ ${ assist.assistPanel() }
 
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: fieldEditorValue,
-                  placeHolder: '${ _ko('Example: SELECT field_1 FROM input') }',
+                  placeHolder: fieldEditorPlaceHolder,
                   autocomplete: { type: sourceType },
                   lines: 5,
                   aceOptions: {
@@ -1613,6 +1613,7 @@ ${ assist.assistPanel() }
 
       var refreshThrottle = -1;
       var sampleColSubDisposals = [];
+      var lastStatement = '';
       var refreshTemporaryTable = function (sampleCols) {
         window.clearTimeout(refreshThrottle);
         window.setTimeout(function () {
@@ -1638,8 +1639,10 @@ ${ assist.assistPanel() }
               tableName = self.tableName();
           }
 
+          var statementCols = [];
           var temporaryColumns = [];
           sampleCols.forEach(function (sampleCol) {
+            statementCols.push(SqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
             var col = {
               name: sampleCol.name(),
               type: sampleCol.type()
@@ -1656,6 +1659,16 @@ ${ assist.assistPanel() }
               colTypeSub.dispose();
             })
           });
+
+          var statement = 'SELECT ';
+          statement += statementCols.join(',\n    ');
+          statement += '\n FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
+          if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
+            wizard.destination.fieldEditorValue(statement);
+          }
+          lastStatement = statement;
+          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName));
+
           var handle = DataCatalog.addTemporaryTable({
             sourceType: self.sourceType,
             namespace: self.namespace(),
@@ -1689,7 +1702,7 @@ ${ assist.assistPanel() }
           }
         } else if (val === 'table') {
           wizard.destination.outputFormat('altus');
-        } else if (val == 'rdbms') {
+        } else if (val === 'rdbms') {
           self.rdbmsMode('customRdbms');
         }
       });
@@ -2414,6 +2427,7 @@ ${ assist.assistPanel() }
       self.fieldEditorDatabase = ko.observable('default');
       // TODO: Do something with the editor value
       self.fieldEditorValue = ko.observable();
+      self.fieldEditorPlaceHolder = ko.observable();
       self.fieldEditorEnabled = ko.pureComputed(function () {
         return '${ ENABLE_FIELD_EDITOR.get() }' == 'True';
       });
