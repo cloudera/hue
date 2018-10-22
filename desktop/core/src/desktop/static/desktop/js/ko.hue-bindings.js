@@ -4123,20 +4123,22 @@
 
     var STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
-    function AceLocationHandler (editor, editorId, snippet) {
+    function AceLocationHandler (options) {
       var self = this;
-      self.editor = editor;
-      self.editorId = editorId;
-      self.snippet = snippet;
+      self.editor = options.editor;
+      self.editorId = options.editorId;
+      self.snippet = options.snippet;
+      self.expandStar = (options.i18n && options.i18n.expandStar) || 'Right-click to expand with columns';
+      self.contextTooltip = (options.i18n && options.i18n.contextTooltip) || 'Right-click for details';
+
       self.sqlSyntaxWorkerSub = null;
-
       self.disposeFunctions = [];
-
       self.databaseIndex = {};
 
       self.attachStatementLocator();
       self.attachSqlWorker();
       self.attachGutterHandler();
+      self.attachMouseListeners();
 
       var updateDatabaseIndex = function (databaseList) {
         self.databaseIndex = {};
@@ -4153,6 +4155,273 @@
 
       updateDatabaseIndex(self.snippet.availableDatabases());
     }
+
+    AceLocationHandler.prototype.attachMouseListeners = function () {
+      var self = this;
+
+      var Tooltip = ace.require("ace/tooltip").Tooltip;
+      var AceRange = ace.require('ace/range').Range;
+
+      var contextTooltip = new Tooltip(self.editor.container);
+      var tooltipTimeout = -1;
+      var disableTooltip = false;
+      var lastHoveredToken = null;
+      var activeMarkers = [];
+      var keepLastMarker = false;
+
+      var hideContextTooltip = function () {
+        clearTimeout(tooltipTimeout);
+        contextTooltip.hide();
+      };
+
+      var clearActiveMarkers = function () {
+        hideContextTooltip();
+        while (activeMarkers.length > keepLastMarker ? 1 : 0) {
+          self.editor.session.removeMarker(activeMarkers.shift());
+        }
+      };
+
+      var markLocation = function (parseLocation) {
+        var range;
+        if (parseLocation.type === 'function') {
+          // Todo: Figure out why functions need an extra char at the end
+          range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column);
+        } else {
+          range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column - 1);
+        }
+        activeMarkers.push(self.editor.session.addMarker(range, 'hue-ace-location'));
+        return range;
+      };
+
+      var popoverShownSub = huePubSub.subscribe('context.popover.shown', function () {
+        hideContextTooltip();
+        keepLastMarker = true;
+        disableTooltip = true;
+      });
+
+      self.disposeFunctions.push(function () {
+        popoverShownSub.remove();
+      });
+
+      var popoverHiddenSub = huePubSub.subscribe('context.popover.hidden', function () {
+        disableTooltip = false;
+        clearActiveMarkers();
+        keepLastMarker = false;
+      });
+
+      self.disposeFunctions.push(function () {
+        popoverHiddenSub.remove();
+      });
+
+      var mousemoveListener = self.editor.on('mousemove', function (e) {
+        clearTimeout(tooltipTimeout);
+        var selectionRange = self.editor.selection.getRange();
+        if (selectionRange.isEmpty()) {
+          var pointerPosition = self.editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
+          var endTestPosition = self.editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
+          if (endTestPosition.column !== pointerPosition.column) {
+            var token = self.editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+            if (token !== null && !token.notFound && token.parseLocation && !disableTooltip && token.parseLocation.type !== 'alias') {
+              tooltipTimeout = window.setTimeout(function () {
+                if (token.parseLocation) {
+                  var endCoordinates = self.editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+
+                  var tooltipText = token.parseLocation.type === 'asterisk' ? self.expandStar : self.contextTooltip;
+                  var colType;
+                  if (token.parseLocation.type === 'column') {
+                    var tableChain = token.parseLocation.identifierChain.concat();
+                    var lastIdentifier = tableChain.pop();
+                    if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
+                      var colName = lastIdentifier.name.toLowerCase();
+                      // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
+                      DataCatalog.getEntry({
+                        sourceType: self.snippet.type(),
+                        namespace: self.snippet.namespace(),
+                        compute: self.snippet.compute(),
+                        temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
+                        path: $.map(tableChain, function (identifier) { return identifier.name })
+                      }).done(function (entry) {
+                        entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
+                          if (sourceMeta && sourceMeta.extended_columns) {
+                            sourceMeta.extended_columns.every(function (col) {
+                              if (col.name.toLowerCase() === colName) {
+                                colType = col.type.match(/^[^<]*/g)[0];
+                                return false;
+                              }
+                              return true;
+                            })
+                          }
+                        });
+                      });
+                    }
+                  }
+                  if (token.parseLocation.identifierChain) {
+                    var sqlIdentifier = $.map(token.parseLocation.identifierChain, function (identifier) {
+                      return identifier.name
+                    }).join('.');
+                    if (colType) {
+                      sqlIdentifier += ' (' + colType + ')';
+                    }
+                    tooltipText = sqlIdentifier + ' - ' + tooltipText;
+                  } else if (token.parseLocation.function) {
+                    tooltipText = token.parseLocation.function + ' - ' + tooltipText;
+                  }
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + self.editor.renderer.lineHeight + 3);
+                }
+              }, 500);
+            } else if (token !== null && token.notFound) {
+              tooltipTimeout = window.setTimeout(function () {
+                // TODO: i18n
+                if (token.notFound && token.syntaxError) {
+                  var tooltipText;
+                  if (token.syntaxError.expected.length > 0) {
+                    tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                  } else {
+                    tooltipText = HUE_I18n.syntaxChecker.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
+                  }
+                  var endCoordinates = self.editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + self.editor.renderer.lineHeight + 3);
+                }
+              }, 500);
+            } else if (token !== null && token.syntaxError) {
+              tooltipTimeout = window.setTimeout(function () {
+                if (token.syntaxError) {
+                  var tooltipText;
+                  if (token.syntaxError.expected.length > 0) {
+                    tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                  } else if (token.syntaxError.expectedStatementEnd) {
+                    tooltipText = HUE_I18n.syntaxChecker.expectedStatementEnd;
+                  }
+                  if (tooltipText) {
+                    var endCoordinates = self.editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + self.editor.renderer.lineHeight + 3);
+                  }
+                }
+              }, 500);
+            } else {
+              hideContextTooltip();
+            }
+            if (lastHoveredToken !== token) {
+              clearActiveMarkers();
+              if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) {
+                markLocation(token.parseLocation);
+              }
+              lastHoveredToken = token;
+            }
+          } else {
+            clearActiveMarkers();
+            lastHoveredToken = null;
+          }
+        }
+      });
+
+      self.disposeFunctions.push(function () {
+        self.editor.off('mousemove', mousemoveListener);
+      });
+
+      var inputListener = self.editor.on('input', function (e) {
+        clearActiveMarkers();
+        lastHoveredToken = null;
+      });
+
+      self.disposeFunctions.push(function () {
+        self.editor.off('input', inputListener);
+      });
+
+      var mouseoutListener = function (e) {
+        clearActiveMarkers();
+        clearTimeout(tooltipTimeout);
+        contextTooltip.hide();
+        lastHoveredToken = null;
+      };
+
+      self.editor.container.addEventListener('mouseout', mouseoutListener);
+
+      self.disposeFunctions.push(function () {
+        self.editor.container.removeEventListener('mouseout', mouseoutListener);
+      });
+
+      var onContextMenu = function (e) {
+        var selectionRange = self.editor.selection.getRange();
+        huePubSub.publish('context.popover.hide');
+        huePubSub.publish('sql.syntax.dropdown.hide');
+        if (selectionRange.isEmpty()) {
+          var pointerPosition = self.editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
+          var token = self.editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+          if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
+            var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
+            var startCoordinates = self.editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
+            var endCoordinates = self.editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
+            var source = {
+              // TODO: add element likely in the event
+              left: startCoordinates.pageX - 3,
+              top: startCoordinates.pageY,
+              right: endCoordinates.pageX - 3,
+              bottom: endCoordinates.pageY + self.editor.renderer.lineHeight
+            };
+
+            if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
+              token.parseLocation.resolveCatalogEntry().done(function (entry) {
+                huePubSub.publish('context.popover.show', {
+                  data: {
+                    type: 'catalogEntry',
+                    catalogEntry: entry
+                  },
+                  pinEnabled: true,
+                  source: source
+                });
+              }).fail(function () {
+                token.notFound = true;
+              });
+            } else if (token.parseLocation && !token.notFound) {
+              // Asterisk, function etc.
+              if (token.parseLocation.type === 'file') {
+                AssistStorageEntry.getEntry(token.parseLocation.path).done(function (entry) {
+                  entry.open(true);
+                  huePubSub.publish('context.popover.show', {
+                    data: {
+                      type: 'storageEntry',
+                      storageEntry: entry,
+                      editorLocation: token.parseLocation.location
+                    },
+                    pinEnabled: true,
+                    source: source
+                  });
+                });
+              } else {
+                huePubSub.publish('context.popover.show', {
+                  data: token.parseLocation,
+                  sourceType: self.snippet.type(),
+                  namespace: self.snippet.namespace(),
+                  compute: self.snippet.compute(),
+                  defaultDatabase: self.snippet.database(),
+                  pinEnabled: true,
+                  source: source
+                });
+              }
+            } else if (token.syntaxError) {
+              huePubSub.publish('sql.syntax.dropdown.show', {
+                snippet: self.snippet,
+                data: token.syntaxError,
+                editor: self.editor,
+                range: range,
+                sourceType: self.snippet.type(),
+                defaultDatabase: self.snippet.database(),
+                source: source
+              });
+            }
+            e.preventDefault();
+            return false;
+          }
+        }
+      };
+
+      var contextmenuListener = self.editor.container.addEventListener('contextmenu', onContextMenu);
+
+      self.disposeFunctions.push(function () {
+        self.editor.container.removeEventListener('contextmenu', contextmenuListener);
+      });
+    };
 
     AceLocationHandler.prototype.attachGutterHandler = function () {
       var self = this;
@@ -4887,7 +5156,6 @@
       $el.text(snippet.statement_raw());
 
       var editor = ace.edit($el.attr("id"));
-      var Tooltip = ace.require("ace/tooltip").Tooltip;
       var AceRange = ace.require('ace/range').Range;
 
       var resizeAce = function () {
@@ -4907,7 +5175,7 @@
         resizePubSub.remove();
       });
 
-      var aceLocationHandler = new AceLocationHandler(editor, $el.attr("id"), snippet);
+      var aceLocationHandler = new AceLocationHandler({ editor: editor, editorId: $el.attr("id"), snippet: snippet, i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }});
       disposeFunctions.push(function () {
         aceLocationHandler.dispose();
       });
@@ -5185,270 +5453,6 @@
       disposeFunctions.push(function () {
         editor.off('blur', blurListener);
       });
-
-      // TODO: Move context menu logic to separate module
-      (function () {
-        var contextTooltip = new Tooltip(editor.container);
-        var tooltipTimeout = -1;
-        var disableTooltip = false;
-        var lastHoveredToken = null;
-        var activeMarkers = [];
-        var keepLastMarker = false;
-
-        var hideContextTooltip = function () {
-          clearTimeout(tooltipTimeout);
-          contextTooltip.hide();
-        };
-
-        var clearActiveMarkers = function () {
-          hideContextTooltip();
-          while (activeMarkers.length > keepLastMarker ? 1 : 0) {
-            editor.session.removeMarker(activeMarkers.shift());
-          }
-        };
-
-        var markLocation = function (parseLocation) {
-          var range;
-          if (parseLocation.type === 'function') {
-            // Todo: Figure out why functions need an extra char at the end
-            range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column);
-          } else {
-            range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column - 1);
-          }
-          activeMarkers.push(editor.session.addMarker(range, 'hue-ace-location'));
-          return range;
-        };
-
-        var popoverShownSub = huePubSub.subscribe('context.popover.shown', function () {
-          hideContextTooltip();
-          keepLastMarker = true;
-          disableTooltip = true;
-        });
-
-        disposeFunctions.push(function () {
-          popoverShownSub.remove();
-        });
-
-        var popoverHiddenSub = huePubSub.subscribe('context.popover.hidden', function () {
-          disableTooltip = false;
-          clearActiveMarkers();
-          keepLastMarker = false;
-        });
-
-        disposeFunctions.push(function () {
-          popoverHiddenSub.remove();
-        });
-
-        var mousemoveListener = editor.on('mousemove', function (e) {
-          clearTimeout(tooltipTimeout);
-          var selectionRange = editor.selection.getRange();
-          if (selectionRange.isEmpty()) {
-            var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
-            var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
-            if (endTestPosition.column !== pointerPosition.column) {
-              var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip && token.parseLocation.type !== 'alias') {
-                tooltipTimeout = window.setTimeout(function () {
-                  if (token.parseLocation) {
-                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-
-                    var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
-                    var colType;
-                    if (token.parseLocation.type === 'column') {
-                      var tableChain = token.parseLocation.identifierChain.concat();
-                      var lastIdentifier = tableChain.pop();
-                      if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
-                        var colName = lastIdentifier.name.toLowerCase();
-                        // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
-                        DataCatalog.getEntry({
-                          sourceType: snippet.type(),
-                          namespace: snippet.namespace(),
-                          compute: snippet.compute(),
-                          path: $.map(tableChain, function (identifier) { return identifier.name })
-                        }).done(function (entry) {
-                          entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
-                            if (sourceMeta && sourceMeta.extended_columns) {
-                              sourceMeta.extended_columns.every(function (col) {
-                                if (col.name.toLowerCase() === colName) {
-                                  colType = col.type.match(/^[^<]*/g)[0];
-                                  return false;
-                                }
-                                return true;
-                              })
-                            }
-                          });
-                        });
-                      }
-                    }
-                    if (token.parseLocation.identifierChain) {
-                      var sqlIdentifier = $.map(token.parseLocation.identifierChain, function (identifier) {
-                          return identifier.name
-                        }).join('.');
-                      if (colType) {
-                        sqlIdentifier += ' (' + colType + ')';
-                      }
-                      tooltipText = sqlIdentifier + ' - ' + tooltipText;
-                    } else if (token.parseLocation.function) {
-                      tooltipText = token.parseLocation.function + ' - ' + tooltipText;
-                    }
-                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-                  }
-                }, 500);
-              } else if (token !== null && token.notFound) {
-                tooltipTimeout = window.setTimeout(function () {
-                  // TODO: i18n
-                  if (token.notFound && token.syntaxError) {
-                    var tooltipText;
-                    if (token.syntaxError.expected.length > 0) {
-                      tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
-                    } else {
-                      tooltipText = HUE_I18n.syntaxChecker.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
-                    }
-                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-                  }
-                }, 500);
-              } else if (token !== null && token.syntaxError) {
-                tooltipTimeout = window.setTimeout(function () {
-                  // TODO: i18n
-                  if (token.syntaxError) {
-                    var tooltipText;
-                    if (token.syntaxError.expected.length > 0) {
-                      tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
-                    } else if (token.syntaxError.expectedStatementEnd) {
-                      tooltipText = HUE_I18n.syntaxChecker.expectedStatementEnd;
-                    }
-                    if (tooltipText) {
-                      var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                      contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-                    }
-                  }
-                }, 500);
-              } else {
-                hideContextTooltip();
-              }
-              if (lastHoveredToken !== token) {
-                clearActiveMarkers();
-                if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) {
-                  markLocation(token.parseLocation);
-                }
-                lastHoveredToken = token;
-              }
-            } else {
-              clearActiveMarkers();
-              lastHoveredToken = null;
-            }
-          }
-        });
-
-        disposeFunctions.push(function () {
-          editor.off('mousemove', mousemoveListener);
-        });
-
-        var inputListener = editor.on('input', function (e) {
-          clearActiveMarkers();
-          lastHoveredToken = null;
-        });
-
-        disposeFunctions.push(function () {
-          editor.off('input', inputListener);
-        });
-
-        var mouseoutListener = function (e) {
-          clearActiveMarkers();
-          clearTimeout(tooltipTimeout);
-          contextTooltip.hide();
-          lastHoveredToken = null;
-        };
-
-        editor.container.addEventListener('mouseout', mouseoutListener);
-
-        disposeFunctions.push(function () {
-          editor.container.removeEventListener('mouseout', mouseoutListener);
-        });
-
-        var onContextMenu = function (e) {
-          var selectionRange = editor.selection.getRange();
-          huePubSub.publish('context.popover.hide');
-          huePubSub.publish('sql.syntax.dropdown.hide');
-          if (selectionRange.isEmpty()) {
-            var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
-            var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
-              var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
-              var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
-              var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
-              var source = {
-                 // TODO: add element likely in the event
-                left: startCoordinates.pageX - 3,
-                top: startCoordinates.pageY,
-                right: endCoordinates.pageX - 3,
-                bottom: endCoordinates.pageY + editor.renderer.lineHeight
-              };
-
-              if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
-                token.parseLocation.resolveCatalogEntry().done(function (entry) {
-                  huePubSub.publish('context.popover.show', {
-                    data: {
-                      type: 'catalogEntry',
-                      catalogEntry: entry
-                    },
-                    pinEnabled: true,
-                    source: source
-                  });
-                }).fail(function () {
-                  token.notFound = true;
-                });
-              } else if (token.parseLocation && !token.notFound) {
-                // Asterisk, function etc.
-                if (token.parseLocation.type === 'file') {
-                  AssistStorageEntry.getEntry(token.parseLocation.path).done(function (entry) {
-                    entry.open(true);
-                    huePubSub.publish('context.popover.show', {
-                      data: {
-                        type: 'storageEntry',
-                        storageEntry: entry,
-                        editorLocation: token.parseLocation.location
-                      },
-                      pinEnabled: true,
-                      source: source
-                    });
-                  });
-                } else {
-                  huePubSub.publish('context.popover.show', {
-                    data: token.parseLocation,
-                    sourceType: snippet.type(),
-                    namespace: snippet.namespace(),
-                    compute: snippet.compute(),
-                    defaultDatabase: snippet.database(),
-                    pinEnabled: true,
-                    source: source
-                  });
-                }
-              } else if (token.syntaxError) {
-                huePubSub.publish('sql.syntax.dropdown.show', {
-                  snippet: snippet,
-                  data: token.syntaxError,
-                  editor: editor,
-                  range: range,
-                  sourceType: snippet.type(),
-                  defaultDatabase: snippet.database(),
-                  source: source
-                });
-              }
-              e.preventDefault();
-              return false;
-            }
-          }
-        };
-
-        var contextmenuListener = editor.container.addEventListener('contextmenu', onContextMenu);
-
-        disposeFunctions.push(function () {
-          editor.container.removeEventListener('contextmenu', contextmenuListener);
-        });
-
-      }());
 
       editor.previousSize = 0;
 
