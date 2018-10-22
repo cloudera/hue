@@ -1317,7 +1317,7 @@ for x in sys.stdin:
     }, follow=True)
 
     # Ensure we can see table.
-    response = self.client.get("/metastore/table/%s/my_table?format=json" % self.db_name)
+    response = self.client.post("/metastore/table/%s/my_table?format=json" % self.db_name, {'format': 'json'})
     data = json.loads(response.content)
     assert_true("my_col" in [col['name'] for col in data['cols']], data)
 
@@ -1887,7 +1887,7 @@ for x in sys.stdin:
       # Retrieve stats before analyze
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
       stats = json.loads(resp.content)['stats']
-      assert_false([stat for stat in stats if stat['data_type'] == 'numRows'], resp.content)
+      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows' and stat['comment'] == '0']), resp.content)
 
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
       stats = json.loads(resp.content)['stats']
