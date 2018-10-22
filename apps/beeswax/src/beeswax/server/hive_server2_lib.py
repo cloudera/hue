@@ -44,7 +44,6 @@ from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException
-from beeswax.server import dbms
 
 
 LOG = logging.getLogger(__name__)
@@ -687,22 +686,7 @@ class HiveServerClient:
     # Get 2 + n_sessions sessions and filter out the busy ones
     sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
     LOG.debug('%s sessions found' % len(sessions))
-    db = dbms.get(self.user, dbms.get_query_server_config())
-
     if sessions:
-      for session in sessions:
-        handle = session.get_handle()
-        try:
-          operation = db.get_operation_status(handle)
-          status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
-          if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index):
-            continue
-          else:
-            return session
-        except (AttributeError):
-          # when session's handle doesn't have an RPC handle, just skip it
-          continue
-      # see which one is in used
       # Include trashed documents to keep the query lazy
       # and avoid retrieving all documents
       docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
