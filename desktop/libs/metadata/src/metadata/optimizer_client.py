@@ -128,6 +128,7 @@ class OptimizerApi(object):
     else:
       data_suffix = '.csv'
       extra_parameters = {
+          'fileType': 'QUERY',
           'colDelim': ',',
           'rowDelim': '\n',
           "headerFields": [

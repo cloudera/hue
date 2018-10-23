@@ -260,7 +260,7 @@ def run_sqoop(request, source, destination, start_time):
     is_task=True
   )
 
-  if request.POST.get('options'):
+  if request.POST.get('show_command'):
     return {'status': 0, 'commands': task.get_str()}
   else:
     return task.execute(request, batch=False)
