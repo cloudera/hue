@@ -1674,7 +1674,8 @@ ${ assist.assistPanel() }
             namespace: self.namespace(),
             compute: self.compute(),
             name: tableName,
-            columns: temporaryColumns
+            columns: temporaryColumns,
+            sample: self.sample()
           });
           sampleColSubDisposals.push(function () {
             handle.delete();

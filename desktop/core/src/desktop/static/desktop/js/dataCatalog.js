@@ -386,6 +386,7 @@ var DataCatalog = (function () {
      * @param {Object[]} options.columns
      * @param {string} options.columns[].name
      * @param {string} options.columns[].type
+     * @param {Object[][]} options.sample
      *
      * @return {Object}
      */
@@ -401,6 +402,8 @@ var DataCatalog = (function () {
         entry.sourceMetaPromise = $.Deferred().resolve(entry.sourceMeta).promise();
         entry.navigatorMeta = { comment: '' };
         entry.navigatorMetaPromise = $.Deferred().resolve(entry.navigatorMeta).promise();
+        entry.analysis = { is_view: false };
+        entry.analysisPromise = $.Deferred().resolve(entry.analysis).promise();
       };
 
       var removeTable = function () {}; // noop until actually added
@@ -489,7 +492,7 @@ var DataCatalog = (function () {
 
               if (options.columns) {
                 var childEntries = [];
-                var index = 0;
+
                 addEntryMeta(tableEntry, {
                   columns: [],
                   extended_columns: [],
@@ -497,6 +500,14 @@ var DataCatalog = (function () {
                   notFound: false,
                   is_view: false
                 });
+
+                tableEntry.sample = {
+                  data: options.sample || [],
+                  meta: tableEntry.sourceMeta.extended_columns
+                };
+                tableEntry.samplePromise = $.Deferred().resolve(tableEntry.sample).promise();
+
+                var index = 0;
                 options.columns.forEach(function (column) {
                   var columnPath = path.concat(column.name);
                   var columnIdentifier = generateEntryCacheId({
@@ -521,6 +532,18 @@ var DataCatalog = (function () {
                       type: column.type
                     }
                   });
+
+                  columnEntry.sample = {
+                    data: [],
+                    meta: column
+                  };
+                  if (options.sample) {
+                    options.sample.forEach(function (sampleRow) {
+                      columnEntry.sample.data.push([sampleRow[index - 1]]);
+                    })
+                  }
+                  columnEntry.samplePromise = $.Deferred().resolve(columnEntry.sample).promise();
+
                   tableEntry.sourceMeta.columns.push(column.name);
                   tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
                   columnDeferred.resolve(columnEntry);
@@ -2382,7 +2405,7 @@ var DataCatalog = (function () {
        * @param {Object[]} options.columns
        * @param {string} options.columns[].name
        * @param {string} options.columns[].type
-       * @param options
+       * @param {Object[][]} options.sample
        *
        * @return {Object}
        */
