@@ -90,7 +90,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(200, response.status_code)
 
     # And have detail
-    response = self.client.get("/metastore/table/%s/test?format=json" % self.db_name)
+    response = self.client.post("/metastore/table/%s/test/?format=json" % self.db_name, {'format': 'json'})
     data = json.loads(response.content)
     assert_true("foo" in [col['name'] for col in data['cols']])
     assert_true("SerDe Library:" in [prop['col_name'] for prop in data['properties']], data)
