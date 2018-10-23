@@ -93,13 +93,11 @@ def notebook(request, is_embeddable=False):
       'is_yarn_mode': is_yarn_mode,
   })
 
-@xframe_options_exempt
-def workers_embedded(request):
-  return render('workers_embedded.mako', request, {})
 
 @check_document_access_permission()
 def notebook_embeddable(request):
   return notebook(request, True)
+
 
 @check_editor_access_permission()
 @check_document_access_permission()

@@ -4064,7 +4064,7 @@
 
     return {
       registerWorkers: function () {
-        if (!registered && window.Worker) {
+        if (!window.IS_EMBEDDED && !registered && window.Worker) {
           // It can take a while before the worker is active
           var whenWorkerIsReady = function (worker, message) {
             if (!worker.isReady) {
