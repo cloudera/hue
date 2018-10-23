@@ -396,11 +396,6 @@ var DataCatalog = (function () {
 
       var identifiersToClean = [];
 
-      var databaseIdentifier = generateEntryCacheId({
-        namespace: options.namespace,
-        path: ['default']
-      });
-
       var addEntryMeta = function (entry, sourceMeta) {
         entry.sourceMeta = sourceMeta || entry.definition;
         entry.sourceMetaPromise = $.Deferred().resolve(entry.sourceMeta).promise();
@@ -408,111 +403,148 @@ var DataCatalog = (function () {
         entry.navigatorMetaPromise = $.Deferred().resolve(entry.navigatorMeta).promise();
       };
 
-      if (!self.temporaryEntries[databaseIdentifier]) {
-        var databaseDeferred = $.Deferred();
-        self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
-        var databaseEntry = new DataCatalogEntry({
+      var removeTable = function () {}; // noop until actually added
+
+      var sourceIdentifier = generateEntryCacheId({
+        namespace: options.namespace,
+        path: []
+      });
+
+      if (!self.temporaryEntries[sourceIdentifier]) {
+        var sourceDeferred = $.Deferred();
+        self.temporaryEntries[sourceIdentifier] = sourceDeferred.promise();
+        var sourceEntry = new DataCatalogEntry({
           dataCatalog: self,
           namespace: options.namespace,
           compute: options.compute,
-          path: path,
+          path: [],
           definition: {
             index: 0,
             navOptLoaded: true,
-            type: 'database'
+            type: 'source'
           }
         });
-        addEntryMeta(databaseEntry);
-        identifiersToClean.push(databaseIdentifier);
-        databaseEntry.childrenPromise = $.Deferred().resolve([]).promise();
-        databaseDeferred.resolve(databaseEntry);
+        addEntryMeta(sourceEntry);
+        identifiersToClean.push(sourceIdentifier);
+        sourceEntry.childrenPromise = $.Deferred().resolve([]).promise();
+        sourceDeferred.resolve(sourceEntry);
       }
 
-      var removeTable = function () {}; // noop until actually added
-
-      self.temporaryEntries[databaseIdentifier].done(function (databaseEntry) {
-        databaseEntry.getChildren().done(function (existingTemporaryTables) {
-          var tableIdentifier = generateEntryCacheId({
+      self.temporaryEntries[sourceIdentifier].done(function (sourceEntry) {
+        sourceEntry.getChildren().done(function (existingTemporaryDatabases) {
+          var databaseIdentifier = generateEntryCacheId({
             namespace: options.namespace,
-            path: path
+            path: ['default']
           });
-          self.temporaryEntries[tableIdentifier] = tableDeferred.promise();
-          identifiersToClean.push(tableIdentifier);
 
-          var tableEntry = new DataCatalogEntry({
-            dataCatalog: self,
-            namespace: options.namespace,
-            compute: options.compute,
-            path: path,
-            definition: {
-              comment: '',
-              index: 0,
-              name: options.name,
-              navOptLoaded: true,
-              type: 'table'
-            }
-          });
-          existingTemporaryTables.push(tableEntry);
-          var indexToDelete = existingTemporaryTables.length - 1;
-          removeTable = function () { existingTemporaryTables.splice(indexToDelete, 1); };
-
-          var childrenDeferred = $.Deferred();
-          tableEntry.childrenPromise = childrenDeferred.promise();
-
-          if (options.columns) {
-            var childEntries = [];
-            var index = 0;
-            addEntryMeta(tableEntry, {
-              columns: [],
-              extended_columns: [],
-              comment: '',
-              notFound: false,
-              is_view: false
+          if (!self.temporaryEntries[databaseIdentifier]) {
+            var databaseDeferred = $.Deferred();
+            self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
+            var databaseEntry = new DataCatalogEntry({
+              dataCatalog: self,
+              namespace: options.namespace,
+              compute: options.compute,
+              path: ['default'],
+              definition: {
+                index: 0,
+                navOptLoaded: true,
+                type: 'database'
+              }
             });
-            options.columns.forEach(function (column) {
-              var columnPath = path.concat(column.name);
-              var columnIdentifier = generateEntryCacheId({
+            addEntryMeta(databaseEntry);
+            identifiersToClean.push(databaseIdentifier);
+            databaseEntry.childrenPromise = $.Deferred().resolve([]).promise();
+            databaseDeferred.resolve(databaseEntry);
+            existingTemporaryDatabases.push(databaseEntry);
+          }
+
+          self.temporaryEntries[databaseIdentifier].done(function (databaseEntry) {
+            databaseEntry.getChildren().done(function (existingTemporaryTables) {
+              var tableIdentifier = generateEntryCacheId({
                 namespace: options.namespace,
-                path: columnPath
+                path: path
               });
+              self.temporaryEntries[tableIdentifier] = tableDeferred.promise();
+              identifiersToClean.push(tableIdentifier);
 
-              var columnDeferred = $.Deferred();
-              self.temporaryEntries[columnIdentifier] = columnDeferred.promise();
-              identifiersToClean.push(columnIdentifier);
-
-              var columnEntry = new DataCatalogEntry({
+              var tableEntry = new DataCatalogEntry({
                 dataCatalog: self,
                 namespace: options.namespace,
                 compute: options.compute,
-                path: columnPath,
+                path: path,
                 definition: {
                   comment: '',
-                  index: index++,
-                  name: column.name,
-                  partitionKey: false,
-                  type: column.type
+                  index: 0,
+                  name: options.name,
+                  navOptLoaded: true,
+                  type: 'table'
                 }
               });
-              tableEntry.sourceMeta.columns.push(column.name);
-              tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
-              columnDeferred.resolve(columnEntry);
-              addEntryMeta(columnEntry, {
-                comment: '',
-                name: column.name,
-                notFount: false,
-                sample: [],
-                type: column.type
-              });
+              existingTemporaryTables.push(tableEntry);
+              var indexToDelete = existingTemporaryTables.length - 1;
+              removeTable = function () { existingTemporaryTables.splice(indexToDelete, 1); };
 
-              childEntries.push(columnEntry)
+              var childrenDeferred = $.Deferred();
+              tableEntry.childrenPromise = childrenDeferred.promise();
+
+              if (options.columns) {
+                var childEntries = [];
+                var index = 0;
+                addEntryMeta(tableEntry, {
+                  columns: [],
+                  extended_columns: [],
+                  comment: '',
+                  notFound: false,
+                  is_view: false
+                });
+                options.columns.forEach(function (column) {
+                  var columnPath = path.concat(column.name);
+                  var columnIdentifier = generateEntryCacheId({
+                    namespace: options.namespace,
+                    path: columnPath
+                  });
+
+                  var columnDeferred = $.Deferred();
+                  self.temporaryEntries[columnIdentifier] = columnDeferred.promise();
+                  identifiersToClean.push(columnIdentifier);
+
+                  var columnEntry = new DataCatalogEntry({
+                    dataCatalog: self,
+                    namespace: options.namespace,
+                    compute: options.compute,
+                    path: columnPath,
+                    definition: {
+                      comment: '',
+                      index: index++,
+                      name: column.name,
+                      partitionKey: false,
+                      type: column.type
+                    }
+                  });
+                  tableEntry.sourceMeta.columns.push(column.name);
+                  tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
+                  columnDeferred.resolve(columnEntry);
+                  addEntryMeta(columnEntry, {
+                    comment: '',
+                    name: column.name,
+                    notFount: false,
+                    sample: [],
+                    type: column.type
+                  });
+
+                  childEntries.push(columnEntry)
+                });
+                childrenDeferred.resolve(childEntries);
+              } else {
+                childrenDeferred.resolve([]);
+              }
+
+              tableDeferred.resolve(tableEntry);
             });
-            childrenDeferred.resolve(childEntries);
-          } else {
-            childrenDeferred.resolve([]);
-          }
+          });
+        })
 
-          tableDeferred.resolve(tableEntry);
-        });
+
       });
 
       return {
