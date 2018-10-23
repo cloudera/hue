@@ -120,7 +120,7 @@ class Notebook(object):
         variable = variables[p2]
         value = variable['value']
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
-        
+
       return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
       
     return statement_raw
