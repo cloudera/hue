@@ -418,7 +418,7 @@
           snippet: {
             autocompleteSettings: {
               temporaryOnly: false
-            }
+            },
             type: function () {
               return dialect;
             },

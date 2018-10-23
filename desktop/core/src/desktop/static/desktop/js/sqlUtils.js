@@ -149,6 +149,7 @@ var SqlUtils = (function () {
    * @param {String} options.sourceType
    * @param {ContextNamespace} options.namespace
    * @param {ContextCompute} options.compute
+   * @param {boolean} [options.temporaryOnly] - Default: false
    * @param {Object[]} [options.identifierChain]
    * @param {Object[]} [options.tables]
    * @param {Object} [options.cancellable]
@@ -223,6 +224,7 @@ var SqlUtils = (function () {
         path: SqlUtils.identifierChainToPath(nextTable.identifierChain),
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
+        temporaryOnly: options && options.temporaryOnly,
         silenceErrors: true
       }).done(function (childEntries) {
         var foundEntry = undefined;
@@ -253,6 +255,7 @@ var SqlUtils = (function () {
         path: [],
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
+        temporaryOnly: options && options.temporaryOnly,
         silenceErrors: true
       }).done(function (entry) {
         findInTree(entry, SqlUtils.identifierChainToPath(options.identifierChain))

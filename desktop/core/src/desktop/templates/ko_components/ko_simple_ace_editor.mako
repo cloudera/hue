@@ -811,26 +811,49 @@ from desktop.views import _ko
 
           var sourceType = params.autocomplete.type.indexOf('Query') !== -1 ? params.autocomplete.type.replace('Query', '') : params.autocomplete.type;
 
+          var snippet = {
+            autocompleteSettings: {
+              temporaryOnly: params.temporaryOnly
+            },
+            type: ko.observable(sourceType),
+            id: ko.observable($element.attr('id')),
+            namespace: params.namespace,
+            compute: params.compute,
+            database: ko.observable(params.database && params.database() ? params.database() : 'default'),
+            availableDatabases: ko.observableArray([params.database && params.database() ? params.database() : 'default']),
+            positionStatement: ko.observable({
+              location: { first_line: 1, last_line: 1, first_column: 0, last_column: editor.getValue().length }
+            }),
+            isSqlDialect: ko.observable(true),
+            aceCursorPosition: ko.observable(),
+            inFocus: ko.observable()
+          };
+
+          if (sourceType === 'hive' || sourceType === 'impala') {
+            WorkerHandler.registerWorkers();
+            var aceLocationHandler = new AceLocationHandler({ editor: editor, editorId: $element.attr('id'), snippet: snippet });
+            self.disposeFunctions.push(function () {
+              aceLocationHandler.dispose();
+            });
+            aceLocationHandler.attachSqlSyntaxWorker();
+          }
+
+          var focusListener = editor.on('focus', function () {
+            snippet.inFocus(true);
+          });
+
+          var blurListener = editor.on('blur', function () {
+            snippet.inFocus(false);
+          });
+
+          self.disposeFunctions.push(function () {
+            editor.off('focus', focusListener);
+            editor.off('blur', blurListener);
+          });
+
           var autocompleteArgs = {
             editor: function() { return editor },
-            snippet: {
-              autocompleteSettings: {
-                temporaryOnly: params.temporaryOnly
-              },
-              type: function () {
-                return sourceType;
-              },
-              namespace: params.namespace,
-              compute: params.compute,
-              database: function () {
-                return params.database && params.database() ? params.database() : 'default';
-              },
-              positionStatement: function () {
-                return {
-                  location: { first_line: 1, last_line: 1, first_column: 0, last_column: editor.getValue().length }
-                }
-              }
-            },
+            snippet: snippet,
             fixedPrefix: params.fixedPrefix,
             fixedPostfix: params.fixedPostfix,
             support: params.autocomplete.support
