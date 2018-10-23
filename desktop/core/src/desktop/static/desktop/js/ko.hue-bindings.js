@@ -4049,6 +4049,7 @@
           sourceType: sourceType,
           namespace: namespace,
           compute: compute,
+          temporaryOnly: options.temporaryOnly,
           cancellable: options.cancellable,
           cachedOnly: options.cachedOnly,
           identifierChain: location.identifierChain || location.colRef.identifierChain,
@@ -4361,7 +4362,9 @@
             };
 
             if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
-              token.parseLocation.resolveCatalogEntry().done(function (entry) {
+              token.parseLocation.resolveCatalogEntry({
+                temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly
+              }).done(function (entry) {
                 huePubSub.publish('context.popover.show', {
                   data: {
                     type: 'catalogEntry',
@@ -4738,6 +4741,7 @@
         sourceType: self.snippet.type(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
+        temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
         path: $.map(identifierChain, function (identifier) { return identifier.name }),
         silenceErrors: true,
         cachedOnly: true
@@ -4820,6 +4824,7 @@
                 sourceType: self.snippet.type(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
+                temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
                 path: $.map(nextTable.identifierChain, function (identifier) { return identifier.name }),
                 cachedOnly: true,
                 silenceErrors: true
@@ -4986,7 +4991,7 @@
       var lastKnownLocations = {};
 
       var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function (callback, snippet) {
-        if (self.snippet === snippet || self.snippet.inFocus() || self.snippet.editorMode()) {
+        if (self.snippet === snippet && (self.snippet.inFocus() || self.snippet.editorMode())) {
           callback(lastKnownLocations);
         }
       });
