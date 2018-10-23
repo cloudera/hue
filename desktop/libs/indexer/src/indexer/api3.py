@@ -355,7 +355,7 @@ def importer_submit(request):
       stats = request.fs.stats(parent_path)
       split = urlparse(path)
       # Only for HDFS, import data and non-external table
-      if split.scheme in ('', 'hdfs') and destination['importData'] and destination['useDefaultLocation'] and oct(stats["mode"])[-1] != '7' and not request.POST.get('options'):
+      if split.scheme in ('', 'hdfs') and destination['importData'] and destination['useDefaultLocation'] and oct(stats["mode"])[-1] != '7' and not request.POST.get('show_command'):
         user_scratch_dir = request.fs.get_home_dir() + '/.scratchdir'
         request.fs.do_as_user(request.user, request.fs.mkdir, user_scratch_dir, 00777)
         request.fs.do_as_user(request.user, request.fs.rename, source['path'], user_scratch_dir)
@@ -487,7 +487,8 @@ def _create_database(request, source, destination, start_time):
 
 def _create_table(request, source, destination, start_time=-1):
   notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time)
-  if request.POST.get('options'):
+
+  if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}
   else:
     return notebook.execute(request, batch=False)
@@ -505,7 +506,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
 
   client = SolrClient(user=request.user)
 
-  if not client.exists(collection_name) and not request.POST.get('options'): # if destination['isTargetExisting']:
+  if not client.exists(collection_name) and not request.POST.get('show_command'): # if destination['isTargetExisting']:
     client.create_index(
       name=collection_name,
       fields=request.POST.get('fields', schema_fields),
@@ -522,7 +523,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'stream' and file_format['streamSelection'] == 'flume':
     indexer = FlumeIndexer(user=request.user)
-    if request.POST.get('options'):
+    if request.POST.get('show_command'):
       configs = indexer.generate_config(file_format, destination)
       return {'status': 0, 'commands': configs[-1]}
     else:
@@ -638,7 +639,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
 
   configs = indexer.generate_config(properties)
 
-  if request.POST.get('options'):
+  if request.POST.get('show_command'):
     return {'status': 0, 'commands': configs['envelope.conf']}
   else:
     return indexer.run(request, collection_name, configs, input_path, start_time=start_time, lib_path=lib_path)

@@ -1073,7 +1073,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 2 -->
-        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
+        <button class="btn btn-primary disable-feedback" data-bind="click: function() { createWizard.indexFile(); }, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
         
@@ -1081,7 +1081,7 @@ ${ assist.assistPanel() }
         <button class="btn disable-feedback" data-bind="click: createWizard.showCommands, enable: createWizard.readyToIndex()">
           ${ _('Show Commands') }
         </button>
-        <button class="btn disable-feedback" data-bind="click: createWizard.indexFile">
+        <button class="btn disable-feedback">
           ${ _('Save') }
         </button>
         % endif
@@ -2751,6 +2751,7 @@ ${ assist.assistPanel() }
         self.indexFile({show: true});
       };
       self.indexFile = function (options) {
+        var options = options || {};
         if (!self.readyToIndex()) {
           return;
         }
@@ -2865,7 +2866,7 @@ ${ assist.assistPanel() }
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime()),
-          "options": ko.mapping.toJSON(options || {})
+          "show_command": ko.mapping.toJSON(options.show || '')
         }, function (resp) {
           self.indexingStarted(false);
           if (resp.status === 0) {
