@@ -363,8 +363,8 @@ from metadata.conf import has_navigator
       </span>
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
-        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
-        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading() && catalogEntry() && !catalogEntry().isTemporary, click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
+        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled && catalogEntry() && !catalogEntry().isTemporary, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
         <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
       </div>
     </div>
@@ -378,16 +378,16 @@ from metadata.conf import has_navigator
         <div class="alert" data-bind="text: errorText"></div>
       </div>
       <!-- /ko -->
-      <!-- ko if: !loading() && !hasErrors() && typeof catalogEntry() !== 'undefined' -->
+      <!-- ko if: !loading() && !hasErrors() && typeof catalogEntry() !== 'undefined'-->
       <div class="context-popover-flex-fill" data-bind="with: catalogEntry">
         <div class="context-popover-inner-content">
-          <!-- ko if: $parent.comment() -->
+          <!-- ko if: $parent.comment() && !isTemporary  -->
           <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis: { expanded: $parent.commentExpanded, expandable: true, expandClass: 'context-popover-comment-expanded' }, text: $parent.comment"></div>
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.commentExpanded -->
             %if has_navigator(user):
-              <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
+              <!-- ko if: !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
               <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
             %endif

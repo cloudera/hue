@@ -770,7 +770,7 @@ from desktop.views import _ko
         self.hasErrors = ko.observable();
         self.loadingSamples = ko.observable();
 
-        self.showOperations = self.catalogEntry().getSourceType() === 'impala' || self.catalogEntry().getSourceType() === 'hive';
+        self.showOperations = !self.catalogEntry().isTemporary && (self.catalogEntry().getSourceType() === 'impala' || self.catalogEntry().getSourceType() === 'hive');
 
         self.sampleClick = function (html) {
           self.onSampleClick(hueUtils.html2text(html));
