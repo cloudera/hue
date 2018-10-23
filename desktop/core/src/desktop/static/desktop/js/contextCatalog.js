@@ -51,6 +51,7 @@ var ContextCatalog = (function () {
       var addPubSubs = function () {
         if (typeof huePubSub !== 'undefined') {
           huePubSub.subscribe('context.catalog.refresh', function () {
+            var namespacesToRefresh = Object.keys(self.namespaces);
             self.namespaces = {};
             self.namespacePromises = {};
 
@@ -60,6 +61,9 @@ var ContextCatalog = (function () {
             self.clusters = {};
             self.clusterPromises = {};
             huePubSub.publish('context.catalog.refreshed');
+            namespacesToRefresh.forEach(function (sourceType) {
+              huePubSub.publish('context.catalog.namespaces.refreshed', sourceType);
+            })
           })
         } else {
           window.setTimeout(addPubSubs, 100);
