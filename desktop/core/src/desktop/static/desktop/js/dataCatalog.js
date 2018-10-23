@@ -417,6 +417,7 @@ var DataCatalog = (function () {
         var sourceDeferred = $.Deferred();
         self.temporaryEntries[sourceIdentifier] = sourceDeferred.promise();
         var sourceEntry = new DataCatalogEntry({
+          isTemporary: true,
           dataCatalog: self,
           namespace: options.namespace,
           compute: options.compute,
@@ -444,6 +445,7 @@ var DataCatalog = (function () {
             var databaseDeferred = $.Deferred();
             self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
             var databaseEntry = new DataCatalogEntry({
+              isTemporary: true,
               dataCatalog: self,
               namespace: options.namespace,
               compute: options.compute,
@@ -471,6 +473,7 @@ var DataCatalog = (function () {
               identifiersToClean.push(tableIdentifier);
 
               var tableEntry = new DataCatalogEntry({
+                isTemporary: true,
                 dataCatalog: self,
                 namespace: options.namespace,
                 compute: options.compute,
@@ -520,6 +523,7 @@ var DataCatalog = (function () {
                   identifiersToClean.push(columnIdentifier);
 
                   var columnEntry = new DataCatalogEntry({
+                    isTemporary: true,
                     dataCatalog: self,
                     namespace: options.namespace,
                     compute: options.compute,
@@ -821,6 +825,7 @@ var DataCatalog = (function () {
      * @param {ContextNamespace} options.namespace - The context namespace
      * @param {ContextCompute} options.compute - The context compute
      * @param {Object} options.definition - Initial known metadata on creation (normally comes from the parent entry)
+     * @param {boolean} [options.isTemporary] - Default false
      *
      * @constructor
      */
@@ -832,6 +837,7 @@ var DataCatalog = (function () {
       self.dataCatalog = options.dataCatalog;
       self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
       self.name = self.path.length ? self.path[self.path.length - 1] : options.dataCatalog.sourceType;
+      self.isTemporary = options.isTemporary;
 
       self.definition = options.definition;
 

@@ -594,7 +594,7 @@ from metadata.conf import has_navigator
                 path: catalogEntry.path.slice(0, i + 1),
                 catalogEntry: self.catalogEntry,
                 makeActive: function () {
-                  self.catalogEntry().dataCatalog.getEntry({ namespace: self.catalogEntry().namespace, compute: self.catalogEntry().compute, path: this.path }).done(self.catalogEntry);
+                  self.catalogEntry().dataCatalog.getEntry({ namespace: self.catalogEntry().namespace, compute: self.catalogEntry().compute, path: this.path, temporaryOnly: self.catalogEntry().isTemporary }).done(self.catalogEntry);
                 }
               })
             }
