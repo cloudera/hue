@@ -3073,6 +3073,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
             if (vm.interface().indexOf('clusters') !== -1 && action === 'kill') {
               huePubSub.publish('context.catalog.refresh');
+              self.selectedJobs([]);
             }
           } else {
             $(document).trigger("error", data.message);
