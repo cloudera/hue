@@ -140,6 +140,49 @@ var ContextCatalog = (function () {
 
       self.namespacePromises[options.sourceType] = deferred.promise();
 
+      var startingNamespaces = {};
+      var pollTimeout = -1;
+
+      var pollForStarted = function () {
+        window.clearTimeout(pollTimeout);
+        window.setTimeout(function () {
+          if (Object.keys(startingNamespaces).length) {
+            ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
+              if (namespaces[options.sourceType]) {
+                var namespaces = namespaces[options.sourceType];
+                if (namespaces) {
+                  var statusChanged = false;
+                  namespaces.forEach(function (namespace) {
+                    if (startingNamespaces[namespace.id] && namespace.status !== 'STARTING') {
+                      startingNamespaces[namespace.id].status = namespace.status;
+                      delete startingNamespaces[namespace.id];
+                      statusChanged = true;
+                    }
+                  });
+                  if (statusChanged) {
+                    huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
+                  }
+                  if (Object.keys(startingNamespaces).length) {
+                    pollForStarted();
+                  }
+                }
+              }
+            });
+          }
+        }, 2000);
+      };
+
+      deferred.done(function (context) {
+        context.namespaces.forEach(function (namespace) {
+          if (namespace.status === 'STARTING') {
+            startingNamespaces[namespace.id] = namespace;
+          }
+        });
+        if (Object.keys(startingNamespaces).length) {
+          pollForStarted();
+        }
+      });
+
       var fetchNamespaces = function () {
         ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
