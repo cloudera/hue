@@ -596,7 +596,7 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   async = json.loads(request.POST.get('async', 'false'))
-  operation = json.loads(request.POST.get('operation', 'default'))
+  operation = json.loads(request.POST.get('operation', '"default"'))
 
   sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async, operation=operation)
   response.update(sample_data)
@@ -640,8 +640,8 @@ def export_result(request):
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  data_format = json.loads(request.POST.get('format', 'hdfs-file'))
-  destination = urllib.unquote(json.loads(request.POST.get('destination', '')))
+  data_format = json.loads(request.POST.get('format', '"hdfs-file"'))
+  destination = urllib.unquote(json.loads(request.POST.get('destination', '""')))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
   start_time = json.loads(request.POST.get('start_time', '-1'))
