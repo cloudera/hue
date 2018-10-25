@@ -3022,7 +3022,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.control = function (action) {
-        if (action == 'rerun') {
+        if (action === 'rerun') {
           $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json', function(response) {
             $('#rerun-modal${ SUFFIX }').modal('show');
             vm.job().rerunModalContent(response);
@@ -3038,7 +3038,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $('#id_actions').find('option').remove();
             $(frag).appendTo('#id_actions');
           });
-        } else if (action == 'ignore') {
+        } else if (action === 'ignore') {
           $.post('/oozie/manage_oozie_jobs/' + vm.job().id() + '/ignore', {
             actions: $.map(vm.job().coordinatorActions().selectedJobs(), function(wf) {
               return wf.properties.number();
@@ -3067,9 +3067,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface: ko.mapping.toJSON(vm.interface),
           operation: ko.mapping.toJSON({action: action})
         }, function (data) {
-          if (data.status == 0) {
+          if (data.status === 0) {
             if (callback) {
               callback(data);
+            }
+            if (vm.interface().indexOf('clusters') !== -1 && action === 'kill') {
+              huePubSub.publish('context.catalog.refresh');
             }
           } else {
             $(document).trigger("error", data.message);
