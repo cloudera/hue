@@ -930,11 +930,16 @@ from desktop.views import _ko
       <!-- /ko -->
       <ul class="assist-tables" data-bind="foreach: filteredNamespaces">
         <li class="assist-table">
+          <!-- ko if: status() === 'STARTING' -->
+          <span class="assist-table-link" title="${_('Starting')}" data-bind="tooltip: { placement: 'bottom' }"><i class="fa fa-fw fa-spinner fa-spin muted valign-middle"></i> <span data-bind="text: name"></span></span>
+          <!-- /ko -->
+          <!-- ko if: status() !== 'STARTING' -->
           <!-- ko if: namespace.computes.length -->
           <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
           <!-- /ko -->
           <!-- ko ifnot: namespace.computes.length -->
           <span class="assist-table-link" title="${_('No related computes')}" data-bind="tooltip: { placement: 'bottom' }"><i class="fa fa-fw fa-warning muted valign-middle"></i> <span data-bind="text: name"></span></span>
+          <!-- /ko -->
           <!-- /ko -->
         </li>
       </ul>

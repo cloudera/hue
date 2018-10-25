@@ -106,6 +106,7 @@ var AssistDbSource = (function () {
           if (existingNamespaceIndex[newNamespace.id]) {
             existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
             existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
+            existingNamespaceIndex[newNamespace.id].status(newNamespace.status);
             newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
           } else {
             newNamespaces.push(new AssistDbNamespace({
@@ -245,6 +246,7 @@ var AssistDbNamespace = (function () {
     self.nonSqlType = options.nonSqlType;
 
     self.namespace = options.namespace;
+    self.status = ko.observable(options.namespace.status);
     // TODO: Compute selection in assist?
     self.compute = ko.observable();
     if (self.namespace.computes.length) {
