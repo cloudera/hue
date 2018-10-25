@@ -2118,6 +2118,8 @@ def test_index_page():
 
 
 def test_history_page():
+  raise SkipTest
+
   client = make_logged_in_client()
   test_user = User.objects.get(username='test')
 
