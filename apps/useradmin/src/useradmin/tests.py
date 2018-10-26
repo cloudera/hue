@@ -572,8 +572,6 @@ class TestUserAdmin(BaseUserAdminTests):
         reset()
 
   def test_user_admin_with_latin1_char(self):
-    # TODO: check how to fix Illegal mix of collations (latin1_swedish_ci,IMPLICIT) and (utf8_general_ci,COERCIBLE)
-    # raise SkipTest
     FUNNY_NAME = 'أحمد@cloudera.com'
     FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
 
