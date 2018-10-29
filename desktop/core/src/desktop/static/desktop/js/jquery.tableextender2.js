@@ -125,15 +125,7 @@
       hideSubscription.remove();
     });
 
-    var lastHeight = -1, currentHeight;
     var adjustSizes = function () {
-      currentHeight = self.$parent.height();
-      if (currentHeight != lastHeight) {
-        self.firstColumnInner.height(self.$parent.get(0).scrollHeight);
-        self.firstColumn.height(currentHeight);
-        lastHeight = currentHeight;
-      }
-
       if (self.lastHeaderWidth !== self.$parent.width()) {
         self.lastHeaderWidth = self.$parent.width();
         self.headerRowContainer.width(self.lastHeaderWidth);
@@ -187,15 +179,6 @@
       self.$parent.children('table').on('mouseout', 'tbody tr', outHandler);
     });
 
-    var dblClickHandler = function () {
-      huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
-    };
-    self.$parent.children('table').on('dblclick', 'tbody tr', dblClickHandler);
-    self.disposeFunctions.push(function () {
-      self.$parent.children('table').off('dblclick', 'tbody tr', dblClickHandler);
-    });
-
-
     if (!self.options.disableTopPosition) {
       self.repositionHeader();
       var scrollFunction = self.repositionHeader.bind(self);
@@ -226,19 +209,8 @@
   };
 
   Plugin.prototype.setOptions = function (options) {
-    if (typeof jHueTableExtenderGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, DEFAULT_OPTIONS, jHueTableExtenderGlobals);
-      extendedDefaults.labels = $.extend({}, DEFAULT_OPTIONS.labels, jHueTableExtenderGlobals.labels);
-      this.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    } else {
-      this.options = $.extend({}, DEFAULT_OPTIONS, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, DEFAULT_OPTIONS.labels, options.labels);
-      }
-    }
+    this.options = $.extend({}, DEFAULT_OPTIONS, options);
+    this.options.labels = $.extend({}, DEFAULT_OPTIONS.labels, HUE_I18n.jHueTableExtender, options ? options.labels : {})
   };
 
   Plugin.prototype.repositionHeader = function () {
@@ -249,14 +221,20 @@
     var pos = self.options.stickToTopPosition;
     var topPos = 0;
     var firstColTopPos = 0;
-    if (typeof pos === 'function'){
+    if (typeof pos === 'function') {
       pos = pos();
     }
+    if (window.IS_EMBEDDED) {
+      pos = $('.hue-embedded-container').offset().top;
+    }
+    var isFixed = false;
     if (pos > -1) {
       if (self.$element.offset().top < pos) {
         topPos = pos;
+        isFixed = true;
       } else {
         topPos = self.$element.offset().top;
+        isFixed = false;
       }
       firstColTopPos = self.$element.offset().top;
     } else if (self.options.clonedContainerPosition == 'absolute') {
@@ -266,10 +244,31 @@
       topPos = self.$parent.offset().top;
       firstColTopPos = topPos;
     }
-    self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
-    self.firstColumn.css("top", firstColTopPos + "px");
-    self.headerRowContainer.css("top", topPos + "px");
-    self.firstColumnTopCell.css("top", topPos + "px");
+
+    if (pos > -1) {
+      var fixCSS = {
+        "top": "",
+        "left": self.$parent.position().left + "px",
+        "position": "absolute"
+      };
+      self.firstColumn.css(fixCSS);
+      if (isFixed) {
+        fixCSS = {
+          "top": topPos + "px",
+          "left": "",
+          "position": "fixed"
+        };
+      }
+      self.firstColumnTopCell.css(fixCSS);
+      self.headerRowContainer.css(fixCSS);
+    }
+    else {
+      self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
+      self.firstColumn.css("top", firstColTopPos + "px");
+      self.headerRowContainer.css("top", topPos + "px");
+      self.firstColumnTopCell.css("top", topPos + "px");
+    }
+
   };
 
   Plugin.prototype.drawHeader = function () {
@@ -422,7 +421,7 @@
           self.drawLockedRow($(this).parent().text()*1);
         }).attr('title', self.options.labels.LOCK);
         $('<i>').addClass('fa fa-expand pointer muted').prependTo(cell).on('click', function(){
-          huePubSub.publish('table.row.dblclick', {idx: idx, table: self.$element});
+          huePubSub.publish('table.row.show.details', {idx: idx, table: self.$element});
         }).attr('title', self.options.labels.ROW_DETAILS);
       });
     }
@@ -435,9 +434,9 @@
     firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
 
     firstColumnInner.appendTo(firstColumn);
-    firstColumn.appendTo(self.$parent);
+    firstColumn.insertAfter(self.$element.prev());
 
-    firstColumnTopCell.appendTo(self.$parent);
+    firstColumnTopCell.insertAfter(firstColumn);
 
     self.firstColumnInner = firstColumnInner;
     self.firstColumnTopCell = firstColumnTopCell;

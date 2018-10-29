@@ -160,7 +160,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <thead>
         <tr>
           <th width="1%">
-            <div id="selectAll" data-bind="click: toggleSelectAll, css: {'hueCheckbox': true, 'fa': true, 'fa-check': allSelected}"></div>
+            <div id="selectAll" data-bind="click: toggleSelectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}"></div>
           </th>
           <th>${_('Name')}</th>
           <th>${_('Description')}</th>
@@ -188,7 +188,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 <script id="designTemplate" type="text/html">
   <tr style="cursor: pointer" data-bind="with: design">
     <td data-row-selector-exclude="true" data-bind="click: function(data, event) {$root.toggleSelect.call($root, $index());}" class="center" style="cursor: default">
-      <div class="hueCheckbox savedCheck" data-row-selector-exclude="true" data-bind="css: {'hueCheckbox': name != '..', 'fa': name != '..', 'fa-check': $parent.selected()}"></div>
+      <div class="hue-checkbox savedCheck" data-row-selector-exclude="true" data-bind="css: {'hue-checkbox': name != '..', 'fa': name != '..', 'fa-check': $parent.selected()}"></div>
     </td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: name"></td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: description"></td>
@@ -924,22 +924,22 @@ $(document).ready(function(e) {
       }
     );
   });
-  $('body').on('click', '#edit-design', function() {
+  $(HUE_CONTAINER).on('click', '#edit-design', function() {
     routie('edit-design/' + designs.selectedDesign().id());
   });
-  $('body').on('click', '#trash-designs', function() {
+  $(HUE_CONTAINER).on('click', '#trash-designs', function() {
     $('#trashWf').modal('show');
   });
-  $('body').on('click', '#destroy-designs', function() {
+  $(HUE_CONTAINER).on('click', '#destroy-designs', function() {
     $('#destroyWf').modal('show');
   });
-  $('body').on('click', '#purge-trashed-designs', function() {
+  $(HUE_CONTAINER).on('click', '#purge-trashed-designs', function() {
     $('#purgeWf').modal('show');
   });
-  $('body').on('click', '#restore-designs', function() {
+  $(HUE_CONTAINER).on('click', '#restore-designs', function() {
     $('#restoreWf').modal('show');
   });
-  $('body').on('click', '#copy-designs', function() {
+  $(HUE_CONTAINER).on('click', '#copy-designs', function() {
     designs.isLoading(true);
     designs.cloneDesigns();
   });

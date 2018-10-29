@@ -22,11 +22,11 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_multi_cluster
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
 from notebook.conf import get_ordered_interpreters
-from desktop.models import Cluster
 
 
 LOG = logging.getLogger(__name__)
@@ -98,7 +98,32 @@ class Notebook(object):
     return _data
 
   def get_str(self):
-    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw']) for snippet in self.get_data()['snippets']])
+    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], Notebook.statement_with_variables(snippet)) for snippet in self.get_data()['snippets']])
+
+  @staticmethod
+  def statement_with_variables(snippet):
+    statement_raw = snippet['statement_raw']
+    hasCurlyBracketParameters = snippet['type'] != 'pig'
+    variables = {}
+    for variable in snippet['variables']:
+      variables[variable['name']] = variable
+
+    if variables:
+      variables_names = []
+      for variable in snippet['variables']:
+        variables_names.append(variable['name'])
+      variablesString = '|'.join(variables_names)
+
+      def replace(match):
+        p1 = match.group(1)
+        p2 = match.group(2)
+        variable = variables[p2]
+        value = variable['value']
+        return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
+
+      return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
+      
+    return statement_raw
 
   def add_hive_snippet(self, database, sql):
     _data = json.loads(self.data)
@@ -154,8 +179,36 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
-  def add_shell_snippet(self, shell_command, arguments, archives, files, env_var, last_executed):
+  def add_spark_snippet(self, clazz, jars, arguments, files):
     _data = json.loads(self.data)
+
+    _data['snippets'].append(self._make_snippet({
+        u'type': u'spark',
+        u'status': u'running',
+        u'properties':  {
+          u'files': files,
+          u'class': clazz,
+          u'app_jar': jars,
+          u'arguments': arguments,
+          u'archives': [],
+          u'spark_opts': ''
+        }
+    }))
+    self._add_session(_data, 'spark')
+
+    self.data = json.dumps(_data)
+
+  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None, capture_output=True):
+    _data = json.loads(self.data)
+
+    if arguments is None:
+      arguments = []
+    if archives is None:
+      archives = []
+    if files is None:
+      files = []
+    if env_var is None:
+      env_var = []
 
     _data['snippets'].append(self._make_snippet({
         u'type': u'shell',
@@ -166,7 +219,8 @@ class Notebook(object):
           u'arguments': arguments,
           u'archives': archives,
           u'env_var': env_var,
-          u'command_path': shell_command
+          u'command_path': shell_command,
+          u'capture_output': capture_output
         },
         u'lastExecuted': last_executed
     }))
@@ -186,7 +240,8 @@ class Notebook(object):
          'database': _snippet.get('database'),
          'result': {},
          'variables': [],
-         'lastExecuted': _snippet.get('lastExecuted')
+         'lastExecuted': _snippet.get('lastExecuted'),
+         'capture_output': _snippet.get('capture_output', True)
     }
 
   def _add_session(self, data, snippet_type):
@@ -211,19 +266,13 @@ class Notebook(object):
 
 
 def get_api(request, snippet):
-  from notebook.connectors.dataeng import DataEngApi
-  from notebook.connectors.hbase import HBaseApi
-  from notebook.connectors.hiveserver2 import HS2Api
-  from notebook.connectors.jdbc import JdbcApi
-  from notebook.connectors.rdbms import RdbmsApi
   from notebook.connectors.oozie_batch import OozieApi
-  from notebook.connectors.solr import SolrApi
-  from notebook.connectors.spark_shell import SparkApi
-  from notebook.connectors.spark_batch import SparkBatchApi
-  from notebook.connectors.text import TextApi
 
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
+
+  if snippet['type'] == 'report':
+    snippet['type'] = 'impala'
 
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
@@ -235,6 +284,14 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
+    elif snippet['type'] == 'kafka':
+      interpreter = [{
+        'name': 'kafka',
+        'type': 'kafka',
+        'interface': 'kafka',
+        'options': {},
+        'is_sql': False
+      }]
     elif snippet['type'] == 'solr':
       interpreter = [{
         'name': 'solr',
@@ -243,36 +300,86 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
+    elif snippet['type'] == 'custom':
+      interpreter = [{
+        'name': snippet['name'],
+        'type': snippet['type'],
+        'interface': snippet['interface'],
+        'options': snippet.get('options', {}),
+        'is_sql': False
+      }]
     else:
       raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = Cluster(request.user)
-  if cluster and cluster.get_type() == 'dataeng':
+  if has_multi_cluster():
+    cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
+    if cluster == '""' or cluster == 'undefined':
+      cluster = None
+    if not cluster and snippet.get('compute'): # Via notebook.ko.js
+      cluster = snippet['compute']
+  else:
+    cluster = None
+
+  cluster_name = cluster.get('id') if cluster else None
+
+  if cluster and 'altus:dataware:k8s' in cluster_name:
+    interface = 'hiveserver2'
+  elif cluster and 'crn:altus:dataware:' in cluster_name:
+    interface = 'altus-adb'
+  elif cluster and 'crn:altus:dataeng:' in cluster_name:
     interface = 'dataeng'
 
+  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
+
   if interface == 'hiveserver2':
-    return HS2Api(user=request.user, request=request)
+    from notebook.connectors.hiveserver2 import HS2Api
+    return HS2Api(user=request.user, request=request, cluster=cluster)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
+    from notebook.connectors.spark_shell import SparkApi
     return SparkApi(request.user)
   elif interface == 'livy-batch':
+    from notebook.connectors.spark_batch import SparkBatchApi
     return SparkBatchApi(request.user)
   elif interface == 'text' or interface == 'markdown':
+    from notebook.connectors.text import TextApi
     return TextApi(request.user)
   elif interface == 'rdbms':
-    return RdbmsApi(request.user, interpreter=snippet['type'])
+    from notebook.connectors.rdbms import RdbmsApi
+    return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
+  elif interface == 'altus-adb':
+    from notebook.connectors.altus_adb import AltusAdbApi
+    return AltusAdbApi(user=request.user, cluster_name=cluster_name, request=request)
   elif interface == 'dataeng':
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
-  elif interface == 'jdbc' or interface == 'teradata':
-    return JdbcApi(request.user, interpreter=interpreter)
+    from notebook.connectors.dataeng import DataEngApi
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
+  elif interface == 'jdbc':
+    if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
+      from notebook.connectors.jdbc import JdbcApi
+      return JdbcApi(request.user, interpreter=interpreter)
+    else:
+      from notebook.connectors.jdbc_teradata import JdbcApiTeradata
+      return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'teradata':
+    from notebook.connectors.jdbc import JdbcApiTeradata
+    return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'sqlalchemy':
+    from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
+    return SqlAlchemyApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
+    from notebook.connectors.solr import SolrApi
     return SolrApi(request.user, interpreter=interpreter)
   elif interface == 'hbase':
+    from notebook.connectors.hbase import HBaseApi
     return HBaseApi(request.user)
+  elif interface == 'kafka':
+    from notebook.connectors.kafka import KafkaApi
+    return KafkaApi(request.user)
   elif interface == 'pig':
     return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4
   else:
@@ -291,10 +398,12 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
+    self.cluster = cluster
+    self.query_server = query_server
 
   def create_session(self, lang, properties=None):
     return {
@@ -312,7 +421,7 @@ class Api(object):
   def fetch_result_size(self, notebook, snippet):
     raise OperationNotSupported()
 
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     pass
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
@@ -326,6 +435,8 @@ class Api(object):
 
   def get_jobs(self, notebook, snippet, logs):
     return []
+
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None): raise NotImplementedError()
 
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
 
@@ -341,7 +452,7 @@ class Api(object):
 
 
 def _get_snippet_name(notebook, unique=False, table_format=False):
-  name = (('%(name)s' + ('%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
+  name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
     name = re.sub('[-|\s:]', '_', name)
   return name

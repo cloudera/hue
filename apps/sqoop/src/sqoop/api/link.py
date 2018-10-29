@@ -45,7 +45,7 @@ def get_links(request):
     'links': []
   }
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['links'] = list_to_dict(c.get_links())
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not get links.')))
@@ -62,11 +62,11 @@ def create_link(request):
   if 'link' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving link'), data={'errors': 'Link is missing.'}, error_code=400)
 
-  d = json.loads(smart_str(request.POST['link']))
+  d = json.loads(smart_str(request.POST.get('link')))
   link = client.Link.from_dict(d)
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['link'] = c.create_link(link).to_dict()
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not create link.')))
@@ -86,10 +86,10 @@ def update_link(request, link):
   if 'link' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving link'), data={'errors': 'Link is missing.'}, error_code=400)
 
-  link.update_from_dict(json.loads(smart_str(request.POST['link'])))
+  link.update_from_dict(json.loads(smart_str(request.POST.get('link'))))
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['link'] = c.update_link(link).to_dict()
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not update link.')))
@@ -138,7 +138,7 @@ def link_clone(request, link):
   link.id = -1
   link.name = '%s-copy' % link.name
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['link'] = c.create_link(link).to_dict()
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not clone link.')))
@@ -159,7 +159,7 @@ def link_delete(request, link):
   }
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
+    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     c.delete_link(link)
   except RestException, e:
     response.update(handle_rest_exception(e, _('Could not delete link.')))

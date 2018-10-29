@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib import i18n
 
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
-from indexer.conf import ENABLE_NEW_INDEXER
+from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
 from indexer.indexers.morphline_operations import get_operator
 
@@ -33,14 +33,14 @@ from indexer.indexers.morphline_operations import get_operator
 LOG = logging.getLogger(__name__)
 
 
-IMPORT_PEEK_SIZE = 1024 * 1024 * 5
+IMPORT_PEEK_SIZE = 1024 * 1024
 IMPORT_PEEK_NLINES = 20
 
 
 def get_format_types():
   formats = [CSVFormat]
 
-  if ENABLE_NEW_INDEXER.get():
+  if ENABLE_SCALABLE_INDEXER.get():
     formats.extend([
       ApacheCombinedFormat,
       SyslogFormat,
@@ -214,7 +214,7 @@ class HueLogFormat(GrokkedFormat):
       Field("component", "string"),
       Field("log_level", "string"),
       Field("details", "string"),
-      Field("message", "text_en"),
+      Field("message", "text_general"),
       Field("ip", "string", [geo_ip_operation]),
       Field("user", "string"),
       Field("http_method", "string"),
@@ -246,7 +246,7 @@ class ApacheCombinedFormat(GrokLineFormat):
       Field("response", "long"),
       Field("bytes", "long"),
       Field("referrer", "string"),
-      Field("field_line", "text_en")
+      Field("field_line", "text_general")
     ]
 
 
@@ -262,8 +262,8 @@ class RubyLogFormat(GrokLineFormat):
       Field("pid", "long"),
       Field("loglevel", "string"),
       Field("progname", "string"),
-      Field("message", "text_en"),
-      Field("field_line", "text_en")
+      Field("message", "text_general"),
+      Field("field_line", "text_general")
     ]
 
 
@@ -281,7 +281,7 @@ class SyslogFormat(GrokLineFormat):
       Field("logsource", "string"),
       Field("program", "string"),
       Field("pid", "string"),
-      Field("message", "text_en"),
+      Field("message", "text_general"),
     ]
 
 
@@ -337,8 +337,76 @@ class CSVFormat(FileFormat):
   def _guess_dialect(cls, sample):
     sniffer = csv.Sniffer()
     dialect = sniffer.sniff(sample)
-    has_header = sniffer.has_header(sample)
+    has_header = cls._hasHeader(sniffer, sample, dialect)
     return dialect, has_header
+
+  # Copied from python2.7/csv.py with small modification to 1st line
+  # Results in large performance gain from not having to reprocess the file if dialect is known.
+  @classmethod
+  def _hasHeader(self, sniffer, sample, dialect):
+    # ******Changed from********
+    # rdr = reader(StringIO(sample), self.sniff(sample))
+    from _csv import reader
+    rdr = reader(StringIO.StringIO(sample), dialect)
+
+    header = rdr.next()  # assume first row is header
+
+    columns = len(header)
+    columnTypes = {}
+    for i in range(columns): columnTypes[i] = None
+
+    checked = 0
+    for row in rdr:
+      # arbitrary number of rows to check, to keep it sane
+      if checked > 20:
+        break
+      checked += 1
+
+      if len(row) != columns:
+        continue  # skip rows that have irregular number of columns
+
+      for col in columnTypes.keys():
+
+        for thisType in [int, long, float, complex]:
+          try:
+            thisType(row[col])
+            break
+          except (ValueError, OverflowError):
+            pass
+        else:
+          # fallback to length of string
+          thisType = len(row[col])
+
+        # treat longs as ints
+        if thisType == long:
+          thisType = int
+
+        if thisType != columnTypes[col]:
+          if columnTypes[col] is None:  # add new column type
+            columnTypes[col] = thisType
+          else:
+            # type is inconsistent, remove column from
+            # consideration
+            del columnTypes[col]
+
+    # finally, compare results against first row and "vote"
+    # on whether it's a header
+    hasHeader = 0
+    for col, colType in columnTypes.items():
+      if type(colType) == type(0):  # it's a length
+        if len(header[col]) != colType:
+          hasHeader += 1
+        else:
+          hasHeader -= 1
+      else:  # attempt typecast
+        try:
+          colType(header[col])
+        except (ValueError, TypeError):
+          hasHeader += 1
+        else:
+          hasHeader -= 1
+
+    return hasHeader > 0
 
   @classmethod
   def valid_format(cls, format_):
@@ -366,7 +434,11 @@ class CSVFormat(FileFormat):
   def _guess_from_file_stream(cls, file_stream):
     for sample_data, sample_lines in cls._get_sample(file_stream):
       try:
-        dialect, has_header = cls._guess_dialect(sample_data)
+        lines = itertools.islice(StringIO.StringIO(sample_data), IMPORT_PEEK_NLINES)
+        sample_data_lines = ''
+        for line in lines:
+          sample_data_lines += line
+        dialect, has_header = cls._guess_dialect(sample_data_lines) # Only use first few lines for guessing. Greatly improves performance of CSV library.
         delimiter = dialect.delimiter
         line_terminator = dialect.lineterminator
         quote_char = dialect.quotechar
@@ -545,6 +617,7 @@ class TextFileReader(object):
 
 
 class HiveFormat(CSVFormat):
+
   FIELD_TYPE_TRANSLATE = {
     "BOOLEAN_TYPE": "boolean",
     "TINYINT_TYPE": "long",
@@ -555,6 +628,7 @@ class HiveFormat(CSVFormat):
     "DOUBLE_TYPE": "double",
     "STRING_TYPE": "string",
     "TIMESTAMP_TYPE": "date",
+    "DATETIME_TYPE": "date",
     "BINARY_TYPE": "string",
     "DECIMAL_TYPE": "double",
     "DATE_TYPE": "date",

@@ -16,43 +16,33 @@
 
 var AssistDbEntry = (function () {
   /**
-   * @param {Object} definition
-   * @param {string} definition.type
-   * @param {string} definition.name
-   * @param {boolean} [definition.isColumn]
-   * @param {boolean} [definition.isTable]
-   * @param {boolean} [definition.isView]
-   * @param {boolean} [definition.isDatabase]
-   * @param {boolean} [definition.isMapValue]
-   * @param {boolean} [definition.isArray]
+   * @param {DataCatalogEntry} catalogEntry
    * @param {AssistDbEntry} parent
-   * @param {AssistDbSource} assistDbSource
+   * @param {AssistDbNamespace} assistDbNamespace
    * @param {Object} filter
    * @param {function} filter.querySpec (observable)
-   * @param {function} filter.showViews (observable)
-   * @param {function} filter.showTables (observable)
    * @param {Object} i18n
    * @param {string} i18n.errorLoadingTablePreview
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
+  function AssistDbEntry (catalogEntry, parent, assistDbNamespace, filter, i18n, navigationSettings) {
     var self = this;
-    self.i18n = i18n;
-    self.definition = definition;
-    self.assistDbSource = assistDbSource;
-    self.sortFunctions = assistDbSource.sortFunctions;
+    self.catalogEntry = catalogEntry;
     self.parent = parent;
+    self.assistDbNamespace = assistDbNamespace;
     self.filter = filter;
-    self.filterColumnNames = ko.observable(false);
-    self.isSearchVisible = assistDbSource.isSearchVisible;
-    self.sourceType = self.assistDbSource.sourceType;
-    self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
-    self.highlight = ko.observable(false);
-    self.activeSort = self.assistDbSource.activeSort;
-    self.popularity = ko.observable(0);
+    self.i18n = i18n;
+    self.navigationSettings = navigationSettings;
 
-    self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
+    self.sourceType = assistDbNamespace.sourceType;
+    self.invalidateOnRefresh =  assistDbNamespace.invalidateOnRefresh;
+
+    self.expandable = self.catalogEntry.hasPossibleChildren();
+
+    self.filterColumnNames = ko.observable(false);
+    self.highlight = ko.observable(false);
+    self.popularity = ko.observable(0);
 
     self.loaded = false;
     self.loading = ko.observable(false);
@@ -62,10 +52,21 @@ var AssistDbEntry = (function () {
 
     self.hasErrors = ko.observable(false);
 
-    self.navigationSettings = navigationSettings;
+    self.iconClass = '';
+    if (!self.navigationSettings.rightAssist) {
+      if (self.sourceType === 'solr') {
+        self.iconClass = 'fa-search';
+      } else if (self.sourceType === 'kafka') {
+        self.iconClass = 'fa-sitemap';
+      } else if (self.catalogEntry.isView()) {
+        self.iconClass = 'fa-eye';
+      } else {
+        self.iconClass = 'fa-table';
+      }
+    }
 
     self.open.subscribe(function(newValue) {
-      if (newValue && self.entries().length == 0) {
+      if (newValue && self.entries().length === 0) {
         self.loadEntries();
       }
     });
@@ -74,39 +75,31 @@ var AssistDbEntry = (function () {
       return self.entries().length > 0;
     });
 
-    self.assistDbSource.activeSort.subscribe(function (newSort) {
-      self.entries.sort(self.sortFunctions[newSort]);
-    });
-
     self.filteredEntries = ko.pureComputed(function () {
       var facets = self.filter.querySpec().facets;
-      var tableAndViewFilterMatch = !self.definition.isDatabase || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews());
       var facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
       // Only text match on tables/views or columns if flag is set
-      var textMatch = (!self.definition.isDatabase && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
+      var textMatch = (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
 
-      if (tableAndViewFilterMatch && facetMatch && textMatch) {
+      if (facetMatch && textMatch) {
         return self.entries();
       }
 
       return self.entries().filter(function (entry) {
         var match = true;
-        if (!tableAndViewFilterMatch) {
-          match = entry.definition.isTable && self.filter.showTables() || entry.definition.isView && self.filter.showViews();
-        }
 
         if (match && !facetMatch) {
-          if (entry.definition.isColumn || entry.definition.isComplex) {
-            match = (Object.keys(facets['type']).length == 2 && facets['type']['table'] && facets['type']['view'])
-              || (Object.keys(facets['type']).length == 1 && (facets['type']['table'] || facets['type']['view']))
-              || facets['type'][entry.definition.type];
-          } else if (entry.definition.isView || entry.definition.isTable) {
-            match = (!facets['type']['table'] && !facets['type']['view']) || (facets['type']['table'] && entry.definition.isTable) || (facets['type']['view'] && entry.definition.isView);
+          if (entry.catalogEntry.isField()) {
+            match = (Object.keys(facets['type']).length === 2 && facets['type']['table'] && facets['type']['view'])
+              || (Object.keys(facets['type']).length === 1 && (facets['type']['table'] || facets['type']['view']))
+              || facets['type'][entry.catalogEntry.getType()];
+          } else if (entry.catalogEntry.isTableOrView()) {
+            match = (!facets['type']['table'] && !facets['type']['view']) || (facets['type']['table'] && entry.catalogEntry.isTable()) || (facets['type']['view'] && entry.catalogEntry.isView());
           }
         }
 
         if (match && !textMatch) {
-          var nameLower = entry.definition.name.toLowerCase();
+          var nameLower = entry.catalogEntry.name.toLowerCase();
           match = self.filter.querySpec().text.every(function (text) {
             return nameLower.indexOf(text.toLowerCase()) !== -1
           });
@@ -116,24 +109,35 @@ var AssistDbEntry = (function () {
       });
     });
 
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.entries().forEach(function (entry) {
+        if (entry.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + entry.catalogEntry.name.substring(partial.length))
+        }
+      });
+      return result;
+    };
+
     self.tableName = null;
     self.columnName = null;
     self.type = null;
     self.databaseName = self.getHierarchy()[0];
-    if (self.definition.isTable || self.definition.isView) {
-      self.tableName = self.definition.name;
+    if (self.catalogEntry.isTableOrView()) {
+      self.tableName = self.catalogEntry.name;
       self.columnName = null;
-      self.type = self.definition.type;
-    } else if (self.definition.isColumn) {
-      self.tableName = parent.definition.name;
-      self.columnName = self.definition.name;
+      self.type = self.catalogEntry.getType();
+    } else if (self.catalogEntry.isColumn()) {
+      self.tableName = parent.catalogEntry.name;
+      self.columnName = self.catalogEntry.name;
     }
 
     self.editorText = ko.pureComputed(function () {
-      if (self.definition.isTable || self.definition.isView) {
+      if (self.catalogEntry.isTableOrView()) {
         return self.getTableName();
       }
-      if (self.definition.isColumn) {
+      if (self.catalogEntry.isColumn()) {
         return self.getColumnName() + ', ';
       }
       return self.getComplexName() + ', ';
@@ -146,20 +150,49 @@ var AssistDbEntry = (function () {
       entry = entry.parent;
     }
     if (entry) {
-      return SqlUtils.backTickIfNeeded(sourceType, entry.definition.name);
+      return SqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name);
     }
   };
 
+  AssistDbEntry.prototype.knownFacetValues = function () {
+    var self = this;
+    var types = {};
+    if (self.parent === null) { // Only find facets on the DB level
+      self.entries().forEach(function (tableEntry) {
+        if (!self.assistDbNamespace.nonSqlType) {
+          if (tableEntry.catalogEntry.isTable()) {
+            types.table =  types.table ? types.table + 1 : 1;
+          } else if (tableEntry.catalogEntry.isView()) {
+            types.view =  types.view ? types.view + 1 : 1;
+          }
+        }
+        if (tableEntry.open()) {
+          tableEntry.entries().forEach(function (colEntry) {
+            if (!types[colEntry.catalogEntry.getType()]) {
+              types[colEntry.catalogEntry.getType()] = 1;
+            } else {
+              types[colEntry.catalogEntry.getType()]++;
+            }
+          })
+        }
+      });
+    }
+    if (Object.keys(types).length) {
+      return { type: types }
+    }
+    return {};
+  };
+
   AssistDbEntry.prototype.getDatabaseName = function () {
-    return findNameInHierarchy(this, function (entry) { return entry.definition.isDatabase });
+    return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isDatabase() });
   };
 
   AssistDbEntry.prototype.getTableName = function () {
-    return findNameInHierarchy(this, function (entry) { return entry.definition.isTable || entry.definition.isView });
+    return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isTableOrView() });
   };
 
   AssistDbEntry.prototype.getColumnName = function () {
-    return findNameInHierarchy(this, function (entry) { return entry.definition.isColumn });
+    return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isColumn() });
   };
 
   AssistDbEntry.prototype.getComplexName = function () {
@@ -167,15 +200,15 @@ var AssistDbEntry = (function () {
     var sourceType = entry.sourceType;
     var parts = [];
     while (entry != null) {
-      if (entry.definition.isTable || entry.definition.isView) {
+      if (entry.catalogEntry.isTableOrView()) {
         break;
       }
-      if (entry.definition.isArray || entry.definition.isMapValue) {
+      if (entry.catalogEntry.isArray() || entry.catalogEntry.isMapValue()) {
         if (sourceType === 'hive') {
           parts.push("[]");
         }
       } else {
-        parts.push(SqlUtils.backTickIfNeeded(sourceType, entry.definition.name));
+        parts.push(SqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name));
         parts.push(".");
       }
       entry = entry.parent;
@@ -193,29 +226,14 @@ var AssistDbEntry = (function () {
       offset.top += positionAdjustment.top;
     }
 
-    var type;
-    if (self.definition.isColumn) {
-      type = 'column';
-    } else if (self.definition.isComplex) {
-      type = 'complex';
-    } else if (self.definition.isTable) {
-      type = 'table';
-    } else if (self.definition.isView) {
-      type = 'view';
-    } else {
-      type = 'database';
-    }
-
     self.statsVisible(true);
     huePubSub.publish('context.popover.show', {
       data: {
-        type: type,
-        identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
+        type: 'catalogEntry',
+        catalogEntry: self.catalogEntry
       },
-      showInAssistEnabled: self.navigationSettings.rightAssist,
+      showInAssistEnabled: !!self.navigationSettings.rightAssist,
       orientation: self.navigationSettings.rightAssist ? 'left' : 'right',
-      sourceType: self.sourceType,
-      defaultDatabase: self.databaseName,
       pinEnabled: self.navigationSettings.pinEnabled,
       source: {
         element: event.target,
@@ -230,14 +248,9 @@ var AssistDbEntry = (function () {
     });
   };
 
-  AssistDbEntry.prototype.toggleSearch = function () {
+  AssistDbEntry.prototype.triggerRefresh = function () {
     var self = this;
-    self.isSearchVisible(!self.isSearchVisible());
-  };
-
-  AssistDbEntry.prototype.triggerRefresh = function (data, event) {
-    var self = this;
-    self.assistDbSource.triggerRefresh(data, event);
+    self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh(), cascade: true });
   };
 
   AssistDbEntry.prototype.highlightInside = function (path) {
@@ -247,7 +260,7 @@ var AssistDbEntry = (function () {
       var foundEntry;
       $.each(self.entries(), function (idx, entry) {
         entry.highlight(false);
-        if (entry.definition.name === path[0]) {
+        if (entry.catalogEntry.name === path[0]) {
           foundEntry = entry;
         }
       });
@@ -289,7 +302,7 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.loadEntries = function(callback, silenceErrors) {
+  AssistDbEntry.prototype.loadEntries = function(callback) {
     var self = this;
     if (!self.expandable || self.loading()) {
       return;
@@ -298,117 +311,48 @@ var AssistDbEntry = (function () {
 
     var loadEntriesDeferred = $.Deferred();
 
-    var successCallback = function(data) {
+    var successCallback = function(sourceMeta) {
       self.entries([]);
-      self.hasErrors(false);
-      self.loading(false);
-      self.loaded = true;
-
-      if (data.status === 0 && data.code === 500 && !data.tables_meta) {
-        self.hasErrors(true);
-        return;
-      }
-
-      var newEntries = [];
-      var index = 0;
-      if (typeof data.tables_meta !== "undefined") {
-        newEntries = $.map(data.tables_meta, function(table) {
-          table.index = index++;
-          table.title = table.name + (table.comment ? ' - ' + table.comment : '');
-          table.displayName = table.name;
-          table.isTable = /table/i.test(table.type);
-          table.isView = /view/i.test(table.type);
-          return self.createEntry(table);
-        });
-      } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
-        newEntries = $.map(data.extended_columns, function (columnDef) {
-          var displayName = columnDef.name;
-          if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
-            displayName += ' (' + columnDef.type + ')'
+      if (!sourceMeta.notFound) {
+        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (catalogEntries) {
+          self.hasErrors(false);
+          self.loading(false);
+          self.loaded = true;
+          if (catalogEntries.length === 0) {
+            self.entries([]);
+            return;
           }
-          var title = displayName;
-          if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
-            title += ' ' + columnDef.comment;
-          }
-          var shortType = null;
-          if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
-            shortType = columnDef.type.match(/^[^<]*/g)[0]; // everything before '<'
-          }
-          columnDef.index = index++;
-          columnDef.displayName = displayName;
-          columnDef.title = title;
-          columnDef.isColumn = true;
-          columnDef.type = shortType;
-          return self.createEntry(columnDef);
-        });
-      } else if (typeof data.columns !== "undefined" && data.columns !== null) {
-        newEntries = $.map(data.columns, function(columnName) {
-          return self.createEntry({
-            name: columnName,
-            index: index++,
-            displayName: columnName,
-            title: columnName,
-            isColumn: true
+          var newEntries = [];
+          catalogEntries.forEach(function (catalogEntry) {
+            newEntries.push(self.createEntry(catalogEntry));
           });
+          if (sourceMeta.type === 'array') {
+            self.entries(newEntries);
+            self.entries()[0].open(true);
+          } else {
+            self.entries(newEntries);
+          }
+
+          loadEntriesDeferred.resolve(newEntries);
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }).fail(function () {
+          self.loading(false);
+          self.loaded = true;
+          self.hasErrors(true);
         });
-      } else if (typeof data.type !== "undefined" && data.type !== null) {
-        if (data.type === "map") {
-          newEntries = [
-            self.createEntry({
-              name: "key",
-              index: index++,
-              displayName: "key (" + data.key.type + ")",
-              title: "key (" + data.key.type + ")",
-              type: data.key.type,
-              isComplex: true
-            }),
-            self.createEntry({
-              name: "value",
-              index: index++,
-              displayName: "value (" + data.value.type + ")",
-              title: "value (" + data.value.type + ")",
-              isMapValue: true,
-              type: data.value.type,
-              isComplex: true
-            })
-          ];
-        } else if (data.type == "struct") {
-          newEntries = $.map(data.fields, function(field) {
-            return self.createEntry({
-              name: field.name,
-              index: index++,
-              displayName: field.name + " (" + field.type + ")",
-              title: field.name + " (" + field.type + ")",
-              type: field.type,
-              isComplex: true
-            });
-          });
-        } else if (data.type == "array") {
-          newEntries = [
-            self.createEntry({
-              name: "item",
-              index: index++,
-              displayName: "item (" + data.item.type + ")",
-              title: "item (" + data.item.type + ")",
-              isArray: true,
-              type: data.item.type,
-              isComplex: true
-            })
-          ];
+
+        if (!self.assistDbNamespace.nonSqlType) {
+          self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
         }
-      }
-
-
-      if (data.type === 'array' || data.type === 'map') {
-        self.entries(newEntries);
-        self.entries()[0].open(true);
       } else {
-        newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
-        self.entries(newEntries);
-      }
-      loadEntriesDeferred.resolve(newEntries);
-      if (typeof callback === 'function') {
-        callback();
+        self.hasErrors(true);
+        self.loading(false);
+        self.loaded = true;
+        if (typeof callback === 'function') {
+          callback();
+        }
       }
     };
 
@@ -419,96 +363,70 @@ var AssistDbEntry = (function () {
       loadEntriesDeferred.resolve([]);
     };
 
-    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && self.definition.isTable) {
-      self.assistDbSource.apiHelper.fetchNavOptTopColumns({
-        sourceType: self.assistDbSource.sourceType,
-        successCallback: function (data) {
-          if (data.status === 0 && data.values && data.values.selectColumns && data.values.selectColumns.length > 0) {
-            var colIndex = {};
-            data.values.selectColumns.forEach(function (col) {
-              colIndex[col.columnName] = col;
-            });
-            $.when(loadEntriesDeferred).done(function () {
-              if (!self.hasErrors()) {
-                self.entries().forEach(function (entry) {
-                  if (colIndex[entry.definition.name]) {
-                    entry.popularity(colIndex[entry.definition.name].columnCount);
-                  }
-                });
-
-                if (self.assistDbSource.activeSort() === 'popular') {
-                  self.entries.sort(self.sortFunctions.popular);
+    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && !self.assistDbNamespace.nonSqlType) {
+      self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
+        loadEntriesDeferred.done(function () {
+          if (!self.hasErrors()) {
+            self.entries().forEach(function (entry) {
+              if (entry.catalogEntry.navOptPopularity) {
+                if (entry.catalogEntry.navOptPopularity.popularity) {
+                  entry.popularity(entry.catalogEntry.navOptPopularity.popularity)
+                } else if (entry.catalogEntry.navOptPopularity.column_count) {
+                  entry.popularity(entry.catalogEntry.navOptPopularity.column_count)
+                } else if (entry.catalogEntry.navOptPopularity.selectColumn) {
+                  entry.popularity(entry.catalogEntry.navOptPopularity.selectColumn.columnCount);
                 }
               }
-            })
+            });
           }
-        },
-        silenceErrors: true,
-        tables: [{ identifierChain: [{ name: self.definition.name }] }],
-        defaultDatabase: self.parent.definition.name
-      })
+        })
+      });
     }
 
-    self.assistDbSource.apiHelper.fetchPanelData({
-      sourceType: self.assistDbSource.sourceType,
-      hierarchy: self.getHierarchy(),
-      successCallback: successCallback,
-      errorCallback: errorCallback,
-      silenceErrors: !!silenceErrors
-    });
+    self.catalogEntry.getSourceMeta({ silenceErrors: self.navigationSettings.rightAssist }).done(successCallback).fail(errorCallback);
   };
 
   /**
-   * @param {Object} definition
-   * @param {string} definition.type
-   * @param {string} definition.name
-   * @param {boolean} [definition.isDatabase]
-   * @param {boolean} [definition.isColumn]
-   * @param {boolean} [definition.isTable]
-   * @param {boolean} [definition.isView]
-   * @param {boolean} [definition.isMapValue]
-   * @param {boolean} [definition.isArray]
+   * @param {DataCatalogEntry} catalogEntry
    */
-  AssistDbEntry.prototype.createEntry = function (definition) {
+  AssistDbEntry.prototype.createEntry = function (catalogEntry) {
     var self = this;
-    return new AssistDbEntry(definition, self, self.assistDbSource, self.filter, self.i18n, self.navigationSettings, self.sortFunctions)
+    return new AssistDbEntry(catalogEntry, self, self.assistDbNamespace, self.filter, self.i18n, self.navigationSettings)
   };
 
   AssistDbEntry.prototype.getHierarchy = function () {
     var self = this;
-    var parts = [];
-    var entry = self;
-    while (entry != null) {
-      parts.push(entry.definition.name);
-      entry = entry.parent;
-    }
-    parts.reverse();
-    return parts;
+    return self.catalogEntry.path.concat();
   };
 
   AssistDbEntry.prototype.dblClick = function () {
     var self = this;
-    if (self.definition.isTable || self.definition.isView) {
+    if (self.catalogEntry.isTableOrView()) {
       huePubSub.publish('editor.insert.table.at.cursor', { name: self.getTableName(), database: self.getDatabaseName() });
-    } else if (self.definition.isColumn) {
+    } else if (self.catalogEntry.isColumn()) {
       huePubSub.publish('editor.insert.column.at.cursor', { name: self.getColumnName(), table: self.getTableName(), database: self.getDatabaseName() });
     } else {
       huePubSub.publish('editor.insert.column.at.cursor', { name: self.getComplexName(), table: self.getTableName(), database: self.getDatabaseName() });
     }
   };
 
-  AssistDbEntry.prototype.explore = function () {
+  AssistDbEntry.prototype.explore = function (isSolr) {
     var self = this;
-    huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbSource.sourceType);
+    if (isSolr) {
+      huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry.name);
+    }
+    else {
+      huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbNamespace.sourceType);
+    }
   };
 
   AssistDbEntry.prototype.openInMetastore = function () {
     var self = this;
     var url;
-    if (self.definition.isDatabase) {
-      url = '/metastore/tables/' + self.definition.name;
-    } else if (self.definition.isTable || self.definition.isView) {
-      url = '/metastore/table/' + self.parent.definition.name + '/' + self.definition.name;
+    if (self.catalogEntry.isDatabase()) {
+      url = '/metastore/tables/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
+    } else if (self.catalogEntry.isTableOrView()) {
+      url = '/metastore/table/' + self.parent.catalogEntry.name + '/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
     } else {
       return;
     }
@@ -520,6 +438,36 @@ var AssistDbEntry = (function () {
     }
   };
 
+  AssistDbEntry.prototype.openInIndexer = function () {
+    var self = this;
+    var definitionName = self.catalogEntry.name;
+    if (IS_NEW_INDEXER_ENABLED) {
+      if (IS_HUE_4) {
+        huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
+      } else {
+        window.open('/indexer/indexes/' + definitionName);
+      }
+    } else {
+      var hash = '#edit/' + definitionName;
+      if (IS_HUE_4) {
+        if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
+          window.location.hash = hash;
+        } else {
+          huePubSub.subscribeOnce('app.gained.focus', function (app) {
+            if (app === 'indexes') {
+              window.setTimeout(function () {
+                window.location.hash = hash;
+              }, 0)
+            }
+          });
+          huePubSub.publish('open.link', '/indexer');
+        }
+      } else {
+        window.open('/indexer/' + hash);
+      }
+    }
+  };
+
   AssistDbEntry.prototype.toggleOpen = function () {
     var self = this;
     self.open(!self.open());
@@ -527,15 +475,18 @@ var AssistDbEntry = (function () {
 
   AssistDbEntry.prototype.openItem = function () {
     var self = this;
-    if (self.definition.isTable || self.definition.isView) {
-      huePubSub.publish("assist.table.selected", {
+    if (self.catalogEntry.isTableOrView()) {
+      huePubSub.publish('assist.table.selected', {
+        sourceType: self.assistDbNamespace.sourceType,
+        namespace: self.assistDbNamespace.namespace,
         database: self.databaseName,
-        name: self.definition.name
+        name: self.catalogEntry.name
       })
-    } else if (self.definition.isDatabase) {
-      huePubSub.publish("assist.database.selected", {
-        source: self.assistDbSource.sourceType,
-        name: self.definition.name
+    } else if (self.catalogEntry.isDatabase()) {
+      huePubSub.publish('assist.database.selected', {
+        sourceType: self.assistDbNamespace.sourceType,
+        namespace: self.assistDbNamespace.namespace,
+        name: self.catalogEntry.name
       })
     }
   };

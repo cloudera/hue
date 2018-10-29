@@ -177,7 +177,7 @@
           'position': 'fixed',
           'bottom': '20px',
           'opacity': 0.85
-        }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
+        }).addClass('hueAnchor hue-datatable-search').appendTo(HUE_CONTAINER);
         search.html('<input type="text"> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-chevron-down pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>');
 
         search.find('.fa-times').on('click', function () {
@@ -359,7 +359,11 @@
             }
           });
           startCol = Math.max(1, startCol - 1);
-          endCol = Math.min(aoColumns.length, endCol + 1);
+          endCol = Math.min(aoColumns.length, endCol + 3); // avoid loading just after the col
+          // for tables under the 30 columns, display them all at once
+          if (aoColumns.length <= 30) {
+            endCol = aoColumns.length;
+          }
 
           var rowHeight = 32;
           var invisibleOffset = $t.data('oInit')['forceInvisible'] ? $t.data('oInit')['forceInvisible'] : (aoColumns.length < 100 ? 10 : 1);
@@ -384,7 +388,7 @@
             if ($t.data('fnDraws') === 0) {
               var html = '';
               for (var i = 0; i < data.length; i++) {
-                html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 32px"><td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+                html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
               }
               appendable.html(html);
               if ($t.data('plugin_jHueTableExtender')) {
@@ -544,7 +548,9 @@
       self.$table.unwrap();
       self.$table.data('isScrollAttached', null);
       self.$table.removeClass('table-huedatatable');
-      self.$table.parents(self.$table.data('oInit')['scrollable']).off('scroll', self.$table.parents(self.$table.data('oInit')['scrollable']).data('scrollFnDt'));
+      if (self.$table.data('oInit')) {
+        self.$table.parents(self.$table.data('oInit')['scrollable']).off('scroll', self.$table.parents(self.$table.data('oInit')['scrollable']).data('scrollFnDt'));
+      }
     };
 
     return self.each(function () {

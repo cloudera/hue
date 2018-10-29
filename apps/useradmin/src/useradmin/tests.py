@@ -30,7 +30,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sessions.models import Session
 from django.db.models import Q
 from django.utils.encoding import smart_unicode
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client
 
 import desktop.conf
@@ -46,7 +46,9 @@ import useradmin.ldap_access
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
-from useradmin.password_policy import reset_password_policy
+from useradmin.hue_password_policy import reset_password_policy
+
+from desktop.auth.backend import is_admin
 
 
 def reset_all_users():
@@ -226,7 +228,7 @@ def test_invalid_username():
   for bad_name in BAD_NAMES:
     assert_true(c.get('/useradmin/users/new'))
     response = c.post('/useradmin/users/new', dict(username=bad_name, password1="test", password2="test"))
-    assert_true('not allowed' in response.context["form"].errors['username'][0])
+    assert_true('not allowed' in response.context[0]["form"].errors['username'][0])
 
 
 class BaseUserAdminTests(object):
@@ -272,6 +274,44 @@ class TestUserAdmin(BaseUserAdminTests):
            save="Save"), follow=True)
     assert_true(len(GroupPermission.objects.all()) == 1)
 
+    # Get ourselves set up with a user and a group with superuser group priv
+    cadmin = make_logged_in_client(username="supertest", is_superuser=True)
+    Group.objects.create(name="super-test-group")
+    cadmin.post('/useradmin/groups/edit/super-test-group',
+                dict(name="super-test-group",
+                     members=[User.objects.get(username="supertest").pk],
+                     permissions=[HuePermission.objects.get(app='useradmin', action='superuser').pk],
+                     save="Save"), follow=True)
+    assert_equal(len(GroupPermission.objects.all()), 2)
+
+    supertest = User.objects.get(username="supertest")
+    supertest.groups.add(Group.objects.get(name="super-test-group"))
+    supertest.is_superuser = False
+    supertest.save()
+    # Validate user is not a checked superuser
+    assert_false(supertest.is_superuser)
+    # Validate user is superuser by group
+    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser",
+                                                                                       app="useradmin"), 1)
+
+    # Make sure that a user of supergroup can access /useradmin/users
+    # Create user to try to edit
+    notused = User.objects.get_or_create(username="notused", is_superuser=False)
+    response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
+    assert_true('Hue Users - Edit user: notused' in response.content)
+
+    # Make sure we can modify permissions
+    response = cadmin.get('/useradmin/permissions/edit/useradmin/access/?is_embeddable=true')
+    assert_true('Hue Permissions - Edit app: useradmin' in response.content)
+
+    # Revoke superuser privilege from groups
+    c.post('/useradmin/permissions/edit/useradmin/superuser',
+           dict(app='useradmin',
+           priv='superuser',
+           groups=[],
+           save="Save"), follow=True)
+    assert_equal(len(GroupPermission.objects.all()), 1)
+
     # Now test that we have limited access
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
     response = c1.get('/useradmin/users')
@@ -281,6 +321,13 @@ class TestUserAdmin(BaseUserAdminTests):
     test_user = User.objects.get(username="nonadmin")
     test_user.groups.add(Group.objects.get(name='test-group'))
     test_user.save()
+
+    # Make sure that a user of nonadmin fails where supertest succeeds
+    response = c1.get("/useradmin/users/edit/notused?is_embeddable=true")
+    assert_true('You must be a superuser to add or edit another user' in response.content)
+
+    response = c1.get("/useradmin/permissions/edit/useradmin/access/?is_embeddable=true")
+    assert_true('You must be a superuser to change permissions' in response.content)
 
     # Check that we have access now
     response = c1.get('/useradmin/users')
@@ -347,12 +394,12 @@ class TestUserAdmin(BaseUserAdminTests):
     c = make_logged_in_client(username="test", is_superuser=True)
     response = c.get('/useradmin/groups')
     # No groups just yet
-    assert_true(len(response.context["groups"]) == 0)
+    assert_true(len(response.context[0]["groups"]) == 0)
     assert_true("Hue Groups" in response.content)
 
     # Create a group
     response = c.get('/useradmin/groups/new')
-    assert_equal('/useradmin/groups/new', response.context['action'])
+    assert_equal('/useradmin/groups/new', response.context[0]['action'])
     c.post('/useradmin/groups/new', dict(name="testgroup"))
 
     # We should have an empty group in the DB now
@@ -422,15 +469,15 @@ class TestUserAdmin(BaseUserAdminTests):
       # Test first-ever login with password policy enabled
       c = Client()
 
-      response = c.get('/accounts/login/')
+      response = c.get('/hue/accounts/login/')
       assert_equal(200, response.status_code)
-      assert_true(response.context['first_login_ever'])
+      assert_true(response.context[0]['first_login_ever'])
 
-      response = c.post('/accounts/login/', dict(username="test_first_login", password="foo"))
-      assert_true(response.context['first_login_ever'])
-      assert_equal([password_error_msg], response.context["form"]["password"].errors)
+      response = c.post('/hue/accounts/login/', dict(username="test_first_login", password="foo"))
+      assert_true(response.context[0]['first_login_ever'])
+      assert_equal([password_error_msg], response.context[0]["form"]["password"].errors)
 
-      response = c.post('/accounts/login/', dict(username="test_first_login", password="foobarTest1["), follow=True)
+      response = c.post('/hue/accounts/login/', dict(username="test_first_login", password="foobarTest1["), follow=True)
       assert_equal(200, response.status_code)
       assert_true(User.objects.get(username="test_first_login").is_superuser)
       assert_true(User.objects.get(username="test_first_login").check_password("foobarTest1["))
@@ -450,7 +497,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=True,
                              password1="foo",
                              password2="foo"))
-      assert_equal([password_error_msg], response.context["form"]["password1"].errors)
+      assert_equal([password_error_msg], response.context[0]["form"]["password1"].errors)
 
       # Password is more than 8 characters long but does not have a special character
       response = c.post('/useradmin/users/edit/superuser',
@@ -458,7 +505,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=True,
                              password1="foobarTest1",
                              password2="foobarTest1"))
-      assert_equal([password_error_msg], response.context["form"]["password1"].errors)
+      assert_equal([password_error_msg], response.context[0]["form"]["password1"].errors)
 
       # Password1 and Password2 are valid but they do not match
       response = c.post('/useradmin/users/edit/superuser',
@@ -468,7 +515,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              password2="foobarTest1?",
                              password_old="foobarTest1[",
                              is_active=True))
-      assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors)
+      assert_equal(["Passwords do not match."], response.context[0]["form"]["password2"].errors)
 
       # Password is valid now
       c.post('/useradmin/users/edit/superuser',
@@ -483,7 +530,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Test creating a new user
       response = c.get('/useradmin/users/new')
-      assert_true(password_hint in response.content)
+      c = make_logged_in_client('superuser', 'foobarTest1[', is_superuser=True)
 
       # Password is more than 8 characters long but does not have a special character
       response = c.post('/useradmin/users/new',
@@ -492,7 +539,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              password1="foo",
                              password2="foo"))
       assert_equal({'password1': [password_error_msg], 'password2': [password_error_msg]},
-                   response.context["form"].errors)
+                   response.context[0]["form"].errors)
 
       # Password is more than 8 characters long but does not have a special character
       response = c.post('/useradmin/users/new',
@@ -502,7 +549,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              password2="foobarTest1"))
 
       assert_equal({'password1': [password_error_msg], 'password2': [password_error_msg]},
-                   response.context["form"].errors)
+                   response.context[0]["form"].errors)
 
       # Password1 and Password2 are valid but they do not match
       response = c.post('/useradmin/users/new',
@@ -510,7 +557,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=False,
                              password1="foobarTest1[",
                              password2="foobarTest1?"))
-      assert_equal({'password2': ["Passwords do not match."]}, response.context["form"].errors)
+      assert_equal({'password2': ["Passwords do not match."]}, response.context[0]["form"].errors)
 
       # Password is valid now
       c.post('/useradmin/users/new',
@@ -526,7 +573,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
 
   def test_user_admin(self):
-    FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
+    FUNNY_NAME = 'أحمد@cloudera.com'
     FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
 
     resets = [
@@ -542,7 +589,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Test basic output.
       response = c.get('/useradmin/')
-      assert_true(len(response.context["users"]) > 0)
+      assert_true(len(response.context[0]["users"]) > 0)
       assert_true("Hue Users" in response.content)
 
       # Test editing a superuser
@@ -553,8 +600,8 @@ class TestUserAdmin(BaseUserAdminTests):
                         dict(username="test",
                              first_name=u"Inglés",
                              last_name=u"Español",
-                             is_superuser="True",
-                             is_active="True"),
+                             is_superuser=True,
+                             is_active=True),
                         follow=True)
       assert_true("User information updated" in response.content,
                   "Notification should be displayed in: %s" % response.content)
@@ -563,13 +610,13 @@ class TestUserAdmin(BaseUserAdminTests):
                         dict(username="test2",
                              first_name=u"Inglés",
                              last_name=u"Español",
-                             is_superuser="True",
-                             is_active="True"),
+                             is_superuser=True,
+                             is_active=True),
                         follow=True)
       assert_true("You cannot change a username" in response.content)
       # Now make sure that those were materialized
       response = c.get('/useradmin/users/edit/test')
-      assert_equal(smart_unicode("Inglés"), response.context["form"].instance.first_name)
+      assert_equal(smart_unicode("Inglés"), response.context[0]["form"].instance.first_name)
       assert_true("Español" in response.content)
       # Shouldn't be able to demote to non-superuser
       response = c.post('/useradmin/users/edit/test', dict(username="test",
@@ -584,16 +631,20 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Let's try changing the password
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser=True, password1="foo", password2="foobar"))
-      assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors, "Should have complained about mismatched password")
+      assert_equal(["Passwords do not match."], response.context[0]["form"]["password2"].errors, "Should have complained about mismatched password")
       # Old password not confirmed
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", is_active=True, is_superuser=True))
-      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context["form"]["password_old"].errors, "Should have complained about old password")
+      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password")
       # Good now
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", password_old="test", is_active=True, is_superuser=True))
       assert_true(User.objects.get(username="test").is_superuser)
       assert_true(User.objects.get(username="test").check_password("foo"))
       # Change it back!
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", password_old="foo", is_active="True", is_superuser="True"))
+      response = c.post('/hue/accounts/login/', dict(username="test", password="foo"), follow=True)
+
+      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", password_old="foo", is_active=True, is_superuser=True))
+      response = c.post('/hue/accounts/login/', dict(username="test", password="test"), follow=True)
+
       assert_true(User.objects.get(username="test").check_password("test"))
       assert_true(make_logged_in_client(username = "test", password = "test"), "Check that we can still login.")
 
@@ -601,20 +652,22 @@ class TestUserAdmin(BaseUserAdminTests):
       group = get_default_user_group()
       response = c.get('/useradmin/users/new')
       assert_true(response)
-      assert_true(('<option value="%s" selected="selected">%s</option>' % (group.id, group.name)) in str(response))
+      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in str(response))
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
-      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context["form"].errors)
+      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context[0]["form"].errors)
 
       # Create a new regular user (for real)
       response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
                                                password1="test",
                                                password2="test",
-                                               is_active="True"))
+                                               is_superuser=True,
+                                               is_active=True))
       response = c.get('/useradmin/')
-      assert_true(FUNNY_NAME_QUOTED in response.content)
-      assert_true(len(response.context["users"]) > 1)
+
+      assert_true(FUNNY_NAME in response.content)
+      assert_true(len(response.context[0]["users"]) > 1)
       assert_true("Hue Users" in response.content)
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
@@ -646,7 +699,7 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_equal(response.status_code, 200)
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), follow=True)
       assert_equal(response.status_code, 200)
-      assert_equal("Hello", response.context["form"].instance.first_name)
+      assert_equal("Hello", response.context[0]["form"].instance.first_name)
       funny_user = User.objects.get(username=FUNNY_NAME)
       # Can't edit other people.
       response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id]})
@@ -669,10 +722,10 @@ class TestUserAdmin(BaseUserAdminTests):
       response = c.post('/useradmin/users/new', dict(username='christian_häusler',
                                                      password1="test",
                                                      password2="test",
-                                                     is_active="True"))
+                                                     is_active=True))
       response = c.get('/useradmin/')
       assert_true('christian_häusler' in response.content)
-      assert_true(len(response.context["users"]) > 1)
+      assert_true(len(response.context[0]["users"]) > 1)
 
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username='christian_häusler').exists())
@@ -711,49 +764,63 @@ class TestUserAdmin(BaseUserAdminTests):
   def test_list_for_autocomplete(self):
 
     # Now the autocomplete has access to all the users and groups
-    c1 = make_logged_in_client('test_list_for_autocomplete', is_superuser=False, groupname='test_list_for_autocomplete')
-    c2_same_group = make_logged_in_client('test_list_for_autocomplete2', is_superuser=False, groupname='test_list_for_autocomplete')
-    c3_other_group = make_logged_in_client('test_list_for_autocomplete3', is_superuser=False, groupname='test_list_for_autocomplete_other_group')
+    c1 = make_logged_in_client('user_test_list_for_autocomplete', is_superuser=False, groupname='group_test_list_for_autocomplete')
+    c2_same_group = make_logged_in_client('user_test_list_for_autocomplete2', is_superuser=False, groupname='group_test_list_for_autocomplete')
+    c3_other_group = make_logged_in_client('user_test_list_for_autocomplete3', is_superuser=False, groupname='group_test_list_for_autocomplete_other_group')
 
-    # c1 users should list only 'test_list_for_autocomplete2' and group should not list 'test_list_for_autocomplete_other_group'
-    response = c1.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+    # c1 users should list only 'user_test_list_for_autocomplete2' and group should not list 'group_test_list_for_autocomplete_other_group'
+    response = c1.get(reverse('useradmin_views_list_for_autocomplete'))
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([u'test_list_for_autocomplete2'], users)
-    assert_true(u'test_list_for_autocomplete' in groups, groups)
-    assert_false(u'test_list_for_autocomplete_other_group' in groups, groups)
+    assert_equal([u'user_test_list_for_autocomplete2'], users)
+    assert_true(u'group_test_list_for_autocomplete' in groups, groups)
+    assert_false(u'group_test_list_for_autocomplete_other_group' in groups, groups)
 
     # only_mygroups has no effect if user is not super user
-    response = c1.get(reverse('useradmin.views.list_for_autocomplete'), {'only_mygroups':False, 'include_myself':True}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = c1.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([u'test_list_for_autocomplete',u'test_list_for_autocomplete2'], users)
-    assert_true(u'test_list_for_autocomplete' in groups, groups)
-    assert_false(u'test_list_for_autocomplete_other_group' in groups, groups)
+    assert_equal([u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2'], users)
+    assert_true(u'group_test_list_for_autocomplete' in groups, groups)
+    assert_false(u'group_test_list_for_autocomplete_other_group' in groups, groups)
 
     # c3 is alone
-    response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), {'include_myself':True}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = c3_other_group.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([u'test_list_for_autocomplete3'], users)
-    assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
+    assert_equal([u'user_test_list_for_autocomplete3'], users)
+    assert_true(u'group_test_list_for_autocomplete_other_group' in groups, groups)
 
-    # superuser should get all users
     c4_super_user = make_logged_in_client(is_superuser=True)
-    response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself':True,'only_mygroups':True}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+    # superuser should get all users as autocomplete filter is not passed
+    response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself': True, 'only_mygroups': True})
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
-    assert_equal([u'test', u'test_list_for_autocomplete', u'test_list_for_autocomplete2', u'test_list_for_autocomplete3'],  users)
+    assert_equal([u'test', u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'], users)
+
+    c5_autocomplete_filter_by_groupname = make_logged_in_client('user_doesnt_match_autocomplete_filter',is_superuser=False,groupname='group_test_list_for_autocomplete')
+
+    # superuser should get all users & groups which match the autocomplete filter case insensitive
+    response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself': True, 'filter': 'Test_list_for_autocomplete'})
+    content = json.loads(response.content)
+
+    users = [smart_unicode(user['username']) for user in content['users']]
+    groups = [smart_unicode(user['name']) for user in content['groups']]
+
+    assert_equal([ u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'],  users)
+    assert_equal([u'group_test_list_for_autocomplete', u'group_test_list_for_autocomplete_other_group'], groups)
 
   def test_language_preference(self):
     # Test that language selection appears in Edit Profile for current user
@@ -773,7 +840,44 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Changing language preference will change language setting
     response = client.post('/useradmin/users/edit/test', dict(language='ko'))
-    assert_true('<option value="ko" selected="selected">Korean</option>' in response.content)
+    assert_true('<option value="ko" selected>Korean</option>' in response.content)
+
+  def test_edit_user_xss(self):
+    # Hue 3 Admin
+    edit_user = make_logged_in_client('admin', is_superuser=True)
+    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
+                                                                      is_superuser=True,
+                                                                      password1="foo",
+                                                                      password2="foo",
+                                                                      language="en-us><script>alert('Hacked')</script>"
+                                                                      ))
+    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    # Hue 4 Admin
+    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
+                                                                      is_superuser=True,
+                                                                      language="en-us><script>alert('Hacked')</script>",
+                                                                      is_embeddable=True))
+    content = json.loads(response.content)
+    assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.', content['errors'][0]['message'][0])
+
+    # Hue 3, User with access to useradmin app
+    edit_user = make_logged_in_client('edit_user', is_superuser=False)
+    grant_access('edit_user', 'edit_user', 'useradmin')
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
+                                                                      is_superuser=False,
+                                                                      password1="foo",
+                                                                      password2="foo",
+                                                                      language="en-us><script>alert('Hacked')</script>"
+                                                                      ))
+    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    # Hue 4, User with access to useradmin app
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
+                                                                      is_superuser=False,
+                                                                      language="en-us><script>alert('Hacked')</script>",
+                                                                      is_embeddable=True))
+    content = json.loads(response.content)
+    assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.',
+                content['errors'][0]['message'][0])
 
 
 class TestUserAdminWithHadoop(BaseUserAdminTests):
@@ -819,6 +923,19 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       assert_equal('test2', dir_stat.user)
       assert_equal('test2', dir_stat.group)
       assert_equal('40755', '%o' % dir_stat.mode)
+
+      # special character in username ctestë01
+      path_with_special_char = '/user/ctestë01'.decode("utf-8")
+      if cluster.fs.exists(path_with_special_char):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
+      response = c.post('/useradmin/users/new', dict(username='ctestë01', password1='test', password2='test', ensure_home_directory=True))
+      assert_true(cluster.fs.exists(path_with_special_char))
+      dir_stat = cluster.fs.stats(path_with_special_char)
+      assert_equal(u'ctestë01', dir_stat.user)
+      assert_equal(u'ctestë01', dir_stat.group)
+      assert_equal('40755', '%o' % dir_stat.mode)
+      if cluster.fs.exists(path_with_special_char):  # clean special characters
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
 
       # Ignore domain in username when importing LDAP users
       # eg: Ignore '@ad.sec.cloudera.com' when importing 'test@ad.sec.cloudera.com'

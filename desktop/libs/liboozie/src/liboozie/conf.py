@@ -78,9 +78,11 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
+  from desktop.lib.fsmanager import get_filesystem
   from hadoop.cluster import get_all_hdfs
   from hadoop.fs.hadoopfs import Hdfs
   from liboozie.oozie_api import get_oozie
+  from oozie.conf import REMOTE_SAMPLE_DIR
 
   res = []
 
@@ -88,6 +90,17 @@ def config_validator(user):
     status = get_oozie_status(user)
     if 'NORMAL' not in status:
       res.append((status, _('The Oozie server is not available')))
+    fs = get_filesystem()
+    NICE_NAME = 'Oozie'
+    if fs.exists(REMOTE_SAMPLE_DIR.get()):
+      stats = fs.stats(REMOTE_SAMPLE_DIR.get())
+      mode = oct(stats.mode)
+      # if neither group nor others have write permission
+      group_has_write = int(mode[-2]) & 2
+      others_has_write = int(mode[-1]) & 2
+
+      if not group_has_write and not others_has_write:
+        res.append((NICE_NAME, "The permissions of workspace '%s' are too restrictive" % REMOTE_SAMPLE_DIR.get()))
 
     api = get_oozie(user, api_version="v2")
 

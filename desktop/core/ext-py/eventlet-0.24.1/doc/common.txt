@@ -1,0 +1,4 @@
+.. |internal| replace::
+
+        This is considered an internal API, and it might change 
+        unexpectedly without being deprecated first.

@@ -45,6 +45,7 @@ var AssistStorageEntry = (function () {
    * @param {string} options.definition.name
    * @param {string} options.definition.type (file, dir)
    * @param {string} options.type - The storage type ('adls', 'hdfs', 's3')
+   * @param {string} [options.originalType] - The original storage type ('adl', 's3a')
    * @param {AssistStorageEntry} options.parent
    * @param {ApiHelper} options.apiHelper
    * @constructor
@@ -52,6 +53,7 @@ var AssistStorageEntry = (function () {
   function AssistStorageEntry (options) {
     var self = this;
     self.type = options.type;
+    self.originalType = options.originalType;
     self.definition = options.definition;
     self.apiHelper = options.apiHelper;
     self.parent = options.parent;
@@ -65,10 +67,14 @@ var AssistStorageEntry = (function () {
     self.path += self.definition.name;
     self.currentPage = 1;
     self.hasMorePages = true;
+    self.preview = ko.observable();
+    self.contextPopoverVisible = ko.observable(false);
 
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
     self.filter.subscribe(function () {
+      self.currentPage = 1;
+      self.hasMorePages = true;
       self.loadEntries();
     });
 
@@ -77,12 +83,17 @@ var AssistStorageEntry = (function () {
     self.loaded = false;
     self.loading = ko.observable(false);
     self.loadingMore = ko.observable(false);
+    self.errorText = ko.observable();
     self.hasErrors = ko.observable(false);
     self.open = ko.observable(false);
 
     self.open.subscribe(function(newValue) {
-      if (newValue && self.entries().length == 0) {
-        self.loadEntries();
+      if (newValue && self.entries().length === 0) {
+        if (self.definition.type === 'dir') {
+          self.loadEntries();
+        } else {
+          self.loadPreview();
+        }
       }
     });
 
@@ -94,6 +105,23 @@ var AssistStorageEntry = (function () {
   AssistStorageEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, self);
+  };
+
+  AssistStorageEntry.prototype.loadPreview = function () {
+    var self = this;
+    self.loading(true);
+    ApiHelper.getInstance().fetchStoragePreview({
+      path: self.getHierarchy(),
+      type: self.type,
+      silenceErrors: true
+    }).done(function (data) {
+      self.preview(data);
+    }).fail(function (errorText) {
+      self.hasErrors(true);
+      self.errorText(errorText);
+    }).always(function () {
+      self.loading(false);
+    })
   };
 
   AssistStorageEntry.prototype.loadEntries = function(callback) {
@@ -110,6 +138,7 @@ var AssistStorageEntry = (function () {
         return file.name !== '.' && file.name !== '..';
       });
       self.entries($.map(filteredFiles, function (file) {
+        file.url = encodeURI(file.url);
         return new AssistStorageEntry({
           type: self.type,
           definition: file,
@@ -124,8 +153,9 @@ var AssistStorageEntry = (function () {
       }
     };
 
-    var errorCallback = function () {
+    var errorCallback = function (errorText) {
       self.hasErrors(true);
+      self.errorText(errorText);
       self.loading(false);
       if (callback) {
         callback();
@@ -160,7 +190,7 @@ var AssistStorageEntry = (function () {
     var findNextAndLoadDeep = function () {
 
       var foundEntry = $.grep(self.entries(), function (entry) {
-        return entry.definition.name === nextName && entry.definition.type === 'dir';
+        return entry.definition.name === nextName;
       });
       var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
 
@@ -229,7 +259,8 @@ var AssistStorageEntry = (function () {
     self.currentPage++;
     self.loadingMore(true);
     self.hasErrors(false);
-    self.apiHelper.fetchHdfsPath({
+
+    self.apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
       filter: self.filter().trim() ? self.filter() : undefined,
@@ -261,8 +292,73 @@ var AssistStorageEntry = (function () {
     });
   };
 
+  AssistStorageEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
+    var $source = $(event.target);
+    var offset = $source.offset();
+    entry.contextPopoverVisible(true);
+
+    if (positionAdjustment) {
+      offset.left += positionAdjustment.left;
+      offset.top += positionAdjustment.top;
+    }
+
+
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: 'storageEntry',
+        storageEntry: entry
+      },
+      pinEnabled: true,
+      orientation: 'right',
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 3,
+        right: offset.left + $source.width() + 3,
+        bottom: offset.top + $source.height() - 3
+      }
+    });
+
+    huePubSub.subscribeOnce('context.popover.hidden', function () {
+      entry.contextPopoverVisible(false);
+    });
+  };
+
   AssistStorageEntry.prototype.openInImporter = function () {
     huePubSub.publish('open.in.importer', this.definition.path);
+  };
+
+  /**
+   * Helper function to create an assistStorageEntry. It will load the entries starting from the root up until the
+   * path or stop when a part is not found.
+   *
+   * @param {string} path - The path, can include the type i.e. '/tmp' or 's3:/tmp'.
+   * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
+   * @return {Promise}
+   */
+  AssistStorageEntry.getEntry = function (path, type) {
+    var deferred = $.Deferred();
+    var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
+    var type = typeMatch ? typeMatch[1] : (type || 'hdfs');
+    type = type.replace(/s3.*/i, 's3');
+    type = type.replace(/adl.*/i, 'adls')
+
+    var rootEntry = new AssistStorageEntry({
+      type: type.toLowerCase(),
+      originalType: typeMatch && typeMatch[1],
+      definition: {
+        name: '/',
+        type: 'dir'
+      },
+      parent: null,
+      apiHelper: ApiHelper.getInstance()
+    });
+
+    var path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+
+    rootEntry.loadDeep(path, deferred.resolve);
+
+    return deferred.promise();
   };
 
   return AssistStorageEntry;

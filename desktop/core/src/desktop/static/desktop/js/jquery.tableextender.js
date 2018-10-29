@@ -50,21 +50,8 @@
   }
 
   Plugin.prototype.setOptions = function (options) {
-    if (typeof jHueTableExtenderGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, defaults, jHueTableExtenderGlobals);
-      extendedDefaults.labels = $.extend({}, defaults.labels, jHueTableExtenderGlobals.labels);
-      this.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    }
-    else {
-      this.options = $.extend({}, defaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, defaults.labels, options.labels);
-      }
-    }
-
+    this.options = $.extend({}, defaults, options);
+    this.options.labels = $.extend({}, defaults.labels, HUE_I18n.jHueTableExtender, options ? options.labels : {});
     this._defaults = defaults;
 
     if (this.options.fixedHeader) {
@@ -122,7 +109,7 @@
       }).appendTo(jHueTableExtenderNavigator);
       $("<label>").html(_this.options.labels.GO_TO_COLUMN + " <input type=\"text\" placeholder=\"" + _this.options.labels.PLACEHOLDER + "\" />").appendTo(jHueTableExtenderNavigator);
 
-      jHueTableExtenderNavigator.appendTo($("body"));
+      jHueTableExtenderNavigator.appendTo(HUE_CONTAINER);
 
       $(_this.element).find("tbody").click(function (event) {
         if ($.trim(getSelection()) == "") {
@@ -208,7 +195,7 @@
     });
     $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function () {
       if (huePubSub){
-        huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
+        huePubSub.publish('table.row.show.details', {idx: $(this).index(), table: $(this).parents('table')});
       }
     });
   };

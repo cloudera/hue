@@ -33,3 +33,14 @@
 .svg-hue-logo-trunk {
   fill: @hue-trunk;
 }
+
+@-webkit-keyframes autofill {
+  to {
+    background: transparent;
+  }
+}
+
+:-webkit-autofill {
+  -webkit-animation-name: autofill;
+  -webkit-animation-fill-mode: both;
+}

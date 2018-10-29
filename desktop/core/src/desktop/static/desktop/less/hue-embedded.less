@@ -1,0 +1,107 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import (reference) "cui/colors.less";
+@import (reference) "hue-mixins.less";
+
+@import (inline) "../ext/css/cui/cui.css";
+@import (inline) "../ext/css/cui/bootstrap-responsive2.css";
+@import (inline) "../css/jquery-ui.css";
+
+.hue-embedded-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+
+  .navbar {
+    padding-left: 0;
+    padding-right: 0;
+    z-index: auto;
+
+    .top-nav {
+      z-index: 999;
+    }
+  }
+
+  .hue-title-bar {
+    background-color: @cui-white !important;
+    border-bottom: none !important;
+    .navbar-inner {
+      border-bottom: none !important;
+    }
+  }
+
+  .modal {
+    right: auto;
+    bottom: auto;
+  }
+
+  .hueAnchor {
+    position: absolute !important;
+  }
+
+  * {
+    box-sizing: content-box;
+  }
+
+  .clearable {
+    border: 1px solid @cui-gray-600;
+    padding: 3px 18px 3px 4px;
+    border-radius: 3px;
+    background-size: 10px 10px;
+  }
+
+  .clearable.x {
+    background-position: right 5px center;
+  }
+
+  .clearable.onX {
+    cursor: pointer !important;
+  }
+
+  .app-header {
+    cursor: default !important;
+  }
+
+  @import "hue-assist.less";
+  @import "hue-autocomplete.less";
+  @import "hue-cui-overrides.less";
+  @import "hue-cross-version.less";
+  @import "hue4.less";
+  @import "home.less";
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  background-color: #000000;
+}
+.modal-backdrop.fade {
+  opacity: 0;
+}
+.modal-backdrop,
+.modal-backdrop.fade.in {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+}

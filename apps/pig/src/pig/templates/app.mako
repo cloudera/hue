@@ -77,7 +77,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
         <table class="table table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
           <thead>
           <tr>
-            <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
+            <th width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}"></div></th>
             <th width="20%">${_('Name')}</th>
             <th width="79%">${_('Script')}</th>
           </tr>
@@ -104,7 +104,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
         <script id="scriptTemplate" type="text/html">
           <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
             <td class="center" data-bind="click: handleSelect" style="cursor: default">
-              <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
+              <div data-bind="css: { 'hue-checkbox': true, 'fa': true, 'fa-check': selected}"></div>
             </td>
             <td data-bind="click: $root.confirmViewScript">
               <strong><a data-bind="click: $root.confirmViewScript, text: name, attr: { href: '#edit/' + id() }"></a></strong>
@@ -1020,16 +1020,11 @@ ${ commonshare() | n,unicode }
       var apiHelper = ApiHelper.getInstance({
         user: '${ user }'
       });
-      apiHelper.fetchTables({
-        successCallback: function (data) {
-          if (data && data.status == 0 && data.tables_meta) {
-            availableTables = data.tables_meta.map(function (t) {
-              return t.name;
-            }).join(' ');
-          }
-        },
-        sourceType: 'hive',
-        databaseName: 'default'
+      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
+        // TODO: Namespace and compute selection
+        DataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
+          availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
+        });
       });
     % endif
 

@@ -58,8 +58,8 @@ def make_syncdb():
   statuses = []
   hue_exec = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue')
   if os.path.exists(hue_exec):
-    statuses.append( runcmd([ hue_exec, 'syncdb', '--noinput' ]) )
-    statuses.append( runcmd([ hue_exec, 'migrate', '--merge' ]) )
+    statuses.append( runcmd([ hue_exec, 'makemigrations', '--noinput' ]) )
+    statuses.append( runcmd([ hue_exec, 'migrate', '--fake-initial' ]) )
   return not any(statuses)
 
 def make_collectstatic():

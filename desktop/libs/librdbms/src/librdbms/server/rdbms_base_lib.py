@@ -17,6 +17,8 @@
 
 import logging
 
+from librdbms.design import SQLdesign
+
 
 LOG = logging.getLogger(__name__)
 
@@ -30,7 +32,6 @@ class BaseRDBMSDataTable(object):
     else:
       self.columns_description = [{'name': col} for col in columns]
       self.columns = columns
-    self.columns_description = columns
     self.next = None
     self.startRowOffset = 0
     self.fetchSize = 1000
@@ -84,7 +85,12 @@ class BaseRDMSClient(object):
 
 
   def explain(self, query):
-    q = query.get_query_statement(0)
+    if isinstance(query, SQLdesign):
+      # Backward compatibility with rdbms app
+      q = query.get_query_statement(0)
+    else:
+      q = query
+
     if q.upper().startswith('EXPLAIN'):
       return self.execute_statement(q)
     else:

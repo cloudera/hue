@@ -23,7 +23,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
@@ -81,23 +81,23 @@ class TestMockedImpala:
     user = User.objects.get(username='test')
 
     response = self.client.get("/impala/list_designs")
-    assert_equal(len(response.context['page'].object_list), 0)
+    assert_equal(len(response.context[0]['page'].object_list), 0)
 
     try:
       beewax_query = create_saved_query('beeswax', user)
       response = self.client.get("/impala/list_designs")
-      assert_equal(len(response.context['page'].object_list), 0)
+      assert_equal(len(response.context[0]['page'].object_list), 0)
 
       impala_query = create_saved_query('impala', user)
       response = self.client.get("/impala/list_designs")
-      assert_equal(len(response.context['page'].object_list), 1)
+      assert_equal(len(response.context[0]['page'].object_list), 1)
 
       # Test my query page
-      QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.index)
+      QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.value)
 
       resp = self.client.get('/impala/my_queries')
-      assert_equal(len(resp.context['q_page'].object_list), 1)
-      assert_equal(resp.context['h_page'].object_list[0].design.name, 'create_saved_query')
+      assert_equal(len(resp.context[0]['q_page'].object_list), 1)
+      assert_equal(resp.context[0]['h_page'].object_list[0].design.name, 'create_saved_query')
     finally:
       if beewax_query is not None:
         beewax_query.delete()

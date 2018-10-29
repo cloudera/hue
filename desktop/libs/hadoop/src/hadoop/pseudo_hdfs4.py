@@ -27,14 +27,13 @@ import tempfile
 import textwrap
 import time
 
+from desktop.lib.paths import get_run_root
 from desktop.lib.python_util import find_unused_port
 from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
 import hadoop
 from hadoop import cluster
 from hadoop.mini_cluster import write_config
-from hadoop.job_tracker import LiveJobTracker
-from desktop.lib.paths import get_run_root
 
 
 _shared_cluster = None
@@ -171,9 +170,7 @@ class PseudoHdfs4(object):
 
   @property
   def jt(self):
-    if self._jt is None:
-      self._jt = LiveJobTracker(self._fqdn, 0)
-    return self._jt
+    return None
 
   def stop(self):
     def _kill_proc(name, proc):

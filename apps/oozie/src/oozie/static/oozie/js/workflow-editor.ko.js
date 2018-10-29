@@ -512,6 +512,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
+  self.isToolbarVisible = ko.pureComputed(function(){
+    return self.isEditing();
+  })
   self.isSaving = ko.observable(false);
 
   self.isInvalid = ko.observable(false);
@@ -522,6 +525,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.columns = ko.observableArray([]);
   self.oozieColumns = ko.observableArray([]);
   self.availableActions = ko.observableArray([]);
+
+  self.availableNamespaces = ko.observableArray();
+  self.namespace = ko.observable();
+  self.availableComputes = ko.observableArray();
+  self.compute = ko.observable();
+
+  ContextCatalog.getNamespaces({ sourceType: 'oozie' }).done(function (context) { self.availableNamespaces(context.namespaces) });
+  ContextCatalog.getComputes({ sourceType: 'oozie' }).done(self.availableComputes);
+
 
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);
@@ -1191,10 +1203,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           self.workflow.id(data.id);
           $(document).trigger("info", data.message);
           self.workflow.tracker().markCurrentStateAsClean();
-
+          huePubSub.publish('assist.document.refresh');
           if (window.location.search.indexOf("workflow") == -1 && !IS_HUE_4) {
             window.location.hash = '#workflow=' + data.id;
-            huePubSub.publish('assist.document.refresh');
           } else if (IS_HUE_4) {
             hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
           }
@@ -1230,7 +1241,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitPopup = function () {
     $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
-      format: IS_HUE_4 ? 'json' : 'html'
+      format: IS_HUE_4 ? 'json' : 'html',
+      cluster: self.compute() ? ko.mapping.toJSON(self.compute()) : '{}'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1339,6 +1351,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableHiveAction = ko.observable(bareWidgetBuilder("Hive Script", "hive-widget"));
   self.draggableHive2Action = ko.observable(bareWidgetBuilder("HiveServer2 Script", "hive2-widget"));
   self.draggableImpalaAction = ko.observable(bareWidgetBuilder("Impala Script", "impala-widget"));
+  self.draggableAltusAction = ko.observable(bareWidgetBuilder("Altus Command", "altus-widget"));
   self.draggablePigAction = ko.observable(bareWidgetBuilder("Pig Script", "pig-widget"));
   self.draggableJavaAction = ko.observable(bareWidgetBuilder("Java program", "java-widget"));
   self.draggableMapReduceAction = ko.observable(bareWidgetBuilder("MapReduce job", "mapreduce-widget"));
@@ -1451,6 +1464,7 @@ var ExtendedWidget = function (params) {
   self.actionURL = ko.observable("");
   self.logsURL = ko.observable("");
   self.externalId = ko.observable("");
+  self.externalJobId = ko.observable("");
   self.externalIdUrl = ko.observable("");
   return self;
 }

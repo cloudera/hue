@@ -22,16 +22,17 @@ import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.translation import get_language, ugettext as _, ugettext_lazy as _t
 
 from desktop import conf as desktop_conf
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
+from desktop.models import HueUser
 from desktop.settings import LANGUAGES
 
 from useradmin.models import GroupPermission, HuePermission
 from useradmin.models import get_default_user_group
-from useradmin.password_policy import get_password_validators
+from useradmin.hue_password_policy import hue_get_password_validators
 
 
 
@@ -96,11 +97,11 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                               widget=forms.
                               PasswordInput,
                               required=False,
-                              validators=get_password_validators())
+                              validators=hue_get_password_validators())
   password2 = forms.CharField(label=_t("Password confirmation"),
                               widget=forms.PasswordInput,
                               required=False,
-                              validators=get_password_validators())
+                              validators=hue_get_password_validators())
   password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
   ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
                                             help_text=_t("Create home directory if one doesn't already exist."),
@@ -115,6 +116,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                                       required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
+    model =  HueUser
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def __init__(self, *args, **kwargs):
@@ -150,7 +152,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       User._default_manager.get(username=username)
     except User.DoesNotExist:
       return username
-    raise forms.ValidationError(self.GENERIC_VALIDATION_ERROR, code='duplicate_username')
+    raise forms.ValidationError(_("Username already exists."), code='duplicate_username')
 
   def clean_password(self):
     return self.cleaned_data["password"]

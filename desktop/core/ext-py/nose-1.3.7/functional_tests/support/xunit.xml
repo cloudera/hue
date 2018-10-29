@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite name="nosetests" tests="6" errors="2" failures="1" skip="1"><testcase classname="test_xunit_as_suite.TestForXunit" name="test_error" time="0.001"><error type="exceptions.TypeError" message="oops, wrong type"><![CDATA[Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/case.py", line 331, in run
+    testMethod()
+  File "/Users/jszakmeister/projects/nose/functional_tests/support/xunit/test_xunit_as_suite.py", line 15, in test_error
+    raise TypeError("oops, wrong type")
+TypeError: oops, wrong type
+]]></error></testcase><testcase classname="test_xunit_as_suite.TestForXunit" name="test_fail" time="0.000"><failure type="exceptions.AssertionError" message="'this' != 'that'"><![CDATA[Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/case.py", line 331, in run
+    testMethod()
+  File "/Users/jszakmeister/projects/nose/functional_tests/support/xunit/test_xunit_as_suite.py", line 12, in test_fail
+    self.assertEqual("this","that")
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/case.py", line 515, in assertEqual
+    assertion_func(first, second, msg=msg)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/case.py", line 508, in _baseAssertEqual
+    raise self.failureException(msg)
+AssertionError: 'this' != 'that'
+]]></failure></testcase><testcase classname="test_xunit_as_suite.TestForXunit" name="test_non_ascii_error" time="0.000"><error type="exceptions.Exception" message="日本"><![CDATA[Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/case.py", line 331, in run
+    testMethod()
+  File "/Users/jszakmeister/projects/nose/functional_tests/support/xunit/test_xunit_as_suite.py", line 18, in test_non_ascii_error
+    raise Exception(u"日本")
+Exception: \u65e5\u672c
+]]></error></testcase><testcase classname="test_xunit_as_suite.TestForXunit" name="test_output" time="0.000"><system-out><![CDATA[test-generated output
+]]></system-out></testcase><testcase classname="test_xunit_as_suite.TestForXunit" name="test_skip" time="0.000"><skipped type="unittest.case.SkipTest" message="skipit"><![CDATA[SkipTest: skipit
+]]></skipped></testcase><testcase classname="test_xunit_as_suite.TestForXunit" name="test_success" time="0.000"></testcase></testsuite>

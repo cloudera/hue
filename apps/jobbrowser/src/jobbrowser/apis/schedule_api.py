@@ -34,14 +34,16 @@ try:
   from oozie.conf import OOZIE_JOBS_COUNT
   from oozie.views.dashboard import list_oozie_coordinator, get_oozie_job_log, massaged_oozie_jobs_for_json, has_job_edition_permission
 except Exception, e:
-  LOG.exception('Some application are not enabled: %s' % e)
+  LOG.warn('Some application are not enabled: %s' % e)
 
 
 class ScheduleApi(Api):
 
   def apps(self, filters):
     oozie_api = get_oozie(self.user)
-    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    kwargs = {'cnt': hasattr(OOZIE_JOBS_COUNT, 'get') and OOZIE_JOBS_COUNT.get(), 'filters': []}
+
+    filters.pop('time')
 
     _filter_oozie_jobs(self.user, filters, kwargs)
 
@@ -97,7 +99,7 @@ class ScheduleApi(Api):
     return _manage_oozie_job(self.user, action, app_ids)
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 

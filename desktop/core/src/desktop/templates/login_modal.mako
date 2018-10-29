@@ -17,7 +17,7 @@
 <%!
   from desktop import conf
   from django.utils.translation import ugettext as _
-  from useradmin.password_policy import is_password_policy_enabled, get_password_hint
+  from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 %>
 
 

@@ -1,0 +1,6 @@
+def func():
+    """ Func
+
+    >>> True
+    True
+    """

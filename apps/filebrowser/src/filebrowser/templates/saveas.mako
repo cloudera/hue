@@ -29,7 +29,7 @@
       </div>
     % endif
     <div class="saveAsPrompt_popup">
-      <form method="post" action="${url('filebrowser.views.save_file')}">
+      <form method="post" action="${url('filebrowser_views_save_file')}">
           ${ csrf_token(request) | n,unicode }
           ${ _('Enter the location where you would like to save the file.') }
           ${edit.render_field(form["path"], notitle=True)}

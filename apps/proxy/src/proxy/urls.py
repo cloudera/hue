@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from proxy import views as proxy_views
 
-urlpatterns = patterns('proxy',
+urlpatterns = [
   # Prefix the names of your views with the app name.
-  url(r'^(?P<host>[^/]+)/(?P<port>\d+)(?P<path>/.*)$', 'views.proxy'),
-)
+  url(r'^(?P<host>[^/]+)/(?P<port>\d+)(?P<path>/.*)$', proxy_views.proxy, name="proxy.views.proxy"),
+]

@@ -1,0 +1,25 @@
+language: python
+
+python:
+  - "3.4"
+  - "3.3"
+  - "2.7"
+  - "2.6"
+
+sudo: false
+
+# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+# These packages only exist on Ubuntu 13.04 and newer:
+# No dependencies currently unless using Python 2.6.
+
+install:
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.6* ]]; then pip install -r requirements_py26.txt --use-mirrors; fi
+  - python setup.py install
+
+# command to run tests, e.g. python setup.py test
+
+script:
+  # We might like to get out of the source directory before running tests to
+  # avoid PYTHONPATH confusion? As an example, see here:
+  #     https://github.com/tornadoweb/tornado/blob/master/.travis.yml
+  - python setup.py test

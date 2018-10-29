@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.from nose.tools import assert_equal
 
+from copy import deepcopy
+
 import StringIO
 import logging
 
@@ -26,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
 
-from indexer.conf import ENABLE_NEW_INDEXER
+from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.controller import CollectionManagerController
 from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
 from indexer.fields import Field
@@ -98,7 +100,7 @@ class TestIndexer():
     self.user = User.objects.get(username='test')
     self.solr_client = SolrClient(self.user, api=MockSolrCdhCloudHdfsApi())
 
-    self.finish = ENABLE_NEW_INDEXER.set_for_testing(True)
+    self.finish = ENABLE_SCALABLE_INDEXER.set_for_testing(True)
 
   def tearDown(self):
     self.finish()
@@ -151,8 +153,8 @@ class TestIndexer():
 
   def test_generate_csv_morphline(self):
     indexer = MorphlineIndexer("test", solr_client=self.solr_client)
-    morphline =indexer.generate_morphline_config("test_collection", {
-        "columns": self.simpleCSVFields,
+    morphline = indexer.generate_morphline_config("test_collection", {
+        "columns": deepcopy(self.simpleCSVFields),
         "format": self.simpleCSVFormat
       })
 
@@ -289,7 +291,7 @@ class TestIndexer():
     assert_true(isinstance(morphline, basestring))
 
   def _test_generate_field_operation_morphline(self, operation_format):
-    fields = TestIndexer.simpleCSVFields[:]
+    fields = deepcopy(TestIndexer.simpleCSVFields)
     fields[0]['operations'].append(operation_format)
 
     indexer = MorphlineIndexer("test", solr_client=self.solr_client)

@@ -257,6 +257,16 @@
     margin-top: 10px !important;
   }
 
+  .result-settings {
+    .nav-list .nav-header {
+      margin-bottom: -3px;
+      padding-left: 3px;
+    }
+    .checkbox {
+      padding-top: 0;
+    }
+  }
+
   .nav-list {
     padding-left: 0;
   }
@@ -300,8 +310,40 @@
     border-right: 1px solid @cui-default-border-color;
   }
 
-  .editor-help .tab-content {
-    border: none;
+  .editor-help {
+    b {
+      font-weight: 500;
+    }
+    .nav-list > li > a {
+      padding: 8px 15px !important;
+      margin-bottom: 2px;
+      margin-top: 2px !important;
+      margin-left: -15px;
+    }
+    .help-list-spacing li {
+      margin-bottom: 15px;
+    }
+    .tab-content {
+      border: none;
+    }
+    .tab-pane > .tab-content {
+      padding: 20px 10px;
+      line-height: 24px;
+    }
+  }
+
+  .two-pane {
+    .display-flex();
+
+    .tab-content {
+      .flex(1);
+    }
+  }
+
+  .two-pane-left {
+    .flex(0 0 150px);
+    border-right: 1px solid @cui-gray-100;
+    margin-right: 10px;
   }
 
   .empty-title {
@@ -597,7 +639,7 @@
   }
 
   .progress-starting .bar {
-    background-color: @cui-orange-500;
+    background-color: @hue-primary-color-dark;
   }
 
   @-webkit-keyframes pulsate {
@@ -699,49 +741,8 @@
     font-style: normal !important;
   }
 
-  .print-logo {
-    display: none;
-  }
-
-  .print-logo img {
-    width: 24px;
-    height: 24px;
-  }
-
   .card-heading-print {
     display: none;
-  }
-
-  @media print {
-    .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
-      display: none !important;
-    }
-    .content-panel {
-      width: 100% !important;
-      left: 0 !important;
-    }
-    * {
-      border: none !important;
-    }
-    .editable {
-      font-size: 20px;
-      font-weight: bold;
-      border-bottom: 2px solid @cui-default-border-color !important;
-    }
-    .tab-content, .content-panel {
-      overflow: visible;
-    }
-    .ace_scroller {
-      border-left: 4px solid @cui-gray-300 !important;
-      padding-left: 10px;
-    }
-    .print-logo {
-      display: block;
-    }
-    .card-heading-print.visible {
-      display: block;
-      font-weight: bold;
-    }
   }
 
   .no-underline:hover {
@@ -993,7 +994,7 @@
     z-index: 3000 !important;
   }
 
-  #saveResultsModal .overlay {
+  .saveResultsModal .overlay {
     background: black;
     opacity: 0.5;
     position: absolute;
@@ -1004,7 +1005,7 @@
     z-index: 100;
   }
 
-  #saveResultsModal .loader {
+  .saveResultsModal .loader {
     text-align: center;
     position: absolute;
     top: 0;
@@ -1013,7 +1014,7 @@
     bottom: 0;
   }
 
-  #saveResultsModal i.fa-spinner, #saveResultsModal img.spinner {
+  .saveResultsModal i.fa-spinner, .saveResultsModal img.spinner {
     margin-top: -30px;
     margin-left: -30px;
     position: absolute;
@@ -1022,7 +1023,7 @@
     z-index: 101;
   }
 
-  #saveResultsModal i.fa-spinner {
+  .saveResultsModal i.fa-spinner {
     font-size: 60px;
     color: @cui-gray-300;
   }
@@ -1046,7 +1047,7 @@
     border-radius: 5px !important;
     min-height: 17px !important;
     height: 17px !important;
-    margin: 0 3px 0 -2px;
+    margin: 0 3px 0 -2px !important;
     padding: 0 18px 0 5px !important;
   }
 
@@ -1314,5 +1315,43 @@
 
   .statement-type-selector > .hue-drop-down-container {
     margin-left: -100px;
+  }
+
+  .variables {
+    .selectize-control {
+      display: inline-block;
+      width: 164px;
+    }
+
+    .selectize-input {
+      line-height: 19px;
+    }
+
+    .selectize-input input[type="text"] {
+      height: 19px;
+    }
+
+    .input-prepend {
+      line-height: 0px;
+    }
+
+    input[type="checkbox"] {
+      margin: 12px 0px 0px 10px;
+    }
+
+    div.selectize-input {
+      padding: 5px 23px 6px 8px;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .nav-tabs-editor {
+    .visible-on-hover {
+      opacity: 0;
+      .hue-ease-transition(opacity);
+    }
+    li:hover .visible-on-hover {
+       opacity: 1;
+    }
   }
 }

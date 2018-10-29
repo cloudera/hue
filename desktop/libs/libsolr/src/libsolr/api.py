@@ -124,8 +124,8 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount'])
           }
 
-          if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
-            keys.update(self._get_time_filter_query(timeFilter, facet))
+          if facet['properties']['canRange'] or timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
+            keys.update(self._get_time_filter_query(timeFilter, facet, collection))
 
           params += (
              ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
@@ -143,61 +143,59 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
-          sort = {'count': facet['properties']['sort']}
-          for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'])):
-            if agg['sort'] != 'default':
-              agg_function = self._get_aggregate_function(agg)
-              sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
-
-          if sort.get('count') == 'default':
-            sort['count'] = 'desc'
-          _f = {
-              'field': facet['field'],
-              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
-              'mincount': int(facet['properties']['mincount']),
-              'sort': sort,
-          }
-
-          if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
-            _f['domain'] = {}
-            if facet['properties']['domain'].get('blockParent'):
-              _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
-            if facet['properties']['domain'].get('blockChildren'):
-              _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
-
-          if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
-            _f.update({
-                'type': 'range',
-                'start': facet['properties']['start'],
-                'end': facet['properties']['end'],
-                'gap': facet['properties']['gap'],
-            })
-            if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
-              _f.update(self._get_time_filter_query(timeFilter, facet))
-          else:
-            _f.update({
-                'type': 'terms',
-                'field': facet['field'],
-                'excludeTags': facet['id'],
-                'offset': 0,
-                'numBuckets': True,
-                'allBuckets': True,
-                #'prefix': '' # Forbidden on numeric fields
-            })
-            if facet['properties']['canRange'] and not facet['properties']['isDate']:
-              del _f['mincount'] # Numeric fields do not support
-
+          _f = {}
           if facet['properties']['facets']:
-            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1)
-            if facet['widgetType'] == 'text-facet-widget':
-              _fname = _f['facet'].keys()[0]
-              _f['sort'] = {_fname: facet['properties']['sort']}
-              # domain = '-d2:NaN' # Solr 6.4
+            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter, collection, can_range = facet['properties']['canRange'])
 
-          json_facets[facet['id']] = _f
+          if facet['properties'].get('domain'):
+            if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
+              _f['domain'] = {}
+              if facet['properties']['domain'].get('blockParent'):
+                _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
+              if facet['properties']['domain'].get('blockChildren'):
+                _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
+
+          if _f:
+            sort = {'count': facet['properties']['facets'][0]['sort']}
+            for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'][1:])):
+              if agg['sort'] != 'default':
+                agg_function = self._get_aggregate_function(agg)
+                sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
+
+            if sort.get('count') == 'default':
+              sort['count'] = 'desc'
+
+            dim_key = [key for key in _f['facet'].keys() if 'dim' in key][0]
+            _f['facet'][dim_key].update({
+                  'excludeTags': facet['id'],
+                  'offset': 0,
+                  'numBuckets': True,
+                  'allBuckets': True,
+                  'sort': sort
+                  #'prefix': '' # Forbidden on numeric fields
+              })
+            json_facets[facet['id']] = _f['facet'][dim_key]
         elif facet['type'] == 'function':
-          json_facets[facet['id']] = self._get_aggregate_function(facet)
-          json_facets['processEmpty'] = True
+          if facet['properties']['facets']:
+            json_facets[facet['id']] = self._get_aggregate_function(facet['properties']['facets'][0])
+            if facet['properties']['compare']['is_enabled']:
+              # TODO: global compare override
+              unit = re.split('\d+', facet['properties']['compare']['gap'])[1]
+              json_facets[facet['id']] = {
+                'type': 'range',
+                'field': collection['timeFilter'].get('field'),
+                'start': 'NOW/%s-%s-%s' % (unit, facet['properties']['compare']['gap'], facet['properties']['compare']['gap']),
+                'end': 'NOW/%s' % unit,
+                'gap': '+%(gap)s' % facet['properties']['compare'],
+                'facet': {facet['id']: json_facets[facet['id']]}
+              }
+            if facet['properties']['filter']['is_enabled']:
+              json_facets[facet['id']] = {
+                'type': 'query',
+                'q': facet['properties']['filter']['query'] or EMPTY_QUERY.get(),
+                'facet': {facet['id']: json_facets[facet['id']]}
+              }
+            json_facets['processEmpty'] = True
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']
@@ -232,6 +230,21 @@ class SolrApi(object):
     if nested_fields:
       fl += urllib.unquote(utf_quoter(',[child parentFilter="%s"]' % ' OR '.join(nested_fields)))
 
+    if collection['template']['moreLikeThis'] and fl != ['*']: # Potential conflict with nested documents
+      id_field = collection.get('idField', 'id')
+      params += (
+        ('mlt', 'true'),
+        ('mlt.fl', fl.replace(',%s' % id_field, '')),
+        ('mlt.mintf', 1),
+        ('mlt.mindf', 1),
+        ('mlt.maxdf', 50),
+        ('mlt.maxntp', 1000),
+        ('mlt.count', 10),
+        #('mlt.minwl', 1),
+        #('mlt.maxwl', 1),
+      )
+      fl = '*'
+
     params += (('fl', fl),)
 
     params += (
@@ -240,6 +253,9 @@ class SolrApi(object):
       ('hl.snippets', 5),
       ('hl.fragsize', 1000),
     )
+
+    #if query.get('timezone'):
+    #  params += (('TZ', query.get('timezone')),)
 
     if collection['template']['fieldsSelected']:
       fields = []
@@ -257,7 +273,7 @@ class SolrApi(object):
     return self._get_json(response)
 
 
-  def _n_facet_dimension(self, widget, _f, facets, dim):
+  def _n_facet_dimension(self, widget, _f, facets, dim, timeFilter, collection, can_range=None):
     facet = facets[0]
     f_name = 'dim_%02d:%s' % (dim, facet['field'])
 
@@ -280,21 +296,36 @@ class SolrApi(object):
           'type': 'terms',
           'field': '%(field)s' % facet,
           'limit': int(facet.get('limit', 10)),
-          'mincount': int(facet['mincount']),
           'numBuckets': True,
           'allBuckets': True,
-          'sort': sort
+          'sort': sort,
+          'missing': facet.get('missing', False)
           #'prefix': '' # Forbidden on numeric fields
       }
+      if int(facet['mincount']):
+        _f[f_name]['mincount'] = int(facet['mincount']) # Forbidden on n > 0 field if mincount = 0
+
+      if 'start' in facet and not facet.get('type') == 'field':
+        _f[f_name].update({
+            'type': 'range',
+            'start': facet['start'],
+            'end': facet['end'],
+            'gap': facet['gap']
+        })
+
+        # Only on dim 1 currently
+        if can_range or (timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides'])): # or facet['widgetType'] != 'bucket-widget'):
+          facet['widgetType'] = widget['widgetType']
+          _f[f_name].update(self._get_time_filter_query(timeFilter, facet, collection))
 
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
 
       if len(facets) > 1: # Get n+1 dimension
         if facets[1]['aggregate']['function'] == 'count':
-          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1, timeFilter, collection)
         else:
-          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim, timeFilter, collection)
     else:
       agg_function = self._get_aggregate_function(facet)
       _f['facet'] = {
@@ -305,7 +336,7 @@ class SolrApi(object):
           agg_function = self._get_aggregate_function(_f_agg)
           _f['facet']['agg_%02d_%02d:%s' % (dim, i, agg_function)] = agg_function
         else:
-          self._n_facet_dimension(widget, _f, facets[i:], dim + 1) # Get n+1 dimension
+          self._n_facet_dimension(widget, _f, facets[i:], dim + 1, timeFilter, collection) # Get n+1 dimension
           break
 
 
@@ -365,6 +396,17 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
+  def config(self, name):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )
+      response = self._root.get('%s/config' % name, params=params)
+      return self._get_json(response)['config']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
   def configs(self):
     try:
       params = self._get_params() + (
@@ -376,13 +418,47 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
+  def create_config(self, name, base_config, immutable=False):
+    try:
+      params = self._get_params() + (
+          ('action', 'CREATE'),
+          ('name', name),
+          ('baseConfigSet', base_config),
+          ('configSetProp.immutable', immutable),
+          ('wt', 'json'),
+      )
+      return self._root.post('admin/configs', params=params, contenttype='application/json')
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def delete_config(self, name):
+    response = {'status': -1, 'message': ''}
+
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETE'),
+        ('name', name),
+        ('wt', 'json')
+      )
+
+      data = self._root.get('admin/configs', params=params)
+      if data['responseHeader']['status'] == 0:
+        response['status'] = 0
+      else:
+        response['message'] = "Could not remove config: %s" % data
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+    return response
+
+
   def list_aliases(self):
     try:
       params = self._get_params() + (
           ('action', 'LISTALIASES'),
           ('wt', 'json'),
       )
-      return self._root.get('admin/collections', params=params)['aliases']
+      return self._root.get('admin/collections', params=params)['aliases'] or []
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -620,8 +696,17 @@ class SolrApi(object):
       params = self._get_params() + (
           ('wt', 'json'),
       )
-      response = self._root.get('%(core)s/schema/fields' % {'core': core}, params=params)
-      return self._get_json(response)
+      response = self._root.get('%(core)s/schema' % {'core': core}, params=params)
+      response_json = self._get_json(response)
+      fields = response_json['schema']['fields']
+      if response_json['schema'].get('uniqueKey'):
+        for field in fields:
+          if field['name'] == response_json['schema']['uniqueKey']:
+            field['primary_key'] = 'true'
+      return {
+        'fields': fields,
+        'responseHeader': response_json['responseHeader']
+      }
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -812,29 +897,19 @@ class SolrApi(object):
 
   @classmethod
   def _get_aggregate_function(cls, facet):
-    if 'properties' in facet:
-      f = facet['properties']['aggregate'] # Level 1 facet
-    else:
-      f = facet['aggregate']
+    f = facet['aggregate']
 
-    if not f['formula']:
-      f['formula'] = facet['field']
-
-    return cls.__get_aggregate_function(f)
-
-  @classmethod
-  def __get_aggregate_function(cls, f):
-    if f['function'] == 'field':
+    if f['function'] == 'formula':
+      return f['formula']
+    elif f['function'] == 'field':
       return f['value']
     else:
-      fields = []
-      if f['formula']:
-        fields.append(f['formula'])
+      fields = [facet['field']]
       if f['function'] == 'median':
         f['function'] = 'percentile'
         fields.append('50')
       elif f['function'] == 'percentile':
-        fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
+        fields.append(str(f['percentile']))
         f['function'] = 'percentile'
       return '%s(%s)' % (f['function'], ','.join(fields))
 
@@ -845,8 +920,8 @@ class SolrApi(object):
 
     if time_field and (collection['timeFilter']['value'] != 'all' or collection['timeFilter']['type'] == 'fixed'):
       # fqs overrides main time filter
-      fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
-      props['time_filter_overrides'] = fq_time_ids
+      # No longer override
+      props['time_filter_overrides'] = []
       props['time_field'] = time_field
 
       if collection['timeFilter']['type'] == 'rolling':
@@ -862,24 +937,45 @@ class SolrApi(object):
 
     return props
 
-  def _get_time_filter_query(self, timeFilter, facet):
-    if 'fixed' in timeFilter:
+  def _get_time_filter_query(self, timeFilter, facet, collection):
+    properties = facet.get('properties', facet)
+    if timeFilter:
       props = {}
-      stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
-      _compute_range_facet(facet['widgetType'], stat_facet, props, stat_facet['min'], stat_facet['max'])
+      # If the start & end are equal to min/max, then we want to show the whole domain (either interval now-x or static)
+      # In that case use timeFilter values
+      if properties['start'] == properties['min'] and properties['end'] == properties['max']:
+        stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
+        properties['start'] = None
+        properties['end'] = None
+      else: # The user has zoomed in. Only show that section.
+        stat_facet = {'min': properties['min'], 'max': properties['max']}
+      _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'],
+                           SLOTS=properties['slot'])
       gap = props['gap']
-      unit = re.split('\d+', gap)[1]
       return {
-        'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': unit},
-        'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': unit},
-        'gap': '%(gap)s' % props, # add a 'auto'
+        'min': '%(min)s' % props,
+        'max': '%(max)s' % props,
+        'start': '%(start)s' % props,
+        'end': '%(end)s' % props,
+        'gap': '%(gap)s' % props,
       }
     else:
-      gap = timeFilter['gap'][facet['widgetType']]
+      props = {}
+      # If the start & end are equal to min/max, then we want to show the whole domain. Since min/max can change, we fetch latest values and update start/end
+      if properties['start'] == properties['min'] and properties['end'] == properties['max']:
+        stats_json = self.stats(collection['name'], [facet['field']])
+        stat_facet = stats_json['stats']['stats_fields'][facet['field']]
+        properties['start'] = None
+        properties['end'] = None
+      else: # the user has zoomed in. Only show that section.
+        stat_facet = {'min': properties['min'], 'max': properties['max']}
+      _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS = properties['slot'])
       return {
-        'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},
-        'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': gap['unit']},
-        'gap': '%(coeff)s%(unit)s/%(unit)s' % gap, # add a 'auto'
+        'start': '%(start)s' % props,
+        'end': '%(end)s' % props,
+        'gap': '%(gap)s' % props,
+        'min': '%(min)s' % props,
+        'max': '%(max)s' % props,
       }
 
   def _get_fq(self, collection, query):
@@ -910,12 +1006,17 @@ class SolrApi(object):
             values = _filter['value'] if type(_filter['value']) == list else [_filter['value']] # 2D facets support
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
-              exclude = '-' if _filter['exclude'] else ''
-              if value is not None and ' ' in force_unicode(value):
-                value = force_unicode(value).replace('"', '\\"')
-                f.append('%s%s:"%s"' % (exclude, field, value))
-              else:
-                f.append('%s{!field f=%s}%s' % (exclude, field, value))
+              if value or value is False:
+                exclude = '-' if _filter['exclude'] else ''
+                if value is not None and ' ' in force_unicode(value):
+                  value = force_unicode(value).replace('"', '\\"')
+                  f.append('%s%s:"%s"' % (exclude, field, value))
+                else:
+                  f.append('%s{!field f=%s}%s' % (exclude, field, value))
+              else: # Handle empty value selection that are returned using solr facet.missing
+                value = "*"
+                exclude = '-'
+                f.append('%s%s:%s' % (exclude, field, value))
           _params ='{!tag=%(id)s}' % fq + ' '.join(f)
           params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
@@ -940,7 +1041,7 @@ class SolrApi(object):
 
   def _get_dimension_aggregates(self, facets):
     aggregates = []
-    for agg in facets[0:]:
+    for agg in facets:
       if agg['aggregate']['function'] != 'count':
         aggregates.append(agg)
       else:
@@ -995,6 +1096,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
         'bar-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
         'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'}, # ~10 slots
+        'pie-widget': {'coeff': '+1', 'unit': 'MINUTES'} # ~10 slots
     },
     '30MINUTES': {
         'histogram-widget': {'coeff': '+20', 'unit': 'SECONDS'},
@@ -1002,6 +1104,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+20', 'unit': 'SECONDS'},
         'bar-widget': {'coeff': '+20', 'unit': 'SECONDS'},
         'facet-widget': {'coeff': '+5', 'unit': 'MINUTES'},
+        'pie-widget': {'coeff': '+5', 'unit': 'MINUTES'},
     },
     '1HOURS': {
         'histogram-widget': {'coeff': '+30', 'unit': 'SECONDS'},
@@ -1009,6 +1112,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+30', 'unit': 'SECONDS'},
         'bar-widget': {'coeff': '+30', 'unit': 'SECONDS'},
         'facet-widget': {'coeff': '+10', 'unit': 'MINUTES'},
+        'pie-widget': {'coeff': '+10', 'unit': 'MINUTES'}
     },
     '12HOURS': {
         'histogram-widget': {'coeff': '+7', 'unit': 'MINUTES'},
@@ -1016,6 +1120,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+7', 'unit': 'MINUTES'},
         'bar-widget': {'coeff': '+7', 'unit': 'MINUTES'},
         'facet-widget': {'coeff': '+1', 'unit': 'HOURS'},
+        'pie-widget': {'coeff': '+1', 'unit': 'HOURS'}
     },
     '1DAYS': {
         'histogram-widget': {'coeff': '+15', 'unit': 'MINUTES'},
@@ -1023,6 +1128,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+15', 'unit': 'MINUTES'},
         'bar-widget': {'coeff': '+15', 'unit': 'MINUTES'},
         'facet-widget': {'coeff': '+3', 'unit': 'HOURS'},
+        'pie-widget': {'coeff': '+3', 'unit': 'HOURS'}
     },
     '2DAYS': {
         'histogram-widget': {'coeff': '+30', 'unit': 'MINUTES'},
@@ -1030,6 +1136,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+30', 'unit': 'MINUTES'},
         'bar-widget': {'coeff': '+30', 'unit': 'MINUTES'},
         'facet-widget': {'coeff': '+6', 'unit': 'HOURS'},
+        'pie-widget': {'coeff': '+6', 'unit': 'HOURS'}
     },
     '7DAYS': {
         'histogram-widget': {'coeff': '+3', 'unit': 'HOURS'},
@@ -1037,6 +1144,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+3', 'unit': 'HOURS'},
         'bar-widget': {'coeff': '+3', 'unit': 'HOURS'},
         'facet-widget': {'coeff': '+1', 'unit': 'DAYS'},
+        'pie-widget': {'coeff': '+1', 'unit': 'DAYS'}
     },
     '1MONTHS': {
         'histogram-widget': {'coeff': '+12', 'unit': 'HOURS'},
@@ -1044,6 +1152,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+12', 'unit': 'HOURS'},
         'bar-widget': {'coeff': '+12', 'unit': 'HOURS'},
         'facet-widget': {'coeff': '+5', 'unit': 'DAYS'},
+        'pie-widget': {'coeff': '+5', 'unit': 'DAYS'}
     },
     '3MONTHS': {
         'histogram-widget': {'coeff': '+1', 'unit': 'DAYS'},
@@ -1051,6 +1160,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+1', 'unit': 'DAYS'},
         'bar-widget': {'coeff': '+1', 'unit': 'DAYS'},
         'facet-widget': {'coeff': '+30', 'unit': 'DAYS'},
+        'pie-widget': {'coeff': '+30', 'unit': 'DAYS'}
     },
     '1YEARS': {
         'histogram-widget': {'coeff': '+3', 'unit': 'DAYS'},
@@ -1058,6 +1168,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+3', 'unit': 'DAYS'},
         'bar-widget': {'coeff': '+3', 'unit': 'DAYS'},
         'facet-widget': {'coeff': '+12', 'unit': 'MONTHS'},
+        'pie-widget': {'coeff': '+12', 'unit': 'MONTHS'}
     },
     '2YEARS': {
         'histogram-widget': {'coeff': '+7', 'unit': 'DAYS'},
@@ -1065,6 +1176,7 @@ GAPS = {
         'bucket-widget': {'coeff': '+7', 'unit': 'DAYS'},
         'bar-widget': {'coeff': '+7', 'unit': 'DAYS'},
         'facet-widget': {'coeff': '+3', 'unit': 'MONTHS'},
+        'pie-widget': {'coeff': '+3', 'unit': 'MONTHS'}
     },
     '10YEARS': {
         'histogram-widget': {'coeff': '+1', 'unit': 'MONTHS'},
@@ -1072,5 +1184,6 @@ GAPS = {
         'bucket-widget': {'coeff': '+1', 'unit': 'MONTHS'},
         'bar-widget': {'coeff': '+1', 'unit': 'MONTHS'},
         'facet-widget': {'coeff': '+1', 'unit': 'YEARS'},
+        'pie-widget': {'coeff': '+1', 'unit': 'YEARS'}
     }
 }

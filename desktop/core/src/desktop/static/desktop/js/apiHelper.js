@@ -49,6 +49,111 @@ var ApiQueueManager = (function () {
   };
 })();
 
+var CancellablePromise = (function () {
+
+  function CancellablePromise(deferred, request, otherCancellables) {
+    var self = this;
+    self.cancelCallbacks = [];
+    self.deferred = deferred;
+    self.request = request;
+    self.otherCancellables = otherCancellables;
+    self.cancelled = false;
+    self.cancelPrevented = false;
+  }
+
+  /**
+   * A promise might be shared across multiple components in the UI, in some cases cancel is not an option and calling
+   * this will prevent that to happen.
+   *
+   * One example is autocompletion of databases while the assist is loading the database tree, closing the autocomplete
+   * results would make the assist loading fail if cancel hasn't been prevented.
+   *
+   * @returns {CancellablePromise}
+   */
+  CancellablePromise.prototype.preventCancel = function () {
+    var self = this;
+    self.cancelPrevented = true;
+    return self;
+  };
+
+  CancellablePromise.prototype.cancel = function () {
+    var self = this;
+    if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
+      return;
+    }
+    self.cancelled = true;
+    if (self.request) {
+      ApiHelper.getInstance().cancelActiveRequest(self.request);
+    }
+
+    if (self.state && self.state() === 'pending' && self.deferred.reject) {
+      self.deferred.reject();
+    }
+
+    if (self.otherCancellables) {
+      self.otherCancellables.forEach(function (cancellable) { if (cancellable.cancel) { cancellable.cancel() } });
+    }
+
+    while (self.cancelCallbacks.length) {
+      self.cancelCallbacks.pop()();
+    }
+    return this;
+  };
+
+  CancellablePromise.prototype.onCancel = function (callback) {
+    var self = this;
+    if (self.cancelled) {
+      callback();
+    } else {
+      self.cancelCallbacks.push(callback);
+    }
+    return self;
+  };
+
+  CancellablePromise.prototype.then = function () {
+    var self = this;
+    self.deferred.then.apply(self.deferred, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.done = function (callback) {
+    var self = this;
+    self.deferred.done.apply(self.deferred, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.fail = function (callback) {
+    var self = this;
+    self.deferred.fail.apply(self.deferred, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.always = function (callback) {
+    var self = this;
+    self.deferred.always.apply(self.deferred, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.pipe = function (callback) {
+    var self = this;
+    self.deferred.pipe.apply(self.deferred, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.progress = function (callback) {
+    var self = this;
+    self.deferred.progress.apply(self.deferred, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.state = function () {
+    var self = this;
+    return self.deferred.state && self.deferred.state();
+  };
+
+  return CancellablePromise;
+})();
+
 var ApiHelper = (function () {
 
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
@@ -67,6 +172,10 @@ var ApiHelper = (function () {
   var SOLR_FIELDS_API = '/indexer/api/index/list/';
   var DASHBOARD_TERMS_API = '/dashboard/get_terms';
   var DASHBOARD_STATS_API = '/dashboard/get_stats';
+  var FORMAT_SQL_API = '/notebook/api/format';
+
+  var SEARCH_API = '/desktop/api/search/entities';
+  var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
 
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
@@ -74,8 +183,9 @@ var ApiHelper = (function () {
   var NAV_URLS = {
     ADD_TAGS: '/metadata/api/navigator/add_tags',
     DELETE_TAGS: '/metadata/api/navigator/delete_tags',
+    FIND_ENTITY: '/metadata/api/navigator/find_entity',
     LIST_TAGS: '/metadata/api/navigator/list_tags',
-    FIND_ENTITY: '/metadata/api/navigator/find_entity'
+    UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties',
   };
 
   var NAV_OPT_URLS = {
@@ -83,36 +193,13 @@ var ApiHelper = (function () {
     TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
     TOP_FILTERS: '/metadata/api/optimizer/top_filters',
     TOP_JOINS: '/metadata/api/optimizer/top_joins',
-    TOP_TABLES: '/metadata/api/optimizer/top_tables'
+    TOP_TABLES: '/metadata/api/optimizer/top_tables',
+    TABLE_DETAILS: '/metadata/api/optimizer/table_details'
   };
 
-  var genericCacheCondition = function (data) {
-    return typeof data !== 'undefined' && typeof data.status !== 'undefined' && data.status === 0;
-  };
-
-  /**
-   * @param {Object} i18n
-   * @param {string} i18n.errorLoadingDatabases
-   * @param {string} i18n.errorLoadingTablePreview
-   * @param {string} user
-   *
-   * @constructor
-   */
-  function ApiHelper (i18n, user) {
+  function ApiHelper () {
     var self = this;
-    self.i18n = i18n;
-    self.user = user;
-    self.lastKnownDatabases = {};
     self.queueManager = ApiQueueManager.getInstance();
-    self.invalidateImpala = null;
-
-    huePubSub.subscribe('assist.invalidate.impala', function (details) {
-      self.invalidateImpala = details;
-    });
-
-    huePubSub.subscribe('assist.clear.db.cache', function (options) {
-      self.clearDbCache(options);
-    });
 
     huePubSub.subscribe('assist.clear.hdfs.cache', function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
@@ -170,12 +257,6 @@ var ApiHelper = (function () {
     }
   }
 
-  ApiHelper.prototype.isDatabase = function (name, sourceType) {
-    var self = this;
-    return typeof self.lastKnownDatabases[sourceType] !== 'undefined'
-        && self.lastKnownDatabases[sourceType].filter(function (knownDb) { return knownDb.toLowerCase() === name.toLowerCase() }).length === 1;
-  };
-
   ApiHelper.prototype.hasExpired = function (timestamp, cacheType) {
     if (typeof hueDebug !== 'undefined' && typeof hueDebug.cacheTimeout !== 'undefined') {
       return (new Date()).getTime() - timestamp > hueDebug.cacheTimeout;
@@ -188,8 +269,7 @@ var ApiHelper = (function () {
    * @returns {string}
    */
   ApiHelper.prototype.getTotalStorageUserPrefix = function (sourceType) {
-    var self = this;
-    return sourceType + '_' + self.user + '_' + window.location.hostname;
+    return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
   };
 
   /**
@@ -293,7 +373,7 @@ var ApiHelper = (function () {
             } else {
               errorMessage = errorResponse.responseText;
             }
-          } catch(err) {
+          } catch (err) {
             errorMessage = errorResponse.responseText;
           }
         } else if (typeof errorResponse.message !== 'undefined' && errorResponse.message !== null) {
@@ -307,12 +387,14 @@ var ApiHelper = (function () {
         }
       }
 
-      if (! options.silenceErrors) {
+      if (!options || !options.silenceErrors) {
         hueUtils.logError(errorResponse);
-        $(document).trigger("error", errorMessage);
+        if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
+          $(document).trigger("error", errorMessage);
+        }
       }
 
-      if (options.errorCallback) {
+      if (options && options.errorCallback) {
         options.errorCallback(errorMessage);
       }
       return errorMessage;
@@ -320,8 +402,11 @@ var ApiHelper = (function () {
   };
 
   ApiHelper.prototype.cancelActiveRequest = function (request) {
-    if (typeof request !== 'undefined' && request !== null && request.readyState < 4) {
-      request.abort();
+    if (typeof request !== 'undefined' && request !== null) {
+      var readyState = request.getReadyState ? request.getReadyState() : request.readyState;
+      if (readyState < 4) {
+        request.abort();
+      }
     }
   };
 
@@ -332,17 +417,40 @@ var ApiHelper = (function () {
    * @param {function} [options.successCallback]
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   *
+   * @return {Promise}
    */
   ApiHelper.prototype.simplePost = function (url, data, options) {
     var self = this;
-    $.post(url, data, function (data) {
+    var deferred = $.Deferred();
+
+    var request = $.post(url, data, function (data) {
       if (self.successResponseIsError(data)) {
-        self.assistErrorCallback(options)(data);
-      } else if (typeof options.successCallback !== 'undefined') {
+        deferred.reject(self.assistErrorCallback(options)(data));
+        return;
+      }
+      if (options && options.successCallback) {
         options.successCallback(data);
       }
+      deferred.resolve(data);
     })
     .fail(self.assistErrorCallback(options));
+
+    request.fail(function (data) {
+      deferred.reject(self.assistErrorCallback(options)(data));
+    });
+
+    var promise = deferred.promise();
+
+    promise.getReadyState = function () {
+      return request.readyState;
+    };
+
+    promise.abort = function () {
+      request.abort();
+    };
+
+    return promise;
   };
 
   /**
@@ -369,7 +477,10 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.simpleGet = function (url, data, options) {
     var self = this;
-    $.get(url, data, function (data) {
+    if (!options) {
+      options = {}
+    }
+    return $.get(url, data, function (data) {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);
       } else if (typeof options.successCallback !== 'undefined') {
@@ -381,7 +492,76 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.fetchUsersAndGroups = function (options) {
     var self = this;
-    self.simpleGet('/desktop/api/users/autocomplete', {}, options);
+    $.ajax({
+      method: "GET",
+      url: "/desktop/api/users/autocomplete",
+      data: options.data || {},
+      contentType: 'application/json'
+    }).done(function(response) {
+      options.successCallback(response);
+    }).fail(function (response) {
+      options.errorCallback(response);
+    });
+  };
+
+  ApiHelper.prototype.fetchUsersByIds = function (options) {
+    var self = this;
+    $.ajax({
+      method: "GET",
+      url: "/desktop/api/users",
+      data: { userids: options.userids},
+      contentType: 'application/json'
+    }).done(function(response) {
+      options.successCallback(response);
+    }).fail(function (response) {
+      options.errorCallback(response);
+    });
+  };
+
+
+  /**
+   *
+   * @param {Object} options
+   * @param {string[]} options.path
+   * @param {string} options.type - 's3', 'adls' or 'hdfs'
+   * @param {number} [options.offset]
+   * @param {number} [options.length]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.fetchStoragePreview = function (options) {
+    var self = this;
+    var url;
+    if (options.type === 's3') {
+      url = S3_API_PREFIX;
+    } else if (options.type === 'adls') {
+      url = ADLS_API_PREFIX;
+    } else {
+      url = HDFS_API_PREFIX;
+    }
+
+    var clonedPath = options.path.concat();
+    if (clonedPath.length && clonedPath[0] === '/') {
+      clonedPath.shift();
+    }
+    url += clonedPath.join('/') + '?compression=none&mode=text';
+    url += '&offset=' + (options.offset || 0);
+    url += '&length=' + (options.length || 118784);
+
+    var deferred = $.Deferred();
+    $.ajax({
+      dataType: "json",
+      url: url,
+      success: function (data) {
+        if (self.successResponseIsError(data)) {
+          deferred.reject(self.assistErrorCallback(options)(data))
+        } else {
+          deferred.resolve(data);
+        }
+      },
+      fail: deferred.reject
+    });
+
+    return deferred.promise();
   };
 
   /**
@@ -402,7 +582,7 @@ var ApiHelper = (function () {
     if (options.pathParts.length > 0 && (options.pathParts[0] === '/' || options.pathParts[0] === '')) {
       options.pathParts.shift();
     }
-    var url = HDFS_API_PREFIX + options.pathParts.join("/") + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    var url = HDFS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
     }
@@ -457,7 +637,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchAdlsPath = function (options) {
     var self = this;
     options.pathParts.shift();
-    var url = ADLS_API_PREFIX + options.pathParts.join("/") + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    var url = ADLS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
     }
@@ -508,7 +688,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchGitContents = function (options) {
     var self = this;
-    var url = GIT_API_PREFIX + '?path=' + options.pathParts.join("/") + '&fileType=' + options.fileType;
+    var url = GIT_API_PREFIX + '?path=' + encodeURI(options.pathParts.join("/")) + '&fileType=' + options.fileType;
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
@@ -559,7 +739,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchS3Path = function (options) {
     var self = this;
     options.pathParts.shift(); // remove the trailing /
-    var url = S3_API_PREFIX + options.pathParts.join("/") + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    var url = S3_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
     }
@@ -594,98 +774,6 @@ var ApiHelper = (function () {
 
     fetchCached.bind(self)($.extend({}, options, {
       sourceType: 's3',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
-   *
-   */
-  ApiHelper.prototype.fetchSolrCollections = function (options) {
-    var self = this;
-    var url = SOLR_COLLECTIONS_API;
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
-        return;
-      }
-      $.ajax({
-        dataType: "json",
-        url: url,
-        type: 'POST',
-        timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections !== null) {
-            storeInCache(data);
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        }
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
-        }
-      });
-    };
-
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'collections',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {String} options.collectionName
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   *
-   */
-  ApiHelper.prototype.fetchSolrCollection = function (options) {
-    var self = this;
-    var url = SOLR_FIELDS_API  + '?name=' + options.collectionName;
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
-        return;
-      }
-      $.ajax({
-        dataType: "json",
-        url: url,
-        type: 'GET',
-        timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.schema !== 'undefined' && data.schema !== null) {
-            storeInCache(data);
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        }
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
-        }
-      });
-    };
-
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'collections',
       url: url,
       fetchFunction: fetchFunction
     }));
@@ -778,17 +866,13 @@ var ApiHelper = (function () {
       timeout: options.timeout,
       success: function (data) {
         if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
-          if (data.status === 0){
-            options.successCallback(data);
-          }
-          else if (data.status === 1) {
+          options.successCallback(data);
+        } else {
+          if (data.status === 1) {
             options.notSupportedCallback(data);
-          }
-          else {
+          } else {
             self.assistErrorCallback(options)(data);
           }
-        } else {
-          self.assistErrorCallback(options)(data);
         }
       }
     })
@@ -980,13 +1064,14 @@ var ApiHelper = (function () {
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.fetchContents]
-   *
    * @param {number} options.uuid
+   *
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchDocument = function (options) {
     var self = this;
-    var promise = $.Deferred();
-    $.ajax({
+    var deferred = $.Deferred();
+    var request = $.ajax({
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid,
@@ -994,18 +1079,18 @@ var ApiHelper = (function () {
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
-          promise.resolve(data)
+          deferred.resolve(data)
         } else {
-          promise.reject(self.assistErrorCallback({
+          deferred.reject(self.assistErrorCallback({
             silenceErrors: options.silenceErrors
           }));
         }
       }
     })
     .fail(function (errorResponse) {
-      promise.reject(self.assistErrorHandler(errorResponse))
+      deferred.reject(self.assistErrorHandler(errorResponse))
     });
-    return promise;
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -1121,6 +1206,21 @@ var ApiHelper = (function () {
    *
    * @param {string} options.uuid
    */
+  ApiHelper.prototype.copyDocument = function (options) {
+    var self = this;
+    self.simplePost(DOCUMENTS_API + 'copy', {
+      uuid: ko.mapping.toJSON(options.uuid)
+    }, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.uuid
+   */
   ApiHelper.prototype.restoreDocument = function (options) {
     var self = this;
     self.simplePost(DOCUMENTS_API + 'restore', {
@@ -1162,613 +1262,524 @@ var ApiHelper = (function () {
 
   /**
    * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
    * @param {string} options.sourceType
-   * @param {string} [options.database]
-   **/
-  ApiHelper.prototype.loadDatabases = function (options) {
+   * @param {string} options.invalidate - 'invalidate' or 'invalidateAndFlush'
+   * @param {string[]} [options.path]
+   * @param {ContextCompute} [options.compute]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.invalidateSourceMetadata = function (options) {
     var self = this;
+    var deferred = $.Deferred();
 
-    var loadFunction = function () {
+    if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
+      var data = {
+        flush_all: options.invalidate === 'invalidateAndFlush',
+        cluster: JSON.stringify(options.compute)
+      };
 
-      fetchAssistData.bind(self)($.extend({}, options, {
-        url: AUTOCOMPLETE_API_PREFIX,
-        successCallback: function (data) {
-          var databases = data.databases || [];
-          var cleanDatabases = [];
-          databases.forEach(function (database) {
-            // Blacklist of system databases
-            if (database !== '_impala_builtins') {
-              // Ensure lower case
-              cleanDatabases.push(database.toLowerCase());
-            }
-          });
-          self.lastKnownDatabases[options.sourceType] = cleanDatabases;
-
-          options.successCallback(self.lastKnownDatabases[options.sourceType]);
-        },
-        errorCallback: function (response) {
-          if (response.status == 401) {
-            $(document).trigger("showAuthModal", {
-              'type': options.sourceType, 'callback': function () {
-                self.loadDatabases(options);
-              }
-            });
-            return;
-          }
-          self.lastKnownDatabases[options.sourceType] = [];
-          self.assistErrorCallback(options)(response);
-        },
-        cacheCondition: genericCacheCondition
-      }));
-    };
-
-    if (options.sourceType === 'impala' && self.invalidateImpala !== null) {
-      if (self.invalidateImpala.database) {
-        $.post(IMPALA_INVALIDATE_API, { flush_all:  self.invalidateImpala.flush, database: self.invalidateImpala.database }, loadFunction);
-      } else {
-        $.post(IMPALA_INVALIDATE_API, { flush_all:  self.invalidateImpala.flush }, loadFunction);
+      if (options.path && options.path.length > 0) {
+        data.database = options.path[0];
       }
-      self.invalidateImpala = null;
-    } else {
-      loadFunction();
+      if (options.path && options.path.length > 1) {
+        data.table = options.path[1];
+      }
+
+      var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
+
+      return new CancellablePromise(deferred, request);
     }
+
+    return deferred.resolve().promise();
   };
+
 
   /**
    * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
+   * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
    * @param {boolean} [options.silenceErrors]
+   * @param {number} [options.timeout]
    *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.defaultDatabase
+   * @param {string[]} [options.path] - The path to fetch
+   *
+   * @return {CancellablePromise}
    */
-  ApiHelper.prototype.fetchPartitions = function (options) {
+  ApiHelper.prototype.fetchSourceMetadata = function (options) {
     var self = this;
+    var deferred = $.Deferred();
 
+    var isQuery = options.sourceType.indexOf('-query') !== -1;
+    var sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
+
+    var request = $.ajax({
+      type: 'POST',
+      url: AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
+      data: {
+        notebook: {},
+        snippet: ko.mapping.toJSON({
+          type: sourceType,
+          source: isQuery ? 'query' : 'data',
+        }),
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+      },
+      timeout: options.timeout
+    }).success(function (data) {
+      data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
+      data.hueTimestamp = Date.now();
+
+      // TODO: Display warning in autocomplete when an entity can't be found
+      // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
+      // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
+      if (!data.notFound && self.successResponseIsError(data)) {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(data);
+      } else {
+        deferred.resolve(data);
+      }
+    }).fail(self.assistErrorCallback({
+      silenceErrors: options.silenceErrors,
+      errorCallback: deferred.reject
+    }));
+
+    return new CancellablePromise(deferred, request);
+  };
+
+
+  ApiHelper.prototype.updateSourceMetadata = function (options) {
+    var self = this;
     var url;
-    if (typeof options.identifierChain !== 'undefined' && options.identifierChain.length === 1) {
-      url = '/metastore/table/' + options.defaultDatabase + '/' + options.identifierChain[0].name + '/partitions';
-    } else if (typeof options.identifierChain !== 'undefined' && options.identifierChain.length === 2) {
-      url = '/metastore/table/' + options.identifierChain[0].name + '/' + options.identifierChain[1].name + '/partitions';
-    } else {
-      url = '/metastore/table/' + options.databaseName + '/' + options.tableName + '/partitions';
-    }
-
-    $.ajax({
-      url: url,
-      data: {
-        format: 'json'
-      },
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('X-Requested-With', 'Hue');
-      },
-      success: function (response) {
-        if (! self.successResponseIsError(response)) {
-          options.successCallback(response);
-        } else {
-          self.assistErrorCallback(options)(response);
-        }
-
-      },
-      error: self.assistErrorCallback(options)
-    });
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   */
-  ApiHelper.prototype.fetchTableDetails = function (options) {
-    var self = this;
-    $.ajax({
-      url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName,
-      data: {
-        "format" : 'json'
-      },
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      success: function (response) {
-        if (! self.successResponseIsError(response)) {
-          options.successCallback(response);
-        } else {
-          self.assistErrorCallback(options)(response);
-        }
-      },
-      error: self.assistErrorCallback(options)
-    });
-  };
-
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {Number} [options.timeout]
-   * @param {string} [options.columnName]
-   * @param {Object} [options.editor] - Ace editor
-   */
-  ApiHelper.prototype.fetchTableSample = function (options) {
-    var self = this;
-    var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName + (options.columnName ? '/' + options.columnName : '');
-
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
-        return;
-      }
-      $.ajax({
-        type: 'POST',
-        url: url,
-        data: {
-          notebook: {},
-          snippet: ko.mapping.toJSON({
-            type: options.sourceType
-          })
-        },
-        timeout: options.timeout
-      }).done(function (data) {
-        if (! self.successResponseIsError(data)) {
-          if ((typeof data.rows !== 'undefined' && data.rows.length > 0) || typeof data.sample !== 'undefined') {
-            storeInCache(data);
-          }
-          options.successCallback(data);
-        } else {
-          self.assistErrorCallback(options)(data);
-        }
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
-        }
-      });
+    var data = {
+      source_type: options.sourceType
     };
-
-    if (options.columnName) {
-      fetchCached.bind(self)($.extend({}, options, {
-        url: url,
-        fetchFunction: fetchFunction
-      }));
-    } else {
-      fetchFunction($.noop);
-    }
-  };
-
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {string} options.columnName
-   */
-  ApiHelper.prototype.refreshTableStats = function (options) {
-    var self = this;
-    var pollRefresh = function (url) {
-      $.post(url, function (data) {
-        if (data.isSuccess) {
-          options.successCallback(data);
-        } else if (data.isFailure) {
-          self.assistErrorCallback(options)(data.message);
-        } else {
-          window.setTimeout(function () {
-            pollRefresh(url);
-          }, 1000);
+    if (options.path.length === 1) {
+      url = '/metastore/databases/' + options.path[1] + '/alter';
+      data.properties = ko.mapping.toJSON(options.properties);
+    } else if (options.path.length === 2) {
+      url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
+      if (options.properties) {
+        if (options.properties.comment) {
+          data.comment = options.properties.comment;
         }
-      }).fail(self.assistErrorCallback(options));
-    };
-
-    $.post("/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/analyze/" + options.databaseName + "/" + options.tableName + "/"  + (options.columnName || ""), function (data) {
-      if (data.status == 0 && data.watch_url) {
-        pollRefresh(data.watch_url);
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    }).fail(self.assistErrorCallback(options));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {string} options.columnName
-   */
-  ApiHelper.prototype.fetchStats = function (options) {
-    var self = this;
-    $.ajax({
-      url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName + "/stats/" + ( options.columnName || ""),
-      data: {},
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      dataType: "json",
-      success: function (response) {
-        if (! self.successResponseIsError(response)) {
-          options.successCallback(response)
-        } else {
-          self.assistErrorCallback(options)(response);
+        if (options.properties.name) {
+          data.new_table_name = options.properties.name;
         }
-      },
-      error: self.assistErrorCallback(options)
-    });
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
-   *
-   * @param {string} options.databaseName
-   */
-  ApiHelper.prototype.fetchTables = function (options) {
-    var self = this;
-    return fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {boolean} [options.cachedOnly] - Default false
-   * @param {Object} [options.editor] - Ace editor
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {string[]} options.fields
-   */
-  ApiHelper.prototype.fetchFields = function (options) {
-    var self = this;
-    var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-    return fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
-  };
-
-  ApiHelper.prototype.containsDatabase = function (sourceType, databaseName) {
-    var self = this;
-    return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName.toLowerCase()) > -1;
-  };
-
-  ApiHelper.prototype.expandComplexIdentifierChain = function (sourceType, database, identifierChain, successCallback, errorCallback, cachedOnly) {
-    var self = this;
-
-    var fetchFieldsInternal =  function (table, database, identifierChain, callback, errorCallback, fetchedFields) {
-      if (!identifierChain) {
-        identifierChain = [];
       }
-      if (identifierChain.length > 0) {
-        fetchedFields.push(identifierChain[0].name);
-        identifierChain = identifierChain.slice(1);
+    } else if (options.path > 2) {
+      url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
+      data.column = options.path.slice(2).join('.');
+      if (options.properties) {
+        if (options.properties.comment) {
+          data.comment = options.properties.comment;
+        }
+        if (options.properties.name) {
+          data.new_column_name = options.properties.name;
+        }
+        if (options.properties.type) {
+          data.new_column_type = options.properties.name;
+        }
+        if (options.properties.partitions) {
+          data.partition_spec = ko.mapping.toJSON(options.properties.partitions);
+        }
       }
-
-      // Parser sometimes knows if it's a map or array.
-      if (identifierChain.length > 0 && (identifierChain[0].name === 'item' || identifierChain[0].name === 'value')) {
-        fetchedFields.push(identifierChain[0].name);
-        identifierChain = identifierChain.slice(1);
-      }
-
-
-      self.fetchFields({
-        sourceType: sourceType,
-        databaseName: database,
-        tableName: table,
-        fields: fetchedFields,
-        timeout: self.timeout,
-        cachedOnly: cachedOnly,
-        successCallback: function (data) {
-          if (sourceType === 'hive'
-              && typeof data.extended_columns !== 'undefined'
-              && data.extended_columns.length === 1
-              && data.extended_columns.length
-              && /^map|array|struct/i.test(data.extended_columns[0].type)) {
-            identifierChain.unshift({ name: data.extended_columns[0].name })
-          }
-          if (identifierChain.length > 0) {
-            if (typeof identifierChain[0].name !== 'undefined' && /value|item|key/i.test(identifierChain[0].name)) {
-              fetchedFields.push(identifierChain[0].name);
-              identifierChain.shift();
-            } else {
-              if (data.type === 'array') {
-                fetchedFields.push('item')
-              }
-              if (data.type === 'map') {
-                fetchedFields.push('value')
-              }
-            }
-            fetchFieldsInternal(table, database, identifierChain, callback, errorCallback, fetchedFields)
-          } else {
-            fetchedFields.unshift(table);
-            callback(fetchedFields);
-          }
-        },
-        silenceErrors: true,
-        errorCallback: errorCallback
-      });
-    };
-
-    fetchFieldsInternal(identifierChain.shift().name, database, identifierChain, successCallback, errorCallback, []);
-  };
-
-  /**
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {function} options.errorCallback
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.identifierChain.name
-   * @param {string} options.defaultDatabase
-   * @param {boolean} [options.cachedOnly] - Default false
-   *
-   * @param {function} successCallback
-   */
-  ApiHelper.prototype.identifierChainToPath = function (options, successCallback) {
-    var self = this;
-    var identifierChainClone = options.identifierChain.concat();
-    var path = [];
-    if (identifierChainClone.length === 0 || ! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
-      path.push(options.defaultDatabase);
-    } else {
-      path.push(identifierChainClone.shift().name)
     }
-
-    if (identifierChainClone.length > 1) {
-      self.expandComplexIdentifierChain(options.sourceType, path[0], identifierChainClone, function (fetchedFields) {
-        successCallback(path.concat(fetchedFields))
-      }, options.errorCallback, options.cachedOnly);
-    } else {
-      successCallback(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
-    }
-
+    return self.simplePost(url, data, options);
   };
 
   /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
-   * @param {boolean} [options.cachedOnly] - Default false
+   * Fetches the analysis for the given source and path
    *
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.identifierChain.name
-   * @param {string} options.defaultDatabase
-   */
-  ApiHelper.prototype.fetchAutocomplete = function (options) {
-    var self = this;
-    self.identifierChainToPath(options, function (path) {
-      fetchAssistData.bind(self)($.extend({}, options, {
-        url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
-        errorCallback: self.assistErrorCallback(options),
-        cacheCondition: genericCacheCondition
-      }));
-    });
-  };
-
-  /**
    * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
    *
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.identifierChain.name
-   * @param {string} options.defaultDatabase
-   */
-  ApiHelper.prototype.fetchSamples = function (options) {
-    var self = this;
-    self.identifierChainToPath(options, function (path) {
-      fetchAssistData.bind(self)($.extend({}, options, {
-        url: SAMPLE_API_PREFIX + path.join('/'),
-        errorCallback: self.assistErrorCallback(options),
-        cacheCondition: genericCacheCondition
-      }));
-    });
-  };
-
-
-  /**
-   * @param {Object} options
+   * @param {ContextCompute} options.compute
    * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
+   * @param {string[]} options.path
    *
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.identifierChain.name
-   * @param {string} options.defaultDatabase
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchAnalysis = function (options) {
     var self = this;
-    var clonedIdentifierChain = options.identifierChain.concat();
+    var deferred = $.Deferred();
 
-    var hierarchy = '';
+    var url;
 
-    self.loadDatabases({
-      sourceType: options.sourceType,
-      successCallback: function () {
-        // Database
-        if (clonedIdentifierChain.length > 1 && self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
-          hierarchy = clonedIdentifierChain.shift().name
-        } else {
-          hierarchy = options.defaultDatabase;
-        }
+    if (options.path.length === 1) {
+      url = '/metastore/databases/' + options.path[0] + '/metadata';
+    } else {
+      url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
 
-        // Table
-        if (clonedIdentifierChain.length > 0) {
-          hierarchy += '/' + clonedIdentifierChain.shift().name;
-        }
+      if (options.path.length > 1) {
+        url += '/' + options.path[1] + '/';
+      }
 
-        // Column/Complex
-        if (clonedIdentifierChain.length > 0) {
-          hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
-        }
-
-        var url = "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + hierarchy;
-
-        var fetchFunction = function (storeInCache) {
-          if (options.timeout === 0) {
-            self.assistErrorCallback(options)({ status: -1 });
-            return;
-          }
-          $.ajax({
-            url: url,
-            data: {
-              "format" : 'json'
-            },
-            beforeSend: function (xhr) {
-              xhr.setRequestHeader("X-Requested-With", "Hue");
-            },
-            timeout: options.timeout
-          }).done(function (data) {
-            if (! self.successResponseIsError(data)) {
-              if ((typeof data.cols !== 'undefined' && data.cols.length > 0) || typeof data.sample !== 'undefined') {
-                storeInCache(data);
-              }
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          })
-            .fail(self.assistErrorCallback(options))
-            .always(function () {
-              if (typeof options.editor !== 'undefined' && options.editor !== null) {
-                options.editor.hideSpinner();
-              }
-            });
-        };
-
-        fetchCached.bind(self)($.extend({}, options, {
-          url: url,
-          fetchFunction: fetchFunction
-        }));
-      },
-      silenceErrors: options.silenceErrors,
-      errorCallback: options.errorCallback
-    });
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string[]} options.hierarchy
-   */
-  ApiHelper.prototype.fetchPanelData = function (options) {
-    var self = this;
-    fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
-  };
-
-  ApiHelper.prototype.getClusterConfig = function (data) {
-    return $.post(FETCH_CONFIG, data);
-  };
-
-  /**
-   * Fetches a navigator entity for the given identifierChain
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {boolean} [options.isView] - Default false
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  ApiHelper.prototype.fetchNavEntity = function (options) {
-    var self = this;
-
-    var clonedIdentifierChain = options.identifierChain.concat();
-
-    var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
-
-    var url = NAV_URLS.FIND_ENTITY + '?type=database&name=' + database;
-
-    var isView = !!options.isView;
-
-    if (clonedIdentifierChain.length > 0) {
-      var table = clonedIdentifierChain.shift().name;
-      url = NAV_URLS.FIND_ENTITY + (isView ? '?type=view' : '?type=table') + '&database=' + database + '&name=' + table;
-      if (clonedIdentifierChain.length > 0) {
-        url = NAV_URLS.FIND_ENTITY + '?type=field&database=' + database + '&table=' + table + '&name=' + clonedIdentifierChain.shift().name;
+      if (options.path.length > 2) {
+        url += 'stats/' + options.path.slice(2).join('/');
       }
     }
 
-    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
-      url: url,
-      errorCallback: self.assistErrorCallback(options),
-      noCache: true
+    var data = {
+      format: 'json',
+      cluster: JSON.stringify(options.compute),
+      source_type: options.sourceType
+    };
+
+    var request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (response) {
+        if (options.path.length === 1) {
+          if (response.data) {
+            response.data.hueTimestamp = Date.now();
+            deferred.resolve(response.data);
+          } else {
+            deferred.reject();
+          }
+        } else {
+          deferred.resolve(response)
+        }
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
+  };
+
+  /**
+   * Fetches the partitions for the given path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string[]} options.path
+   * @param {ContextCompute} options.compute
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchPartitions = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    // TODO: No sourceType needed?
+    var request = $.post('/metastore/table/' + options.path.join('/') + '/partitions', {
+      format: 'json',
+      cluster: JSON.stringify(options.compute)
+    }).done(function (response) {
+      if (!self.successResponseIsError(response)) {
+        if (!response) {
+          response = {};
+        }
+        response.hueTimestamp = Date.now();
+        deferred.resolve(response);
+      } else {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(response);
+      }
+    }).fail(function (response) {
+      // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
+      if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
+        deferred.resolve({
+          hueTimestamp: Date.now(),
+          partition_keys_json: [],
+          partition_values_json: []
+        })
+      } else {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(response);
+      }
+    });
+
+    return new CancellablePromise(deferred, request);
+  };
+
+  /**
+   * Refreshes the analysis for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
+   * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.refreshAnalysis = function (options) {
+    var self = this;
+
+    if (options.path.length === 1) {
+      return self.fetchAnalysis(options);
+    }
+    var deferred = $.Deferred();
+
+    var promises = [];
+
+    var pollForAnalysis = function (url, delay) {
+      window.setTimeout(function () {
+        promises.push(self.simplePost(url, undefined, {
+          silenceErrors: options.silenceErrors,
+          successCallback: function (data) {
+            promises.pop();
+            if (data.isSuccess) {
+              promises.push(self.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject));
+            } else if (data.isFailure) {
+              deferred.reject(data);
+            } else {
+              pollForAnalysis(url, 1000);
+            }
+          },
+          errorCallback: deferred.reject
+        }));
+      }, delay);
+    };
+
+    var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/analyze/' + options.path.join('/') + '/';
+
+    promises.push(self.simplePost(url, undefined, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        promises.pop();
+        if (data.status === 0 && data.watch_url) {
+          pollForAnalysis(data.watch_url, 500);
+        } else {
+          deferred.reject();
+        }
+      },
+      errorCallback: deferred.reject
     }));
+
+    return new CancellablePromise(deferred, undefined, promises);
   };
 
-  ApiHelper.prototype.addNavTags = function (entityId, tags) {
-    return $.post(NAV_URLS.ADD_TAGS, {
-      id: ko.mapping.toJSON(entityId),
-      tags: ko.mapping.toJSON(tags)
+  /**
+   * Checks the status for the given snippet ID
+   * Note: similar to notebook and search check_status.
+   *
+   * @param {Object} options
+   * @param {Object} options.notebookJson
+   * @param {Object} options.snippetJson
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.whenAvailable = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+    var cancellablePromises = [];
+
+    var waitTimeout = -1;
+
+    deferred.fail(function () {
+      window.clearTimeout(waitTimeout);
     });
+
+    var waitForAvailable = function () {
+      var request = self.simplePost('/notebook/api/check_status', {
+        notebook: options.notebookJson,
+        snippet: options.snippetJson,
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+      }, {
+        silenceErrors: options.silenceErrors
+      }).done(function (response) {
+        if (response && response.query_status && response.query_status.status) {
+          var status = response.query_status.status;
+          if (status === 'available') {
+            deferred.resolve();
+          } else if (status === 'running' || status === 'starting' || status === 'waiting') {
+            waitTimeout = window.setTimeout(function () {
+              waitForAvailable();
+            }, 500);
+          } else {
+            deferred.reject();
+          }
+        }
+      }).fail(deferred.reject);
+
+      cancellablePromises.push(new CancellablePromise(request, request));
+    };
+
+    waitForAvailable();
+    return new CancellablePromise(deferred, undefined, cancellablePromises);
   };
 
-  ApiHelper.prototype.deleteNavTags = function (entityId, tags) {
-    return $.post(NAV_URLS.DELETE_TAGS, {
-      id: ko.mapping.toJSON(entityId),
-      tags: ko.mapping.toJSON(tags)
+  /**
+   * Wrapper around the response from the Query API
+   *
+   * @param {string} sourceType
+   * @param {Object} response
+   *
+   * @constructor
+   */
+  var QueryResult = function (sourceType, compute, response) {
+    var self = this;
+    self.id = UUID();
+    self.type = response.result.type || sourceType;
+    self.compute = compute;
+    self.status = response.status || 'running';
+    self.result = response.result || {};
+    self.result.type = 'table';
+  };
+
+  /**
+   * Fetches samples for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
+   * @param {number} [options.sampleCount] - Default 100
+   * @param {string[]} options.path
+   * @param {string} [options.operation] - Default 'default'
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchSample = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var cancellablePromises = [];
+
+    var notebookJson = null;
+    var snippetJson = null;
+    var cancelled = false;
+
+    var cancelQuery = function () {
+      cancelled = true;
+      if (notebookJson) {
+        self.simplePost('/notebook/api/cancel_statement', {
+          notebook: notebookJson,
+          snippet: snippetJson,
+          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+        }, { silenceErrors:  options.silenceErrors });
+      }
+    };
+
+    self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
+      notebook: {},
+      snippet: JSON.stringify({
+        type: options.sourceType,
+        compute: options.compute
+      }),
+      async: true,
+      operation: '"' + (options.operation || 'default') + '"',
+      cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+    }, {
+      silenceErrors: options.silenceErrors
+    }).done(function (sampleResponse) {
+      var queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
+
+      notebookJson = JSON.stringify({ type: options.sourceType });
+      snippetJson = JSON.stringify(queryResult);
+
+      if (sampleResponse && sampleResponse.rows) { // Sync results
+        var data = { data: sampleResponse.rows, meta: sampleResponse.full_headers };
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      } else {
+        cancellablePromises.push(
+          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
+              notebook: notebookJson,
+              snippet: snippetJson,
+              rows: options.sampleCount || 100,
+              startOver: 'false'
+            }, {
+              silenceErrors: options.silenceErrors
+            }).done(function (sampleResponse) {
+              var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
+              data.hueTimestamp = Date.now();
+              deferred.resolve(data);
+            }).fail(deferred.reject);
+
+            cancellablePromises.push(resultRequest, resultRequest);
+          }).fail(deferred.reject)
+        );
+      }
+    }).fail(deferred.reject);
+
+    cancellablePromises.push({
+      cancel: cancelQuery
     });
+
+    return new CancellablePromise(deferred, undefined, cancellablePromises);
+  };
+
+  /**
+   * Fetches a navigator entity for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {boolean} [options.isView] - Default false
+   * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavigatorMetadata = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+    var url = NAV_URLS.FIND_ENTITY;
+
+    if (options.path.length === 1) {
+      url += '?type=database&name=' + options.path[0];
+    } else if (options.path.length === 2) {
+      url +=  (options.isView ? '?type=view' : '?type=table') + '&database=' + options.path[0] + '&name=' + options.path[1];
+    } else if (options.path.length === 3) {
+      url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
+    } else {
+      return new CancellablePromise($.Deferred().reject());
+    }
+
+    var request = self.simplePost(url, {
+      notebook: {},
+      snippet: ko.mapping.toJSON({
+        type: 'nav'
+      })
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        data = data.entity || data;
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
+  };
+
+  /**
+   * Updates Navigator properties and custom metadata for the given entity
+   *
+   * @param {Object} options
+   * @param {string} options.identity - The identifier for the Navigator entity to update
+   * @param {Object} [options.properties]
+   * @param {Object} [options.modifiedCustomMetadata]
+   * @param {string[]} [options.deletedCustomMetadataKeys]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {Promise}
+   */
+  ApiHelper.prototype.updateNavigatorProperties = function (options) {
+    var self = this;
+    var data = { id: ko.mapping.toJSON(options.identity) };
+
+    if (options.properties) {
+      data.properties = ko.mapping.toJSON(options.properties);
+    }
+    if (options.modifiedCustomMetadata) {
+      data.modifiedCustomMetadata = ko.mapping.toJSON(options.modifiedCustomMetadata);
+    }
+    if (options.deletedCustomMetadataKeys) {
+      data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
+    }
+    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options)
   };
 
   /**
@@ -1778,400 +1789,356 @@ var ApiHelper = (function () {
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   *
+   * @return {CancellablePromise}
    */
-  ApiHelper.prototype.listNavTags = function (options) {
+  ApiHelper.prototype.fetchAllNavigatorTags = function (options) {
     var self = this;
-    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
-      url: NAV_URLS.LIST_TAGS,
-      errorCallback: self.assistErrorCallback(options),
-      noCache: true
-    }));
-  };
 
-  ApiHelper.prototype.createNavOptDbTablesJson = function (options) {
-    var self = this;
-    var tables = [];
-    var tableIndex = {};
-    options.tables.forEach(function (table) {
-      if (table.subQuery || !table.identifierChain) {
-        return;
-      }
-      var clonedIdentifierChain = table.identifierChain.concat();
+    var deferred = $.Deferred();
 
-      var databasePrefix;
-      if (clonedIdentifierChain.length > 1 && self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
-        databasePrefix = clonedIdentifierChain.shift().name + '.';
-      } else if (options.defaultDatabase) {
-        databasePrefix = options.defaultDatabase + '.';
-      } else {
-        databasePrefix = '';
-      }
-      var identifier = databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.');
-      if (!tableIndex[databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.')]) {
-        tables.push(identifier);
-        tableIndex[identifier] = true;
-      }
+    var request = self.simplePost(NAV_URLS.LIST_TAGS, undefined, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        if (data && data.tags) {
+          deferred.resolve(data.tags);
+        } else {
+          deferred.resolve({});
+        }
+      },
+      errorCallback: deferred.reject
     });
-    return ko.mapping.toJSON(tables);
+
+    return new CancellablePromise(deferred, request);
   };
 
-  /**
-   * Fetches the top tables for the given database
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.database
-   */
-  ApiHelper.prototype.fetchNavOptTopTables = function (options) {
+  ApiHelper.prototype.addNavTags = function (entityId, tags) {
     var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
-      return data.status === 0;
+    return self.simplePost(NAV_URLS.ADD_TAGS, {
+      id: ko.mapping.toJSON(entityId),
+      tags: ko.mapping.toJSON(tags)
+    });
+  };
+
+  ApiHelper.prototype.deleteNavTags = function (entityId, tags) {
+    var self = this;
+    return self.simplePost(NAV_URLS.DELETE_TAGS, {
+      id: ko.mapping.toJSON(entityId),
+      tags: ko.mapping.toJSON(tags)
     });
   };
 
   /**
-   * Fetches the top columns for the given tables
+   * Fetches navOpt popularity for the children of the given path
    *
    * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
    */
-  ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
+  ApiHelper.prototype.fetchNavOptPopularity = function (options) {
     var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
-      return data.status === 0;
+    var deferred = $.Deferred();
+    var url, data;
+
+    if (options.paths.length === 1 && options.paths[0].length === 1) {
+      url = NAV_OPT_URLS.TOP_TABLES;
+      data = {
+        database: options.paths[0][0]
+      };
+    } else {
+      url = NAV_OPT_URLS.TOP_COLUMNS;
+      var dbTables = [];
+      options.paths.forEach(function (path) {
+        dbTables.push(path.join('.'));
+      });
+      data = {
+        dbTables: ko.mapping.toJSON(dbTables)
+      };
+    }
+
+    var request = self.simplePost(url, data, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      },
+      errorCallback: deferred.reject
     });
+
+    return new CancellablePromise(deferred, request);
   };
 
   /**
-   * Fetches the popular joins for the given tables
+   * Fetches the popularity for various aspects of the given tables
    *
+   * @param {ApiHelper} apiHelper
    * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
+   * @param {string[][]} options.paths
+   * @param {string} url
+   * @return {CancellablePromise}
    */
-  ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_JOINS, options, function (data) {
-      return data.status === 0;
-    });
-  };
+  var genericNavOptMultiTableFetch = function (apiHelper, options, url) {
+    var deferred = $.Deferred();
 
-  /**
-   * Fetches the popular filters for the given tables
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_FILTERS, options, function (data) {
-      return data.status === 0;
+    var dbTables = {};
+    options.paths.forEach(function (path) {
+      dbTables[path.join('.')] = true;
     });
+    var data = {
+      dbTables: ko.mapping.toJSON(Object.keys(dbTables))
+    };
+
+    var request = apiHelper.simplePost(url, data, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
   };
 
   /**
    * Fetches the popular aggregate functions for the given tables
    *
    * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
-   *
-   * @param {number} options.timeout
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_AGGS, options, function (data) {
-      return data.status === 0;
-    });
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
   };
 
-  ApiHelper.prototype.fetchNavOptCached = function (url, options, cacheCondition) {
+  /**
+   * Fetches the popular columns for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
+  };
+
+  /**
+   * Fetches the popular filters for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
+  };
+
+  /**
+   * Fetches the popular joins for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopJoins = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
+  };
+
+  /**
+   * Fetches navOpt meta for the given path, only possible for tables atm.
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptMeta = function (options) {
     var self = this;
+    var deferred = $.Deferred();
 
-    var data, hash;
-    if (options.tables) {
-      data = {
-        dbTables: self.createNavOptDbTablesJson(options)
-      };
-      hash = data.dbTables.hashCode();
-    } else if (options.database) {
-      data = {
-        database: options.database
-      };
-      hash = data.database;
-    }
-
-    var promise = self.queueManager.getQueued(url, hash);
-    var firstInQueue = typeof promise === 'undefined';
-    if (firstInQueue) {
-      promise = $.Deferred();
-      self.queueManager.addToQueue(promise, url, hash);
-    }
-
-    promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
-      if (typeof options.editor !== 'undefined' && options.editor !== null) {
-        options.editor.hideSpinner();
-      }
+    var request = self.simplePost(NAV_OPT_URLS.TABLE_DETAILS, {
+      databaseName: options.path[0],
+      tableName: options.path[1]
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (response) {
+        if (response.status === 0 && response.details) {
+          response.details.hueTimestamp = Date.now();
+          deferred.resolve(response.details);
+        } else {
+          deferred.reject();
+        }
+      },
+      errorCallback: deferred.reject
     });
 
-    if (!firstInQueue) {
-      return;
-    }
+    return new CancellablePromise(deferred, request);
+  };
 
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {ContextCompute} options.compute
+   * @param {string} options.queryId
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchQueryExecutionAnalysis = function (options)  {
+    var self = this;
+    var url = '/metadata/api/workload_analytics/get_impala_query/';
+    var deferred = $.Deferred();
+
+    var tries = 0;
+
+    var cancellablePromises = [];
+
+    var promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+
+    var pollForAnalysis = function () {
+      if (tries === 10) {
+        deferred.reject();
         return;
       }
-
-      return $.ajax({
-        type: 'post',
-        url: url,
-        data: data,
-        timeout: options.timeout
-      })
-      .done(function (data) {
-        if (data.status === 0) {
-          if (cacheCondition(data)) {
-            storeInCache(data);
-          }
-          promise.resolve(data);
+      tries++;
+      cancellablePromises.pop(); // Remove the last one
+      cancellablePromises.push(deferred, self.simplePost(url, {
+        'cluster': JSON.stringify(options.compute),
+        'query_id': '"' + options.queryId + '"'
+      }, options).done(function (response) {
+        if (response && response.data) {
+          deferred.resolve(response.data)
         } else {
-          promise.reject(data);
+          var timeout = window.setTimeout(function () {
+            pollForAnalysis();
+          }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
+          promise.onCancel(function () {
+            window.clearTimeout(timeout);
+          })
         }
-      })
-      .fail(promise.reject);
+      }).fail(deferred.reject));
     };
 
-    return fetchCached.bind(self)($.extend({}, options, {
-      url: url,
-      hash: hash,
-      cacheType: 'optimizer',
-      fetchFunction: fetchFunction,
-      promise: promise
-    }));
+    pollForAnalysis();
+
+    return promise;
+  };
+
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchContextNamespaces = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/namespaces/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchContextComputes = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/computes/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchContextClusters = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/clusters/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
+  };
+
+  ApiHelper.prototype.getClusterConfig = function (data) {
+    return $.post(FETCH_CONFIG, data);
   };
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
-    var promise = $.Deferred();
-    $.post('/desktop/api/search/entities_interactive', {
+    var deferred = $.Deferred();
+    var request = $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
-      limit: 5,
+      limit: 50,
       sources: '["documents"]'
     }).done(function (data) {
       if (data.status === 0) {
-        promise.resolve(data);
+        deferred.resolve(data);
       } else {
-        promise.reject(data);
+        deferred.reject(data);
       }
-    }).fail(promise.reject);
-    return promise;
+    }).fail(deferred.reject);
+    return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.fetchNavEntitiesInteractive = function (query) {
-    var promise = $.Deferred();
-    $.post('/desktop/api/search/entities_interactive', {
-      query_s: ko.mapping.toJSON(query),
-      limit: 5,
+  ApiHelper.prototype.fetchNavEntitiesInteractive = function (options) {
+    var deferred = $.Deferred();
+    var request = $.post(INTERACTIVE_SEARCH_API, {
+      query_s: ko.mapping.toJSON(options.query),
+      field_facets: ko.mapping.toJSON(options.facets || []),
+      limit: 50,
       sources: '["sql", "hdfs", "s3"]'
     }).done(function (data) {
       if (data.status === 0) {
-        promise.resolve(data);
+        deferred.resolve(data);
       } else {
-        promise.reject(data);
+        deferred.reject(data);
       }
-    }).fail(promise.reject);
-    return promise;
+    }).fail(deferred.reject);
+    return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.globalSearchAutocomplete = function (options) {
+  ApiHelper.prototype.searchEntities = function (options) {
     var self = this;
+    var deferred = $.Deferred();
 
-    $.when.apply($, [
-      $.post('/desktop/api/search/entities_interactive', {
-        query_s: ko.mapping.toJSON(options.query),
-        limit: 5,
-        sources: '["sql", "hdfs", "s3"]'
-      }),
-      $.post('/desktop/api/search/entities_interactive', {
-          query_s: ko.mapping.toJSON(options.query),
-          limit: 5,
-          sources: '["documents"]'
-        })
-      ]
-    ).done(function (metadata, documents) {
-      if (metadata[0].status === 0 || documents[0].status === 0) {
-        if (documents[0].status === 0) {
-           metadata[0].resultsHuedocuments = documents[0].results;
-        }
-        options.successCallback(metadata[0]);
-      } else {
-        self.assistErrorCallback(options)(metadata);
-      }
-    }).fail(self.assistErrorCallback(options));
-  };
-
-  ApiHelper.prototype.navSearchAutocomplete = function (options) {
-    var self = this;
-    return $.post('/desktop/api/search/entities_interactive', {
+    var request = self.simplePost(SEARCH_API, {
       query_s: ko.mapping.toJSON(options.query),
-      limit: 10,
-      sources: '["' + options.source + '"]'
-    }).done(function (data) {
-      if (data.status === 0 && !self.successResponseIsError(data)) {
-        options.successCallback(data);
-      } else if (data.status === -2 && typeof data.message !== 'undefined' && typeof data.message.message !== 'undefined') {
-        options.errorCallback({
-          source: 'navigator',
-          message: data.message.message
-        })
-      } else if (data.status === -2 && typeof data.message !== 'undefined') {
-        options.errorCallback({
-          source: 'navigator',
-          message: data.message
-        })
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    }).fail(self.assistErrorCallback(options));
-  };
-
-  ApiHelper.prototype.formatSql = function (statements) {
-    return $.post("/notebook/api/format", {
-      statements: statements
+      limit: options.limit || 100,
+      raw_query: !!options.rawQuery,
+      sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: deferred.reject
     });
+
+    return new CancellablePromise(deferred, request);
   };
 
   /**
+   *
    * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {string} options.url
-   * @param {boolean} [options.noCache]
-   * @param {Function} options.cacheCondition - Determines whether it should be cached or not
-   * @param {Function} options.successCallback
-   * @param {Function} options.errorCallback
-   * @param {string} [options.cacheType] - Possible values 'default', 'optimizer'. Default value 'default'
-   * @param {Number} [options.timeout]
-   * @param {boolean} [options.cachedOnly] - Default false
-   * @param {Object} [options.editor] - Ace editor
+   * @param {string} options.statements
+   * @param {boolean} [options.silenceErrors]
    */
-  var fetchAssistData = function (options) {
+  ApiHelper.prototype.formatSql = function (options) {
     var self = this;
-    if (!options.sourceType) {
-      options.errorCallback('No sourceType supplied');
-      console.warn('No sourceType supplied to fetchAssistData');
-      return
-    }
+    var deferred = $.Deferred();
 
-    if (!options.noCache) {
-      var cachedData = $.totalStorage(self.getAssistCacheIdentifier(options)) || {};
-      if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp, options.cacheType || 'default')) {
-        options.successCallback(cachedData[options.url].data);
-        return;
-      }
-    }
-    if (options.cachedOnly) {
-      if (options.errorCallback) {
-        options.errorCallback(false);
-      }
-      return;
-    }
-    if (typeof options.editor !== 'undefined' && options.editor !== null) {
-      options.editor.showSpinner();
-    }
-
-    var promise = self.queueManager.getQueued(options.url, options.sourceType);
-    var firstInQueue = typeof promise === 'undefined';
-    if (firstInQueue) {
-      promise = $.Deferred();
-      self.queueManager.addToQueue(promise, options.url, options.sourceType);
-    }
-
-    promise
-      .done(function (data) {
-        options.successCallback(data)
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-      if (typeof options.editor !== 'undefined' && options.editor !== null) {
-        options.editor.hideSpinner();
-      }
+    var request = self.simplePost(FORMAT_SQL_API, {
+      statements: options.statements
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: deferred.reject
     });
 
-    if (!firstInQueue) {
-      return;
-    }
-
-    if (options.timeout === 0) {
-      promise.reject({ status: -1 });
-      return;
-    }
-
-    return $.ajax({
-      type: 'POST',
-      url: options.url,
-      data: {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: options.sourceType
-        })
-      },
-      timeout: options.timeout
-    }).success(function (data) {
-      data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
-      // TODO: Display warning in autocomplete when an entity can't be found
-      // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
-      // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
-      if (!data.notFound && self.successResponseIsError(data)) {
-        // When not found we at least cache the response to prevent a bunch of unnecessary calls
-        promise.reject(data);
-      } else {
-        // Safe to assume all requests in the queue have the same cacheCondition
-        if (!options.noCache && data.status === 0 && options.cacheCondition(data)) {
-          var cacheIdentifier = self.getAssistCacheIdentifier(options);
-          cachedData = $.totalStorage(cacheIdentifier) || {};
-          cachedData[options.url] = {
-            timestamp: (new Date()).getTime(),
-            data: data
-          };
-          $.totalStorage(cacheIdentifier, cachedData);
-        }
-        promise.resolve(data);
-      }
-    }).fail(promise.reject);
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -2179,6 +2146,7 @@ var ApiHelper = (function () {
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.url
+   * @param {boolean} options.refreshCache
    * @param {string} [options.hash] - Optional hash to use as well as the url
    * @param {Function} options.fetchFunction
    * @param {Function} options.successCallback
@@ -2192,7 +2160,7 @@ var ApiHelper = (function () {
     var cachedData = $.totalStorage(cacheIdentifier) || {};
     var cachedId = options.hash ? options.url + options.hash : options.url;
 
-    if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
+    if (options.refreshCache || typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }
@@ -2223,7 +2191,7 @@ var ApiHelper = (function () {
      */
     getInstance: function () {
       if (instance === null) {
-        instance = new ApiHelper(ApiHelperGlobals.i18n, ApiHelperGlobals.user);
+        instance = new ApiHelper();
       }
       return instance;
     }

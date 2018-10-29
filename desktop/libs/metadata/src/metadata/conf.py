@@ -56,21 +56,24 @@ def get_optimizer_url():
 def has_optimizer():
   return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
+def has_workload_analytics():
+  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
+
 
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
 def has_navigator(user):
+  from desktop.auth.backend import is_admin
   return bool(get_navigator_url() and get_navigator_auth_password()) \
-      and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
 def get_security_default():
-  '''Get default security value from Hadoop'''
-  from hadoop import cluster # Avoid dependencies conflicts
-  cluster = cluster.get_yarn()
+  '''Get if Sentry is available so that we filter the objects or not'''
+  from libsentry.conf import is_enabled
 
-  return cluster.SECURITY_ENABLED.get()
+  return is_enabled()
 
 
 def get_optimizer_password_script():
@@ -129,11 +132,23 @@ OPTIMIZER = ConfigSection(
       key='cacheable_ttl',
       type=int,
       help=_t('The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 to disable the cache.'),
-      default=7 * 24 * 60 * 60 * 1000),
+      default=10 * 24 * 60 * 60 * 1000),
     AUTO_UPLOAD_QUERIES = Config(
       key="auto_upload_queries",
       help=_t("Automatically upload queries after their execution in order to improve recommendations."),
       default=True,
+      type=coerce_bool
+    ),
+    AUTO_UPLOAD_DDL = Config(
+      key="auto_upload_ddl",
+      help=_t("Automatically upload queried tables DDL in order to improve recommendations."),
+      default=True,
+      type=coerce_bool
+    ),
+    AUTO_UPLOAD_STATS = Config(
+      key="auto_upload_stats",
+      help=_t("Automatically upload queried tables and columns stats in order to improve recommendations."),
+      default=False,
       type=coerce_bool
     ),
     QUERY_HISTORY_UPLOAD_LIMIT = Config(
@@ -143,6 +158,63 @@ OPTIMIZER = ConfigSection(
       type=int
     ),
   )
+)
+
+
+ALTUS = ConfigSection(
+  key='altus',
+  help=_t("""Configuration options for Altus API"""),
+  members=dict(
+    HOSTNAME=Config(
+      key='hostname',
+      help=_t('Hostname prefix to Altus API or compatible service.'),
+      default='sdxapi.us-west-1.altus.cloudera.com'),
+    HOSTNAME_ANALYTICDB=Config(
+      key='hostname_analyticdb',
+      help=_t('Hostname prefix to Altus ADB API or compatible service.'),
+      default='analyticdbapi.us-west-1.altus.cloudera.com'),
+    HOSTNAME_DATAENG=Config(
+      key='hostname_dataeng',
+      help=_t('Hostname prefix to Altus DE API or compatible service.'),
+      default='dataengapi.us-west-1.altus.cloudera.com'),
+    HOSTNAME_WA=Config(
+      key='hostname_wa',
+      help=_t('Hostname prefix to Altus WA API or compatible service.'),
+      default='waapi.us-west-1.altus.cloudera.com'),
+    HAS_WA = Config(
+      key="has_wa",
+      help=_t("Switch to turn on workload analytics insights."),
+      default=True,
+      type=coerce_bool),
+    AUTH_KEY_ID=Config(
+      key="auth_key_id",
+      help=_t("The name of the key of the service."),
+      private=False,
+      default=None),
+    AUTH_KEY_SECRET=Config(
+      key="auth_key_secret",
+      help=_t("The private part of the key associated with the auth_key."),
+      private=True,
+      default=None)
+  )
+)
+
+K8S = ConfigSection(
+  key='k8s',
+  help=_t("""Configuration options for Kubernetes API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('API URL to Kubernetes API or compatible service.'),
+      default='http://provisioner.com/'),
+  )
+)
+
+DEFAULT_PUBLIC_KEY = Config(
+  key="default_publick_key",
+  help=_t("Public key used for cluster creation."),
+  type=str,
+  default=''
 )
 
 
@@ -286,6 +358,20 @@ NAVIGATOR = ConfigSection(
       default=False
     )
   )
+)
+
+
+MANAGER = ConfigSection(
+  key='manager',
+  help=_t("""Configuration options for Manager API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to API.'),
+      default=None),
+  )
+  # username comes from get_navigator_auth_username()
+  # password comes from get_navigator_auth_password()
 )
 
 

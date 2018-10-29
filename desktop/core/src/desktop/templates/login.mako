@@ -18,7 +18,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
   from desktop.views import commonheader, commonfooter
-  from useradmin.password_policy import is_password_policy_enabled, get_password_hint
+  from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
   from desktop.conf import is_hue4
 %>
 
@@ -42,6 +42,10 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     bottom: 0;
     background-color: #0B7FAD;
     height: 6px;
+    width: 100%;
+  }
+
+  select {
     width: 100%;
   }
 </style>
@@ -76,6 +80,12 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       %endif
     </div>
     <h3>Query. Explore. Repeat.</h3>
+
+    %if 'OIDCBackend' in backend_names:
+      <button title="${ _('Single Sign-on') }" class="btn btn-primary" onclick="location.href='/oidc/authenticate/'">${ _('Single Sign-on') }</button>
+
+      <hr class="separator-line"/>
+    %endif
 
     %if first_login_ever:
       <div class="alert alert-info center">
@@ -114,8 +124,20 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     ${ form['password'].errors | n,unicode }
 
     %if active_directory:
-    <div>
-      ${ form['server'] | n,unicode }
+    <div
+      %if 'server' in form.fields and len(form.fields['server'].choices) == 1:
+        class="hide"
+      %endif
+      >
+      %if 'server' in form.fields:
+        ${ form['server'] | n,unicode }
+      %endif
+    </div>
+    %endif
+
+    %if 'ImpersonationBackend' in backend_names:
+    <div class="text-input">
+      ${ form['login_as'] | n,unicode }
     </div>
     %endif
 

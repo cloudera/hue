@@ -135,7 +135,7 @@ class TestDocumentConverter(object):
       assert_equal(doch.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
-      assert_equal('hive', doc2.data_dict['sessions'][0]['type'])
+      assert_false(doc2.data_dict['sessions'])
 
       # Verify snippet values
       assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
@@ -368,7 +368,7 @@ class TestDocumentConverter(object):
       u'files': '["hello.py"]',
       u'name': 'Shell',
       u'job_properties': '[{"name": "mapred.job.queue.name", "value": "test"}]',
-      u'capture_output': 'on',
+      u'capture_output': True,
       u'command': 'hello.py',
       u'archives': '[{"dummy": "", "name": "test.zip"}]',
       u'prepares': '[]',
@@ -435,7 +435,7 @@ class TestDocumentConverter(object):
       'job_properties': '[{"name": "mapred.job.queue.name", "value": "test"}]',
       "prepares": '[{"value":"/test","type":"mkdir"}]',
       "archives": '[{"dummy":"","name":"my_archive"},{"dummy":"","name":"my_archive2"}]',
-      "capture_output": "on",
+      "capture_output": True,
     })
     Link(parent=action, child=wf.end, name="ok").save()
 

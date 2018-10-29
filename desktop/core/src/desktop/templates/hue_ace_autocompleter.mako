@@ -22,7 +22,7 @@ from desktop.views import _ko
 <%def name="hueAceAutocompleter()">
   <script type="text/html" id="hue-ace-autocompleter">
     <!-- ko if: active() && (suggestions.filtered().length !== 0 || suggestions.loading()) -->
-    <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }, event: { mousewheel: function (data, event) { event.stopPropagation(); }}">
+    <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }">
       <div class="autocompleter-suggestions">
         <!-- ko if: suggestions.availableCategories().length > 1 || suggestions.loading() -->
         <div class="autocompleter-header">
@@ -34,25 +34,33 @@ from desktop.views import _ko
           <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
         </div>
         <!-- /ko -->
-        <div class="autocompleter-entries" data-bind="foreach: suggestions.filtered, niceScroll">
-          <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
-              css: { 'selected': $index() === $parent.selectedIndex() },
-              event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
-            <div class="autocompleter-suggestion-value">
-              <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key === 'true' --><i class="fa fa-key"></i><!-- /ko -->
+        <div class="autocompleter-entries">
+          <div data-bind="foreachVisible: { data: suggestions.filtered, minHeight: 25, container: '.autocompleter-entries' }">
+            <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index() + $indexOffset()); $parent.insertSuggestion(); $parent.editor().focus(); },
+                css: { 'selected': $index() + $indexOffset() === $parent.selectedIndex() },
+                event: { 'mouseover': function () { $parent.hoveredIndex($index() + $indexOffset()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
+              <div class="autocompleter-suggestion-value">
+                <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key === 'true' --><i class="fa fa-key"></i><!-- /ko -->
+              </div>
+              <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
-            <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
           </div>
         </div>
       </div>
       <!-- ko if: focusedEntry() && focusedEntry().details -->
-      <!-- ko template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
+      <!-- ko template: { name: 'autocomplete-' + (focusedEntry().hasCatalogEntry ? 'catalog-details-' : 'details-') + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-keyword">
+  </script>
+
+  <script type="text/html" id="autocomplete-details-solr-field">
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-solr-field">
   </script>
 
   <script type="text/html" id="autocomplete-details-udf">
@@ -83,6 +91,18 @@ from desktop.views import _ko
   <script type="text/html" id="autocomplete-details-database">
   </script>
 
+  <script type="text/html" id="autocomplete-catalog-details-database">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">
+        <i class="fa fa-fw fa-database"></i> <span data-bind="text: details.getTitle()"></span>
+      </div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details } }">
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="autocomplete-details-table">
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
@@ -99,6 +119,21 @@ from desktop.views import _ko
           <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
           <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
           <!-- /ko -->
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-table">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">
+        <i class="fa fa-fw" data-bind="css: { 'fa-eye': details.isView(), 'fa-table': details.isTable() }"></i> <span data-bind="text: details.getTitle()"></span>
+        <!-- ko if: popular() && relativePopularity -->
+        <div class="autocompleter-header-popularity" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i></div>
+        <!-- /ko -->
+      </div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details } }">
         </div>
       </div>
     </div>
@@ -136,14 +171,41 @@ from desktop.views import _ko
     <!-- /ko -->
   </script>
 
+  <script type="text/html" id="autocomplete-catalog-details-column">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">
+        <i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span>
+        <!-- ko if: popular() && relativePopularity -->
+        <div class="autocompleter-header-popularity" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i></div>
+        <!-- /ko -->
+      </div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details } }">
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="autocomplete-details-variable">
   </script>
 
   <script type="text/html" id="autocomplete-details-hdfs">
     <div class="autocompleter-details">
-      <div class="autocompleter-details-contents-inner">
-        <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
-        <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"></div>
+      <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner">
+          <!-- ko with: details -->
+          <div class="assist-details-wrap">
+            <div><div class="assist-details-header">${ _('Size') }</div><div class="assist-details-value" data-bind="text: humansize"></div></div>
+            <!-- ko with: stats -->
+            <div><div class="assist-details-header">${ _('User') }</div><div class="assist-details-value" data-bind="text: user"></div></div>
+            <div><div class="assist-details-header">${ _('Group') }</div><div class="assist-details-value" data-bind="text: group"></div></div>
+            <!-- /ko -->
+            <div><div class="assist-details-header">${ _('Permissions') }</div><div class="assist-details-value" data-bind="text: rwx"></div></div>
+            <div><div class="assist-details-header">${ _('Date') }</div><div class="assist-details-value" data-bind="text: mtime"></div></div>
+          </div>
+          <!-- /ko -->
+        </div>
       </div>
     </div>
   </script>
@@ -198,6 +260,15 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-value">
+    <!-- ko if: value.length > 31 -->
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">${ _('Value')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" style="word-wrap: break-word; white-space: normal" data-bind="text: value">
+        </div>
+      </div>
+    </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-identifier">
@@ -222,6 +293,15 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="autocomplete-catalog-details-group-by">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular group by')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details, showTitle: true } }"></div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="autocomplete-details-order-by">
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
@@ -234,6 +314,15 @@ from desktop.views import _ko
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-order-by">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details, showTitle: true } }"></div>
       </div>
     </div>
   </script>
@@ -295,9 +384,10 @@ from desktop.views import _ko
         var self = this;
         self.disposeFunctions = [];
         self.editor = params.editor;
-        self.snippet = params.snippet;
+        self.snippet = params.snippet || {};
+        self.foreachVisible = ko.observable();
 
-        self.autocompleter = new SqlAutocompleter3(params);
+        self.autocompleter = params.autocompleter || new SqlAutocompleter3(params);
         self.suggestions = self.autocompleter.suggestions;
 
         self.active = ko.observable(false).extend({ rateLimit: 10 }); // to prevent flickering on empty result
@@ -328,6 +418,11 @@ from desktop.views import _ko
               self.editor().execCommand('golineup');
             } else if (self.selectedIndex() > 0) {
               self.selectedIndex(self.selectedIndex() - 1);
+              self.hoveredIndex(null);
+              self.scrollSelectionIntoView();
+            } else {
+              self.selectedIndex(self.suggestions.filtered().length - 1);
+              self.hoveredIndex(null);
               self.scrollSelectionIntoView();
             }
           },
@@ -337,6 +432,11 @@ from desktop.views import _ko
               self.editor().execCommand('golinedown');
             } else if (self.selectedIndex() < self.suggestions.filtered().length - 1) {
               self.selectedIndex(self.selectedIndex() + 1);
+              self.hoveredIndex(null);
+              self.scrollSelectionIntoView();
+            } else {
+              self.selectedIndex(0);
+              self.hoveredIndex(null);
               self.scrollSelectionIntoView();
             }
           },
@@ -346,6 +446,7 @@ from desktop.views import _ko
               self.editor().execCommand('gotostart');
             } else {
               self.selectedIndex(0);
+              self.hoveredIndex(null);
               self.scrollSelectionIntoView();
             }
           },
@@ -355,6 +456,7 @@ from desktop.views import _ko
               self.editor().execCommand('gotoend');
             } else if (self.suggestions.filtered().length > 0 ) {
               self.selectedIndex(self.suggestions.filtered().length - 1);
+              self.hoveredIndex(null);
               self.scrollSelectionIntoView();
             }
           },
@@ -386,7 +488,11 @@ from desktop.views import _ko
             self.detach();
           } else {
             changeTimeout = window.setTimeout(function () {
-              self.suggestions.filter(self.editor().session.getTextRange({ start: self.base, end: self.editor().getCursorPosition() }));
+              var pos = self.editor().getCursorPosition();
+              if (self.active() && self.autocompleter.onPartial) {
+                self.autocompleter.onPartial(aceUtil.retrievePrecedingIdentifier(self.editor().session.getLine(pos.row), pos.column));
+              }
+              self.suggestions.filter(self.editor().session.getTextRange({ start: self.base, end: pos }));
               if (self.suggestions.filtered().length === 0) {
                 self.detach();
               }
@@ -551,19 +657,8 @@ from desktop.views import _ko
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
         var self = this;
-        var $autocompleterList = $('.autocompleter-entries');
-        var selected = $autocompleterList.children().eq(self.selectedIndex());
-        var selectedTop = selected.position().top;
-        if (selectedTop < 0) {
-          $autocompleterList.scrollTop($autocompleterList.scrollTop() + selectedTop);
-          return;
-        }
-        var selectedHeight = selected.outerHeight(true);
-        var listHeight = $autocompleterList.innerHeight();
-
-        var diff = (selectedHeight + selectedTop) - listHeight;
-        if (diff > 0) {
-          $autocompleterList.scrollTop($autocompleterList.scrollTop() + diff);
+        if (self.foreachVisible()) {
+          self.foreachVisible().scrollToIndex(self.selectedIndex());
         }
       };
 
@@ -572,6 +667,87 @@ from desktop.views import _ko
           return new HueAceAutocompleter(params, componentInfo.element);
         }},
         template: { element: 'hue-ace-autocompleter' }
+      });
+    })();
+  </script>
+
+  <script type="text/html" id="data-catalog-mini-context">
+    <!-- ko if: catalogEntry.isColumn() -->
+    <!-- ko ifnot: showTitle -->
+    <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: catalogEntry.path[0]"></span>.<span data-bind="text: catalogEntry.path[1]"></span></div>
+    <!-- /ko -->
+    <!-- ko if: showTitle -->
+    <div class="details-attribute" ><i class="fa fa-columns fa-fw"></i> <span data-bind="text: catalogEntry.getTitle()"></span></div>
+    <!-- /ko -->
+    <!-- ko if: catalogEntry.isPartitionKey() -->
+    <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Partition key') }</div>
+    <!-- /ko -->
+    <!-- ko if: catalogEntry.isPrimaryKey() -->
+    <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: loading -->
+    <div class="details-comment" ><!-- ko hueSpinner: { spin: loading, size: 'small', inline: true } --><!-- /ko --></div>
+    <!-- /ko -->
+    <!-- ko ifnot: loading -->
+    <!-- ko if: comment() -->
+    <div class="details-comment" data-bind="text: comment"></div>
+    <!-- /ko -->
+    <!-- ko ifnot: comment() -->
+    <div class="details-no-comment">
+      ${ _('No description') }
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+
+      var COMMENT_LOAD_DELAY = 1500;
+
+      function DataCatalogMiniContext (params) {
+        var self = this;
+        self.catalogEntry = params.catalogEntry;
+        self.filter = params.filter;
+        self.comment = ko.observable();
+        self.popularity = ko.observable();
+        self.showTitle = !!params.showTitle;
+        self.loading = ko.observable(false);
+
+        self.loadTimeout = -1;
+        self.activePromises = [];
+
+        if (self.catalogEntry.hasResolvedComment()) {
+          self.comment(self.catalogEntry.getResolvedComment());
+        } else {
+          self.loading(true);
+          self.loadTimeout = window.setTimeout(function () {
+            self.activePromises.push(self.catalogEntry.getComment({ silenceErrors: true, cancellable: true }).done(self.comment).always(function () {
+              self.loading(false);
+            }));
+          }, COMMENT_LOAD_DELAY);
+        }
+
+        if (self.catalogEntry.navOptPopularity && self.catalogEntry.navOptPopularity.relativePopularity) {
+          self.popularity(self.catalogEntry.navOptPopularity.relativePopularity);
+        }
+      }
+
+      DataCatalogMiniContext.prototype.dispose = function () {
+        var self = this;
+        window.clearTimeout(self.loadTimeout);
+        while (self.activePromises.length) {
+          var promise = self.activePromises.pop();
+          if (promise.cancel) {
+            promise.cancel();
+          }
+        }
+      };
+
+      ko.components.register('dataCatalogMiniContext', {
+        viewModel: DataCatalogMiniContext,
+        template: { element: 'data-catalog-mini-context' }
       });
     })();
   </script>

@@ -15,13 +15,15 @@
 ## limitations under the License.
 
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.conf import IS_HUE_4
 from desktop.views import commonheader, commonfooter
 from metadata.conf import OPTIMIZER, has_optimizer
+
+from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
@@ -36,13 +38,13 @@ ${ layout.menubar(section='quick_start') }
   <div class="row-fluid" style="margin-bottom: 100px;">
     <div>
       <h1 class="margin-top-20 margin-bottom-30">
-        % if user.is_superuser:
+        % if is_admin(user):
           ${ _('Quick Start Wizard') } -
         % endif
         Hue&trade; ${version} - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Open gethue.com in a new window.') }">${ _("Query. Explore. Repeat.") }</a>
       </h1>
 
-     % if user.is_superuser:
+     % if is_admin(user):
 
       <div class="margin-bottom-30">
          <div class="row-fluid">
@@ -139,7 +141,7 @@ ${ layout.menubar(section='quick_start') }
                     </a>
                   </li>
               % endif
-              % if IS_HUE_4.get():
+              % if IS_HUE_4.get() and 'oozie' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">
@@ -190,7 +192,7 @@ ${ layout.menubar(section='quick_start') }
                 <i class="fa fa-home"></i> ${ _('Landing page') }
               </a>
               % else:
-                <a href="${ url('desktop.views.home2') }">
+                <a href="${ url('desktop_views_home2') }">
                   <i class="fa fa-home"></i> ${ _('Home') }
                 </a>
               % endif
@@ -227,7 +229,7 @@ ${ layout.menubar(section='quick_start') }
           <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
           % if not user.is_authenticated():
             <br/>
-            <a href="${ url('desktop.views.home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+            <a href="${ url('desktop_views_home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
           % endif
         </p>
        </div>
@@ -238,7 +240,7 @@ ${ layout.menubar(section='quick_start') }
 
 </div>
 
-% if user.is_superuser:
+% if is_admin(user):
 <style type="text/css">
   .steps {
     min-height: 300px;
@@ -378,7 +380,7 @@ $(document).ready(function(){
   });
 
   $("#doneBtn").click(function () {
-    location.href = "${ is_embeddable and '/' or url('desktop.views.home2') }";
+    location.href = "${ is_embeddable and '/' or url('desktop_views_home2') }";
   });
 
   $(".updatePreferences").click(function () {

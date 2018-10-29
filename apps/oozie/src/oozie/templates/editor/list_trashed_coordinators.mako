@@ -57,7 +57,7 @@ ${ layout.menubar(section='coordinators') }
   <table id="coordinatorTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="coordinatorCheck"></div></th>
+        <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="coordinatorCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Workflow') }</th>
@@ -71,7 +71,7 @@ ${ layout.menubar(section='coordinators') }
       %for coordinator in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox coordinatorCheck fa" data-row-selector-exclude="true" data-coordinator-id="${ coordinator.id }"></div>
+            <div class="hue-checkbox coordinatorCheck fa" data-row-selector-exclude="true" data-coordinator-id="${ coordinator.id }"></div>
           </td>
           <td>${ coordinator.name }</td>
           <td>${ coordinator.description }</td>
@@ -183,8 +183,8 @@ ${ layout.menubar(section='coordinators') }
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox[checked='checked']");
-      var can_write = $(".hueCheckbox[checked='checked'][data-coordinator-id]");
+      var selector = $(".hue-checkbox[checked='checked']");
+      var can_write = $(".hue-checkbox[checked='checked'][data-coordinator-id]");
       if (can_write.length >= 1 && can_write.length == selector.length) {
         $("#destroy-btn").removeAttr("disabled");
         $("#restore-btn").removeAttr("disabled");
@@ -193,7 +193,7 @@ ${ layout.menubar(section='coordinators') }
 
     $("#purge-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox").each(function( index ) {
+      $(".hue-checkbox").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("coordinator-id"));
       });
       $("#purge-job").modal("show");
@@ -201,7 +201,7 @@ ${ layout.menubar(section='coordinators') }
 
     $("#destroy-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("coordinator-id"));
       });
       $("#destroy-job").modal("show");
@@ -209,7 +209,7 @@ ${ layout.menubar(section='coordinators') }
 
     $("#restore-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("coordinator-id"));
       });
       $("#restore-job").modal("show");

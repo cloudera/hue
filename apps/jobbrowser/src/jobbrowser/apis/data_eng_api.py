@@ -21,8 +21,7 @@ from datetime import datetime,  timedelta
 
 from django.utils.translation import ugettext as _
 
-from desktop.models import Cluster, DATAENG
-from notebook.connectors.dataeng import DataEng, DATE_FORMAT
+from notebook.connectors.altus import DataEngApi, DATE_FORMAT
 
 from jobbrowser.apis.base_api import Api
 
@@ -30,10 +29,13 @@ from jobbrowser.apis.base_api import Api
 LOG = logging.getLogger(__name__)
 
 
+RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
+
+
 class DataEngClusterApi(Api):
 
   def apps(self, filters):
-    api = DataEng(self.user)
+    api = DataEngApi(self.user)
 
     jobs = api.list_clusters()
 
@@ -43,13 +45,14 @@ class DataEngClusterApi(Api):
         'name': '%(clusterName)s' % app,
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
-        'type': '%(serviceType)s %(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
+        'type': 'Altus %(serviceType)s %(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
         'user': app['clusterName'].split('-', 1)[0],
         'progress': 100,
         'queue': 'group',
         'duration': 1,
-        'submitted': app['creationDate']
-      } for app in jobs['clusters']],
+        'submitted': app['creationDate'],
+        'canWrite': True
+      } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
       'total': len(jobs)
     }
 
@@ -59,10 +62,23 @@ class DataEngClusterApi(Api):
 
 
   def action(self, appid, action):
-    return {}
+    message = {'message': '', 'status': 0}
+
+    if action.get('action') == 'kill':
+      api = DataEngApi(self.user)
+
+      for _id in appid:
+        result = api.delete_cluster(_id)
+        if result.get('error'):
+          message['message'] = result.get('error')
+          message['status'] = -1
+        elif result.get('contents') and message.get('status') != -1:
+          message['message'] = result.get('contents')
+
+    return message;
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
 
@@ -70,9 +86,9 @@ class DataEngClusterApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'TERMINATING']:
+    if status in ['CREATING', 'CREATED']:
       return 'RUNNING'
-    elif status in ['ARCHIVING', 'COMPLETED']:
+    elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING']:
       return 'SUCCEEDED'
     else:
       return 'FAILED' # KILLED and FAILED
@@ -91,45 +107,43 @@ class DataEngJobApi(Api):
       else:
         delta = timedelta(days=int(filters['time']['time_value']))
       kwargs['creation_date_after'] = (datetime.today() - delta).strftime(DATE_FORMAT)
+    # Todo: filter on 'cluster_crn'
 
-    # Could also come from filters
-    cluster = Cluster(self.user)
-    if cluster.get_type() == DATAENG:
-      kwargs['cluster_crn'] = cluster.get_id()
-
-    api = DataEng(self.user)
+    api = DataEngApi(self.user)
 
     jobs = api.list_jobs(**kwargs)
 
     return {
       'apps': [{
         'id': app['jobId'],
-        'name': app['creationDate'],
+        'name': app['jobName'],
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
-        'type': app['jobType'],
+        'type': 'Altus %(jobType)s' % app,
         'user': '',
-        'progress': 100,
+        'progress': 50 if self._api_status(app['status']) == 'RUNNING' else 100,
         'duration': 10 * 3600,
-        'submitted': app['creationDate']
+        'submitted': app['creationDate'],
+        'canWrite': True
       } for app in jobs['jobs']],
       'total': len(jobs)
     }
 
   def app(self, appid):
-    handle = DataEng(self.user).describe_job(job_id=appid)
+    handle = DataEngApi(self.user).describe_job(job_id=appid)
 
     job = handle['job']
 
     common = {
         'id': job['jobId'],
-        'name': job['jobId'],
+        'name': job['jobName'],
         'status': job['status'],
         'apiStatus': self._api_status(job['status']),
-        'progress': 50,
+        'progress': 50 if self._api_status(job['status']) == 'RUNNING' else 100,
         'duration': 10 * 3600,
         'submitted': job['creationDate'],
         'type': 'dataeng-job-%s' % job['jobType'],
+        'canWrite': True
     }
 
     common['properties'] = {
@@ -143,7 +157,7 @@ class DataEngJobApi(Api):
     return {}
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
 
@@ -151,7 +165,7 @@ class DataEngJobApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'TERMINATING']:
+    if status in RUNNING_STATES:
       return 'RUNNING'
     elif status in ['COMPLETED']:
       return 'SUCCEEDED'

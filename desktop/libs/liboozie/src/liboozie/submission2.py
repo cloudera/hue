@@ -29,14 +29,18 @@ from beeswax.hive_site import get_hive_site_content
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import find_variables
+from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2
-from hadoop import cluster
-from hadoop.fs.hadoopfs import Hdfs
+from indexer.conf import CONFIG_JDBC_LIBS_PATH
+from metadata.conf import ALTUS
 from oozie.utils import convert_to_server_timezone
 
-from liboozie.oozie_api import get_oozie
+from hadoop import cluster
+from hadoop.fs.hadoopfs import Hdfs
+
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
 from liboozie.credentials import Credentials
+from liboozie.oozie_api import get_oozie
 
 
 LOG = logging.getLogger(__name__)
@@ -206,6 +210,80 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
+        elif action.data['type'] == 'altus' or \
+            (action.data['type'] == 'spark-document' and 'altus' in self.properties.get('cluster', '')) or \
+            (self.properties.get('auto-cluster') and 'document' in action.data['type']):
+          is_altus_job = 'altus' in self.properties.get('cluster', '') and action.data['type'] != 'altus'
+          is_scheduled_altus_job = self.properties.get('auto-cluster')
+
+          self._create_file(deployment_dir, action.data['name'] + '.sh', '''#!/usr/bin/env bash
+
+export PYTHONPATH=`pwd`
+
+echo 'Starting Altus command...'
+
+python altus.py
+
+          ''')
+
+          if is_altus_job:
+            shell_script = self._generate_altus_job_action_script(
+                service='dataeng',
+                cluster=self.properties['cluster'],
+                jobs=[{
+                    'sparkJob': {
+                        'jars': [u's3a://datawarehouse-customer360/ETL/spark-examples.jar'],
+                        'mainClass': u'org.apache.spark.examples.SparkPi ',
+                        'applicationArguments': [u'10']
+                      },
+                    'name': None,
+                    'failureAction': 'NONE'
+                }],
+                auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+            )
+          elif is_scheduled_altus_job:
+            shell_script = self._generate_altus_job_action_script(
+                service='dataeng',
+                cluster=self.properties['auto-cluster'],
+                jobs=[],
+                auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+            )
+          else:
+            if action.data['properties'].get('service', '').lower().strip().startswith('query'):
+              shell_script = self._generate_altus_warehouse_query_script(
+                cluster_crn=action.data['properties'].get('service').split(' ')[-1],
+                query=action.data['properties'].get('command'),
+                auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+              )
+            else:
+              shell_script = self._generate_altus_action_script(
+                  service=action.data['properties'].get('service'),
+                  command=action.data['properties'].get('command'),
+                  arguments=dict([arg.split('=', 1) for arg in action.data['properties'].get('arguments', [])]),
+                  auth_key_id=ALTUS.AUTH_KEY_ID.get(),
+                  auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+              )
+            
+          self._create_file(deployment_dir, 'altus.py', shell_script)
+
+          ext_py_lib_path = os.path.join(get_desktop_root(), 'core', 'ext-py')
+          lib_dir_path = os.path.join(self.job.deployment_dir, 'lib')
+          libs = [
+            (os.path.join(ext_py_lib_path, 'navoptapi-0.1.0'), 'navoptapi'),
+            (os.path.join(ext_py_lib_path, 'navoptapi-0.1.0'), 'altuscli'),
+            (os.path.join(ext_py_lib_path, 'asn1crypto-0.24.0'), 'asn1crypto'),
+            (os.path.join(ext_py_lib_path, 'rsa-3.4.2'), 'rsa'),
+            (os.path.join(ext_py_lib_path, 'pyasn1-0.1.8'), 'pyasn1'),
+          ]
+          for source_path, name in libs:
+            destination_path = os.path.join(lib_dir_path, name)
+            if not self.fs.do_as_user(self.user, self.fs.exists, destination_path):
+              # Note: would be much faster to have only one zip archive
+              self.fs.do_as_user(self.user, self.fs.copyFromLocal, os.path.join(source_path, name), destination_path)
+
         elif action.data['type'] == 'impala' or action.data['type'] == 'impala-document':
           from oozie.models2 import _get_impala_url
           from impala.impala_flags import get_ssl_server_certificate
@@ -288,12 +366,20 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
           statements = notebook.get_data()['snippets'][0]['statement_raw']
 
           self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
-        elif action.data['type'] == 'spark':
+        elif action.data['type'] in ('spark', 'spark-document') or (
+              action.data['type'] in ('sqoop', 'sqoop-document') and action.data['properties']['statement'] in '--hive-import'):
           if not [f for f in action.data.get('properties').get('files', []) if f.get('value').endswith('hive-site.xml')]:
             hive_site_lib = Hdfs.join(deployment_dir + '/lib/', 'hive-site.xml')
             hive_site_content = get_hive_site_content()
             if not self.fs.do_as_user(self.user, self.fs.exists, hive_site_lib) and hive_site_content:
               self.fs.do_as_user(self.user, self.fs.create, hive_site_lib, overwrite=True, permission=0700, data=smart_str(hive_site_content))
+          if action.data['type'] in ('sqoop', 'sqoop-document'):
+            if CONFIG_JDBC_LIBS_PATH.get() and CONFIG_JDBC_LIBS_PATH.get() not in self.properties.get('oozie.libpath', ''):
+              LOG.debug("Adding to oozie.libpath %s" % CONFIG_JDBC_LIBS_PATH.get())
+              paths = [CONFIG_JDBC_LIBS_PATH.get()]
+              if self.properties.get('oozie.libpath'):
+                paths.append(self.properties['oozie.libpath'])
+              self.properties['oozie.libpath'] = ','.join(paths)
 
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)
@@ -492,9 +578,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       if self._do_as(self.user.username , self.fs.exists, path):
         self._do_as(self.user.username , self.fs.rmtree, path)
     except Exception, ex:
-      LOG.warn("Failed to clean up workflow deployment directory for "
-               "%s (owner %s). Caused by: %s",
-               self.job.name, self.user, ex)
+      LOG.warn("Failed to clean up workflow deployment directory for %s (owner %s). Caused by: %s", self.job.name, self.user, ex)
 
   def _is_workflow(self):
     from oozie.models2 import Workflow
@@ -511,6 +595,208 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     else:
       self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
     LOG.debug("Created/Updated %s" % (file_path,))
+
+  def _generate_altus_action_script(self, service, command, arguments, auth_key_id, auth_key_secret):
+    if service == 'analyticdb' or service == 'dataware':
+      hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
+    elif service == 'dataeng':
+      hostname = ALTUS.HOSTNAME_DATAENG.get()
+    elif service == 'wa':
+      hostname = ALTUS.HOSTNAME_WA.get()
+    else:
+      hostname = ALTUS.HOSTNAME.get()
+
+    return """#!/usr/bin/env python
+
+from navoptapi.api_lib import ApiLib
+
+hostname = '%(hostname)s'
+auth_key_id = '%(auth_key_id)s'
+auth_key_secret = '''%(auth_key_secret)s'''
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    print e
+    raise e
+
+print _exec('%(service)s', '%(command)s', %(args)s)
+
+""" % {
+      'hostname': hostname,
+      'service': service,
+      'command': command,
+      'args': arguments,
+      'auth_key_id': auth_key_id,
+      'auth_key_secret': auth_key_secret
+    }
+
+  def _generate_altus_job_action_script(self, service, cluster, jobs, auth_key_id, auth_key_secret):
+    if service == 'analyticdb' or service == 'dataware':
+      hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
+    elif service == 'dataeng':
+      hostname = ALTUS.HOSTNAME_DATAENG.get()
+    elif service == 'wa':
+      hostname = ALTUS.HOSTNAME_WA.get()
+    else:
+      hostname = ALTUS.HOSTNAME.get()
+
+    if type(cluster) == dict:
+      command = 'createAWSCluster'
+      arguments = cluster
+    else:
+      command = 'submitJobs'
+      arguments = {'clusterName': cluster, 'jobs': jobs}
+
+    return """#!/usr/bin/env python
+
+import time
+
+from ast import literal_eval
+
+from navoptapi.api_lib import ApiLib
+
+hostname = '%(hostname)s'
+arguments = literal_eval("%(arguments)s")
+auth_key_id = '%(auth_key_id)s'
+auth_key_secret = '''%(auth_key_secret)s'''
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    print e
+    raise e
+
+
+try:    
+  handle = _exec('%(service)s', '%(command)s', arguments)
+  
+  if 'create' in '%(command)s':
+    handle = _exec('%(service)s', 'listJobs', {'clusterCrn': handle['cluster']['crn']})
+
+  while handle['jobs']:
+    job = handle['jobs'].pop(0)
+    status = 'QUEUED'
+    print 'Job submitted: %%(jobId)s' %% job
+  
+    while status in ('QUEUED', 'RUNNING', 'SUBMITTING'):
+      time.sleep(5)
+  
+      print 'Checking status...'
+      status = _exec('%(service)s', 'describeJob', {'jobId': job['jobId']})['job']['status']
+  
+    if status != 'COMPLETED':
+      raise Exception('Job %%s failed %%s' %% (job['jobId'], status))
+    else:
+      print 'Job %%(jobId)s completed successfully' %% job
+except Exception, e:
+  print e
+  raise e
+
+""" % {
+      'service': service,
+      'hostname': hostname,      
+      'command': command,
+      'arguments': repr(arguments),
+      'auth_key_id': auth_key_id,
+      'auth_key_secret': auth_key_secret
+    }
+
+  def _generate_altus_warehouse_query_script(self, cluster_crn, query, auth_key_id, auth_key_secret):
+    service = 'dataware'
+    hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
+
+    return """#!/usr/bin/env python
+
+import urllib
+
+from navoptapi.api_lib import ApiLib
+
+hostname = '%(hostname)s'
+auth_key_id = '%(auth_key_id)s'
+auth_key_secret = '''%(auth_key_secret)s'''
+query = '%(query)s'
+cluster_crn = '%(cluster_crn)s'
+payload = '''%(payload)s'''.replace('show+tables', urllib.quote_plus(query.replace('\\n', ' ')))
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    print e
+    raise e
+
+print _exec('%(service)s', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
+
+""" % {
+      'hostname': hostname,
+      'service': service,
+      'cluster_crn': cluster_crn,
+      'query': query,
+      'auth_key_id': auth_key_id,
+      'auth_key_secret': auth_key_secret,
+      'payload': '''{
+              "method": "POST",
+              "url": "http://127.0.0.1:8000/notebook/api/execute/impala",
+              "httpVersion": "HTTP/1.1",
+              "headers": [
+                {
+                  "name": "Accept-Encoding",
+                  "value": "gzip, deflate, br"
+                },
+                {
+                  "name": "Content-Type",
+                  "value": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                {
+                  "name": "Accept",
+                  "value": "*/*"
+                },
+                {
+                  "name": "X-Requested-With",
+                  "value": "XMLHttpRequest"
+                },
+                {
+                  "name": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "queryString": [],
+              "cookies": [
+              ],
+              "postData": {
+                "mimeType": "application/x-www-form-urlencoded; charset=UTF-8",
+                "text": "notebook=%7B%22uuid%22%3A%22f2b8a233-c34c-44b8-a8a1-0e6123996216%22%2C%22name%22%3A%22%22%2C%22description%22%3A%22%22%2C%22type%22%3A%22query-impala%22%2C%22initialType%22%3A%22impala%22%2C%22coordinatorUuid%22%3Anull%2C%22isHistory%22%3Atrue%2C%22isManaged%22%3Afalse%2C%22parentSavedQueryUuid%22%3Anull%2C%22isSaved%22%3Afalse%2C%22onSuccessUrl%22%3Anull%2C%22pubSubUrl%22%3Anull%2C%22isPresentationModeDefault%22%3Afalse%2C%22isPresentationMode%22%3Afalse%2C%22isPresentationModeInitialized%22%3Atrue%2C%22presentationSnippets%22%3A%7B%7D%2C%22isHidingCode%22%3Afalse%2C%22snippets%22%3A%5B%7B%22id%22%3A%22dd5755a3-e8db-82d9-4f98-9f4fb5a99a06%22%2C%22name%22%3A%22%22%2C%22type%22%3A%22impala%22%2C%22isBatchable%22%3Atrue%2C%22aceCursorPosition%22%3A%7B%22column%22%3A33%2C%22row%22%3A0%7D%2C%22errors%22%3A%5B%5D%2C%22aceErrorsHolder%22%3A%5B%5D%2C%22aceWarningsHolder%22%3A%5B%5D%2C%22aceErrors%22%3A%5B%5D%2C%22aceWarnings%22%3A%5B%5D%2C%22editorMode%22%3Atrue%2C%22dbSelectionVisible%22%3Afalse%2C%22isSqlDialect%22%3Atrue%2C%22namespaceRefreshEnabled%22%3Afalse%2C%22availableNamespaces%22%3A%5B%5D%2C%22availableComputes%22%3A%5B%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22default-romain%22%2C%22id%22%3A%22default-romain%22%2C%22name%22%3A%22default-romain%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22compute1%22%2C%22id%22%3A%22compute1%22%2C%22name%22%3A%22compute1%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22compute2%22%2C%22id%22%3A%22compute2%22%2C%22name%22%3A%22compute2%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22altus%22%2C%22namespace%22%3A%22Altus%22%2C%22id%22%3A%22Altus%22%2C%22name%22%3A%22Altus%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22storage1%22%2C%22id%22%3A%22storage1%22%2C%22name%22%3A%22storage1%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22storage2%22%2C%22id%22%3A%22storage2%22%2C%22name%22%3A%22storage2%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22Default%22%2C%22id%22%3A%22Default%22%2C%22name%22%3A%22default%22%7D%5D%2C%22compute%22%3A%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22default-romain%22%2C%22id%22%3A%22default-romain%22%2C%22name%22%3A%22default-romain%22%7D%2C%22database%22%3A%22default%22%2C%22currentQueryTab%22%3A%22queryHistory%22%2C%22pinnedContextTabs%22%3A%5B%5D%2C%22loadingQueries%22%3Afalse%2C%22queriesHasErrors%22%3Afalse%2C%22queriesCurrentPage%22%3A1%2C%22queriesTotalPages%22%3A1%2C%22queriesFilter%22%3A%22%22%2C%22queriesFilterVisible%22%3Afalse%2C%22statementType%22%3A%22text%22%2C%22statementTypes%22%3A%5B%22text%22%2C%22file%22%5D%2C%22statementPath%22%3A%22%22%2C%22externalStatementLoaded%22%3Afalse%2C%22associatedDocumentLoading%22%3Atrue%2C%22associatedDocumentUuid%22%3Anull%2C%22statement_raw%22%3A%22show+tables%3B%22%2C%22statementsList%22%3A%5B%22show+tables%3B%22%5D%2C%22aceSize%22%3A100%2C%22status%22%3A%22running%22%2C%22statusForButtons%22%3A%22executing%22%2C%22properties%22%3A%7B%22files%22%3A%5B%5D%2C%22functions%22%3A%5B%5D%2C%22arguments%22%3A%5B%5D%2C%22settings%22%3A%5B%5D%7D%2C%22viewSettings%22%3A%7B%22placeHolder%22%3A%22Example%3A+SELECT+*+FROM+tablename%2C+or+press+CTRL+%2B+space%22%2C%22sqlDialect%22%3Atrue%7D%2C%22variables%22%3A%5B%5D%2C%22hasCurlyBracketParameters%22%3Atrue%2C%22variableNames%22%3A%5B%5D%2C%22variableValues%22%3A%7B%7D%2C%22statement%22%3A%22show+tables%3B%22%2C%22result%22%3A%7B%22id%22%3A%2206840534-9434-33b5-5eca-2cd08432ceb3%22%2C%22type%22%3A%22table%22%2C%22hasResultset%22%3Atrue%2C%22handle%22%3A%7B%22has_more_statements%22%3Afalse%2C%22statement_id%22%3A0%2C%22statements_count%22%3A1%2C%22previous_statement_hash%22%3A%22acb6478fcf28c31b5e76d49de7d77bbe46fe5e4f9436c16c0ca8ed5f%22%7D%2C%22meta%22%3A%5B%5D%2C%22rows%22%3Anull%2C%22hasMore%22%3Afalse%2C%22statement_id%22%3A0%2C%22statement_range%22%3A%7B%22start%22%3A%7B%22row%22%3A0%2C%22column%22%3A0%7D%2C%22end%22%3A%7B%22row%22%3A0%2C%22column%22%3A0%7D%7D%2C%22statements_count%22%3A1%2C%22previous_statement_hash%22%3Anull%2C%22metaFilter%22%3A%7B%22query%22%3A%22%22%2C%22facets%22%3A%7B%7D%2C%22text%22%3A%5B%5D%7D%2C%22isMetaFilterVisible%22%3Afalse%2C%22filteredMetaChecked%22%3Atrue%2C%22filteredMeta%22%3A%5B%5D%2C%22fetchedOnce%22%3Afalse%2C%22startTime%22%3A%222018-06-12T16%3A15%3A01.951Z%22%2C%22endTime%22%3A%222018-06-12T16%3A15%3A01.951Z%22%2C%22executionTime%22%3A0%2C%22data%22%3A%5B%5D%2C%22explanation%22%3A%22%22%2C%22logs%22%3A%22%22%2C%22logLines%22%3A0%2C%22hasSomeResults%22%3Afalse%7D%2C%22showGrid%22%3Atrue%2C%22showChart%22%3Afalse%2C%22showLogs%22%3Atrue%2C%22progress%22%3A0%2C%22jobs%22%3A%5B%5D%2C%22isLoading%22%3Afalse%2C%22resultsKlass%22%3A%22results+impala%22%2C%22errorsKlass%22%3A%22results+impala+alert+alert-error%22%2C%22is_redacted%22%3Afalse%2C%22chartType%22%3A%22bars%22%2C%22chartSorting%22%3A%22none%22%2C%22chartScatterGroup%22%3Anull%2C%22chartScatterSize%22%3Anull%2C%22chartScope%22%3A%22world%22%2C%22chartTimelineType%22%3A%22bar%22%2C%22chartLimits%22%3A%5B5%2C10%2C25%2C50%2C100%5D%2C%22chartLimit%22%3Anull%2C%22chartX%22%3Anull%2C%22chartXPivot%22%3Anull%2C%22chartYSingle%22%3Anull%2C%22chartYMulti%22%3A%5B%5D%2C%22chartData%22%3A%5B%5D%2C%22chartMapType%22%3A%22marker%22%2C%22chartMapLabel%22%3Anull%2C%22chartMapHeat%22%3Anull%2C%22hideStacked%22%3Atrue%2C%22hasDataForChart%22%3Afalse%2C%22previousChartOptions%22%3A%7B%22chartLimit%22%3Anull%2C%22chartX%22%3Anull%2C%22chartXPivot%22%3Anull%2C%22chartYSingle%22%3Anull%2C%22chartMapType%22%3A%22marker%22%2C%22chartMapLabel%22%3Anull%2C%22chartMapHeat%22%3Anull%2C%22chartYMulti%22%3A%5B%5D%2C%22chartScope%22%3A%22world%22%2C%22chartTimelineType%22%3A%22bar%22%2C%22chartSorting%22%3A%22none%22%2C%22chartScatterGroup%22%3Anull%2C%22chartScatterSize%22%3Anull%7D%2C%22isResultSettingsVisible%22%3Afalse%2C%22settingsVisible%22%3Afalse%2C%22checkStatusTimeout%22%3Anull%2C%22topRisk%22%3Anull%2C%22suggestion%22%3A%22%22%2C%22hasSuggestion%22%3Anull%2C%22compatibilityCheckRunning%22%3Afalse%2C%22compatibilitySourcePlatform%22%3A%22impala%22%2C%22compatibilitySourcePlatforms%22%3A%5B%7B%22name%22%3A%22Teradata%22%2C%22value%22%3A%22teradata%22%7D%2C%7B%22name%22%3A%22Oracle%22%2C%22value%22%3A%22oracle%22%7D%2C%7B%22name%22%3A%22Netezza%22%2C%22value%22%3A%22netezza%22%7D%2C%7B%22name%22%3A%22Impala%22%2C%22value%22%3A%22impala%22%7D%2C%7B%22name%22%3A%22impala%22%2C%22value%22%3A%22impala%22%7D%2C%7B%22name%22%3A%22DB2%22%2C%22value%22%3A%22db2%22%7D%2C%7B%22name%22%3A%22Greenplum%22%2C%22value%22%3A%22greenplum%22%7D%2C%7B%22name%22%3A%22MySQL%22%2C%22value%22%3A%22mysql%22%7D%2C%7B%22name%22%3A%22PostgreSQL%22%2C%22value%22%3A%22postgresql%22%7D%2C%7B%22name%22%3A%22Informix%22%2C%22value%22%3A%22informix%22%7D%2C%7B%22name%22%3A%22SQL+Server%22%2C%22value%22%3A%22sqlserver%22%7D%2C%7B%22name%22%3A%22Sybase%22%2C%22value%22%3A%22sybase%22%7D%2C%7B%22name%22%3A%22Access%22%2C%22value%22%3A%22access%22%7D%2C%7B%22name%22%3A%22Firebird%22%2C%22value%22%3A%22firebird%22%7D%2C%7B%22name%22%3A%22ANSISQL%22%2C%22value%22%3A%22ansisql%22%7D%2C%7B%22name%22%3A%22Generic%22%2C%22value%22%3A%22generic%22%7D%5D%2C%22compatibilityTargetPlatform%22%3A%22impala%22%2C%22compatibilityTargetPlatforms%22%3A%5B%7B%22name%22%3A%22Impala%22%2C%22value%22%3A%22impala%22%7D%2C%7B%22name%22%3A%22impala%22%2C%22value%22%3A%22impala%22%7D%5D%2C%22showOptimizer%22%3Atrue%2C%22delayedStatement%22%3A%22show+tables%3B%22%2C%22wasBatchExecuted%22%3Afalse%2C%22isReady%22%3Atrue%2C%22lastExecuted%22%3A1528820101947%2C%22lastAceSelectionRowOffset%22%3A0%2C%22executingBlockingOperation%22%3Anull%2C%22showLongOperationWarning%22%3Afalse%2C%22formatEnabled%22%3Atrue%2C%22isFetchingData%22%3Afalse%2C%22isCanceling%22%3Afalse%2C%22aceAutoExpand%22%3Afalse%7D%5D%2C%22selectedSnippet%22%3A%22impala%22%2C%22creatingSessionLocks%22%3A%5B%5D%2C%22sessions%22%3A%5B%7B%22type%22%3A%22impala%22%2C%22properties%22%3A%5B%7B%22multiple%22%3Atrue%2C%22defaultValue%22%3A%5B%5D%2C%22value%22%3A%5B%5D%2C%22nice_name%22%3A%22Files%22%2C%22key%22%3A%22files%22%2C%22help_text%22%3A%22Add+one+or+more+files%2C+jars%2C+or+arcimpalas+to+the+list+of+resources.%22%2C%22type%22%3A%22hdfs-files%22%7D%2C%7B%22multiple%22%3Atrue%2C%22defaultValue%22%3A%5B%5D%2C%22value%22%3A%5B%5D%2C%22nice_name%22%3A%22Functions%22%2C%22key%22%3A%22functions%22%2C%22help_text%22%3A%22Add+one+or+more+registered+UDFs+(requires+function+name+and+fully-qualified+class+name).%22%2C%22type%22%3A%22functions%22%7D%2C%7B%22nice_name%22%3A%22Settings%22%2C%22multiple%22%3Atrue%2C%22key%22%3A%22settings%22%2C%22help_text%22%3A%22impala+and+Hadoop+configuration+properties.%22%2C%22defaultValue%22%3A%5B%5D%2C%22type%22%3A%22settings%22%2C%22options%22%3A%5B%22impala.map.aggr%22%2C%22impala.exec.compress.output%22%2C%22impala.exec.parallel%22%2C%22impala.execution.engine%22%2C%22mapreduce.job.queuename%22%5D%2C%22value%22%3A%5B%5D%7D%5D%2C%22reuse_session%22%3Atrue%2C%22id%22%3A6865%2C%22session_id%22%3A%22714fb09b96ba3368%3A4d02ec93d7ffbfb6%22%7D%5D%2C%22directoryUuid%22%3A%22%22%2C%22dependentsCoordinator%22%3A%5B%5D%2C%22historyFilter%22%3A%22%22%2C%22historyFilterVisible%22%3Afalse%2C%22loadingHistory%22%3Afalse%2C%22historyInitialHeight%22%3A1679%2C%22forceHistoryInitialHeight%22%3Atrue%2C%22historyCurrentPage%22%3A1%2C%22historyTotalPages%22%3A3%2C%22schedulerViewModel%22%3Anull%2C%22schedulerViewModelIsLoaded%22%3Afalse%2C%22isBatchable%22%3Atrue%2C%22isExecutingAll%22%3Afalse%2C%22executingAllIndex%22%3A0%2C%22retryModalConfirm%22%3Anull%2C%22retryModalCancel%22%3Anull%2C%22unloaded%22%3Afalse%2C%22updateHistoryFailed%22%3Afalse%2C%22viewSchedulerId%22%3A%22%22%2C%22loadingScheduler%22%3Afalse%7D&snippet=%7B%22id%22%3A%22dd5755a3-e8db-82d9-4f98-9f4fb5a99a06%22%2C%22type%22%3A%22impala%22%2C%22status%22%3A%22running%22%2C%22statementType%22%3A%22text%22%2C%22statement%22%3A%22show+tables%3B%22%2C%22aceCursorPosition%22%3A%7B%22column%22%3A33%2C%22row%22%3A0%7D%2C%22statementPath%22%3A%22%22%2C%22associatedDocumentUuid%22%3Anull%2C%22properties%22%3A%7B%22files%22%3A%5B%5D%2C%22functions%22%3A%5B%5D%2C%22arguments%22%3A%5B%5D%2C%22settings%22%3A%5B%5D%7D%2C%22result%22%3A%7B%22id%22%3A%2206840534-9434-33b5-5eca-2cd08432ceb3%22%2C%22type%22%3A%22table%22%2C%22handle%22%3A%7B%22has_more_statements%22%3Afalse%2C%22statement_id%22%3A0%2C%22statements_count%22%3A1%2C%22previous_statement_hash%22%3A%22acb6478fcf28c31b5e76d49de7d77bbe46fe5e4f9436c16c0ca8ed5f%22%7D%7D%2C%22database%22%3A%22default%22%2C%22compute%22%3A%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22default-romain%22%2C%22id%22%3A%22default-romain%22%2C%22name%22%3A%22default-romain%22%7D%2C%22wasBatchExecuted%22%3Afalse%7D",
+                "params": [
+                  {
+                    "name": "notebook",
+                    "value": "%7B%22uuid%22%3A%22f2b8a233-c34c-44b8-a8a1-0e6123996216%22%2C%22name%22%3A%22%22%2C%22description%22%3A%22%22%2C%22type%22%3A%22query-impala%22%2C%22initialType%22%3A%22impala%22%2C%22coordinatorUuid%22%3Anull%2C%22isHistory%22%3Atrue%2C%22isManaged%22%3Afalse%2C%22parentSavedQueryUuid%22%3Anull%2C%22isSaved%22%3Afalse%2C%22onSuccessUrl%22%3Anull%2C%22pubSubUrl%22%3Anull%2C%22isPresentationModeDefault%22%3Afalse%2C%22isPresentationMode%22%3Afalse%2C%22isPresentationModeInitialized%22%3Atrue%2C%22presentationSnippets%22%3A%7B%7D%2C%22isHidingCode%22%3Afalse%2C%22snippets%22%3A%5B%7B%22id%22%3A%22dd5755a3-e8db-82d9-4f98-9f4fb5a99a06%22%2C%22name%22%3A%22%22%2C%22type%22%3A%22impala%22%2C%22isBatchable%22%3Atrue%2C%22aceCursorPosition%22%3A%7B%22column%22%3A33%2C%22row%22%3A0%7D%2C%22errors%22%3A%5B%5D%2C%22aceErrorsHolder%22%3A%5B%5D%2C%22aceWarningsHolder%22%3A%5B%5D%2C%22aceErrors%22%3A%5B%5D%2C%22aceWarnings%22%3A%5B%5D%2C%22editorMode%22%3Atrue%2C%22dbSelectionVisible%22%3Afalse%2C%22isSqlDialect%22%3Atrue%2C%22namespaceRefreshEnabled%22%3Afalse%2C%22availableNamespaces%22%3A%5B%5D%2C%22availableComputes%22%3A%5B%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22default-romain%22%2C%22id%22%3A%22default-romain%22%2C%22name%22%3A%22default-romain%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22compute1%22%2C%22id%22%3A%22compute1%22%2C%22name%22%3A%22compute1%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22compute2%22%2C%22id%22%3A%22compute2%22%2C%22name%22%3A%22compute2%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22altus%22%2C%22namespace%22%3A%22Altus%22%2C%22id%22%3A%22Altus%22%2C%22name%22%3A%22Altus%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22storage1%22%2C%22id%22%3A%22storage1%22%2C%22name%22%3A%22storage1%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22storage2%22%2C%22id%22%3A%22storage2%22%2C%22name%22%3A%22storage2%22%7D%2C%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22Default%22%2C%22id%22%3A%22Default%22%2C%22name%22%3A%22default%22%7D%5D%2C%22compute%22%3A%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22default-romain%22%2C%22id%22%3A%22default-romain%22%2C%22name%22%3A%22default-romain%22%7D%2C%22database%22%3A%22default%22%2C%22currentQueryTab%22%3A%22queryHistory%22%2C%22pinnedContextTabs%22%3A%5B%5D%2C%22loadingQueries%22%3Afalse%2C%22queriesHasErrors%22%3Afalse%2C%22queriesCurrentPage%22%3A1%2C%22queriesTotalPages%22%3A1%2C%22queriesFilter%22%3A%22%22%2C%22queriesFilterVisible%22%3Afalse%2C%22statementType%22%3A%22text%22%2C%22statementTypes%22%3A%5B%22text%22%2C%22file%22%5D%2C%22statementPath%22%3A%22%22%2C%22externalStatementLoaded%22%3Afalse%2C%22associatedDocumentLoading%22%3Atrue%2C%22associatedDocumentUuid%22%3Anull%2C%22statement_raw%22%3A%22show+tables%3B%22%2C%22statementsList%22%3A%5B%22show+tables%3B%22%5D%2C%22aceSize%22%3A100%2C%22status%22%3A%22running%22%2C%22statusForButtons%22%3A%22executing%22%2C%22properties%22%3A%7B%22files%22%3A%5B%5D%2C%22functions%22%3A%5B%5D%2C%22arguments%22%3A%5B%5D%2C%22settings%22%3A%5B%5D%7D%2C%22viewSettings%22%3A%7B%22placeHolder%22%3A%22Example%3A+SELECT+*+FROM+tablename%2C+or+press+CTRL+%2B+space%22%2C%22sqlDialect%22%3Atrue%7D%2C%22variables%22%3A%5B%5D%2C%22hasCurlyBracketParameters%22%3Atrue%2C%22variableNames%22%3A%5B%5D%2C%22variableValues%22%3A%7B%7D%2C%22statement%22%3A%22show+tables%3B%22%2C%22result%22%3A%7B%22id%22%3A%2206840534-9434-33b5-5eca-2cd08432ceb3%22%2C%22type%22%3A%22table%22%2C%22hasResultset%22%3Atrue%2C%22handle%22%3A%7B%22has_more_statements%22%3Afalse%2C%22statement_id%22%3A0%2C%22statements_count%22%3A1%2C%22previous_statement_hash%22%3A%22acb6478fcf28c31b5e76d49de7d77bbe46fe5e4f9436c16c0ca8ed5f%22%7D%2C%22meta%22%3A%5B%5D%2C%22rows%22%3Anull%2C%22hasMore%22%3Afalse%2C%22statement_id%22%3A0%2C%22statement_range%22%3A%7B%22start%22%3A%7B%22row%22%3A0%2C%22column%22%3A0%7D%2C%22end%22%3A%7B%22row%22%3A0%2C%22column%22%3A0%7D%7D%2C%22statements_count%22%3A1%2C%22previous_statement_hash%22%3Anull%2C%22metaFilter%22%3A%7B%22query%22%3A%22%22%2C%22facets%22%3A%7B%7D%2C%22text%22%3A%5B%5D%7D%2C%22isMetaFilterVisible%22%3Afalse%2C%22filteredMetaChecked%22%3Atrue%2C%22filteredMeta%22%3A%5B%5D%2C%22fetchedOnce%22%3Afalse%2C%22startTime%22%3A%222018-06-12T16%3A15%3A01.951Z%22%2C%22endTime%22%3A%222018-06-12T16%3A15%3A01.951Z%22%2C%22executionTime%22%3A0%2C%22data%22%3A%5B%5D%2C%22explanation%22%3A%22%22%2C%22logs%22%3A%22%22%2C%22logLines%22%3A0%2C%22hasSomeResults%22%3Afalse%7D%2C%22showGrid%22%3Atrue%2C%22showChart%22%3Afalse%2C%22showLogs%22%3Atrue%2C%22progress%22%3A0%2C%22jobs%22%3A%5B%5D%2C%22isLoading%22%3Afalse%2C%22resultsKlass%22%3A%22results+impala%22%2C%22errorsKlass%22%3A%22results+impala+alert+alert-error%22%2C%22is_redacted%22%3Afalse%2C%22chartType%22%3A%22bars%22%2C%22chartSorting%22%3A%22none%22%2C%22chartScatterGroup%22%3Anull%2C%22chartScatterSize%22%3Anull%2C%22chartScope%22%3A%22world%22%2C%22chartTimelineType%22%3A%22bar%22%2C%22chartLimits%22%3A%5B5%2C10%2C25%2C50%2C100%5D%2C%22chartLimit%22%3Anull%2C%22chartX%22%3Anull%2C%22chartXPivot%22%3Anull%2C%22chartYSingle%22%3Anull%2C%22chartYMulti%22%3A%5B%5D%2C%22chartData%22%3A%5B%5D%2C%22chartMapType%22%3A%22marker%22%2C%22chartMapLabel%22%3Anull%2C%22chartMapHeat%22%3Anull%2C%22hideStacked%22%3Atrue%2C%22hasDataForChart%22%3Afalse%2C%22previousChartOptions%22%3A%7B%22chartLimit%22%3Anull%2C%22chartX%22%3Anull%2C%22chartXPivot%22%3Anull%2C%22chartYSingle%22%3Anull%2C%22chartMapType%22%3A%22marker%22%2C%22chartMapLabel%22%3Anull%2C%22chartMapHeat%22%3Anull%2C%22chartYMulti%22%3A%5B%5D%2C%22chartScope%22%3A%22world%22%2C%22chartTimelineType%22%3A%22bar%22%2C%22chartSorting%22%3A%22none%22%2C%22chartScatterGroup%22%3Anull%2C%22chartScatterSize%22%3Anull%7D%2C%22isResultSettingsVisible%22%3Afalse%2C%22settingsVisible%22%3Afalse%2C%22checkStatusTimeout%22%3Anull%2C%22topRisk%22%3Anull%2C%22suggestion%22%3A%22%22%2C%22hasSuggestion%22%3Anull%2C%22compatibilityCheckRunning%22%3Afalse%2C%22compatibilitySourcePlatform%22%3A%22impala%22%2C%22compatibilitySourcePlatforms%22%3A%5B%7B%22name%22%3A%22Teradata%22%2C%22value%22%3A%22teradata%22%7D%2C%7B%22name%22%3A%22Oracle%22%2C%22value%22%3A%22oracle%22%7D%2C%7B%22name%22%3A%22Netezza%22%2C%22value%22%3A%22netezza%22%7D%2C%7B%22name%22%3A%22Impala%22%2C%22value%22%3A%22impala%22%7D%2C%7B%22name%22%3A%22impala%22%2C%22value%22%3A%22impala%22%7D%2C%7B%22name%22%3A%22DB2%22%2C%22value%22%3A%22db2%22%7D%2C%7B%22name%22%3A%22Greenplum%22%2C%22value%22%3A%22greenplum%22%7D%2C%7B%22name%22%3A%22MySQL%22%2C%22value%22%3A%22mysql%22%7D%2C%7B%22name%22%3A%22PostgreSQL%22%2C%22value%22%3A%22postgresql%22%7D%2C%7B%22name%22%3A%22Informix%22%2C%22value%22%3A%22informix%22%7D%2C%7B%22name%22%3A%22SQL+Server%22%2C%22value%22%3A%22sqlserver%22%7D%2C%7B%22name%22%3A%22Sybase%22%2C%22value%22%3A%22sybase%22%7D%2C%7B%22name%22%3A%22Access%22%2C%22value%22%3A%22access%22%7D%2C%7B%22name%22%3A%22Firebird%22%2C%22value%22%3A%22firebird%22%7D%2C%7B%22name%22%3A%22ANSISQL%22%2C%22value%22%3A%22ansisql%22%7D%2C%7B%22name%22%3A%22Generic%22%2C%22value%22%3A%22generic%22%7D%5D%2C%22compatibilityTargetPlatform%22%3A%22impala%22%2C%22compatibilityTargetPlatforms%22%3A%5B%7B%22name%22%3A%22Impala%22%2C%22value%22%3A%22impala%22%7D%2C%7B%22name%22%3A%22impala%22%2C%22value%22%3A%22impala%22%7D%5D%2C%22showOptimizer%22%3Atrue%2C%22delayedStatement%22%3A%22show+tables%3B%22%2C%22wasBatchExecuted%22%3Afalse%2C%22isReady%22%3Atrue%2C%22lastExecuted%22%3A1528820101947%2C%22lastAceSelectionRowOffset%22%3A0%2C%22executingBlockingOperation%22%3Anull%2C%22showLongOperationWarning%22%3Afalse%2C%22formatEnabled%22%3Atrue%2C%22isFetchingData%22%3Afalse%2C%22isCanceling%22%3Afalse%2C%22aceAutoExpand%22%3Afalse%7D%5D%2C%22selectedSnippet%22%3A%22impala%22%2C%22creatingSessionLocks%22%3A%5B%5D%2C%22sessions%22%3A%5B%7B%22type%22%3A%22impala%22%2C%22properties%22%3A%5B%7B%22multiple%22%3Atrue%2C%22defaultValue%22%3A%5B%5D%2C%22value%22%3A%5B%5D%2C%22nice_name%22%3A%22Files%22%2C%22key%22%3A%22files%22%2C%22help_text%22%3A%22Add+one+or+more+files%2C+jars%2C+or+arcimpalas+to+the+list+of+resources.%22%2C%22type%22%3A%22hdfs-files%22%7D%2C%7B%22multiple%22%3Atrue%2C%22defaultValue%22%3A%5B%5D%2C%22value%22%3A%5B%5D%2C%22nice_name%22%3A%22Functions%22%2C%22key%22%3A%22functions%22%2C%22help_text%22%3A%22Add+one+or+more+registered+UDFs+(requires+function+name+and+fully-qualified+class+name).%22%2C%22type%22%3A%22functions%22%7D%2C%7B%22nice_name%22%3A%22Settings%22%2C%22multiple%22%3Atrue%2C%22key%22%3A%22settings%22%2C%22help_text%22%3A%22impala+and+Hadoop+configuration+properties.%22%2C%22defaultValue%22%3A%5B%5D%2C%22type%22%3A%22settings%22%2C%22options%22%3A%5B%22impala.map.aggr%22%2C%22impala.exec.compress.output%22%2C%22impala.exec.parallel%22%2C%22impala.execution.engine%22%2C%22mapreduce.job.queuename%22%5D%2C%22value%22%3A%5B%5D%7D%5D%2C%22reuse_session%22%3Atrue%2C%22id%22%3A6865%2C%22session_id%22%3A%22714fb09b96ba3368%3A4d02ec93d7ffbfb6%22%7D%5D%2C%22directoryUuid%22%3A%22%22%2C%22dependentsCoordinator%22%3A%5B%5D%2C%22historyFilter%22%3A%22%22%2C%22historyFilterVisible%22%3Afalse%2C%22loadingHistory%22%3Afalse%2C%22historyInitialHeight%22%3A1679%2C%22forceHistoryInitialHeight%22%3Atrue%2C%22historyCurrentPage%22%3A1%2C%22historyTotalPages%22%3A3%2C%22schedulerViewModel%22%3Anull%2C%22schedulerViewModelIsLoaded%22%3Afalse%2C%22isBatchable%22%3Atrue%2C%22isExecutingAll%22%3Afalse%2C%22executingAllIndex%22%3A0%2C%22retryModalConfirm%22%3Anull%2C%22retryModalCancel%22%3Anull%2C%22unloaded%22%3Afalse%2C%22updateHistoryFailed%22%3Afalse%2C%22viewSchedulerId%22%3A%22%22%2C%22loadingScheduler%22%3Afalse%7D"
+                  },
+                  {
+                    "name": "snippet",
+                    "value": "%7B%22id%22%3A%22dd5755a3-e8db-82d9-4f98-9f4fb5a99a06%22%2C%22type%22%3A%22impala%22%2C%22status%22%3A%22running%22%2C%22statementType%22%3A%22text%22%2C%22statement%22%3A%22show+tables%3B%22%2C%22aceCursorPosition%22%3A%7B%22column%22%3A33%2C%22row%22%3A0%7D%2C%22statementPath%22%3A%22%22%2C%22associatedDocumentUuid%22%3Anull%2C%22properties%22%3A%7B%22files%22%3A%5B%5D%2C%22functions%22%3A%5B%5D%2C%22arguments%22%3A%5B%5D%2C%22settings%22%3A%5B%5D%7D%2C%22result%22%3A%7B%22id%22%3A%2206840534-9434-33b5-5eca-2cd08432ceb3%22%2C%22type%22%3A%22table%22%2C%22handle%22%3A%7B%22has_more_statements%22%3Afalse%2C%22statement_id%22%3A0%2C%22statements_count%22%3A1%2C%22previous_statement_hash%22%3A%22acb6478fcf28c31b5e76d49de7d77bbe46fe5e4f9436c16c0ca8ed5f%22%7D%7D%2C%22database%22%3A%22default%22%2C%22compute%22%3A%7B%22interface%22%3A%22impala%22%2C%22type%22%3A%22direct%22%2C%22namespace%22%3A%22default-romain%22%2C%22id%22%3A%22default-romain%22%2C%22name%22%3A%22default-romain%22%7D%2C%22wasBatchExecuted%22%3Afalse%7D"
+                  }
+                ]
+              }
+            }'''
+    }
 
 def create_directories(fs, directory_list=[]):
   # If needed, create the remote home, deployment and data directories

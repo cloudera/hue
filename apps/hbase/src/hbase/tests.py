@@ -32,7 +32,7 @@ from hbase.conf import HBASE_CONF_DIR
 from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from nose.plugins.skip import SkipTest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 def test_security_plain():

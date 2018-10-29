@@ -27,6 +27,7 @@ from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
 from impala.impala_flags import get_webserver_certificate_file
+from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD
 
 
 LOG = logging.getLogger(__name__)
@@ -141,6 +142,10 @@ class ImpalaDaemonApi(object):
   def __init__(self, server_url):
     self._url = server_url
     self._client = HttpClient(self._url, logger=LOG)
+    # You can set username/password for Impala Web UI which overrides kerberos
+    if DAEMON_API_USERNAME.get() is not None and DAEMON_API_PASSWORD.get() is not None:
+      self._client.set_digest_auth(DAEMON_API_USERNAME.get(), DAEMON_API_PASSWORD.get())
+
     self._root = Resource(self._client)
     self._security_enabled = False
     self._thread_local = threading.local()
@@ -179,7 +184,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('queries', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
@@ -192,7 +200,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('query_plan', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
@@ -205,7 +216,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('query_profile', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON: %s' % e)
 
@@ -217,7 +231,10 @@ class ImpalaDaemonApi(object):
 
     resp = self._root.get('query_memory', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_memory did not return valid JSON: %s' % e)
 
@@ -228,6 +245,39 @@ class ImpalaDaemonApi(object):
     }
     resp = self._root.get('cancel_query', params=params)
     try:
-      return json.loads(resp)
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi kill did not return valid JSON: %s' % e)
+
+  def get_query_backends(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_backends', params=params)
+    try:
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_backends did not return valid JSON: %s' % e)
+
+  def get_query_finstances(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_finstances', params=params)
+    try:
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_finstances did not return valid JSON: %s' % e)

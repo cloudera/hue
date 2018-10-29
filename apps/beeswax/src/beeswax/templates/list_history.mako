@@ -120,28 +120,30 @@ ${ layout.menubar(section='history') }
               </tr>
             </thead>
             <tbody>
-            % for query in page.object_list:
-              <tr class="histRow">
-                <td data-sort-value="${time.mktime(query.submission_date.timetuple())}"></td>
-                <td>${show_saved_query(query.design, query)}</td>
-                <td>
-                  % if len(query.query) > 100:
-                    <code>${collapse_whitespace(query.query[:100])}...</code>
-                  % else:
-                    <code>${collapse_whitespace(query.query)}</code>
-                  % endif
-                </td>
-                <td>${query.owner}</td>
-                <td>${models.QueryHistory.STATE[query.last_state]}</td>
-                <td>
-                  % if query.last_state not in (models.QueryHistory.STATE.expired.index, models.QueryHistory.STATE.failed.index):
-                    <a href="${ url(app_name + ':watch_query_history', query_history_id=query.id) }" data-row-selector="true">${_('Results')}</a>
-                  % else:
-                    ~
-                  % endif
-                </td>
-              </tr>
-            % endfor
+            % if page:
+              % for query in page.object_list:
+                <tr class="histRow">
+                  <td data-sort-value="${time.mktime(query.submission_date.timetuple())}"></td>
+                  <td>${show_saved_query(query.design, query)}</td>
+                  <td>
+                    % if len(query.query) > 100:
+                      <code>${collapse_whitespace(query.query[:100])}...</code>
+                    % else:
+                      <code>${collapse_whitespace(query.query)}</code>
+                    % endif
+                  </td>
+                  <td>${query.owner}</td>
+                  <td>${query.last_state}</td>
+                  <td>
+                    % if query.last_state not in (models.QueryHistory.STATE.expired.value, models.QueryHistory.STATE.failed.value):
+                      <a href="${ url(app_name + ':watch_query_history', query_history_id=query.id) }" data-row-selector="true">${_('Results')}</a>
+                    % else:
+                      ~
+                    % endif
+                  </td>
+                </tr>
+              % endfor
+            % endif
             </tbody>
           </table>
 

@@ -17,6 +17,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="shared" file="shared_components.mako" />
@@ -50,7 +51,7 @@ ${ shared.header(_breadcrumbs, clusters, False) }
         % if len(children) == 0:
           <li class="white">${ _('No children available') }</li>
         % endif
-        % if user.is_superuser:
+        % if is_admin(user):
         <li class="white">
           <button class="btn" onclick="location.href='${url('zookeeper:create', id=cluster['id'], path=path)}'">
             <i class="fa fa-plus-circle"></i> ${ _('Add') }
@@ -77,13 +78,13 @@ ${ shared.header(_breadcrumbs, clusters, False) }
       %if znode.get('dataLength', 0) != 0:
       <div class="tab-pane active" id="text">
         <textarea id="textareaText" rows="25" readonly="readonly"></textarea>
-        % if user.is_superuser:
+        % if is_admin(user):
         <a href="${url('zookeeper:edit_as_text', id=cluster['id'], path=path)}" class="btn"><i class="fa fa-pencil"></i> ${_('Edit as Text')}</a>
         % endif
       </div>      
       <div class="tab-pane" id="base64">
         <textarea id="textarea64" rows="25" readonly="readonly">${znode.get('data64', '')}</textarea>
-        % if user.is_superuser:
+        % if is_admin(user):
         <a href="${url('zookeeper:edit_as_base64', id=cluster['id'], path=path)}" class="btn"><i class="fa fa-pencil"></i> ${_('Edit as Base64')}</a>
         % endif
       </div>

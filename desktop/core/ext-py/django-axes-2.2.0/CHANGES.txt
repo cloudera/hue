@@ -1,0 +1,331 @@
+Changes
+=======
+
+2.2.0 (2016-07-20)
+------------------
+
+- Improve the logic when using a reverse proxy to avoid possible attacks.
+  [camilonova]
+
+
+2.1.0 (2016-07-14)
+------------------
+
+- Add `default_app_config` so you can just use `axes` in `INSTALLED_APPS`
+  [vdboor]
+
+
+2.0.0 (2016-06-24)
+------------------
+
+- Removed middleware to use app_config
+  [camilonova]
+
+- Lots of cleaning
+  [camilonova]
+
+- Improved test suite and versions
+  [camilonova]
+
+
+1.7.0 (2016-06-10)
+------------------
+
+- Use render shortcut for rendering LOCKOUT_TEMPLATE
+  [Radosław Luter]
+
+- Added app_label for RemovedInDjango19Warning
+  [yograterol]
+
+- Add iso8601 translator.
+  [mullakhmetov]
+
+- Edit json response. Context now contains ISO 8601 formatted cooloff time
+  [mullakhmetov]
+
+- Add json response and iso8601 tests.
+  [mullakhmetov]
+
+- Fixes issue 162: UnicodeDecodeError on pip install
+  [joeribekker]
+
+- Added AXES_NEVER_LOCKOUT_WHITELIST option to prevent certain IPs from being locked out.
+  [joeribekker]
+
+
+1.6.1 (2016-05-13)
+------------------
+
+- Fixes whitelist check when BEHIND_REVERSE_PROXY
+  [Patrick Hagemeister]
+
+- Made migrations py3 compatible
+  [mvdwaeter]
+
+- Fixing #126, possibly breaking compatibility with Django<=1.7
+  [int-ua]
+
+- Add note for upgrading users about new migration files
+  [kelseyq]
+
+- Fixes #148
+  [camilonova]
+
+- Decorate auth_views.login only once
+  [teeberg]
+
+- Set IP public/private classifier to be compliant with RFC 1918.
+  [SilasX]
+
+- Issue #155. Lockout response status code changed to 403.
+  [Артур Муллахметов]
+
+- BUGFIX: Missing migration
+  [smeinel]
+
+1.6.0 (2016-01-07)
+------------------
+
+- Stopped using render_to_response so that other template engines work
+  [tarkatronic]
+
+- Improved performance & DoS prevention on query2str
+  [tarkatronic]
+
+- Immediately return from is_already_locked if the user is not lockable
+  [jdunck]
+
+- Iterate over ip addresses only once
+  [annp89]
+
+- added initial migration files to support django 1.7 &up. Upgrading users should run migrate --fake-initial after update
+  [ibaguio]
+
+- Add db indexes to CommonAccess model
+  [Schweigi]
+
+1.5.0 (2015-09-11)
+------------------
+
+- Fix #_get_user_attempts to include username when filtering AccessAttempts if AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP is True
+  [afioca]
+
+1.4.0 (2015-08-09)
+------------------
+
+- Send the user_locked_out signal. Fixes #94.
+  [toabi]
+
+1.3.9 (2015-02-11)
+------------------
+
+- Python 3 fix (#104)
+
+1.3.8 (2014-10-07)
+------------------
+
+- Rename GitHub organization from django-security to django-pci to emphasize focus on providing assistance with building PCI compliant websites with Django.
+  [aclark4life]
+
+1.3.7 (2014-10-05)
+------------------
+
+- Explain common issues where Axes fails silently
+  [cericoda]
+
+- Allow for user-defined username field for lookup in POST data
+  [SteveByerly]
+
+- Log out only if user was logged in
+  [zoten]
+
+- Support for floats in cooloff time (i.e: 0.1 == 6 minutes)
+  [marianov]
+
+- Limit amount of POST data logged (#73). Limiting the length of value is not enough, as there could be arbitrary number of them, or very long key names.
+  [peterkuma]
+
+- Improve get_ip to try for real ip address
+  [7wonders]
+
+- Change IPAddressField to GenericIPAddressField. When using a PostgreSQL database and the client does not pass an IP address you get an inet error. This is a known problem with PostgreSQL and the IPAddressField. https://code.djangoproject.com/ticket/5622. It can be fixed by using a GenericIPAddressField instead.
+  [polvoblanco]
+
+- Get first X-Forwarded-For IP
+  [tutumcloud]
+
+- White listing IP addresses behind reverse proxy. Allowing some IP addresses to have direct access to the app even if they are behind a reverse proxy. Those IP addresses must still be on a white list.
+  [ericbulloch]
+
+- Reduce logging of reverse proxy IP lookup and use configured logger. Fixes #76. Instead of logging the notice that django.axes looks for a HTTP header set by a reverse proxy on each attempt, just log it one-time on first module import. Also use the configured logger (by default axes.watch_login) for the message to be more consistent in logging.
+  [eht16]
+
+- Limit the length of the values logged into the database. Refs #73
+  [camilonova]
+
+- Refactored tests to be more stable and faster
+  [camilonova]
+
+- Clean client references
+  [camilonova]
+
+- Fixed admin login url
+  [camilonova]
+
+- Added django 1.7 for testing
+  [camilonova]
+
+- Travis file cleanup
+  [camilonova]
+
+- Remove hardcoded url path
+  [camilonova]
+
+- Fixing tests for django 1.7
+  [Andrew-Crosio]
+
+- Fix for django 1.7 exception not existing
+  [Andrew-Crosio]
+
+- Removed python 2.6 from testing
+  [camilonova]
+
+- Use django built-in six version
+  [camilonova]
+
+- Added six as requirement
+  [camilonova]
+
+- Added python 2.6 for travis testing
+  [camilonova]
+
+- Replaced u string literal prefixes with six.u() calls
+  [amrhassan]
+
+- Fixes object type issue, response is not an string
+  [camilonova]
+
+- Python 3 compatibility fix for db_reset
+  [nicois]
+
+- Added example project and helper scripts
+  [barseghyanartur]
+
+- Admin command to list login attemps
+  [marianov]
+
+- Replaced six imports with django.utils.six ones
+  [amrhassan]
+
+- Replaced u string literal prefixes with six.u() calls to make it compatible with Python 3.2
+  [amrhassan]
+
+- Replaced `assertIn`s and `assertNotIn`s with `assertContains` and `assertNotContains`
+  [fcurella]
+
+- Added py3k to travis
+  [fcurella]
+
+- Update test cases to be python3 compatible
+  [nicois]
+
+- Python 3 compatibility fix for db_reset
+  [nicois]
+
+- Removed trash from example urls
+  [barseghyanartur]
+
+- Added django installer
+  [barseghyanartur]
+
+- Added example project and helper scripts
+  [barseghyanartur]
+
+
+1.3.6 (2013-11-23)
+------------------
+
+- Added AttributeError in case get_profile doesn't exist [camilonova]
+- Improved axes_reset command [camilonova]
+
+
+1.3.5 (2013-11-01)
+------------------
+
+- Fix an issue with __version__ loading the wrong version [graingert]
+
+
+1.3.4 (2013-11-01)
+------------------
+
+- Update README.rst for PyPI [marty] [camilonova] [graingert]
+- Add cooloff period [visualspace]
+
+
+1.3.3 (2013-07-05)
+------------------
+
+- Added 'username' field to the Admin table [bkvirendra]
+- Removed fallback logging creation since logging cames by default on django 1.4 or later, if you don't have it is because you explicitly wanted. Fixes #45 [camilonova]
+
+
+1.3.2 (2013-03-28)
+------------------
+
+- Fix an issue when a user logout [camilonova]
+- Match pypi version [camilonova]
+- Better User model import method [camilonova]
+- Use only one place to get the version number [camilonova]
+- Fixed an issue when a user on django 1.4 logout [camilonova]
+- Handle exception if there is not user profile model set [camilonova]
+- Made some cleanup and remove a pokemon exception handling [camilonova]
+- Improved tests so it really looks for the rabbit in the hole [camilonova]
+- Match pypi version [camilonova]
+
+
+1.3.1 (2013-03-19)
+------------------
+
+- Add support for Django 1.5 [camilonova]
+
+
+1.3.0 (2013-02-27)
+------------------
+
+- Bug fix: get_version() format string [csghormley]
+
+
+1.2.9 (2013-02-20)
+------------------
+
+- Add to and improve test cases [camilonova]
+
+
+1.2.8 (2013-01-23)
+------------------
+
+- Increased http accept header length [jslatts]
+
+
+1.2.7 (2013-01-17)
+------------------
+
+- Reverse proxy support [rmagee]
+- Clean up README [martey]
+
+
+1.2.6 (2012-12-04)
+------------------
+
+- Remove unused import [aclark4life]
+
+
+1.2.5 (2012-11-28)
+------------------
+
+- Fix setup.py [aclark4life]
+- Added ability to flag user accounts as unlockable. [kencochrane]
+- Added ipaddress as a param to the user_locked_out signal. [kencochrane]
+- Added a signal receiver for user_logged_out. [kencochrane]
+- Added a signal for when a user gets locked out. [kencochrane]
+- Added AccessLog model to log all access attempts. [kencochrane]

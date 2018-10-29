@@ -17,12 +17,17 @@
 from __future__ import absolute_import
 
 import gc
+import logging
 import multiprocessing
 import threading
 
 from django.contrib.auth.models import User
 
 from desktop.lib.metrics import global_registry
+
+
+LOG = logging.getLogger(__name__)
+
 
 global_registry().gauge_callback(
     name='threads.total',
@@ -105,9 +110,17 @@ response_time = global_registry().timer(
 
 # ------------------------------------------------------------------------------
 
+def user_count():
+  users = 0
+  try:
+    users = User.objects.count()
+  except:
+    LOG.exception('Metrics: Failed to get number of user accounts')
+  return users
+
 user_count = global_registry().gauge_callback(
     name='users',
-    callback=lambda: User.objects.count(),
+    callback=user_count,
     label='Users',
     description='Total number of user accounts',
     numerator='users',

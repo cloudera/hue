@@ -48,7 +48,7 @@
       </li>
       <!-- /ko -->
       %if showMore:
-      <!-- ko if: page().number() != page().num_pages() -->
+      <!-- ko if: page().number != page().num_pages() -->
       <li>
         <a href="javascript: void(0)" data-bind="click: ${showMore}" style="padding-left: 8px">
           <i class="fa fa-plus"></i> ${_('Show more...')}

@@ -34,10 +34,13 @@
   ul.nav li {
     margin-right: 10px;
     line-height: 19px;
+    a {
+      padding: 16px 15px 13px;
+    }
   }
 
   ul.nav li a:hover, ul.nav li a:focus  {
-    background-color: transparent;
+    background-color: inherit;
   }
 }
 
@@ -131,4 +134,18 @@ select:-moz-focusring {
 
 .input-append input[type="password"] {
     padding: 5px 6px;
+}
+
+.cui-app-switcher {
+  a {
+    padding: 8px 12px !important;
+  }
+
+  .app-switcher-app-icon {
+    margin-left: 2px;
+
+    svg {
+      margin: 0 !important;
+    }
+  }
 }

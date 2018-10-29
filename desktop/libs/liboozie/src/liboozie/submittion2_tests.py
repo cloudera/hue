@@ -29,6 +29,7 @@ from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
+from useradmin.views import ensure_home_directory
 from oozie.models2 import Node
 from oozie.tests import OozieMockBase
 
@@ -48,6 +49,7 @@ def test_copy_files():
   try:
     c = make_logged_in_client()
     user = User.objects.get(username='test')
+    ensure_home_directory(cluster.fs, user)
 
     prefix = '/tmp/test_copy_files'
 
@@ -119,7 +121,7 @@ def test_copy_files():
     else:
       list_dir_workspace = cluster.fs.listdir(deployment_dir)
       list_dir_deployement = cluster.fs.listdir(external_deployment_dir)
-  
+
       # All destinations there
       assert_true(cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace)
       assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
@@ -127,23 +129,23 @@ def test_copy_files():
       assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
       assert_true(cluster.fs.exists(deployment_dir + '/udf5.jar'), list_dir_workspace)
       assert_true(cluster.fs.exists(deployment_dir + '/udf6.jar'), list_dir_workspace)
-  
+
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf5.jar'), list_dir_deployement)
       assert_true(cluster.fs.exists(external_deployment_dir + '/udf6.jar'), list_dir_deployement)
-  
+
       stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
       stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
       stats_udf3 = cluster.fs.stats(deployment_dir + '/udf3.jar')
       stats_udf4 = cluster.fs.stats(deployment_dir + '/udf4.jar')
       stats_udf5 = cluster.fs.stats(deployment_dir + '/udf5.jar')
       stats_udf6 = cluster.fs.stats(deployment_dir + '/udf6.jar')
-  
+
       submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>", {'prop1': 'val1'})
-  
+
       assert_not_equal(stats_udf1['fileId'], cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId'])
       assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
       assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
@@ -228,13 +230,12 @@ class TestSubmission(OozieMockBase):
 
       clear_sys_caches()
       fs = cluster.get_hdfs()
-      jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
       final_properties.update({
         'jobTracker': 'jtaddress',
         'nameNode': fs.fs_defaultfs
       })
-      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
@@ -243,16 +244,13 @@ class TestSubmission(OozieMockBase):
       finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
       clear_sys_caches()
       fs = cluster.get_hdfs()
-      jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
       final_properties.update({
         'jobTracker': 'jobtracker',
         'nameNode': 'namenode'
       })
-      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
-      submission._update_properties('jtaddress', 'deployment-directory')
-      assert_equal(final_properties, submission.properties)
     finally:
       clear_sys_caches()
       for reset in finish:
@@ -409,3 +407,50 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
     finally:
       for f in finish:
         f()
+
+  def test_generate_altus_action_start_cluster(self):
+
+    class TestJob():
+      XML_FILE_NAME = 'workflow.xml'
+
+      def __init__(self):
+        self.deployment_dir = '/tmp/test'
+        self.nodes = [
+            Node({'id': '1', 'type': 'hive-document', 'properties': {'jdbc_url': u"${wf:actionData('shell-31b5')['hiveserver']}", 'password': u'test'}})
+        ]
+
+    user = User.objects.get(username='test')
+    submission = Submission(user, job=TestJob(), fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
+
+    command = submission._generate_altus_action_script(
+      service='dataeng',
+      command='listClusters',
+      arguments={},
+      auth_key_id='altus_auth_key_id',
+      auth_key_secret='altus_auth_key_secret'
+    )
+
+    assert_true('''#!/usr/bin/env python
+
+from navoptapi.api_lib import ApiLib
+
+hostname = 'dataengapi.us-west-1.altus.cloudera.com'
+auth_key_id = 'altus_auth_key_id'
+auth_key_secret = \'\'\'altus_auth_key_secret\'\'\'
+
+def _exec(service, command, parameters=None):
+  if parameters is None:
+    parameters = {}
+
+  try:
+    api = ApiLib(service, hostname, auth_key_id, auth_key_secret)
+    resp = api.call_api(command, parameters)
+    return resp.json()
+  except Exception, e:
+    print e
+    raise e
+
+print _exec('dataeng', 'listClusters', {})
+''' in command,
+      command
+    )

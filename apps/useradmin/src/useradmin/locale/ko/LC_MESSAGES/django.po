@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -250,163 +250,163 @@ msgstr "첫 로그인인 경우."
 msgid "You do not have permissions to %(description)s."
 msgstr "%(description)s에 대한 권한이 없습니다."
 
-#: src/useradmin/views.py:167
+#: src/useradmin/views.py:175
 msgid "You must be a superuser to delete users."
 msgstr "사용자를 삭제하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:170
+#: src/useradmin/views.py:178
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/useradmin/views.py:177
+#: src/useradmin/views.py:185
 msgid "You cannot remove yourself."
 msgstr "자신을 제거할 수는 없습니다."
 
-#: src/useradmin/views.py:195 src/useradmin/templates/list_users.mako:203
+#: src/useradmin/views.py:203 src/useradmin/templates/list_users.mako:203
 msgid "The users were deleted."
 msgstr "사용자가 삭제되었습니다."
 
-#: src/useradmin/views.py:207
+#: src/useradmin/views.py:215
 msgid "You must be a superuser to delete groups."
 msgstr "그룹을 삭제하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:216
+#: src/useradmin/views.py:224
 msgid "The default user group may not be deleted."
 msgstr "기본 사용자 그룹을 삭제할 수 없습니다."
 
-#: src/useradmin/views.py:228 src/useradmin/templates/list_groups.mako:175
+#: src/useradmin/views.py:236 src/useradmin/templates/list_groups.mako:175
 msgid "The groups were deleted."
 msgstr "그룹이 삭제되었습니다."
 
-#: src/useradmin/views.py:231
+#: src/useradmin/views.py:239
 msgid "Group not found."
 msgstr "그룹을 찾을 수 없습니다."
 
-#: src/useradmin/views.py:260
+#: src/useradmin/views.py:268
 msgid "You must be a superuser to add or edit another user."
 msgstr "다른 사용자를 추가하거나 편집하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:288
+#: src/useradmin/views.py:296
 msgid "You cannot change a username."
 msgstr "사용자 이름을 변경할 수 없습니다."
 
-#: src/useradmin/views.py:290
+#: src/useradmin/views.py:298
 msgid "You cannot make yourself inactive."
 msgstr "자신을 비활성화할 수는 없습니다."
 
-#: src/useradmin/views.py:305
+#: src/useradmin/views.py:313
 msgid "You cannot make yourself a superuser."
 msgstr "자신을 superuser로 지정할 수는 없습니다."
 
-#: src/useradmin/views.py:313
+#: src/useradmin/views.py:321
 msgid "You must be a superuser to reset users."
 msgstr "사용자를 재설정하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:317
+#: src/useradmin/views.py:325
 #, python-format
 msgid "Successfully unlocked account for user: %s"
 msgstr "다음 사용자 계정을 성공적으로 잠금 해제함: %s"
 
-#: src/useradmin/views.py:319
+#: src/useradmin/views.py:327
 #, python-format
 msgid "Failed to reset login attempts for %s: %s"
 msgstr "%s에 대한 로그인 시도를 재설정할 수 없음: %s"
 
-#: src/useradmin/views.py:328 src/useradmin/views.py:562
+#: src/useradmin/views.py:336 src/useradmin/views.py:570
 #, python-format
 msgid "Cannot make home directory for user %s."
 msgstr "사용자 %s의 홈 디렉토리를 만들 수 없습니다."
 
-#: src/useradmin/views.py:338
+#: src/useradmin/views.py:346
 msgid "User information updated"
 msgstr "사용자 정보 업데이트됨"
 
-#: src/useradmin/views.py:420
+#: src/useradmin/views.py:428
 msgid "You must be a superuser to add or edit a group."
 msgstr "그룹을 추가하거나 편집하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:452
+#: src/useradmin/views.py:460
 msgid "Group information updated"
 msgstr "그룹 정보 업데이트됨"
 
-#: src/useradmin/views.py:488
+#: src/useradmin/views.py:496
 msgid "You must be a superuser to change permissions."
 msgstr "권한을 변경하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:505
+#: src/useradmin/views.py:513
 msgid "Permission information updated"
 msgstr "권한 정보 업데이트됨"
 
-#: src/useradmin/views.py:537
+#: src/useradmin/views.py:545
 msgid "You must be a superuser to add another user."
 msgstr "다른 사용자를 추가하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:553 src/useradmin/views.py:629
-#: src/useradmin/views.py:732
+#: src/useradmin/views.py:561 src/useradmin/views.py:637
+#: src/useradmin/views.py:740
 msgid "There was an error when communicating with LDAP"
 msgstr "LDAP와 통신하는 중 오류가 발생했습니다."
 
-#: src/useradmin/views.py:555 src/useradmin/views.py:631
+#: src/useradmin/views.py:563 src/useradmin/views.py:639
 msgid "There was a problem with some of the LDAP information"
 msgstr "일부 LDAP 정보에 문제가 있음"
 
-#: src/useradmin/views.py:566
+#: src/useradmin/views.py:574
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
 msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져올 수 없습니다."
 
-#: src/useradmin/views.py:575 src/useradmin/views.py:652
-#: src/useradmin/views.py:710
+#: src/useradmin/views.py:583 src/useradmin/views.py:660
+#: src/useradmin/views.py:718
 #, python-format
 msgid "Failed to import following users: %s"
 msgstr "다음 사용자를 가져올 수 없음: %s"
 
-#: src/useradmin/views.py:607
+#: src/useradmin/views.py:615
 msgid "You must be a superuser to add another group."
 msgstr "다른 그룹을 추가하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:628
+#: src/useradmin/views.py:636
 #, python-format
 msgid "LDAP Exception: %s"
 msgstr "LDAP 예외: %s"
 
-#: src/useradmin/views.py:642
+#: src/useradmin/views.py:650
 #, python-format
 msgid "Exception creating home directory for LDAP user %s in group %s."
 msgstr "LDAP 사용자 %s(그룹 %s에 있음)의 홈 디렉토리를 생성하는 중 예외가 발생했습니다."
 
-#: src/useradmin/views.py:661
+#: src/useradmin/views.py:669
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
 msgstr "패턴이 %s인 그룹의 LDAP 세부 정보를 가져올 수 없습니다."
 
-#: src/useradmin/views.py:687
+#: src/useradmin/views.py:695
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "LDAP 사용자/그룹을 동기화하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:740
+#: src/useradmin/views.py:748
 msgid "The import may not be complete, sync again."
 msgstr "가져오기를 완료할 수 없습니다. 다시 동기화하십시오."
 
-#: src/useradmin/views.py:855
+#: src/useradmin/views.py:863
 #, python-format
 msgid "Synced user %s from Unix"
 msgstr "Unix에서 사용자 %s이(가) 업데이트됨"
 
-#: src/useradmin/views.py:871
+#: src/useradmin/views.py:879
 msgid "No active superuser configured."
 msgstr "구성된 활성 superuser가 없습니다."
 
-#: src/useradmin/views.py:873
+#: src/useradmin/views.py:881
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "구성에서 마지막 활성 superuser를 제거할 수 없습니다."
 
-#: src/useradmin/views.py:909
+#: src/useradmin/views.py:917
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
 msgstr "사용자 %(username)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
 
-#: src/useradmin/views.py:1110 src/useradmin/views.py:1165
+#: src/useradmin/views.py:1118 src/useradmin/views.py:1173
 #, python-format
 msgid ""
 "There was a naming conflict while importing group %(groupname)s in "
@@ -488,7 +488,7 @@ msgstr "사용자 추가/동기화"
 #: src/useradmin/templates/add_ldap_users.mako:56
 #: src/useradmin/templates/edit_group.mako:82
 #: src/useradmin/templates/edit_permissions.mako:65
-#: src/useradmin/templates/list_configurations.mako:118
+#: src/useradmin/templates/list_configurations.mako:117
 #: src/useradmin/templates/sync_ldap_users_groups.mako:55
 msgid "Cancel"
 msgstr "취소"
@@ -679,8 +679,8 @@ msgid "Users"
 msgstr "사용자"
 
 #: src/useradmin/templates/layout.mako:65
-#: src/useradmin/templates/list_configurations.mako:48
-#: src/useradmin/templates/list_configurations.mako:87
+#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:86
 #: src/useradmin/templates/list_permissions.mako:44
 #: src/useradmin/templates/list_users.mako:78
 msgid "Groups"
@@ -693,44 +693,44 @@ msgstr "권한"
 
 #: src/useradmin/templates/layout.mako:68
 #: src/useradmin/templates/list_configurations.mako:28
-#: src/useradmin/templates/list_configurations.mako:42
+#: src/useradmin/templates/list_configurations.mako:41
 msgid "Configurations"
 msgstr "구성"
 
-#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:46
 #: src/useradmin/templates/list_permissions.mako:42
 msgid "Application"
 msgstr "애플리케이션"
 
-#: src/useradmin/templates/list_configurations.mako:66
+#: src/useradmin/templates/list_configurations.mako:65
 msgid "There are no configurations matching the search criteria."
 msgstr "검색 기준과 일치하는 구성이 없습니다."
 
-#: src/useradmin/templates/list_configurations.mako:78
+#: src/useradmin/templates/list_configurations.mako:77
 msgid "configuration"
 msgstr "구성"
 
-#: src/useradmin/templates/list_configurations.mako:81
+#: src/useradmin/templates/list_configurations.mako:80
 msgid "Role"
 msgstr "역할"
 
-#: src/useradmin/templates/list_configurations.mako:83
+#: src/useradmin/templates/list_configurations.mako:82
 msgid "Remove"
 msgstr "제거"
 
-#: src/useradmin/templates/list_configurations.mako:102
+#: src/useradmin/templates/list_configurations.mako:101
 msgid "Properties"
 msgstr "속성"
 
-#: src/useradmin/templates/list_configurations.mako:111
+#: src/useradmin/templates/list_configurations.mako:110
 msgid "Add role"
 msgstr "역할 추가"
 
-#: src/useradmin/templates/list_configurations.mako:117
+#: src/useradmin/templates/list_configurations.mako:116
 msgid "Update configuration"
 msgstr "구성 업데이트"
 
-#: src/useradmin/templates/list_configurations.mako:124
+#: src/useradmin/templates/list_configurations.mako:123
 msgid "There was an error loading the configurations"
 msgstr "구성을 로드하는 중 오류 발생"
 
@@ -858,8 +858,8 @@ msgid "An unknown error has occurred while deleting the user. Please try again."
 msgstr "사용자를 삭제하는 중 알 수 없는 오류가 발생했습니다. 다시 시도하십시오."
 
 #: src/useradmin/templates/list_users.mako:240
-msgid "The users and groups were update correctly."
-msgstr "사용자 및 그룹이 올바로 업데이트되었습니다."
+msgid "The users and groups were updated correctly."
+msgstr "사용자 및 그룹이 올바르게 업데이트되었습니다."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:43
 msgid "Sync LDAP users and groups"

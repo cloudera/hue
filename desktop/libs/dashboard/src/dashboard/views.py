@@ -17,11 +17,12 @@
 
 import json
 import logging
+import re
 
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from django.core.urlresolvers import reverse
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -29,6 +30,7 @@ from desktop.models import Document2, Document
 from desktop.views import antixss
 
 from search.conf import LATEST
+from indexer.views import importer
 
 from dashboard.dashboard_api import get_engine
 from dashboard.decorators import allow_owner_only
@@ -49,6 +51,33 @@ DEFAULT_LAYOUT = [
          {"size":12,"name":"Grid Results","widgetType":"resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
           "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
         "drops":["temp"],"klass":"card card-home card-column span10"},
+]
+
+REPORT_LAYOUT = [
+  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets":[]}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}
+]
+
+QUERY_BUILDER_LAYOUT = [
+  {u'klass': u'card card-home card-column span12', u'rows': [
+    {u'widgets': [
+        {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],
+     u'id': u'22532a0a-8e43-603a-daa9-77d5d233fd7f', u'columns': []},
+        {u'widgets': [], u'id': u'ebb7fe4d-64c5-c660-bdc0-02a77ff8321e', u'columns': []},
+        {u'widgets': [{u'name': u'Grid Results', u'widgetType': u'resultset-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'14023aef-b233-9420-96c6-15d48293532b', u'size': 12}],
+    u'id': u'2bfa8b4b-f7f3-1491-4de0-282130c6ab61', u'columns': []}
+    ],
+    u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12
+  }
+]
+
+TEXT_SEARCH_LAYOUT = [
+     {"size":12,"rows":[{"widgets":[
+         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
+          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
+                        {"widgets":[
+         {"size":12,"name":"HTML Results","widgetType":"html-resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
+          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+        "drops":["temp"],"klass":"card card-home card-column span12"},
 ]
 
 
@@ -80,13 +109,15 @@ def index(request, is_mobile=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
-
+  engine = collection.data['collection']['engine']
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
     'initial': json.dumps({
         'collections': [],
         'layout': DEFAULT_LAYOUT,
+        'qb_layout': QUERY_BUILDER_LAYOUT,
+        'text_search_layout': TEXT_SEARCH_LAYOUT,
         'is_latest': _get_latest(),
         'engines': get_engines(request.user)
     }),
@@ -94,6 +125,7 @@ def index(request, is_mobile=False):
     'can_edit_index': can_edit_index(request.user),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'mobile': is_mobile,
+    'is_report': collection.data['collection'].get('engine') == 'report'
   })
 
 def index_m(request):
@@ -101,12 +133,17 @@ def index_m(request):
 
 def new_search(request):
   engine = request.GET.get('engine', 'solr')
-  collections = get_engine(request.user, engine).datasets()
+  cluster = request.POST.get('cluster','""')
+  collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
   if not collections:
-    return no_collections(request)
+    if engine == 'solr':
+      return no_collections(request)
+    else:
+      return importer(request)
 
   collection = Collection2(user=request.user, name=collections[0], engine=engine)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
+  layout = DEFAULT_LAYOUT if engine != 'report' else REPORT_LAYOUT
 
   if request.GET.get('format', 'plain') == 'json':
     return JsonResponse({
@@ -114,7 +151,9 @@ def new_search(request):
       'query': query,
       'initial': {
           'collections': collections,
-          'layout': DEFAULT_LAYOUT,
+          'layout': layout,
+          'qb_layout': QUERY_BUILDER_LAYOUT,
+          'text_search_layout': TEXT_SEARCH_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }
@@ -125,22 +164,30 @@ def new_search(request):
       'query': query,
       'initial': json.dumps({
           'collections': collections,
-          'layout': DEFAULT_LAYOUT,
+          'layout': layout,
+          'qb_layout': QUERY_BUILDER_LAYOUT,
+          'text_search_layout': TEXT_SEARCH_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }),
       'is_owner': True,
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'can_edit_index': can_edit_index(request.user)
+      'can_edit_index': can_edit_index(request.user),
+      'is_report': engine == 'report'
     })
 
 def browse(request, name, is_mobile=False):
   engine = request.GET.get('engine', 'solr')
-  collections = get_engine(request.user, engine).datasets()
+  source = request.GET.get('source', 'data')
+
+  if engine == 'solr':
+    name = re.sub('^default\.', '', name)
+
+  collections = get_engine(request.user, engine, source=source).datasets()
   if not collections and engine == 'solr':
     return no_collections(request)
 
-  collection = Collection2(user=request.user, name=name, engine=engine)
+  collection = Collection2(user=request.user, name=name, engine=engine, source=source)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   template = 'search.mako'
@@ -159,6 +206,8 @@ def browse(request, name, is_mobile=False):
                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
           "drops":["temp"],"klass":"card card-home card-column span10"}
       ],
+      'qb_layout': QUERY_BUILDER_LAYOUT,
+      'text_search_layout': TEXT_SEARCH_LAYOUT,
       'is_latest': _get_latest(),
       'engines': get_engines(request.user)
     }),
@@ -179,6 +228,7 @@ def save(request):
 
   collection = json.loads(request.POST.get('collection', '{}'))
   layout = json.loads(request.POST.get('layout', '{}'))
+  gridItems = json.loads(request.POST.get('gridItems', '{}'))
 
   collection['template']['extracode'] = escape(collection['template']['extracode'])
 
@@ -191,7 +241,8 @@ def save(request):
 
     dashboard_doc.update_data({
         'collection': collection,
-        'layout': layout
+        'layout': layout,
+        'gridItems': gridItems
     })
     dashboard_doc1 = dashboard_doc.doc.get()
     dashboard_doc.name = dashboard_doc1.name = collection['label']

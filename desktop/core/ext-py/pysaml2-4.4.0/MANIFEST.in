@@ -1,0 +1,7 @@
+include INSTALL
+include LICENSE.txt
+include README
+include TODO
+recursive-include tests *
+recursive-include example *
+recursive-include doc *

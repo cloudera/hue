@@ -65,7 +65,7 @@ def list_indexes(request):
 def list_index(request):
   response = {'status': -1}
 
-  name = request.REQUEST.get('name')
+  name = request.POST.get('name')
 
   client = SolrClient(user=request.user)
 
@@ -131,7 +131,7 @@ def delete_indexes(request):
 
     for index in indexes:
       if index['type'] == 'collection':
-        client.delete_index(index['name'])
+        client.delete_index(index['name'], keep_config=False)
       elif index['type'] == 'alias':
         client.delete_alias(index['name'])
       else:
@@ -142,6 +142,19 @@ def delete_indexes(request):
 
   return JsonResponse(response)
 
+@require_POST
+@api_error_handler
+def index(request):
+  response = {'status': -1}
+
+  name = request.POST.get('name')
+  data = request.POST.get('data')
+  client = SolrClient(request.user)
+  client.index(name, data)
+  response['status'] = 0
+  response['message'] = _('Data added')
+
+  return JsonResponse(response)
 
 @require_POST
 @api_error_handler
@@ -171,6 +184,21 @@ def sample_index(request):
   client = SolrClient(user=request.user)
 
   response['sample'] = client.sample_index(name)['response']['docs']
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
+def config_index(request):
+  response = {'status': -1}
+
+  name = request.POST.get('name')
+
+  client = SolrClient(user=request.user)
+
+  response['config'] = json.dumps(client.get_config(name), indent=2)
   response['status'] = 0
 
   return JsonResponse(response)

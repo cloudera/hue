@@ -15,11 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from hbase import views as hbase_views
 
-urlpatterns = patterns('hbase.views',
-  url(r'^$', 'app', name='index'),
-  url(r'api/(?P<url>.+)$', 'api_router'),
+urlpatterns = [
+  url(r'^$', hbase_views.app, name='index'),
+  url(r'api/(?P<url>.+)$', hbase_views.api_router),
 
-  url(r'^install_examples$', 'install_examples', name='install_examples'),
-)
+  url(r'^install_examples$', hbase_views.install_examples, name='install_examples'),
+]

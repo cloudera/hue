@@ -77,7 +77,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
   <table id="workflowTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Owner') }</th>
@@ -87,7 +87,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
     <tbody data-bind="foreach: { data: jobs }">
       <tr data-bind="attr: { 'oozie-data-id': id() }">
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="multiCheck: '#workflowTable', css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
+          <div data-bind="multiCheck: '#workflowTable', css: { 'hue-checkbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <!-- ko if: ! uuid() -->
             <a data-bind="attr: { 'href': '${ url('oozie:open_old_bundle') }?bundle=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->

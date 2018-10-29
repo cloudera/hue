@@ -627,10 +627,10 @@ function renderCrons() {
     });
 
     function toggleBulkButtons() {
-      if ($(".hueCheckbox.fa-check:not(.select-all)").length > 0){
+      if ($(".hue-checkbox.fa-check:not(.select-all)").length > 0){
         var _allResume = true;
         var _allSuspended = true;
-        $(".hueCheckbox.fa-check:not(.select-all)").each(function(){
+        $(".hue-checkbox.fa-check:not(.select-all)").each(function(){
           if (['RUNNING', 'PREP', 'WAITING'].indexOf($(this).parents("tr").find(".label").text()) > -1){
             _allResume = false;
           }
@@ -668,7 +668,7 @@ function renderCrons() {
 
     function bulkOperation(what) {
       var _ids = [];
-      $(".hueCheckbox.fa-check:not(.select-all)").each(function(){
+      $(".hue-checkbox.fa-check:not(.select-all)").each(function(){
         _ids.push($(this).parents("tr").find("a[data-row-selector='true']").text());
       });
 
@@ -694,21 +694,21 @@ function renderCrons() {
           else {
             $.jHueNotify.info(_messages[what]);
           }
-          $(".hueCheckbox").removeClass("fa-check");
+          $(".hue-checkbox").removeClass("fa-check");
           toggleBulkButtons();
           $(".btn-toolbar").find(".loader").addClass("hide");
           $(".bulkToolbarBtn").show();
       });
     }
 
-    $(document).on("click", ".hueCheckbox", function(){
+    $(document).on("click", ".hue-checkbox", function(){
       var _check = $(this);
       if (_check.hasClass("select-all")){
         if (_check.hasClass("fa-check")){
-          $(".hueCheckbox").removeClass("fa-check");
+          $(".hue-checkbox").removeClass("fa-check");
         }
         else {
-          $(".hueCheckbox").addClass("fa-check");
+          $(".hue-checkbox").addClass("fa-check");
         }
       }
       else {

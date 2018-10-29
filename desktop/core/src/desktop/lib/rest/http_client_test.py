@@ -16,6 +16,7 @@
 
 from requests import Response
 from requests.exceptions import HTTPError
+from desktop.conf import REST_CONN_TIMEOUT
 
 from nose.tools import assert_equal, assert_false, assert_true
 
@@ -42,7 +43,7 @@ class MockedSession():
   def __init__(self, cookies=None):
     self.cookies = cookies or {}
 
-  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False):
+  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, timeout=REST_CONN_TIMEOUT.get()):
     return MockedResponse()
 
 

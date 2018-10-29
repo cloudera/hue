@@ -20,7 +20,7 @@ import logging
 import re
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.utils.html import escape
 from django.utils.translation import ugettext_lazy as _t
@@ -304,7 +304,7 @@ class Collection(models.Model):
       if facet['widgetType'] == 'map-widget' and facet['type'] == 'field':
         facet['type'] = 'pivot'
         properties['facets'] = []
-        properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
+        properties['facets_form'] = {'field': '', 'mincount': 0, 'limit': 5}
 
     return json.dumps(props)
 

@@ -23,7 +23,7 @@ import threading
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from spark.conf import get_livy_server_url, SECURITY_ENABLED
+from spark.conf import get_livy_server_url, SECURITY_ENABLED, SSL_CERT_CA_VERIFY
 
 
 LOG = logging.getLogger(__name__)
@@ -53,8 +53,8 @@ def get_api(user):
 
 class JobServerApi(object):
 
-  def __init__(self, oozie_url):
-    self._url = posixpath.join(oozie_url)
+  def __init__(self, livy_url):
+    self._url = posixpath.join(livy_url)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = SECURITY_ENABLED.get()
@@ -62,6 +62,8 @@ class JobServerApi(object):
 
     if self.security_enabled:
       self._client.set_kerberos_auth()
+
+    self._client.set_verify(SSL_CERT_CA_VERIFY.get())
 
   def __str__(self):
     return "JobServerApi at %s" % (self._url,)

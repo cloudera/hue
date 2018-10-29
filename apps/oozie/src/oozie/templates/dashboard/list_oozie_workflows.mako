@@ -72,7 +72,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th width="1%"><div class="select-all hue-checkbox fa"></div></th>
           <th width="14%">${ _('Submission') }</th>
           <th width="5%">${ _('Status') }</th>
           <th width="31%">${ _('Name') }</th>
@@ -374,7 +374,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       completedTableOffset = 1;
 
       // Clear select-all
-      $(".hueCheckbox").removeClass("fa-check");
+      $(".hue-checkbox").removeClass("fa-check");
     }
 
     function drawTable() {
@@ -474,7 +474,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
           // Find previously selected jobs
           var _ids = [];
-          $(".hueCheckbox.fa-check:not(.select-all)").each(function(){
+          $(".hue-checkbox.fa-check:not(.select-all)").each(function(){
             _ids.push($(this).parents("tr").find("a[data-row-selector='true']").text());
           });
           runningTable.fnClearTable();
@@ -497,7 +497,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(wf.status) > -1) {
               try {
                 runningTable.fnAddData([
-                  wf.canEdit ? '<div class="hueCheckbox fa ' + checkboxSelected + '" data-row-selector-exclude="true"></div>':'',
+                  wf.canEdit ? '<div class="hue-checkbox fa ' + checkboxSelected + '" data-row-selector-exclude="true"></div>':'',
                   '<span data-sort-value="'+ wf.createdInMillis +'" data-type="date">' + emptyStringIfNull(wf.created) + '</span>',
                   '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>',
                   wf.appName,

@@ -20,6 +20,7 @@ import urllib
 import urllib2
 
 from contextlib import contextmanager
+from desktop.conf import REST_CONN_TIMEOUT
 
 
 class RequestWithMethod(urllib2.Request):
@@ -173,7 +174,7 @@ class ZooKeeper(object):
         try:
             req = urllib2.Request(uri)
             req.add_header("Accept", "application/json");
-            r = urllib2.urlopen(req)
+            r = urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get())
             resp = json.load(r)
 
             if 'Error' in resp:
@@ -193,7 +194,7 @@ class ZooKeeper(object):
             if data is not None:
                 req.add_data(data)
 
-            resp = json.load(urllib2.urlopen(req))
+            resp = json.load(urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get()))
             if 'Error' in resp:
                 raise ZooKeeper.Error(resp['Error'])
             return resp
@@ -212,7 +213,7 @@ class ZooKeeper(object):
         req = RequestWithMethod(uri)
         req.set_method('DELETE')
         req.add_header('Content-Type', 'application/octet-stream')
-        return urllib2.urlopen(req).read()
+        return urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get()).read()
 
     def _do_put(self, uri, data):
         """ Send a PUT request """
@@ -223,7 +224,7 @@ class ZooKeeper(object):
             if data is not None:
                 req.add_data(data)
 
-            return urllib2.urlopen(req).read()
+            return urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get()).read()
         except urllib2.HTTPError, e:
             if e.code == 412: # precondition failed
                 raise ZooKeeper.WrongVersion(uri)

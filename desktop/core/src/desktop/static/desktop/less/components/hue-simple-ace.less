@@ -1,0 +1,78 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.simple-ace-single-line {
+  background-color: @cui-white;
+  position: relative;
+  border: 1px solid @cui-gray-300;
+  border-radius: 4px;
+  width: 100%;
+  height: 25px;
+
+  .ace-editor {
+    position: absolute;
+    top: 4px;
+    right: 15px;
+    bottom: 4px;
+    left: 3px;
+  }
+
+  .ace-clearable {
+    position: absolute;
+    right: 5px;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    opacity: 0;
+    color: @cui-gray-700;
+    .hue-ease-transition(~"opacity, color");
+
+    &:hover {
+      color: @hue-primary-color-dark;
+    }
+
+    .fa {
+      position:absolute;
+      top: 0;
+      bottom: 0;
+      height: 13px;
+      font-size: 13px;
+      display: block;
+      margin: auto;
+      vertical-align: middle;
+    }
+
+    &.visible {
+      opacity: 1;
+      cursor: pointer;
+    }
+  }
+}
+
+.simple-ace-multi-line {
+  background-color: @cui-white;
+  position: relative;
+  border: 1px solid @cui-gray-300;
+  border-radius: 4px;
+  width: 100%;
+
+  .ace_emptyMessage {
+    margin-left:3px;
+  }
+}

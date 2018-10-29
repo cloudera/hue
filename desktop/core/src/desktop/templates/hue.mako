@@ -18,13 +18,17 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
+
+  from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
@@ -43,30 +47,99 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
+% if DEV_EMBEDDED.get():
+  <style>
+    html {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      font-size: 1em;
+    }
+
+    body {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: pink;
+    }
+
+    .hue-embedded-container {
+      position: absolute !important;
+      top: 60px !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      right: 0 !important;
+    }
+  </style>
+% endif
+
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
+% if IS_EMBEDDED.get():
+  <link href="${ static('desktop/css/hue-bootstrap-embedded.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/hue-embedded.css') }" rel="stylesheet">
+% else:
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
-
-
-  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
-
+% endif
   <script type="text/javascript">
-    var IS_HUE_4 = true;
+    window.IS_HUE_4 = true;
+% if IS_EMBEDDED.get():
+  // Bootstrap 2.3.2 relies on the hide css class presence for modals but doesn't remove it when opened for fade type
+  // modals, a parent container might have it set to !important which will prevent the modal from showing. This
+  // redefines all .hide definitions to exclude .modal.fade
+  try {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      if (document.styleSheets[i] && document.styleSheets[i].cssRules) {
+        for (var j = document.styleSheets[i].cssRules.length - 1; j > 0; j--) {
+          if (document.styleSheets[i] && document.styleSheets[i].cssRules[j] && document.styleSheets[i].cssRules[j].selectorText === '.hide') {
+            var originalCssText = document.styleSheets[i].cssRules[j].cssText;
+            if (originalCssText.indexOf('!important') !== -1) {
+              document.styleSheets[i].deleteRule(j);
+              document.styleSheets[i].insertRule(originalCssText.replace('.hide', '.hide:not(.modal):not(.fade)'));
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+
+  // Add modified URL for .clearable background
+  var originalClearableImgUrl = '${ static('desktop/art/clearField@2x.png') }';
+  var clearableImgUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(originalClearableImgUrl) : originalClearableImgUrl;
+
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode('.clearable { background: url(' + clearableImgUrl + ') no-repeat right -10px center; }'));
+  document.head.appendChild(style);
+% endif
   </script>
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
+  ${ commonHeaderFooterComponents.header_i18n_redirection() }
+
+  <script src="/desktop/globalJsConstants.js?v=${ hue_version() }"></script>
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
+  <script src="${ static('desktop/js/contextCatalog.js') }"></script>
 </head>
 
 <body>
+
+% if IS_EMBEDDED.get():
+<div class="hue-embedded-container">
+% endif
 
 % if is_demo:
   <ul class="side-labels unstyled">
@@ -103,18 +176,26 @@ ${ hueIcons.symbols() }
       ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
     </div>
   % endif
+  % if not IS_EMBEDDED.get():
   <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
+        % if not IS_EMBEDDED.get():
         <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-          <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
+            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() === 'dw'">
+            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 22px; margin-top:3px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
+          % else:
+            <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          % endif
         </a>
+        % endif
 
-
+        % if not IS_MULTICLUSTER_ONLY.get():
         <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
@@ -131,6 +212,7 @@ ${ hueIcons.symbols() }
             <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
         </div>
+        % endif
 
         <script type="text/html" id="quick-create-item-template">
           <!-- ko if: item.dividerAbove -->
@@ -138,7 +220,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
           <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
             <!-- ko if: item.url -->
-             <a href="javascript: void(0);" data-bind="hueLink: item.url">
+              <a href="javascript: void(0);" data-bind="hueLink: item.url">
                 <!-- ko if: item.icon -->
                 <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
                 <!-- /ko -->
@@ -159,57 +241,19 @@ ${ hueIcons.symbols() }
 
 
       <div class="top-nav-middle">
-
-        <!-- ko if: cluster.clusters().length > 1 -->
-        <div class="btn-group pull-right" style="display: none;" data-bind="visible: cluster.clusters().length > 1">
-          <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
-          <button class="btn dropdown-toggle" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
-
-          <ul class="dropdown-menu">
-            <!-- ko foreach: cluster.clusters -->
-              <!-- ko if: ['dataeng', 'cm'].indexOf(type()) != -1 && interfaces().length > 0 -->
-                <li class="dropdown-submenu">
-                  <a data-rel="navigator-tooltip" href="javascript: void(0)">
-                    <i class="fa fa-fw fa-th-large inline-block"></i> <span data-bind="text: name"></span>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li data-bind="visible: type() == 'dataeng'">
-                      <a data-rel="navigator-tooltip" href="#">
-                        <span class="dropdown-no-icon"><i class="fa fa-fw fa-plus inline-block"></i></span>
-                      </a>
-                    </li>
-                    <!-- ko foreach: interfaces -->
-                      <li>
-                        <a href="javascript: void(0)" data-bind="click: function() { $root.cluster.cluster($data) }">
-                          <span class="dropdown-no-icon" data-bind="text: interface"></span>
-                        </a>
-                      </li>
-                    <!-- /ko -->
-                  </ul>
-                </li>
-                <!-- /ko -->
-                <!-- ko if: ['dataeng', 'cm'].indexOf(type()) == -1 || interfaces().length == 0 -->
-                  <li><a href="javascript: void(0)" data-bind="click: function(){  $root.cluster.cluster($data) }">
-                    <i class="fa fa-fw fa-square"></i> <span data-bind="text: name"></span></a>
-                  </li>
-                <!-- /ko -->
-              <!-- /ko -->
-            <!-- /ko -->
-          </ul>
-        </div>
-        <!-- /ko -->
-
         <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
       </div>
 
       <div class="top-nav-right">
 
-        % if user.is_authenticated() and section != 'login':
+        % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
         <div class="dropdown navbar-dropdown pull-right">
+          % if IS_MULTICLUSTER_ONLY.get():
+            ##<!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
+          % endif
+
           <%
-            view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
+            view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
           %>
           <button class="btn btn-flat" data-toggle="dropdown" data-bind="click: function(){ huePubSub.publish('hide.jobs.panel'); huePubSub.publish('hide.history.panel'); }">
             <i class="fa fa-user"></i> ${ user.username } <span class="caret"></span>
@@ -218,14 +262,16 @@ ${ hueIcons.symbols() }
             % if view_profile:
             <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/edit/${ user.username }'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
             % endif
-            % if user.is_superuser:
+            % if is_admin(user):
             <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
+            % if not conf.DISABLE_HUE_3.get():
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 3')}</a></li>
+            % endif
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
-            % if user.is_superuser:
-            <li><a href="/about/"><span class="dropdown-no-icon">${_('Check Configuration')}</span></a></li>
+            % if is_admin(user):
+            <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
             % endif
             <li class="divider"></li>
             <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
@@ -243,58 +289,63 @@ ${ hueIcons.symbols() }
   </nav>
 
   <div id="jobsPanel" class="jobs-panel" style="display: none;">
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
-    <ul class="nav nav-pills">
-      <li class="active" data-interface="jobs"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
-      % if 'jobbrowser' in apps:
-      <% from jobbrowser.conf import ENABLE_QUERY_BROWSER %>
-      % if ENABLE_QUERY_BROWSER.get():
-        <li data-interface="queries"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'queries')">${_('Queries')}</a></li>
-      % endif
-      % endif
-      <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
-      <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
-    </ul>
+    <div style="position: absolute; right: 0px; padding: 5px 10px;">
+      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
+      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
+        ${ _('Open') } <i class="fa fa-fw fa-expand"></i>
+      </a>
+    </div>
     <div id="mini_jobbrowser"></div>
   </div>
 
+  % endif
+
   <div class="content-wrapper">
 
-    <script type="text/html" id="tmpl-sidebar-link">
-      <a role="button" class="sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
-        <span class="sidebar-item-name" data-bind="text: item.displayName"></span>
+    <script type="text/html" id="hue-tmpl-sidebar-link">
+      <a role="button" class="hue-sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
+        <span class="hue-sidebar-item-name" data-bind="text: item.displayName"></span>
       </a>
     </script>
 
-    <div class="sidebar sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
-      <div class="sidebar-content">
-        <!-- ko foreach: {data: items, as: 'item'} -->
+    <div class="hue-sidebar hue-sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
+      % if IS_MULTICLUSTER_ONLY.get():
+        <!-- ko component: { name: 'hue-multi-cluster-sidebar' } --><!-- /ko -->
+      % else:
+        <div class="hue-sidebar-content">
+          <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
-             <h4 class="sidebar-category-item" data-bind="text: item.displayName"></h4>
-             <!-- ko template: {name: 'tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
+            <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
+            <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: item.isCategory -->
-             <!-- ko template: { name: 'tmpl-sidebar-link' } --><!-- /ko -->
+            <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
           <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <div class="sidebar-footer-panel">
-        <div data-bind="dropzone: {
+          <!-- /ko -->
+        </div>
+        <div class="hue-sidebar-footer-panel">
+          % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
+          <div data-bind="dropzone: {
             clickable: false,
-            url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir,
-            params: { dest: DropzoneGlobals.homeDir },
+            url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
+            params: { dest: DROPZONE_HOME_DIR },
             paramName: 'hdfs_file',
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
             click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
-          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+            <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+          </div>
+          % endif
         </div>
-      </div>
+      % endif
     </div>
 
+    % if IS_MULTICLUSTER_ONLY.get():
+    <div class="hue-dw-sidebar-container collapsed" data-bind="component: { name: 'hue-dw-sidebar', params: { items: items, pocClusterMode: pocClusterMode } }"></div>
+    % endif
+
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
-      <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
+      <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
       <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <div class="assist" data-bind="component: {
           name: 'assist-panel',
@@ -321,7 +372,7 @@ ${ hueIcons.symbols() }
 
 
     <div class="page-content">
-      <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge' } --><!-- /ko -->
+      <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_notebook" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
@@ -333,7 +384,9 @@ ${ hueIcons.symbols() }
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
+      <div id="embeddable_catalog" class="embeddable"></div>
       <div id="embeddable_indexer" class="embeddable"></div>
+      <div id="embeddable_kafka" class="embeddable"></div>
       <div id="embeddable_importer" class="embeddable"></div>
       <div id="embeddable_collections" class="embeddable"></div>
       <div id="embeddable_indexes" class="embeddable"></div>
@@ -357,6 +410,8 @@ ${ hueIcons.symbols() }
       <div id="embeddable_admin_wizard" class="embeddable"></div>
       <div id="embeddable_logs" class="embeddable"></div>
       <div id="embeddable_dump_config" class="embeddable"></div>
+      <div id="embeddable_threads" class="embeddable"></div>
+      <div id="embeddable_metrics" class="embeddable"></div>
       <div id="embeddable_403" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
@@ -369,44 +424,29 @@ ${ hueIcons.symbols() }
       % endif
     </div>
 
-    <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
-      containerSelector: '.content-wrapper',
-      sidePanelSelector: '.right-panel',
-      sidePanelVisible: rightAssistVisible,
-      orientation: 'right',
-      onPosition: function() { huePubSub.publish('split.draggable.position') }
-    }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
+    <div class="right-panel" data-bind="css: { 'right-assist-minimized': !rightAssistVisible() }, visible: rightAssistAvailable, component: {
+        name: 'right-assist-panel',
+        params: {
+          visible: rightAssistVisible
+        }
+      }" style="display: none;"></div>
 
-    <div class="right-panel side-panel-closed" data-bind="visible: rightAssistAvailable, css: { 'side-panel-closed': !rightAssistVisible() || !rightAssistAvailable() }, visibleOnHover: { selector: '.hide-right-side-panel' }" style="display:none;">
-      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: rightAssistAvailable() && !rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistAvailable() && rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
-
-      <div class="assist" data-bind="component: {
-          name: 'right-assist-panel',
-          params: {
-            rightAssistAvailable: rightAssistAvailable
-          }
-        }, visible: rightAssistAvailable() && rightAssistVisible()" style="display: none;">
-      </div>
-    </div>
-
-    <div class="context-panel" data-bind="css: { 'visible': contextPanelVisible }">
-      <a href="javascript: void(0);" class="inactive-action" style="position: absolute; left: 6px; top: 4px;" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-right"></i></a>
-      <ul class="nav nav-tabs">
-        <!-- ko if: sessionsAvailable -->
-        <li class="active"><a href="#sessionsTab" data-toggle="tab" data-bind="visible: sessionsAvailable">${_('Sessions')}</a></li>
-        <!-- /ko -->
-      </ul>
-
-      <div class="tab-content">
-        <!-- ko if: sessionsAvailable() && templateApp() -->
-        <div class="tab-pane active" id="sessionsTab">
+    <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
+      <div class="margin-top-10 padding-left-10 padding-right-10">
+        <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
+        <div class="context-panel-content">
+          <!-- ko if: sessionsAvailable() && templateApp() -->
           <div class="row-fluid">
-            <div class="span12" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
+            <div class="span11" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
           </div>
+          <!-- /ko -->
+
+          <!-- ko ifnot: sessionsAvailable() && templateApp() -->
+          ${_('There are currently no information about the sessions.')}
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
       </div>
+      <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-up"></i></a>
     </div>
   </div>
 </div>
@@ -414,6 +454,9 @@ ${ hueIcons.symbols() }
 ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue-bundle.js') }"></script>
+% if IS_EMBEDDED.get():
+<script src="${ static('desktop/ext/js/page.js') }"></script>
+% endif
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
@@ -437,8 +480,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
-
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
@@ -452,6 +493,8 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
+<script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
+<script src="${ static('desktop/js/dataCatalog.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
@@ -478,10 +521,13 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
@@ -559,7 +605,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
         filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
         home: { url: '/home*', title: '${_('Home')}' },
+        catalog: { url: '/catalog', title: '${_('Catalog')}' },
         indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
+        kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
         collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
         % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
@@ -587,6 +635,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
         logs: { url: '/logs', title: '${_('Logs')}' },
         dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
+        threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
+        metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
         sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
         jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
         % if other_apps:
@@ -670,6 +720,26 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           })
         });
 
+        huePubSub.subscribe('open.importer.query', function (data) {
+          self.loadApp('importer');
+          self.getActiveAppViewModel(function (viewModel) {
+            hueUtils.waitForVariable(viewModel.createWizard, function(){
+              hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
+                viewModel.createWizard.prefill.source_type(data['source_type']);
+                viewModel.createWizard.prefill.target_type(data['target_type']);
+                viewModel.createWizard.prefill.target_path(data['target_path']);
+                viewModel.createWizard.destination.outputFormat(data['target_type']);
+              });
+              hueUtils.waitForVariable(viewModel.createWizard.source.query, function(){
+                viewModel.createWizard.source.query({"id": data.id, "name": data.name});
+              });
+              hueUtils.waitForVariable(viewModel.createWizard.loadSampleData, function(){
+                viewModel.createWizard.loadSampleData(data);
+              });
+            });
+          })
+        });
+
         huePubSub.subscribe('resize.form.actions', function () {
           document.styleSheets[0].addRule('.form-actions','width: ' + $('.page-content').width() + 'px');
           if ($('.content-panel:visible').length > 0) {
@@ -707,6 +777,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var loadedJs = [];
         var loadedCss = [];
         var loadedApps = [];
+        var head = document.getElementsByTagName('head')[0];
 
         $('script[src]').each(function(){
           loadedJs.push($(this).attr('src'));
@@ -716,70 +787,116 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           loadedCss.push($(this).attr('href'));
         });
 
-        huePubSub.subscribe('hue4.add.global.js', function ($el) {
-          var jsFile = $el.attr('src').split('?')[0];
-          if (loadedJs.indexOf(jsFile) === -1) {
-            loadedJs.push(jsFile);
-            $.ajaxSetup({ cache: true });
-            $el.clone().appendTo($('head'));
-            $.ajaxSetup({ cache: false });
-          }
-          $el.remove();
-        });
+        var loadScript = function (scriptUrl) {
+          var deferred = $.Deferred();
+          $.get(scriptUrl).done(function (contents) {
+            loadedJs.push(scriptUrl);
+            deferred.resolve(contents);
+          }).fail(function () {
+            deferred.resolve('');
+          });
+          return deferred.promise();
+        };
 
-        huePubSub.subscribe('hue4.add.global.css', function ($el) {
+        var loadScripts = function (scriptUrls) {
+          var promises = [];
+          while (scriptUrls.length) {
+            var scriptUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(scriptUrls.shift()) : scriptUrls.shift();
+            if (loadedJs.indexOf(scriptUrl) !== -1) {
+              continue;
+            }
+            promises.push(loadScript(scriptUrl));
+          }
+          return promises;
+        };
+
+        var addGlobalCss = function ($el) {
           var cssFile = $el.attr('href').split('?')[0];
           if (loadedCss.indexOf(cssFile) === -1) {
             loadedCss.push(cssFile);
             $.ajaxSetup({ cache: true });
+            if (typeof adaptHueEmbeddedUrls !== 'undefined') {
+              $el.attr('href', adaptHueEmbeddedUrls($el.attr('href')));
+            }
+            % if conf.DEV.get():
+              $el.attr('href', $el.attr('href') + '?dev=' + Math.random());
+            % endif
             $el.clone().appendTo($('head'));
             $.ajaxSetup({ cache: false });
           }
           $el.remove();
-        });
-
-        huePubSub.subscribe('hue4.get.globals', function(callback){
-          callback(loadedJs, loadedCss);
-        });
+        };
 
         // Only load CSS and JS files that are not loaded before
-        self.processHeaders = function(response){
-          var r = $('<span>').html(response);
-          % if conf.DEV.get():
-          r.find('link').each(function () {
-            $(this).attr('href', $(this).attr('href') + '?' + Math.random())
+        self.processHeaders = function (response){
+          var promise = $.Deferred();
+          var $rawHtml = $('<span>').html(response);
+
+          var $allScripts = $rawHtml.find('script[src]');
+          var scriptsToLoad = $allScripts.map(function () {
+            return $(this).attr('src');
+          }).toArray();
+          $allScripts.remove();
+
+          $rawHtml.find('link[href]').each(function () {
+            addGlobalCss($(this)); // Also removes the elements;
           });
-          r.find('script[src]').each(function () {
-            $(this).attr('src', $(this).attr('src') + '?' + Math.random())
-          });
-          % endif
-          r.find('script[src]').each(function () {
-            huePubSub.publish('hue4.add.global.js', $(this));
-          });
-          r.find('link[href]').each(function () {
-            huePubSub.publish('hue4.add.global.css', $(this));
-          });
-          r.find('a[href]').each(function () {
+
+          $rawHtml.find('a[href]').each(function () {
             var link = $(this).attr('href');
             if (link.startsWith('/') && !link.startsWith('/hue')){
               link = '/hue' + link;
             }
             $(this).attr('href', link);
           });
-          r.unwrap('<span>');
-          return r;
+
+          if (typeof adaptHueEmbeddedUrls !== 'undefined') {
+            $rawHtml.find('img[src]').each(function () {
+              var $img = $(this);
+              $img.attr('src', adaptHueEmbeddedUrls($img.attr('src')));
+            })
+          }
+
+          $rawHtml.unwrap('<span>');
+
+          var scriptPromises = loadScripts(scriptsToLoad);
+
+          var evalScriptSync = function () {
+            if (scriptPromises.length) {
+              // Evaluate the scripts in the order they were defined in the page
+              var nextScriptPromise = scriptPromises.shift();
+              nextScriptPromise.done(function (contents) {
+                if (contents) {
+                  new Function(contents)();
+                }
+                evalScriptSync();
+              });
+            } else {
+              // All evaluated
+              promise.resolve($rawHtml);
+            }
+          };
+
+          evalScriptSync();
+          return promise;
         };
 
         huePubSub.subscribe('hue4.process.headers', function(opts){
-          opts.callback(self.processHeaders(opts.response));
+          self.processHeaders(opts.response).done(function (rawHtml) {
+            opts.callback(rawHtml);
+          });
         });
 
         self.loadApp = function(app, loadDeep) {
-          if (self.currentApp() == 'editor') {
-           var vm = ko.dataFor($('#editorComponents')[0]);
+          if (self.currentApp() == 'editor' && $('#editorComponents').length) {
+            var vm = ko.dataFor($('#editorComponents')[0]);
             if (vm.isPresentationMode()) {
-              vm.isPresentationMode(false);
+              vm.selectedNotebook().isPresentationMode(false);
             }
+          }
+
+          if (self.currentApp() == 'editor' && self.embeddable_cache['editor'] && !$('#editorComponents').length) {
+            self.embeddable_cache['editor'] = undefined;
           }
 
           self.currentApp(app);
@@ -787,6 +904,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.lastContext = null;
           }
           SKIP_CACHE.forEach(function (skipped) {
+            huePubSub.publish('app.dom.unload', skipped);
             $('#embeddable_' + skipped).html('');
           });
           self.isLoadingEmbeddable(true);
@@ -796,7 +914,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
           $('.tooltip').hide();
           huePubSub.publish('hue.datatable.search.hide');
-          huePubSub.publish('nicescroll.resize');
           huePubSub.publish('hue.scrollleft.hide');
           huePubSub.publish('context.panel.visible', false);
           huePubSub.publish('context.panel.visible.editor', false);
@@ -843,6 +960,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               baseURL += (baseURL.indexOf('?') > -1 ? '&' : '?') + self.currentQueryString();
               self.currentQueryString(null);
             }
+            baseURL = encodeURI(baseURL);
             $.ajax({
               url: baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
               beforeSend: function (xhr) {
@@ -855,17 +973,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                   window.clearAppIntervals(app);
                   huePubSub.clearAppSubscribers(app);
                   self.extraEmbeddableURLParams('');
-                  var r = self.processHeaders(response);
-                  if (SKIP_CACHE.indexOf(app) === -1) {
-                    self.embeddable_cache[app] = r;
-                  }
-                  $('#embeddable_' + app).html(r);
-                  huePubSub.publish('app.dom.loaded', app);
-                }
-                else {
+
+                  self.processHeaders(response).done(function ($rawHtml) {
+                    if (SKIP_CACHE.indexOf(app) === -1) {
+                      self.embeddable_cache[app] = $rawHtml;
+                    }
+                    $('#embeddable_' + app).html($rawHtml);
+                    huePubSub.publish('app.dom.loaded', app);
+                    self.isLoadingEmbeddable(false);
+                  });
+                } else {
                   window.location.href = baseURL;
                 }
-                self.isLoadingEmbeddable(false);
               },
               error: function (xhr) {
                 console.error('Route loading problem', xhr);
@@ -895,7 +1014,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.dropzoneError = function (filename) {
           self.loadApp('importer');
           self.getActiveAppViewModel(function (vm) {
-            vm.createWizard.source.path(DropzoneGlobals.homeDir + '/' + filename);
+            vm.createWizard.source.path(DROPZONE_HOME_DIR + '/' + filename);
           });
           $('.dz-drag-hover').removeClass('dz-drag-hover');
         };
@@ -919,8 +1038,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.in.importer', openImporter);
 
+        huePubSub.subscribe('assist.dropzone.complete', self.dropzoneComplete);
+
         // prepend /hue to all the link on this page
-        $('a[href]').each(function () {
+        $('${ '.hue-embedded-container a[href]' if IS_EMBEDDED.get() else 'a[href]' }').each(function () {
           var link = $(this).attr('href');
           if (link.startsWith('/') && !link.startsWith('/hue')){
             link = '/hue' + link;
@@ -928,7 +1049,33 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $(this).attr('href', link);
         });
 
+        % if IS_EMBEDDED.get():
+        page.base(window.location.pathname + window.location.search);
+        page.baseSearch = window.location.search.replace('?', '');
+        if (!window.location.hash) {
+          window.location.hash = '#!/editor?type=impala'
+        }
+        page({ hashbang: true });
+        % else:
         page.base('/hue');
+        % endif
+
+        var getUrlParameter = function (name) {
+          % if IS_EMBEDDED.get():
+            if (~window.location.hash.indexOf('?')) {
+              var paramString = window.location.hash.substring(window.location.hash.indexOf('?'));
+              var params = paramString.split('&');
+              for (var i = 0; i < params.length; i++) {
+                if (~params[i].indexOf(name + '=')) {
+                  return params[i].substring(name.length + 2);
+                }
+              }
+            }
+            return '';
+          % else:
+          return window.location.getParameter(name) || '';
+          % endif
+        };
 
         self.lastContext = null;
 
@@ -945,6 +1092,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
+          { url: '/desktop/debug/threads', app: function () {
+            self.loadApp('threads');
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.fetchThreads();
+            });
+          }},
+          { url: '/desktop/metrics', app: function () {
+            self.loadApp('metrics');
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.fetchMetrics();
+            });
+          }},
           { url: '/desktop/download_logs', app: function () {
             location.href = '/desktop/download_logs';
           }},
@@ -952,20 +1111,23 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             // Defer to allow window.location param update
             _.defer(function () {
               if (typeof self.embeddable_cache['editor'] === 'undefined'){
-                if (window.location.getParameter('editor') !== '') {
-                  self.extraEmbeddableURLParams('&editor=' + window.location.getParameter('editor'));
-                } else if (window.location.getParameter('type') !== '') {
-                  self.extraEmbeddableURLParams('&type=' + window.location.getParameter('type'));
+                if (getUrlParameter('editor') !== '') {
+                  self.extraEmbeddableURLParams('&editor=' + getUrlParameter('editor'));
+                } else if (getUrlParameter('type') !== '' && getUrlParameter('type') !== 'notebook') {
+                  self.extraEmbeddableURLParams('&type=' + getUrlParameter('type'));
                 }
                 self.loadApp('editor');
               } else {
                 self.loadApp('editor');
-                if (window.location.getParameter('editor') !== '') {
+                if (getUrlParameter('editor') !== '') {
                   self.getActiveAppViewModel(function (viewModel) {
-                    viewModel.openNotebook(window.location.getParameter('editor'));
+                    self.isLoadingEmbeddable(true);
+                    viewModel.openNotebook(getUrlParameter('editor')).always(function () {
+                      self.isLoadingEmbeddable(false);
+                    });
                   });
-                } else if (window.location.getParameter('type') !== '') {
-                  self.changeEditorType(window.location.getParameter('type'));
+                } else if (getUrlParameter('type') !== '') {
+                  self.changeEditorType(getUrlParameter('type'));
                 }
               }
             });
@@ -976,7 +1138,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/filebrowser/view=*', app: 'filebrowser' },
           { url: '/filebrowser/download=*', app: 'filebrowser' },
           { url: '/filebrowser/*', app: function () {
-            page('/filebrowser/view=' + DropzoneGlobals.homeDir);
+            page('/filebrowser/view=' + DROPZONE_HOME_DIR);
           }},
           { url: '/hbase/', app: 'hbase' },
           { url: '/help', app: 'help' },
@@ -984,6 +1146,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page(ctx.path.replace(/home2/gi, 'home'));
           }},
           { url: '/home*', app: 'home' },
+          { url: '/catalog', app: 'catalog' },
+          { url: '/kafka/', app: 'kafka' },
+          { url: '/indexer/topics/*', app: 'kafka' },
           { url: '/indexer/indexes/*', app: 'indexes' },
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },
@@ -1020,7 +1185,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             var notebookId = hueUtils.getSearchParameter('?' + ctx.querystring, 'notebook');
             if (notebookId !== '') {
               self.getActiveAppViewModel(function (viewModel) {
-                viewModel.openNotebook(notebookId);
+                self.isLoadingEmbeddable(true);
+                viewModel.openNotebook(notebookId).always(function () {
+                  self.isLoadingEmbeddable(false);
+                });
               });
             } else {
               self.getActiveAppViewModel(function (viewModel) {
@@ -1103,10 +1271,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 self.currentContextParams(ctx.params);
                 self.currentQueryString(ctx.querystring);
                 self.loadApp('${ other.display_name }', true)
-              }}
+              }},
             % endfor
           % endif
         ];
+
+        if (typeof HUE_EMBEDDED_PAGE_MAPPINGS !== 'undefined') {
+          pageMapping = pageMapping.concat(HUE_EMBEDDED_PAGE_MAPPINGS)
+        }
 
         pageMapping.forEach(function (mapping) {
           page(mapping.url, _.isFunction(mapping.app) ? mapping.app : function (ctx) {
@@ -1127,13 +1299,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.link', function (href) {
           if (href) {
-            if (href.startsWith('/') && !href.startsWith('/hue')){
-              page('/hue' + href);
+            var prefix = '${ '' if IS_EMBEDDED.get() else '/hue' }';
+            if (href.startsWith('/') && !href.startsWith(prefix)){
+              page(prefix + href);
             } else {
               page(href);
             }
-          }
-          else {
+          } else {
             console.warn('Received an open.link without href.')
           }
         });
@@ -1157,6 +1329,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
           window.setTimeout(function () {
             huePubSub.publish('split.panel.resized');
+            $(window).trigger('resize');
           }, 0);
         });
 
@@ -1168,8 +1341,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           hueAnalytics.convert('hue', 'rightAssistVisible/' + val)
           window.setTimeout(function () {
             huePubSub.publish('reposition.scroll.anchor.up');
-            huePubSub.publish('nicescroll.resize');
             huePubSub.publish('split.panel.resized');
+            $(window).trigger('resize');
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
@@ -1179,6 +1352,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.rightAssistVisible(true);
           }
         });
+
+        huePubSub.subscribe('set.current.app.name', function (appName) {
+          if (appName === 'dashboard') {
+            self.rightAssistAvailable(true);
+          } else if (appName !== 'editor' && appName !== 'notebook') {
+            self.rightAssistAvailable(false);
+          }
+        });
+
+        huePubSub.subscribe('active.snippet.type.changed', function (snippetType) {
+          self.rightAssistAvailable(snippetType === 'impala' || snippetType === 'hive' || snippetType ==='pig');
+        });
+
+        huePubSub.publish('get.current.app.name');
 
         self.activeAppViewModel = ko.observable();
         self.currentApp = ko.observable('');
@@ -1192,6 +1379,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         self.contextPanelVisible = ko.observable(false);
+        self.contextPanelVisible.subscribe(function () {
+          var $el = $('.snippet .ace-editor:visible');
+          if ($el.length === 0) {
+            $el = $('.content-panel:visible');
+          }
+          $('.context-panel').width($el.width()).css('left', $el.offset().left);
+        });
+
         self.sessionsAvailable = ko.observable(false);
 
         self.activeAppViewModel.subscribe(function (viewModel) {
@@ -1208,7 +1403,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.publish('get.current.app.view.model');
 
         var previousVisibilityValues = {};
-        huePubSub.subscribe('side.panels.hide', function(withoutStorage){
+        huePubSub.subscribe('both.assists.hide', function(withoutStorage){
           previousVisibilityValues = {
             left: self.leftAssistVisible(),
             right: self.rightAssistVisible()
@@ -1221,7 +1416,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
 
-        huePubSub.subscribe('side.panels.show', function(withoutStorage){
+        huePubSub.subscribe('both.assists.show', function(withoutStorage){
           self.assistWithoutStorage(withoutStorage);
           self.leftAssistVisible(previousVisibilityValues.left);
           self.rightAssistVisible(previousVisibilityValues.right);
@@ -1230,17 +1425,36 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
 
+        huePubSub.subscribe('right.assist.hide', function(withoutStorage){
+          previousVisibilityValues = {
+            left: self.leftAssistVisible(),
+            right: self.rightAssistVisible()
+          };
+          self.assistWithoutStorage(withoutStorage);
+          self.rightAssistVisible(false);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
+        });
+
+        huePubSub.subscribe('right.assist.show', function () {
+          if (!self.rightAssistVisible()) {
+            self.rightAssistVisible(true);
+          }
+        });
+
         huePubSub.subscribe('left.assist.show', function () {
           if (!self.leftAssistVisible()) {
             self.leftAssistVisible(true);
           }
-        })
+        });
+
       }
 
       var sidePanelViewModel = new SidePanelViewModel();
       ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
       ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
-      ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
+      ##  ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
       ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
 
@@ -1269,6 +1483,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }, 0);
           }
         });
+
+        // TODO: Drop. Just for PoC
+        self.pocClusterMode = ko.observable();
+        ApiHelper.getInstance().withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw')
+        huePubSub.subscribe('set.multi.cluster.mode', self.pocClusterMode);
 
         self.onePageViewModel.currentApp.subscribe(function () {
           self.leftNavVisible(false);
@@ -1303,7 +1522,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               $.each(app['interpreters'], function(index, interpreter) {
                 // Promote the first catagory of interpreters
                 if (! dividerAdded) {
-                  toAddDivider = app.name === 'editor' && (lastInterpreter != null && lastInterpreter.is_sql != interpreter.is_sql);
+                  toAddDivider = (app.name === 'editor' || app.name === 'dashboard') && (lastInterpreter != null && lastInterpreter.is_sql != interpreter.is_sql);
                 }
                 interpreters.push({
                   displayName: interpreter.displayName,
@@ -1318,7 +1537,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 }
               });
 
-              % if user.is_superuser:
+              % if is_admin(user) and cluster != ANALYTIC_DB:
                 if (app.name === 'editor') {
                   interpreters.push({
                     displayName: '${ _('Add more...') }',
@@ -1348,59 +1567,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.subscribe('hue.new.default.app', function () {
           huePubSub.publish('cluster.config.refresh.config');
         });
-
-        var ClusterPanelViewModel = function() {
-          var self = this;
-          self.apiHelper = ApiHelper.getInstance();
-
-          self.clusters = ko.mapping.fromJS(${ clusters_config_json | n,unicode });
-          self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[${ default_cluster_index }] : self.clusters()[0]);
-          self.cluster.subscribe(function(newValue) {
-            new ClusterConfig({'cluster': ko.mapping.toJSON(newValue)});
-          });
-
-          self.contextPanelVisible = ko.observable(false);
-
-          self._loadInterface = function() {
-            var interfaces = self.cluster().interfaces().filter(function (i) {return i.interface() == '${ default_cluster_interface }'});
-            if (interfaces.length > 0) {
-              self.cluster(interfaces[0]);
-            }
-          };
-          var dataEngCluster = $.grep(self.clusters(), function(cluster) {
-            return cluster.type() == 'dataeng';
-          });
-          if (dataEngCluster.length > 0) {
-            $.post("/jobbrowser/api/jobs", {
-              interface: ko.mapping.toJSON('dataeng-clusters'),
-              filters: ko.mapping.toJSON([]),
-            }, function (data) {
-              if (data.status == 0) {
-                var interfaces = [];
-                if (data && data.apps) {
-                  data.apps.forEach(function(cluster) {
-                    interfaces.push(ko.mapping.fromJS({'name': dataEngCluster[0].name(), 'type': 'dataeng', 'interface': cluster.name, 'id': cluster.id}));
-                  });
-                }
-                dataEngCluster[0]['interfaces'](interfaces);
-
-                if (dataEngCluster[0].type() == 'dataeng') {
-                  self._loadInterface();
-                }
-              } else {
-                $(document).trigger("error", data.message);
-              }
-            });
-          }
-          if (self.cluster().type() != 'dataeng') {
-            self._loadInterface();
-          }
-        };
-        self.cluster = new ClusterPanelViewModel();
       }
 
       var topNavViewModel = new TopNavViewModel(onePageViewModel);
+      % if not IS_EMBEDDED.get():
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
+      % endif
 
       return topNavViewModel;
     })(onePageViewModel);
@@ -1412,6 +1584,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var self = this;
 
         self.items = ko.observableArray();
+
+        self.pocClusterMode = topNavViewModel.pocClusterMode;
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           var items = [];
@@ -1521,7 +1695,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
 
       var sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
-      ko.applyBindings(sidebarViewModel, $('.sidebar')[0]);
+      ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
+    % if IS_MULTICLUSTER_ONLY.get():
+      ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+    % endif
+
     })(onePageViewModel, topNavViewModel);
 
     huePubSub.publish('cluster.config.get.config');
@@ -1562,16 +1740,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     $('.page-content').jHueScrollUp();
 
-    window.hueDebug = {
-      viewModel: function (element) {
-        if (typeof element !== 'undefined' && typeof element === 'string') {
-          element = $(element)[0];
-        }
-        return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
-      },
-      onePageViewModel: onePageViewModel,
-      sidePanelViewModel: sidePanelViewModel,
-      topNavViewModel: topNavViewModel
+    if (typeof window.hueDebug === 'undefined') {
+      window.hueDebug = {};
+    }
+
+    window.hueDebug.onePageViewModel = onePageViewModel;
+    window.hueDebug.sidePanelViewModel = sidePanelViewModel;
+    window.hueDebug.topNavViewModel = topNavViewModel;
+    window.hueDebug.viewModel = function (element) {
+      if (typeof element !== 'undefined' && typeof element === 'string') {
+        element = $(element)[0];
+      }
+      return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
     };
 
     var tour = new Shepherd.Tour({
@@ -1590,7 +1770,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       attachTo: '.navbar-default bottom'
     });
 
-    %if user.is_superuser:
+    %if is_admin(user):
       tour.addStep('admin', {
         text: '${ _ko('As a superuser, you can check system configuration from the username drop down and install sample data and jobs for your users.') }',
         attachTo: '.top-nav-right .dropdown bottom'
@@ -1622,7 +1802,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
     };
 
-    % if is_demo or not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN):
+    % if is_demo or (not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN) and not IS_EMBEDDED.get()):
       $(document).on('keyup', closeTourOnEsc);
       $(document).on('click', '.shepherd-backdrop', tour.cancel);
       tour.start();
@@ -1652,6 +1832,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 </script>
 
 ${ commonHeaderFooterComponents.footer(messages) }
+
+% if IS_EMBEDDED.get():
+</div>
+% endif
+
+<div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
+  ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
+  <b>Query. Explore. Repeat.</b>
+</div>
 
 </body>
 </html>

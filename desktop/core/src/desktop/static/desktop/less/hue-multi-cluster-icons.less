@@ -1,0 +1,125 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@font-face {
+  font-family: 'altus';
+  src: url('../ext/fonts/altus.ttf') format('truetype'), url('../ext/fonts/altus.woff') format('woff'), url('../ext/fonts/altus.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+&.altus-icon {
+  display: inline-block;
+  font: normal normal normal 16px/1 altus;
+  font-size: inherit;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-align: center;
+  text-transform: none;
+
+  text-rendering: auto;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @altus-adb-cluster: '\e900';
+  @altus-environment: '\e901';
+  @altus-dashboard: '\e902';
+  @altus-iam: '\e903';
+  @altus-user-group: '\e903';
+  @altus-de-cluster: '\e904';
+  @altus-de-job: '\e905';
+  @altus-adb: '\e906';
+  @altus-de: '\e907';
+  @altus-ds: '\e908';
+  @altus-sdx: '\e909';
+  @altus-na: '\e910';
+  @altus-no-access: '\e911';
+  @altus-user-access: '\e90a';
+  @altus-adb-query: '\e90b';
+  @altus-workload: '\e90c';
+  @altus-azure: '\e90d';
+  @altus-aws: '\e90e';
+  @altus-user: '\e90f';
+  @altus-sql-editor: '\e912';
+  @altus-feedback: '\e913';
+
+  &.altus-adb-cluster:before {
+    content: @altus-adb-cluster;
+  }
+  &.altus-environment:before {
+    content: @altus-environment;
+  }
+  &.altus-dashboard:before {
+    content: @altus-dashboard;
+  }
+  &.altus-iam:before {
+    content: @altus-iam;
+  }
+  &.altus-user-group:before {
+    content: @altus-user-group;
+  }
+  &.altus-de-cluster:before {
+    content: @altus-de-cluster;
+  }
+  &.altus-de-job:before {
+    content: @altus-de-job;
+  }
+  &.altus-adb:before {
+    content: @altus-adb;
+  }
+  &.altus-de:before {
+    content: @altus-de;
+  }
+  &.altus-ds:before {
+    content: @altus-ds;
+  }
+  &.altus-sdx:before {
+    content: @altus-sdx;
+  }
+  &.altus-na:before {
+    content: @altus-na;
+  }
+  &.altus-no-access:before {
+    content: @altus-no-access;
+  }
+  &.altus-user-access:before {
+    content: @altus-user-access;
+  }
+  &.altus-adb-query:before {
+    content: @altus-adb-query;
+  }
+  &.altus-workload:before {
+    content: @altus-workload;
+  }
+  &.altus-azure:before {
+    content: @altus-azure;
+  }
+  &.altus-aws:before {
+    content: @altus-aws;
+  }
+  &.altus-user:before {
+    content: @altus-user;
+  }
+  &.altus-sql-editor:before {
+    content: @altus-sql-editor;
+  }
+  &.altus-feedback:before {
+    content: @altus-feedback;
+  }
+}

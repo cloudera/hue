@@ -1,0 +1,502 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.hue-popover {
+  .display-flex;
+  position: absolute;
+  .flex-direction(column);
+  top: 0;
+  left: 0;
+  z-index: 1039;
+  padding: 1px;
+  background-color: @cui-white;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+
+.hue-context-popover {
+  padding: 0;
+  border: none;
+}
+
+.hue-popover.hue-popover-top {
+  margin-top: -5px;
+}
+
+.hue-popover.hue-popover-top .hue-popover-arrow {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+  border-top-color: @hue-primary-color-dark;
+  border-bottom-width: 0;
+}
+
+.hue-popover.hue-popover-top .hue-popover-arrow::after {
+  bottom: 1px;
+  margin-left: -3px;
+  content: "";
+  border-top-color: @hue-primary-color-dark;
+  border-bottom-width: 0;
+}
+
+.hue-popover.hue-popover-right {
+  margin-left: 5px;
+}
+
+.hue-popover.hue-popover-right .hue-popover-arrow {
+  top: 50%;
+  left: -6px;
+  margin-top: -6px;
+  border-right-color: @hue-primary-color-dark;
+  border-left-width: 0;
+}
+
+.hue-popover.hue-popover-right .hue-popover-arrow::after {
+  bottom: -3px;
+  left: 1px;
+  content: "";
+  border-right-color: @hue-primary-color-dark;
+  border-left-width: 0;
+}
+
+.hue-popover.hue-popover-bottom {
+  margin-top: 7px;
+}
+
+.hue-popover.hue-popover-bottom .hue-popover-arrow {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+  border-top-width: 0;
+  border-bottom-color: @hue-primary-color-dark;
+}
+
+.hue-popover.hue-popover-bottom .hue-popover-arrow::after {
+  top: 3px;
+  margin-left: -3px;
+  content: "";
+  border-top-width: 0;
+  border-bottom-color: @hue-primary-color-dark;
+}
+
+.hue-popover.hue-popover-left {
+  margin-left: -5px;
+}
+
+.hue-popover.hue-popover-left .hue-popover-arrow {
+  top: 50%;
+  right: -6px;
+  margin-top: -3px;
+  border-right-width: 0;
+  border-left-color: @hue-primary-color-dark;
+}
+
+.hue-popover.hue-popover-left .hue-popover-arrow::after {
+  right: 2px;
+  bottom: -3px;
+  content: "";
+  border-right-width: 0;
+  border-left-color: @hue-primary-color-dark;
+}
+
+.hue-popover-title {
+  .flex(0 1 auto);
+  .nowrap-ellipsis;
+  overflow: hidden;
+  padding: 6px 10px;
+  margin: 0 30px 0 0;
+  font-size: 14px;
+  background-color: @cui-white;
+
+  .hue-popover-title-icon {
+    margin-top: 3px;
+  }
+
+  .hue-popover-title-text {
+    padding-left: 4px;
+    font-size: 0;
+
+    div {
+      display: inline-block;
+      font-size: 14px;
+    }
+  }
+
+  .hue-popover-title-actions {
+    position: absolute;
+    right: 6px;
+    top: 8px;
+  }
+}
+
+.hue-popover-title:empty {
+  display: none;
+}
+
+.hue-popover-arrow, .hue-popover-arrow::after {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+
+.hue-popover-arrow {
+  border-width: 6px;
+}
+
+.hue-popover-top {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-bottom;
+}
+
+.hue-popover-right {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-right;
+}
+
+.hue-popover-left {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-left;
+}
+
+.context-popover-content {
+  padding: 5px;
+  .display-flex();
+  .flex(1 1 100%);
+  .flex-direction(column);
+  padding: 0;
+  overflow: hidden;
+}
+
+.context-popover-tab-pane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.context-popover-tabs {
+  .flex(0 1 auto);
+  border-bottom: 1px solid @cui-default-border-color;
+  margin-left: -1px;
+  margin-right: -1px;
+  padding-left: 15px;
+}
+
+.context-popover-tab-container {
+  position: relative;
+  .flex(1 1 100%);
+  border: none;
+  overflow: auto;
+}
+
+.context-popover-tab {
+  padding-top: 0 !important;
+  padding-bottom: 5px !important;
+  margin-bottom: -1px !important
+}
+
+.context-popover-flex {
+  .display-flex();
+  .flex-flow(column nowrap);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.context-popover-flex-header {
+  .flex(0 0 35px);
+}
+
+.context-popover-flex-attributes {
+  .context-popover-attributes;
+  .flex(1);
+  padding: 0 12px;
+}
+
+.context-popover-flex-fill {
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  margin: 0 10px;
+  .flex(1 1 100%);
+
+  .alert {
+    margin: 0 5px;
+  }
+}
+
+.context-popover-table-details {
+  .flex(1);
+  padding: 10px 10px 0 10px;
+}
+
+.context-popover-header {
+  font-weight: bold;
+  color: @hue-primary-color-dark;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding-left: 4px;
+  display: inline-block;
+  margin: 5px 0 0 15px;
+}
+
+.context-popover-section {
+  margin-left: 15px;
+}
+.context-popover-doc-header-link {
+  .flex(1);
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.context-popover-doc-description {
+  .flex(1);
+  margin-top: 5px;
+
+  > em {
+    font-style: normal;
+    font-weight: bold;
+  }
+}
+
+.context-popover-doc-contents {
+  .flex(1 1 100%);
+  margin-top: 8px;
+  overflow: auto;
+
+  .ace_editor,
+  .ace_layer {
+    overflow: visible !important;
+  }
+}
+
+.context-popover-flex-bottom-links {
+  .flex(0 0 35px);
+  border-top: 1px solid @cui-default-border-color;
+  z-index: 100;
+  background-color: @cui-white;
+}
+
+.context-popover-link-row {
+  float: right;
+  margin: 8px 15px 0 10px;
+}
+
+.context-popover-link-row a {
+  margin-left: 10px;
+}
+
+.context-popover-inline-search {
+  border-radius: 8px !important;
+  min-height: 18px !important;
+  height: 18px !important;
+  margin: 0 5px 0 5px !important;
+  padding-right: 18px !important;
+}
+
+.context-popover-inline-autocomplete {
+  height: 26px;
+  margin: 0 0 10px 0;
+  .display-flex();
+
+  .context-popover-sample-filter {
+    .flex(1);
+  }
+
+  .context-popover-sample-controls {
+    .flex(0 0 120px);
+    line-height: 28px;
+  }
+
+  .inline-autocomplete-container {
+    height: 26px;
+
+    > div {
+      right: 10px !important;
+    }
+
+    > div input {
+      padding: 3px 5px;
+      font-size: 14px !important;
+      line-height: 14px !important;
+    }
+  }
+}
+
+.context-popover-empty-columns {
+  letter-spacing: 0.035em;
+  margin-top: 50px;
+  font-size: 14px;
+  color: @cui-gray-700;
+  text-align: center;
+}
+
+.context-popover-sample {
+  text-align: left;
+  padding: 3px;
+  overflow: hidden;
+  height: 100%;
+
+  th {
+    border-right: 1px solid @cui-gray-200;
+  }
+
+  td {
+    border-right: 1px solid @cui-gray-200;
+    white-space: nowrap;
+  }
+
+  .fixed-first-column {
+    margin-left: 0 !important;
+    table>tbody>tr>td:first-child {
+      background-color: @cui-gray-050;
+    }
+  }
+
+  .fixed-header-row {
+    border-bottom: 1px solid @cui-gray-200;
+  }
+
+  .fixed-first-cell {
+    border-right: 1px solid @cui-gray-200;
+
+    thead th {
+      height: 23px;
+      border-bottom: 1px solid @cui-gray-200 !important;
+    }
+  }
+}
+
+.context-popover-flex-fill.context-popover-sample-container {
+  margin: 0;
+}
+
+#contextPopover .hue-popover {
+  position: fixed;
+}
+
+.context-popover-comment {
+  .flex(0 1 54px);
+  margin-top: 2px;
+  margin-bottom: 8px;
+  padding-left: 4px;
+  overflow: hidden;
+
+  &.context-popover-comment-expanded {
+    .flex(1 1 100%);
+    white-space: pre-wrap;
+    margin-bottom: 2px;
+    overflow: auto;
+  }
+}
+
+.context-popover-sql {
+  .flex(1 1 100%);
+}
+
+.context-popover-attributes {
+  .flex(1);
+  margin-bottom: 10px;
+  margin-left: 4px;
+  font-size: 13px;
+
+  .context-popover-attribute {
+    display: inline-block;
+    //background-color: @cui-gray-100;
+    border-radius: 4px;
+    padding: 2px 4px 2px 0;
+
+    white-space: pre;
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+
+    div:first-child {
+      display: inline-block;
+      color: @cui-gray-700;
+      margin-right: 3px;
+    }
+
+    div:last-child {
+      display: inline-block;
+      background-color: #FFF;
+      //color: @hue-primary-color-dark;
+    }
+  }
+}
+
+.context-popover-inner-content {
+  position: absolute;
+  .display-flex();
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  .flex-direction(column);
+
+  .hue-tags {
+    margin-top: 2px;
+
+    .selectize-read-only > .selectize-input {
+      height: 36px;
+      overflow: hidden;
+    }
+  }
+}
+
+.context-popover-entries-list {
+  margin: 10px 4px 4px 4px;
+}
+
+.context-popover-title {
+  .display-flex;
+  .flex-direction(row);
+  width: 100%;
+  padding:0;
+  background-color: @cui-gray-050;
+}
+
+.context-popover-breadcrumbs {
+  .flex(1 1 100%);
+  .nowrap-ellipsis();
+  padding: 5px;
+}
+
+.context-popover-close {
+  .flex(1 0 15px);
+  padding: 5px;
+}
+
+.storage-entry-container {
+  padding: 5px;
+
+  .empty-file-contents {
+    font-style: italic;
+    color: @cui-gray-400;
+  }
+}

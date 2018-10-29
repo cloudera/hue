@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -246,163 +246,163 @@ msgstr "如果这是用户首次登录。"
 msgid "You do not have permissions to %(description)s."
 msgstr "您没有 %(description)s 的权限。"
 
-#: src/useradmin/views.py:167
+#: src/useradmin/views.py:175
 msgid "You must be a superuser to delete users."
 msgstr "您必须是超级用户才能删除用户。"
 
-#: src/useradmin/views.py:170
+#: src/useradmin/views.py:178
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
-#: src/useradmin/views.py:177
+#: src/useradmin/views.py:185
 msgid "You cannot remove yourself."
 msgstr "您不能删除自己。"
 
-#: src/useradmin/views.py:195 src/useradmin/templates/list_users.mako:203
+#: src/useradmin/views.py:203 src/useradmin/templates/list_users.mako:203
 msgid "The users were deleted."
 msgstr "已删除用户。"
 
-#: src/useradmin/views.py:207
+#: src/useradmin/views.py:215
 msgid "You must be a superuser to delete groups."
 msgstr "您必须是超级用户才能删除组。"
 
-#: src/useradmin/views.py:216
+#: src/useradmin/views.py:224
 msgid "The default user group may not be deleted."
 msgstr "不可删除默认用户组。"
 
-#: src/useradmin/views.py:228 src/useradmin/templates/list_groups.mako:175
+#: src/useradmin/views.py:236 src/useradmin/templates/list_groups.mako:175
 msgid "The groups were deleted."
 msgstr "已删除组。"
 
-#: src/useradmin/views.py:231
+#: src/useradmin/views.py:239
 msgid "Group not found."
 msgstr "未找到组。"
 
-#: src/useradmin/views.py:260
+#: src/useradmin/views.py:268
 msgid "You must be a superuser to add or edit another user."
 msgstr "您必须是超级用户才能添加或编辑其他用户。"
 
-#: src/useradmin/views.py:288
+#: src/useradmin/views.py:296
 msgid "You cannot change a username."
 msgstr "您无法更改用户名。"
 
-#: src/useradmin/views.py:290
+#: src/useradmin/views.py:298
 msgid "You cannot make yourself inactive."
 msgstr "您不能让自己处于非活动状态。"
 
-#: src/useradmin/views.py:305
+#: src/useradmin/views.py:313
 msgid "You cannot make yourself a superuser."
 msgstr "您不能让自己成为超级用户。"
 
-#: src/useradmin/views.py:313
+#: src/useradmin/views.py:321
 msgid "You must be a superuser to reset users."
 msgstr "您必须是超级用户才能重置用户。"
 
-#: src/useradmin/views.py:317
+#: src/useradmin/views.py:325
 #, python-format
 msgid "Successfully unlocked account for user: %s"
 msgstr "已成功解锁用户帐户：%s"
 
-#: src/useradmin/views.py:319
+#: src/useradmin/views.py:327
 #, python-format
 msgid "Failed to reset login attempts for %s: %s"
 msgstr "重置 %s 登录尝试失败：%s"
 
-#: src/useradmin/views.py:328 src/useradmin/views.py:562
+#: src/useradmin/views.py:336 src/useradmin/views.py:570
 #, python-format
 msgid "Cannot make home directory for user %s."
 msgstr "无法为用户 %s 创建主目录。"
 
-#: src/useradmin/views.py:338
+#: src/useradmin/views.py:346
 msgid "User information updated"
 msgstr "已更新用户信息"
 
-#: src/useradmin/views.py:420
+#: src/useradmin/views.py:428
 msgid "You must be a superuser to add or edit a group."
 msgstr "您必须是超级用户才能添加或编辑组。"
 
-#: src/useradmin/views.py:452
+#: src/useradmin/views.py:460
 msgid "Group information updated"
 msgstr "已更新组信息"
 
-#: src/useradmin/views.py:488
+#: src/useradmin/views.py:496
 msgid "You must be a superuser to change permissions."
 msgstr "您必须是超级用户才能更改权限。"
 
-#: src/useradmin/views.py:505
+#: src/useradmin/views.py:513
 msgid "Permission information updated"
 msgstr "已更新权限信息"
 
-#: src/useradmin/views.py:537
+#: src/useradmin/views.py:545
 msgid "You must be a superuser to add another user."
 msgstr "您必须是超级用户才能添加其他用户。"
 
-#: src/useradmin/views.py:553 src/useradmin/views.py:629
-#: src/useradmin/views.py:732
+#: src/useradmin/views.py:561 src/useradmin/views.py:637
+#: src/useradmin/views.py:740
 msgid "There was an error when communicating with LDAP"
 msgstr "与 LDAP 通信时出错"
 
-#: src/useradmin/views.py:555 src/useradmin/views.py:631
+#: src/useradmin/views.py:563 src/useradmin/views.py:639
 msgid "There was a problem with some of the LDAP information"
 msgstr "一些 LDAP 信息出错"
 
-#: src/useradmin/views.py:566
+#: src/useradmin/views.py:574
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
 msgstr "无法为处于 %s 模式的用户获取 LDAP 详细信息。"
 
-#: src/useradmin/views.py:575 src/useradmin/views.py:652
-#: src/useradmin/views.py:710
+#: src/useradmin/views.py:583 src/useradmin/views.py:660
+#: src/useradmin/views.py:718
 #, python-format
 msgid "Failed to import following users: %s"
 msgstr "导入以下用户失败：%s"
 
-#: src/useradmin/views.py:607
+#: src/useradmin/views.py:615
 msgid "You must be a superuser to add another group."
 msgstr "您必须是超级用户才能添加其他组。"
 
-#: src/useradmin/views.py:628
+#: src/useradmin/views.py:636
 #, python-format
 msgid "LDAP Exception: %s"
 msgstr "LDAP 例外情况：%s"
 
-#: src/useradmin/views.py:642
+#: src/useradmin/views.py:650
 #, python-format
 msgid "Exception creating home directory for LDAP user %s in group %s."
 msgstr "为 %s 组中的 LDAP 用户 %s 创建主目录时出现异常。"
 
-#: src/useradmin/views.py:661
+#: src/useradmin/views.py:669
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
 msgstr "无法为处于 %s 模式的组获取 LDAP 详细信息"
 
-#: src/useradmin/views.py:687
+#: src/useradmin/views.py:695
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "您必须是超级用户才能同步 LDAP 用户/组。"
 
-#: src/useradmin/views.py:740
+#: src/useradmin/views.py:748
 msgid "The import may not be complete, sync again."
 msgstr "导入可能不完整，请重新同步。"
 
-#: src/useradmin/views.py:855
+#: src/useradmin/views.py:863
 #, python-format
 msgid "Synced user %s from Unix"
 msgstr "从 Unix 同步的用户 %s"
 
-#: src/useradmin/views.py:871
+#: src/useradmin/views.py:879
 msgid "No active superuser configured."
 msgstr "未配置活动的超级用户。"
 
-#: src/useradmin/views.py:873
+#: src/useradmin/views.py:881
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "您无法从配置删除最后一个活动的超级用户。"
 
-#: src/useradmin/views.py:909
+#: src/useradmin/views.py:917
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
 msgstr "导入用户 %(username)s 时出现命名冲突"
 
-#: src/useradmin/views.py:1110 src/useradmin/views.py:1165
+#: src/useradmin/views.py:1118 src/useradmin/views.py:1173
 #, python-format
 msgid ""
 "There was a naming conflict while importing group %(groupname)s in "
@@ -484,7 +484,7 @@ msgstr "添加/同步用户"
 #: src/useradmin/templates/add_ldap_users.mako:56
 #: src/useradmin/templates/edit_group.mako:82
 #: src/useradmin/templates/edit_permissions.mako:65
-#: src/useradmin/templates/list_configurations.mako:118
+#: src/useradmin/templates/list_configurations.mako:117
 #: src/useradmin/templates/sync_ldap_users_groups.mako:55
 msgid "Cancel"
 msgstr "取消"
@@ -675,8 +675,8 @@ msgid "Users"
 msgstr "用户"
 
 #: src/useradmin/templates/layout.mako:65
-#: src/useradmin/templates/list_configurations.mako:48
-#: src/useradmin/templates/list_configurations.mako:87
+#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:86
 #: src/useradmin/templates/list_permissions.mako:44
 #: src/useradmin/templates/list_users.mako:78
 msgid "Groups"
@@ -689,44 +689,44 @@ msgstr "权限"
 
 #: src/useradmin/templates/layout.mako:68
 #: src/useradmin/templates/list_configurations.mako:28
-#: src/useradmin/templates/list_configurations.mako:42
+#: src/useradmin/templates/list_configurations.mako:41
 msgid "Configurations"
 msgstr "配置"
 
-#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:46
 #: src/useradmin/templates/list_permissions.mako:42
 msgid "Application"
 msgstr "应用程序"
 
-#: src/useradmin/templates/list_configurations.mako:66
+#: src/useradmin/templates/list_configurations.mako:65
 msgid "There are no configurations matching the search criteria."
 msgstr "没有符合搜索条件的配置。"
 
-#: src/useradmin/templates/list_configurations.mako:78
+#: src/useradmin/templates/list_configurations.mako:77
 msgid "configuration"
 msgstr "配置"
 
-#: src/useradmin/templates/list_configurations.mako:81
+#: src/useradmin/templates/list_configurations.mako:80
 msgid "Role"
 msgstr "角色"
 
-#: src/useradmin/templates/list_configurations.mako:83
+#: src/useradmin/templates/list_configurations.mako:82
 msgid "Remove"
 msgstr "删除"
 
-#: src/useradmin/templates/list_configurations.mako:102
+#: src/useradmin/templates/list_configurations.mako:101
 msgid "Properties"
 msgstr "属性"
 
-#: src/useradmin/templates/list_configurations.mako:111
+#: src/useradmin/templates/list_configurations.mako:110
 msgid "Add role"
 msgstr "添加角色"
 
-#: src/useradmin/templates/list_configurations.mako:117
+#: src/useradmin/templates/list_configurations.mako:116
 msgid "Update configuration"
 msgstr "更新配置"
 
-#: src/useradmin/templates/list_configurations.mako:124
+#: src/useradmin/templates/list_configurations.mako:123
 msgid "There was an error loading the configurations"
 msgstr "加载配置时出错"
 
@@ -854,8 +854,8 @@ msgid "An unknown error has occurred while deleting the user. Please try again."
 msgstr "删除用户时发生未知错误。请重试。"
 
 #: src/useradmin/templates/list_users.mako:240
-msgid "The users and groups were update correctly."
-msgstr "已正确更新用户和组。"
+msgid "The users and groups were updated correctly."
+msgstr "用户和组已正确更新。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:43
 msgid "Sync LDAP users and groups"

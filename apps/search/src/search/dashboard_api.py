@@ -30,8 +30,8 @@ LOG = logging.getLogger(__name__)
 
 class SearchApi(DashboardApi):
 
-  def __init__(self, user):
-    DashboardApi.__init__(self, user)
+  def __init__(self, user, cluster):
+    DashboardApi.__init__(self, user, cluster)
     self.api = SolrApi(SOLR_URL.get(), self.user)
 
   def query(self, collection, query, facet=None):

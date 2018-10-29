@@ -115,10 +115,7 @@ class S3FileUploadHandler(FileUploadHandler):
 
 
   def _get_s3fs(self, request):
-    try:
-      fs = request.fs
-    except AttributeError:
-      fs = get_s3fs()
+    fs = get_s3fs() # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
 
     if not fs:
       raise S3FileUploadError(_("No S3 filesystem found."))

@@ -21,7 +21,7 @@ Views & controls for creating tables
 
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.lib import django_mako
 from desktop.lib.django_util import render

@@ -156,6 +156,48 @@
 .cui-btn-circle.btn {
   padding: 0;
 }
+.cui-app-switcher {
+  margin-right: 12px;
+  margin-left: -8px;
+}
+.cui-app-switcher i.fa-bars {
+  color: #0B7FAD;
+}
+.cui-app-switcher .nav-item {
+  margin-right: 0 !important;
+}
+.cui-app-switcher .nav-item .app-img,
+.cui-app-switcher .nav-item .fa {
+  background-color: #0B7FAD;
+  padding: 2px;
+  color: white;
+}
+.cui-app-switcher .nav-item .app-img {
+  width: 20px;
+  height: 20px;
+}
+.cui-app-switcher .nav-item .fa {
+  font-size: 16px;
+}
+.cui-app-switcher .nav-item:hover {
+  background-color: #0B7FAD;
+}
+.cui-app-switcher .nav-item:hover .app-img,
+.cui-app-switcher .nav-item:hover .fa {
+  background-color: #29A7DE;
+  color: white;
+}
+.cui-app-switcher .nav-item .app-switcher-app-icon {
+  margin-left: -4px;
+}
+.cui-app-switcher .nav-item .app-switcher-app-name {
+  margin-left: 8px;
+}
+.cui-app-switcher .hue-hamburger + .dropdown-menu .nav-link:hover {
+  background-color: #0B7FAD;
+  color: white;
+}
+*/
 .cui-card {
   border: 1px solid #DCDCDC;
   padding: 19px 23px 19px 23px;

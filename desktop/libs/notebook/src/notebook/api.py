@@ -19,16 +19,20 @@ import json
 import logging
 
 import sqlparse
+import urllib
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.api2 import __paginate
+from desktop.conf import IS_K8S_ONLY
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
+from indexer.file_format import HiveFormat
+from indexer.fields import Field
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
 from notebook.connectors.dataeng import DataEngApi
@@ -77,6 +81,17 @@ def create_session(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   session = json.loads(request.POST.get('session', '{}'))
+
+  if IS_K8S_ONLY.get(): # TODO: create session happening asynchronously on cluster selection when opening Notebook
+    return JsonResponse({
+      "status": 0,
+      "session": {
+        "reuse_session": True, "type": session['type'],
+        "properties": [
+          {"nice_name": "Settings", "multiple": True, "key": "settings", "help_text": "Hive and Hadoop configuration properties.", "defaultValue": [], "type": "settings", "options": ["hive.map.aggr", "hive.exec.compress.output", "hive.exec.parallel", "hive.execution.engine", "mapreduce.job.queuename"], "value": []}
+        ]
+      }
+    })
 
   properties = session.get('properties', [])
 
@@ -219,14 +234,15 @@ def fetch_result_data(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  rows = json.loads(request.POST.get('rows', 100))
-  start_over = json.loads(request.POST.get('startOver', False))
+  rows = json.loads(request.POST.get('rows', '100'))
+  start_over = json.loads(request.POST.get('startOver', 'false'))
 
   response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
 
   # Materialize and HTML escape results
-  if response['result'].get('data') and response['result'].get('type') == 'table':
+  if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
     response['result']['data'] = escape_rows(response['result']['data'])
+    response['result']['isEscaped'] = True
 
   response['status'] = 0
 
@@ -296,7 +312,7 @@ def get_logs(request):
   db = get_api(request, snippet)
 
   full_log = smart_str(request.POST.get('full_log', ''))
-  logs = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
+  logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
   full_log += logs
 
   jobs = db.get_jobs(notebook, snippet, full_log)
@@ -330,6 +346,7 @@ def _save_notebook(notebook, user):
   notebook['isSaved'] = True
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
+  _clear_sessions(notebook)
   notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
@@ -357,6 +374,10 @@ def save_notebook(request):
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
+
+
+def _clear_sessions(notebook):
+  notebook['sessions'] = [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr')]
 
 
 def _historify(notebook, user):
@@ -391,6 +412,7 @@ def _historify(notebook, user):
     )
 
   notebook['uuid'] = history_doc.uuid
+  _clear_sessions(notebook)
   history_doc.update_data(notebook)
   history_doc.search = _get_statement(notebook)
   history_doc.save()
@@ -399,16 +421,9 @@ def _historify(notebook, user):
 
 
 def _get_statement(notebook):
-  statement = ''
   if notebook['snippets'] and len(notebook['snippets']) > 0:
-    try:
-      statement = notebook['snippets'][0]['result']['handle']['statement']
-      if type(statement) == dict:  # Old format
-        statement = notebook['snippets'][0]['statement_raw']
-    except KeyError:  # Old format
-      statement = notebook['snippets'][0]['statement_raw']
-  return statement
-
+    return Notebook.statement_with_variables(notebook['snippets'][0])
+  return ''
 
 @require_GET
 @api_error_handler
@@ -580,8 +595,10 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  async = json.loads(request.POST.get('async', 'false'))
+  operation = json.loads(request.POST.get('operation', '"default"'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async, operation=operation)
   response.update(sample_data)
 
   response['status'] = 0
@@ -618,13 +635,13 @@ def format(request):
 @check_document_access_permission()
 @api_error_handler
 def export_result(request):
-  response = {'status': -1, 'message': _('Exporting result failed.')}
+  response = {'status': -1, 'message': _('Success')}
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  data_format = json.loads(request.POST.get('format', 'hdfs-file'))
-  destination = json.loads(request.POST.get('destination', ''))
+  data_format = json.loads(request.POST.get('format', '"hdfs-file"'))
+  destination = urllib.unquote(json.loads(request.POST.get('destination', '""')))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
   start_time = json.loads(request.POST.get('start_time', '-1'))
@@ -655,7 +672,7 @@ def export_result(request):
         description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
         editor_type=snippet['type'],
         statement=sql,
-        status='ready-execute',
+        status='ready',
         database=snippet['database'],
         on_success_url=success_url,
         last_executed=start_time,
@@ -696,48 +713,37 @@ def export_result(request):
       'operationText': 'User %s exported to HDFS directory: %s' % (request.user.username, destination),
       'allowed': True
     }
-  elif data_format == 'search-index':
+  elif data_format in ('search-index', 'dashboard'):
+    # Open the result in the Dashboard via a SQL sub-query or the Import wizard (quick vs scalable)
     if is_embedded:
-      if destination == '__hue__':
-        destination = _get_snippet_name(notebook, unique=True, table_format=True)
-        live_indexing = True
-      else:
-        live_indexing = False
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
 
-      sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
-
-      from indexer.api3 import _index # Will be moved to the lib
-      from indexer.file_format import HiveFormat
-      from indexer.fields import Field
-
-      file_format = {
-          'name': 'col',
-          'inputFormat': 'query',
-          'format': {'quoteChar': '"', 'recordSeparator': '\n', 'type': 'csv', 'hasHeader': False, 'fieldSeparator': '\u0001'},
-          "sample": '',
-          "columns": [
-              Field(col['name'].rsplit('.')[-1], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-              for col in sample['meta']
-          ]
-      }
-
-      if live_indexing:
-        file_format['inputFormat'] = 'hs2_handle'
-        file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
-        response['rowcount'] = _index(request, file_format, destination, query=notebook['uuid'], start_time=start_time)
-        response['watch_url'] = reverse('search:browse', kwargs={'name': destination})
+      if data_format == 'dashboard':
+        engine = notebook['type'].replace('query-', '')
+        response['watch_url'] = reverse('dashboard:browse', kwargs={'name': notebook_id}) + '?source=query&engine=%(engine)s' % {'engine': engine}
         response['status'] = 0
       else:
-        response = _index(request, file_format, destination, query=notebook['uuid'], start_time=start_time)
+        sample = get_api(request, snippet).fetch_result(notebook, snippet, rows=4, start_over=True)
+        for col in sample['meta']:
+          col['type'] = HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')
+
+        response['status'] = 0
+        response['id'] = notebook_id
+        response['name'] = _get_snippet_name(notebook)
+        response['source_type'] = 'query'
+        response['target_type'] = 'index'
+        response['target_path'] = destination
+        response['sample'] = list(sample['data'])
+        response['columns'] = [
+            Field(col['name'], col['type']).to_dict() for col in sample['meta']
+        ]
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
-    request.audit = {
-      'operation': 'EXPORT',
-      'operationText': 'User %s exported to Search index: %s' % (request.user.username, destination),
-      'allowed': True
-    }
+
+    if response.get('status') != 0:
+      response['message'] =  _('Exporting result failed.')
 
   return JsonResponse(response)
 
@@ -820,5 +826,5 @@ def _get_statement_from_file(user, fs, snippet):
   script_path = snippet['statementPath']
   if script_path:
     script_path = script_path.replace('hdfs://', '')
-    if fs.do_as_user(user, fs.exists, script_path):
+    if fs.do_as_user(user, fs.isfile, script_path):
       return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)

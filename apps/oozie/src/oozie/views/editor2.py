@@ -18,16 +18,16 @@
 import json
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR
+from desktop.conf import USE_NEW_EDITOR, IS_MULTICLUSTER_ONLY, has_multi_cluster
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str
+from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document, Document2
@@ -35,6 +35,7 @@ from desktop.models import Document, Document2
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
+from metadata.conf import DEFAULT_PUBLIC_KEY
 from notebook.connectors.base import Notebook
 
 from oozie.decorators import check_document_access_permission, check_document_modify_permission,\
@@ -203,7 +204,7 @@ def save_workflow(request):
 
   is_imported = workflow['properties'].get('imported')
 
-  workflow_doc = _save_workflow(workflow, layout, request.user)
+  workflow_doc = _save_workflow(workflow, layout, request.user, fs=request.fs)
 
   # For old workflow import
   if is_imported:
@@ -380,6 +381,10 @@ def submit_single_action(request, doc_id, node_id):
   workflow.set_workspace(request.user)
 
   workflow.check_workspace(request.fs, request.user)
+
+  # The imported wf deployment directory might not neccessarily exist on first submission
+  if not request.fs.exists(parent_wf.deployment_dir):
+    request.fs.do_as_user(request.user.username, request.fs.mkdir, parent_wf.deployment_dir)
   workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
   workflow.document = parent_doc
 
@@ -390,6 +395,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
+    cluster = json.loads(request.POST.get('cluster', '{}'))
     params_form = ParametersFormSet(request.POST)
 
     if params_form.is_valid():
@@ -398,6 +404,9 @@ def _submit_workflow_helper(request, workflow, submit_action):
       mapping['send_email'] = request.POST.get('email_checkbox') == 'on'
       if '/submit_single_action/' in submit_action:
         mapping['submit_single_action'] = True
+
+      if 'altus' in cluster.get('type', ''):
+        mapping['cluster'] = cluster.get('id')
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
@@ -412,6 +421,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
+    cluster_json = request.GET.get('cluster', '{}')
     parameters = workflow and workflow.find_all_parameters() or []
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
@@ -424,7 +434,8 @@ def _submit_workflow_helper(request, workflow, submit_action):
                      'show_dryrun': True,
                      'email_id': request.user.email,
                      'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user),
-                     'return_json': request.GET.get('format') == 'json'
+                     'return_json': request.GET.get('format') == 'json',
+                     'cluster_json': cluster_json
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
@@ -504,8 +515,17 @@ def edit_coordinator(request):
   if USE_NEW_EDITOR.get():
     scheduled_uuid = coordinator.data['properties']['workflow'] or coordinator.data['properties']['document']
     if scheduled_uuid:
-      document = Document2.objects.get(uuid=scheduled_uuid)
-      if not document.can_read(request.user):
+      try:
+        document = Document2.objects.get(uuid=scheduled_uuid)
+      except Document2.DoesNotExist as e:
+        document = None
+        coordinator.data['properties']['workflow'] = ''
+        LOG.warn("Workflow with uuid %s doesn't exist: %s" % (scheduled_uuid, e))
+
+      if document and document.is_trashed:
+        raise PopupException(_('Your workflow %s has been trashed!') % (document.name if document.name else ''))
+
+      if document and not document.can_read(request.user):
         raise PopupException(_('You don\'t have access to the workflow or document of this coordinator.'))
   else:
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
@@ -671,7 +691,11 @@ def submit_coordinator(request, doc_id):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       jsonify = request.POST.get('format') == 'json'
-      job_id = _submit_coordinator(request, coordinator, mapping)
+      try:
+        job_id = _submit_coordinator(request, coordinator, mapping)
+      except Exception, e:
+        message = force_unicode(str(e))
+        return JsonResponse({'status': -1, 'message': message}, safe=False)
       if jsonify:
         return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'schedule'}, safe=False)
       else:
@@ -697,6 +721,58 @@ def submit_coordinator(request, doc_id):
 def _submit_coordinator(request, coordinator, mapping):
   try:
     wf = coordinator.workflow
+    if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
+      mapping['auto-cluster'] = {
+        u'additionalClusterResourceTags': [],
+        u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE', #'u'NONE',
+        u'cdhVersion': u'CDH514',
+        u'clouderaManagerPassword': u'guest',
+        u'clouderaManagerUsername': u'guest',
+        u'clusterName': u'analytics4', # Add time variable
+        u'computeWorkersConfiguration': {
+          u'bidUSDPerHr': 0,
+          u'groupSize': 0,
+          u'useSpot': False
+        },
+        u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',
+        u'instanceBootstrapScript': u'',
+        u'instanceType': u'm4.xlarge',
+        u'jobSubmissionGroupName': u'',
+        u'jobs': [{
+            u'failureAction': u'INTERRUPT_JOB_QUEUE',
+            u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
+            u'sparkJob': {
+              u'applicationArguments': ['5'],
+              u'jars': [u's3a://datawarehouse-customer360/ETL/spark-examples.jar'],
+              u'mainClass': u'org.apache.spark.examples.SparkPi'
+            }
+          },
+  #         {
+  #           u'failureAction': u'INTERRUPT_JOB_QUEUE',
+  #           u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
+  #           u'sparkJob': {
+  #             u'applicationArguments': ['10'],
+  #             u'jars': [u's3a://datawarehouse-customer360/ETL/spark-examples.jar'],
+  #             u'mainClass': u'org.apache.spark.examples.SparkPi'
+  #           }
+  #         },
+  #         {
+  #           u'failureAction': u'INTERRUPT_JOB_QUEUE',
+  #           u'name': u'a87e20d7-5c0d-49ee-ab37-625fa2803d51',
+  #           u'sparkJob': {
+  #             u'applicationArguments': [u'filesystems3.conf'],
+  #             u'jars': [u's3a://datawarehouse-customer360/ETL/envelope-0.6.0-SNAPSHOT-c6.jar'],
+  #             u'mainClass': u'com.cloudera.labs.envelope.EnvelopeMain',
+  #             u'sparkArguments': u'--archives=s3a://datawarehouse-customer360/ETL/filesystems3.conf'
+  #           }
+  #         }
+        ],
+        u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
+        u'publicKey': DEFAULT_PUBLIC_KEY.get(),
+        u'serviceType': u'SPARK',
+        u'workersConfiguration': {},
+        u'workersGroupSize': u'3'
+      }
     wf_dir = Submission(request.user, wf, request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
@@ -787,7 +863,7 @@ def save_bundle(request):
   if bundle_data['coordinators']:
     dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']])
     for doc in dependencies:
-      doc.doc.get().can_read_or_exception(request.user)
+      doc._get_doc1(doc2_type='coordinator2').can_read_or_exception(request.user)
     bundle_doc.dependencies = dependencies
 
   bundle_doc1 = bundle_doc.doc.get()

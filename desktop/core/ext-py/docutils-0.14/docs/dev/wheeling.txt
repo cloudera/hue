@@ -1,0 +1,204 @@
+===========================
+ Docutils_ Building Wheels
+===========================
+
+:Authors: engelbert gruber; open to all Docutils developers
+:Contact: docutils-develop@lists.sourceforge.net
+:Date: $Date: 2015-05-06 18:36:40 +0200 (Mi, 06 Mai 2015) $
+:Revision: $Revision: 7887 $
+:Copyright: This document has been placed in the public domain.
+
+.. _Docutils: http://docutils.sourceforge.net/
+
+.. contents::
+
+Abstract
+--------
+
+This document documents trials to build python wheels from Docutils. Once it
+is finished it might be driven into distribution or release documentation.
+
+Requests
+--------
+
+There is `feature request 43`_ :  Make setup.py build wheels.
+
+  Just add this to setup.cfg:
+
+  [bdist_wheel]
+  universal = 1
+
+
+  .. warning:: Docutils is not fit for Universal Wheels. It supports both
+     Python 2 and 3, but with different code (we use “2to3”). This makes it
+     a candidate for `Pure Python wheels`_.
+
+     As "universal" is false by default, no change to setup.cfg is required.
+     The wheel builder detects that the package is pure Python and generates
+     wheels for Py2 and Py3 depending under which python version it runs.
+
+and bugs275_ : Upload wheels to pypi
+
+  Currently docutils does not publish any wheels on pypi. Wheels make docutils
+  faster to install (no need to run setup.py, which for a large number of
+  packages can take some time), and is no more difficult than uploading an
+  sdist (see https://packaging.python.org/en/latest/distributing.html#wheels
+  for instructions).
+
+Logbook
+-------
+
+1. Add ``[bdist_wheel] universal = 0`` to setup.cfg.
+2. Run ``python setup.py bdist_wheel``::
+
+     error: invalid command 'bdist_wheel'
+
+3. setuptools is too old. Install the new one by wheel or source or pip or
+   easy...
+
+4. try wheel ... first get wheel tar.gz and unpack.
+
+5. try ::
+
+     python2.7 wheel-0.24.0/wheel install setuptools-15.0-py2.py3-none-any.whl
+
+   no error. But still ``error: invalid command 'bdist_wheel'``::
+
+     $ python2.7 setup.py --version
+     0.12
+
+   Did wheel install ? If no, why no error, if yes in which place ?
+
+
+Logbook: with setuptools branch
+-------------------------------
+
+`gitpull/setuptools`_ sandbox branch introduces `setuptools`_ in ``setup.py``.
+
+As of 2015-04-16: **Not working yet**, ``import docutils`` will raise an
+``ImportError``. Need to get packages detected correctly.
+
+Install::
+
+    $ svn checkout svn://svn.code.sf.net/p/docutils/code/trunk/sandbox/gitpull/setuptools docutils-setuptools
+    $ cd setuptools
+    # create a virtualenv (however you like)
+    $ pip install -e .
+
+This includes support for generate ``python setup.py bdist_wheel``::
+
+    $ python setup.py bdist_wheel
+    running bdist_wheel
+    running build
+    running build_scripts
+    installing to build/bdist.linux-x86_64/wheel
+    running install
+    running install_egg_info
+    running egg_info
+    writing docutils.egg-info/PKG-INFO
+    writing top-level names to docutils.egg-info/top_level.txt
+    writing dependency_links to docutils.egg-info/dependency_links.txt
+    reading manifest file 'docutils.egg-info/SOURCES.txt'
+    reading manifest template 'MANIFEST.in'
+    warning: no files found matching 'MANIFEST'
+    warning: no files found matching '*' under directory 'extras'
+    warning: no previously-included files matching '.cvsignore' found under directory '*'
+    warning: no previously-included files matching '*~' found under directory '*'
+    warning: no previously-included files matching '.DS_Store' found under directory '*'
+    writing manifest file 'docutils.egg-info/SOURCES.txt'
+    Copying docutils.egg-info to build/bdist.linux-x86_64/wheel/docutils-0.13.data/purelib/docutils-0.13-py2.7.egg-info
+    running install_scripts
+    creating build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2pseudoxml.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2man.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2odt.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2latex.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rstpep2html.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2s5.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2odt_prepstyles.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2html.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2html5.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2xml.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    copying build/scripts-2.7/rst2xetex.py -> build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2pseudoxml.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2man.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2odt.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2latex.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rstpep2html.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2s5.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2odt_prepstyles.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2html.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2html5.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2xml.py to 755
+    changing mode of build/bdist.linux-x86_64/wheel/docutils-0.13.data/scripts/rst2xetex.py to 755
+    creating build/bdist.linux-x86_64/wheel/docutils-0.13.dist-info/WHEEL
+
+Installation::
+
+    # create a fresh virtualenv
+    $ pip install -U dist/docutils-0.13-cp27-none-linux_x86_64.whl
+    Processing ./dist/docutils-0.13-cp27-none-linux_x86_64.whl
+    Installing collected packages: docutils
+    Found existing installation: docutils 0.13
+    Uninstalling docutils-0.13:
+    Successfully uninstalled docutils-0.13
+    Successfully installed docutils-0.13
+    
+    
+Logbook with "pip"
+------------------
+
+Docutils' "setup.py" imports from the stdlib's "distutils" module
+instead of the 3rd party "setuptools". "distutils" cannot build wheels. [#]_
+
+OTOH, pip_ internally uses "setuptools" instead of "distutils". This way, it
+can generate wheels without changes to "setup.py".
+
+1. Install "pip" and "wheels"
+
+   Under Debian Gnu/Linux: ``aptitude install python-pip python3-pip``
+
+2. In the repository root directory, run ::
+
+      #> pip wheel ./docutils/
+      Unpacking ./docutils
+        Running setup.py (path:/tmp/pip-Ym9hKL-build/setup.py) egg_info for package from file:///[...]docutils-svn/docutils
+
+          warning: no previously-included files matching '.DS_Store' found under directory '*'
+      Building wheels for collected packages: docutils
+        Running setup.py bdist_wheel for docutils
+        Destination directory: /home/milde/Code/Python/docutils-svn/wheelhouse
+      Successfully built docutils
+      Cleaning up...
+
+3. There is a "pure Python" wheel under
+   ``wheelhouse/docutils-0.13-py2-none-any.whl``
+
+4. Repeat with::
+
+     #> pip3 wheel ./docutils/
+     
+   to get ``wheelhouse/docutils-0.13-py3-none-any.whl``
+
+You can also generate wheels for Docutils 0.12 with ``pip wheel docutils``
+and ``pip3 wheel docutils``. The 0.12 archive is downloaded from PIP and
+re-packed as wheel. With "pip3" this includes the 2to3 conversion.
+
+Summary:
+  With the "pip" utility, it is possible to generate wheels for Python 2
+  and 3 for both, the released and the repository version of Docutils
+  without changes to the code base.
+
+  The generated wheel can be installed. Installing the Py3k version happens
+  "instantaneously".
+
+.. [#] Docutils uses the batteries included with Python and avoids external
+   dependencies.  
+
+.. _bugs275: https://sourceforge.net/p/docutils/bugs/275/
+.. _pure python wheels:
+    https://packaging.python.org/en/latest/distributing.html#pure-python-wheels
+.. _feature request 43: https://sourceforge.net/p/docutils/feature-requests/43/
+.. _gitpull/setuptools: https://sourceforge.net/p/docutils/code/HEAD/tree/trunk/sandbox/gitpull/setuptools/
+.. _setuptools: https://pythonhosted.org/setuptools/
+.. _pip: http://pip.readthedocs.org/en/latest/

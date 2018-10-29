@@ -59,7 +59,7 @@ ${ layout.menubar(section='workflows') }
   <table id="workflowTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="workflowCheck"></div></th>
+        <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="workflowCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Last Modified') }</th>
@@ -72,7 +72,7 @@ ${ layout.menubar(section='workflows') }
       % for workflow in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-             <div class="hueCheckbox workflowCheck fa" data-row-selector-exclude="true" data-workflow-id="${ workflow.id }"></div>
+             <div class="hue-checkbox workflowCheck fa" data-row-selector-exclude="true" data-workflow-id="${ workflow.id }"></div>
           </td>
           <td>
             ${ workflow.name }
@@ -182,8 +182,8 @@ ${ layout.menubar(section='workflows') }
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox.workflowCheck[checked='checked']");
-      var can_delete = $(".hueCheckbox.workflowCheck[checked='checked'][data-workflow-id]");
+      var selector = $(".hue-checkbox.workflowCheck[checked='checked']");
+      var can_delete = $(".hue-checkbox.workflowCheck[checked='checked'][data-workflow-id]");
       if (can_delete.length >= 1 && can_delete.length == selector.length) {
         $("#destroy-btn").removeAttr("disabled");
         $("#restore-btn").removeAttr("disabled");
@@ -192,7 +192,7 @@ ${ layout.menubar(section='workflows') }
 
     $("#destroy-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("workflow-id"));
       });
       $("#destroyWf").modal("show");
@@ -200,7 +200,7 @@ ${ layout.menubar(section='workflows') }
 
     $("#purge-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox").each(function( index ) {
+      $(".hue-checkbox").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("workflow-id"));
       });
       $("#purgeWfs").modal("show");
@@ -208,7 +208,7 @@ ${ layout.menubar(section='workflows') }
 
     $("#restore-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("workflow-id"));
       });
       $("#restoreWf").modal("show");

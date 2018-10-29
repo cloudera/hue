@@ -21,22 +21,36 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def get_engine(user, engine='solr'):
+def get_engine(user, engine='solr', facet=None, source='data', cluster='""'):
   if isinstance(engine, dict):
+    if source == 'data':
+      source = engine.get('source')
     engine = engine.get('engine', 'solr')
 
+  if engine == 'report' and facet:
+    engine = facet['properties'].get('engine')
+
   if engine != 'solr':
-    from impala.dashboard_api import SQLApi
-    return SQLApi(user, engine)
+    if engine == 'impala':
+      from impala.dashboard_api import ImpalaDashboardApi
+      return ImpalaDashboardApi(user, engine, source=source, cluster=cluster)
+    elif engine == 'hive':
+      from beeswax.dashboard_api import HiveDashboardApi
+      return HiveDashboardApi(user, engine, source=source, cluster=cluster)
+    else:
+      from notebook.dashboard_api import SQLDashboardApi
+      return SQLDashboardApi(user, engine, source=source, cluster=cluster)
   else:
     from search.dashboard_api import SearchApi
-    return SearchApi(user)
+    # Could add source to Solr at some point, to behave like a 'view', but need state in query history or URL params
+    return SearchApi(user, cluster)
 
 
 class DashboardApi(object):
 
-  def __init__(self, user):
+  def __init__(self, user, cluster):
     self.user = user
+    self.cluster = cluster
 
   def datasets(self, show_all=False): pass
 

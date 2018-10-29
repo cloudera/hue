@@ -18,7 +18,8 @@
 import logging
 
 from django.core import management
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from desktop.models import Directory, Document, Document2, Document2Permission, SAMPLE_USER_OWNERS
 from useradmin.models import get_default_user_group, install_sample_user
@@ -27,8 +28,8 @@ from useradmin.models import get_default_user_group, install_sample_user
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
-  def handle_noargs(self, **options):
+class Command(BaseCommand):
+  def handle(self, *args, **options):
 
     sample_user = install_sample_user()
 
@@ -41,8 +42,9 @@ class Command(NoArgsCommand):
     )
 
     if not Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).exists():
-      management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
-      Document.objects.sync()
+      with transaction.atomic():
+        management.call_command('loaddata', 'initial_search_examples.json', verbosity=2, commit=False)
+        Document.objects.sync()
 
       Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).update(parent_directory=examples_dir)
     else:

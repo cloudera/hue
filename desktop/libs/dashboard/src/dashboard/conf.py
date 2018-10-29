@@ -19,8 +19,8 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 from desktop.appmanager import get_apps_dict
-from notebook.conf import get_ordered_interpreters
 
+from notebook.conf import get_ordered_interpreters
 
 
 def is_enabled():
@@ -44,13 +44,6 @@ HAS_SQL_ENABLED = Config(
   type=coerce_bool
 )
 
-HAS_QUERY_BUILDER_ENABLED = Config(
-  key="has_query_builder_enabled",
-  help=_t("Activate the Query Builder (beta)."),
-  default=False,
-  type=coerce_bool
-)
-
 HAS_REPORT_ENABLED = Config(
   key="has_report_enabled",
   help=_t("Activate the static report layout (beta)."),
@@ -60,7 +53,28 @@ HAS_REPORT_ENABLED = Config(
 
 USE_GRIDSTER = Config(
   key="use_gridster",
-  help=_t("Activate the new grid layout system (beta)."),
+  help=_t("Activate the new grid layout system."),
+  default=True,
+  type=coerce_bool
+)
+
+USE_NEW_ADD_METHOD = Config(
+  key="use_new_add_method",
+  help=_t("Activate the simplified drag in the dashboard."),
+  default=False,
+  type=coerce_bool
+)
+
+HAS_WIDGET_FILTER = Config(
+  key="has_widget_filter",
+  help=_t("Activate the widget filter and comparison (beta)."),
+  default=False,
+  type=coerce_bool
+)
+
+HAS_TREE_WIDGET = Config(
+  key="has_tree_widget",
+  help=_t("Activate the tree widget (to drill down fields as dimensions, alpha)."),
   default=False,
   type=coerce_bool
 )
@@ -78,7 +92,7 @@ def get_properties():
   else:
     return {
       'solr': {
-        'analytics': False,
+        'analytics': True,
         'nesting': False,
       },
       'sql': {

@@ -20,6 +20,7 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
+import gc
 import logging
 import os
 import pkg_resources
@@ -53,7 +54,7 @@ ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
 
 # Configure debug mode
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+GTEMPLATE_DEBUG = DEBUG
 
 # Start basic logging as soon as possible.
 if ENV_HUE_PROCESS_NAME not in os.environ:
@@ -129,8 +130,9 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 
+
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
+GTEMPLATE_LOADERS = (
   'django.template.loaders.filesystem.Loader',
   'django.template.loaders.app_directories.Loader'
 )
@@ -157,11 +159,11 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.NotificationMiddleware',
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware'
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.middleware.http.ConditionalGetMiddleware',
-    'axes.middleware.FailedLoginMiddleware',
+    #@TODO@ Prakash to check FailedLoginMiddleware working or not?
+    #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
 ]
 
@@ -174,7 +176,7 @@ ROOT_URLCONF = 'desktop.urls'
 # Hue runs its own wsgi applications
 WSGI_APPLICATION = None
 
-TEMPLATE_DIRS = (
+GTEMPLATE_DIRS = (
     get_desktop_root("core/templates"),
 )
 
@@ -190,7 +192,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     # 'debug_toolbar',
-    'south', # database migration tool
+    #'south', # database migration tool
 
     # i18n support
     'babeldjango',
@@ -207,17 +209,36 @@ LOCALE_PATHS = [
 ]
 
 # Keep default values up to date
-TEMPLATE_CONTEXT_PROCESSORS = (
+GTEMPLATE_CONTEXT_PROCESSORS = (
   'django.contrib.auth.context_processors.auth',
-  'django.core.context_processors.debug',
-  'django.core.context_processors.i18n',
-  'django.core.context_processors.media',
-  'django.core.context_processors.request',
+  'django.template.context_processors.debug',
+  'django.template.context_processors.i18n',
+  'django.template.context_processors.media',
+  'django.template.context_processors.request',
   'django.contrib.messages.context_processors.messages',
    # Not default
   'desktop.context_processors.app_name',
 )
 
+TEMPLATES = [
+  {
+    'BACKEND': 'djangomako.backends.MakoBackend',
+    'DIRS': GTEMPLATE_DIRS,
+    'NAME': 'mako',
+    'OPTIONS': {
+      'context_processors': GTEMPLATE_CONTEXT_PROCESSORS,
+      'loaders': GTEMPLATE_LOADERS,
+    },
+  },
+  {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [
+      get_desktop_root("core/templates/debug_toolbar"),
+    ],
+    'NAME': 'django',
+    'APP_DIRS': True,
+  },
+]
 
 # Desktop doesn't use an auth profile module, because
 # because it doesn't mesh very well with the notion
@@ -271,7 +292,7 @@ conf.initialize(_app_conf_modules, _config_dir)
 
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
-TEMPLATE_DEBUG = DEBUG
+GTEMPLATE_DEBUG = DEBUG
 if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
   os.environ[ENV_DESKTOP_DEBUG] = 'True'
   desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
@@ -412,6 +433,10 @@ AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_C
 AXES_BEHIND_REVERSE_PROXY = desktop.conf.AUTH.BEHIND_REVERSE_PROXY.get()
 AXES_REVERSE_PROXY_HEADER = desktop.conf.AUTH.REVERSE_PROXY_HEADER.get()
 
+
+LOGIN_URL = '/hue/accounts/login'
+
+
 # SAML
 SAML_AUTHENTICATION = 'libsaml.backend.SAML2Backend' in AUTHENTICATION_BACKENDS
 if SAML_AUTHENTICATION:
@@ -431,6 +456,35 @@ if OPENID_AUTHENTICATION:
   INSTALLED_APPS.append('libopenid')
   LOGIN_URL = '/openid/login'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# OpenID Connect
+def is_oidc_configured():
+  return 'desktop.auth.backend.OIDCBackend' in AUTHENTICATION_BACKENDS
+
+if is_oidc_configured():
+  INSTALLED_APPS.append('mozilla_django_oidc')
+  if 'desktop.auth.backend.AllowFirstUserDjangoBackend' not in AUTHENTICATION_BACKENDS:
+    # when multi-backend auth, standard login URL '/hue/accounts/login' is used.
+    LOGIN_URL = '/oidc/authenticate/'
+  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+  MIDDLEWARE_CLASSES.append('mozilla_django_oidc.middleware.SessionRefresh')
+  OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = 15 * 60
+  OIDC_RP_SIGN_ALGO = 'RS256'
+  OIDC_RP_CLIENT_ID = desktop.conf.OIDC.OIDC_RP_CLIENT_ID.get()
+  OIDC_RP_CLIENT_SECRET = desktop.conf.OIDC.OIDC_RP_CLIENT_SECRET.get()
+  OIDC_OP_AUTHORIZATION_ENDPOINT = desktop.conf.OIDC.OIDC_OP_AUTHORIZATION_ENDPOINT.get()
+  OIDC_OP_TOKEN_ENDPOINT = desktop.conf.OIDC.OIDC_OP_TOKEN_ENDPOINT.get()
+  OIDC_OP_USER_ENDPOINT = desktop.conf.OIDC.OIDC_OP_USER_ENDPOINT.get()
+  OIDC_RP_IDP_SIGN_KEY = desktop.conf.OIDC.OIDC_RP_IDP_SIGN_KEY.get()
+  OIDC_OP_JWKS_ENDPOINT = desktop.conf.OIDC.OIDC_OP_JWKS_ENDPOINT.get()
+  OIDC_VERIFY_SSL = desktop.conf.OIDC.OIDC_VERIFY_SSL.get()
+  LOGIN_REDIRECT_URL = desktop.conf.OIDC.LOGIN_REDIRECT_URL.get()
+  LOGOUT_REDIRECT_URL = desktop.conf.OIDC.LOGOUT_REDIRECT_URL.get()
+  LOGIN_REDIRECT_URL_FAILURE = desktop.conf.OIDC.LOGIN_REDIRECT_URL_FAILURE.get()
+  OIDC_STORE_ACCESS_TOKEN = True
+  OIDC_STORE_ID_TOKEN = True
+  OIDC_STORE_REFRESH_TOKEN = True
+  OIDC_CREATE_USER = desktop.conf.OIDC.CREATE_USERS_ON_LOGIN.get()
 
 # OAuth
 OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
@@ -502,11 +556,14 @@ if desktop.conf.MEMORY_PROFILER.get():
   MEMORY_PROFILER = hpy()
   MEMORY_PROFILER.setrelheap()
 
+# Instrumentation
+if desktop.conf.INSTRUMENTATION.get():
+  gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
 
 if not desktop.conf.DATABASE_LOGGING.get():
   def disable_database_logging():
-    from django.db.backends import BaseDatabaseWrapper
-    from django.db.backends.util import CursorWrapper
+    from django.db.backends.base.base import BaseDatabaseWrapper
+    from django.db.backends.utils import CursorWrapper
 
     BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
 
@@ -521,3 +578,55 @@ if not desktop.conf.DATABASE_LOGGING.get():
 #
 # For performance reasons and to avoid searching in huge fields, we also truncate to a max length
 DOCUMENT2_SEARCH_MAX_LENGTH = 2000
+
+# To avoid performace issue, config check will display warning when Document2 over this size
+DOCUMENT2_MAX_ENTRIES = 100000
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
+def show_toolbar(request):
+  # Here can be used to decide if showing toolbar bases on request object:
+  #   For example, limit IP address by checking request.META['REMOTE_ADDR'], which can avoid setting INTERNAL_IPS.
+  list_allowed_users = desktop.conf.DJANGO_DEBUG_TOOL_USERS.get()
+  is_user_allowed = list_allowed_users[0] == '' or request.user.username in list_allowed_users
+  return DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get() and is_user_allowed
+
+if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
+  idx = MIDDLEWARE_CLASSES.index('desktop.middleware.ClusterMiddleware')
+  MIDDLEWARE_CLASSES.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
+
+  INSTALLED_APPS += (
+      'debug_toolbar',
+      'debug_panel',
+  )
+
+  DEBUG_TOOLBAR_PANELS = [
+      'debug_toolbar.panels.versions.VersionsPanel',
+      'debug_toolbar.panels.timer.TimerPanel',
+      'debug_toolbar.panels.settings.SettingsPanel',
+      'debug_toolbar.panels.headers.HeadersPanel',
+      'debug_toolbar.panels.request.RequestPanel',
+      'debug_toolbar.panels.sql.SQLPanel',
+      'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+      'debug_toolbar.panels.templates.TemplatesPanel',
+      'debug_toolbar.panels.cache.CachePanel',
+      'debug_toolbar.panels.signals.SignalsPanel',
+      'debug_toolbar.panels.logging.LoggingPanel',
+      'debug_toolbar.panels.redirects.RedirectsPanel',
+  ]
+
+  DEBUG_TOOLBAR_CONFIG = {
+      'JQUERY_URL': os.path.join(STATIC_ROOT, 'desktop/ext/js/jquery/jquery-2.2.4.min.js'),
+      'RESULTS_CACHE_SIZE': 200,
+      'SHOW_TOOLBAR_CALLBACK': show_toolbar
+  }
+
+  CACHES.update({
+      'debug-panel': {
+          'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+          'LOCATION': '/var/tmp/debug-panel-cache',
+          'OPTIONS': {
+              'MAX_ENTRIES': 10000
+          }
+      }
+  })

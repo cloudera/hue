@@ -277,6 +277,19 @@
         });
       });
 
+      it('should handle "COMPUTE STATS bla.boo (foo, bar) TABLESAMPLE SYSTEM(10) REPEATABLE(10);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS bla.boo (foo, bar) TABLESAMPLE SYSTEM(10) REPEATABLE(10);',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "COMPUTE INCREMENTAL STATS bla.boo;|"', function() {
         assertAutoComplete({
           beforeCursor: 'COMPUTE INCREMENTAL STATS bla.boo;',
@@ -378,6 +391,57 @@
             lowerCase: false,
             suggestTables: {},
             suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE STATS tbl |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS tbl ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TABLESAMPLE']
+          }
+        });
+      });
+
+      it('should suggest columns for "COMPUTE STATS db.tbl (|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS db.tbl (',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db'}, { name: 'tbl'} ]}]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE STATS tbl TABLESAMPLE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS tbl TABLESAMPLE ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SYSTEM()']
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE STATS tbl TABLESAMPLE SYSTEM(1) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS tbl TABLESAMPLE SYSTEM(1) ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['REPEATABLE()']
           }
         });
       });

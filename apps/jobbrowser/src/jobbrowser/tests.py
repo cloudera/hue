@@ -23,7 +23,7 @@ import time
 import unittest
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 
@@ -33,15 +33,18 @@ from desktop.models import Document
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
+from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api, spark_history_server_api
+from hadoop.yarn.spark_history_server_api import SparkHistoryServerApi
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
 
-from jobbrowser import models, views
+from jobbrowser import views
 from jobbrowser.api import get_api
 from jobbrowser.apis.query_api import QueryApi
+from jobbrowser.apis import job_api
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.models import can_view_job, can_modify_job, Job, LinkJobLogs
+from jobbrowser.models import can_view_job, can_modify_job, LinkJobLogs
+from jobbrowser.yarn_models import SparkJob
 
 
 LOG = logging.getLogger(__name__)
@@ -49,15 +52,6 @@ _INITIALIZED = False
 
 
 class TestBrowser():
-
-  def test_dots_to_camel_case(self):
-    assert_equal("fooBar", models.dots_to_camel_case("foo.bar"))
-    assert_equal("fooBarBaz", models.dots_to_camel_case("foo.bar.baz"))
-    assert_equal("foo", models.dots_to_camel_case("foo"))
-    assert_equal("foo.", models.dots_to_camel_case("foo."))
-
-  def test_get_path(self):
-    assert_equal("/foo/bar", models.get_path("hdfs://host/foo/bar"))
 
   def test_format_counter_name(self):
     assert_equal("Foo Bar", views.format_counter_name("fooBar"))
@@ -115,7 +109,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                                       u'form-0-value': [u'1'],
                                       u'form-TOTAL_FORMS': [u'1']},
                                 follow=True)
-    oozie_jobid = response.context['oozie_workflow'].id
+    oozie_jobid = response.context[0]['oozie_workflow'].id
     OozieServerProvider.wait_until_completion(oozie_jobid)
 
     cls.hadoop_job_id = get_hadoop_job_id(cls.oozie, oozie_jobid, 1)
@@ -219,7 +213,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                                       u'form-0-value': [u'1'],
                                       u'form-TOTAL_FORMS': [u'1']},
                                 follow=True)
-    oozie_jobid = response.context['oozie_workflow'].id
+    oozie_jobid = response.context[0]['oozie_workflow'].id
     job = OozieServerProvider.wait_until_completion(oozie_jobid)
     hadoop_job_id = get_hadoop_job_id(TestJobBrowserWithHadoop.oozie, oozie_jobid, 1)
     hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
@@ -325,7 +319,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Single job page
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s' % TestJobBrowserWithHadoop.hadoop_job_id)
     # Check some counters for single job.
-    counters = response.context['job'].counters
+    counters = response.context[0]['job'].counters
     counters_file_bytes_written = counters['org.apache.hadoop.mapreduce.FileSystemCounter']['counters']['FILE_BYTES_WRITTEN']
     assert_true(counters_file_bytes_written['map'] > 0)
     assert_true(counters_file_bytes_written['reduce'] > 0)
@@ -334,16 +328,16 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     raise SkipTest
 
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 4)
+    assert_true(len(response.context[0]['page'].object_list), 4)
     # Select by tasktype
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktype=reduce' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 1)
+    assert_true(len(response.context[0]['page'].object_list), 1)
     # Select by taskstate
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 4)
+    assert_true(len(response.context[0]['page'].object_list), 4)
     # Select by text
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktext=clean' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 1)
+    assert_true(len(response.context[0]['page'].object_list), 1)
 
   def test_job_single_logs(self):
     if not is_live_cluster():
@@ -364,29 +358,6 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     assert_true(log_length > 0, 'Log Length is 0, expected content in syslog.')
 
 
-class TestMapReduce1NoHadoop:
-
-  def test_acls_job(self):
-    job = MockMr1Job()
-
-    assert_true(can_view_job('test', job))
-    assert_true(can_modify_job('test', job))
-
-    assert_false(can_view_job('test2', job))
-    assert_false(can_modify_job('test2', job))
-
-
-class MockMr1Job(Job):
-
-  def __init__(self):
-    self.is_mr2 = False
-    self._full_job_conf = {
-      'mapreduce.cluster.acls.enabled': True,
-      'mapreduce.job.acl-modify-job': 'test',
-      'mapreduce.job.acl-view-job': 'test'
-    }
-
-
 class TestMapReduce2NoHadoop:
 
   def setUp(self):
@@ -397,6 +368,9 @@ class TestMapReduce2NoHadoop:
       mapreduce_api.old_get_mapreduce_api = mapreduce_api.get_mapreduce_api
     if not hasattr(history_server_api, 'old_get_history_server_api'):
       history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
+    if not hasattr(spark_history_server_api, 'old_get_spark_history_server_api'):
+      spark_history_server_api.old_get_spark_history_server_api = spark_history_server_api.get_history_server_api
+
 
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "jobbrowser")
@@ -413,6 +387,7 @@ class TestMapReduce2NoHadoop:
     resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
     history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
+    spark_history_server_api.get_history_server_api = lambda: MockSparkHistoryApi()
 
     self.finish = [
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
@@ -425,6 +400,7 @@ class TestMapReduce2NoHadoop:
     resource_manager_api.get_resource_manager = getattr(resource_manager_api, 'old_get_resource_manager')
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
+    spark_history_server_api.get_history_server_api = getattr(spark_history_server_api, 'old_get_spark_history_server_api')
 
     for f in self.finish:
       f()
@@ -466,23 +442,23 @@ class TestMapReduce2NoHadoop:
 
   def test_finished_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
 
   def test_spark_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0006')
-    assert_equal(response.context['job'].jobId, 'application_1428442704693_0006')
+    assert_equal(response.context[0]['job'].jobId, 'application_1428442704693_0006')
 
   def test_yarn_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
 
   def job_not_assigned(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url')
-    assert_equal(response.context['jobid'], 'job_1356251510842_0009')
-    assert_equal(response.context['path'], '/my_url')
+    assert_equal(response.context[0]['jobid'], 'job_1356251510842_0009')
+    assert_equal(response.context[0]['path'], '/my_url')
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url?format=json')
     result = json.loads(response.content)
@@ -490,14 +466,14 @@ class TestMapReduce2NoHadoop:
 
   def test_acls_job(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054') # Check in perm decorator
-    assert_true(can_view_job('test', response.context['job']))
-    assert_true(can_modify_job('test', response.context['job']))
+    assert_true(can_view_job('test', response.context[0]['job']))
+    assert_true(can_modify_job('test', response.context[0]['job']))
 
-    assert_true(can_view_job('test2', response.context['job']))
-    assert_false(can_modify_job('test2', response.context['job']))
+    assert_true(can_view_job('test2', response.context[0]['job']))
+    assert_false(can_modify_job('test2', response.context[0]['job']))
 
-    assert_false(can_view_job('test3', response.context['job']))
-    assert_false(can_modify_job('test3', response.context['job']))
+    assert_false(can_view_job('test3', response.context[0]['job']))
+    assert_false(can_modify_job('test3', response.context[0]['job']))
 
     response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
     assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
@@ -619,13 +595,14 @@ class TestResourceManagerHaNoHadoop:
 
 
 class TestImpalaApi(object):
+
   def setUp(self):
-    api = MockImpalaQueryApi()
+    api = MockImpalaQueryApi('http://url.com')
     self.api = QueryApi(None, impala_api=api)
 
   def test_apps(self):
     response = self.api.apps({})
-    target = [{'status': u'FINISHED', 'rows_fetched': 28, 'user': u'admin', 'canWrite': False, 'duration': 3355000.0, 'id': u'8a46a8865624698f:b80b211500000000', 'apiStatus': 'SUCCEEDED', 'name': u'SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 10000...', 'submitted': u'2017-10-25 15:38:26.637010000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}, {'status': u'FINISHED', 'rows_fetched': 53, 'user': u'admin', 'canWrite': False, 'duration': 3369000.0, 'id': u'4d497267f34ff17d:817bdfb500000000', 'apiStatus': 'SUCCEEDED', 'name': u'select * from customers', 'submitted': u'2017-10-25 15:38:12.872825000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}]
+    target = [{'status': u'FINISHED', 'rows_fetched': 28, 'user': u'admin', 'canWrite': False, 'duration': 3355000.0, 'id': u'8a46a8865624698f:b80b211500000000', 'apiStatus': 'SUCCEEDED', 'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'submitted': u'2017-10-25 15:38:26.637010000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}, {'status': u'FINISHED', 'rows_fetched': 53, 'user': u'admin', 'canWrite': False, 'duration': 3369000.0, 'id': u'4d497267f34ff17d:817bdfb500000000', 'apiStatus': 'SUCCEEDED', 'name': u'select * from customers', 'submitted': u'2017-10-25 15:38:12.872825000', 'queue': u'root.admin', 'waiting': True, 'progress': u'2 / 3 (66.6667%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}]
     for i in range(0,len(target)):
       for key, value in target[i].iteritems():
         assert_equal(response.get('apps')[i].get(key), value)
@@ -633,17 +610,86 @@ class TestImpalaApi(object):
   def test_app(self):
     response = self.api.app('4d497267f34ff17d:817bdfb500000000')
     for key, value in {'status': u'FINISHED', 'name': u'select * from customers',
-     'duration': 211000, 'progress': 100, 'user': u'admin', 'type': 'queries',
-     'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-26 11:19:40.420511000', 'apiStatus': 'SUCCEEDED'}.iteritems():
+      'duration': 3369000.0, 'progress': 66.6667, 'user': u'admin', 'type': 'queries',
+      'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000', 'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.iteritems():
       assert_equal(response.get(key), value)
 
     response = self.api.app('8a46a8865624698f:b80b211500000000')
 
     for key, value in {'status': u'FINISHED',
-     'name': u'SELECT sample_07.description, sample_07.salary', 'duration': 180000, 'progress': 100, 'user': u'admin',
-     'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-26 11:20:11.971764000',
-     'apiStatus': 'SUCCEEDED'}.iteritems():
-     assert_equal(response.get(key), value)
+      'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'duration': 3355000.0, 'progress': 100.0, 'user': u'admin',
+      'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-25 15:38:26.637010000',
+      'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.iteritems():
+      assert_equal(response.get(key), value)
+
+
+class TestSparkNoHadoop(object):
+  def setUp(self):
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "jobbrowser")
+    self.user = User.objects.get(username='test')
+
+    if not hasattr(job_api, 'old_NativeYarnApi'):
+      job_api.old_NativeYarnApi = job_api.YarnApi
+
+    if not hasattr(views, 'old_get_api'):
+      views.old_get_api = views.get_api
+
+    job_api.NativeYarnApi = MockYarnApi
+    views.get_api = MockYarnApi
+
+  def tearDown(self):
+    job_api.NativeYarnApi = getattr(job_api, 'old_NativeYarnApi')
+    views.get_api = getattr(views, 'old_get_api')
+
+  def test_spark_executor_logs(self):
+    # Spark job status is succeed
+    query_executor_data = {u'interface': [u'"jobs"'], u'app_id': [u'"driver_executor_application_1513618343677_0018"']}
+    resp_executor = self.c.post('/jobbrowser/api/job/jobs', query_executor_data)
+    response_executor = json.loads(resp_executor.content)
+    assert_equal(response_executor['status'], 0)
+    assert_equal(response_executor['app']['executor_id'], 'driver')
+
+    query_log_data = {u'interface': [u'"jobs"'], u'type': [u'"SPARK"'], u'app_id': [u'"application_1513618343677_0018"'], u'name': [u'"default"']}
+    resp_log = self.c.post('/jobbrowser/api/job/logs', query_log_data)
+    response_log = json.loads(resp_log.content)
+    assert_equal(response_log['status'], 0)
+    assert_equal(response_log['logs']['logs'], 'dummy_logs')
+
+    # Spark job status is running
+    query_executor_data = {u'interface': [u'"jobs"'], u'app_id': [u'"driver_executor_application_1513618343677_0020"']}
+    resp_executor = self.c.post('/jobbrowser/api/job/jobs', query_executor_data)
+    response_executor = json.loads(resp_executor.content)
+    assert_equal(response_executor['status'], 0)
+    assert_equal(response_executor['app']['executor_id'], 'driver')
+
+    query_log_data = {u'interface': [u'"jobs"'], u'type': [u'"SPARK"'], u'app_id': [u'"application_1513618343677_0020"'], u'name': [u'"default"']}
+    resp_log = self.c.post('/jobbrowser/api/job/logs', query_log_data)
+    response_log = json.loads(resp_log.content)
+    assert_equal(response_log['status'], 0)
+    assert_equal(response_log['logs']['logs'], 'dummy_logs')
+
+
+class MockYarnApi:
+  def __init__(self, user, jt=None):
+    self.user = user
+
+  def get_job(self, jobid):
+    return MockSparkJob(app_id=jobid)
+
+
+class MockSparkJob(SparkJob):
+  def __init__(self, app_id):
+    self.history_server_api = MockSparkHistoryApi()
+    self.jobId = app_id
+    self.trackingUrl = 'http://localhost:8088/proxy/' + app_id
+
+    if app_id == 'application_1513618343677_0018':
+      self.status = 'SUCCEEDED'
+    elif app_id == 'application_1513618343677_0020':
+      self.status = 'RUNNING'
+
+    self._get_metrics()
 
 
 class MockResourceManagerHaApi(object):
@@ -821,8 +867,8 @@ class MockResourceManagerApi:
 
 class MockImpalaQueryApi:
   APPS = {
-    '4d497267f34ff17d:817bdfb500000000': {u'stmt_type': u'QUERY', u'resource_pool': u'root.admin', u'waiting': True, u'last_event': u'Unregister query', u'start_time': u'2017-10-25 15:38:26.637010000', u'rows_fetched': 28, u'stmt': u'SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 100000)\r\nORDER BY sample_07.salary DESC\r\nLIMIT 1000', u'executing': False, u'state': u'FINISHED', u'query_id': u'8a46a8865624698f:b80b211500000000', u'end_time': u'2017-10-25 16:34:22.592036000', u'duration': u'55m55s', u'progress': u'1 / 1 ( 100%)', u'effective_user': u'admin', u'default_db': u'default', u'waiting_time': u'52m8s'}, 
-    '8a46a8865624698f:b80b211500000000': {u'stmt_type': u'QUERY', u'resource_pool': u'root.admin', u'waiting': True, u'last_event': u'Unregister query', u'start_time': u'2017-10-25 15:38:12.872825000', u'rows_fetched': 53, u'stmt': u'select * from customers', u'executing': False, u'state': u'FINISHED', u'query_id': u'4d497267f34ff17d:817bdfb500000000', u'end_time': u'2017-10-25 16:34:22.589811000', u'duration': u'56m9s', u'progress': u'1 / 1 ( 100%)', u'effective_user': u'admin', u'default_db': u'default', u'waiting_time': u'52m8s'}
+    '8a46a8865624698f:b80b211500000000': {u'stmt_type': u'QUERY', u'resource_pool': u'root.admin', u'waiting': True, u'last_event': u'Unregister query', u'start_time': u'2017-10-25 15:38:26.637010000', u'rows_fetched': 28, u'stmt': u'SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 100000)\r\nORDER BY sample_07.salary DESC\r\nLIMIT 1000', u'executing': False, u'state': u'FINISHED', u'query_id': u'8a46a8865624698f:b80b211500000000', u'end_time': u'2017-10-25 16:34:22.592036000', u'duration': u'55m55s', u'progress': u'1 / 1 ( 100%)', u'effective_user': u'admin', u'default_db': u'default', u'waiting_time': u'52m8s'},
+    '4d497267f34ff17d:817bdfb500000000': {u'stmt_type': u'QUERY', u'resource_pool': u'root.admin', u'waiting': True, u'last_event': u'Unregister query', u'start_time': u'2017-10-25 15:38:12.872825000', u'rows_fetched': 53, u'stmt': u'select * from customers', u'executing': False, u'state': u'FINISHED', u'query_id': u'4d497267f34ff17d:817bdfb500000000', u'end_time': u'2017-10-25 16:34:22.589811000', u'duration': u'56m9s', u'progress': u'2 / 3 (66.6667%)', u'effective_user': u'admin', u'default_db': u'default', u'waiting_time': u'52m8s'}
   }
   PLAN = {
     '4d497267f34ff17d:817bdfb500000000': {'status': -1, u'plan': {u'status': u'OK', u'plan_json': {u'plan_nodes': [{u'num_instances': 1, u'output_card': 53, u'label_detail': u'UNPARTITIONED', u'label': u'01:EXCHANGE', u'is_broadcast': True, u'max_time': u'0.000ns', u'avg_time': u'0.000ns', u'children': [], u'max_time_val': 0}, {u'num_instances': 1, u'output_card': 53, u'label_detail': u'default.customers', u'data_stream_target': u'01:EXCHANGE', u'label': u'00:SCAN HDFS', u'max_time': u'215.018ms', u'avg_time': u'215.018ms', u'children': [], u'max_time_val': 215018404}]}, u'__common__': {u'navbar': [{u'link': u'/backends', u'title': u'/backends'}, {u'link': u'/catalog', u'title': u'/catalog'}, {u'link': u'/hadoop-varz', u'title': u'/hadoop-varz'}, {u'link': u'/log_level', u'title': u'/log_level'}, {u'link': u'/logs', u'title': u'/logs'}, {u'link': u'/memz', u'title': u'/memz'}, {u'link': u'/metrics', u'title': u'/metrics'}, {u'link': u'/queries', u'title': u'/queries'}, {u'link': u'/rpcz', u'title': u'/rpcz'}, {u'link': u'/sessions', u'title': u'/sessions'}, {u'link': u'/threadz', u'title': u'/threadz'}, {u'link': u'/varz', u'title': u'/varz'}], u'process-name': u'impalad'}, u'stmt': u'select * from customers', u'summary': u'\nOperator       #Hosts   Avg Time   Max Time  #Rows  Est. #Rows  Peak Mem  Est. Peak Mem  Detail            \n-----------------------------------------------------------------------------------------------------------\n01:EXCHANGE         1    0.000ns    0.000ns     53           0         0              0  UNPARTITIONED     \n00:SCAN HDFS        1  215.018ms  215.018ms     53           0  45.02 KB       32.00 MB  default.customers ', u'query_id': u'1a48b5796f8f07f5:49ba9e6b00000000', u'plan': u'\n----------------\nPer-Host Resource Reservation: Memory=0B\nPer-Host Resource Estimates: Memory=32.00MB\nWARNING: The following tables have potentially corrupt table statistics.\nDrop and re-compute statistics to resolve this problem.\ndefault.customers\nWARNING: The following tables are missing relevant table and/or column statistics.\ndefault.customers\n\nF01:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1\nPLAN-ROOT SINK\n|  mem-estimate=0B mem-reservation=0B\n|\n01:EXCHANGE [UNPARTITIONED]\n|  mem-estimate=0B mem-reservation=0B\n|  tuple-ids=0 row-size=19B cardinality=0\n|\nF00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1\n00:SCAN HDFS [default.customers, RANDOM]\n   partitions=1/1 files=1 size=15.44KB\n   table stats: 0 rows total\n   column stats: unavailable\n   mem-estimate=32.00MB mem-reservation=0B\n   tuple-ids=0 row-size=19B cardinality=0\n----------------'}},
@@ -836,8 +882,8 @@ class MockImpalaQueryApi:
     '4d497267f34ff17d:817bdfb500000000': {u'query_id': u'1a48b5796f8f07f5:49ba9e6b00000000', u'__common__': {u'navbar': [{u'link': u'/backends', u'title': u'/backends'}, {u'link': u'/catalog', u'title': u'/catalog'}, {u'link': u'/hadoop-varz', u'title': u'/hadoop-varz'}, {u'link': u'/log_level', u'title': u'/log_level'}, {u'link': u'/logs', u'title': u'/logs'}, {u'link': u'/memz', u'title': u'/memz'}, {u'link': u'/metrics', u'title': u'/metrics'}, {u'link': u'/queries', u'title': u'/queries'}, {u'link': u'/rpcz', u'title': u'/rpcz'}, {u'link': u'/sessions', u'title': u'/sessions'}, {u'link': u'/threadz', u'title': u'/threadz'}, {u'link': u'/varz', u'title': u'/varz'}], u'process-name': u'impalad'}, u'mem_usage': u'The query is finished, current memory consumption is not available.'},
     '8a46a8865624698f:b80b211500000000': {u'query_id': u'd424420e0c44ab9:c637ac2900000000', u'__common__': {u'navbar': [{u'link': u'/backends', u'title': u'/backends'}, {u'link': u'/catalog', u'title': u'/catalog'}, {u'link': u'/hadoop-varz', u'title': u'/hadoop-varz'}, {u'link': u'/log_level', u'title': u'/log_level'}, {u'link': u'/logs', u'title': u'/logs'}, {u'link': u'/memz', u'title': u'/memz'}, {u'link': u'/metrics', u'title': u'/metrics'}, {u'link': u'/queries', u'title': u'/queries'}, {u'link': u'/rpcz', u'title': u'/rpcz'}, {u'link': u'/sessions', u'title': u'/sessions'}, {u'link': u'/threadz', u'title': u'/threadz'}, {u'link': u'/varz', u'title': u'/varz'}], u'process-name': u'impalad'}, u'mem_usage': u'The query is finished, current memory consumption is not available.'}
   }
-  #PROFILE = {}
-  def __init__(self): pass
+  def __init__(self, url):
+    self.url = url
 
   def get_queries(self, **kwargs):
     return {
@@ -1006,6 +1052,103 @@ class MockMapreduceApi(MockMapreduce2Api):
       job['job']['id'] = job_id
       return job
 
+class MockSparkHistoryApi(SparkHistoryServerApi):
+  def __init__(self):
+    self.APPS = [{
+        "id": "application_1513618343677_0018",
+        "name": "Sleep15minPySpark",
+        "attempts": [ {
+          "attemptId": "1",
+          "startTime": "2017-12-20T20:25:19.672GMT",
+          "endTime": "2017-12-20T20:40:43.768GMT",
+          "sparkUser": "test",
+          "completed": True
+      }]
+    }, {
+        "id": "application_1513618343677_0020",
+        "name": "Sleep15minPySpark",
+        "attempts": [ {
+          "attemptId": "2",
+          "startTime": "2017-12-24T03:19:29.993GMT",
+          "endTime": "1969-12-31T23:59:59.999GMT",
+          "sparkUser": "test",
+          "completed": False
+        }, {
+          "attemptId": "1",
+          "startTime": "2017-12-24T03:12:50.763GMT",
+          "endTime": "2017-12-24T03:19:22.178GMT",
+          "sparkUser": "test",
+          "completed": True
+      }]
+    }]
+
+  def applications(self):
+    return self.APPS
+
+  def executors(self, job):
+    EXECUTORS_LISTS = {
+      u'application_1513618343677_0018/1': [{
+        u'diskUsed': 0,
+        u'totalShuffleWrite': 0,
+        u'totalCores': 0,
+        u'executorLogs': {
+          u'stderr': u'http://localhost:8042/node/containerlogs/container_1513618343677_0018_01_000001/test/stderr?start=-4096',
+          u'stdout': u'http://localhost:8042/node/containerlogs/container_1513618343677_0018_01_000001/test/stdout?start=-4096'
+        },
+        u'totalInputBytes': 0,
+        u'rddBlocks': 0,
+        u'maxMemory': 515553361,
+        u'totalShuffleRead': 0,
+        u'totalTasks': 0,
+        u'activeTasks': 0,
+        u'failedTasks': 0,
+        u'completedTasks': 0,
+        u'hostPort': u'172.31.122.54:43234',
+        u'maxTasks': 0, u'totalGCTime': 0,
+        u'isBlacklisted': False,
+        u'memoryUsed': 0,
+        u'id': u'driver',
+        u'isActive': True,
+        u'totalDuration': 0
+      }],
+      u'application_1513618343677_0020/2' : [{
+        u'diskUsed': 0,
+        u'totalShuffleWrite': 0,
+        u'totalCores': 0,
+        u'executorLogs': {
+          u'stderr': u'http://localhost:8042/node/containerlogs/container_1513618343677_0020_01_000001/test/stderr?start=-4096',
+          u'stdout': u'http://localhost:8042/node/containerlogs/container_1513618343677_0020_01_000001/test/stdout?start=-4096'},
+        u'totalInputBytes': 0,
+        u'rddBlocks': 0,
+        u'maxMemory': 515553361,
+        u'totalShuffleRead': 0,
+        u'totalTasks': 0,
+        u'activeTasks': 0,
+        u'failedTasks': 0,
+        u'completedTasks': 0,
+        u'hostPort': u'172.31.122.65:38210',
+        u'maxTasks': 0,
+        u'totalGCTime': 0,
+        u'isBlacklisted': False,
+        u'memoryUsed': 0,
+        u'id': u'driver',
+        u'isActive': True,
+        u'totalDuration': 0}]
+    }
+    app_id = self.get_real_app_id(job)
+    if not app_id:
+      return []
+
+    return EXECUTORS_LISTS[app_id] if app_id in EXECUTORS_LISTS else []
+
+  def download_executors_logs(self, request, job, name, offset):
+    return 'dummy_logs'
+
+  def download_executor_logs(self, user, executor, name, offset):
+    return 'dummy_log'
+
+  def get_executors_loglinks(self, job):
+    return None
 
 class HistoryServerApi(MockMapreduce2Api):
 
@@ -1079,30 +1222,30 @@ def test_make_log_links():
 
   # JobBrowser
   assert_equal(
-      """<a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """<a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('job_201306261521_0058')
   )
   assert_equal(
-      """Hadoop Job IDs executed by Pig: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """Hadoop Job IDs executed by Pig: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('Hadoop Job IDs executed by Pig: job_201306261521_0058')
   )
   assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058')
   )
   assert_equal(
-      """- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
+      """- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058')
   )
   assert_equal(
-      """ Logging error messages to: <a href="/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002""",
+      """ Logging error messages to: <a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002""",
       LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002')
   )
   assert_equal(
-      """ pig-<a href="/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""",
+      """ pig-<a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""",
       LinkJobLogs._make_links(' pig-job_201307091553_0028.log')
   )
   assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI""",
+      """MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI""",
       LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI')
   )

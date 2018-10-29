@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:36-0700\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -64,20 +64,19 @@ msgstr ""
 
 #: src/hbase/conf.py:48
 msgid ""
-"'buffered' is the default of the HBase Thrift Server and supports "
-"security. 'framed' can be used to chunk up responses, which is useful "
-"when used in conjunction with the nonblocking server in Thrift."
+"'framed' is used to chunk up responses, which is useful when used in "
+"conjunction with the nonblocking server in Thrift.'buffered' used to be "
+"the default of the HBase Thrift Server."
 msgstr ""
-"\"buffered\" est la valeur par défaut du serveur Thrift HBase et prend en"
-" charge la sécurité. La valeur \"framed\", qui peut servir à tronquer des"
-" réponses, s'avère utile lorsqu'elle est utilisée conjointement avec le "
-"serveur non bloquant dans Thrift."
+"'framed' permet de tronquer des réponses, ce qui peut s'avérer utile lorsque cette valeur est utilisée "
+"avec le serveur non bloquant dans Thrift. 'buffered' était la"
+"valeur par défaut du serveur HBase Thrift."
 
-#: src/hbase/conf.py:56
+#: src/hbase/conf.py:55
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "Répertoire de configuration HBase, contenant le fichier hbase-site.xml."
 
-#: src/hbase/conf.py:63
+#: src/hbase/conf.py:62
 msgid ""
 "Force Hue to use Http Thrift mode with doas impersonation, regarless of "
 "hbase-site.xml properties."

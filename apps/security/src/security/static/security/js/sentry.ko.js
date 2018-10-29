@@ -115,6 +115,9 @@ var SentryViewModel = (function () {
           else if (_parts[0] == 'configs') {
             self.authorizables.push(new Authorizable(vm, self, {type: 'CONFIG', name: _parts[1]}))
           }
+          else if (_parts[0] == 'admin') {
+            self.authorizables.push(new Authorizable(vm, self, {type: 'ADMIN', name: _parts[1]}))
+          }
         } else {
           self.authorizables.push(new Authorizable(vm, self, {type: 'DATABASE', name: _parts[0]}))
           if (_parts.length > 1) {
@@ -861,14 +864,27 @@ var SentryViewModel = (function () {
     self.isApplyingBulk = ko.observable(false);
 
     self.availablePrivileges = ko.observableArray();
-    self.availableActions = ko.observableArray();
     self.availableSolrConfigActions = ko.observableArray();
     if (initial.component == 'solr') {
-      self.availableActions(['QUERY', 'UPDATE', 'ALL']);
+      self.availableActions = function () {
+        return ko.observableArray(['QUERY', 'UPDATE', 'ALL']);
+      }
       self.availableSolrConfigActions(['ALL']);
     } else {
-      self.availableActions(['SELECT', 'INSERT', 'ALL']);
+      self.availableActions = function (authorizables) {
+        var actions = ['SELECT', 'INSERT', 'ALL'];
+        var databaseActions = ['CREATE'];
+        var tableActions = ['REFRESH']; // 'ALTER', 'DROP'
+        if (authorizables.length < 2) { // server and database
+          actions = actions.concat(databaseActions).concat(tableActions);
+        }
+        else {
+          actions = actions.concat(tableActions);
+        }
+        return ko.observableArray(actions.sort());
+      }
     }
+
 
     self.privilegeFilter = ko.observable("");
 
@@ -933,9 +949,9 @@ var SentryViewModel = (function () {
 
     self.deletePrivilegeModal = function (role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function (privilege) {
-          return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE');
-        }
-      );
+        return privilege.status() == 'deleted' && (privilege.privilegeType() == 'SERVER' || privilege.privilegeType() == 'DATABASE');
+      });
+
       if (cascadeDeletes.length > 0) {
         self.roleToUpdate(role);
         huePubSub.publish('show.delete.privilege.modal');
@@ -1139,7 +1155,9 @@ var SentryViewModel = (function () {
 
       if (self.component() == 'solr') {
         if (paths.length > 1) {
-          if (paths[0] == 'configs') {
+          if (paths[0] == 'admin') {
+            authorizables.push({'type': 'ADMIN', 'name': paths[1]});
+          } else if (paths[0] == 'configs') {
             authorizables.push({'type': 'CONFIG', 'name': paths[1]});
           } else {
             authorizables.push({'type': 'COLLECTION', 'name': paths[1]});

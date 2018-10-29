@@ -44,11 +44,12 @@ ko.bindingHandlers.browserAwareSelectize = {
 ko.bindingHandlers.selectize = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     if (typeof allBindingsAccessor.get('optionsCaption') == 'undefined')
-      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', SelectizeGlobals.i18n.CHOOSE);
+      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', HUE_I18n.selectize.choose);
 
     ko.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 
     var options = {};
+
     if (allBindingsAccessor.get('optionsValue')) {
       options.valueField = allBindingsAccessor.get('optionsValue');
     }
@@ -66,13 +67,21 @@ ko.bindingHandlers.selectize = {
             return input.length <= passed_options[attr_name]
           }
         }
+        else if (attr_name === 'clearable' && passed_options[attr_name]) {
+          options.plugins = ['clear_button'];
+        }
         else {
           options[attr_name] = passed_options[attr_name];
         }
       }
     }
 
+    if (!options.hasOwnProperty('dropdownParent')) {
+      options.dropdownParent = 'body';
+    }
+
     var $select = $(element).selectize(options)[0].selectize;
+
 
     if (typeof allBindingsAccessor.get('value') == 'function') {
       $select.addItem(allBindingsAccessor.get('value')());

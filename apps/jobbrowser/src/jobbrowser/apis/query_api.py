@@ -56,16 +56,17 @@ class QueryApi(Api):
     jobs_iter = itertools.chain(jobs['in_flight_queries'], jobs['completed_queries'])
     jobs_iter_filtered = self._n_filter(filter_list, jobs_iter)
 
-    return {
+    apps = {
       'apps': sorted([{
         'id': job['query_id'],
-        'name': job['stmt'][:100] + ('...' if len(job['stmt']) > 100 else ''),
+        'name': job['stmt'].replace('\r\n', ' ')[:60] + ('...' if len(job['stmt']) > 60 else ''),
         'status': job['state'],
         'apiStatus': self._api_status(job['state']),
         'type': job['stmt_type'],
         'user': job['effective_user'],
-        'queue': job['resource_pool'],
+        'queue': job.get('resource_pool'),
         'progress': job['progress'],
+        'isRunning': job['start_time'] > job['end_time'],
         'canWrite': job in jobs['in_flight_queries'],
         'duration': self._time_in_ms_groups(re.search(r"\s*(([\d.]*)([a-z]*))(([\d.]*)([a-z]*))?(([\d.]*)([a-z]*))?", job['duration'], re.MULTILINE).groups()),
         'submitted': job['start_time'],
@@ -74,8 +75,11 @@ class QueryApi(Api):
         'waiting': job['waiting'],
         'waiting_time': job['waiting_time']
       } for job in jobs_iter_filtered], key=lambda job: job.get('submitted'), reverse=True),
-      'total': jobs['num_in_flight_queries'] + jobs['num_executing_queries'] + jobs['num_waiting_queries']
+      'total': 0
     }
+    apps['total'] = len(apps['apps'])
+
+    return apps
 
   def _time_in_ms_groups(self, groups):
     time = 0
@@ -101,56 +105,30 @@ class QueryApi(Api):
       return float(time)
 
   def app(self, appid):
-    query = self.api.get_query_profile(query_id=appid)
-    if query.get('error'):
+    apps = self.apps({
+      'text': 'id:' + appid
+    })
+
+    if not apps.get('apps'):
       return {
-        'status': -1,
-        'message': query.get('error')
+        'name': _('Unknown or expired query id %s') % appid
       }
+    app = apps.get('apps')[0]
+    progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
+    app.update({
+      'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100 if self._api_status(app.get('status')) in ['SUCCEEDED', 'FAILED'] else 1,
+      'type': 'queries',
+      'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid),
+      'properties': {
+        'memory': '',
+        'profile': '',
+        'plan': '',
+        'backends': '',
+        'finstances': ''
+      }
+    })
 
-    user = re.search(r"^\s*User:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    status = re.search(r"^\s*Query State:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    stmt = re.search(r"^\s*Sql Statement:\s?([^\n\r]*)", query['profile'], re.MULTILINE).group(1)
-    partitions = re.findall(r"partitions=\s*(\d)+\s*\/\s*(\d)+", query['profile'])
-    end_time = re.search(r"^\s*End Time:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    submitted = re.search(r"^\s*Start Time:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-
-    progress = 0
-    if end_time:
-      progress = 100
-    elif partitions:
-      for partition in partitions:
-        progress += float(partition[0]) / float(partition[1])
-      progress /= len(partitions)
-      progress *= 100
-
-    if end_time:
-      end_time_ms = int(time.mktime(datetime.strptime(end_time[:26], '%Y-%m-%d %H:%M:%S.%f').timetuple()))*1000
-      start_time_ms = int(time.mktime(datetime.strptime(submitted[:26], '%Y-%m-%d %H:%M:%S.%f').timetuple()))*1000
-      duration_ms = end_time_ms - start_time_ms
-    else:
-      duration_ms = 0
-
-    common = {
-        'id': appid,
-        'name': stmt,
-        'status': status,
-        'apiStatus': self._api_status(status),
-        'user': user,
-        'progress': progress,
-        'duration': duration_ms,
-        'submitted': submitted,
-        'type': 'queries'
-    }
-
-    common['properties'] = {
-      'memory': '',
-      'profile': '',
-      'plan': ''
-    }
-
-    return common
-
+    return app
 
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
@@ -168,7 +146,7 @@ class QueryApi(Api):
     return message;
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
   def profile(self, appid, app_type, app_property, app_filters):
@@ -176,6 +154,10 @@ class QueryApi(Api):
       return self._memory(appid, app_type, app_property, app_filters)
     elif app_property == 'profile':
       return self._query_profile(appid)
+    elif app_property == 'backends':
+      return self._query_backends(appid)
+    elif app_property == 'finstances':
+      return self._query_finstances(appid)
     else:
       return self._query(appid)
 
@@ -183,26 +165,37 @@ class QueryApi(Api):
     return self.api.get_query_memory(query_id=appid);
 
   def _query(self, appid):
-    return self.api.get_query(query_id=appid)
+    query = self.api.get_query(query_id=appid)
+    query['summary'] = query.get('summary').strip() if query.get('summary') else ''
+    query['plan'] = query.get('plan').strip() if query.get('plan') else ''
+    return query
 
   def _query_profile(self, appid):
     return self.api.get_query_profile(query_id=appid)
 
+  def _query_backends(self, appid):
+    return self.api.get_query_backends(query_id=appid)
+
+  def _query_finstances(self, appid):
+    return self.api.get_query_finstances(query_id=appid)
+
   def _api_status_filter(self, status):
-    if status in ['RUNNING', 'CREATED']:
-      return 'RUNNING'
-    elif status in ['FINISHED']:
+    if status == 'FINISHED':
       return 'COMPLETED'
-    else:
+    elif status == 'EXCEPTION':
       return 'FAILED'
+    elif status == 'RUNNING':
+      return 'RUNNING'
 
   def _api_status(self, status):
-    if status in ['RUNNING', 'CREATED']:
-      return 'RUNNING'
-    elif status in ['FINISHED']:
+    if status == 'FINISHED':
       return 'SUCCEEDED'
-    else:
+    elif status == 'EXCEPTION':
       return 'FAILED'
+    elif status == 'RUNNING':
+      return 'RUNNING'
+    else:
+      return 'PAUSED'
 
   def _get_filter_list(self, filters):
     filter_list = []
@@ -215,13 +208,13 @@ class QueryApi(Api):
         'status':'status'
       }
 
-      def makeLambda(name, value):
+      def make_lambda(name, value):
         return lambda app: app[name] == value
 
       for key, name in filter_names.items():
           text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
           if text_filter and text_filter.group(1) == key:
-            filter_list.append(makeLambda(name, text_filter.group(2).strip()))
+            filter_list.append(make_lambda(name, text_filter.group(2).strip()))
     if filters.get("time"):
       time_filter = filters.get("time")
       period_ms = self._time_in_ms(float(time_filter.get("time_value")), time_filter.get("time_unit")[0:1])

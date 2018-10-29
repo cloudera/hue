@@ -157,7 +157,9 @@ NonReservedKeyword
  | '<hive>LOAD'
  | '<hive>LOCATION'
  | '<hive>LOCKS'
+ | '<hive>MATCHED'
  | '<hive>METADATA'
+ | '<hive>MERGE'
  | '<hive>MSCK'
  | '<hive>NOSCAN'
  | '<hive>NOVALIDATE'
@@ -197,7 +199,6 @@ NonReservedKeyword
  | '<hive>STATISTICS'
  | '<hive>STORED'
  | '<hive>STRING'
- | 'STRUCT'
  | '<hive>TABLES'
  | '<hive>TBLPROPERTIES'
  | '<hive>TEMPORARY'
@@ -236,29 +237,17 @@ NonReservedKeyword
  ;
 
 NonReservedKeyword
- : '<impala>ANALYTIC'
-// | '<impala>ANTI'
- | '<impala>CURRENT'
- | '<impala>GRANT'
- | '<impala>RECOVER'
- | '<impala>ROLE'
- | '<impala>ROLES'
- | '<impala>URI'
- | '<impala>SERVER'
-// | '<impala>BROADCAST'
-// | '<impala>NOSHUFFLE'
-// | '<impala>SHUFFLE'
-// TODO: Check if following are true
- | '<impala>BLOCK_SIZE'
- | '<impala>COMPRESSION'
- | '<impala>DEFAULT'
- | '<impala>ENCODING'
+ : '<impala>DEFAULT'
  | '<impala>KEY'
+ | '<impala>OWNER'
+ | '<impala>SERVER'
+ | '<impala>URI'
  ;
 
 NonReservedKeyword
  : 'ROLE'
  | 'OPTION'
+ | 'STRUCT'
  ;
 
 RegularIdentifier
@@ -297,14 +286,544 @@ OptionalHiveExplainTypes
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- : '<hive>ADMIN' | '<hive>ALL' | '<hive>AS' | '<hive>AUTHORIZATION' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKET' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CONSTRAINT' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DBPROPERTIES' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DEPENDENCY' | '<hive>DIRECTORY' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>DOUBLE_PRECISION' |'<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FOREIGN' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>KEY' | '<hive>LATERAL' | '<hive>LOCAL' | '<hive>LOCK' | '<hive>MACRO' | '<hive>NORELY' | '<hive>NOVALIDATE' | '<hive>OVERWRITE' | '<hive>OWNER' | '<hive>PARTITION' | '<hive>PERCENT' | '<hive>PRIVILEGES' | '<hive>PRIMARY' | '<hive>REBUILD' | '<hive>REFERENCES' | '<hive>RELY' | '<hive>REPAIR' | '<hive>REPLICATION' |'<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>SHOW_DATABASE' | '<hive>TABLE' | '<hive>TIMESTAMP' |'<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>METADATA' | '<hive>NONE' | '<hive>NOSCAN' | '<hive>OF' | '<hive>ORC' | '<hive>OUT' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>TABLES' | '<hive>TABLESAMPLE' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>VIEWS' | '<hive>WAIT' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
- | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CASCADE' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELETE' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTENDED' |'<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FILES' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>HASH' | '<impala>ILIKE' | '<impala>INCREMENTAL' | '<impala>INTERMEDIATE' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>IREGEXP' | '<impala>KEY' | '<impala>KUDU' | '<impala>LAST' | '<impala>LIMIT' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>PRIMARY' | '<impala>RANGE' | '<impala>REAL' | '<impala>RECOVER' | '<impala>REPEATABLE' | '<impala>REPLICATION' | '<impala>RESTRICT' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>SERVER' | '<impala>SORT' | '<impala>STATS' | '<impala>STRAIGHT_JOIN' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>TABLESAMPLE' | '<impala>URI' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>NOSHUFFLE' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
- | 'ALL' | 'ARRAY' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CROSS' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'MAP' | 'NOT' | 'NULL' | 'ON' | 'OPTION' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'PURGE' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'STRUCT' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VALUES' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
- | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
- | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>DAY' | '<hive>DAYOFWEEK' | '<hive>HISTOGRAM_NUMERIC' | '<hive>HOUR' | '<hive>MINUTE' | '<hive>MONTH' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX' | '<hive>QUARTER' | '<hive>SECOND' | '<hive>WEEK' | '<hive>YEAR'
- | '<impala>APPX_MEDIAN' | '<impala>EXTRACT' | '<impala>GROUP_CONCAT' | '<impala>STDDEV' | '<impala>VARIANCE_POP' | '<impala>VARIANCE_SAMP'
+ : '<hive>.'
+ | '<hive>['
+ | '<hive>]'
+ | '<hive>ADMIN'
+ | '<hive>ALL'
+ | '<hive>AS'
+ | '<hive>ASC'
+ | '<hive>AUTHORIZATION'
+ | '<hive>AVRO'
+ | '<hive>BINARY'
+ | '<hive>BUCKET'
+ | '<hive>BUCKETS'
+ | '<hive>CACHE'
+ | '<hive>CLUSTER'
+ | '<hive>CLUSTERED'
+ | '<hive>COLLECT_LIST'
+ | '<hive>COLLECT_SET'
+ | '<hive>COLLECTION'
+ | '<hive>COLUMNS'
+ | '<hive>COMMENT'
+ | '<hive>COMPACTIONS'
+ | '<hive>COMPUTE'
+ | '<hive>CONF'
+ | '<hive>CONSTRAINT'
+ | '<hive>CORR'
+ | '<hive>COVAR_POP'
+ | '<hive>COVAR_SAMP'
+ | '<hive>CUBE'
+ | '<hive>CURRENT'
+ | '<hive>DATA'
+ | '<hive>DATABASES'
+ | '<hive>DATE'
+ | '<hive>DAY'
+ | '<hive>DAYOFWEEK'
+ | '<hive>DBPROPERTIES'
+ | '<hive>DEFERRED'
+ | '<hive>DEFINED'
+ | '<hive>DELIMITED'
+ | '<hive>DEPENDENCY'
+ | '<hive>DESC'
+ | '<hive>DIRECTORY'
+ | '<hive>DISTRIBUTE'
+ | '<hive>DISTRIBUTED'
+ | '<hive>DOUBLE_PRECISION' |'<hive>ESCAPED'
+ | '<hive>EXTENDED'
+ | '<hive>EXTERNAL'
+ | '<hive>FIELDS'
+ | '<hive>FILE'
+ | '<hive>FOR'
+ | '<hive>FOREIGN'
+ | '<hive>FORMAT'
+ | '<hive>FORMATTED'
+ | '<hive>FUNCTION'
+ | '<hive>FUNCTIONS'
+ | '<hive>GRANT'
+ | '<hive>GROUPING'
+ | '<hive>HISTOGRAM_NUMERIC'
+ | '<hive>HOUR'
+ | '<hive>IDXPROPERTIES'
+ | '<hive>INDEX'
+ | '<hive>INDEXES'
+ | '<hive>INPATH'
+ | '<hive>INPUTFORMAT'
+ | '<hive>ITEMS'
+ | '<hive>JAR'
+ | '<hive>KEY'
+ | '<hive>KEYS'
+ | '<hive>LATERAL'
+ | '<hive>LINES'
+ | '<hive>LOCAL'
+ | '<hive>LOCATION'
+ | '<hive>LOCK'
+ | '<hive>LOCKS'
+ | '<hive>MACRO'
+ | '<hive>MATCHED'
+ | '<hive>METADATA'
+ | '<hive>MINUTE'
+ | '<hive>MONTH'
+ | '<hive>NONE'
+ | '<hive>NORELY'
+ | '<hive>NOSCAN'
+ | '<hive>NOVALIDATE'
+ | '<hive>NTILE'
+ | '<hive>OF'
+ | '<hive>ORC'
+ | '<hive>OUT'
+ | '<hive>OUTPUTFORMAT'
+ | '<hive>OVERWRITE'
+ | '<hive>OWNER'
+ | '<hive>PARQUET'
+ | '<hive>PARTITION'
+ | '<hive>PARTITIONED'
+ | '<hive>PARTITIONS'
+ | '<hive>PERCENT'
+ | '<hive>PERCENTILE'
+ | '<hive>PERCENTILE_APPROX'
+ | '<hive>PRIMARY'
+ | '<hive>PRIVILEGES'
+ | '<hive>QUARTER'
+ | '<hive>RCFILE'
+ | '<hive>REBUILD'
+ | '<hive>REFERENCES'
+ | '<hive>RELY'
+ | '<hive>REPAIR'
+ | '<hive>REPLICATION' |'<hive>ROLLUP'
+ | '<hive>ROLE'
+ | '<hive>ROLES'
+ | '<hive>SCHEMA'
+ | '<hive>SCHEMAS'
+ | '<hive>SECOND'
+ | '<hive>SEQUENCEFILE'
+ | '<hive>SERDE'
+ | '<hive>SERDEPROPERTIES'
+ | '<hive>SETS'
+ | '<hive>SHOW_DATABASE'
+ | '<hive>SKEWED'
+ | '<hive>SORTED'
+ | '<hive>STATISTICS'
+ | '<hive>STORED'
+ | '<hive>STORED_AS_DIRECTORIES'
+ | '<hive>STRING'
+ | '<hive>TABLE'
+ | '<hive>TABLES'
+ | '<hive>TABLESAMPLE'
+ | '<hive>TBLPROPERTIES'
+ | '<hive>TEMPORARY'
+ | '<hive>TERMINATED'
+ | '<hive>TEXTFILE'
+ | '<hive>TIMESTAMP' |'<hive>USER'
+ | '<hive>TINYINT'
+ | '<hive>TRANSACTIONS'
+ | '<hive>UNIONTYPE'
+ | '<hive>USING'
+ | '<hive>VIEW'
+ | '<hive>VIEWS'
+ | '<hive>WAIT'
+ | '<hive>WEEK'
+ | '<hive>WINDOW'
+ | '<hive>YEAR'
+ | '<impala>.'
+ | '<impala>...'
+ | '<impala>['
+ | '<impala>]'
+ | '<impala>AGGREGATE'
+ | '<impala>ALLOCATE'
+ | '<impala>ANALYTIC'
+ | '<impala>ANTI'
+ | '<impala>ANY'
+ | '<impala>APPX_MEDIAN'
+ | '<impala>ARE'
+ | '<impala>ARRAY_AGG'
+ | '<impala>ARRAY_MAX_CARDINALITY'
+ | '<impala>ASENSITIVE'
+ | '<impala>ASYMMETRIC'
+ | '<impala>AT'
+ | '<impala>ATOMIC'
+ | '<impala>AUTHORIZATION'
+ | '<impala>AVRO'
+ | '<impala>BEGIN_FRAME'
+ | '<impala>BEGIN_PARTITION'
+ | '<impala>BLOB'
+ | '<impala>BLOCK_SIZE'
+ | '<impala>BOTH'
+ | '<impala>BROADCAST'
+ | '<impala>CACHED'
+ | '<impala>CALLED'
+ | '<impala>CARDINALITY'
+ | '<impala>CASCADE'
+ | '<impala>CASCADED'
+ | '<impala>CHARACTER'
+ | '<impala>CLOB'
+ | '<impala>CLOSE_FN'
+ | '<impala>COLLATE'
+ | '<impala>COLLECT'
+ | '<impala>COLUMN'
+ | '<impala>COMMIT'
+ | '<impala>CONDITION'
+ | '<impala>CONNECT'
+ | '<impala>CONSTRAINT'
+ | '<impala>CONTAINS'
+ | '<impala>CONVERT'
+ | '<impala>COPY'
+ | '<impala>CORR'
+ | '<impala>CORRESPONDING'
+ | '<impala>COVAR_POP'
+ | '<impala>COVAR_SAMP'
+ | '<impala>CUBE'
+ | '<impala>CURRENT'
+ | '<impala>CURRENT_DATE'
+ | '<impala>CURRENT_DEFAULT_TRANSFORM_GROUP'
+ | '<impala>CURRENT_PATH'
+ | '<impala>CURRENT_ROLE'
+ | '<impala>CURRENT_ROW'
+ | '<impala>CURRENT_SCHEMA'
+ | '<impala>CURRENT_TIME'
+ | '<impala>CURRENT_TRANSFORM_GROUP_FOR_TYPE'
+ | '<impala>CURSOR'
+ | '<impala>CYCLE'
+ | '<impala>DATA'
+ | '<impala>DATABASES'
+ | '<impala>DEALLOCATE'
+ | '<impala>DEC'
+ | '<impala>DECFLOAT'
+ | '<impala>DECLARE'
+ | '<impala>DEFINE'
+ | '<impala>DELETE'
+ | '<impala>DELIMITED'
+ | '<impala>DEREF'
+ | '<impala>DETERMINISTIC'
+ | '<impala>DISCONNECT'
+ | '<impala>DYNAMIC'
+ | '<impala>EACH'
+ | '<impala>ELEMENT'
+ | '<impala>EMPTY'
+ | '<impala>END_FRAME'
+ | '<impala>END_PARTITION'
+ | '<impala>EQUALS'
+ | '<impala>ESCAPE'
+ | '<impala>ESCAPED'
+ | '<impala>EVERY'
+ | '<impala>EXCEPT'
+ | '<impala>EXEC'
+ | '<impala>EXECUTE'
+ | '<impala>EXTENDED'
+ | '<impala>EXTERNAL'
+ | '<impala>EXTRACT'
+ | '<impala>FETCH'
+ | '<impala>FIELDS'
+ | '<impala>FILES'
+ | '<impala>FILTER'
+ | '<impala>FINALIZE_FN'
+ | '<impala>FIRST'
+ | '<impala>FOR'
+ | '<impala>FOREIGN'
+ | '<impala>FORMAT'
+ | '<impala>FORMATTED'
+ | '<impala>FRAME_ROW'
+ | '<impala>FREE'
+ | '<impala>FUNCTION'
+ | '<impala>FUNCTIONS'
+ | '<impala>FUSION'
+ | '<impala>GET'
+ | '<impala>GLOBAL'
+ | '<impala>GRANT'
+ | '<impala>GROUP'
+ | '<impala>GROUP_CONCAT'
+ | '<impala>GROUPING'
+ | '<impala>GROUPS'
+ | '<impala>HASH'
+ | '<impala>HOLD'
+ | '<impala>IGNORE'
+ | '<impala>ILIKE'
+ | '<impala>INCREMENTAL'
+ | '<impala>INDICATOR'
+ | '<impala>INIT_FN'
+ | '<impala>INITIAL'
+ | '<impala>INOUT'
+ | '<impala>INPATH'
+ | '<impala>INSENSITIVE'
+ | '<impala>INTERMEDIATE'
+ | '<impala>INTERSECT'
+ | '<impala>INTERSECTION'
+ | '<impala>INTERVAL'
+ | '<impala>IREGEXP'
+ | '<impala>JSON_ARRAY'
+ | '<impala>JSON_ARRAYAGG'
+ | '<impala>JSON_EXISTS'
+ | '<impala>JSON_OBJECT'
+ | '<impala>JSON_OBJECTAGG'
+ | '<impala>JSON_QUERY'
+ | '<impala>JSON_TABLE'
+ | '<impala>JSON_TABLE_PRIMITIVE'
+ | '<impala>JSON_VALUE'
+ | '<impala>KEY'
+ | '<impala>KUDU'
+ | '<impala>LARGE'
+ | '<impala>LAST'
+ | '<impala>LATERAL'
+ | '<impala>LEADING'
+ | '<impala>LIKE_REGEX'
+ | '<impala>LIMIT'
+ | '<impala>LINES'
+ | '<impala>LISTAGG'
+ | '<impala>LOCAL'
+ | '<impala>LOCALTIMESTAMP'
+ | '<impala>LOCATION'
+ | '<impala>MATCH'
+ | '<impala>MATCH_NUMBER'
+ | '<impala>MATCH_RECOGNIZE'
+ | '<impala>MATCHES'
+ | '<impala>MERGE'
+ | '<impala>MERGE_FN'
+ | '<impala>METHOD'
+ | '<impala>MODIFIES'
+ | '<impala>MULTISET'
+ | '<impala>NATIONAL'
+ | '<impala>NATURAL'
+ | '<impala>NCHAR'
+ | '<impala>NCLOB'
+ | '<impala>NDV'
+ | '<impala>NO'
+ | '<impala>NONE'
+ | '<impala>NORMALIZE'
+ | '<impala>NOSHUFFLE'
+ | '<impala>NTH_VALUE'
+ | '<impala>NULLS'
+ | '<impala>NUMERIC'
+ | '<impala>OCCURRENCES_REGEX'
+ | '<impala>OCTET_LENGTH'
+ | '<impala>OF'
+ | '<impala>OMIT'
+ | '<impala>ONE'
+ | '<impala>ONLY'
+ | '<impala>OUT'
+ | '<impala>OVER'
+ | '<impala>OVERLAPS'
+ | '<impala>OVERLAY'
+ | '<impala>OWNER'
+ | '<impala>PARQUET'
+ | '<impala>PARTITIONED'
+ | '<impala>PARTITIONS'
+ | '<impala>PATTERN'
+ | '<impala>PER'
+ | '<impala>PERCENT'
+ | '<impala>PERCENTILE_CONT'
+ | '<impala>PERCENTILE_DISC'
+ | '<impala>PORTION'
+ | '<impala>POSITION'
+ | '<impala>POSITION_REGEX'
+ | '<impala>PRECEDES'
+ | '<impala>PREPARE'
+ | '<impala>PREPARE_FN'
+ | '<impala>PRIMARY'
+ | '<impala>PROCEDURE'
+ | '<impala>PTF'
+ | '<impala>RANGE'
+ | '<impala>RCFILE'
+ | '<impala>READS'
+ | '<impala>REAL'
+ | '<impala>RECOVER'
+ | '<impala>RECURSIVE'
+ | '<impala>REF'
+ | '<impala>REFERENCES'
+ | '<impala>REFERENCING'
+ | '<impala>REGR_AVGX'
+ | '<impala>REGR_AVGY'
+ | '<impala>REGR_COUNT'
+ | '<impala>REGR_INTERCEPT'
+ | '<impala>REGR_R2REGR_SLOPE'
+ | '<impala>REGR_SXX'
+ | '<impala>REGR_SXY'
+ | '<impala>REGR_SYY'
+ | '<impala>RELEASE'
+ | '<impala>REPEATABLE'
+ | '<impala>REPLICATION'
+ | '<impala>RESTRICT'
+ | '<impala>RETURNS'
+ | '<impala>ROLE'
+ | '<impala>ROLES'
+ | '<impala>ROLLBACK'
+ | '<impala>ROLLUP'
+ | '<impala>RUNNING'
+ | '<impala>SAVEPOINT'
+ | '<impala>SCHEMAS'
+ | '<impala>SCOPE'
+ | '<impala>SCROLL'
+ | '<impala>SEARCH'
+ | '<impala>SEEK'
+ | '<impala>SENSITIVE'
+ | '<impala>SEQUENCEFILE'
+ | '<impala>SERDEPROPERTIES'
+ | '<impala>SERIALIZE_FN'
+ | '<impala>SERVER'
+ | '<impala>SHUFFLE'
+ | '<impala>SIMILAR'
+ | '<impala>SKIP'
+ | '<impala>SOME'
+ | '<impala>SORT'
+ | '<impala>SPECIFIC'
+ | '<impala>SPECIFICTYPE'
+ | '<impala>SQLEXCEPTION'
+ | '<impala>SQLSTATE'
+ | '<impala>SQLWARNING'
+ | '<impala>STATIC'
+ | '<impala>STATS'
+ | '<impala>STDDEV'
+ | '<impala>STORED'
+ | '<impala>STRAIGHT_JOIN'
+ | '<impala>SUBMULTISET'
+ | '<impala>SUBSET'
+ | '<impala>SUBSTRING_REGEX'
+ | '<impala>SUCCEEDS'
+ | '<impala>SYMBOL'
+ | '<impala>SYMMETRIC'
+ | '<impala>SYSTEM_TIME'
+ | '<impala>SYSTEM_USER'
+ | '<impala>TABLE'
+ | '<impala>TABLES'
+ | '<impala>TABLESAMPLE'
+ | '<impala>TBLPROPERTIES'
+ | '<impala>TERMINATED'
+ | '<impala>TEXTFILE'
+ | '<impala>TIMEZONE_HOUR'
+ | '<impala>TIMEZONE_MINUTE'
+ | '<impala>TRAILING'
+ | '<impala>TRANSLATE_REGEX'
+ | '<impala>TRANSLATION'
+ | '<impala>TREAT'
+ | '<impala>TRIGGER'
+ | '<impala>TRIM_ARRAY'
+ | '<impala>UESCAPE'
+ | '<impala>UNIQUE'
+ | '<impala>UNNEST'
+ | '<impala>UPDATE_FN'
+ | '<impala>URI'
+ | '<impala>USER'
+ | '<impala>USING'
+ | '<impala>VALUE_OF'
+ | '<impala>VARBINARY'
+ | '<impala>VARCHAR'
+ | '<impala>VARIANCE_POP'
+ | '<impala>VARIANCE_SAMP'
+ | '<impala>VARYING'
+ | '<impala>VERSIONING'
+ | '<impala>WHENEVER'
+ | '<impala>WIDTH_BUCKET'
+ | '<impala>WINDOW'
+ | '<impala>WITHIN'
+ | '<impala>WITHOUT'
+ | '!'
+ | '('
+ | ')'
+ | '*'
+ | ','
+ | '-'
+ | '.'
+ | '<'
+ | '='
+ | '>'
+ | '['
+ | ']'
+ | '~'
+ | 'ALL'
  | 'ANALYTIC'
- | 'UNSIGNED_INTEGER' | 'UNSIGNED_INTEGER_E' | 'REGULAR_IDENTIFIER' | 'HDFS_START_QUOTE' | 'AND' | 'OR' | '=' | '<' | '>' | 'COMPARISON_OPERATOR' | '-' | '*' | 'ARITHMETIC_OPERATOR' | ',' | '.' | '~' | '!' | '(' | ')' | '[' | ']' | 'VARIABLE_REFERENCE' | 'BACKTICK' | 'SINGLE_QUOTE' | 'DOUBLE_QUOTE'
+ | 'AND'
+ | 'ARITHMETIC_OPERATOR'
+ | 'ARRAY'
+ | 'AS'
+ | 'ASC'
+ | 'AVG'
+ | 'BACKTICK'
+ | 'BETWEEN'
+ | 'BIGINT'
+ | 'BOOLEAN'
+ | 'BY'
+ | 'CASE'
+ | 'CAST'
+ | 'CHAR'
+ | 'COMPARISON_OPERATOR'
+ | 'COUNT'
+ | 'CROSS'
+ | 'CURRENT'
+ | 'DATABASE'
+ | 'DECIMAL'
+ | 'DESC'
+ | 'DISTINCT'
+ | 'DOUBLE'
+ | 'DOUBLE_QUOTE'
+ | 'ELSE'
+ | 'END'
+ | 'EXISTS'
+ | 'FALSE'
+ | 'FLOAT'
+ | 'FOLLOWING'
+ | 'FROM'
+ | 'FULL'
+ | 'GROUP'
+ | 'HAVING'
+ | 'HDFS_START_QUOTE'
+ | 'IF'
+ | 'IN'
+ | 'INNER'
+ | 'INT'
+ | 'INTO'
+ | 'IS'
+ | 'JOIN'
+ | 'LEFT'
+ | 'LIKE'
+ | 'LIMIT'
+ | 'MAP'
+ | 'MAX'
+ | 'MIN'
+ | 'NOT'
+ | 'NULL'
+ | 'ON'
+ | 'OPTION'
+ | 'OR'
+ | 'ORDER'
+ | 'OUTER'
+ | 'OVER'
+ | 'PARTITION'
+ | 'PRECEDING'
+ | 'PURGE'
+ | 'RANGE'
+ | 'REGEXP'
+ | 'REGULAR_IDENTIFIER'
+ | 'RIGHT'
+ | 'RLIKE'
+ | 'ROLE'
+ | 'ROW'
+ | 'ROWS'
+ | 'SCHEMA'
+ | 'SEMI'
+ | 'SET'
+ | 'SINGLE_QUOTE'
+ | 'SMALLINT'
+ | 'STDDEV_POP'
+ | 'STDDEV_SAMP'
+ | 'STRING'
+ | 'STRUCT'
+ | 'SUM'
+ | 'TABLE'
+ | 'THEN'
+ | 'TIMESTAMP'
+ | 'TINYINT'
+ | 'TRUE'
+ | 'UNION'
+ | 'UNSIGNED_INTEGER'
+ | 'UNSIGNED_INTEGER_E'
+ | 'VALUES'
+ | 'VAR_POP'
+ | 'VAR_SAMP'
+ | 'VARCHAR'
+ | 'VARIABLE_REFERENCE'
+ | 'VARIANCE'
+ | 'WHEN'
+ | 'WHERE'
+ | 'WITH'
  ;
 
 DataDefinition
@@ -467,6 +986,11 @@ HiveOrImpalaTerminated
 HiveRoleOrUser
  : '<hive>ROLE'
  | '<hive>USER'
+ ;
+
+ImpalaRoleOrUser
+ : '<impala>ROLE'
+ | '<impala>USER'
  ;
 
 SingleQuotedValue
@@ -1396,7 +1920,7 @@ SelectStatement_EDIT
    {
      parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      if ($4.cursorAtStart) {
-       var keywords = [{ value: '*', weight: 10000 }];
+       var keywords = parser.getSelectListKeywords();
        if (!$3 && !$2) {
          keywords.push({ value: 'ALL', weight: 2 });
          keywords.push({ value: 'DISTINCT', weight: 2 });
@@ -1428,7 +1952,7 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
    {
      parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
-     var keywords = [{ value: '*', weight: 10000 }];
+     var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
@@ -1461,7 +1985,7 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR' TableExpression
    {
      parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
-     var keywords = [{ value: '*', weight: 10000 }];
+     var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
@@ -1847,9 +2371,13 @@ OptionalSelectConditions_EDIT
      if ($2.suggestKeywords) {
        keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 8));
      }
-     $$ = parser.getValueExpressionKeywords($2, keywords);
-     if ($2.columnReference) {
-       $$.columnReference = $2.columnReference;
+     if ($2.valueExpression) {
+       $$ = parser.getValueExpressionKeywords($2.valueExpression, keywords);
+       if ($2.valueExpression.columnReference) {
+         $$.columnReference = $2.valueExpression.columnReference;
+       }
+     } else {
+       $$ = { suggestKeywords: keywords };
      }
      $$.cursorAtEnd = !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
      if (!$4 && !$5 && !$6) {
@@ -1949,16 +2477,9 @@ OptionalGroupByClause
 GroupByClause
  : AnyGroup 'BY' GroupByColumnList OptionalHiveGroupingSetsCubeOrRollup
    {
-     if (!$4) {
-       $$ = $3;
-       if (parser.isHive()) {
-         if (!$$.suggestKeywords) {
-           $$.suggestKeywords = [];
-         }
-         $$.suggestKeywords.push('GROUPING SETS');
-         $$.suggestKeywords.push('WITH CUBE');
-         $$.suggestKeywords.push('WITH ROLLUP');
-       }
+     $$ = { valueExpression: $4 ? false : $3 };
+     if (!$4 && parser.isHive()) {
+       $$.suggestKeywords = ['GROUPING SETS', 'WITH CUBE', 'WITH ROLLUP'];
      }
    }
  ;
@@ -2493,7 +3014,9 @@ ColumnOrArbitraryFunctionRef
  : BasicIdentifierChain
    {
      var lastLoc = parser.yy.locations[parser.yy.locations.length - 1];
-     lastLoc.type = 'column';
+     if (lastLoc.type !== 'variable') {
+       lastLoc.type = 'column';
+     }
      // used for function references with db prefix
      var firstLoc = parser.yy.locations[parser.yy.locations.length - $1.length];
      $$ = { chain: $1, firstLoc: firstLoc, lastLoc: lastLoc }
@@ -2564,8 +3087,24 @@ ApproximateNumericLiteral
  ;
 
 GeneralLiteral
- : SingleQuotedValue  -> { types: [ 'STRING' ] }
- | DoubleQuotedValue  -> { types: [ 'STRING' ] }
+ : SingleQuotedValue
+   {
+     if (/\$\{[^}]*\}/.test($1)) {
+       parser.addVariableLocation(@1, $1);
+       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }] }
+     } else {
+       $$ = { types: [ 'STRING' ] }
+     }
+   }
+ | DoubleQuotedValue
+   {
+     if (/\$\{[^}]*\}/.test($1)) {
+       parser.addVariableLocation(@1, $1);
+       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }] }
+     } else {
+       $$ = { types: [ 'STRING' ] }
+     }
+   }
  | TruthValue         -> { types: [ 'BOOLEAN' ] }
  ;
 
@@ -2658,21 +3197,21 @@ SelectList_EDIT
    }
  | SelectList ',' AnyCursor
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
  | SelectList ',' SelectSpecification_EDIT                 -> $3
  | SelectList ',' AnyCursor SelectList
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' AnyCursor ','
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ','             -> $3
  | SelectList ',' AnyCursor ',' SelectList
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
  ;
@@ -3044,7 +3583,7 @@ OptionalHiveTableSample_EDIT
 
 OptionalImpalaTableSample
  :
- | '<impala>TABLESAMPLE' '<impala>SYSTEM' '(' 'UNSIGNED_INTEGER' ')'                                                  --> { suggestKeywords: ['REPEATABLE'] }
+ | '<impala>TABLESAMPLE' '<impala>SYSTEM' '(' 'UNSIGNED_INTEGER' ')'                                                  --> { suggestKeywords: ['REPEATABLE()'] }
  | '<impala>TABLESAMPLE' '<impala>SYSTEM' '(' 'UNSIGNED_INTEGER' ')' '<impala>REPEATABLE' '(' 'UNSIGNED_INTEGER' ')'
  ;
 
@@ -3281,6 +3820,9 @@ ArbitraryFunctionName
  | 'ARRAY'
  | '<hive>BINARY'
  | 'MAP'
+ | '<impala>REPLACE'
+ | 'TRUNCATE'
+ | '<impala>USER'
  ;
 
 ArbitraryFunctionRightPart
@@ -3349,10 +3891,13 @@ OptionalOverClause_EDIT
 OverClause
  : 'OVER' RegularOrBacktickedIdentifier
  | 'OVER' WindowExpression
+ | '<impala>OVER' RegularOrBacktickedIdentifier
+ | '<impala>OVER' WindowExpression
  ;
 
 OverClause_EDIT
  : 'OVER' WindowExpression_EDIT
+ | '<impala>OVER' WindowExpression_EDIT
  ;
 
 WindowExpression
@@ -3361,7 +3906,17 @@ WindowExpression
 
 WindowExpression_EDIT
  : '(' PartitionBy_EDIT OptionalOrderByAndWindow RightParenthesisOrError
+   {
+     if (parser.yy.result.suggestFunctions) {
+       parser.suggestAggregateFunctions();
+     }
+   }
  | '(' OptionalPartitionBy OptionalOrderByAndWindow_EDIT RightParenthesisOrError
+   {
+     if (parser.yy.result.suggestFunctions) {
+       parser.suggestAggregateFunctions();
+     }
+   }
  | '(' AnyCursor OptionalPartitionBy OptionalOrderByAndWindow RightParenthesisOrError
    {
      if (!$3 && !$4) {
@@ -3433,12 +3988,13 @@ OptionalWindowSpec
 
 WindowSpec
  : RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
+ | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
  ;
 
 WindowSpec_EDIT
  : RowsOrRange 'CURSOR'
    {
-     parser.suggestKeywords(['BETWEEN']);
+     parser.suggestKeywords(parser.isHive() ? ['BETWEEN', 'UNBOUNDED'] : ['BETWEEN']);
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
    {
@@ -3450,6 +4006,13 @@ WindowSpec_EDIT
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
+ | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding 'CURSOR'
+   {
+     if (!$4 && parser.isHive()) {
+       parser.suggestKeywords(['PRECEDING']);
+     }
+   }
+ | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding_EDIT
  ;
 
 PopLexerState
@@ -3648,13 +4211,17 @@ CountFunction_EDIT
  : 'COUNT' '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
+     var keywords = parser.getSelectListKeywords();
      if (!$3) {
-       var keywords = parser.isImpala() ? [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 10000 }, 'DISTINCT'];
+       keywords.push('DISTINCT');
+       if (parser.isImpala()) {
+         keywords.push('ALL');
+       }
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       parser.suggestKeywords(keywords);
      }
+     parser.suggestKeywords(keywords);
      $$ = { types: parser.findReturnTypes($1) };
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
@@ -3664,12 +4231,15 @@ CountFunction_EDIT
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
-     if ($4.cursorAtStart && !$3) {
-       if (parser.isImpala()) {
-         parser.suggestKeywords(['ALL', 'DISTINCT']);
-       } else {
-         parser.suggestKeywords(['DISTINCT']);
+     if ($4.cursorAtStart) {
+       var keywords = parser.getSelectListKeywords();
+       if (!$3) {
+         keywords.push('DISTINCT');
+         if (parser.isImpala()) {
+           keywords.push('ALL');
+         }
        }
+       parser.suggestKeywords(keywords);
      }
      $$ = { types: parser.findReturnTypes($1) };
    }
@@ -3729,20 +4299,21 @@ OtherAggregateFunction_EDIT
  : OtherAggregateFunction_Type '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
+     var keywords = parser.getSelectListKeywords(true);
      if (!$3) {
-       var keywords = [];
        if ($1.toLowerCase() === 'group_concat') {
-         keywords = ['ALL'];
+         keywords.push('ALL');
        } else if (parser.isImpala()) {
-         keywords = ['ALL', 'DISTINCT'];
+         keywords.push('ALL');
+         keywords.push('DISTINCT');
        } else {
-         keywords = ['DISTINCT'];
+         keywords.push('DISTINCT');
        }
-       if (parser.yy.result.suggestKeywords) {
-         keywords = parser.yy.result.suggestKeywords.concat(keywords);
-       }
-       parser.suggestKeywords(keywords);
      }
+     if (parser.yy.result.suggestKeywords) {
+       keywords = parser.yy.result.suggestKeywords.concat(keywords);
+     }
+     parser.suggestKeywords(keywords);
      parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { types: parser.findReturnTypes($1) };
    }
@@ -3753,14 +4324,17 @@ OtherAggregateFunction_EDIT
    }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
-     if ($4.cursorAtStart && !$3) {
-       var keywords = [];
-       if ($1.toLowerCase() === 'group_concat') {
-         keywords = ['ALL'];
-       } else if (parser.isImpala()) {
-         keywords = ['ALL', 'DISTINCT'];
-       } else {
-         keywords = ['DISTINCT'];
+     if ($4.cursorAtStart) {
+       var keywords = parser.getSelectListKeywords(true);
+       if (!$3) {
+         if ($1.toLowerCase() === 'group_concat') {
+           keywords.push('ALL');
+         } else if (parser.isImpala()) {
+           keywords.push('ALL');
+           keywords.push('DISTINCT');
+         } else {
+           keywords.push('DISTINCT');
+         }
        }
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
@@ -3783,12 +4357,13 @@ OtherAggregateFunction_Type
  | '<hive>COVAR_POP'
  | '<hive>COVAR_SAMP'
  | '<impala>GROUP_CONCAT'
- | '<hive>HISTOGRAM_NUMERI'
+ | '<hive>HISTOGRAM_NUMERIC'
  | '<impala>STDDEV'
  | 'STDDEV_POP'
  | 'STDDEV_SAMP'
  | 'MAX'
  | 'MIN'
+ | '<impala>NDV'
  | '<hive>NTILE'
  | '<hive>PERCENTILE'
  | '<hive>PERCENTILE_APPROX'
@@ -3895,13 +4470,17 @@ SumFunction_EDIT
    {
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($1, 1);
+     var keywords = parser.getSelectListKeywords(true);
      if (!$3) {
-       var keywords = parser.isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
-       if (parser.yy.result.suggestKeywords) {
-         keywords = parser.yy.result.suggestKeywords.concat(keywords);
+       keywords.push('DISTINCT');
+       if (parser.isImpala()) {
+         keywords.push('ALL');
        }
-       parser.suggestKeywords(keywords);
      }
+     if (parser.yy.result.suggestKeywords) {
+       keywords = parser.yy.result.suggestKeywords.concat(keywords);
+     }
+     parser.suggestKeywords(keywords);
      $$ = { types: parser.findReturnTypes($1) };
    }
  | 'SUM' '(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError

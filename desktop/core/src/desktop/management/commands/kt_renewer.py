@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 import desktop.kt_renewer
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   """ Starts a daemon which renews Kerberos credentials from a keytab
   periodically. """
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     desktop.kt_renewer.run()

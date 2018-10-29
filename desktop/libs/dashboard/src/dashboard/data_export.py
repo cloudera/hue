@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 DL_FORMATS = [ 'csv', 'xls' ]
 
 
-def download(results, format, collection):
+def download(results, format, collection, user_agent=None):
   """
   download(results, format) -> HttpResponse
 
@@ -40,7 +40,7 @@ def download(results, format, collection):
 
   content_generator = SearchDataAdapter(results, format, collection)
   generator = export_csvxls.create_generator(content_generator, format)
-  return export_csvxls.make_response(generator, format, 'query_result')
+  return export_csvxls.make_response(generator, format, 'query_result', user_agent=user_agent)
 
 
 def SearchDataAdapter(results, format, collection):

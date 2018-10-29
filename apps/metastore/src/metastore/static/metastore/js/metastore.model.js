@@ -14,175 +14,478 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var MetastoreSource = (function () {
+
+  var MetastoreSource = function (options) {
+    var self = this;
+    self.type = options.type;
+    self.name = options.name;
+    self.metastoreViewModel = options.metastoreViewModel;
+
+    self.reloading = ko.observable(false);
+    self.loading = ko.observable(false);
+
+    self.lastLoadNamespacesDeferred = $.Deferred();
+    self.namespace = ko.observable();
+    self.namespaces = ko.observableArray();
+
+    self.namespace.subscribe(function () {
+      if (self.namespace() && self.namespace().databases().length === 0) {
+        self.namespace().loadDatabases();
+      }
+    });
+
+    // When manually changed through dropdown
+    self.namespaceChanged = function (newNamespace, previousNamespace) {
+      if (previousNamespace.database() && !self.namespace().database()) {
+        // Try to set the same database by name, if not there it will revert to 'default'
+        self.namespace().setDatabaseByName(previousNamespace.database().catalogEntry.name, function () {
+          huePubSub.publish('metastore.url.change');
+        });
+      } else {
+        huePubSub.publish('metastore.url.change');
+      }
+    };
+
+    huePubSub.subscribe("assist.db.panel.ready", function () {
+      self.lastLoadNamespacesDeferred.done(function () {
+        var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
+        huePubSub.publish('assist.set.database', {
+          source: self.type,
+          namespace: self.namespace().namespace,
+          name: lastSelectedDb
+        });
+      });
+    });
+
+    var getCurrentState = function () {
+      var result = {
+        namespaceId: null,
+        database: null,
+        table: null
+      };
+      var prevNamespaceId = null;
+      var prevDbName = null;
+      var prevTableName = null;
+      if (self.namespace()) {
+        result.namespaceId = self.namespace().id;
+        if (self.namespace().database()) {
+          result.database = self.namespace().database().catalogEntry.name;
+          if (self.namespace().database().table()) {
+            result.table = self.namespace().database().table().catalogEntry.name;
+          }
+        }
+      }
+      return result;
+    };
+
+    var setState = function (state) {
+      if (state.namespaceId) {
+        self.setNamespaceById(state.namespaceId).done(function () {
+          if (state.database) {
+            self.namespace().setDatabaseByName(state.database, function () {
+              if (self.namespace().database() && state.table) {
+                self.namespace().database().setTableByName(state.table);
+              }
+            });
+          }
+        });
+      }
+    };
+
+    var completeRefresh = function (previousState) {
+      self.reloading(true);
+      if (self.namespace() && self.namespace().database() && self.namespace().database().table()) {
+        self.namespace().database().table(null);
+      }
+      if (self.namespace() && self.namespace().database()) {
+        self.namespace().database(null);
+      }
+      if (self.namespace()) {
+        self.namespace(null);
+      }
+      self.loadNamespaces().done(function () {
+        setState(previousState);
+      }).always(function () {
+        self.reloading(false);
+      });
+    };
+
+    huePubSub.subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+      if (self.type !== sourceType) {
+        return;
+      }
+      var previousState = getCurrentState();
+      completeRefresh(previousState);
+    });
+
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+      var refreshedEntry = details.entry;
+
+      if (refreshedEntry.getSourceType() !== self.type) {
+        return;
+      }
+
+      var previousState = getCurrentState();
+
+      if (refreshedEntry.isSource()) {
+        completeRefresh(previousState);
+      } else if (refreshedEntry.isDatabase() && self.namespace()) {
+        self.namespace().databases().some(function (database) {
+          if (database.catalogEntry === refreshedEntry) {
+            database.load(function () {
+              setState(previousState);
+            }, self.optimizerEnabled(), self.navigatorEnabled());
+            return true;
+          }
+        })
+      } else if (refreshedEntry.isTableOrView()) {
+        self.namespace().databases().some(function (database) {
+          if (database.catalogEntry.name === refreshedEntry.path[0]) {
+            database.tables().some(function (table) {
+              if (table.catalogEntry.name === refreshedEntry.name) {
+                table.load();
+                return true;
+              }
+            });
+            return true;
+          }
+        })
+      }
+    });
+  };
+
+  MetastoreSource.prototype.loadNamespaces = function () {
+    var self = this;
+    self.loading(true);
+    ContextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
+      var namespacesWithComputes = context.namespaces.filter(function (namespace) { return namespace.computes.length });
+      self.namespaces($.map(namespacesWithComputes, function (namespace) {
+        return new MetastoreNamespace({
+          metastoreViewModel: self.metastoreViewModel,
+          sourceType: self.type,
+          navigatorEnabled: self.metastoreViewModel.navigatorEnabled,
+          optimizerEnabled: self.metastoreViewModel.optimizerEnabled,
+          namespace: namespace
+        });
+      }));
+      self.namespace(self.namespaces()[0]);
+      self.lastLoadNamespacesDeferred.resolve();
+    }).fail(self.lastLoadNamespacesDeferred.reject).always(function () {
+      self.loading(false);
+    });
+    return self.lastLoadNamespacesDeferred;
+  };
+
+
+  MetastoreSource.prototype.setNamespaceById = function (namespaceId) {
+    var self = this;
+    var deferred = $.Deferred();
+    self.lastLoadNamespacesDeferred.done(function () {
+      var found = self.namespaces().some(function (namespace) {
+        if (namespace.namespace.id === namespaceId) {
+          self.namespace(namespace);
+          deferred.resolve();
+          return true;
+        }
+      });
+      if (!found) {
+        deferred.reject();
+      }
+    }).fail(deferred.reject);
+    return deferred.promise();
+  }
+
+  return MetastoreSource;
+})();
+
+var MetastoreNamespace = (function () {
+
+  var MetastoreNamespace = function (options) {
+    var self = this;
+    self.apiHelper = ApiHelper.getInstance();
+    self.namespace = options.namespace;
+
+    // TODO: Compute selection in the metastore?
+    self.compute = options.namespace.computes[0];
+    self.id = options.namespace.id;
+    self.name = options.namespace.name;
+    self.metastoreViewModel = options.metastoreViewModel;
+    self.sourceType = options.sourceType;
+    self.navigatorEnabled = options.navigatorEnabled;
+    self.optimizerEnabled = options.optimizerEnabled;
+
+    self.catalogEntry = ko.observable();
+
+    self.database = ko.observable();
+    self.databases = ko.observableArray();
+    self.selectedDatabases = ko.observableArray();
+    self.loadingDatabases = ko.observable(false);
+    self.lastLoadDatabasesPromise = undefined;
+  };
+
+  MetastoreNamespace.prototype.loadDatabases = function () {
+    var self = this;
+    if (self.loadingDatabases() && self.lastLoadDatabasesPromise) {
+      return self.lastLoadDatabasesPromise;
+    }
+
+    self.loadingDatabases(true);
+    var deferred = $.Deferred();
+    self.lastLoadDatabasesPromise = deferred.promise();
+
+    deferred.fail(function () {
+      self.databases([]);
+    }).always(function () {
+      self.loadingDatabases(false);
+    });
+
+    DataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
+      self.catalogEntry(entry);
+      entry.getChildren().done(function (databaseEntries) {
+        self.databases($.map(databaseEntries, function (databaseEntry) {
+          return new MetastoreDatabase({ catalogEntry: databaseEntry, optimizerEnabled: self.optimizerEnabled, metastoreViewModel: self.metastoreViewModel });
+        }));
+        deferred.resolve();
+      }).fail(deferred.reject);
+    });
+
+    return self.lastLoadDatabasesPromise;
+  };
+
+  MetastoreNamespace.prototype.reload = function () {
+    var self = this;
+    if (!self.reloading() && self.catalogEntry()) {
+      self.reloading(true);
+      // Clear will publish when done
+      self.catalogEntry().clearCache({ invalidate: self.sourceType === 'impala' ? 'invalidate' : 'cache' });
+    }
+  };
+
+  MetastoreNamespace.prototype.setDatabase = function (metastoreDatabase, callback) {
+    var self = this;
+    huePubSub.publish('metastore.scroll.to.top');
+    self.database(metastoreDatabase);
+
+    if (!metastoreDatabase.loaded()) {
+      metastoreDatabase.load(callback, self.optimizerEnabled(), self.navigatorEnabled(), self.sourceType);
+    } else if (callback) {
+      callback();
+    }
+  };
+
+  MetastoreNamespace.prototype.onDatabaseClick = function (catalogEntry) {
+    var self = this;
+
+    self.databases().some(function (database) {
+      if (database.catalogEntry === catalogEntry) {
+        self.setDatabase(database, function() { huePubSub.publish('metastore.url.change') });
+        return true;
+      }
+    });
+  };
+
+  MetastoreNamespace.prototype.setDatabaseByName = function (databaseName, callback) {
+    var self = this;
+
+    var whenLoaded = function (clearCacheOnMissing) {
+      if (!databaseName) {
+        databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
+          self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
+        clearCacheOnMissing = false;
+      }
+      if (self.database() && self.database().catalogEntry.name === databaseName) {
+        if (callback) {
+          callback();
+        }
+        return;
+      }
+      var foundDatabases = self.databases().filter(function (database) {
+        return database.catalogEntry.name === databaseName;
+      });
+
+      if (foundDatabases.length === 1) {
+        self.setDatabase(foundDatabases[0], callback);
+      } else if (clearCacheOnMissing) {
+        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+          self.loadDatabases().done(function () {
+            whenLoaded(false)
+          })
+        })
+      } else {
+        foundDatabases = self.databases().filter(function (database) {
+          return database.catalogEntry.name === 'default';
+        });
+
+        if (foundDatabases.length === 1) {
+          self.setDatabase(foundDatabases[0], callback);
+        } else {
+        }
+      }
+    };
+
+    window.setTimeout(function () {
+      if (self.loadingDatabases() && self.lastLoadDatabasesPromise !== null) {
+        self.lastLoadDatabasesPromise.done(function () {
+          whenLoaded(true);
+        });
+      } else {
+        if (self.databases().length) {
+          whenLoaded(true);
+        } else {
+          self.loadDatabases().done(function () {
+            whenLoaded(true);
+          })
+        }
+      }
+    }, 0);
+  };
+
+  return MetastoreNamespace;
+})();
+
 var MetastoreDatabase = (function () {
   /**
-   * @param {Object} options
-   * @param {string} options.name
-   * @param {string} [options.tableName]
-   * @param {string} [options.tableComment]
+   * @param {object} options
+   * @param {DataCatalogEntry} options.catalogEntry
+   * @param {observable} options.optimizerEnabled
+   * @param {MetastoreViewModel} options.metastoreViewModel;
    * @constructor
    */
   function MetastoreDatabase(options) {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
-    self.name = options.name;
+    self.catalogEntry = options.catalogEntry;
+    self.metastoreViewModel = options.metastoreViewModel;
 
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(false);
+    self.loadingTables = ko.observable(false);
+    self.loadingAnalysis = ko.observable(false);
+    self.loadingComment = ko.observable(false);
+    self.loadingTableComments = ko.observable(false);
+    self.loadingTablePopularity = ko.observable(false);
+
     self.tables = ko.observableArray();
+
+    self.loading = ko.pureComputed(function () {
+      return self.loadingTables() || self.loadingAnalysis();
+    });
+
+    self.refreshing = ko.pureComputed(function () {
+      return self.loadingTables() || self.loadingAnalysis() || self.loadingComment() || self.loadingTableComments() ||
+        self.loadingTablePopularity();
+    });
+
+    self.comment = ko.observable();
+
+    self.comment.subscribe(function (newValue) {
+      self.catalogEntry.getComment().done(function (comment) {
+        if (comment !== newValue) {
+          self.catalogEntry.setComment(newValue).done(self.comment).fail(function () {
+            self.comment(comment);
+          })
+        }
+      });
+    });
+
     self.stats = ko.observable();
-    self.optimizerStats = ko.observableArray(); // TODO to plugify, duplicates similar MetastoreTable
-    self.navigatorStats = ko.observable();
+    self.navigatorMeta = ko.observable();
 
     self.showAddTagName = ko.observable(false);
     self.addTagName = ko.observable('');
-
-    self.tableQuery = ko.observable('').extend({rateLimit: 150});
-
-    self.filteredTables = ko.computed(function () {
-      var returned = self.tables();
-      if (self.tableQuery() !== '') {
-        returned = $.grep(self.tables(), function (table) {
-          return table.name.toLowerCase().indexOf(self.tableQuery()) > -1
-            || (table.comment() && table.comment().toLowerCase().indexOf(self.tableQuery()) > -1);
-        });
-      }
-      return returned.sort(function (a, b) {
-        if (options.optimizerEnabled()) {
-          if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
-            if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-              if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
-                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-              }
-              return  b.optimizerStats().popularity - a.optimizerStats().popularity;
-            }
-            return -1
-          }
-          if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-            return 1;
-          }
-        }
-
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      });
-    });
 
     self.selectedTables = ko.observableArray();
 
     self.editingTable = ko.observable(false);
     self.table = ko.observable(null);
-
-    self.addTags = function () {
-      $.post('/metadata/api/navigator/add_tags', {
-        id: ko.mapping.toJSON(self.navigatorStats().identity),
-        tags: ko.mapping.toJSON([self.addTagName()])
-      }, function(data) {
-        if (data && data.status == 0) {
-          self.navigatorStats().tags.push(self.addTagName());
-          self.addTagName('');
-          self.showAddTagName(false);
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      });
-    };
-
-    self.deleteTags = function (tag) {
-      $.post('/metadata/api/navigator/delete_tags', {
-        id: ko.mapping.toJSON(self.navigatorStats().identity),
-        tags: ko.mapping.toJSON([tag])
-      }, function(data) {
-        if (data && data.status == 0) {
-          self.navigatorStats().tags.remove(tag);
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      });
-    };
   }
 
-  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled, sourceType) {
+  MetastoreDatabase.prototype.onTableClick = function (catalogEntry) {
     var self = this;
-    if (self.loading()) {
-      return;
+    self.tables().some(function (table) {
+      if (table.catalogEntry === catalogEntry) {
+        self.setTable(table, function() { huePubSub.publish('metastore.url.change'); });
+        return true;
+      }
+    })
+  };
+
+  MetastoreDatabase.prototype.reload = function () {
+    var self = this;
+    // Clear will publish when done
+    self.catalogEntry.clearCache({ invalidate: self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache' });
+  };
+
+  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled) {
+    var self = this;
+
+
+    if (navigatorEnabled) {
+      self.loadingComment(true);
+      self.catalogEntry.getNavigatorMeta().done(self.navigatorMeta).always(function () {
+        self.loadingComment(false);
+      });
     }
 
-    self.loading(true);
-    self.apiHelper.fetchTables({
-      sourceType: sourceType,
-      databaseName: self.name,
-      successCallback: function (data) {
-        self.tables($.map(data.tables_meta, function (tableMeta) {
-          return new MetastoreTable({
-            database: self,
-            name: tableMeta.name,
-            type: tableMeta.type,
-            comment: tableMeta.comment,
-            optimizerEnabled: optimizerEnabled,
-            navigatorEnabled: navigatorEnabled,
-            sourceType: sourceType
+    self.catalogEntry.getComment().done(self.comment);
+
+    self.loadingTables(true);
+    self.catalogEntry.getChildren().done(function (tableEntries) {
+      self.tables($.map(tableEntries, function (tableEntry) {
+        return new MetastoreTable({
+          database: self,
+          catalogEntry: tableEntry,
+          optimizerEnabled: optimizerEnabled,
+          navigatorEnabled: navigatorEnabled
+        });
+      }));
+      if (navigatorEnabled) {
+        self.loadingTableComments(true);
+        self.catalogEntry.loadNavigatorMetaForChildren().done(function () {
+          self.tables().forEach(function (table) {
+            table.navigatorMeta(table.catalogEntry.navigatorMeta);
           })
-        }));
-        self.loaded(true);
-        self.loading(false);
-        if (optimizerEnabled && navigatorEnabled) {
-          $.get('/metadata/api/navigator/find_entity', {
-            type: 'database',
-            name: self.name
-          }, function(data){
-            if (data && data.status == 0) {
-              self.navigatorStats(ko.mapping.fromJS(data.entity));
-            } else {
-              //$(document).trigger("info", data.message);
-            }
-          });
-
-          $.post('/metadata/api/optimizer/top_tables', {
-            database: self.name
-          }, function(data){
-            if (data && data.status == 0) {
-              var tableIndex = {};
-              data.top_tables.forEach(function (topTable) {
-                tableIndex[topTable.name] = topTable;
-              });
-              self.tables().forEach(function (table) {
-                table.optimizerStats(tableIndex[table.name]);
-              });
-              self.optimizerStats(data.top_tables);
-            } else {
-              $(document).trigger("error", data.message);
-            }
-          }).always(function () {
-            if (callback) {
-              callback();
-            }
-          });
-        } else if (callback) {
-          callback();
-        }
-      },
-      errorCallback: function (response) {
-        self.loading(false);
-        if (callback) {
-          callback();
-        }
+        }).always(function () {
+          self.loadingTableComments(false);
+        })
+      }
+      if (optimizerEnabled) {
+        self.loadingTablePopularity(true);
+        self.catalogEntry.loadNavOptPopularityForChildren().done(function () {
+          self.tables().forEach(function (table) {
+            table.optimizerStats(table.catalogEntry.navOptPopularity);
+          })
+        }).always(function () {
+          self.loadingTablePopularity(false);
+        })
+      }
+      self.loaded(true);
+    }).fail(function () {
+      self.tables([]);
+    }).always(function () {
+      self.loadingTables(false);
+      if (callback) {
+        callback();
       }
     });
 
-    $.getJSON('/metastore/databases/' + self.name + '/metadata', function (data) {
-      if (data && data.status == 0) {
-        self.stats(data.data);
-      }
+    self.loadingAnalysis(true);
+    self.catalogEntry.getAnalysis().done(self.stats).always(function () {
+      self.loadingAnalysis(false);
     });
-
 
     self.apiHelper.setInTotalStorage('metastore', 'last.selected.database', self.name);
   };
 
   MetastoreDatabase.prototype.setTableByName = function (tableName) {
     var self = this;
-    var foundTables = $.grep(self.tables(), function (metastoreTable) {
-      return metastoreTable.name === tableName;
+
+    if (self.table() && self.table().catalogEntry.name === tableName) {
+      return;
+    }
+
+    var foundTables = self.tables().filter(function (metastoreTable) {
+      return metastoreTable.catalogEntry.name === tableName;
     });
 
     if (foundTables.length === 1) {
@@ -200,10 +503,25 @@ var MetastoreDatabase = (function () {
     if (callback) {
       callback();
     }
-    hueUtils.waitForRendered('a[href="#overview"]', function(el){ return el.is(':visible') }, function(){
-      window.setTimeout(function(){
-        $('a[href="#overview"]').click();
-      }, 0);
+    self.metastoreViewModel.currentTab('overview');
+  };
+
+  MetastoreDatabase.prototype.showContextPopover = function (entry, event, orientation) {
+    var $source = $(event.currentTarget || event.target);
+    var offset = $source.offset();
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: 'catalogEntry',
+        catalogEntry: entry.catalogEntry
+      },
+      orientation: orientation || 'right',
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 2,
+        right: offset.left + (orientation === 'left' ? 0 : $source.width() + 1),
+        bottom: offset.top + $source.height() - 2
+      }
     });
   };
 
@@ -239,56 +557,56 @@ var MetastoreTable = (function () {
     self.apiHelper = ApiHelper.getInstance();
 
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(true);
+    self.loading = ko.observable(false);
 
     self.sortDesc = ko.observable(true);
     self.filters = ko.observableArray([]);
 
     self.typeaheadValues = function (column) {
-      var _vals = [];
+      var values = [];
       self.values().forEach(function (row) {
-        var _cell = row.columns[self.keys().indexOf(column())];
-        if (_vals.indexOf(_cell) == -1) {
-          _vals.push(_cell);
+        var cell = row.columns[self.keys().indexOf(column())];
+        if (values.indexOf(cell) !== -1) {
+          values.push(cell);
         }
       });
-      return _vals
-    }
+      return values
+    };
 
     self.addFilter = function () {
       self.filters.push(ko.mapping.fromJS({'column': '', 'value': ''}));
-    }
+    };
 
     self.removeFilter = function (data) {
       self.filters.remove(data);
-      if (self.filters().length == 0) {
+      if (self.filters().length === 0) {
         self.sortDesc(true);
         self.filter();
       }
-    }
+    };
 
     self.filter = function () {
       self.loading(true);
       self.loaded(false);
-      var _filters = JSON.parse(ko.toJSON(self.filters));
-      var _postData = {};
-      _filters.forEach(function (filter) {
-        _postData[filter.column] = filter.value;
+      var filters = JSON.parse(ko.toJSON(self.filters));
+      var postData = {};
+      filters.forEach(function (filter) {
+        postData[filter.column] = filter.value;
       });
-      _postData["sort"] = self.sortDesc() ? "desc" : "asc";
+      postData['sort'] = self.sortDesc() ? 'desc' : 'asc';
 
       $.ajax({
-        type: "POST",
-        url: '/metastore/table/' + self.metastoreTable.database.name + '/' + self.metastoreTable.name + '/partitions',
-        data: _postData,
+        type: 'POST',
+        url: '/metastore/table/' + self.metastoreTable.catalogEntry.path.join('/') + '/partitions',
+        data: postData,
         success: function (data) {
           self.values(data.partition_values_json);
           self.loading(false);
           self.loaded(true);
         },
-        dataType: "json"
+        dataType: 'json'
       });
-    }
+    };
 
     self.preview = {
       keys: ko.observableArray(),
@@ -301,23 +619,19 @@ var MetastoreTable = (function () {
     if (self.loaded()) {
       return;
     }
-    self.apiHelper.fetchPartitions({
-      databaseName: self.metastoreTable.database.name,
-      tableName: self.metastoreTable.name,
-      successCallback: function (data) {
-        self.keys(data.partition_keys_json);
-        self.values(data.partition_values_json);
-        self.preview.values(self.values().slice(0, 5));
-        self.preview.keys(self.keys());
-        self.loading(false);
-        self.loaded(true);
-        huePubSub.publish('metastore.loaded.partitions');
-      },
-      errorCallback: function (data) {
-        self.loading(false);
-        self.loaded(true);
-      }
-    })
+
+    self.loading(true);
+
+    self.metastoreTable.catalogEntry.getPartitions().done(function (partitions) {
+      self.keys(partitions.partition_keys_json);
+      self.values(partitions.partition_values_json);
+      self.preview.values(self.values().slice(0, 5));
+      self.preview.keys(self.keys());
+      huePubSub.publish('metastore.loaded.partitions');
+    }).always(function () {
+      self.loading(false);
+      self.loaded(true);
+    });
   };
 
   /**
@@ -329,11 +643,11 @@ var MetastoreTable = (function () {
     self.rows = ko.observableArray();
     self.headers = ko.observableArray();
     self.metastoreTable = options.metastoreTable;
-    self.apiHelper = ApiHelper.getInstance();
 
     self.hasErrors = ko.observable(false);
+    self.errorMessage = ko.observable();
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(true);
+    self.loading = ko.observable(false);
 
     self.preview = {
       headers: ko.observableArray(),
@@ -347,82 +661,78 @@ var MetastoreTable = (function () {
       return;
     }
     self.hasErrors(false);
-    self.apiHelper.fetchTableSample({
-      sourceType: self.metastoreTable.sourceType,
-      databaseName: self.metastoreTable.database.name,
-      tableName: self.metastoreTable.name,
-      silenceErrors: true,
-      successCallback: function (data) {
-        self.rows(data.rows);
-        self.headers(data.headers);
-        self.preview.rows(self.rows().slice(0, 3));
-        self.preview.headers(self.headers());
-        self.loading(false);
-        self.loaded(true);
-      },
-      errorCallback: function (data) {
-        self.hasErrors(true);
-        self.loading(false);
-        self.loaded(true);
-      }
+    self.loading(true);
+    self.metastoreTable.catalogEntry.getSample().done(function (sample) {
+      self.rows(sample.data);
+      self.headers($.map(sample.meta, function (meta) { return meta.name }));
+      self.preview.rows(self.rows().slice(0, 3));
+      self.preview.headers(self.headers());
+    }).fail(function (message) {
+      self.errorMessage(message);
+      self.hasErrors(true);
+    }).always(function () {
+      self.loading(false);
+      self.loaded(true);
     });
   };
 
   /**
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
-   * @param {string} options.name
-   * @param {string} options.type
-   * @param {string} options.comment
-   * @param {string} options.sourceType
+   * @param {DataCatalogEntry} options.catalogEntry
+   * @param {boolean} options.optimizerEnabled
+   * @param {boolean} options.navigatorEnabled
    * @constructor
    */
   function MetastoreTable(options) {
     var self = this;
     self.database = options.database;
-    self.apiHelper = ApiHelper.getInstance();
     self.optimizerEnabled = options.optimizerEnabled;
     self.navigatorEnabled = options.navigatorEnabled;
-    self.sourceType = options.sourceType;
-    self.name = options.name;
-    self.type = options.type;
-    self.isView = ko.observable(false);
+    self.catalogEntry = options.catalogEntry;
+
+    self.apiHelper = ApiHelper.getInstance();
+
+    // TODO: Check if enough or if we need to fetch additional details
+    self.isView = ko.observable(self.catalogEntry.isView());
+    self.viewSql = ko.observable();
 
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
-
-    self.navigatorStats = ko.observable();
+    self.topJoins = ko.observableArray();
+    self.navigatorMeta = ko.observable();
     self.relationshipsDetails = ko.observable();
 
     self.loaded = ko.observable(false);
-    self.loading = ko.observable(false);
 
     self.loadingDetails = ko.observable(false);
     self.loadingColumns = ko.observable(false);
-    self.columnQuery = ko.observable('').extend({rateLimit: 150});
-    self.columns = ko.observableArray();
-    self.filteredColumns = ko.computed(function () {
-      var returned = self.columns();
-      if (self.columnQuery() !== '') {
-        returned = $.grep(self.columns(), function (column) {
-          return column.name().toLowerCase().indexOf(self.columnQuery()) > -1
-            || (column.type() && column.type().toLowerCase().indexOf(self.columnQuery()) > -1)
-            || (column.comment() && column.comment().toLowerCase().indexOf(self.columnQuery()) > -1);
-        });
-      }
-      return returned;
-    });
+    self.loadingQueries = ko.observable(false);
+    self.loadingComment = ko.observable(false);
+    self.loadingViewSql = ko.observable(false);
+    self.loadingTopJoins = ko.observable(false);
 
-    self.favouriteColumns = ko.observableArray();
+    self.columns = ko.observableArray();
+
     self.samples = new MetastoreTableSamples({
       metastoreTable: self
     });
+
     self.partitions = new MetastoreTablePartitions({
       metastoreTable: self
     });
 
+    self.loading = ko.pureComputed(function () {
+      return self.loadingDetails() || self.loadingColumns();
+    });
+
+    self.refreshing = ko.pureComputed(function () {
+      return self.loadingDetails() || self.loadingColumns() || self.loadingQueries() || self.loadingComment() ||
+        self.samples.loading() || self.partitions.loading() || self.loadingViewSql() || self.loadingTopJoins();
+    });
+
     self.partitionsCountLabel = ko.pureComputed(function () {
-      if (self.partitions.values().length === MetastoreGlobals.partitionsLimit) {
+      if (self.partitions.values().length === METASTORE_PARTITION_LIMIT) {
         return self.partitions.values().length + '+'
       }
       return self.partitions.values().length;
@@ -432,22 +742,25 @@ var MetastoreTable = (function () {
     self.refreshingTableStats = ko.observable(false);
     self.showAddTagName = ko.observable(false);
     self.addTagName = ko.observable('');
-    self.loadingQueries = ko.observable(true);
 
-    //TODO: Fetch table comment async and don't set it from python
-    self.comment = ko.observable(hueUtils.deXSS(options.comment));
+    self.comment = ko.observable();
+    self.editingComment = ko.observable();
+
+    if (self.catalogEntry.hasResolvedComment()) {
+      self.comment(self.catalogEntry.getResolvedComment());
+    }
+
     self.commentWithoutNewLines = ko.pureComputed(function(){
-      return self.comment() ? hueUtils.deXSS(self.comment().replace(/<br\s*[\/]?>/gi, ' ')) : '';
+      return self.comment() ? hueUtils.deXSS(self.comment().replace(/[\n\r]+/gi, ' ')) : '';
     });
 
     self.comment.subscribe(function (newValue) {
-      $.post('/metastore/table/' + self.database.name + '/' + self.name + '/alter', {
-        comment: newValue ? newValue : ""
-      }, function () {
-        huePubSub.publish('assist.clear.db.cache', {
-          sourceType: self.sourceType,
-          databaseName: self.database.name
-        })
+      self.catalogEntry.getComment().done(function (comment) {
+        if (comment !== newValue) {
+          self.catalogEntry.setComment(newValue).done(self.comment).fail(function () {
+            self.comment(comment);
+          })
+        }
       });
     });
 
@@ -456,137 +769,188 @@ var MetastoreTable = (function () {
         return;
       }
       self.refreshingTableStats(true);
-      self.apiHelper.refreshTableStats({
-        tableName: self.name,
-        databaseName: self.database.name,
-        sourceType: self.sourceType,
-        successCallback: function (data) {
-          self.fetchDetails();
-        },
-        errorCallback: function (data) {
-          self.refreshingTableStats(false);
-          $.jHueNotify.error(MetastoreGlobals.i18n.errorRefreshingTableStats);
-          console.error('apiHelper.refreshTableStats error');
-          console.error(data);
-        }
-      })
+      self.catalogEntry.getAnalysis({ refreshAnalysis: true, silenceErrors: true }).done(function () {
+        self.fetchDetails();
+      }).fail(function () {
+        self.refreshingTableStats(false);
+        $.jHueNotify.error(HUE_I18n.metastore.errorRefreshingTableStats);
+        console.error('apiHelper.refreshTableStats error');
+        console.error(data);
+      });
     };
 
     self.fetchFields = function () {
-      var self = this;
       self.loadingColumns(true);
-      self.apiHelper.fetchFields({
-        sourceType: self.sourceType,
-        databaseName: self.database.name,
-        tableName: self.name,
-        fields: [],
-        successCallback: function (data) {
-          self.loadingColumns(false);
-          self.isView(data.is_view);
-          self.columns($.map(data.extended_columns, function (column) {
-            return new MetastoreColumn({
-              extendedColumn: column,
-              table: self
-            })
-          }));
-          self.favouriteColumns(self.columns().slice(0, 5));
-        },
-        errorCallback: function () {
-          self.loadingColumns(false);
-        }
-      })
+      self.catalogEntry.getChildren().done(function (columnEntries) {
+        self.columns($.map(columnEntries, function (columnEntry) {
+          return new MetastoreColumn({
+            catalogEntry: columnEntry,
+            table: self
+          })
+        }));
+
+        self.catalogEntry.getNavOptMeta().done(function (navOptMeta) {
+          self.optimizerDetails(navOptMeta);
+
+          var topColIndex = {};
+          navOptMeta.topCols.forEach(function (topCol) {
+            topColIndex[topCol.name] = topCol;
+          });
+
+          self.columns().forEach(function (column) {
+            if (topColIndex[column.catalogEntry.name]) {
+              column.popularity(topColIndex[column.catalogEntry.name].score);
+            }
+          });
+        }).always(function () {
+          self.loadingQueries(false);
+        });
+      }).fail(function () {
+        self.columns([]);
+      }).always(function () {
+        self.loadingColumns(false);
+      });
     };
 
     self.fetchDetails = function () {
-      var self = this;
-      self.loadingDetails(true);
-      self.apiHelper.fetchTableDetails({
-        sourceType: self.sourceType,
-        databaseName: self.database.name,
-        tableName: self.name,
-        successCallback: function (data) {
-          self.loadingDetails(false);
-          if ((typeof data === 'object') && (data !== null)) {
-            self.tableDetails(data);
-            self.tableStats(data.details.stats);
-            self.refreshingTableStats(false);
-            self.samples.load();
-            self.loaded(true);
-            self.loading(false);
-            if (data.partition_keys.length) {
-              self.partitions.detailedKeys(data.partition_keys);
-              self.partitions.load();
-            } else {
-              self.partitions.loading(false);
-              self.partitions.loaded(true);
-            }
-            if (self.navigatorEnabled) {
-              $.get('/metadata/api/navigator/find_entity', {
-                type: 'table',
-                database: self.database.name,
-                name: self.name
-              }, function(data) {
-                if (data && data.status == 0) {
-                  self.navigatorStats(ko.mapping.fromJS(data.entity));
-                  self.getRelationships();
-                } else {
-                  //$(document).trigger("info", data.message);
-                }
-              }).fail(function (xhr, textStatus, errorThrown) {
-                $(document).trigger("error", xhr.responseText);
-              });
-            }
-            if (self.optimizerEnabled) {
-              $.post('/metadata/api/optimizer/table_details', {
-                databaseName: self.database.name,
-                tableName: self.name
-              }, function(data){
-                self.loadingQueries(false);
-                if (data && data.status == 0) {
-                  self.optimizerDetails(ko.mapping.fromJS(data.details));
+      self.loadingComment(true);
+      self.database.catalogEntry.loadNavigatorMetaForChildren().done(function () {
+        self.catalogEntry.getComment().done(self.comment);
+      }).always(function () {
+        self.loadingComment(false);
+      });
 
-                  // Bump the most important columns first
-                  var topCols = $.map(self.optimizerDetails().topCols().slice(0, 5), function(item) { return item.name(); });
-                  if (topCols.length >= 3 && self.favouriteColumns().length > 0) {
-                    self.favouriteColumns($.grep(self.columns(), function(col) {
-                        return topCols.indexOf(col.name()) != -1;
-                      })
-                    );
-                  }
+      if (self.catalogEntry.isView()) {
+        self.loadingViewSql(true);
+      }
 
-                  // Column popularity, stats
-                  $.each(self.optimizerDetails().topCols(), function(index, optimizerCol) {
-                    var metastoreCol = $.grep(self.columns(), function(col) {
-                      return col.name() == optimizerCol.name();
-                    });
-                    if (metastoreCol.length > 0) {
-                      metastoreCol[0].popularity(optimizerCol.score())
+      self.catalogEntry.getTopJoins({ silenceErrors: true }).done(function (topJoins) {
+        if (topJoins && topJoins.values) {
+          var joins = [];
+          var ownQidLower = self.catalogEntry.path.join('.').toLowerCase();
+          var ownNameLower = self.catalogEntry.name.toLowerCase();
+          var ownDbNameLower = self.database.catalogEntry.name.toLowerCase();
+
+          var joinIndex = {};
+          var joinColsIndex = {};
+          topJoins.values.forEach(function (topJoin) {
+            if (topJoin.tables.length === 2) {
+              topJoin.tables.forEach(function (table) {
+                var tableLower = table.toLowerCase();
+                if (tableLower !== ownQidLower && tableLower !== ownNameLower) {
+                  var name = tableLower.indexOf(ownDbNameLower + '.') === 0 ? table.substring(ownDbNameLower.length + 1) : table;
+                  if (!joinIndex[name]) {
+                    joinIndex[name] = {
+                      tableName: name,
+                      tablePath: table.split('.'),
+                      joinCols: [],
+                      queryCount: 0
                     }
-                  });
-                } else {
-                  $(document).trigger("info", data.message);
+                  }
+                  var join = joinIndex[name];
+                  join.queryCount += topJoin.totalQueryCount;
+
+                  topJoin.joinCols.forEach(function (joinCol) {
+                    var cleanCols = {
+                      queryCount: topJoin.totalQueryCount
+                    };
+                    if (joinCol.columns.length === 2) {
+                      joinCol.columns.forEach(function (col) {
+                        var colLower = col.toLowerCase();
+                        if (colLower.indexOf(ownQidLower + '.') === 0) {
+                          cleanCols.source = colLower.substring(ownDbNameLower.length + 1);
+                          cleanCols.sourcePath = col.split('.');
+                        } else if (colLower.indexOf(ownNameLower + '.') === 0) {
+                          cleanCols.source = colLower;
+                          cleanCols.sourcePath = col.split('.');
+                          cleanCols.sourcePath.unshift(ownDbNameLower);
+                        } else if (colLower.indexOf(ownDbNameLower + '.') === 0) {
+                          cleanCols.target = colLower.substring(ownDbNameLower.length + 1);
+                          cleanCols.targetPath = col.split('.');
+                        } else {
+                          cleanCols.target = col;
+                          cleanCols.targetPath = col.split('.');
+                        }
+                      })
+                    }
+                    if (cleanCols.source && cleanCols.target) {
+                      if (joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target]) {
+                        joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target].queryCount += topJoin.totalQueryCount;
+                      } else {
+                        joinColsIndex[ownQidLower + join.tableName + cleanCols.source + cleanCols.target] = cleanCols;
+                        join.joinCols.push(cleanCols);
+                      }
+                    }
+                  })
                 }
               });
             }
-          }
-          else {
-            self.refreshingTableStats(false);
-            self.loading(false);
-          }
-        },
-        errorCallback: function (data) {
-          self.refreshingTableStats(false);
-          self.loadingDetails(false);
-          self.loading(false);
+          });
+
+          Object.keys(joinIndex).forEach(function (key) {
+            var join = joinIndex[key];
+            if (join.joinCols.length) {
+              join.joinCols.sort(function (a, b) {
+                return b.queryCount - a.queryCount;
+              });
+              joins.push(join);
+            }
+          });
+          joins.sort(function (a, b) {
+            return b.queryCount - a.queryCount;
+          });
+          self.topJoins(joins);
         }
-      })
+      }).always(function () {
+        self.loadingTopJoins(false);
+      });
+
+      self.loadingDetails(true);
+      self.catalogEntry.getAnalysis().done(function (analysis) {
+        self.tableDetails(analysis);
+        self.tableStats(analysis.details.stats);
+        self.loaded(true);
+        if (analysis.partition_keys.length) {
+          self.partitions.detailedKeys(analysis.partition_keys);
+          self.partitions.load();
+        } else {
+          self.partitions.loading(false);
+          self.partitions.loaded(true);
+        }
+
+        var found = analysis.properties && analysis.properties.some(function (property) {
+          if (property.col_name.toLowerCase() === 'view original text:') {
+            ApiHelper.getInstance().formatSql({ statements: property.data_type }).done(function (formatResponse) {
+              self.viewSql(formatResponse.status === 0 ? formatResponse.formatted_statements : property.data_type)
+            }).fail(function () {
+              self.viewSql(property.data_type)
+            }).always(function () {
+              self.loadingViewSql(false);
+            });
+            return true;
+          }
+        });
+        if (!found) {
+          self.loadingViewSql(false);
+        }
+      }).fail(function () {
+        self.partitions.loading(false);
+        self.partitions.loaded(true);
+        self.loadingViewSql(false);
+      }).always(function () {
+        self.refreshingTableStats(false);
+        self.loadingDetails(false)
+      });
+
+      self.samples.load();
     };
 
     self.drop = function () {
-      $.post('/tables/drop/' + self.database.name, {
+      $.post('/tables/drop/' + self.database.catalogEntry.name, {
         table_selection: ko.mapping.toJSON([self.name]),
         skip_trash: 'off',
-        is_embeddable: true
+        is_embeddable: true,
+        cluster: JSON.stringify(self.database.catalogEntry.compute)
       }, function(resp) {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp.history_uuid);
@@ -596,65 +960,41 @@ var MetastoreTable = (function () {
       });
     };
 
-    self.addTags = function () {
-      $.post('/metadata/api/navigator/add_tags', {
-        id: ko.mapping.toJSON(self.navigatorStats().identity),
-        tags: ko.mapping.toJSON([self.addTagName()])
-      }, function(data) {
-        if (data && data.status == 0) {
-          self.navigatorStats().tags.push(self.addTagName());
-          self.addTagName('');
-          self.showAddTagName(false);
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      });
-    };
-
-    self.deleteTags = function (tag) {
-      $.post('/metadata/api/navigator/delete_tags', {
-        id: ko.mapping.toJSON(self.navigatorStats().identity),
-        tags: ko.mapping.toJSON([tag])
-      }, function(data) {
-        if (data && data.status == 0) {
-          self.navigatorStats().tags.remove(tag);
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      });
-    };
-
     self.getRelationships = function () {
       $.post('/metadata/api/navigator/lineage', {
-        id: self.navigatorStats().identity
+        id: self.navigatorMeta().identity
       }, function(data) {
-        if (data && data.status == 0) {
+        if (data && data.status === 0) {
           self.relationshipsDetails(ko.mapping.fromJS(data));
         } else {
           $(document).trigger("error", data.message);
         }
-      }).fail(function (xhr, textStatus, errorThrown) {
+      }).fail(function (xhr) {
         $(document).trigger("info", xhr.responseText);
       });
     };
   }
 
+  MetastoreTable.prototype.reload = function () {
+    var self = this;
+    self.samples.loaded(false);
+    self.partitions.loaded(false);
+    // Clear will publish when done
+    self.catalogEntry.clearCache({ invalidate: self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache' });
+  };
+
   MetastoreTable.prototype.showImportData = function () {
     var self = this;
     $("#import-data-modal").empty().html('<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h2 class="modal-title"></h2></div><div class="modal-body"><i class="fa fa-spinner fa-spin fa-2x muted"></i></div>').modal("show");
-    $.get('/metastore/table/' + self.database.name + '/' + self.name + '/load', function (data) {
+    $.get('/metastore/table/' + self.catalogEntry.path.join('/') + '/load', function (data) {
       $("#import-data-modal").html(data['data']);
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);
     });
   };
 
   MetastoreTable.prototype.load = function () {
     var self = this;
-    if (self.loading()) {
-      return;
-    }
-    self.loading(true);
     self.fetchFields();
     self.fetchDetails();
     huePubSub.publish('metastore.loaded.table');
@@ -669,12 +1009,10 @@ var MetastoreTable = (function () {
     var offset = $source.offset();
     huePubSub.publish('context.popover.show', {
       data: {
-        type: 'table',
-        identifierChain: [{ name: entry.name }]
+        type: 'catalogEntry',
+        catalogEntry: entry.catalogEntry
       },
       orientation: orientation || 'right',
-      sourceType: entry.sourceType,
-      defaultDatabase: entry.database.name,
       source: {
         element: event.target,
         left: offset.left,
@@ -706,38 +1044,31 @@ var MetastoreColumn = (function () {
   /**
    * @param {Object} options
    * @param {MetastoreTable} options.table
-   * @param {object} options.extendedColumn
+   * @param {DataCatalogEntry} options.catalogEntry
    * @constructor
    */
   function MetastoreColumn(options) {
     var self = this;
     self.table = options.table;
-    if (options.extendedColumn && options.extendedColumn.comment) {
-      options.extendedColumn.comment = hueUtils.deXSS(options.extendedColumn.comment);
-    }
-    ko.mapping.fromJS(options.extendedColumn, {}, self);
+    self.catalogEntry = options.catalogEntry;
 
     self.favourite = ko.observable(false);
     self.popularity = ko.observable();
+    self.comment = ko.observable();
 
     self.comment.subscribe(function (newValue) {
-      $.post('/metastore/table/' + self.table.database.name + '/' + self.table.name + '/alter_column', {
-        column: self.name(),
-        comment: newValue
-      }, function (data) {
-        if (data.status == 0) {
-          huePubSub.publish('assist.clear.db.cache', {
-            sourceType: self.sourceType,
-            databaseName: self.table.database.name,
-            tableName: self.table.name
-          });
-        } else {
-          $(document).trigger("error", data.message);
+      self.catalogEntry.getComment().done(function (comment) {
+        if (comment !== newValue) {
+          self.catalogEntry.setComment(newValue).done(self.comment).fail(function () {
+            self.comment(comment);
+          })
         }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
       });
-    })
+    });
+
+    self.table.catalogEntry.loadNavigatorMetaForChildren().done(function () {
+      self.catalogEntry.getComment().done(self.comment);
+    });
   }
 
   MetastoreColumn.prototype.showContextPopover = function (entry, event) {
@@ -745,12 +1076,10 @@ var MetastoreColumn = (function () {
     var offset = $source.offset();
     huePubSub.publish('context.popover.show', {
       data: {
-        type: 'column',
-        identifierChain: [{ name: entry.table.name }, { name: entry.name() }]
+        type: 'catalogEntry',
+        catalogEntry: entry.catalogEntry
       },
       orientation: 'right',
-      sourceType: self.sourceType,
-      defaultDatabase: entry.table.database.name,
       source: {
         element: event.target,
         left: offset.left,

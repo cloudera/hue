@@ -27,6 +27,8 @@ from desktop.models import Document, Document2
 
 from oozie.models import Job, Node, Dataset
 
+from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -37,8 +39,8 @@ def check_document_access_permission():
       doc_id = uuid = doc2 = None
 
       try:
-        if request.REQUEST.get('workflow'):
-          workflow_id = request.REQUEST.get('workflow')
+        if request.GET.get('workflow'):
+          workflow_id = request.GET.get('workflow')
           if workflow_id.isdigit():
             doc_id = workflow_id
           else:
@@ -108,7 +110,7 @@ def check_document_modify_permission():
 def check_editor_access_permission(view_func):
 
   def decorate(request, *args, **kwargs):
-    if not request.user.is_superuser and request.user.has_hue_permission(action="disable_editor_access", app="oozie"):
+    if not is_admin(request.user) and request.user.has_hue_permission(action="disable_editor_access", app="oozie"):
       raise PopupException(_('Missing permission to access the Oozie Editor'), error_code=401)
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)

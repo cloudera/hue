@@ -16,6 +16,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
+from desktop.auth.backend import is_admin
 
 from desktop.views import commonheader, commonfooter, antixss
 %>
@@ -39,12 +40,12 @@ ${layout.menubar(section='groups')}
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, members, etc...')}">
       </%def>
       <%def name="actions()">
-        %if user.is_superuser:
+        %if is_admin(user):
             <button class="btn delete-group-btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
-        %if user.is_superuser:
+        %if is_admin(user):
           <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i
               class="fa fa-plus-circle"></i> ${_('Add group')}</a>
           % if is_ldap_setup:
@@ -62,9 +63,9 @@ ${layout.menubar(section='groups')}
     <table class="table table-condensed datatables">
       <thead>
       <tr>
-        %if user.is_superuser:
+        %if is_admin(user):
             <th width="1%">
-              <div class="select-all hueCheckbox fa"></div>
+              <div class="select-all hue-checkbox fa"></div>
             </th>
         %endif
         <th>${_('Group Name')}</th>
@@ -76,13 +77,13 @@ ${layout.menubar(section='groups')}
           % for group in groups:
           <tr class="tableRow"
               data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
-          %if user.is_superuser:
+          %if is_admin(user):
             <td data-row-selector-exclude="true">
-              <div class="hueCheckbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
+              <div class="hue-checkbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
             </td>
           %endif
           <td>
-            %if user.is_superuser:
+            %if is_admin(user):
               <strong><a title="${ _('Edit %(groupname)s') % dict(groupname=group.name) }"
                          href="${ url('useradmin.views.edit_group', name=group.name) }"
                          data-row-selector="true">${group.name}</a></strong>
@@ -152,7 +153,7 @@ ${layout.menubar(section='groups')}
       "bFilter": true,
       "bAutoWidth": false,
       "aoColumns": [
-        %if user.is_superuser:
+        %if is_admin(user):
             { "bSortable": false },
         %endif
         { "sWidth": "20%" },
@@ -225,7 +226,7 @@ ${layout.menubar(section='groups')}
     $groupsComponents.find(".delete-group-btn").click(function () {
       viewModel.chosenGroups.removeAll();
 
-      $groupsComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
+      $groupsComponents.find(".hue-checkbox[checked='checked']").each(function (index) {
         viewModel.chosenGroups.push($(this).data("name").toString()); // needed for numeric group names
       });
 

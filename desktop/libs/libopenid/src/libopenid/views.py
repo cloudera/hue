@@ -34,7 +34,7 @@ __all__ = ['login_begin', 'login_complete']
 
 
 def login_begin(request):
-  redirect_to = request.REQUEST.get('next', '/')
+  redirect_to = request.GET.get('next', '/')
   is_first_login_ever = OpenIDBackend.is_first_login_ever()
 
   request.session.set_test_cookie()

@@ -433,6 +433,7 @@ ${ dashboard.import_layout() }
       statusClass: "label " + getStatusClass(action.status),
       externalIdUrl: action.externalIdUrl,
       externalId: action.externalId,
+      externalJobId: action.externalJobId,
       startTime: action.startTime,
       endTime: action.endTime,
       errorMessage: action.errorMessage,

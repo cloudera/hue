@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from django.utils.translation import ugettext as _
 
@@ -42,9 +43,11 @@ def query_error_handler(func):
     except Exception, e:
       message = force_unicode(smart_str(e))
       if 'error occurred while trying to connect to the Java server' in message:
-        raise QueryError(_('%s: is the DB Proxy server running?') % message)
+        raise QueryError, _('%s: is the DB Proxy server running?') % message, sys.exc_info()[2]
+      elif 'Access denied' in message:
+        raise AuthenticationRequired, '', sys.exc_info()[2]
       else:
-        raise QueryError(message)
+        raise QueryError, message, sys.exc_info()[2]
   return decorator
 
 
@@ -61,7 +64,8 @@ class JdbcApi(Api):
       self.db = API_CACHE[self.cache_key]
     elif 'password' in self.options:
       username = self.options.get('user') or user.username
-      self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], username, self.options['password'])
+      impersonation_property = self.options.get('impersonation_property')
+      self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], username, self.options['password'], impersonation_property=impersonation_property, impersonation_user=user.username)
 
   def create_session(self, lang=None, properties=None):
     global API_CACHE
@@ -70,11 +74,12 @@ class JdbcApi(Api):
     properties = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
     props['properties'] = {} # We don't store passwords
 
-    if self.db is None:
+    if self.db is None or not self.db.test_connection(throw_exception='password' not in properties):
       if 'password' in properties:
         user = properties.get('user') or self.options.get('user')
         props['properties'] = {'user': user}
         self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], user, properties.pop('password'))
+        self.db.test_connection(throw_exception=True)
 
     if self.db is None:
       raise AuthenticationRequired()
@@ -119,7 +124,7 @@ class JdbcApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     raise PopupException('Downloading is not supported yet')
 
   def progress(self, snippet, logs):
@@ -134,40 +139,42 @@ class JdbcApi(Api):
     if self.db is None:
       raise AuthenticationRequired()
 
-    assist = Assist(self.db)
+    assist = self._createAssist(self.db)
     response = {'status': -1}
 
     if database is None:
       response['databases'] = assist.get_databases()
     elif table is None:
-      response['tables'] = assist.get_tables(database)
-      response['tables_meta'] = response['tables']
+      tables = assist.get_tables_full(database)
+      response['tables'] = [table['name'] for table in tables]
+      response['tables_meta'] = tables
     else:
-      columns = assist.get_columns(database, table)
-      response['columns'] = [col[0] for col in columns]
-      response['extended_columns'] = [{
-        'name': col[0],
-        'type': col[1],
-        'comment': col[5]
-      } for col in columns]
+      columns = assist.get_columns_full(database, table)
+      response['columns'] = [col['name'] for col in columns]
+      response['extended_columns'] = columns
 
     response['status'] = 0
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     if self.db is None:
       raise AuthenticationRequired()
 
-    assist = Assist(self.db)
-    response = {'status': -1}
+    assist = self._createAssist(self.db)
+    response = {'status': -1, 'result': {}}
 
     sample_data, description = assist.get_sample_data(database, table, column)
 
-    if sample_data:
+    if sample_data or description:
       response['status'] = 0
       response['headers'] = [col[0] for col in description] if description else []
-      response['rows'] = sample_data
+      response['full_headers'] = [{
+        'name': col[0],
+        'type': col[1],
+        'comment': ''
+      } for col in description]
+      response['rows'] = sample_data if sample_data else []
     else:
       response['message'] = _('Failed to get sample data.')
 
@@ -177,6 +184,9 @@ class JdbcApi(Api):
   def cache_key(self):
     return '%s-%s' % (self.interpreter['name'], self.user.username)
 
+  def _createAssist(self, db):
+    return Assist(db)
+
 
 class Assist():
 
@@ -184,26 +194,28 @@ class Assist():
     self.db = db
 
   def get_databases(self):
-    dbs, description = query_and_fetch(self.db, 'SELECT DatabaseName FROM DBC.Databases')
+    dbs, description = query_and_fetch(self.db, 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA')
     return [db[0] and db[0].strip() for db in dbs]
 
   def get_tables(self, database, table_names=[]):
-    tables, description = query_and_fetch(self.db, "SELECT * FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
-    return [{"comment": table[7] and table[7].strip(), "type": "Table", "name": table[1] and table[1].strip()} for table in tables]
+    tables = self.get_tables_full(database, table_names)
+    return [table['name'] for table in tables]
+
+  def get_tables_full(self, database, table_names=[]):
+    tables, description = query_and_fetch(self.db, "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'" % database)
+    return [{"comment": table[1] and table[1].strip(), "type": "Table", "name": table[0] and table[0].strip()} for table in tables]
 
   def get_columns(self, database, table):
-    columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s'" % (database, table))
-    return [[col[0] and col[0].strip(), self._type_converter(col[1]), '', '', col[2], ''] for col in columns]
+    columns = self.get_columns_full(database, table)
+    return [col['name'] for col in columns]
+
+  def get_columns_full(self, database, table):
+    columns, description = query_and_fetch(self.db, "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s'" % (database, table))
+    return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
 
   def get_sample_data(self, database, table, column=None):
     column = column or '*'
-    return query_and_fetch(self.db, 'SELECT %s FROM %s.%s' % (column, database, table))
-
-  def _type_converter(self, name):
-    return {
-        "I": "INT_TYPE",
-        "I2": "SMALLINT_TYPE",
-        "CF": "STRING_TYPE",
-        "CV": "CHAR_TYPE",
-        "DA": "DATE_TYPE",
-      }.get(name, 'STRING_TYPE')
+    #data, description =  query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
+    #response['rows'] = data
+    #response['columns'] = []
+    return query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))

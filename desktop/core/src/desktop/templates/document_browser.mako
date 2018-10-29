@@ -34,7 +34,7 @@ from desktop.views import _ko
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
 
-    <div id="shareDocumentModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
+    <div id="shareDocumentModal"  class="modal hide fade">
       <!-- ko with: activeEntry -->
       <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
@@ -42,15 +42,15 @@ from desktop.views import _ko
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h2>
       </div>
-      <div class="modal-body" style="overflow-y: visible; height: 240px">
+      <div class="modal-body" style="overflow: visible; height: 240px">
         <!-- ko with: definition -->
-        <div class="row-fluid" data-bind="visible: !$parent.hasErrors()">
+        <div class="row-fluid" data-bind="visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
           <div class="span6">
             <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
             <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.read.users">
               <li>
-                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
@@ -65,7 +65,7 @@ from desktop.views import _ko
             <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.write.users">
               <li>
-                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
@@ -84,13 +84,16 @@ from desktop.views import _ko
         </div>
         <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
           <div class="input-append">
-            <input id="documentShareTypeahead" type="text" style="width: 420px" placeholder="${_('Type a username or a group name')}">
+             <div id="menu"></div>
+              <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: shareAutocompleteUserSource.bind($data), itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match', valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: onShareAutocompleteUserEnter.bind($data), appendTo: $('#menu') }, clearable: { value: searchInput, textInput: searchInput }" class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
             <div class="btn-group" style="overflow:visible">
-              <a class="btn btn-primary" data-bind="click: function () { if (selectedUserOrGroup()) { handleTypeAheadSelection() }}, css: { 'disabled': !selectedUserOrGroup() }"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
-              <a class="btn btn-primary dropdown-toggle" data-bind="css: { 'disabled': !selectedUserOrGroup() }" data-toggle="dropdown"><span class="caret"></span></a>
+              <a id="documentShareAddBtn" class="btn" data-bind="click: function () {  onShareAutocompleteUserEnter() }"><span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
+              <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
+               <span class="caret"></span>
+              </a>
               <ul class="dropdown-menu">
-                <li><a data-bind="click: function () { selectedPerm('read'); handleTypeAheadSelection() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Read') }</a></li>
-                <li><a data-bind="click: function () { selectedPerm('write'); handleTypeAheadSelection() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Modify') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('read'); onShareAutocompleteUserEnter() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Read') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('write'); onShareAutocompleteUserEnter() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Modify') }</a></li>
               </ul>
             </div>
           </div>
@@ -191,24 +194,6 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div id="createDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
-      <!-- ko with: activeEntry -->
-      <form class="form-horizontal">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-          <h2 class="modal-title">${_('Create Directory')}</h2>
-        </div>
-        <div class="modal-body ">
-          <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
-        </div>
-        <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" value="${ _('Cancel') }">
-          <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { if ($('#newDirectoryName').val()) { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); } }"/>
-        </div>
-      </form>
-      <!-- /ko -->
-    </div>
-
     <div id="renameDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
@@ -247,50 +232,6 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
-      <!-- ko with: activeEntry -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: entriesToDelete().length === 0 -->
-        <h2 class="modal-title">${ _('The trash is empty') }</h2>
-        <!-- /ko -->
-        <!-- ko if: entriesToDelete().length > 0 -->
-        <h2 class="modal-title"> ${ _('Do you really want to delete the following document(s)?') } </h2>
-        <!-- /ko -->
-      </div>
-      <div class="modal-body">
-        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: selectedDocsWithDependents().length === 0">
-          <i class="fa fa-spinner fa-spin fa-2x"></i>
-        </div>
-        <ul data-bind="foreach: selectedDocsWithDependents()">
-          <li>
-            <span data-bind="text: $data.name"></span>
-            <!-- ko if: $data.dependents.length > 0 -->
-              (${_('used by')}
-              <a class="pointer" data-bind="hueLink: $data.dependents[0].absoluteUrl, text: $data.dependents[0].name"></a>
-              <!-- ko if: $data.dependents.length > 1 -->
-              ${_('and')} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name"></a>
-                <!-- ko if: $data.dependents.length > 2 -->
-                  ${_('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${_('other')}
-                <!-- /ko -->
-              <!-- /ko -->
-              )
-            <!-- /ko -->
-          </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <!-- ko if: entriesToDelete().length === 0 -->
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Close') }">
-        <!-- /ko -->
-        <!-- ko if: entriesToDelete().length > 0 -->
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="submit" data-bind="click: function() { if (isTrash() || isTrashed()) { removeDocuments(true) } else { moveToTrash() } }, disable: deletingEntries" class="btn btn-danger disable-feedback" value="${_('Yes')}"/>
-        <!-- /ko -->
-      </div>
-      <!-- /ko -->
-    </div>
-
     <div class="doc-browser-container" data-bind="docSelect: activeEntry.entries, docDroppable: { entries: activeEntry.entries }">
       <div class="navbar hue-title-bar">
         <div class="navbar-inner">
@@ -301,7 +242,7 @@ from desktop.views import _ko
                 <div class="doc-browser-action doc-browser-search-container pull-left"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
                 <!-- /ko -->
                 <!-- ko with: activeEntry -->
-                <div class="doc-browser-action doc-browser-type-filter margin-right-10 pull-left" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: $root.allDocumentTypes, linkTitle: '${ _ko('Type filter') }' } }"></div>
+                <div class="doc-browser-action doc-browser-type-filter margin-right-10 pull-left" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Type filter') }' } }"></div>
                 <a class="btn margin-right-20" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
                 <!-- ko if: app === 'documents' -->
                 <div class="inline">
@@ -317,7 +258,7 @@ from desktop.views import _ko
                             data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
                           % endif
                           >
-                            <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'hive' } } --><!-- /ko --> ${_('Hive Query')}
                           </a>
                         </li>
                       % endif
@@ -330,7 +271,7 @@ from desktop.views import _ko
                             data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
                           % endif
                           >
-                            <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'impala' } } --><!-- /ko --> ${_('Impala Query')}
                           </a>
                       </li>
                       % endif
@@ -340,44 +281,44 @@ from desktop.views import _ko
                       % if SHOW_NOTEBOOKS.get():
                         <li>
                           <a title="${_('Notebook')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:index') }')">
-                            <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'notebook' } } --><!-- /ko --> ${_('Notebook')}
                           </a>
                         </li>
                       % endif
                       % if 'pig' in apps:
                         <li>
                           <a title="${_('Pig Script')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('pig:index') }')">
-                            <img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'pig' } } --><!-- /ko --> ${_('Pig Script')}
                           </a>
                         </li>
                       % endif
                       % if 'oozie' in apps:
                         <li>
                           <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
-                            <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
                           </a>
                         </li>
                         <li>
                           <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
-                            <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-coordinator' } } --><!-- /ko --> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
                           </a>
                         </li>
                         <li>
                           <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
-                            <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-bundle' } } --><!-- /ko --> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
                           </a>
                         </li>
                       % endif
                       % if 'search' in apps:
                         <li>
                           <a title="${_('Solr Search')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('search:new_search') }')">
-                            <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${_('Dashboard')}
                           </a>
                         </li>
                       % endif
                       <li class="divider"></li>
                       <li data-bind="css: { 'disabled': isTrash() || isTrashed() || !canModify() }">
-                        <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi hi-fw"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
+                        <a href="javascript:void(0);" data-bind="click: function () {  huePubSub.publish('show.create.directory.modal', $data);showNewDirectoryModal() }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
                       </li>
                     </ul>
                   </span>
@@ -391,7 +332,7 @@ from desktop.views import _ko
                 <!-- ko if: app === 'documents' -->
                 <div class="margin-left-20 margin-right-20 pull-right doc-browser-type-filter" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
                   <!-- ko if: isTrash() || isTrashed() -->
-                  <a class="inactive-action" href="javascript:void(0);" data-bind="click: emptyTrash">
+                  <a href="javascript:void(0);" data-bind="click: emptyTrash">
                     <i class="fa fa-fw fa-trash"></i> ${_('Empty trash')}
                   </a>
                   <!-- /ko -->
@@ -408,8 +349,8 @@ from desktop.views import _ko
                     <i class="fa fa-fw fa-ellipsis-v"></i>
                   </a>
                   <ul class="dropdown-menu">
-                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || !canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }">
-                      <a href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }"><i class="fa fa-fw fa-edit"></i> ${_('Rename folder')}</a>
+                    <li data-bind="css: { 'disabled': directorySelected() || selectedEntries().length < 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }">
+                      <a href="javascript:void(0);" data-bind="click: function () {  copy() }"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a>
                     </li>
                     <!-- ko if: isTrash() -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 }">
@@ -417,7 +358,10 @@ from desktop.views import _ko
                     </li>
                     <!-- /ko -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && !superuser) }">
-                      <a href="javascript:void(0);" data-bind="click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
+                      <a href="javascript:void(0);" data-bind="click: function() {huePubSub.publish('doc.show.delete.modal', $data);getSelectedDocsWithDependents(); showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
+                    </li>
+                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || !canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }">
+                      <a href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }"><i class="fa fa-fw fa-edit"></i> ${_('Rename folder')}</a>
                     </li>
                     <li>
                       <a title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a>
@@ -505,7 +449,7 @@ from desktop.views import _ko
             <div class="doc-browser-row" data-bind="contextMenu: { scrollContainer: '.doc-browser-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
-                <li><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showRestoreConfirmation(); }"><i class="fa fa-fw fa-undo"></i> ${ _('Restore to Home') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: isTrashed -->
@@ -514,10 +458,10 @@ from desktop.views import _ko
                 <!-- /ko -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-file-o"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
+                <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
                   <i class="fa fa-fw fa-times"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a>
                 </li>
-                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data);$parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->
               </ul>
@@ -528,7 +472,7 @@ from desktop.views import _ko
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
                 <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
-                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: DocumentTypeGlobals[type] || type"></div>
+                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: HUE_I18n.documentType[type] || type"></div>
                 <div class="doc-browser-attr-col doc-browser-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                 <div class="doc-browser-attr-col doc-browser-modified" data-bind="text: localeFormat(last_modified)"></div>
                 <!-- /ko -->
@@ -590,7 +534,6 @@ from desktop.views import _ko
             drop: function (ev, ui) {
               if (!dragToSelect && dragData && !dragData.dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
                 boundEntry.moveHere(dragData.selectedEntries);
-                dragData.originEntry.load();
               }
               $element.removeClass('doc-browser-drop-hover');
             },
@@ -683,7 +626,7 @@ from desktop.views import _ko
 
                 $helper.appendTo($container);
               } else {
-                $('<div>').addClass('doc-browser-drag-select').appendTo('body');
+                $('<div>').addClass('doc-browser-drag-select').appendTo(HUE_CONTAINER);
               }
             },
             drag: function (event) {

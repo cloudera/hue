@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -21,16 +21,16 @@ msgstr ""
 msgid "Successfully invalidated metadata"
 msgstr "メタデータを無効化しました"
 
-#: src/impala/api.py:65
+#: src/impala/api.py:64
 #, python-format
 msgid "Successfully refreshed metadata for `%s`.`%s`"
 msgstr "`%s`.`%s` のメタデータをリフレッシュしました"
 
-#: src/impala/api.py:80
+#: src/impala/api.py:79
 msgid "get_exec_summary requires a valid query_history_id"
 msgstr "get_exec_summary には有効な query_history_id が必要です"
 
-#: src/impala/api.py:102
+#: src/impala/api.py:101
 msgid "get_runtime_profile requires a valid query_history_id"
 msgstr "get_runtime_profile には有効な query_history_id が必要です"
 
@@ -83,11 +83,11 @@ msgstr ""
 msgid ""
 "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
 "if Impala does not do any work (compute or send back results) for that "
-"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+"session within SESSION_TIMEOUT_S seconds. Default: 30 min."
 msgstr ""
-"SESSION_TIMEOUT_S > 0 の場合、QUERY_TIMEOUT_S 秒以内に Impala が"
+"SESSION_TIMEOUT_S > 0 の場合、SESSION_TIMEOUT_S 秒以内に Impala が"
 "そのセッションの処理（計算または結果の送信）を実行しないと、セッションはタイムアウトになります"
-"（つまりキャンセルされます）。デフォルトは 1 時間です。"
+"（つまりキャンセルされます）。デフォルトは 30 分です。"
 
 #: src/impala/conf.py:102
 msgid ""

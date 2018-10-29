@@ -17,7 +17,9 @@
 from django.template.defaultfilters import date, time
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import USERNAME_RE_RULE
 from desktop.views import commonheader, commonfooter, antixss
+from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -38,21 +40,22 @@ ${layout.menubar(section='users')}
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
       </%def>
       <%def name="actions()">
-        %if user.is_superuser:
+        %if is_admin(user):
             <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
-        %if user.is_superuser:
+        %if is_admin(user):
             % if not is_ldap_setup:
               <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             %endif
 
             % if is_ldap_setup:
-            <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
-            <a href="javascript:void(0)" class="btn confirmationModal"
-               data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}"><i
-                class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
+              <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+              <a href="javascript:void(0)" class="btn confirmationModal"
+                 data-confirmation-url="${ url('useradmin_views_sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}">
+                 <i class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}
+              </a>
             % endif
 
             <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/"
@@ -66,9 +69,9 @@ ${layout.menubar(section='users')}
     <table class="table table-condensed datatables">
       <thead>
       <tr>
-        %if user.is_superuser:
+        %if is_admin(user):
             <th width="1%">
-              <div class="select-all hueCheckbox fa"></div>
+              <div class="select-all hue-checkbox fa"></div>
             </th>
         %endif
         <th>${_('Username')}</th>
@@ -83,13 +86,13 @@ ${layout.menubar(section='users')}
           % for listed_user in users:
           <tr class="tableRow"
               data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
-          %if user.is_superuser:
+          %if is_admin(user):
               <td data-row-selector-exclude="true">
-                <div class="hueCheckbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
+                <div class="hue-checkbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
               </td>
           %endif
           <td>
-            %if user.is_superuser or user.username == listed_user.username:
+            %if is_admin(user) or user.username == listed_user.username:
               <strong><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}"
                          href="${ url('useradmin.views.edit_user', username=listed_user.username) }"
                          data-row-selector="true">${listed_user.username}</a></strong>
@@ -167,7 +170,7 @@ ${layout.menubar(section='users')}
       "bInfo": false,
       "bFilter": true,
       "aoColumns": [
-        %if user.is_superuser:
+        %if is_admin(user):
             { "bSortable": false },
         %endif
         null,
@@ -231,15 +234,22 @@ ${layout.menubar(section='users')}
           % if is_embeddable:
           $usersComponents.find('.sync-ldap form').ajaxForm({
             dataType:  'json',
+            beforeSend: function (xhr) {
+              $usersComponents.find('input[type="submit"]').attr('disabled','disabled');
+            },
             success: function(data) {
+              $usersComponents.find('input[type="submit"]').removeAttr("disabled");
               if (data && data.status == -1) {
                 renderUseradminErrors(data.errors);
               }
               else if (data && data.url) {
                 huePubSub.publish('open.link', data.url);
-                $.jHueNotify.info("${ _('The users and groups were update correctly.') }")
+                $.jHueNotify.info("${ _('The users and groups were updated correctly.') }")
                 $usersComponents.find(".sync-ldap").modal("hide");
               }
+            },
+            error: function(data) {
+              $usersComponents.find('input[type="submit"]').removeAttr("disabled");
             }
           });
           % endif
@@ -282,7 +292,7 @@ ${layout.menubar(section='users')}
     $usersComponents.find(".delete-user-btn").click(function () {
       viewModel.chosenUsers.removeAll();
 
-      $usersComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
+      $usersComponents.find(".hue-checkbox[checked='checked']").each(function (index) {
         viewModel.chosenUsers.push($(this).data("id"));
       });
 

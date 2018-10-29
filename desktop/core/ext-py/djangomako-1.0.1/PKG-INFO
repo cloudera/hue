@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: djangomako
+Version: 1.0.1
+Summary: The simple, elegant Django Mako library
+Home-page: https://github.com/ahmedaljazzar/django-mako
+Author: Ahmed Jazzar
+Author-email: me@ahmedjazzar.com
+License: MIT License
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python

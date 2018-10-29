@@ -80,7 +80,7 @@ ${layout.menubar(section='my queries')}
       <table id="recentSavedQueriesTable" class="table table-condensed datatables">
         <thead>
           <tr>
-            <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="savedCheck"></div></th>
+            <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="savedCheck"></div></th>
             <th>${_('Name')}</th>
             <th>${_('Desc')}</th>
             <th>${_('Last Modified')}</th>
@@ -90,7 +90,7 @@ ${layout.menubar(section='my queries')}
         % for design in q_page.object_list:
           <tr>
             <td data-row-selector-exclude="true">
-              <div class="hueCheckbox savedCheck fa canDelete"
+              <div class="hue-checkbox savedCheck fa canDelete"
                    data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
                    data-delete-name="${ design.id }"
                    data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
@@ -110,7 +110,7 @@ ${layout.menubar(section='my queries')}
         % endfor
         </tbody>
       </table>
-      % if q_page.number != q_page.num_pages():
+      % if q_page.number != q_paginator.num_pages:
         <a href="${ url(app_name + ':list_designs') }?q-user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
       % endif
     </div>
@@ -119,7 +119,7 @@ ${layout.menubar(section='my queries')}
       <table id="recentRunQueriesTable" class="table table-condensed datatables">
         <thead>
           <tr>
-            <th width="1%"><div class="hueCheckbox selectAll" data-selectables="runCheck"></div></th>
+            <th width="1%"><div class="hue-checkbox selectAll" data-selectables="runCheck"></div></th>
             <th>${_('Time')}</th>
             <th>${_('Name')}</th>
             <th>${_('Query')}</th>
@@ -133,9 +133,9 @@ ${layout.menubar(section='my queries')}
         %>
           <tr>
             <td width="1%" data-row-selector-exclude="true">
-              <div class="hueCheckbox runCheck fa"
+              <div class="hue-checkbox runCheck fa"
                 data-edit-url="${ url(app_name + ':execute_design', design_id=query.design.id) }"
-                % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
+                % if qcontext and query.last_state != models.QueryHistory.STATE.expired.value:
                   data-view-url="${ url(app_name + ':watch_query_history', query_history_id=query.id) }?context=${qcontext|u}"
                 % endif
                 data-row-selector-exclude="true"></div>
@@ -149,12 +149,12 @@ ${layout.menubar(section='my queries')}
               <code>${ collapse_whitespace(query.query) }</code>
               % endif
             </td>
-            <td width="9%">${models.QueryHistory.STATE[query.last_state]}</td>
+            <td width="9%">${query.last_state}</td>
           </tr>
         % endfor
         </tbody>
       </table>
-      % if h_page.number != h_page.num_pages():
+      % if h_page.number != h_paginator.num_pages:
         <a href="${ url(app_name + ':list_query_history') }">${_('View my entire query history')} &raquo;</a>
       % endif
     </div>
@@ -278,7 +278,7 @@ ${layout.menubar(section='my queries')}
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
 
-      var selector = $(".hueCheckbox[checked='checked']");
+      var selector = $(".hue-checkbox[checked='checked']");
       if (selector.length == 1) {
         if (selector.data("view-url")) {
           $("#viewBtn").removeAttr("disabled").click(function () {
@@ -321,7 +321,7 @@ ${layout.menubar(section='my queries')}
 
     function deleteQueries() {
       viewModel.chosenSavedQueries.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenSavedQueries.push($(this).data("delete-name"));
       });
 

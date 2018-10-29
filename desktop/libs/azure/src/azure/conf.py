@@ -16,12 +16,12 @@
 from __future__ import absolute_import
 
 import logging
-import re
+
 
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
-from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
+from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
 LOG = logging.getLogger(__name__)
 
@@ -30,18 +30,24 @@ REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
 
 def get_default_client_id():
   """
-  Attempt to set AWS access key ID from script, else core-site, else None
+  Attempt to set AWS client id from script, else core-site, else None
   """
-  client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID.get()
+  client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID_SCRIPT.get()
   return client_id_script or get_adls_client_id()
 
-
-def get_default_authentication_code():
+def get_default_secret_key():
   """
   Attempt to set AWS secret key from script, else core-site, else None
   """
-  client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET.get()
+  client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET_SCRIPT.get()
   return client_secret_script or get_adls_authentication_code()
+
+def get_default_tenant_id():
+  """
+  Attempt to set AWS tenant id from script, else core-site, else None
+  """
+  tenant_id_script = AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
+  return tenant_id_script or get_adls_refresh_url()
 
 def get_default_refresh_url():
   refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get())
@@ -77,9 +83,40 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
   each=ConfigSection(
     help="Information about a single azure account",
     members=dict(
-      CLIENT_ID=Config("client_id", help="", default=None),
-      CLIENT_SECRET=Config("client_secret", help="", default=None),
-      TENANT_ID=Config("tenant_id", help="", default=None)
+      CLIENT_ID=Config(
+        key="client_id",
+        type=str,
+        dynamic_default=get_default_client_id,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      CLIENT_ID_SCRIPT=Config(
+        key="client_id_script",
+        type=coerce_password_from_script,
+        default=None,
+        private=True,
+        help="Execute this script to produce the ADLS client id."),
+      CLIENT_SECRET=Config(
+        key="client_secret",
+        type=str,
+        dynamic_default=get_default_secret_key,
+        private=True,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      CLIENT_SECRET_SCRIPT=Config(
+        key='client_secret_script',
+        type=coerce_password_from_script,
+        default=None,
+        private=True,
+        help=_("Execute this script to produce the ADLS client secret.")),
+      TENANT_ID=Config(
+        key="tenant_id",
+        type=str,
+        dynamic_default=get_default_tenant_id,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      TENANT_ID_SCRIPT=Config(
+        key='tenant_id_script',
+        type=coerce_password_from_script,
+        default=None,
+        private=True,
+        help=_("Execute this script to produce the ADLS tenant id.")),
     )
   )
 )
@@ -89,7 +126,8 @@ def is_adls_enabled():
   return ('default' in AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None)
 
 def has_adls_access(user):
-  return user.is_authenticated() and user.is_active and (user.is_superuser or user.has_hue_permission(action="adls_access", app="filebrowser"))
+  from desktop.auth.backend import is_admin
+  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser"))
 
 def config_validator(user):
   res = []

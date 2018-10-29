@@ -23,7 +23,6 @@ import os
 import parquet
 import posixpath
 import re
-import shutil
 import stat as stat_module
 import urllib
 from urlparse import urlparse
@@ -34,10 +33,10 @@ from cStringIO import StringIO
 from gzip import GzipFile
 
 from django.contrib.auth.models import User, Group
-from django.core.paginator import EmptyPage
-from django.core.urlresolvers import reverse
+from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
+from django.urls import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseForbidden
+from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
@@ -49,7 +48,7 @@ from django.utils.translation import ugettext as _
 from aws.s3.s3fs import S3FileSystemException
 from avro import datafile, io
 from desktop import appmanager
-from desktop.lib import i18n, paginator
+from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
 from desktop.lib.django_util import JsonResponse
@@ -59,6 +58,8 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.views import serve_403_error
+
+from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -75,9 +76,11 @@ from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkD
                               TrashPurgeForm, SetReplicationFactorForm
 
 
+from desktop.auth.backend import is_admin
+
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
-DOWNLOAD_CHUNK_SIZE = 64 * 1024 * 1024 # 64MB
+DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
 
 # Defaults for "xxd"-style output.
 # Sentences refer to groups of bytes printed together, within a line.
@@ -161,7 +164,7 @@ def download(request, path):
         else:
             raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
-    response = HttpResponse(_file_reader(fh), content_type=content_type)
+    response = StreamingHttpResponse(_file_reader(fh), content_type=content_type)
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
@@ -214,9 +217,8 @@ def view(request, path):
 
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
-
-        if request.fs._get_scheme(path).lower() == 'hdfs':
-            if request.user.is_superuser and not _is_hdfs_superuser(request):
+        elif request.fs._get_scheme(path).lower() == 'hdfs':
+            if is_admin(request.user) and not _is_hdfs_superuser(request):
                 msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                         % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
 
@@ -262,7 +264,7 @@ def edit(request, path, form=None):
         raise PopupException(_("File too big to edit: %(path)s") % {'path': path})
 
     if not form:
-        encoding = request.REQUEST.get('encoding') or i18n.get_site_encoding()
+        encoding = request.GET.get('encoding') or i18n.get_site_encoding()
         if stats:
             f = request.fs.open(path)
             try:
@@ -285,7 +287,7 @@ def edit(request, path, form=None):
         breadcrumbs=parse_breadcrumbs(path),
         is_embeddable=request.GET.get('is_embeddable', False),
         show_download_button=SHOW_DOWNLOAD_BUTTON.get())
-    if request.META.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest':
+    if not request.is_ajax():
         data['stats'] = stats;
         data['form'] = form;
     return render("edit.mako", request, data)
@@ -324,7 +326,7 @@ def save_file(request):
     except Exception, e:
         raise PopupException(_("The file could not be saved"), detail=e)
 
-    request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
+    request.path = reverse("filebrowser_views_edit", kwargs=dict(path=path))
     return edit(request, path, form)
 
 
@@ -335,7 +337,7 @@ def parse_breadcrumbs(path):
       if url and not url.endswith('/'):
         url += '/'
       url += part
-      breadcrumbs.append({'url': url, 'label': part})
+      breadcrumbs.append({'url': urllib.quote(url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''), 'label': part})
     return breadcrumbs
 
 
@@ -344,13 +346,11 @@ def listdir(request, path):
     Implements directory listing (or index).
 
     Intended to be called via view().
-
-    TODO: Remove?
     """
     if not request.fs.isdir(path):
         raise PopupException(_("Not a directory: %(path)s") % {'path': path})
 
-    file_filter = request.REQUEST.get('file_filter', 'any')
+    file_filter = request.GET.get('file_filter', 'any')
 
     assert file_filter in ['any', 'file', 'dir']
 
@@ -362,15 +362,15 @@ def listdir(request, path):
         'path': path,
         'file_filter': file_filter,
         'breadcrumbs': breadcrumbs,
-        'current_dir_path': path,
-        'current_request_path': request.path,
-        'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
+        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'cwd_set': True,
         'is_superuser': request.user.username == request.fs.superuser,
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
-        'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
+        'show_upload': (request.GET.get('show_upload') == 'false' and (False,) or (True,))[0],
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
         'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
         'is_embeddable': request.GET.get('is_embeddable', False),
@@ -390,15 +390,25 @@ def listdir(request, path):
     data['files'] = [_massage_stats(request, stat_absolute_path(path, stat)) for stat in stats]
     return render('listdir.mako', request, data)
 
-def _massage_page(page):
+def _massage_page(page, paginator):
+    try:
+        prev_num = page.previous_page_number()
+    except InvalidPage:
+        prev_num = 0
+
+    try:
+        next_num = page.next_page_number()
+    except InvalidPage:
+        next_num = 0
+
     return {
         'number': page.number,
-        'num_pages': page.num_pages(),
-        'previous_page_number': page.previous_page_number(),
-        'next_page_number': page.next_page_number(),
+        'num_pages': paginator.num_pages,
+        'previous_page_number': prev_num,
+        'next_page_number': next_num,
         'start_index': page.start_index(),
         'end_index': page.end_index(),
-        'total_count': page.total_count()
+        'total_count': paginator.count
     }
 
 def listdir_paged(request, path):
@@ -422,12 +432,15 @@ def listdir_paged(request, path):
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
     do_as = None
-    if request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security"):
+    if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
       do_as = request.GET.get('doas', request.user.username)
     if hasattr(request, 'doas'):
       do_as = request.doas
 
-    home_dir_path = request.user.get_home_directory()
+    if request.fs._get_scheme(path) == 'hdfs':
+      home_dir_path = request.user.get_home_directory()
+    else:
+      home_dir_path = None
     breadcrumbs = parse_breadcrumbs(path)
 
     if do_as:
@@ -457,10 +470,12 @@ def listdir_paged(request, path):
 
     # Do pagination
     try:
-      page = paginator.Paginator(all_stats, pagesize).page(pagenum)
+      paginator = Paginator(all_stats, pagesize, allow_empty_first_page=True)
+      page = paginator.page(pagenum)
       shown_stats = page.object_list
     except EmptyPage:
       logger.warn("No results found for requested page.")
+      paginator = None
       page = None
       shown_stats = []
 
@@ -485,25 +500,23 @@ def listdir_paged(request, path):
     if page:
       page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
 
-    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
-                       (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
-                        request.fs.isdir(request.fs.trash_path(path)))
+    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
         'path': path,
         'breadcrumbs': breadcrumbs,
-        'current_request_path': request.path,
+        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_trash_enabled': is_trash_enabled,
         'files': page.object_list if page else [],
-        'page': _massage_page(page) if page else {},
+        'page': _massage_page(page, paginator) if page else {},
         'pagesize': pagesize,
-        'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
+        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'descending': descending_param,
         # The following should probably be deprecated
         'cwd_set': True,
         'file_filter': 'any',
-        'current_dir_path': path,
+        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_fs_superuser': is_fs_superuser,
         'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
@@ -598,7 +611,7 @@ def display(request, path):
     # display inline files just if it's not an ajax request
     if not request.is_ajax():
       if _can_inline_display(path):
-        return redirect(reverse('filebrowser.views.download', args=[path]) + '?disposition=inline')
+        return redirect(reverse('filebrowser_views_download', args=[path]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()
@@ -642,8 +655,7 @@ def display(request, path):
     if mode == 'binary':
         compression = 'none'
         # Read out based on meta.
-    compression, offset, length, contents =\
-    read_contents(compression, path, request.fs, offset, length)
+    compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
     # Get contents as string for text mode, or at least try
     uni_contents = None
@@ -1038,7 +1050,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         ret['extra_params'] = extra_params
 
     for p in parameter_names:
-        val = request.REQUEST.get(p)
+        val = request.GET.get(p)
         if val:
             ret[p] = val
 
@@ -1052,19 +1064,13 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             except (IOError, WebHdfsException), e:
                 msg = _("Cannot perform operation.")
                 # TODO: Only apply this message for HDFS
-                if request.user.is_superuser and not _is_hdfs_superuser(request):
+                if is_admin(request.user) and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
-                if request.is_ajax():
-                    return HttpResponseForbidden(smart_str(e))
-                else:
-                    raise PopupException(msg, detail=e)
+                raise PopupException(msg, detail=e)
             except S3FileSystemException, e:
               msg = _("S3 filesystem exception.")
-              if request.is_ajax():
-                  return HttpResponseForbidden(smart_str(e))
-              else:
-                  raise PopupException(msg, detail=e)
+              raise PopupException(msg, detail=e)
             except NotImplementedError, e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)
@@ -1076,7 +1082,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             ret["success"] = True
             try:
                 if piggyback:
-                    piggy_path = form.cleaned_data[piggyback]
+                    piggy_path = form.cleaned_data.get(piggyback)
                     ret["result"] = _massage_stats(request, stat_absolute_path(piggy_path ,request.fs.stats(piggy_path)))
             except Exception, e:
                 # Hard to report these more naturally here.  These happen either
@@ -1137,7 +1143,7 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(request.fs.join(path, name))
+        request.fs.create(request.fs.join(urllib.unquote(path), urllib.unquote(name)))
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
@@ -1160,7 +1166,9 @@ def move(request):
     params = ['src_path']
     def bulk_move(*args, **kwargs):
         for arg in args:
-            request.fs.rename(arg['src_path'], arg['dest_path'])
+            if arg['src_path'] == arg['dest_path']:
+                raise PopupException(_('Source path and destination path cannot be same'))
+            request.fs.rename(urllib.unquote(arg['src_path']), urllib.unquote(arg['dest_path']))
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1173,6 +1181,8 @@ def copy(request):
     params = ['src_path']
     def bulk_copy(*args, **kwargs):
         for arg in args:
+            if arg['src_path'] == arg['dest_path']:
+                raise PopupException(_('Source path and destination path cannot be same'))
             request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
     return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
@@ -1362,27 +1372,6 @@ def status(request):
         'name': request.fs.name
     }
     return render("status.mako", request, data)
-
-
-def location_to_url(location, strict=True):
-    """
-    If possible, returns a file browser URL to the location.
-    Prunes HDFS URI to path.
-    Location is a URI, if strict is True.
-
-    Python doesn't seem to have a readily-available URI-comparison
-    library, so this is quite hacky.
-    """
-    if location is None:
-      return None
-    split_path = Hdfs.urlsplit(location)
-    if strict and not split_path[1] or not split_path[2]:
-      # No netloc not full url or no URL
-      return None
-    path = location
-    if split_path[0] == 'hdfs':
-      path = split_path[2]
-    return reverse("filebrowser.views.view", kwargs=dict(path=path))
 
 
 def truncate(toTruncate, charsToKeep=50):

@@ -17,6 +17,8 @@
 
 import json
 import logging
+import math
+import types
 
 from django.utils.translation import ugettext as _
 
@@ -31,7 +33,7 @@ FETCH_SIZE = 1000
 DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
 
-def download(handle, format, db, id=None, file_name='query_result'):
+def download(handle, format, db, id=None, file_name='query_result', user_agent=None, callback=None):
   """
   download(query_model, format) -> HttpResponse
 
@@ -42,11 +44,12 @@ def download(handle, format, db, id=None, file_name='query_result'):
     return
 
   max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
+  max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes, callback=callback)
   generator = export_csvxls.create_generator(content_generator, format)
 
-  resp = export_csvxls.make_response(generator, format, file_name)
+  resp = export_csvxls.make_response(generator, format, file_name, user_agent=user_agent)
 
   if id:
     resp.set_cookie(
@@ -61,7 +64,7 @@ def download(handle, format, db, id=None, file_name='query_result'):
   return resp
 
 
-def upload(path, handle, user, db, fs, max_rows=-1):
+def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
   """
   upload(query_model, path, user, db, fs) -> None
 
@@ -72,7 +75,7 @@ def upload(path, handle, user, db, fs, max_rows=-1):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
@@ -80,23 +83,55 @@ def upload(path, handle, user, db, fs, max_rows=-1):
 
 class HS2DataAdapter:
 
-  def __init__(self, handle, db, max_rows=-1, start_over=True):
+  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None):
     self.handle = handle
     self.db = db
     self.max_rows = max_rows
+    self.max_bytes = max_bytes
     self.start_over = start_over
     self.fetch_size = FETCH_SIZE
     self.limit_rows = max_rows > -1
+    self.limit_bytes = max_bytes > -1
+    self.callback = callback
 
     self.first_fetched = True
     self.headers = None
     self.num_cols = None
     self.row_counter = 1
+    self.bytes_counter = 0
     self.is_truncated = False
     self.has_more = True
 
   def __iter__(self):
     return self
+
+  # Return an estimate of the size of the object using only ascii characters once serialized to string.
+  # Avoid serialization to string where possible
+  def _getsizeofascii(self, row):
+    size = 0
+    size += max(len(row) - 1, 0) # CSV commas between columns
+    size += 2 # CSV \r\n at the end of row
+    for col in row:
+      col_type = type(col)
+      if col_type == types.IntType:
+        if col == 0:
+          size += 1
+        elif col < 0:
+          size += int(math.log10(-1 * col)) + 2
+        else:
+          size += int(math.log10(col)) + 1
+      elif col_type == types.StringType:
+        size += len(col)
+      elif col_type == types.FloatType:
+        size += len(str(col))
+      elif col_type == types.BooleanType:
+        size += 4
+      elif col_type == types.NoneType:
+        size += 4
+      else:
+        size += len(str(col))
+
+    return size
 
   def next(self):
     results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
@@ -106,6 +141,10 @@ class HS2DataAdapter:
       self.start_over = False
       self.headers = results.cols()
       self.num_cols = len(self.headers)
+      if self.limit_bytes:
+        self.bytes_counter += max(self.num_cols - 1, 0)
+        for header in self.headers:
+          self.bytes_counter += len(header)
 
       # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
       if self.num_cols > 100:
@@ -118,12 +157,21 @@ class HS2DataAdapter:
 
       for row in results.rows():
         self.row_counter += 1
+        if self.limit_bytes:
+          self.bytes_counter += self._getsizeofascii(row)
+
         if self.limit_rows and self.row_counter > self.max_rows:
           LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (self.max_rows, self.row_counter))
+          self.is_truncated = True
+          break
+        if self.limit_bytes and self.bytes_counter > self.max_bytes:
+          LOG.warn('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (self.max_bytes, self.row_counter))
           self.is_truncated = True
           break
         data.append(row)
 
       return self.headers, data
     else:
+      if self.callback:
+        self.callback()
       raise StopIteration

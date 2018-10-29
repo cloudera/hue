@@ -19,7 +19,7 @@
 import json
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
@@ -37,11 +37,11 @@ QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
 
 def test_ranges():
-  assert_equal((90.0, 100.0), _round_number_range(99))
-  assert_equal((0.0, 100.0), _round_number_range(100))
-  assert_equal((0.0, 100.0), _round_number_range(101))
+  assert_equal((90, 100), _round_number_range(99))
+  assert_equal((0, 100), _round_number_range(100))
+  assert_equal((0, 100), _round_number_range(101))
 
-  assert_equal((8000000.0, 9000000.0), _round_number_range(9045352))
+  assert_equal((8000000, 9000000), _round_number_range(9045352))
 
 
 class MockResource():
@@ -295,8 +295,8 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], response.content)
-    assert_true('denied' in data['message'], response.content)
+    assert_equal(0, data['status'], response.content)
+    assert_true('no modifications to change' in data['message'], response.content)
 
     # Admin
     c = make_logged_in_client(username='admin', is_superuser=True, recreate=True)
@@ -480,7 +480,7 @@ class TestWithMockedSolr(TestSearchBase):
 
     json_response_content = json.loads(json_response.content)
     assert_equal('application/json', json_response['Content-Type'])
-    assert_equal('attachment; filename=query_result.json', json_response['Content-Disposition'])
+    assert_equal('attachment; filename="query_result.json"', json_response['Content-Disposition'])
     assert_equal(4, len(json_response_content), len(json_response_content))
     assert_equal('Investigations for neonatal seizures.', json_response_content[0]['article_title'])
 
@@ -491,7 +491,7 @@ class TestWithMockedSolr(TestSearchBase):
     })
     csv_response_content = ''.join(csv_response.streaming_content)
     assert_equal('application/csv', csv_response['Content-Type'])
-    assert_equal('attachment; filename=query_result.csv', csv_response['Content-Disposition'])
+    assert_equal('attachment; filename="query_result.csv"', csv_response['Content-Disposition'])
     assert_equal(4 + 1 + 1, len(csv_response_content.split('\n')), csv_response_content.split('\n'))
     assert_true('&lt;script&gt;alert(1234)&lt;/script&gt;,_version_,author,category,comments,content,content_type,description,features,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight,id' in csv_response_content, csv_response_content)
     # Fields does not exactly match the response but this is because the collection schema does not match the query response.
@@ -505,14 +505,14 @@ class TestWithMockedSolr(TestSearchBase):
     xls_response_content = ''.join(xls_response.content)
     assert_not_equal(0, len(xls_response_content))
     assert_equal('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', xls_response['Content-Type'])
-    assert_equal('attachment; filename=query_result.xlsx', xls_response['Content-Disposition'])
+    assert_equal('attachment; filename="query_result.xlsx"', xls_response['Content-Disposition'])
 
   def test_index_xss(self):
     doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
                                    data=json.dumps(self.collection.data), parent_directory=self.home_dir)
     try:
       response = self.c.get(reverse('dashboard:index') + ('?collection=%s' % doc.id) + '&q=</script><script>alert(%27XSS%27)</script>')
-      assert_equal('{"fqs": [], "qs": [{"q": "alert(\'XSS\')"}], "start": 0}', response.context['query'])
+      assert_equal('{"fqs": [], "qs": [{"q": "alert(\'XSS\')"}], "start": 0}', response.context[0]['query'])
     finally:
       doc.delete()
 

@@ -19,7 +19,7 @@ import json
 import logging
 import time
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_str
@@ -28,6 +28,7 @@ from liboozie.oozie_api import get_oozie
 from oozie.models import Workflow, Pig
 from oozie.views.api import get_log as get_workflow_logs
 from oozie.views.editor import _submit_workflow
+from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -78,7 +79,7 @@ class OozieApi(object):
     workflow.name = OozieApi.WORKFLOW_NAME
     workflow.is_history = True
     if pig_script.use_hcatalog:
-      workflow.add_parameter("oozie.action.sharelib.for.pig", "pig,hcatalog")
+      workflow.add_parameter("oozie.action.sharelib.for.pig", "pig,hcatalog,hive")
     workflow.save()
     Workflow.objects.initialize(workflow, self.fs)
 
@@ -240,5 +241,5 @@ def format_time(st_time):
 
 
 def has_job_edition_permission(oozie_job, user):
-  return user.is_superuser or oozie_job.user == user.username
+  return is_admin(user) or oozie_job.user == user.username
 

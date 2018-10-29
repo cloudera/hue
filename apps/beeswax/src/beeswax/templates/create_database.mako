@@ -222,7 +222,9 @@ ${ assist.assistPanel() }
 
   (function () {
 
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     function CreateDatabaseViewModel() {
       var self = this;
@@ -233,11 +235,11 @@ ${ assist.assistPanel() }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
-        location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;
+        location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name + '?source=' + tableDef.sourceType + '&namespace=' + tableDef.namespace.id;
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
-        location.href = '/metastore/tables/' + databaseDef.name;
+        location.href = '/metastore/tables/' + databaseDef.name + '?source=' + databaseDef.sourceType + '&namespace=' + databaseDef.namespace.id;
       });
     }
 

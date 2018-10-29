@@ -19,6 +19,7 @@ import json
 import logging
 import math
 import numbers
+import urllib
 import uuid
 
 from django.utils.html import escape
@@ -32,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 
 # Materialize and HTML escape results
-def escape_rows(rows, nulls_only=False):
+def escape_rows(rows, nulls_only=False, encoding=None):
   data = []
 
   for row in rows:
@@ -46,7 +47,7 @@ def escape_rows(rows, nulls_only=False):
       elif field is None:
         escaped_field = 'NULL'
       else:
-        escaped_field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
+        escaped_field = smart_unicode(field, errors='replace', encoding=encoding) # Prevent error when getting back non utf8 like charset=iso-8859-1
         if not nulls_only:
           escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
       escaped_row.append(escaped_field)
@@ -57,12 +58,17 @@ def escape_rows(rows, nulls_only=False):
 
 def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
                   files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
-                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None):
+                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
+                  namespace=None, compute=None):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
   '''
   from notebook.connectors.hiveserver2 import HS2Api
+
+  # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config)
+  if editor_type.startswith('impala'):
+    editor_type = 'impala'
 
   editor = Notebook()
   if snippet_properties is None:
@@ -102,7 +108,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': on_success_url,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'') if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
@@ -122,6 +128,8 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          },
          'name': name,
          'database': database,
+         'namespace': namespace if namespace else {},
+         'compute': compute if compute else {},
          'result': {'handle':{}},
          'variables': []
       }
@@ -130,6 +138,8 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
 
   if snippet_properties:
     data['snippets'][0]['properties'].update(snippet_properties)
+  if result_properties:
+    data['snippets'][0]['result'].update(result_properties)
 
   editor.data = json.dumps(data)
 
@@ -192,6 +202,17 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
   return editor
 
 
+class MockedDjangoRequest():
+
+  def __init__(self, user, get=None, post=None, method='POST'):
+    self.user = user
+    self.jt = None
+    self.GET = get if get is not None else {'format': 'json'}
+    self.POST = post if post is not None else {}
+    self.REQUEST = {}
+    self.method = method
+
+
 def import_saved_beeswax_query(bquery):
   design = bquery.get_design()
 
@@ -212,18 +233,18 @@ def import_saved_beeswax_query(bquery):
 def import_saved_pig_script(pig_script):
   snippet_properties = {}
 
+  snippet_properties['hadoopProperties'] = []
   if pig_script.dict.get('hadoopProperties'):
-    snippet_properties['hadoopProperties'] = []
     for prop in pig_script.dict.get('hadoopProperties'):
       snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
 
+  snippet_properties['parameters'] = []
   if pig_script.dict.get('parameters'):
-    snippet_properties['parameters'] = []
     for param in pig_script.dict.get('parameters'):
       snippet_properties['parameters'].append("%s=%s" % (param.get('name'), param.get('value')))
 
+  snippet_properties['resources'] = []
   if pig_script.dict.get('resources'):
-    snippet_properties['resources'] = []
     for resource in pig_script.dict.get('resources'):
       snippet_properties['resources'].append(resource.get('value'))
 

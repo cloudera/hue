@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_hue4, is_oozie_enabled
+from desktop.conf import is_oozie_enabled
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_bool, coerce_csv
 
@@ -73,7 +73,7 @@ def get_ordered_interpreters(user=None):
       "type": i,
       "interface": interpreters[i].INTERFACE.get(),
       "options": interpreters[i].OPTIONS.get(),
-      "is_sql" : interpreters[i].INTERFACE.get() in ["hiveserver2", "rdbms", "jdbc", "solr"]
+      "is_sql" : interpreters[i].INTERFACE.get() in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"]
     }
     for i in reordered_interpreters
   ]
@@ -137,6 +137,7 @@ ENABLE_QUERY_BUILDER = Config(
   default=True
 )
 
+# Note: requires Oozie app
 ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),

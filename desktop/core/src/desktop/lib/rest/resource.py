@@ -19,6 +19,9 @@ import posixpath
 import time
 
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
+
+from desktop import conf
 
 
 LOG = logging.getLogger(__name__)
@@ -66,6 +69,19 @@ class Resource(object):
       return resp.content
 
   def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
+    resp = self._invoke(method=method,
+                        relpath=relpath,
+                        params=params,
+                        data=data,
+                        headers=headers,
+                        files=files,
+                        allow_redirects=allow_redirects,
+                        clear_cookies=clear_cookies,
+                        log_response=log_response)
+
+    return self._format_response(resp)
+
+  def _invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
@@ -82,17 +98,21 @@ class Resource(object):
                                 urlencode=self._urlencode,
                                 clear_cookies=clear_cookies)
 
-    if log_response and self._client.logger.isEnabledFor(logging.DEBUG):
-      self._client.logger.debug(
-        "%s %s Got response%s: %s%s" % (
+    if log_response:
+      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get()
+      duration = time.time() - start_time
+      message = "%s %s Got response%s: %s%s" % (
           method,
           smart_unicode(path, errors='ignore'),
-           ' in %dms' % ((time.time() - start_time) * 1000),
-           smart_unicode(resp.content[:1000], errors='replace'),
-           len(resp.content) > 1000 and "..." or "")
+          ' in %dms' % (duration * 1000),
+          smart_unicode(resp.content[:log_length or None], errors='replace'),
+          log_length and len(resp.content) > log_length and "..." or ""
       )
+      self._client.logger.disabled = 0
+      log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
 
-    return self._format_response(resp)
+    return resp
+
 
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
     """
@@ -161,3 +181,26 @@ class Resource(object):
       headers.update({'Content-Type': contenttype})
 
     return headers
+
+  def resolve_redirect_url(self, method="GET", relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=True, clear_cookies=False, log_response=True):
+    resp = self._invoke(method=method,
+                        relpath=relpath,
+                        params=params,
+                        data=data,
+                        headers=headers,
+                        files=files,
+                        allow_redirects=allow_redirects,
+                        clear_cookies=clear_cookies,
+                        log_response=log_response)
+
+    return resp.url.encode("utf-8")
+
+
+# Same in thrift_util.py for not losing the trace class
+def log_if_slow_call(duration, message, logger):
+  if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
+    logger.warn('SLOW: %.2f - %s' % (duration, message))
+  elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
+    logger.info('SLOW: %.2f - %s' % (duration, message))
+  else:
+    logger.debug(message)

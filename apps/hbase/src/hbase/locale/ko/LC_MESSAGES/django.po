@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:36-0700\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -59,18 +59,19 @@ msgstr "자르기 전에 가져온 행당 행 또는 열 하드 제한입니다.
 
 #: src/hbase/conf.py:48
 msgid ""
-"'buffered' is the default of the HBase Thrift Server and supports "
-"security. 'framed' can be used to chunk up responses, which is useful "
-"when used in conjunction with the nonblocking server in Thrift."
+"'framed' is used to chunk up responses, which is useful when used in "
+"conjunction with the nonblocking server in Thrift.'buffered' used to be "
+"the default of the HBase Thrift Server."
 msgstr ""
-"'buffered'은 HBase Thrift Server의 기본값이며 보안을 지원합니다. 'framed'를 사용하여 응답을 생성할 "
-"수 있으며 Thrift의 비차단 서버와 함께 사용할 때 유용합니다."
+"'framed'는 응답을 생성하는 데 사용되며 Thrift의 비차단 서버와 함께 "
+"사용하는 경우에 유용합니다. 'buffered'는 HBase Thrift "
+"Server의 기본값으로 사용됩니다."
 
-#: src/hbase/conf.py:56
+#: src/hbase/conf.py:55
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "hive-site.xml이 위치한 HBase 구성 디렉토리입니다."
 
-#: src/hbase/conf.py:63
+#: src/hbase/conf.py:62
 msgid ""
 "Force Hue to use Http Thrift mode with doas impersonation, regarless of "
 "hbase-site.xml properties."

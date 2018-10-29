@@ -14,8 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from optparse import make_option
-
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext_lazy as _t
 
@@ -32,12 +30,10 @@ class Command(BaseCommand):
   user information and group memberships will be updated based on the LDAP
   server's current state.
   """
-
-  option_list = BaseCommand.option_list + (
-      make_option("--server", help=_t("Server to connect to."),
+  def add_arguments(self, parser):
+    parser.add_argument("--server", help=_t("Server to connect to."),
                               action="store",
-                              default=None),
-   )
+                              default=None)
 
   def handle(self, **options):
     server = options['server']

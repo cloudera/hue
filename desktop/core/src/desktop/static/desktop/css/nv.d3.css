@@ -69,3 +69,20 @@ svg:not(.leaflet-zoom-animated) {
 .nvtooltip p {
   font-size: 12px;
 }
+.nvtooltip b {
+  width: 100px;
+  display: inline-block;
+  text-align: left;
+  padding-left: 1px;
+  direction: ltr;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.nvtooltip span.circle {
+  border-radius: 6px;
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+}

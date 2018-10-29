@@ -1,0 +1,7 @@
+include wheel/*.txt *.txt *.sh
+recursive-include wheel/test *.py
+include wheel/test/test-1.0-py2.py3-none-win32.whl
+include wheel/test/headers.dist/header.h
+include wheel/test/pydist-schema.json
+prune wheel/test/*/dist
+prune wheel/test/*/build

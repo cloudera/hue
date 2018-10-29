@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
             });
           }
           expected.push({
-            label: SyntaxCheckerGlobals.i18n.suppressError,
+            label: HUE_I18n.syntaxChecker.suppressError,
             suppressRule: params.data.ruleId.toString() + params.data.text.toLowerCase()
           });
         }
@@ -120,7 +120,7 @@ from django.utils.translation import ugettext as _
       huePubSub.subscribe('sql.syntax.dropdown.show', function (details) {
         hideSyntaxDropdown();
         var $sqlSyntaxDropdown = $('<div id="sqlSyntaxDropdown" data-bind="component: { name: \'sql-syntax-dropdown\', params: $data }" />');
-        $('body').append($sqlSyntaxDropdown);
+        $(HUE_CONTAINER).append($sqlSyntaxDropdown);
         ko.applyBindings(details, $sqlSyntaxDropdown[0]);
       });
     })();

@@ -45,12 +45,9 @@ class ServerContainer(object):
 class Command(BaseCommand):
   """Runs windmill tests."""
 
-  option_list = BaseCommand.option_list + (
-      make_option('-p', '--port', 
-        type=int, 
-        default=DEFAULT_PORT,
-        help='Port number to use for server.'),
-  )
+  def add_arguments(self, parser):
+    parser.add_argument('-p', '--port', type=int, default=DEFAULT_PORT, dest='port',
+        help='Port number to use for server.')
 
   def setup_test_db(self):
     """
@@ -85,6 +82,8 @@ class Command(BaseCommand):
     from windmill.bin import admin_lib
     from windmill.conf import global_settings
     import nose
+
+    self.port = options['port']
 
     # Setup DB
     self.setup_test_db()

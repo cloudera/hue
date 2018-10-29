@@ -19,7 +19,7 @@ import json
 import os
 import uuid
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client

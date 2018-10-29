@@ -19,6 +19,7 @@ shift 3;
 
 exec $RBT post \
 	-o \
+	-X /'*.css' \
 	--description="$(git whatchanged $REVLIST)" \
 	--target-groups=hue \
 	--target-people="$REVIEWER" \

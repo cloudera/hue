@@ -15,10 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import inspect
-import os
-import sys
 from django.conf import settings
+
+
+# When a Thrift or REST call finishes, the level at which we log its duration
+# depends on the number of millis the call took.
+WARN_LEVEL_CALL_DURATION_MS = 5000
+INFO_LEVEL_CALL_DURATION_MS = 1000
 
 
 def get_current_app(frame=None):
@@ -46,6 +51,8 @@ def get_app_for_module(module):
   for app in settings.INSTALLED_APPS:
     # TODO(philip): This is quite hacky.  If desktop becomes a more
     # full application, we'll want to separate this out more cleanly.
+    if module.__name__.startswith('desktop.lib.metrics.views'):
+      return app
     if module.__name__.startswith(app) and not module.__name__.startswith("desktop.lib"):
       return app
   return None

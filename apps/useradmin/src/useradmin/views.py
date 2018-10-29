@@ -31,9 +31,9 @@ import ldap_access
 from ldap_access import LdapBindException, LdapSearchException
 
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms import ValidationError
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import smart_str
@@ -43,6 +43,7 @@ import desktop.conf
 from desktop.conf import LDAP
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.views import antixss
 
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
@@ -51,6 +52,7 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -96,33 +98,40 @@ def list_configurations(request):
 
 
 def list_for_autocomplete(request):
-  if request.ajax:
-    extended_user_object = request.GET.get('extend_user') == 'true'
+  extended_user_object = request.GET.get('extend_user') == 'true'
+  autocomplete_filter = request.GET.get('filter', "")
+  if is_admin(request.user):
+    users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
+    groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
+    if request.GET.get('only_mygroups'):
+      groups = request.user.groups.filter(name__icontains=autocomplete_filter).order_by('name')
+  else:
+    usergroups = request.user.groups.all()
+    # Get all users in the usergroups he belongs to and then filter by username
+    users = User.objects.filter(groups__in=usergroups, username__icontains=autocomplete_filter).order_by('username').distinct()
+    groups = usergroups.filter(name__icontains=autocomplete_filter).order_by('name')
 
-    if request.user.is_superuser:
-      users = User.objects.all().order_by('username')
-      groups = Group.objects.all().order_by('name')
-      if request.GET.get('only_mygroups'):
-        groups = request.user.groups.all()
-    else:
-      usergroups = request.user.groups.all()
-      users = User.objects.filter(groups__in=usergroups).order_by('username').distinct()
-      groups = usergroups.order_by('name')
+  # Don't include myself by default
+  if not request.GET.get('include_myself'):
+    users = users.exclude(pk=request.user.pk)
 
-    if not request.GET.get('include_myself'):
-      users = users.exclude(pk=request.user.pk)
+  users = users[:100]
+  groups = groups[:100]
 
-    users = users[:2000]
-    groups = groups[:2000]
+  response = {
+    'users': massage_users_for_json(users, extended_user_object),
+    'groups': massage_groups_for_json(groups)
+  }
+  return JsonResponse(response)
 
-    response = {
-      'users': massage_users_for_json(users, extended_user_object),
-      'groups': massage_groups_for_json(groups)
-    }
-    return JsonResponse(response)
-
-  return HttpResponse("")
-
+def get_users_by_id(request):
+  userids = json.loads(request.GET.get('userids', "[]"))
+  userids = userids[:100]
+  users = User.objects.filter(id__in=userids).order_by('username')
+  response = {
+    'users': massage_users_for_json(users)
+  }
+  return JsonResponse(response)
 
 def massage_users_for_json(users, extended=False):
   simple_users = []
@@ -158,7 +167,7 @@ def is_user_locked_out(username):
 
 
 def delete_user(request):
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'DELETE_USER',
       'operationText': _get_failed_operation_text(request.user.username, 'DELETE_USER'),
@@ -198,7 +207,7 @@ def delete_user(request):
 
 
 def delete_group(request):
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'DELETE_GROUP',
        'operationText': _get_failed_operation_text(request.user.username, 'DELETE_GROUP'),
@@ -249,7 +258,7 @@ def edit_user(request, username=None):
   @type username:       string
   @param username:      Default to None, when creating a new user
   """
-  if request.user.username != username and not request.user.is_superuser:
+  if request.user.username != username and not is_admin(request.user):
     request.audit = {'allowed': False}
     if username is not None:
       request.audit['operation'] = 'EDIT_USER'
@@ -270,14 +279,14 @@ def edit_user(request, username=None):
 
   if require_change_password(userprofile):
     form_class = PasswordChangeForm
-  elif request.user.is_superuser:
+  elif is_admin(request.user):
     form_class = SuperUserChangeForm
   else:
     form_class = UserChangeForm
 
   if request.method == 'POST':
     form = form_class(request.POST, instance=instance)
-    if request.user.is_superuser and request.user.username != username:
+    if is_admin(request.user) and request.user.username != username:
       form.fields.pop("password_old")
     if form.is_valid(): # All validation rules pass
       if instance is None:
@@ -301,7 +310,7 @@ def edit_user(request, username=None):
             if not form.instance.is_superuser or not form.instance.is_active:
               _check_remove_last_super(orig)
           else:
-            if form.instance.is_superuser and not request.user.is_superuser:
+            if form.instance.is_superuser and not is_admin(request.user):
               raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
 
           # All ok
@@ -309,7 +318,7 @@ def edit_user(request, username=None):
 
           # Unlock account if selected
           if form.cleaned_data.get('unlock_account'):
-            if not request.user.is_superuser:
+            if not is_admin(request.user):
               raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
 
             try:
@@ -353,11 +362,11 @@ def edit_user(request, username=None):
         userprofile.first_login = False
         userprofile.save()
 
-        if request.user.is_superuser:
+        if is_admin(request.user):
           return redirect(reverse('about:index'))
         else:
-          return redirect(reverse('desktop.views.home'))
-      elif request.user.is_superuser:
+          return redirect(reverse('desktop_views_home'))
+      elif is_admin(request.user):
         if is_embeddable:
           return JsonResponse({'url': '/hue' + reverse(list_users)})
         else:
@@ -377,7 +386,7 @@ def edit_user(request, username=None):
     }
     form = form_class(instance=instance, initial=initial)
 
-    if request.user.is_superuser and request.user.username != username:
+    if is_admin(request.user) and request.user.username != username:
       form.fields.pop("password_old")
 
   if require_change_password(userprofile):
@@ -388,7 +397,7 @@ def edit_user(request, username=None):
     })
   else:
     if request.method == 'POST' and is_embeddable:
-      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': map(antixss, f.errors)} for f in form if f.errors]})
     else:
       return render('edit_user.mako', request, {
         'form': form,
@@ -408,7 +417,7 @@ def edit_group(request, name=None):
 
   Only superusers may create a group
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {'allowed': False}
     if name is not None:
       request.audit['operation'] = 'EDIT_GROUP'
@@ -479,7 +488,7 @@ def edit_permission(request, app=None, priv=None):
 
   Only superusers may modify permissions
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'EDIT_PERMISSION',
       'operationText': _get_failed_operation_text(request.user.username, 'EDIT_PERMISSION'),
@@ -528,7 +537,7 @@ def add_ldap_users(request):
   If a user has been previously imported, this will sync their user information.
   If the LDAP request failed, the error message is generic right now.
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'ADD_LDAP_USERS',
       'operationText': _get_failed_operation_text(request.user.username, 'ADD_LDAP_USERS'),
@@ -541,7 +550,7 @@ def add_ldap_users(request):
   if request.method == 'POST':
     form = AddLdapUsersForm(request.POST)
     if form.is_valid():
-      username_pattern = form.cleaned_data['username_pattern']
+      username_pattern = smart_str(form.cleaned_data['username_pattern'])
       import_by_dn = form.cleaned_data['dn']
       server = form.cleaned_data.get('server')
       try:
@@ -598,7 +607,7 @@ def add_ldap_groups(request):
   group with the LDAP server. If --import-members is specified, it will import
   all unimported users.
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'ADD_LDAP_GROUPS',
       'operationText': _get_failed_operation_text(request.user.username, 'ADD_LDAP_GROUPS'),
@@ -678,7 +687,7 @@ def sync_ldap_users_groups(request):
   user information and group memberships will be updated based on the LDAP
   server's current state.
   """
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     request.audit = {
       'operation': 'SYNC_LDAP_USERS_GROUPS',
       'operationText': _get_failed_operation_text(request.user.username, 'SYNC_LDAP_USERS_GROUPS'),
@@ -751,6 +760,10 @@ def import_ldap_groups(connection, group_pattern, import_members, import_members
                              import_by_dn, failed_users=failed_users)
 
 
+def get_find_groups_filter(ldap_info, server=None):
+  return _get_find_groups_filter(ldap_info, server=server)
+
+
 def sync_ldap_users(connection, failed_users=None):
   """
   Syncs LDAP user information. This will not import new
@@ -758,7 +771,7 @@ def sync_ldap_users(connection, failed_users=None):
   group at the same time. Each must be a separate operation. If neither a user,
   nor a group is provided, all users and groups will be synced.
   """
-  users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
+  users = User.objects.filter(userprofile__creation_method=UserProfile.CreationMethod.EXTERNAL.name).all()
   for user in users:
     _import_ldap_users(connection, user.username, failed_users=failed_users)
   return users
@@ -792,10 +805,11 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
+    if not isinstance(home_directory, unicode):
+      home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
     LOG.warn("Not creating home directory of %s as his profile is empty" % user)
-
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   """
@@ -860,6 +874,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
+  """We could actually check the entire super group as well"""
   if not user_obj.is_superuser:
     return
 
@@ -891,6 +906,30 @@ def _import_ldap_users(connection, username_pattern, sync_groups=False, import_b
   return _import_ldap_users_info(connection, user_info, sync_groups, import_by_dn, server, failed_users=failed_users)
 
 
+def _get_find_groups_filter(ldap_info, server=None):
+  if desktop.conf.LDAP.LDAP_SERVERS.get():
+    # Choose from multiple server configs
+    ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server]
+  else:
+    ldap_config = desktop.conf.LDAP
+
+  group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
+  group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
+  # Search for groups based on group_member_attr=username and group_member_attr=dn
+  # covers AD, Standard Ldap and posixAcount/posixGroup
+  if not group_filter.startswith('('):
+    group_filter = '(' + group_filter + ')'
+
+  # Sanitizing the DN before using in a Search filter
+  sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
+  sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
+
+  find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+                       group_member_attr + "=" + sanitized_dn + ")))"
+
+  return find_groups_filter
+
+
 def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_dn=False, server=None, failed_users=None):
   """
   Import user_info found through ldap_access.find_users.
@@ -904,7 +943,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
 
       user, created = ldap_access.get_or_create_ldap_user(username=ldap_info['username'])
       profile = get_profile(user)
-      if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
+      if not created and profile.creation_method == UserProfile.CreationMethod.HUE.name:
         # This is a Hue user, and shouldn't be overwritten
         LOG.warn(_('There was a naming conflict while importing user %(username)s') % {
           'username': ldap_info['username']
@@ -924,7 +963,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
       if 'email' in ldap_info:
         user.email = ldap_info['email']
 
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
       user.save()
       imported_users.append(user)
@@ -935,20 +974,8 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         new_groups = set()
         current_ldap_groups = set()
 
-        ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
-        group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
-        group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
-        # Search for groups based on group_member_attr=username and group_member_attr=dn
-        # covers AD, Standard Ldap and posixAcount/posixGroup
-        if not group_filter.startswith('('):
-          group_filter = '(' + group_filter + ')'
+        find_groups_filter = _get_find_groups_filter(ldap_info, server=server)
 
-        # Sanitizing the DN before using in a Search filter
-        sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
-        sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
-
-        find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
-                             group_member_attr + "=" + sanitized_dn + ")))"
         group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
         for group_info in group_ldap_info:
           if Group.objects.filter(name=group_info['name']).exists():
@@ -1015,7 +1042,7 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
     user_info = None
     try:
-      user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException, e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
@@ -1066,7 +1093,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
     LOG.debug("Synchronizing posix user %s with group %s" % (smart_str(posix_member), smart_str(group.name)))
     users_info = []
     try:
-      users_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException, e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
@@ -1227,7 +1254,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           # which are defined by 'uid'.
           user_info = None
           try:
-            user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
           except LdapSearchException, e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
@@ -1241,7 +1268,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
         for posix_member in posix_members:
           user_info = []
           try:
-            user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
           except LdapSearchException, e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 

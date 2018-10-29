@@ -224,7 +224,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               <table class="table table-condensed margin-top-10">
                 <thead>
                 <tr>
-                  <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
+                  <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hue-checkbox fa"></div></th>
                   <th width="200">${ _('Day') }</th>
                   <th>${ _('Warning message') }</th>
                 </tr>
@@ -257,7 +257,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
             <script id="calendarTemplate" type="text/html">
               <tr data-bind="css: { disabled: url == '' }">
-                <td data-bind="click: handleSelect"><div data-bind="css: { 'fa-check': selected }" class="hueCheckbox fa"></div></td>
+                <td data-bind="click: handleSelect"><div data-bind="css: { 'fa-check': selected }" class="hue-checkbox fa"></div></td>
                 <td data-bind="css: { disabled: url == '' }">
                   <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
                     <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>

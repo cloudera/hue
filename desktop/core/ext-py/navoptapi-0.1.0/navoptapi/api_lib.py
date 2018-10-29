@@ -129,9 +129,11 @@ class ApiLib(object):
             resp = json.dumps(resp.json())
         return resp
 
-    def call_api(self, operation_name, params):
-        if not operation_name or not params:
+    def call_api(self, operation_name, params=None):
+        if not operation_name:
             return
+        if params is None:
+          params = {}
 
         api_session = Session()
         api_url = self._endpoint_url + operation_name

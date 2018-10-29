@@ -1,0 +1,160 @@
+Metadata-Version: 1.1
+Name: django-nose
+Version: 1.4.5
+Summary: Makes your Django tests simple and snappy
+Home-page: http://github.com/django-nose/django-nose
+Author: Erik Rose
+Author-email: erikrose@grinchcentral.com
+License: BSD
+Description: 
+        ===========
+        django-nose
+        ===========
+        
+        
+        **django-nose** provides all the goodness of `nose`_ in your Django tests, like:
+        
+          * Testing just your apps by default, not all the standard ones that happen to
+            be in ``INSTALLED_APPS``
+          * Running the tests in one or more specific modules (or apps, or classes, or
+            folders, or just running a specific test)
+          * Obviating the need to import all your tests into ``tests/__init__.py``.
+            This not only saves busy-work but also eliminates the possibility of
+            accidentally shadowing test classes.
+          * Taking advantage of all the useful `nose plugins`_
+        
+        .. _nose: https://nose.readthedocs.io/en/latest/
+        .. _nose plugins: http://nose-plugins.jottit.com/
+        
+        It also provides:
+        
+          * Fixture bundling, an optional feature which speeds up your fixture-based
+            tests by a factor of 4
+          * Reuse of previously created test DBs, cutting 10 seconds off startup time
+          * Hygienic TransactionTestCases, which can save you a DB flush per test
+          * Support for various databases. Tested with MySQL, PostgreSQL, and SQLite.
+            Others should work as well.
+        
+        django-nose requires nose 1.2.1 or later, and the `latest release`_ is
+        recommended.  It follows the `Django's support policy`_, supporting:
+        
+          * Django 1.8 (LTS) with Python 2.7, 3.4, or 3.5
+          * Django 1.9 with Python 2.7, 3.4, or 3.5
+          * Django 1.10 with Python 2.7, 3.4, or 3.5
+          * Django 1.11 (LTS) with Python 2.7, 3.4, 3.5, or 3.6
+        
+        .. _latest release: https://pypi.python.org/pypi/nose
+        .. _Django's support policy: https://docs.djangoproject.com/en/1.8/internals/release-process/#supported-versions
+        
+        Development
+        -----------
+        :Code:   https://github.com/django-nose/django-nose
+        :Issues: https://github.com/django-nose/django-nose/issues?state=open
+        :Docs:   https://django-nose.readthedocs.io
+        
+        
+        Changelog
+        ---------
+        
+        1.4.5 (2017-08-22)
+        ~~~~~~~~~~~~~~~~~~
+        * Add Django 1.11 support
+        
+        1.4.4 (2016-06-27)
+        ~~~~~~~~~~~~~~~~~~
+        * Add Django 1.10 support
+        * Drop Django 1.4 - 1.7, and Python 2.6 support
+        * Drop South support
+        
+        1.4.3 (2015-12-28)
+        ~~~~~~~~~~~~~~~~~~
+        * Add Django 1.9 support
+        * Support long options without equals signs, such as "--attr selected"
+        * Support nose plugins using callback options
+        * Support nose options without default values (jsatt)
+        * Remove Django from install dependencies, to avoid accidental upgrades
+          (jsocol, willkg)
+        * Setting REUSE_DB to an empty value now disables REUSE_DB, instead of
+          enabling it (wdoekes)
+        
+        1.4.2 (2015-10-07)
+        ~~~~~~~~~~~~~~~~~~
+        * Warn against using REUSE_DB=1 and FastFixtureTestCase in docs
+        * REUSE_DB=1 uses new transaction management in Django 1.7, 1.8 (scottsexton)
+        * Try to avoid accidentally using production database with REUSE_DB=1 (alexjg, eroninjapan)
+        * Supported Django versions limited to current supported Django version 1.4,
+          1.7, and 1.8, as well as relevant Python versions.
+        
+        1.4.1 (2015-06-29)
+        ~~~~~~~~~~~~~~~~~~
+        * Fix version number (ezarowny)
+        * Fix choice options, unbreaking nose-cover (aamirtharaj-rpx, jwhitlock)
+        * Support 1.8 app loading system (dgladkov)
+        * Support non-ASCII file names (singingwolfboy)
+        * Better PEP8'd assertion names (roganov)
+        
+        1.4 (2015-04-23)
+        ~~~~~~~~~~~~~~~~
+        * Django 1.8 support (timc3, adepue, jwhitlock)
+        * Support --testrunner option (st4lk)
+        * Fix REUSE_DB second run in py3k (edrmp)
+        
+        1.3 (2014-12-05)
+        ~~~~~~~~~~~~~~~~
+        * Django 1.6 and 1.7 support (conrado, co3k, Nepherhotep, mbertheau)
+        * Python 3.3 and 3.4 testing and support (frewsxcv, jsocol)
+        
+        1.2 (2013-07-23)
+        ~~~~~~~~~~~~~~~~
+        * Python 3 support (melinath and jonashaag)
+        * Django 1.5 compat (fabiosantoscode)
+        
+        1.1 (2012-05-19)
+        ~~~~~~~~~~~~~~~~
+        * Django TransactionTestCases don't clean up after themselves; they leave
+          junk in the DB and clean it up only on ``_pre_setup``. Thus, Django makes
+          sure these tests run last. Now django-nose does, too. This means one fewer
+          source of failures on existing projects. (Erik Rose)
+        * Add support for hygienic TransactionTestCases. (Erik Rose)
+        * Support models that are used only for tests. Just put them in any file
+          imported in the course of loading tests. No more crazy hacks necessary.
+          (Erik Rose)
+        * Make the fixture bundler more conservative, fixing some conceivable
+          situations in which fixtures would not appear as intended if a
+          TransactionTestCase found its way into the middle of a bundle. (Erik Rose)
+        * Fix an error that would surface when using SQLAlchemy with connection
+          pooling. (Roger Hu)
+        * Gracefully ignore the new ``--liveserver`` option introduced in Django 1.4;
+          don't let it through to nose. (Adam DePue)
+        
+        1.0 (2012-03-12)
+        ~~~~~~~~~~~~~~~~
+        * New fixture-bundling plugin for avoiding needless fixture setup (Erik Rose)
+        * Moved FastFixtureTestCase in from test-utils, so now all the
+          fixture-bundling stuff is in one library. (Erik Rose)
+        * Added the REUSE_DB setting for faster startup and shutdown. (Erik Rose)
+        * Fixed a crash when printing options with certain verbosities. (Daniel Abel)
+        * Broke hard dependency on MySQL. Support PostgreSQL. (Roger Hu)
+        * Support SQLite, both memory- and disk-based. (Roger Hu and Erik Rose)
+        * Nail down versions of the package requirements. (Daniel Mizyrycki)
+        
+        
+        
+        _(Older changes can be found in the full documentation)._
+        
+Keywords: d,j,a,n,g,o, ,n,o,s,e, ,d,j,a,n,g,o,-,n,o,s,e
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Software Development :: Testing

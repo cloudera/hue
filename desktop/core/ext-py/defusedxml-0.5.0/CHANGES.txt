@@ -1,0 +1,72 @@
+Changelog
+=========
+
+defusedxml 0.5.0
+----------------
+
+*Release date: 07-Feb-2017*
+
+- No changes
+
+defusedxml 0.5.0.rc1
+--------------------
+
+*Release date: 28-Jan-2017*
+
+- Add compatibility with Python 3.6
+- Drop support for Python 2.6, 3.1, 3.2, 3.3
+- Fix lxml tests (XMLSyntaxError: Detected an entity reference loop)
+
+
+defusedxml 0.4.1
+----------------
+
+*Release date: 28-Mar-2013*
+
+- Add more demo exploits, e.g. python_external.py and Xalan XSLT demos.
+- Improved documentation.
+
+
+defusedxml 0.4
+--------------
+
+*Release date: 25-Feb-2013*
+
+- As per http://seclists.org/oss-sec/2013/q1/340 please REJECT
+  CVE-2013-0278, CVE-2013-0279 and CVE-2013-0280 and use CVE-2013-1664,
+  CVE-2013-1665 for OpenStack/etc.
+- Add missing parser_list argument to sax.make_parser(). The argument is
+  ignored, though. (thanks to Florian Apolloner)
+- Add demo exploit for external entity attack on Python's SAX parser, XML-RPC
+  and WebDAV.
+
+
+defusedxml 0.3
+--------------
+
+*Release date: 19-Feb-2013*
+
+- Improve documentation
+
+
+defusedxml 0.2
+--------------
+
+*Release date: 15-Feb-2013*
+
+- Rename ExternalEntitiesForbidden to ExternalReferenceForbidden
+- Rename defusedxml.lxml.check_dtd() to check_docinfo()
+- Unify argument names in callbacks
+- Add arguments and formatted representation to exceptions
+- Add forbid_external argument to all functions and classs
+- More tests
+- LOTS of documentation
+- Add example code for other languages (Ruby, Perl, PHP) and parsers (Genshi)
+- Add protection against XML and gzip attacks to xmlrpclib
+
+defusedxml 0.1
+--------------
+
+*Release date: 08-Feb-2013*
+
+- Initial and internal release for PSRT review

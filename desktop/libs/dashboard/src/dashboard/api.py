@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import json
 import logging
+import uuid
 
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
@@ -24,17 +26,22 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
+from desktop.models import Document2
 
 from libsolr.api import SolrApi
 
+from notebook.connectors.base import get_api
+from notebook.dashboard_api import MockRequest
 from search.conf import SOLR_URL
 
+from dashboard.conf import get_engines, USE_GRIDSTER
 from dashboard.controller import can_edit_index
 from dashboard.dashboard_api import get_engine
 from dashboard.data_export import download as export_download
 from dashboard.decorators import allow_viewer_only
 from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
-from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception
+from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
+  NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
 
 
 LOG = logging.getLogger(__name__)
@@ -47,6 +54,7 @@ def search(request):
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
   facet = json.loads(request.POST.get('facet', '{}'))
+  cluster = request.POST.get('cluster', '""')
 
   query['download'] = 'download' in request.POST
   fetch_result = 'fetch_result' in request.POST
@@ -54,9 +62,9 @@ def search(request):
   if collection:
     try:
       if fetch_result:
-        response = get_engine(request.user, collection).fetch_result(collection, query, facet)
+        response = get_engine(request.user, collection, facet, cluster=cluster).fetch_result(collection, query, facet)
       else:
-        response = get_engine(request.user, collection).query(collection, query, facet)
+        response = get_engine(request.user, collection, facet, cluster=cluster).query(collection, query, facet)
     except RestException, e:
       response.update(extract_solr_exception_message(e))
     except Exception, e:
@@ -99,10 +107,11 @@ def index_fields_dynamic(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    name = request.POST['name']
-    engine = request.POST['engine']
+    name = request.POST.get('name')
+    engine = request.POST.get('engine')
+    source = request.POST.get('source')
 
-    dynamic_fields = get_engine(request.user, engine).luke(name)
+    dynamic_fields = get_engine(request.user, engine, source=source).luke(name)
 
     result['message'] = ''
     result['fields'] = [
@@ -242,18 +251,24 @@ def get_terms(request):
   try:
     collection = json.loads(request.POST.get('collection', '{}'))
     analysis = json.loads(request.POST.get('analysis', '{}'))
+    limit = json.loads(request.POST.get('limit', '25'))
+
+    support_distributed = [engine for engine in get_engines(request.user) if engine['type'] == 'solr'][0]['analytics']
 
     field = analysis['name']
     properties = {
-      'terms.limit': 25,
-      'terms.prefix': analysis['terms']['prefix']
+      'terms.limit': limit,
+      'terms.distrib': str(support_distributed).lower(),
       # lower
-      # limit
       # mincount
       # maxcount
     }
+    if analysis['terms']['prefix']:
+      properties['terms.regex'] = '.*%(prefix)s.*' % analysis['terms'] # Use regexp instead of case sensitive 'terms.prefix'
+      properties['terms.regex.flag'] = 'case_insensitive'
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
+
     result['terms'] = pairwise2(field, [], result['terms']['terms'][field])
     result['status'] = 0
     result['message'] = ''
@@ -279,16 +294,18 @@ def download(request):
     if facet:
       response['response']['docs'] = response['normalized_facets'][0]['docs']
       collection = facet
+      if not collection['template']['fieldsSelected']:
+        facet['fields'] = facet['template']['fieldsAttributes']
     else:
       collection = json.loads(request.POST.get('collection', '{}'))
 
     if file_format == 'json':
       docs = response['response']['docs']
       resp = JsonResponse(docs, safe=False)
-      resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
+      resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % ('query_result', file_format)
       return resp
     else:
-      return export_download(response, file_format, collection)
+      return export_download(response, file_format, collection, user_agent=request.META.get('HTTP_USER_AGENT'))
   except Exception, e:
     raise PopupException(_("Could not download search results: %s") % e)
 
@@ -347,13 +364,15 @@ def new_facet(request):
   try:
     collection = json.loads(request.POST.get('collection', '{}'))
 
-    facet_id = request.POST['id']
-    facet_label = request.POST['label']
-    facet_field = request.POST['field']
-    widget_type = request.POST['widget_type']
+    facet_id = request.POST.get('id')
+    facet_label = request.POST.get('label')
+    facet_field = request.POST.get('field')
+    widget_type = request.POST.get('widget_type')
+    window_size = request.POST.get('window_size')
+
 
     result['message'] = ''
-    result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
+    result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type, window_size)
     result['status'] = 0
   except Exception, e:
     result['message'] = force_unicode(e)
@@ -361,29 +380,66 @@ def new_facet(request):
   return JsonResponse(result)
 
 
-def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
+def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type, window_size):
   properties = {
     'sort': 'desc',
     'canRange': False,
     'stacked': False,
     'limit': 10,
-    'mincount': 1,
+    'mincount': 0,
+    'missing': False,
     'isDate': False,
-    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}
+    'slot': 0,
+    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
   }
-
+  template = {
+      "showFieldList": True,
+      "showGrid": False,
+      "showChart": True,
+      "chartSettings" : {
+        'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
+        'chartSorting': 'none',
+        'chartScatterGroup': None,
+        'chartScatterSize': None,
+        'chartScope': 'world',
+        'chartX': None,
+        'chartYSingle': None,
+        'chartYMulti': [],
+        'chartData': [],
+        'chartMapLabel': None,
+        'chartSelectorType': 'bar'
+      },
+      "fieldsAttributes": [],
+      "fieldsAttributesFilter": "",
+      "filteredAttributeFieldsAll": True,
+      "fields": [],
+      "fieldsSelected": [],
+      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
+      'leafletmapOn': False,
+      'isGridLayout': False,
+      "hasDataForChart": True,
+      "rows": 25,
+  }
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
-  elif widget_type == 'gradient-map-widget':
-    facet_type = 'nested'
-    properties['facets'] = []
-    properties['domain'] = {'blockParent': [], 'blockChildren': []}
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}}
-    properties['scope'] = 'world'
-    properties['limit'] = 100
+  elif widget_type == 'document-widget':
+    # SQL query, 1 solr widget
+    if collection['selectedDocument'].get('uuid'):
+      properties['statementUuid'] = collection['selectedDocument'].get('uuid')
+      doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
+      snippets = doc.data_dict.get('snippets', [])
+      properties['result'] = {'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
+      if snippets:
+        properties['engine'] = snippets[0]['type']
+    else:
+      properties['statementUuid'] = ''
+    properties['statement'] = ''
+    properties['uuid'] = facet_field
+    properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
+    facet_type = 'statement'
   else:
     api = get_engine(user, collection)
-    range_properties = _new_range_facet(api, collection, facet_field, widget_type)
+    range_properties = _new_range_facet(api, collection, facet_field, widget_type, window_size)
 
     if range_properties:
       facet_type = 'range'
@@ -394,18 +450,51 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget'):
+    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
+      # properties = {'canRange': False, 'stacked': False, 'limit': 10} # TODO: Lighter weight top nested facet
+
+      properties['facets_form'] = NESTED_FACET_FORM
+      # Not supported on dim 2 currently
+      properties['facets_form']['type'] = 'field'
+      properties['facets_form']['canRange'] = False
+      properties['facets_form']['isFacetForm'] = True
+
+      facet = NESTED_FACET_FORM.copy()
+      facet['field'] = facet_field
+      facet['limit'] = 10
+      facet['fieldLabel'] = facet_field
+      facet['multiselect'] = True
+
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
+        if USE_GRIDSTER.get():
+          properties['limit'] = facet['limit'] = 100
+
+      if range_properties:
+        # TODO: timeline still uses properties from top properties
+        facet.update(range_properties)
+        facet['initial_gap'] = facet['gap']
+        facet['initial_start'] = facet['start']
+        facet['initial_end'] = facet['end']
+        facet['stacked'] = False
+        facet['type'] = 'range'
+      else:
+        facet['type'] = facet_type
+
+      if collection.get('engine', 'solr') != 'solr':
+        facet['sort'] = 'default'
+
+      properties['facets'] = [facet]
+      properties['domain'] = {'blockParent': [], 'blockChildren': []}
+      properties['compare'] = COMPARE_FACET
+      properties['filter'] = QUERY_FACET
 
       if widget_type == 'hit-widget':
         facet_type = 'function'
+        facet['aggregate']['function'] = 'unique'
       else:
         facet_type = 'nested'
-
-      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}}
-      properties['facets'] = []
-      properties['domain'] = {'blockParent': [], 'blockChildren': []}
+        facet['aggregate']['function'] = 'count'
 
       if widget_type == 'pie2-widget':
         properties['scope'] = 'stack'
@@ -414,11 +503,14 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         properties['scope'] = 'tree'
         properties['facets_form']['limit'] = 5
         properties['isOldPivot'] = True
+      elif widget_type == 'gradient-map-widget':
+        properties['scope'] = 'world'
+        facet['limit'] = 100
       else:
         properties['scope'] = 'stack'
         properties['timelineChartType'] = 'bar'
 
-  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
+  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget') and widget_type != 'gradient-map-widget':
     properties['mincount'] = 1
     properties['facets'] = []
     properties['stacked'] = True
@@ -443,33 +535,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'widgetType': widget_type,
     'properties': properties,
     # Hue 4+
-    'template': {
-        "showFieldList": True,
-        "showGrid": False,
-        "showChart": True,
-        "chartSettings" : {
-          'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
-          'chartSorting': 'none',
-          'chartScatterGroup': None,
-          'chartScatterSize': None,
-          'chartScope': 'world',
-          'chartX': None,
-          'chartYSingle': None,
-          'chartYMulti': [],
-          'chartData': [],
-          'chartMapLabel': None,
-        },
-        "fieldsAttributes": [],
-        "fieldsAttributesFilter": "",
-        "filteredAttributeFieldsAll": True,
-        "fields": [],
-        "fieldsSelected": [],
-        "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
-        'leafletmapOn': False,
-        'isGridLayout': False,
-        "hasDataForChart": True,
-        "rows": 25,
-    },
+    'template': template,
     'queryResult': {}
   }
 
@@ -503,10 +569,11 @@ def get_collection(request):
   result = {'status': -1, 'message': ''}
 
   try:
-    name = request.POST['name']
-    engine = request.POST['engine']
+    name = request.POST.get('name')
+    engine = request.POST.get('engine')
+    source = request.POST.get('source')
 
-    collection = Collection2(request.user, name=name, engine=engine)
+    collection = Collection2(request.user, name=name, engine=engine, source=source)
     collection_json = collection.get_json(request.user)
 
     result['collection'] = json.loads(collection_json)
@@ -536,18 +603,3 @@ def get_collections(request):
       result['message'] = force_unicode(e)
 
   return JsonResponse(result)
-
-
-def extract_solr_exception_message(e):
-  response = {}
-
-  try:
-    message = json.loads(e.message)
-    msg = message['error'].get('msg')
-    response['error'] = msg if msg else message['error']['trace']
-  except Exception, e2:
-    LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
-    LOG.exception('Failed to parse json response: %s' % force_unicode(e))
-    response['error'] = force_unicode(e)
-
-  return response

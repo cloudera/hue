@@ -18,10 +18,11 @@
 import json
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
@@ -30,7 +31,7 @@ from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document, FilesystemException
 from desktop.views import serve_403_error
 
-from metadata.conf import has_optimizer, has_navigator
+from metadata.conf import has_optimizer, has_navigator, has_workload_analytics
 
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
 from notebook.connectors.base import Notebook, get_api, _get_snippet_name
@@ -65,7 +66,7 @@ def notebooks(request):
 
 @check_document_access_permission()
 def notebook(request, is_embeddable=False):
-  if not SHOW_NOTEBOOKS.get():
+  if not SHOW_NOTEBOOKS.get() or not request.user.has_hue_permission(action="access", app='notebook'):
     return serve_403_error(request)
 
   notebook_id = request.GET.get('notebook', request.GET.get('editor'))
@@ -85,6 +86,7 @@ def notebook(request, is_embeddable=False):
           'languages': get_ordered_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
+          'is_wa_enabled': has_workload_analytics(),
           'is_navigator_enabled': has_navigator(request.user),
           'editor_type': 'notebook'
       }),
@@ -95,6 +97,7 @@ def notebook(request, is_embeddable=False):
 @check_document_access_permission()
 def notebook_embeddable(request):
   return notebook(request, True)
+
 
 @check_editor_access_permission()
 @check_document_access_permission()
@@ -122,6 +125,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
         'languages': get_ordered_interpreters(request.user),
         'mode': 'editor',
         'is_optimizer_enabled': has_optimizer(),
+        'is_wa_enabled': has_workload_analytics(),
         'is_navigator_enabled': has_navigator(request.user),
         'editor_type': editor_type,
         'mobile': is_mobile
@@ -148,12 +152,16 @@ def browse(request, database, table, partition_spec=None):
 
   statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
   editor_type = snippet['type']
+  namespace = request.POST.get('namespace', 'default')
+  compute = json.loads(request.POST.get('cluster', '{}'))
 
   if request.method == 'POST':
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute', is_task=True)
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute',
+                             is_task=True, namespace=namespace, compute=compute)
     return JsonResponse(notebook.execute(request, batch=False))
   else:
-    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute')
+    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute',
+                           namespace=namespace, compute=compute)
 
     return render('editor.mako', request, {
         'notebooks_json': json.dumps([editor.get_data()]),
@@ -313,7 +321,7 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  response = get_api(request, snippet).download(notebook, snippet, file_format)
+  response = get_api(request, snippet).download(notebook, snippet, file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
 
   if response:
     request.audit = {

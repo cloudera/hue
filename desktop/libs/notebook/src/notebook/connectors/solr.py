@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from indexer.solr_client import SolrClient
 
 from notebook.connectors.base import Api, QueryError
 from notebook.models import escape_rows
@@ -39,6 +40,8 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
+    except QueryError, e:
+      raise e
     except Exception, e:
       message = force_unicode(str(e))
       raise QueryError(message)
@@ -126,7 +129,7 @@ class SolrApi(Api):
     return 'No logs'
 
 
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     raise PopupException('Downloading is not supported yet')
 
 
@@ -145,10 +148,7 @@ class SolrApi(Api):
     if database is None:
       response['databases'] = [self.options.get('collection') or snippet.get('database') or 'default']
     elif table is None:
-      tables_meta = []
-      for t in assist.get_tables(database):
-        tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
-      response['tables_meta'] = tables_meta
+      response['tables_meta'] = assist.get_tables(database)
     else:
       columns = assist.get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
@@ -159,18 +159,22 @@ class SolrApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     from search.conf import SOLR_URL
     db = NativeSolrApi(SOLR_URL.get(), self.user)
 
     assist = Assist(self, self.user, db)
     response = {'status': -1}
 
-    sample_data = assist.get_sample_data(database, table, column)
+    if snippet.get('source') == 'sql':
+      sample_data = assist.get_sample_data_sql(database, table, column)
+    else:
+      sample_data = assist.get_sample_data(database, table, column)
 
     if sample_data:
       response['status'] = 0
       response['headers'] = sample_data['headers']
+      response['full_headers'] = sample_data.get('full_headers')
       response['rows'] = sample_data['rows']
     else:
       response['message'] = _('Failed to get sample data.')
@@ -189,12 +193,37 @@ class Assist():
     return self.options['collection'].get('collection') or ['default']
 
   def get_tables(self, database, table_names=[]):
-    return self.db.collections2()
+    searcher = SolrClient(self.user)
+    return [{
+        'name': table['name'],
+        'comment': '',
+        'type': 'View' if table['type'] == 'alias' else 'Table'
+      }
+      for table in searcher.get_indexes()
+    ]
 
   def get_columns(self, database, table):
-    return [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in self.db.schema_fields(table)['fields']]
+    return [{'name': field['name'], 'type': field['type'], 'comment': '', 'primary_key': field.get('primary_key')} for field in self.db.schema_fields(table)['fields']]
 
   def get_sample_data(self, database, table, column=None):
+    # Note: currently ignores dynamic fields
+    full_headers = self.get_columns(database, table)
+    headers = [col['name'] for col in full_headers]
+
+    records = self.db.select(table, rows=100)['response']['docs']
+    rows = [[record.get(col, '') for col in headers] for record in records]
+
+    response = {'status': -1}
+
+    response['status'] = 0
+    response['full_headers'] = full_headers
+    response['headers'] = headers
+    response['rows'] = escape_rows(rows, nulls_only=True)
+
+    return response
+
+  def get_sample_data_sql(self, database, table, column=None):
+
     if column is None:
       column = ', '.join([col['name'] for col in self.get_columns(database, table)])
 

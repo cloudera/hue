@@ -162,6 +162,7 @@ INSTALL_CORE_FILES = \
 	ext \
 	tools/app_reg \
 	tools/virtual-bootstrap \
+	tools/enable-python27.sh \
 	tools/relocatable.sh \
 	VERS* LICENSE* README*
 
@@ -205,8 +206,6 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
-	@echo --- Setting up Desktop database
-	$(MAKE) -C $(INSTALL_DIR)/desktop syncdb
 
 ###################################
 # Internationalization
@@ -232,13 +231,41 @@ ace:
 
 
 ###################################
-# JISON Parser Generator
+# JISON Parser Generators
 ###################################
 
 # <<<< DEV ONLY
-.PHONY: jison
-jison:
-	@cd tools/jison && ./hue-jison.sh
+.PHONY: global-search-parser
+global-search-parser:
+	@cd tools/jison && ./hue-global-search.sh
+
+.PHONY: solr-all-parsers
+solr-all-parsers:
+	@cd tools/jison && ./hue-solr-query.sh && ./hue-solr-formula.sh
+
+.PHONY: solr-query-parser
+solr-query-parser:
+	@cd tools/jison && ./hue-solr-query.sh
+
+.PHONY: solr-formula-parser
+solr-formula-parser:
+	@cd tools/jison && ./hue-solr-formula.sh
+
+.PHONY: sql-all-parsers
+sql-all-parsers:
+	@cd tools/jison && ./hue-sql-autocomplete.sh && ./hue-sql-statement.sh && ./hue-sql-syntax.sh
+
+.PHONY: sql-autocomplete-parser
+sql-autocomplete-parser:
+	@cd tools/jison && ./hue-sql-autocomplete.sh
+
+.PHONY: sql-statement-parser
+sql-statement-parser:
+	@cd tools/jison && ./hue-sql-statement.sh
+
+.PHONY: sql-syntax-parser
+sql-syntax-parser:
+	@cd tools/jison && ./hue-sql-syntax.sh
 # END DEV ONLY >>>>
 
 ###################################
@@ -279,13 +306,10 @@ ext-clean:
 js-test:
 	$(ROOT)/tools/jasmine/phantomjs.runner.sh $(ROOT)/desktop/core/src/desktop/templates/jasmineRunner.html
 
-java-test:
-	mvn -f desktop/libs/hadoop/java/pom.xml test $(MAVEN_OPTIONS)
-
-test: java-test
+test:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test fast --with-xunit
 
-test-slow: java-test
+test-slow:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test all --with-xunit --with-cover
 	$(BLD_DIR_BIN)/coverage xml -i
 

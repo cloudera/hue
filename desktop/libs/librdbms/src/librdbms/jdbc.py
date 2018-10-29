@@ -19,7 +19,9 @@ import logging
 import os
 import sys
 
+from desktop.lib.i18n import force_unicode, smart_str
 from notebook.conf import DBPROXY_EXTRA_CLASSPATH
+from notebook.connectors.base import AuthenticationRequired
 
 LOG = logging.getLogger(__name__)
 
@@ -43,16 +45,22 @@ def query_and_fetch(db, statement, n=None):
       return data, meta
     finally:
       curs.close()
+  except Exception, e:
+    message = force_unicode(smart_str(e))
+    if 'Access denied' in message:
+      raise AuthenticationRequired()
+    raise
   finally:
     db.close()
 
 
 class Jdbc():
 
-  def __init__(self, driver_name, url, username, password):
+  def __init__(self, driver_name, url, username, password, impersonation_property=None, impersonation_user=None):
     if 'py4j' not in sys.modules:
       raise Exception('Required py4j module is not imported.')
 
+    os.environ["PATH"] = os.environ["PATH"] + ':/usr/java/default/bin' # TODO: more generic
     classpath = os.environ.get('CLASSPATH', '')
     if DBPROXY_EXTRA_CLASSPATH.get():
       classpath = '%s:%s' % (DBPROXY_EXTRA_CLASSPATH.get(), classpath)
@@ -64,7 +72,25 @@ class Jdbc():
     self.username = username
     self.password = password
 
+    if impersonation_property and impersonation_user:
+      self.db_url += ";{}={};".format(impersonation_property, impersonation_user)
+
     self.conn = None
+
+  def test_connection(self, throw_exception=True):
+    try:
+      self.connect()
+      return True
+    except Exception, e:
+      message = force_unicode(smart_str(e))
+      if throw_exception:
+        if 'Access denied' in message:
+          raise AuthenticationRequired()
+        raise
+      else:
+        return False
+    finally:
+      self.close()
 
   def connect(self):
     if self.conn is None:

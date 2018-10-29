@@ -21,6 +21,7 @@ import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
+from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
 
@@ -29,11 +30,18 @@ LOG = logging.getLogger(__name__)
 
 
 # Livy
+LIVY_SERVER_URL = Config(
+  key="livy_server_url",
+  help=_t("The Livy Server URL."),
+  default="")
+
+# Deprecated
 LIVY_SERVER_HOST = Config(
   key="livy_server_host",
   help=_t("Host address of the Livy Server."),
   default="localhost")
 
+# Deprecated
 LIVY_SERVER_PORT = Config(
   key="livy_server_port",
   help=_t("Port of the Livy Server."),
@@ -62,9 +70,20 @@ SQL_SERVER_PORT = Config(
   default=10000,
   type=int)
 
+SSL_CERT_CA_VERIFY = Config(
+  key="ssl_cert_ca_verify",
+  help=_t("Choose whether Hue should validate certificates received from the server."),
+  dynamic_default=default_ssl_validate,
+  type=coerce_bool
+)
+
 
 def get_livy_server_url():
-  return 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
+  url = LIVY_SERVER_URL.get()
+  if not url:
+    # backward compatibility
+    url = 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
+  return url
 
 def get_spark_status(user):
   from spark.job_server_api import get_api

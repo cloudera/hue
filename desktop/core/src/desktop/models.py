@@ -30,10 +30,11 @@ except ImportError:
 from itertools import chain
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes import generic
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -43,17 +44,18 @@ from settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, has_adls_access
-from dashboard.conf import get_engines
+from dashboard.conf import get_engines, HAS_REPORT_ENABLED
+from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
-
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -64,8 +66,6 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
 HUE_VERSION = None
 
-USER_PREFERENCE_CLUSTER = 'cluster'
-
 
 def uuid_default():
   return str(uuid.uuid4())
@@ -74,16 +74,18 @@ def hue_version():
   global HUE_VERSION
 
   if HUE_VERSION is None:
+    HUE_VERSION = HUE_DESKTOP_VERSION
+
     p = get_run_root('cloudera', 'cdh_version.properties')
     if os.path.exists(p):
-      HUE_VERSION = _version_from_properties(open(p))
-    else:
-      HUE_VERSION = HUE_DESKTOP_VERSION
+      build_version = _version_from_properties(open(p))
+      if build_version:
+        HUE_VERSION = '%s - %s' % (HUE_VERSION, build_version)
 
   return HUE_VERSION
 
 def _version_from_properties(f):
-  return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('version', HUE_DESKTOP_VERSION)
+  return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
 
 
 ###################################################################################################
@@ -91,6 +93,16 @@ def _version_from_properties(f):
 ###################################################################################################
 
 PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
+
+class HueUser(auth_models.User):
+  class Meta:
+    proxy = True
+
+  def __init__(self, *args, **kwargs):
+    self._meta.get_field(
+      'username'
+    ).validators[0] = UnicodeUsernameValidator()
+    super(auth_models.User, self).__init__(*args, **kwargs)
 
 
 class UserPreferences(models.Model):
@@ -598,6 +610,7 @@ class DocumentManager(models.Manager):
 
 
 class Document(models.Model):
+
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -610,7 +623,7 @@ class Document(models.Model):
 
   content_type = models.ForeignKey(ContentType)
   object_id = models.PositiveIntegerField()
-  content_object = generic.GenericForeignKey('content_type', 'object_id')
+  content_object = GenericForeignKey('content_type', 'object_id')
 
   objects = DocumentManager()
 
@@ -660,11 +673,11 @@ class Document(models.Model):
     DocumentPermission.objects.share_to_default(self, name=name)
 
   def can_read(self, user):
-    return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
+    return is_admin(user) or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
   def can_write(self, user):
     perm = self.list_permissions('write')
-    return user.is_superuser or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+    return is_admin(user) or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
 
   def can_read_or_exception(self, user, exception_class=PopupException):
     if self.can_read(user):
@@ -929,8 +942,7 @@ class Document2QueryMixin(object):
       documents = documents.filter(type__in=types)
 
     if search_text:
-      documents = documents.filter(Q(uuid__icontains=search_text) | Q(name__icontains=search_text) | Q(description__icontains=search_text) |
-                                   Q(search__icontains=search_text))
+      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text) | Q(search__icontains=search_text))
 
     if order_by:  # TODO: Validate that order_by is a valid sort parameter
       documents = documents.order_by(order_by)
@@ -944,7 +956,7 @@ class Document2QuerySet(QuerySet, Document2QueryMixin):
 
 class Document2Manager(models.Manager, Document2QueryMixin):
 
-  def get_query_set(self):
+  def get_queryset(self):
     return Document2QuerySet(self.model, using=self._db)
 
   # TODO prevent get() in favor of this
@@ -1077,7 +1089,7 @@ class Document2(models.Model):
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 
-  doc = generic.GenericRelation(Document, related_name='doc_doc') # Compatibility with Hue 3
+  doc = GenericRelation(Document, related_query_name='doc_doc') # Compatibility with Hue 3
 
   objects = Document2Manager()
 
@@ -1178,8 +1190,8 @@ class Document2(models.Model):
       'parent_uuid': self.parent_directory.uuid if self.parent_directory else None,
       'type': self.type,
       'perms': self._massage_permissions(),
-      'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
-      'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
+      'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT) if self.last_modified else None,
+      'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()) if self.last_modified else None,
       'is_managed': self.is_managed,
       'isSelected': False,
       'absoluteUrl': self.get_absolute_url(),
@@ -1300,7 +1312,7 @@ class Document2(models.Model):
   def can_read(self, user):
     perm = self.get_permission('read')
     has_read_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or self.can_write(user) or has_read_permissions
+    return is_admin(user) or self.owner == user or self.can_write(user) or has_read_permissions
 
   def can_read_or_exception(self, user):
     if self.can_read(user):
@@ -1311,7 +1323,7 @@ class Document2(models.Model):
   def can_write(self, user):
     perm = self.get_permission('write')
     has_write_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or has_write_permissions
+    return is_admin(user) or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1548,12 +1560,18 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
-DATAENG = 'dataeng'
-IMPALAUI = 'impalaui'
+# Aka 'Atus'
+ANALYTIC_DB = 'altus'
 
 
 class ClusterConfig():
-
+  """
+  Configuration of the apps and engines that each individual user sees on the core Hue.
+  Fine grained Hue permissions and available apps are leveraged here in order to render the correct UI.
+  
+  TODO: rename to HueConfig
+  TODO: get list of contexts dynamically
+  """
   def __init__(self, user, apps=None, cluster_type='ini'):
     self.user = user
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
@@ -1644,10 +1662,9 @@ class ClusterConfig():
     interpreters = []
 
     _interpreters = get_ordered_interpreters(self.user)
-    if self.cluster_type == DATAENG:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'mapreduce')]
-    elif self.cluster_type == IMPALAUI:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
+
+    if self.cluster_type == ANALYTIC_DB:
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala', 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
       interpreters.append({
@@ -1660,7 +1677,7 @@ class ClusterConfig():
         'is_sql': interpreter['is_sql']
       })
 
-    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if SHOW_NOTEBOOKS.get() and self.cluster_type != ANALYTIC_DB:
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
@@ -1690,19 +1707,34 @@ class ClusterConfig():
 
   def _get_dashboard(self):
     interpreters = get_engines(self.user)
+    _interpreters = []
 
-    if interpreters and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if interpreters and self.cluster_type != ANALYTIC_DB:
+      if HAS_REPORT_ENABLED.get():
+        _interpreters.append({
+          'type': 'report',
+          'displayName': 'Report',
+          'buttonName': 'Report',
+          'page': '/dashboard/new_search?engine=report',
+          'tooltip': _('Report'),
+          'is_sql': False
+        })
+
+      _interpreters.extend([{
+          'type': interpreter['type'],
+          'displayName': interpreter['type'].title(),
+          'buttonName': interpreter['type'].title(),
+          'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
+          'tooltip': _('%s Dashboard') % interpreter['type'].title(),
+          'is_sql': True
+        } for interpreter in interpreters
+      ])
+
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
         'buttonName': _('Dashboard'),
-        'interpreters': [{
-            'type': interpreter['type'],
-            'displayName': interpreter['type'].title(),
-            'buttonName': interpreter['type'].title(),
-            'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
-            'tooltip': _('%s Dashboard') % interpreter['type'].title()
-          } for interpreter in interpreters],
+        'interpreters': _interpreters,
         'page': '/dashboard/new_search?engine=%(type)s' % interpreters[0]
       }
     else:
@@ -1711,7 +1743,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'filebrowser' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1720,7 +1752,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
 
-    if is_s3_enabled() and has_s3_access(self.user):
+    if is_s3_enabled() and has_s3_access(self.user) and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1729,7 +1761,7 @@ class ClusterConfig():
         'page': '/filebrowser/view=S3A://'
       })
 
-    if is_adls_enabled() and has_adls_access(self.user):
+    if is_adls_enabled() and has_adls_access(self.user) and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -1747,7 +1779,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'search' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1756,27 +1788,30 @@ class ClusterConfig():
         'page': '/indexer/'
       })
 
-    if 'jobbrowser' in self.apps and self.cluster_type != IMPALAUI:
-      if self.cluster_type == DATAENG:
+    if 'jobbrowser' in self.apps:
+      from hadoop.cluster import get_default_yarncluster # Circular loop
+
+      title =  _('Jobs') if self.cluster_type != ANALYTIC_DB else _('Queries')
+
+      if get_default_yarncluster():
         interpreters.append({
-          'type': 'dataeng',
-          'displayName': _('Jobs'),
-          'buttonName': _('Jobs'),
-          'tooltip': _('Jobs'),
+          'type': 'yarn',
+          'displayName': title,
+          'buttonName': title,
+          'tooltip': title,
           'page': '/jobbrowser/'
         })
-      else:
-        from hadoop.cluster import get_default_yarncluster # Circular loop
-        if get_default_yarncluster():
-          interpreters.append({
-            'type': 'yarn',
-            'displayName': _('Jobs'),
-            'buttonName': _('Jobs'),
-            'tooltip': _('Jobs'),
-            'page': '/jobbrowser/'
-          })
 
-    if 'hbase' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if has_kafka() and self.cluster_type != ANALYTIC_DB:
+      interpreters.append({
+        'type': 'kafka',
+        'displayName': _('Streams'),
+        'buttonName': _('Browse'),
+        'tooltip': _('Kafka'),
+        'page': '/kafka/'
+      })
+
+    if 'hbase' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1785,7 +1820,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'security' in self.apps and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1794,14 +1829,16 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
-      interpreters.append({
-        'type': 'sqoop',
-        'displayName': _('Sqoop'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Sqoop'),
-        'page': '/sqoop'
-      })
+    if 'sqoop' in self.apps and self.cluster_type != ANALYTIC_DB:
+      from sqoop.conf import IS_ENABLED
+      if IS_ENABLED.get():
+        interpreters.append({
+          'type': 'sqoop',
+          'displayName': _('Sqoop'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Sqoop'),
+          'page': '/sqoop'
+        })
 
     if interpreters:
       return {
@@ -1837,7 +1874,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser) and self.cluster_type != 'impalaui':
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and self.cluster_type != ANALYTIC_DB:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
@@ -1860,7 +1897,7 @@ class ClusterConfig():
         'displayName': other.nice_name,
         'buttonName': other.nice_name,
         'tooltip': other.nice_name,
-        'page': '/%s' % other.nice_name
+        'page': '/%s' % other.display_name
       })
 
     if interpreters:
@@ -1878,46 +1915,31 @@ class Cluster():
 
   def __init__(self, user):
     self.user = user
-    self.default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
-    self.data = {}
+    self.clusters = get_clusters(user)
 
-    if self.default_cluster:
-      clusters = get_clusters()
-      cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
-      self.data = cluster_name and clusters.get(cluster_name) and clusters[cluster_name] or None
+    if len(self.clusters) == 1:
+      self.data = self.clusters.values()[0]
+    elif IS_K8S_ONLY.get():
+      self.data = self.clusters['AltusV2']
+      self.data['type'] = 'altus' # To show simplified UI
+    elif IS_MULTICLUSTER_ONLY.get():
+      self.data = self.clusters['Altus']
+    else:
+      self.data = self.clusters[CLUSTER_ID.get()]
 
   def get_type(self):
-    return self.data and self.data['type'] or 'ini'
+    return self.data['type']
 
-  def get_interface(self):
-    return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('interface')
-
-  def get_id(self):
-    return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('id')
-
-  def get_list_interface_indexes(self):
-    default_cluster_index = 0
-    default_cluster_interface = ''
-
-    clusters = get_clusters()
-    default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
-
-    if clusters and default_cluster:
-      default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
-      default_cluster_name = default_cluster_json.get('name')
-
-      default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
-      default_cluster_interface = default_cluster_json.get('interface', '')
-
-    return default_cluster_index, default_cluster_interface
+  def get_config(self, name):
+    return self.clusters[name]
 
 
 def _get_apps(user, section=None):
   current_app = None
   other_apps = []
   if user.is_authenticated():
-    apps = appmanager.get_apps(user)
     apps_list = appmanager.get_apps_dict(user)
+    apps = apps_list.values()
     for app in apps:
       if app.display_name not in [
           'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',

@@ -1,0 +1,208 @@
+=====================================
+ The Docutils_ Subversion Repository
+=====================================
+
+:Author: Lea Wiemann
+:Contact: docutils-develop@lists.sourceforge.net
+:Revision: $Revision: 7800 $
+:Date: $Date: 2015-02-24 14:01:43 +0100 (Di, 24 Feb 2015) $
+:Copyright: This document has been placed in the public domain.
+
+.. _Docutils: http://docutils.sourceforge.net/
+
+.. admonition:: Quick Instructions
+
+   To get a checkout of the Docutils source tree (with the
+   sandboxes), type ::
+
+       svn checkout http://svn.code.sf.net/p/docutils/code/trunk docutils-code
+
+
+   If you are going to commit changes to the repository, please read
+   the **whole document**, especially the section "`Information for
+   Developers`_"!
+
+.. important::
+   As of 2013-03-13 the subversion urls have changed.
+
+Docutils uses a Subversion_ repository located at
+``docutils.svn.sourceforge.net``.
+Subversion is exhaustively documented in the `Subversion Book`_ (svnbook).
+
+While Unix and Mac OS X users will probably prefer the standard
+Subversion command line interface, Windows user may want to try
+TortoiseSVN_, a convenient explorer extension.  The instructions apply
+analogously.
+
+There is a git_ mirror at http://repo.or.cz/docutils.git providing
+`web access`_ and the base for `creating a local git clone`_.
+
+For the project policy on repository use (check-in requirements,
+branching, etc.), please see the `Docutils Project Policies`__.
+
+__ policies.html#subversion-repository
+
+.. _Subversion: http://subversion.tigris.org/
+.. _Subversion Book: http://svnbook.red-bean.com/
+.. _TortoiseSVN: http://tortoisesvn.tigris.org/
+.. _SourceForge.net: http://sourceforge.net/
+.. _git: http://git-scm.com/
+
+.. contents::
+
+
+Accessing the Repository
+========================
+
+General Information
+-------------------
+
+Web Access
+~~~~~~~~~~
+
+The repository can be browsed and examined via the web at
+http://sourceforge.net/p/docutils/code
+
+Alternatively, use the web interface of the git mirror at
+http://repo.or.cz/w/docutils.git.
+
+
+Repository Access Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get a checkout of the Docutils repository, first determine the root
+of the repository depending on your preferred protocol:
+
+anonymous access: (read only)
+    ``http://svn.code.sf.net/p/docutils/code``
+
+`developer access`_: (read and write)
+    ``svn+ssh://<USERNAME>@svn.code.sf.net/p/docutils/code``
+
+.. git clone: (read only)
+    ``git clone git://repo.or.cz/docutils.git``
+
+Checking Out the Repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To check out only the current main source tree of Docutils, type ::
+
+    svn checkout ROOT/trunk/docutils
+
+(Substitute your preferred repository root for ROOT.)  To check out
+everything (main tree, sandboxes, web site, and parallel projects),
+type ::
+
+    svn checkout ROOT/trunk docutils
+
+This will create a working copy of the whole trunk in a new directory
+called ``docutils``.
+
+Note that you probably do *not* want to check out the ROOT itself
+(without "/trunk"), because then you'd end up fetching the whole
+Docutils tree for every branch and tag over and over again.
+
+To update your working copy later on, ``cd`` into the working copy and
+type ::
+
+    svn update
+
+Creating a local git clone
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Users of git_ can clone a mirror of the docutils repository with ::
+
+  git clone git://repo.or.cz/docutils.git
+
+and proceed according to the `git documentation`_.
+
+.. _git documentation: http://git-scm.com/documentation
+
+Switching the Repository Root
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you changed your mind and want to use a different repository root,
+``cd`` into your working copy and type::
+
+    svn switch --relocate OLDROOT NEWROOT
+
+.. _developer access:
+
+Information for Developers
+--------------------------
+
+If you would like to have write access to the repository, register
+with SourceForge.net_ and send your SourceForge.net
+user names to docutils-develop@lists.sourceforge.net.
+(Note that there may be a delay of several hours until you can commit
+changes to the repository.)
+
+Sourceforge subversion access is documented `here`__
+
+__ http://sourceforge.net/p/forge/documentation/svn/
+
+
+Setting Up Your Subversion Client For Development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before commiting changes to the repository, please ensure that the
+following lines are contained (and uncommented) in your local
+~/.subversion/config file, so that new files are added with the
+correct properties set::
+
+    [miscellany]
+    # For your convenience:
+    global-ignores = ... *.pyc ...
+    # For correct properties:
+    enable-auto-props = yes
+
+    [auto-props]
+    *.py = svn:eol-style=native;svn:keywords=Author Date Id Revision
+    *.txt = svn:eol-style=native;svn:keywords=Author Date Id Revision
+    *.html = svn:eol-style=native;svn:keywords=Author Date Id Revision
+    *.xml = svn:eol-style=native;svn:keywords=Author Date Id Revision
+    *.tex = svn:eol-style=native;svn:keywords=Author Date Id Revision
+    *.css = svn:eol-style=native;svn:keywords=Author Date Id Revision
+    *.patch = svn:eol-style=native
+    *.sh = svn:eol-style=native;svn:executable;svn:keywords=Author Date Id Revision
+    *.png = svn:mime-type=image/png
+    *.jpg = svn:mime-type=image/jpeg
+    *.gif = svn:mime-type=image/gif
+
+
+Repository Layout
+=================
+
+The following tree shows the repository layout::
+
+    docutils/
+    |-- branches/
+    |   |-- branch1/
+    |   |   |-- docutils/
+    |   |   |-- sandbox/
+    |   |   `-- web/
+    |   `-- branch2/
+    |       |-- docutils/
+    |       |-- sandbox/
+    |       `-- web/
+    |-- tags/
+    |   |-- tag1/
+    |   |   |-- docutils/
+    |   |   |-- sandbox/
+    |   |   `-- web/
+    |   `-- tag2/
+    |       |-- docutils/
+    |       |-- sandbox/
+    |       `-- web/
+    `-- trunk/
+        |-- docutils/
+        |-- sandbox/
+        `-- web/
+
+The main source tree lives at ``docutils/trunk/docutils/``, next to
+the sandboxes (``docutils/trunk/sandbox/``) and the web site files
+(``docutils/trunk/web/``).
+
+``docutils/branches/`` and ``docutils/tags/`` contain (shallow) copies
+of either the whole trunk or only the main source tree
+(``docutils/trunk/docutils``).

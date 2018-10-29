@@ -1,0 +1,14 @@
+[run]
+branch = True
+source =
+   OpenSSL
+   tests/
+
+[paths]
+source =
+   src/OpenSSL
+   .tox/*/lib/python*/site-packages/OpenSSL
+   .tox/pypy/site-packages/OpenSSL
+
+[report]
+show_missing = True

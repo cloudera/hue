@@ -53,6 +53,19 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu">
+        <li>
+          <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_bundle') }'">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+          </a>
+        </li>
+        %if is_embeddable:
+          <li>
+            <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-bundle2' }">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
+            </a>
+          </li>
+        %endif
+        <li class="divider"></li>
         <li data-bind="visible: canEdit">
           <a class="pointer" data-toggle="modal" data-target="#settingsModal">
             <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
@@ -63,19 +76,6 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
             <i class="fa fa-fw fa-users"></i> ${ _("Share") }
           </a>
         </li>
-        <li class="divider"></li>
-        <li>
-          <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_bundle') }'">
-            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
-          </a>
-        </li>
-        %if is_embeddable:
-          <li>
-            <a href="javascript: void(0)" data-bind="hueLink: '/home/?type=oozie-bundle2'">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
-            </a>
-          </li>
-        %endif
       </ul>
     </div>
   </div>

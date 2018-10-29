@@ -15,15 +15,15 @@
 # limitations under the License.
 import os
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from desktop.lib.paths import get_build_dir
 from hadoop.fs import fs_for_testing
 from django.utils.translation import ugettext as _
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   """Creates file system for testing."""
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     fs_dir = os.path.join(get_build_dir(), "fs")
     if not os.path.isdir(fs_dir):
       os.makedirs(fs_dir)

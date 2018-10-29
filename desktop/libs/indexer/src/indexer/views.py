@@ -35,7 +35,7 @@ LOG = logging.getLogger(__name__)
 
 
 def collections(request, is_redirect=False):
-  if not request.user.has_hue_permission(action="access", app='search'):
+  if not request.user.has_hue_permission(action="access", app='indexer'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
   return render('collections.mako', request, {
@@ -44,7 +44,7 @@ def collections(request, is_redirect=False):
 
 
 def indexes(request, index=''):
-  if not request.user.has_hue_permission(action="access", app='search'):
+  if not request.user.has_hue_permission(action="access", app='indexer'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
   return render('indexes.mako', request, {
@@ -53,8 +53,18 @@ def indexes(request, index=''):
   })
 
 
-def indexer(request):
+def topics(request, index=''):
   if not request.user.has_hue_permission(action="access", app='search'):
+    raise PopupException(_('Missing permission.'), error_code=403)
+
+  return render('topics.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False),
+    'index': index
+  })
+
+
+def indexer(request):
+  if not request.user.has_hue_permission(action="access", app='indexer'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
   searcher = SolrClient(request.user)
@@ -120,7 +130,7 @@ def install_examples(request, is_redirect=False):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      data = request.POST['data']
+      data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       result['status'] = 0
     except Exception, e:

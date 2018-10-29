@@ -114,7 +114,7 @@ class Rdbms(object):
       server_port='%(server_port)d' % self.client.query_server,
       server_name='%(server_name)s' % self.client.query_server,
       server_type=self.server_type,
-      last_state=QueryHistory.STATE.available.index,
+      last_state=QueryHistory.STATE.available.value,
       design=design,
       notify=False,
       query_type=query.query['type'],

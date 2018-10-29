@@ -24,6 +24,8 @@ from indexer.management.commands import indexer_setup
 
 from search.management.commands import search_setup
 
+from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -31,17 +33,17 @@ LOG = logging.getLogger(__name__)
 def install_examples(request):
   result = {'status': -1, 'message': ''}
 
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     return PopupException(_("You must be a superuser."))
 
   if request.method != 'POST':
     result['message'] = _('A POST request is required.')
   else:
     try:
-      data = request.POST['data']
+      data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       if 'log_analytics_demo' == data: # Hue documents installed only one time
-        search_setup.Command().handle_noargs()
+        search_setup.Command().handle()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)

@@ -90,18 +90,6 @@ def get_auth(ldap_config):
 
   return ldap_conf
 
-def get_connection(ldap_config):
-  global CACHED_LDAP_CONN
-  if CACHED_LDAP_CONN is not None:
-    return CACHED_LDAP_CONN
-
-  search_bind_authentication = ldap_config.SEARCH_BIND_AUTHENTICATION.get()
-  if search_bind_authentication:
-    ldap_obj = LdapConnection(ldap_config, *get_auth(ldap_config))
-  else:
-    ldap_obj = LdapConnection(ldap_config, *get_auth(ldap_config))
-  return ldap_obj
-
 def get_ldap_username(username, nt_domain):
   if nt_domain:
     return '%s@%s' % (username, nt_domain)
@@ -153,9 +141,12 @@ class LdapConnection(object):
     self._username = bind_user
     self._ldap_cert = cert_file
 
-    if cert_file is not None:
-      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
-      ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, cert_file)
+    # Certificate-related config settings
+    if ldap_config.LDAP_CERT.get():
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
+      ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
+    else:
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
     if self.ldap_config.FOLLOW_REFERRALS.get():
       ldap.set_option(ldap.OPT_REFERRALS, 1)
@@ -170,18 +161,26 @@ class LdapConnection(object):
     if bind_user:
       try:
         self.ldap_handle.simple_bind_s(bind_user, bind_password)
-      except:
-        msg = "Failed to bind to LDAP server as user %s" % bind_user
-        LOG.exception(msg)
-        raise LdapBindException(msg)
+      except Exception, e:
+        self.handle_bind_exception(e, bind_user)
     else:
       try:
         # Do anonymous bind
         self.ldap_handle.simple_bind_s('','')
-      except:
+      except Exception, e:
+        self.handle_bind_exception(e)
+
+  def handle_bind_exception(self, exception, bind_user=None):
+    LOG.error("LDAP access bind error: %s" % exception)
+    if 'Can\'t contact LDAP server' in str(exception):
+      msg = "Can\'t contact LDAP server"
+    else:
+      if bind_user:
+        msg = "Failed to bind to LDAP server as user %s" % bind_user
+      else:
         msg = "Failed to bind to LDAP server anonymously"
-        LOG.exception(msg)
-        raise LdapBindException(msg)
+
+    raise LdapBindException(msg)
 
   def _get_search_params(self, name, attr, find_by_dn=False):
     """

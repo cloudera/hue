@@ -35,7 +35,7 @@ import socket
 import sys
 
 from desktop.conf import LDAP
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 from useradmin import ldap_access
 
@@ -137,8 +137,8 @@ will typically work with Active Directory/LDAP. Typically this is member
 for Active Directory and LDAP.
 """
 
-class Command(NoArgsCommand):
-  def print_ldap_setting(self, cfg):
+class Command(BaseCommand):
+  def print_ldap_global_settings(self, cfg, is_multi_ldap):
     LOG.info('[desktop]')
     LOG.info('[[ldap]]')
     LOG.info('create_users_on_login=%s' % cfg.CREATE_USERS_ON_LOGIN.get())
@@ -148,6 +148,15 @@ class Command(NoArgsCommand):
     LOG.info('force_username_uppercase=%s' % cfg.FORCE_USERNAME_UPPERCASE.get())
     LOG.info('subgroups=%s' % cfg.SUBGROUPS.get())
     LOG.info('nested_members_search_depth=%s' % cfg.NESTED_MEMBERS_SEARCH_DEPTH.get())
+    if is_multi_ldap:
+      LOG.info('[[[ldap_servers]]]')
+
+  def print_ldap_setting(self, cfg, is_multi_ldap):
+    if not is_multi_ldap:
+      self.print_ldap_global_settings(cfg, is_multi_ldap)
+    else:
+      LOG.info('[[[[%s]]]]', cfg.prefix.split('.')[3])
+
     LOG.info('follow_referrals=%s' % cfg.FOLLOW_REFERRALS.get())
     LOG.info('debug=%s' % cfg.DEBUG.get())
     LOG.info('debug_level=%s' % cfg.DEBUG_LEVEL.get())
@@ -163,10 +172,20 @@ class Command(NoArgsCommand):
     LOG.info('search_bind_authentication=%s' % cfg.SEARCH_BIND_AUTHENTICATION.get())
     LOG.info('test_ldap_user="%s"' % cfg.TEST_LDAP_USER.get())
     LOG.info('test_ldap_group="%s"' % cfg.TEST_LDAP_GROUP.get())
-    LOG.info('[[[users]]]')
+
+    if not is_multi_ldap:
+      LOG.info('[[[users]]]')
+    else:
+      LOG.info('[[[[[users]]]]]')
+
     LOG.info('user_filter="%s"' % cfg.USERS.USER_FILTER.get())
     LOG.info('user_name_attr="%s"' % cfg.USERS.USER_NAME_ATTR.get())
-    LOG.info('[[[groups]]]')
+
+    if not is_multi_ldap:
+      LOG.info('[[[groups]]]')
+    else:
+      LOG.info('[[[[[groups]]]]]')
+
     LOG.info('group_filter="%s"' % cfg.GROUPS.GROUP_FILTER.get())
     LOG.info('group_name_attr="%s"' % cfg.GROUPS.GROUP_NAME_ATTR.get())
     LOG.info('group_member_attr="%s"' % cfg.GROUPS.GROUP_MEMBER_ATTR.get())
@@ -419,7 +438,7 @@ class Command(NoArgsCommand):
       LOG.warn('LDAP Test Command failed')
     sys.exit(exit_code)
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     """
       ldap_test management command enters here. Main logic as follows:
       * check ldap parameters from hue.ini file
@@ -437,17 +456,24 @@ class Command(NoArgsCommand):
     ldap_config = None
 
     if LDAP.LDAP_SERVERS.get():
-      ldap_config = next(LDAP.LDAP_SERVERS.__iter__())
+      self.print_ldap_global_settings(LDAP, True)
+      for server in LDAP.LDAP_SERVERS.get():
+        ldap_config = LDAP.LDAP_SERVERS.get()[server]
+        err_code = self.check_single_ldap_setting(ldap_config, True)
     else:
       ldap_config = LDAP
+      err_code = self.check_single_ldap_setting(ldap_config)
 
-    self.print_ldap_setting(ldap_config)
+    self.sys_exit(err_code)
+
+
+  def check_single_ldap_setting(self, ldap_config, is_multi_ldap=False):
+    self.print_ldap_setting(ldap_config, is_multi_ldap)
     # Basic validation check for hue.ini's ldap parameters [desktop] > [[ldap]]
     err_code = self.check_ldap_params(ldap_config)
 
     if not err_code:
       # Connect to only one LDAP server given in the hue.ini config
-      # @TODO@ support for multiple LDAP servers
       try:
         connection = ldap_access.get_connection(ldap_config)
       except ldap_access.LdapBindException as err:
@@ -509,4 +535,4 @@ class Command(NoArgsCommand):
         LOG.info('Now test further by providing test ldap user in CM')
         LOG.info('test_ldap_user=someusername')
 
-    self.sys_exit(err_code)
+    return err_code

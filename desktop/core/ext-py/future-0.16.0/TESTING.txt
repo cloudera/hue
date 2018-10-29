@@ -1,0 +1,9 @@
+Currently the tests are passing on OS X and Linux on Python 2.6, 2.7, 3.3 and 3.4.
+
+The test suite can be run either with:
+
+    $ python setup.py test
+
+which uses the unittest module's test discovery mechanism, or with:
+
+    $ py.test

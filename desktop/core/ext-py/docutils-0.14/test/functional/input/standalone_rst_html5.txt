@@ -1,0 +1,207 @@
+.. include:: data/standard.txt
+.. include:: data/header_footer.txt
+.. include:: data/table_colspan.txt
+.. include:: data/table_rowspan.txt
+.. include:: data/table_complex.txt
+.. include:: data/list_table.txt
+.. include:: data/custom_roles.txt
+.. include:: data/svg_images.txt
+.. include:: data/swf_images.txt
+
+Changes to the html4css1 writer
+===============================
+
+* Use only meta keywords recognized by HTML 5.
+
+* Set table column widths with <style="width: ...">, not "width" argument.
+
+* Horizontal alignment of table heads with CSS.
+
+* Field lists as styled definition lists.
+
+* Do not drop paragraph objects, use CSS rules to prevent unwanted vertical
+  space.
+
+* Put subtitles in <p> elements.
+
+Field list handling
+-------------------
+
+The following list demonstrates the problems with the html4css1
+approach: the `field-name-limit` setting is given in "number of
+characters" but the field name uses a proportional font.
+
+:The field name:  is typeset on the same line, unless it is "long".
+
+:this field name: is considered "long" in the html table rendering by
+                  the html4css1 writer with the default setting of
+                  ``--field-name-limit=14``.
+
+:iiiiiiiiiiiiiii: a field name that is considered "long" by html4css1
+                  with the default setting of `field-name-limit: 14`.
+
+:MMMMMMMMMMMMMM: a field name that is actually longer than the
+                 previous one but regarded "short" by html4css1.
+
+With ``html_plain``, a `field list` is typeset as CSS-styled `definition
+list`. The default layout is similar to the look with `html4css1`:
+
+.. class:: open
+
+:A long field name: sticks into the field body.
+
+                The field body is pushed to the next line (you can suppress
+                this behaviour with the `run-in`_ class argument).
+
+:Customization: of the field name width is possible with CSS instead
+                of the `field-name-limit` configuration setting, for
+                example::
+
+                    dl.field-list > dd { margin-left: 6em; }
+
+:Empty:
+
+:fields:       must not lead to misalignment of the following content.
+
+Styling with class arguments
+----------------------------
+
+The ``plain.css`` style sheet comes with some pre-defined style variants
+that can be choosen via a class argument.
+
+Description lists
+`````````````````
+
+Definition lists with the "description" class argument:
+
+.. class:: description
+
+description lists
+  Definition lists that are styled like in most dictionaries,
+  encyclopedias etc. (as well as the LaTeX `description` environment).
+label
+  The term to be described. Put in boldface.
+content
+  Starts on the same line and has a hanging indent.
+
+Field list variants
+```````````````````
+
+For field lists, the "compact/open", "narrow" and "run-in" styles are defined.
+
+*compact*
+  .. class:: compact
+
+  :Feature: No additional space between list items.
+
+  :Option: The ``--compact-field-lists`` command line option (and the
+           corresponding configuration setting) set the `compact`
+           class argument on all "simple" field lists, if not
+           overridden with `open`.
+
+  :Use:  For lists with short field body.
+
+*open*
+  .. class:: open
+
+  :Feature: Additional space between list items also in "simple" lists.
+            (Overrides the ``--compact-field-lists`` command line
+            option and the corresponding configuration setting)
+
+  :Use: For "simple" lists that should keep the space between list items.
+
+*narrow*
+  .. class:: narrow
+
+  :Feature: Less indented field body.
+  :Use:   For lists with short field names.
+  :A long field name:
+       sticks into the field body and the field body starts on a
+       new line (if not combined with `run-in`_).
+
+.. _`run-in`:
+
+*run-in*
+  .. class:: run-in
+
+  :Feature: Field body starts on the same line also after long field
+            names.
+
+  :A long field name: sticks into the field body which continues on
+                         the same line.
+
+  :The next field name:  and field body should align. Long text in the field
+                         body is wrapped and aligns with other fields.
+
+Table variants
+``````````````
+
+The following styles can be applied to individual tables via a class
+argument or as document wide setting with the table-style_ configuration
+setting (or command line argument).
+
+* Numbered tables can be achieved with the "numbered" class option:
+
+  .. table:: truth values
+     :class: numbered
+
+     ======= ======= ==========
+     A       B       A or B
+     ======= ======= ==========
+     False   False   False
+     True    False   True
+     False   True    True
+     True    True    True
+     ======= ======= ==========
+
+  Currently, referencing to the table by number is not supported. This is a
+  common request and already on the `TODO list`.
+
+* A table with "booktabs" class value, is rendered similar to the style
+  from the booktabs_ LaTeX package.
+
+  .. _table-style:
+     http://docutils.sourceforge.net/docs/user/config.html#table-style
+  .. _booktabs:
+     http://tug.ctan.org/tex-archive/macros/latex/contrib/booktabs/booktabs.pdf
+
+"Booktabs" style table, numbered, centre-aligned, with auto-sized columns:
+
+  .. table:: I/O values
+     :class: booktabs numbered
+     :align: center
+     :widths: auto
+
+     ======= ======= ==========
+     Input           Output
+     --------------- ----------
+     A       B       A or B
+     ======= ======= ==========
+     False   False   False
+     True    False   True
+     False   True    True
+     True    True    True
+     ======= ======= ==========
+
+
+.. include:: data/errors.txt
+
+.. footer:: |HTML 5| |validator| |valid-CSS2|
+
+.. |HTML 5| image:: http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics.png
+   :height: 31
+   :width: 88
+   :alt: Conforms to HTML 5
+   :target: http://www.w3.org/TR/html5/
+
+.. |validator| image:: https://validator-suite.w3.org/icons/vs-blue-256.png
+   :height: 31
+   :width: 88
+   :alt: Check validity!
+   :target: http://validator.w3.org/check?uri=referer
+
+.. |valid-CSS2| image:: http://jigsaw.w3.org/css-validator/images/vcss
+   :height: 31
+   :width: 88
+   :alt: Valid CSS 2.1!
+   :target: http://jigsaw.w3.org/css-validator/check/referer

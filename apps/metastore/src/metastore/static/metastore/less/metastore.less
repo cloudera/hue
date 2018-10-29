@@ -19,205 +19,337 @@
 @import (reference) "hue-mixins.less";
 @import (reference) "hue-helpers.less";
 
-.divider {
-  padding-left: 12px;
-  color: @cui-gray-400;
-}
-
-.sidebar-nav {
-  padding: 0;
-}
-
-.card-heading {
-  padding-left: 6px !important;
-  border-bottom: none !important;
-}
-
-.sampleTable td, .sampleTable th {
-  white-space: nowrap;
-}
-
-h2.card-heading {
-  border-bottom: 1px solid @cui-gray-100!important;
-  font-size: 12px!important;
-  font-weight: bold!important;
-}
-
-.filter-box {
-  float: left;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding: 4px;
-  background-color: @cui-gray-050;
-}
-
-.filter-box a.pull-right {
-  margin: 4px;
-}
-
-.filter-box select, .filter-box input {
-  margin-bottom: 0;
-}
-
-.add-filter {
-  margin: 5px;
-  float: left;
-}
-
-.checkbox.inline.pulled {
-  margin-right: 10px;
-  padding-top: 1px;
-}
-
-.checkbox.inline.pulled input {
-  margin-left: 0;
-  margin-right: 4px;
-}
-
-.metastore-main {
-  padding: 20px;
-  padding-top: 10px;
-}
-
-.metastore-main h3 {
-  margin: 0;
-  margin-bottom: 10px;
-}
-
-.empty-header-col,
-.metastore-main h4 {
-  .section-h4-border;
-}
-
-.tile {
-  margin-bottom: 20px;
-  min-height: 124px;
-}
-
-.properties-table {
-  width: 100%;
-}
-
-.properties-table td {
-  padding-top: 5px;
-}
-
-.property-name {
-  padding-left: 10px;
-}
-
-.empty-message {
-  padding: 10px;
-}
-
-.editable-breadcrumbs {
-  cursor: text;
-}
-
-.editable-breadcrumbs:hover {
-  background-color: @cui-purple-gray-050;
-}
-
-.editable-breadcrumb-input {
-  padding: 0!important;
-}
-
-.editable-breadcrumb-input input {
-  font-size: 24px;
-  margin: 0;
-  margin-top: 1px;
-  padding-left: 11px;
-  border-radius: 2px;
-  border: 1px solid @cui-purple-gray-050;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  font-weight: 400;
-}
-
-.acl-panel {
-  border-left: 1px solid @cui-gray-100;
-  padding-top: 6px;
-  padding-left: 12px;
-}
-
-.acl-panel .nav-tabs {
-  margin-bottom: 0;
-}
-
-.acl-panel h4:not(:first-child) {
-  margin-top: 20px;
-}
-
-.acl-panel-content {
-  padding: 6px;
-  overflow-y: scroll;
-}
-
-.acl-block-title {
-  background-color: @cui-purple-gray-050;
-  font-weight: bold;
-  padding: 3px;
-  margin-top: 14px;
-  margin-bottom: 4px;
-}
-
-.acl-block {
-  background-color: @cui-gray-050;
-  padding: 3px;
-  margin-bottom: 4px;
-}
-
-.acl-block .checkbox, .acl-block .radio {
-  margin-left: 6px;
-}
-
-.acl-block-airy {
-  padding: 6px;
-}
-
-.acl-block-airy input {
-  margin-bottom: 0;
-}
-
-.acl-block-section {
-  margin-top: 10px;
-}
-
-.acl-block-section input {
-  margin-left: 14px;
-}
-
-.span6 .acl-block input[type='text'] {
-  width: 25%;
-}
-
-.span6 .acl-block input[type='text'] {
-  width: 21%;
-}
-
-.acl-actions {
-  padding: 5px;
-  text-align: center;
-  color: @cui-gray-400;
-  font-size: 20px;
-}
-
-.acl-actions span:hover {
-  color: @cui-gray-600;
-}
-
-.show-inactive-on-hover {
-  .inactive-action {
-    opacity: 0;
-    vertical-align: top;
+#metastoreComponents {
+  .divider {
+    padding-left: 12px;
+    color: @cui-gray-400;
   }
+
+  .entries-table-container {
+    margin: 0 10px;
+    position:relative;
+
+    .entries-table-header {
+      margin-bottom: 15px;
+    }
+
+    .entries-table-no-header {
+      padding-top: 40px;
+    }
+
+    .actionbar-actions {
+      position:absolute;
+      right:0;
+      top: 0;
+    }
+  }
+
+  .sidebar-nav {
+    padding: 0;
+  }
+
+  .card-heading {
+    padding-left: 6px !important;
+    border-bottom: none !important;
+  }
+
+  .sampleTable td, .sampleTable th {
+    white-space: nowrap;
+  }
+
+  .hue-breadcrumbs-bar {
+    padding-left: 0;
+  }
+
+  h2.card-heading {
+    border-bottom: 1px solid @cui-gray-100!important;
+    font-size: 12px!important;
+    font-weight: bold!important;
+  }
+
+  .filter-box {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 4px;
+    background-color: @cui-gray-050;
+  }
+
+  .filter-box a.pull-right {
+    margin: 4px;
+  }
+
+  .filter-box select, .filter-box input {
+    margin-bottom: 0;
+  }
+
+  .add-filter {
+    margin: 5px;
+    float: left;
+  }
+
+  .checkbox.inline.pulled {
+    margin-right: 10px;
+    padding-top: 1px;
+  }
+
+  .checkbox.inline.pulled input {
+    margin-left: 0;
+    margin-right: 4px;
+  }
+
+  .metastore-main {
+    padding: 20px;
+    padding-top: 10px;
+  }
+
+  .metastore-main h3 {
+    margin: 0;
+    margin-bottom: 10px;
+  }
+
+  .empty-header-col,
+  .metastore-main h4 {
+    .section-h4-border;
+    margin-bottom: 0;
+  }
+
+  .tile {
+    margin-bottom: 20px;
+  }
+
+  .table-description {
+    margin-bottom: 10px;
+    margin-left: 30px;
+    white-space: pre;
+  }
+
+  .properties-table {
+    width: 100%;
+  }
+
+  .properties-table td {
+    padding-top: 5px;
+  }
+
+  .property-name {
+    padding-left: 10px;
+  }
+
+  .empty-message {
+    padding: 10px;
+  }
+
+  .editable-breadcrumbs {
+    cursor: text;
+  }
+
+  .editable-breadcrumbs:hover {
+    background-color: @cui-purple-gray-050;
+  }
+
+  .editable-breadcrumb-input {
+    padding: 0!important;
+  }
+
+  .editable-breadcrumb-input input {
+    font-size: 24px;
+    margin: 0;
+    margin-top: 1px;
+    padding-left: 11px;
+    border-radius: 2px;
+    border: 1px solid @cui-purple-gray-050;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    font-weight: 400;
+  }
+
+  .acl-panel {
+    border-left: 1px solid @cui-gray-100;
+    padding-top: 6px;
+    padding-left: 12px;
+  }
+
+  .acl-panel .nav-tabs {
+    margin-bottom: 0;
+  }
+
+  .acl-panel h4:not(:first-child) {
+    margin-top: 20px;
+  }
+
+  .acl-panel-content {
+    padding: 6px;
+    overflow-y: scroll;
+  }
+
+  .acl-block-title {
+    background-color: @cui-purple-gray-050;
+    font-weight: bold;
+    padding: 3px;
+    margin-top: 14px;
+    margin-bottom: 4px;
+  }
+
+  .acl-block {
+    background-color: @cui-gray-050;
+    padding: 3px;
+    margin-bottom: 4px;
+  }
+
+  .acl-block .checkbox, .acl-block .radio {
+    margin-left: 6px;
+  }
+
+  .acl-block-airy {
+    padding: 6px;
+  }
+
+  .acl-block-airy input {
+    margin-bottom: 0;
+  }
+
+  .acl-block-section {
+    margin-top: 10px;
+  }
+
+  .acl-block-section input {
+    margin-left: 14px;
+  }
+
+  .span6 .acl-block input[type='text'] {
+    width: 25%;
+  }
+
+  .span6 .acl-block input[type='text'] {
+    width: 21%;
+  }
+
+  .acl-actions {
+    padding: 5px;
+    text-align: center;
+    color: @cui-gray-400;
+    font-size: 20px;
+  }
+
+  .acl-actions span:hover {
+    color: @cui-gray-600;
+  }
+
   .editable-unsaved {
     font-weight: normal;
   }
-  &:hover {
+
+  .show-inactive-on-hover {
     .inactive-action {
-      opacity: 1;
+      opacity: 0;
+      vertical-align: top;
+    }
+    &:hover {
+      .inactive-action {
+        opacity: 1;
+      }
+    }
+  }
+
+  .hue-table-browser-desc-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .edit-description-action {
+    position: absolute;
+    left: 10px;
+    top: 2px;
+  }
+
+  .editable-inline-empty {
+    cursor: pointer;
+    font-style: italic;
+    display: inline-block;
+    font-size: 13px;
+    color: @cui-gray-700;
+    margin-right: 4px;
+  }
+
+  .metastore-description-col .editable-container,
+  .hue-table-browser-desc .editable-container,
+  .metastore-description-col .editable-input,
+  .hue-table-browser-desc .editable-input,
+  .hue-table-browser-desc-input {
+    width: 100%;
+  }
+
+  .hue-table-browser-desc {
+    width: 100%;
+    margin: 5px 14px 14px 14px;
+
+    .editable:not(.editable-open) {
+      margin-left: 9px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .editable-inline-empty {
+      font-size: 13px;
+    }
+  }
+
+  .metastore-nav-tags {
+    margin: 5px 0 0 14px;
+  }
+
+  .metastore-description-col .control-group > div,
+  .hue-table-browser-desc .control-group > div {
+    padding-right: 40px;
+  }
+
+  .metastore-description-col .toggle-editable {
+    cursor: pointer;
+  }
+
+  .metastore-description-col {
+    position: relative;
+  }
+
+  .metastore-property:first-child {
+    margin-top: 0;
+  }
+
+  .metastore-property {
+    margin: 5px;
+    div:first-child {
+      display: inline-block;
+      color: @cui-gray-700;
+      margin-right: 3px;
+    }
+
+    div:last-child {
+      display: inline-block;
+    }
+  }
+
+  .metastore-view-more {
+    margin-left: 5px;
+  }
+
+  .metastore-table {
+    margin-bottom: 5px;
+  }
+
+  .metastore-join-column-table {
+    tr {
+      td {
+        border: none !important;
+        padding: 0;
+      }
+
+      td.metastore-join-arrow {
+        padding: 0 15px;
+      }
     }
   }
 }

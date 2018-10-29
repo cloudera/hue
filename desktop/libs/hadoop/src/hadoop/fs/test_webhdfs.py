@@ -298,7 +298,7 @@ class WebhdfsTests(unittest.TestCase):
       listing = self.cluster.fs.listdir(parent)
       assertion(name in listing, "%s should be in %s" % (name, listing))
 
-    name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@#$%^&()_-+='"'''
+    name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@$%^&()_-+='"'''
     prefix = self.prefix + '/tmp/i18n'
     dir_path = '%s/%s' % (prefix, name)
     file_path = '%s/%s' % (dir_path, name)

@@ -1085,9 +1085,9 @@
         });
       });
 
-      it('should suggest keywords for "CREATE TABLE foo (id INT, some FLOAT, bar |"', function () {
+      it('should suggest keywords for "CREATE TABLE foo (id INT, `some` FLOAT, bar |"', function () {
         assertAutoComplete({
-          beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
+          beforeCursor: 'CREATE TABLE foo (id INT, `some` FLOAT, bar ',
           afterCursor: '',
           containsKeywords: ['BOOLEAN'],
           expectedResult: {
@@ -1114,8 +1114,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'SORT BY (baa, boo, ble) WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'SORT BY (baa, boo, ble) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' ' +
+            'LINES TERMINATED BY \'q\' STORED AS PARQUET WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED IN \'boo\';',
             afterCursor: '',
@@ -1366,7 +1366,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AVRO', 'KUDU', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+              suggestKeywords: ['AVRO', 'KUDU', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
             }
           });
         });
@@ -1476,7 +1476,6 @@
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['PARQUET'],
-            doesNotContainKeywords: ['ORC'],
             expectedResult: {
               lowerCase: false
             }
@@ -1535,8 +1534,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName (id INT, col2 STRING COMMENT \'booo\', col3 BIGINT) ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED ',
             afterCursor: '',
@@ -1552,9 +1551,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'SORT BY (baa, boo, ble) WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
-            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
+            'SORT BY (baa, boo, ble) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
@@ -1597,8 +1595,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE TABLE dbOne.tableName ' +
             'COMMENT \'Table comment...\' ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED IN \'boo\' AS ',
             afterCursor: '',
@@ -2936,13 +2934,13 @@
           beforeCursor: 'CREATE VIEW foo AS SELECT a, ',
           afterCursor: ' FROM tableOne',
           hasLocations:true,
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
-            suggestKeywords: ['*']
+            suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] }
           }
         });
       });
@@ -3021,13 +3019,13 @@
             afterCursor: ' FROM tableOne',
             dialect: 'hive',
             hasLocations:true,
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
-              suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
-              suggestKeywords: ['*']
+              suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] }
             }
           });
         });
@@ -3064,6 +3062,42 @@
             beforeCursor: 'CREATE VIEW IF NOT EXISTS boo ',
             afterCursor: '',
             dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW boo (id |"', function () {
+          assertAutoComplete({
+            dialect: 'impala',
+            beforeCursor: 'CREATE VIEW boo (id ',
+            afterCursor: '',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW boo (id COMMENT \'boo\') |"', function () {
+          assertAutoComplete({
+            dialect: 'impala',
+            beforeCursor: 'CREATE VIEW boo (id COMMENT \'boo\') ',
+            afterCursor: '',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW boo (id COMMENT \'boo\') COMMENT \'foo\' |"', function () {
+          assertAutoComplete({
+            dialect: 'impala',
+            beforeCursor: 'CREATE VIEW boo (id COMMENT \'boo\') COMMENT \'foo\' ',
+            afterCursor: '',
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS']

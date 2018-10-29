@@ -796,7 +796,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/sqlAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1807,11 +1806,11 @@ $(document).one('fetched.design', editables);
 $(document).one('fetched.query', editables);
 
 function isNumericColumn(type) {
-  return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE', 'DATETIME_TYPE']) > -1;
 }
 
 function isDateTimeColumn(type) {
-  return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+  return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE', 'DATETIME_TYPE']) > -1;
 }
 
 function isStringColumn(type) {
@@ -2842,7 +2841,7 @@ viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
 var handleAssistSelection = function (databaseDef) {
-  if (databaseDef.source === snippetType && snippet.database() !== databaseDef.name) {
+  if (databaseDef.sourceType === snippetType && snippet.database() !== databaseDef.name) {
     snippet.database(databaseDef.name);
   }
 };

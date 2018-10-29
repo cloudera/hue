@@ -91,10 +91,17 @@ def config_settings_loader(request):
     # set to 1 to output debugging information
     'debug': 1,
 
-    # certificate
+    # Signing
     'key_file': libsaml.conf.KEY_FILE.get(),
     'key_file_passphrase': libsaml.conf.get_key_file_password(),
-    'cert_file': libsaml.conf.CERT_FILE.get()
+    'cert_file': libsaml.conf.CERT_FILE.get(),
+
+    # Encryption
+    'encryption_keypairs': [{
+      'key_file': libsaml.conf.KEY_FILE.get(),  # private part
+      'key_file_passphrase': libsaml.conf.get_key_file_password(),
+      'cert_file': libsaml.conf.CERT_FILE.get(),  # public part
+    }],
   })
 
   return conf

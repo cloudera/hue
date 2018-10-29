@@ -20,7 +20,7 @@ import logging
 import os
 
 from django.core import management
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
@@ -39,7 +39,7 @@ from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
   def install_pig_script(self, sample_user):
     doc2 = None
@@ -49,12 +49,14 @@ class Command(NoArgsCommand):
       LOG.info("Sample pig editor script already installed.")
       doc2 = Document2.objects.get(owner=sample_user, name=name, type='query-pig', is_history=False)
     else:
-      statement = """data = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);
+      statement = """REGISTER hdfs://{}/piggybank.jar;
+
+data = LOAD '{}/data/midsummer.txt' as (text:CHARARRAY);
 
 upper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);
 
 STORE upper_case INTO '$output';
-"""
+""".format(REMOTE_SAMPLE_DIR.get(), REMOTE_SAMPLE_DIR.get())
       snippet_properties = {
         'hadoopProperties': [],
         'parameters': [],
@@ -96,7 +98,7 @@ STORE upper_case INTO '$output';
     return doc2
 
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     fs = cluster.get_hdfs()
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
     remote_dir = REMOTE_SAMPLE_DIR.get()
@@ -127,9 +129,9 @@ STORE upper_case INTO '$output';
     else:
       # Install old pig script fixture
       LOG.info("Using Hue 3, will install pig script fixture.")
-
-      management.call_command('loaddata', 'initial_pig_examples.json', verbosity=2)
-      Document.objects.sync()
+      with transaction.atomic():
+        management.call_command('loaddata', 'initial_pig_examples.json', verbosity=2, commit=False)
+        Document.objects.sync()
 
     if USE_NEW_EDITOR.get():
       # Get or create sample user directories

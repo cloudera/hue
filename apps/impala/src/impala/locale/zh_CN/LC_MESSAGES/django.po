@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -21,16 +21,16 @@ msgstr ""
 msgid "Successfully invalidated metadata"
 msgstr "已成功使元数据无效"
 
-#: src/impala/api.py:65
+#: src/impala/api.py:64
 #, python-format
 msgid "Successfully refreshed metadata for `%s`.`%s`"
 msgstr "已成功刷新 `%s`.`%s` 元数据"
 
-#: src/impala/api.py:80
+#: src/impala/api.py:79
 msgid "get_exec_summary requires a valid query_history_id"
 msgstr "get_exec_summary 需要有效的 query_history_id"
 
-#: src/impala/api.py:102
+#: src/impala/api.py:101
 msgid "get_runtime_profile requires a valid query_history_id"
 msgstr "get_runtime_profile 需要有效的 query_history_id"
 
@@ -81,11 +81,11 @@ msgstr ""
 msgid ""
 "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
 "if Impala does not do any work (compute or send back results) for that "
-"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+"session within SESSION_TIMEOUT_S seconds. Default: 30 min."
 msgstr ""
-"如果 SESSION_TIMEOUT_S > 0，"
-"则当 Impala 在 QUERY_TIMEOUT_S 秒内没有对该"
-"会话执行任何操作（计算或发回结果）时，该会话将超时（例如，取消）。默认值：1 小时。"
+"如果 SESSION_TIMEOUT_S > 0，则当 Impala 在 SESSION_TIMEOUT_S 秒内"
+"没有对该会话执行任何操作（计算或发回结果）时，"
+"该会话将超时（例如，取消）。默认值：30 分钟"
 
 #: src/impala/conf.py:102
 msgid ""

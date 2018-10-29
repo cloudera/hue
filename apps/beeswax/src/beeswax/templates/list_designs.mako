@@ -89,32 +89,34 @@ ${ layout.menubar(section='saved queries') }
       </tr>
     </thead>
     <tbody>
-      % for design in page.object_list:
-        <%
-          may_edit = design.doc.get().can_write(user)
-        %>
-      <tr>
-        <td data-row-selector-exclude="true">
-          <div class="hueCheckbox savedCheck fa"
-              data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
-              data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
-            % if may_edit:
-              data-delete-name="${ design.id }"
-            % endif
-            data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
-        </td>
-        <td>
-          <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
-        </td>
-        <td>
-        % if design.desc:
-          ${ force_unicode(design.desc) }
-        % endif
-        </td>
-        <td>${ design.owner.username }</td>
-        <td data-sort-value="${time.mktime(design.mtime.timetuple())}"></td>
-      </tr>
-      % endfor
+      % if page:
+        % for design in page.object_list:
+          <%
+            may_edit = design.doc.get().can_write(user)
+          %>
+        <tr>
+          <td data-row-selector-exclude="true">
+            <div class="hueCheckbox savedCheck fa"
+                data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
+                data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
+              % if may_edit:
+                data-delete-name="${ design.id }"
+              % endif
+              data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
+          </td>
+          <td>
+            <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
+          </td>
+          <td>
+          % if design.desc:
+            ${ force_unicode(design.desc) }
+          % endif
+          </td>
+          <td>${ design.owner.username }</td>
+          <td data-sort-value="${time.mktime(design.mtime.timetuple())}"></td>
+        </tr>
+        % endfor
+      % endif
     </tbody>
   </table>
     <div class="card-body">

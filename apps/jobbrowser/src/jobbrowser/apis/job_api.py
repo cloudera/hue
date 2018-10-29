@@ -18,16 +18,18 @@
 import json
 import logging
 
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from hadoop.yarn import resource_manager_api
 
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
-from jobbrowser.conf import MAX_JOB_FETCH
-from jobbrowser.views import job_single_logs
+from jobbrowser.conf import MAX_JOB_FETCH, LOG_OFFSET
+from jobbrowser.views import job_executor_logs, job_single_logs
 
 
 LOG = logging.getLogger(__name__)
+LOG_OFFSET_BYTES = LOG_OFFSET.get()
 
 
 try:
@@ -55,8 +57,8 @@ class JobApi(Api):
   def action(self, app_ids, operation):
     return self._get_api(app_ids).action(operation, app_ids)
 
-  def logs(self, appid, app_type, log_name):
-    return self._get_api(appid).logs(appid, app_type, log_name)
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
+    return self._get_api(appid).logs(appid, app_type, log_name, is_embeddable)
 
   def profile(self, appid, app_type, app_property, app_filters):
     return self._get_api(appid).profile(appid, app_type, app_property, app_filters)
@@ -66,8 +68,10 @@ class JobApi(Api):
       return self.yarn_api
     elif appid.startswith('task_'):
       return YarnMapReduceTaskApi(self.user, appid)
-    elif appid.startswith('attempt_'):
+    elif appid.startswith('attempt_') or appid.startswith('appattempt_'):
       return YarnMapReduceTaskAttemptApi(self.user, appid)
+    elif appid.find('_executor_') > 0:
+      return SparkExecutorApi(self.user, appid)
     else:
       return self.yarn_api # application_
 
@@ -169,15 +173,27 @@ class YarnApi(Api):
           'desiredReduces': app['desiredReduces'] or 0,
           'durationFormatted': app['durationFormatted'],
           'startTimeFormatted': app['startTimeFormatted'],
-
+          'diagnostics': app['diagnostics'] if app['diagnostics'] else '',
           'tasks': [],
           'metadata': [],
           'counters': []
       }
     elif app['applicationType'] == 'SPARK':
+      app['logs'] = job.logs_url if hasattr(job, 'logs_url') else ''
+      app['trackingUrl'] = job.trackingUrl if hasattr(job, 'trackingUrl') else ''
       common['type'] = 'SPARK'
       common['properties'] = {
-        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems()]
+        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems() if name != "url" and name != "killUrl"],
+        'executors': []
+      }
+      if hasattr(job, 'metrics'):
+        common['metrics'] = job.metrics
+    elif app['applicationType'] == 'Oozie Launcher':
+      common['properties'] = {
+        'startTime': job.startTime,
+        'finishTime': job.finishTime,
+        'elapsedTime': job.duration,
+        'attempts': []
       }
 
     return common
@@ -196,22 +212,25 @@ class YarnApi(Api):
       return {}
 
 
-  def logs(self, appid, app_type, log_name):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     logs = ''
     try:
-      if app_type == 'MAPREDUCE':
+      if app_type == 'MAPREDUCE' or app_type == 'Oozie Launcher':
         if log_name == 'default':
           response = job_single_logs(MockDjangoRequest(self.user), job=appid)
           logs = json.loads(response.content).get('logs')
           if logs and len(logs) == 4:
             logs = logs[1]
         else:
-          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
+          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name, is_embeddable=is_embeddable)
           logs = json.loads(response.content).get('log')
+      elif app_type == 'SPARK':
+        response = job_executor_logs(MockDjangoRequest(self.user), job=appid, name=log_name)
+        logs = json.loads(response.content).get('log')
       else:
         logs = None
     except PopupException, e:
-      LOG.warn('No task attempt found for logs: %s' % e)
+      LOG.warn('No task attempt found for logs: %s' % smart_str(e))
     return {'logs': logs}
 
 
@@ -226,7 +245,18 @@ class YarnApi(Api):
         return NativeYarnApi(self.user).get_job(jobid=appid).full_job_conf
       elif app_property == 'counters':
         return NativeYarnApi(self.user).get_job(jobid=appid).counters
-
+    elif app_type == 'SPARK':
+      if app_property == 'executors':
+        return {
+          'executor_list': NativeYarnApi(self.user).get_job(jobid=appid).get_executors(),
+          'filter_text': ''
+        }
+    elif app_type == 'Oozie Launcher':
+      if app_property == 'attempts':
+        return {
+          'task_list': NativeYarnApi(self.user).get_job(jobid=appid).job_attempts['jobAttempt'],
+          'filter_text': ''
+        }
     return {}
 
   def _api_status(self, status):
@@ -294,12 +324,12 @@ class YarnMapReduceTaskApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
 
     try:
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name, is_embeddable=is_embeddable)
       logs = json.loads(response.content)['log']
     except PopupException, e:
       LOG.warn('No task attempt found for default logs: %s' % e)
@@ -344,8 +374,9 @@ class YarnMapReduceTaskAttemptApi(Api):
 
   def __init__(self, user, app_id):
     Api.__init__(self, user)
-    self.app_id = '_'.join(app_id.replace('task_', 'application_').replace('attempt_', 'application_').split('_')[:3])
-    self.task_id = '_'.join(app_id.replace('attempt_', 'task_').split('_')[:5])
+    start = 'appattempt_' if app_id.startswith('appattempt_') else 'attempt_'
+    self.app_id = '_'.join(app_id.replace('task_', 'application_').replace(start, 'application_').split('_')[:3])
+    self.task_id = '_'.join(app_id.replace(start, 'task_').split('_')[:5])
     self.attempt_id = app_id
 
 
@@ -371,7 +402,7 @@ class YarnMapReduceTaskAttemptApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
 
@@ -401,24 +432,85 @@ class YarnMapReduceTaskAttemptApi(Api):
     return {
         #"elapsedMergeTime" : task.elapsedMergeTime,
         #"shuffleFinishTime" : task.shuffleFinishTime,
-        "assignedContainerId" : task.assignedContainerId,
-        "progress" : task.progress,
-        "elapsedTime" : task.elapsedTime,
-        "state" : task.state,
+        "assignedContainerId" : task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',
+        "progress" : task.progress if hasattr(task, 'progress') else '',
+        "elapsedTime" : task.elapsedTime if hasattr(task, 'elapsedTime') else '',
+        "state" : task.state if hasattr(task, 'state') else task.appAttemptState if hasattr(task, 'appAttemptState') else '',
         #"elapsedShuffleTime" : task.elapsedShuffleTime,
         #"mergeFinishTime" : task.mergeFinishTime,
-        "rack" : task.rack,
+        "rack" : task.rack if hasattr(task, 'rack') else '',
         #"elapsedReduceTime" : task.elapsedReduceTime,
-        "nodeHttpAddress" : task.nodeHttpAddress,
-        "type" : task.type + '_ATTEMPT',
-        "startTime" : task.startTime,
-        "id" : task.id,
-        "finishTime" : task.finishTime,
+        "nodeHttpAddress" : task.nodeHttpAddress if hasattr(task, 'nodeHttpAddress') else '',
+        "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
+        "startTime" : task.startTime if hasattr(task, 'startTime') else '',
+        "id" : task.id if hasattr(task, 'id') else task.appAttemptId if hasattr(task, 'appAttemptId') else '',
+        "finishTime" : task.finishTime if hasattr(task, 'finishTime') else long(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
-        'apiStatus': self._api_status(task.state),
+        'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',
+        'host': task.host if hasattr(task, 'host') else '',
+        'rpcPort': task.rpcPort if hasattr(task, 'rpcPort') else '',
+        'diagnosticsInfo': task.diagnosticsInfo if hasattr(task, 'diagnosticsInfo') else ''
     }
 
 
 class YarnAtsApi(Api):
   pass
+
+
+class SparkExecutorApi(Api):
+
+  def __init__(self, user, app_id):
+    Api.__init__(self, user)
+    self.app_executor_id = app_id
+    self.executor_id, self.app_id = app_id.split('_executor_')
+    job = NativeYarnApi(self.user).get_job(jobid=self.app_id)
+    if job:
+      executors = job.get_executors()
+      self._executors = [executor for executor in executors if executor['executor_id'] == self.executor_id]
+      self.history_server_api = job.history_server_api
+
+  def set_for_test(self, hs_api):
+    self.history_server_api = hs_api
+
+  def app(self, appid):
+    common = {}
+
+    if self._executors and self._executors[0]:
+      common = self._massage_executor(self._executors[0])
+      common['properties'] = {
+          'metadata': [],
+          'counters': []
+      }
+      common['properties'].update(self._massage_executor(self._executors[0]))
+
+    return common
+
+  def _massage_executor(self, executor):
+    return {
+       "app_id": self.app_id,
+       "type": 'SPARK_EXECUTOR',
+       "id": self.app_executor_id,
+       "executor_id": executor['executor_id'],
+       "address": executor['address'],
+       "rdd_blocks": executor['rdd_blocks'],
+       "storage_memory": executor['storage_memory'],
+       "disk_used": executor['disk_used'],
+       "active_tasks": executor['active_tasks'],
+       "failed_tasks": executor['failed_tasks'],
+       "complete_tasks": executor['complete_tasks'],
+       "task_time": executor['task_time'],
+       "input": executor['input'],
+       "shuffle_read": executor['shuffle_read'],
+       "shuffle_write": executor['shuffle_write'],
+       "logs": executor['logs']
+    }
+
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
+    log = ""
+
+    if self._executors and self._executors[0]:
+      log = self.history_server_api.download_executor_logs(self.user, self._executors[0], log_name, LOG_OFFSET_BYTES)
+    return {
+       "logs": log
+    }

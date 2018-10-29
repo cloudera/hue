@@ -22,6 +22,15 @@ PREFIX=/usr/share make install
 ${PREFIX}/hue/build/env/bin/supervisor
 
 
+Upgrade
+-------
+Stop the current Hue and do a database backup.
+Install the new Hue to replace the old one and run the database migrations:
+
+./build/env/bin/hue syncdb
+./build/env/bin/hue migrate
+
+
 Configure Hadoop
 ----------------
 

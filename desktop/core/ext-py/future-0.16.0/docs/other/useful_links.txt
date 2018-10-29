@@ -1,0 +1,111 @@
+Official words on porting:
+--------------------------
+http://docs.python.org/2/howto/pyporting.html
+http://wiki.python.org/moin/Python2orPython3
+
+Other docs to read about porting to Py3:
+----------------------------------------
+
+https://github.com/nltk/nltk/blob/2and3/web/dev/python3porting.rst (particularly about doctests)
+https://ep2013.europython.eu/media/conference/slides/python-3-the-next-generation-is-here-already.pdf
+http://lucumr.pocoo.org/2011/1/22/forwards-compatible-python/
+Supporting both 2 and 3 without 2to3 conversion: http://python3porting.com/noconv.html
+http://python3porting.com/strategies.html
+http://techspot.zzzeek.org/2011/01/24/zzzeek-s-guide-to-python-3-porting/
+http://dabeaz.blogspot.com.au/2011/01/porting-py65-and-my-superboard-to.html
+http://wolfprojects.altervista.org/talks/unicode-and-python-3/
+
+Porting Django apps: https://docs.djangoproject.com/en/dev/topics/python3/
+http://www.wefearchange.org/2012/01/python-3-porting-fun-redux.html
+
+http://lucumr.pocoo.org/2011/12/7/thoughts-on-python3/
+
+http://python3porting.com/fixers.html
+http://washort.twistedmatrix.com/2010/11/unicode-in-python-and-how-to-prevent-it.html
+http://docs.python.org/release/3.0.1/whatsnew/3.0.html
+https://pypi.python.org/pypi/unicode-nazi
+http://www.rmi.net/~lutz/strings30.html
+
+"Porting your code to Python 3": Alexandre Vassalotti: peadrop.com/slides/mp5.pdf
+
+Migration problems:
+-------------------
+http://python3porting.com/problems.html
+http://www.wefearchange.org/2012/01/python-3-porting-fun-redux.html
+
+Six module: http://pythonhosted.org/six/
+
+Dive Into Python: Appendix A: Porting Code to Python 3 with 2to3: http://getpython3.com/diveintopython3/porting-code-to-python-3-with-2to3.html
+
+Stdlib reorganization: http://python3porting.com/stdlib.html
+
+python-modernize: https://github.com/mitsuhiko/python-modernize
+
+2to3 docs describing the different fixers: http://docs.python.org/2/library/2to3.html
+
+Injecting code into running Python processes (hopefully not needed): https://pypi.python.org/pypi/pyrasite/2.0
+
+Withdrawn PEP to help with the Py3k standard library transition: http://www.peps.io/364/
+
+Import hooks
+------------
+http://www.peps.io/302/
+"Hacking Python imports ... for fun and profit": blog post from 2012-05: http://xion.org.pl/2012/05/06/hacking-python-imports/
+
+Full importlib backport to Py2: https://pypi.python.org/pypi/backport_importlib/0...1
+
+Python 2.7 importlib subset: http://docs.python.org/2/whatsnew/2.7.html#importlib-section
+
+Post-import hooks (rendered obsolete by importlib): http://blog.cdleary.com/2009/04/monstrous-polymorphism-and-a-python-post-import-hook-decorator/
+
+'An import hook for Python 3 that removes u prefixes '
+                 'from Python source code before compiling it.': https://bitbucket.org/vinay.sajip/uprefix/
+
+
+__future__ imports
+------------------
+http://simeonvisser.com/posts/how-does-from-future-import-work-in-python.html
+http://docs.python.org/2/library/__future__.html
+
+lib3to2
+-------
+https://bitbucket.org/amentajo/lib3to2
+http://www.startcodon.com/wordpress/category/3to2/
+
+Unicode and bytes
+-----------------
+PEPs: 358, 3112, 3137, 3138
+http://python3porting.com/noconv.html#unicode-section
+Unicode literals u'...' back in Python 3.3: http://www.python.org/dev/peps/pep-0414/
+https://github.com/django/django/blob/master/django/utils/encoding.py
+https://pypi.python.org/pypi/unicode-nazi
+http://docs.python.org/3/library/stdtypes.html#bytes-methods
+http://wolfprojects.altervista.org/talks/unicode-and-python-3/
+Buffer protocol (which bytes and bytes-like objects obey): http://docs.python.org/3.3/c-api/buffer.html#bufferobjects
+
+
+Python's future
+----------------
+https://ncoghlan_devs-python-notes.readthedocs.org/en/latest/python3/questions_and_answers.html
+
+http://www.ironfroggy.com/software/i-am-worried-about-the-future-of-python
+
+Backporting
+-----------
+http://stackoverflow.com/questions/7507492/is-backporting-python-3s-range-to-python-2-a-bad-idea
+
+
+Other
+-----
+Type-checking decorators (maybe useful for implementing a Py3-like bytes
+object in Py2): http://wiki.python.org/moin/PythonDecoratorLibrary#Type_Enforcement_.28accepts.2Freturns.29
+Also: typecheck module on PyPI
+
+To categorize
+-------------
+
+https://pypi.python.org/pypi/awkwardduet/1.1a4
+https://github.com/campadrenalin/persei/blob/master/persei.py
+http://slideshare.net/dabeaz/mastering-python-3-io
+http://rmi.net/~lutz/strings30.html
+

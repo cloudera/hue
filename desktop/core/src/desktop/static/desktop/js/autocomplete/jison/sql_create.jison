@@ -167,35 +167,35 @@ TableDefinition_EDIT
  ;
 
 TableDefinitionRightPart
- : TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ : TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
  ;
 
 TableDefinitionRightPart_EDIT
- : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment PartitionedBy_EDIT OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy SortBy_EDIT OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy WithSerdeproperties_EDIT OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties ClusteredBy_EDIT
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   SkewedBy_EDIT OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy StoredAsOrBy_EDIT OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy HdfsLocation_EDIT OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn WithReplication_EDIT OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement_EDIT
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalWithSerdeproperties OptionalClusteredBy
-   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached 'CURSOR'
+ : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment PartitionedBy_EDIT OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy SortBy_EDIT OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy ClusteredBy_EDIT OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy SkewedBy_EDIT
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   StoredAsOrBy_EDIT OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy WithSerdeproperties_EDIT OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties HdfsLocation_EDIT OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties CachedIn WithReplication_EDIT OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached OptionalAsSelectStatement_EDIT
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalSortBy OptionalClusteredBy OptionalSkewedBy
+   OptionalStoredAsOrBy OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalCachedInOrUncached 'CURSOR'
    {
      var keywords = [];
      if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10 && !$11) {
@@ -216,25 +216,25 @@ TableDefinitionRightPart_EDIT
        if (parser.isImpala() && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10 && !$11) {
          keywords.push({ value: 'SORT BY', weight: 9 });
        }
-       if (parser.isImpala() && !$5 && !$6 && !$7 && !$8 && !$9 && !$10 && !$11) {
-         keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 8 });
+       if (parser.isHive() && !$5 && !$6 && !$7 && !$8 && !$9 && !$10 && !$11) {
+         keywords.push({ value: 'CLUSTERED BY', weight: 8 });
        }
        if (parser.isHive() && !$6 && !$7 && !$8 && !$9 && !$10 && !$11) {
-         keywords.push({ value: 'CLUSTERED BY', weight: 7 });
+         keywords.push({ value: 'SKEWED BY', weight: 7 });
+       } else if (parser.isHive() && $6 && $6.suggestKeywords && !$7 && !$8 && !$9 && !$10 && !$10) {
+         keywords = keywords.concat(parser.createWeightedKeywords($6.suggestKeywords, 7)); // Get the last optional from SKEWED BY
        }
-       if (parser.isHive() && !$7 && !$8 && !$9 && !$10 && !$11) {
-         keywords.push({ value: 'SKEWED BY', weight: 6 });
-       } else if (parser.isHive() && $7 && $7.suggestKeywords && !$8 && !$9 && !$10 && !$10) {
-         keywords = keywords.concat(parser.createWeightedKeywords($7.suggestKeywords, 6)); // Get the last optional from SKEWED BY
-       }
-       if (!$8 && !$9 && !$10 && !$11) {
-         keywords.push({ value: 'ROW FORMAT', weight: 5 });
-         keywords.push({ value: 'STORED AS', weight: 5 });
+       if (!$7 && !$8 && !$9 && !$10 && !$11) {
+         keywords.push({ value: 'ROW FORMAT', weight: 6 });
+         keywords.push({ value: 'STORED AS', weight: 6 });
          if (parser.isHive()) {
-           keywords.push({ value: 'STORED BY', weight: 5 });
+           keywords.push({ value: 'STORED BY', weight: 6 });
          }
-       } else if ($8 && $8.suggestKeywords && !$9 && !$10 && !$11) {
-         keywords = keywords.concat(parser.createWeightedKeywords($8.suggestKeywords, 5));
+       } else if ($7 && $7.suggestKeywords && !$8 && !$9 && !$10 && !$11) {
+         keywords = keywords.concat(parser.createWeightedKeywords($7.suggestKeywords, 6));
+       }
+       if ((($7 && $7.storedBy) || parser.isImpala()) && !$8 && !$9 && !$10 && !$11) {
+         keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 5 });
        }
        if (!$9 && !$10 && !$11) {
          keywords.push({ value: 'LOCATION', weight: 4 });
@@ -336,6 +336,7 @@ ColumnSpecificationList_EDIT
 ColumnSpecification
  : ColumnIdentifier ColumnDataType OptionalColumnOptions
    {
+     $$ = $1;
      var keywords = [];
      if (parser.isImpala()) {
        if (!$3['primary']) {
@@ -365,7 +366,7 @@ ColumnSpecification
        }
      }
      if (keywords.length > 0) {
-       $$ = { suggestKeywords: keywords };
+       $$.suggestKeywords = keywords;
      }
    }
  ;
@@ -999,11 +1000,9 @@ StoredAsOrBy
    {
      $$ = parser.mergeSuggestKeywords($3, $4)
    }
- | '<hive>STORED' 'BY' QuotedValue OptionalWithSerdeproperties
+ | '<hive>STORED' 'BY' QuotedValue
   {
-    if (!$4) {
-      $$ = { suggestKeywords: ['WITH SERDEPROPERTIES'] };
-    }
+    $$ = { storedBy: true }
   }
  ;
 
@@ -1035,7 +1034,6 @@ StoredAsOrBy_EDIT
      parser.suggestKeywords(['AS']);
    }
  | 'ROW' HiveOrImpalaFormat HiveOrImpalaRowFormat StoredAs_EDIT
- | '<hive>STORED' 'BY' QuotedValue WithSerdeproperties_EDIT
  ;
 
 OptionalStoredAs
@@ -1064,6 +1062,7 @@ FileFormat
  | '<hive>TEXTFILE'
  | '<impala>AVRO'
  | '<impala>KUDU'
+ | '<impala>ORC'
  | '<impala>PARQUET'
  | '<impala>RCFILE'
  | '<impala>SEQUENCEFILE'
@@ -1082,12 +1081,7 @@ HiveOrImpalaRowFormat_EDIT
 
 HiveRowFormat
  : HiveDelimitedRowFormat
- | '<hive>SERDE' QuotedValue OptionalWithSerdeproperties
-   {
-     if (!$3) {
-       $$ = { suggestKeywords: [{ value: 'WITH SERDEPROPERTIES', weight: 1 }] };
-     }
-   }
+ | '<hive>SERDE' QuotedValue
  ;
 
 HiveRowFormat_EDIT
@@ -1312,15 +1306,19 @@ ViewDefinition_EDIT
      }
    }
  | AnyCreate AnyView OptionalIfNotExists_EDIT
+ | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedViewColumnList_EDIT OptionalComment OptionalHiveTblproperties
  | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties 'CURSOR'
    {
-     if (parser.isHive() && !$6 && !$7) {
-       parser.suggestKeywords([{ value: 'COMMENT', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
-     } else if (parser.isHive() && !$7) {
-       parser.suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
-     } else {
-       parser.suggestKeywords([{value: 'AS', weight: 1 }]);
+     var keywords = [{value: 'AS', weight: 1 }];
+     if (!$7) {
+       if (parser.isHive()) {
+         keywords.push({ value: 'TBLPROPERTIES', weight: 2 });
+       }
+       if (!$6) {
+         keywords.push({ value: 'COMMENT', weight: 3 });
+       }
      }
+     parser.suggestKeywords(keywords);
    }
  | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs 'CURSOR'
    {
@@ -1689,9 +1687,25 @@ ParenthesizedViewColumnList
  : '(' ViewColumnList ')'
  ;
 
+ParenthesizedViewColumnList_EDIT
+ : '(' ViewColumnList_EDIT RightParenthesisOrError
+   {
+     if (!$2) {
+       parser.suggestKeywords(['COMMENT']);
+     }
+   }
+ ;
+
 ViewColumnList
  : ColumnReference OptionalComment
  | ViewColumnList ',' ColumnReference OptionalComment
+ ;
+
+ViewColumnList_EDIT
+ : ColumnReference OptionalComment 'CURSOR'                                        --> $2
+ | ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList                     --> $2
+ | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR'                     --> $4
+ | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList  --> $4
  ;
 
 RoleDefinition

@@ -124,20 +124,8 @@ def create_tables(model):
 
   This is a subset of django.core.management.commands.syncdb
   """
-  from django.core.management import sql
   from django.db import connection
-  from django.core.management.color import no_style
+  from django.db.models import Model
 
-  cursor = connection.cursor()
-  def execute(statements):
-    for statement in statements:
-      logging.debug("Executing: " + statement)
-      cursor.execute(statement)
-
-  STYLE = no_style()
-  execute(connection.creation.sql_create_model(model, STYLE)[0])
-  execute(connection.creation.sql_indexes_for_model(model, STYLE))
-  # Skipping custom sql and many-to-many, since those rely on 
-  # loading the app modules.
-  # execute(sql.custom_sql_for_model(model, STYLE))
-  # execute(connection.creation.sql_for_many_to_many(model, STYLE))
+  with connection.schema_editor() as editor:
+    editor.create_model(model)

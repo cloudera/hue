@@ -23,12 +23,12 @@ import urllib
 
 from django.forms import Widget, Field
 from django import forms
-from django.forms.util import ErrorList, ValidationError, flatatt
+from django.forms.utils import ErrorList, ValidationError, flatatt
 from django.forms.fields import MultiValueField, CharField, ChoiceField, BooleanField
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
 from django.utils import formats
 from django.utils.safestring import mark_safe
-from django.utils.encoding import StrAndUnicode, force_unicode
+from django.utils.encoding import python_2_unicode_compatible, force_unicode
 
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
@@ -36,6 +36,15 @@ from desktop.lib.i18n import smart_str
 
 LOG = logging.getLogger(__name__)
 
+try:
+  from django.utils.encoding import StrAndUnicode
+except ImportError:
+  from django.utils.encoding import python_2_unicode_compatible
+
+  @python_2_unicode_compatible
+  class StrAndUnicode(object):
+    def __str__(self):
+      return self.code
 
 class SplitDateTimeWidget(forms.MultiWidget):
   """
@@ -324,7 +333,12 @@ class SubmitButton(Input):
   def render(self, name, value, attrs=None):
     if value is None:
       value = 'True'
-    final_attrs = self.build_attrs(attrs, type=self.input_type, name=name, value=value)
+
+    extra_attrs = dict(type=self.input_type, name=name)
+    if self.attrs:
+      extra_attrs.update(self.attrs)
+    final_attrs = self.build_attrs(attrs, extra_attrs=extra_attrs)
+
     if value != '':
       # Only add the 'value' attribute if a value is non-empty.
       final_attrs['value'] = force_unicode(value)

@@ -83,8 +83,8 @@ ${ comps.menubar() }
                   <tbody>
                   % for attempt in task.attempts:
                     <tr>
-                      <td data-row-selector-exclude="true"><a href="${ url('jobbrowser.views.single_task_attempt_logs', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a></td>
-                      <td><a title="${_('View this attempt')}" href="${ url('jobbrowser.views.single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
+                      <td data-row-selector-exclude="true"><a href="${ url('single_task_attempt_logs', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a></td>
+                      <td><a title="${_('View this attempt')}" href="${ url('single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
                       <td>${"%d" % (attempt.progress * 100)}%</td>
                       <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
                       <td>

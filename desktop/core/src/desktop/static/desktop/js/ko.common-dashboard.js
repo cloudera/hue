@@ -133,7 +133,7 @@ var Row = function (widgets, vm, columns) {
   self.columns = ko.observableArray(columns ? columns : []);
   self.columns.subscribe(function (val) {
     self.columns().forEach(function (col) {
-      col.percWidth(Math.max(3, (100 - self.columns().length * BOOTSTRAP_RATIOS.MARGIN()) / self.columns().length));
+      col.percWidth(Math.max(3, (100 - self.columns().length * hueUtils.bootstrapRatios.margin()) / self.columns().length));
     });
   });
 
@@ -229,13 +229,15 @@ var Widget = function (params) {
   }
 
   self.size = ko.observable(params.size).extend({ numeric: 0 });
+  self.gridsterHeight = ko.observable(params.gridsterHeight).extend({ numeric: 0 });
 
   self.name = ko.observable(params.name);
   self.id = ko.observable(params.id);
   self.widgetType = ko.observable(typeof params.widgetType != "undefined" && params.widgetType != null ? params.widgetType : "empty-widget");
   self.properties = ko.observable(typeof params.properties != "undefined" && params.properties != null ? params.properties : {});
   self.offset = ko.observable(typeof params.offset != "undefined" && params.offset != null ? params.offset : 0).extend({ numeric: 0 });
-  self.isLoading = ko.observable(typeof params.isLoading != "undefined" && params.isLoading != null ? params.isLoading : false);
+  self.isLoading = ko.observable(!!params.isLoading);
+  self.isEditing = ko.observable(!!params.isEditing);
 
   self.klass = ko.computed(function () {
     return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
@@ -346,6 +348,7 @@ function setLayout(colSizes, vm) {
 
   vm.columns(_cols);
 
+  huePubSub.publish('dashboard.set.layout');
   $(document).trigger("setLayout");
 }
 

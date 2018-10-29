@@ -128,6 +128,24 @@ def is_https_enabled():
   """Hue is configured for HTTPS."""
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 
+USE_CHERRYPY_SERVER = Config(
+  key="use_cherrypy_server",
+  help=_("If set to true, CherryPy will be used. Otherwise, Gunicorn will be used as the webserver."),
+  type=coerce_bool,
+  default=True)
+
+GUNICORN_WORKER_CLASS = Config(
+  key="gunicorn_work_class",
+  help=_("Gunicorn work class: gevent or evenlet, gthread or sync."),
+  type=str,
+  default="eventlet")
+
+GUNICORN_NUMBER_OF_WORKERS = Config(
+  key="gunicorn_number_of_workers",
+  help=_("The number of Gunicorn worker processes. If not specified, it uses: (number of CPU * 2) + 1."),
+  type=int,
+  default=None)
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),
@@ -379,6 +397,12 @@ COLLECT_USAGE = Config(
   type=coerce_bool,
   default=True)
 
+REST_RESPONSE_SIZE = Config(
+  key="rest_response_size",
+  help=_("Number of characters the rest api reponse calls to dump to the logs when debug is enabled.  Enter -1 for entire response."),
+  type=int,
+  default=2000)
+
 LEAFLET_TILE_LAYER = Config(
   key="leaflet_tile_layer",
   help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),
@@ -470,6 +494,12 @@ ALLOWED_HOSTS = Config(
   type=coerce_csv,
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
+
+REST_CONN_TIMEOUT = Config(
+  key='rest_conn_timeout',
+  default=120,
+  type=int,
+  help=_('Timeout in seconds for REST calls.'))
 
 VCS = UnspecifiedConfigSection(
   "vcs",
@@ -791,6 +821,16 @@ SASL_MAX_BUFFER = Config(
   type=int
 )
 
+ENABLE_SMART_THRIFT_POOL = Config(
+  key="enable_smart_thrift_pool",
+  help=_("Hue will try to get the actual host of the Service, even if it resides behind a load balancer. "
+         "This will enable an automatic configuration of the service without requiring custom configuration of the service load balancer. "
+         "This is available for the Impala service only currently. It is highly recommended to only point to a series of coordinator-only nodes only."),
+  type=coerce_bool,
+  default=False
+)
+
+
 # See python's documentation for time.tzset for valid values.
 TIME_ZONE = Config(
   key="time_zone",
@@ -844,7 +884,7 @@ CUSTOM = ConfigSection(
                    help=_("The login splash HTML code. This code will be placed in the login page, "
                         "useful for security warning messages.")),
     CACHEABLE_TTL=Config("cacheable_ttl",
-                   default=86400000,
+                   default=10 * 24 * 60 * 60 * 1000,
                    type=int,
                    help=_("The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache.")),
     LOGO_SVG=Config("logo_svg",
@@ -978,7 +1018,7 @@ LDAP = ConfigSection(
     SYNC_GROUPS_ON_LOGIN = Config("sync_groups_on_login",
       help=_("Synchronize a users groups when they login."),
       type=coerce_bool,
-      default=False),
+      default=True),
     IGNORE_USERNAME_CASE = Config("ignore_username_case",
       help=_("Ignore the case of usernames when searching for existing users in Hue."),
       type=coerce_bool,
@@ -1003,7 +1043,10 @@ LDAP = ConfigSection(
       help=_("Whether or not to follow referrals."),
       type=coerce_bool,
       default=False),
-
+    LOGIN_GROUPS = Config("login_groups",
+      help=_("A comma-separated list of Ldap groups with users that can login"),
+      type=coerce_csv,
+      default=[]),
     DEBUG = Config("debug",
       type=coerce_bool,
       default=False,
@@ -1231,6 +1274,109 @@ OAUTH = ConfigSection(
   )
 )
 
+OIDC = ConfigSection(
+  key='oidc',
+  help=_('Configuration options for OpenID Connect authentication'),
+  members=dict(
+    OIDC_RP_CLIENT_ID = Config(
+      key="oidc_rp_client_id",
+      help=_("The client ID as relay party set in OpenID provider."),
+      type=str,
+      default="XXXXXXXXXXXXXXXXXXXXX"
+    ),
+
+    OIDC_RP_CLIENT_SECRET = Config(
+      key="oidc_rp_client_secret",
+      help=_("The client secret as relay party set in OpenID provider."),
+      type=str,
+      default="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    ),
+
+    OIDC_OP_AUTHORIZATION_ENDPOINT = Config(
+      key="oidc_op_authorization_endpoint",
+      help=_("The OpenID provider authoriation endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/Cloudera/protocol/openid-connect/auth"
+    ),
+
+    OIDC_OP_TOKEN_ENDPOINT = Config(
+      key="oidc_op_token_endpoint",
+      help=_("The OpenID provider token endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/token"
+    ),
+
+    AUTHENTICATE_URL = Config(
+      key="authenticate_url",
+      help=_("The Authorize URL."),
+      type=str,
+      default="https://api.twitter.com/oauth/authorize"
+    ),
+
+    OIDC_OP_USER_ENDPOINT=Config(
+      key="oidc_op_user_endpoint",
+      help=_("The OpenID provider user info endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/userinfo"
+    ),
+
+    OIDC_RP_IDP_SIGN_KEY=Config(
+      key="oidc_rp_idp_sign_key",
+      help=_("The OpenID provider signing key in PEM or DER format."),
+      type=str,
+      default=None
+    ),
+
+    OIDC_OP_JWKS_ENDPOINT=Config(
+      key="oidc_op_jwks_endpoint",
+      help=_("The OpenID provider authoriation endpoint."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/Cloudera/protocol/openid-connect/certs"
+    ),
+
+    OIDC_VERIFY_SSL=Config(
+      key="oidc_verify_ssl",
+      help=_("Whether Hue as OpenID Connect client verify SSL cert."),
+      type=coerce_bool,
+      default=False
+    ),
+
+    LOGIN_REDIRECT_URL=Config(
+      key="login_redirect_url",
+      help=_("As relay party Hue URL path to redirect to after login."),
+      type=str,
+      default="https://localhost:8888/oidc/callback/"
+    ),
+
+    LOGOUT_REDIRECT_URL=Config(
+      key="logout_redirect_url",
+      help=_("The OpenID provider URL path to redirect to after logout."),
+      type=str,
+      default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/logout"
+    ),
+
+    LOGIN_REDIRECT_URL_FAILURE=Config(
+      key="login_redirect_url_failure",
+      help=_("As relay party Hue URL path to redirect to after login."),
+      type=str,
+      default="https://localhost:8888/hue/oidc_failed/"
+    ),
+
+    CREATE_USERS_ON_LOGIN=Config(
+      key="create_users_on_login",
+      help=_("Create a new user from OpenID Connect on login if it doesn't exist."),
+      type=coerce_bool,
+      default=True
+    ),
+
+    SUPERUSER_GROUP=Config(
+      key="superuser_group",
+      help=_("The group of users will be created and updated as superuser."),
+      type=str,
+      default=""
+    ),
+  )
+)
 
 LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
   key="local_filesystems",
@@ -1281,7 +1427,7 @@ DJANGO_ADMINS = UnspecifiedConfigSection(
 
 DJANGO_DEBUG_MODE = Config(
   key="django_debug_mode",
-  help=_("Enable or disable Django debug mode."),
+  help=_("Enable or disable debug mode."),
   type=coerce_bool,
   default=True
 )
@@ -1290,6 +1436,12 @@ DEV = Config("dev",
    type=coerce_bool,
    default=False,
    help=_("Enable development mode, where notably static files are not cached.")
+)
+
+DEV_EMBEDDED = Config("dev_embedded",
+   type=coerce_bool,
+   default=False,
+   help=_("Enable embedded development mode, where the page will be rendered inside a container div element.")
 )
 
 HTTP_500_DEBUG_MODE = Config(
@@ -1306,6 +1458,16 @@ MEMORY_PROFILER = Config(
   help=_('Enable or disable memory profiling.'),
   type=coerce_bool,
   default=False)
+
+def get_instrumentation_default():
+  """If django_debug_mode is True, this is automatically enabled"""
+  return DJANGO_DEBUG_MODE.get()
+
+INSTRUMENTATION = Config(
+  key='instrumentation',
+  help=_('Enable or disable instrumentation. If django_debug_mode is True, this is automatically enabled.'),
+  type=coerce_bool,
+  dynamic_default=get_instrumentation_default)
 
 
 AUDIT_EVENT_LOG_DIR = Config(
@@ -1342,6 +1504,13 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
+IS_EMBEDDED = Config(
+  key='is_embedded',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether Hue is embedded or not.')
+)
+
 USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
   key='use_new_autocompleter',
   default=True,
@@ -1365,9 +1534,23 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
 
 ENABLE_DOWNLOAD = Config(
   key="enable_download",
-  help=_('Global setting to allow or disable end user downloads in all Hue (e.g. Query result in editors and dashboard, file in File Browser browsers...).'),
+  help=_(
+    'Global setting to allow or disable end user downloads in all Hue (e.g. Query result in editors and dashboard, file in File Browser browsers...).'),
   type=coerce_bool,
   default=True)
+
+ENABLE_DJANGO_DEBUG_TOOL = Config(
+  key="enable_django_debug_tool",
+  help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
+  type=coerce_bool,
+  default=False)
+
+DJANGO_DEBUG_TOOL_USERS = Config(
+  key='django_debug_tool_users',
+  default='',
+  type=coerce_csv,
+  help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
+)
 
 def is_hue4():
   """Hue is configured to show version 4."""
@@ -1403,43 +1586,94 @@ IS_HUE_4 = Config( # To remove in Hue 5
   help=_('Choose whether to enable the new Hue 4 interface.')
 )
 
+DISABLE_HUE_3 = Config( # To remove in Hue 5
+  key='disable_hue_3',
+  default=True,
+  type=coerce_bool,
+  help=_('Choose whether to still allow users to enable the old Hue 3 interface.')
+)
 
-def get_clusters():
-  if CLUSTERS.get():
-    cluster_config = CLUSTERS.get()
-    clusters = OrderedDict([
+IS_MULTICLUSTER_ONLY = Config(
+  key='is_multicluster_only',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
+IS_K8S_ONLY = Config(
+  key='is_k8s_only',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
+
+def get_clusters(user):
+  clusters = []
+  cluster_config = CLUSTERS.get()
+
+  for i in cluster_config:
+    # Get additional remote multi clusters
+    clusters.append(
       (i, {
-        'name': i,
-        'type': cluster_config[i].TYPE.get(),
-        'interfaces': [{'name': i, 'type': cluster_config[i].TYPE.get(), 'interface': interface} for interface in cluster_config[i].INTERFACES.get()]
-      }) for i in cluster_config]
+          'id': i,
+          'name': cluster_config[i].NAME.get() or i,
+          'type': cluster_config[i].TYPE.get(),
+          'interface': cluster_config[i].INTERFACE.get() or 'hive',
+          'server_host': cluster_config[i].SERVER_HOST.get()
+        }
+      )
     )
-  else:
-    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
 
-  if 'Data Eng' in clusters:
-    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
-    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
-  return clusters
+  # Get traditional services in regular ini too
+  if not IS_MULTICLUSTER_ONLY.get():
+    clusters.append(
+      (CLUSTER_ID.get(), {
+        'id': CLUSTER_ID.get(),
+        'name': CLUSTER_ID.get(),
+        'type': 'direct',
+        'interface': 'all',
+        'server_host': 'all'
+        }
+      )
+    )
+
+  return OrderedDict(clusters)
+
+
+def has_multi_cluster():
+  return bool(CLUSTERS.get())
 
 
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
-  help="One entry for each additional cluster Hue can interact with.",
+  help="One entry for each additional remote cluster Hue can interact with.",
   each=ConfigSection(
-    help=_("Name of the cluster to show to the user."),
+    help=_("Id of the cluster."),
     members=dict(
-      TYPE=Config(
-          "type",
-          help=_("Type of cluster, e.g. local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
-          default='local',
+      NAME=Config(
+          "name",
+          help=_("Nice name of the cluster to show to the user. Same as id if not specified."),
+          default=None,
           type=str,
       ),
-      INTERFACES=Config(
-          "interfaces",
-          help=_("List of cluster instances of the cluster (optional)."),
-          default=[],
-          type=coerce_csv,
+      TYPE=Config(
+          "type",
+          help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          default='direct',
+          type=str,
+      ),
+      INTERFACE=Config(
+          "interface",
+          help=_("Type of cluster interface"),
+          default='hive',
+          type=str,
+      ),
+      SERVER_HOST=Config(
+          "server_host",
+          help=_("The host service to contact."),
+          default=None,
+          type=str,
       ),
     )
   )
@@ -1513,11 +1747,11 @@ def validate_database(user):
     res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', unicode(_('SQLite is only recommended for development environments. '
         'It might cause the "Database is locked" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended.'))))
 
-  # Check if south_migrationhisotry table is up to date
+  # Check if django_migrations table is up to date
   try:
     from desktop import appmanager
 
-    cursor.execute('''SELECT * from south_migrationhistory''')
+    cursor.execute('''SELECT * from django_migrations''')
     migration_history_entries = [(entry[1], entry[2]) for entry in cursor.fetchall()]
 
     apps = appmanager.get_apps(user)
@@ -1531,10 +1765,10 @@ def validate_database(user):
               missing_migration_entries.append((app.name, migration_name))
 
     if missing_migration_entries:
-      res.append(('SOUTH_MIGRATION_HISTORY', unicode(_('''south_migrationhistory table seems to be corrupted or incomplete.
+      res.append(('django_migrations', unicode(_('''django_migrations table seems to be corrupted or incomplete.
                                                         %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries))))
   except Exception:
-    LOG.exception("Error in config validation of SOUTH_MIGRATION_HISTORY")
+    LOG.exception("Error in config validation of django_migrations")
 
   return res
 
@@ -1544,9 +1778,23 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
+  from beeswax.models import Session
   from desktop.lib import i18n
+  from desktop.models import Document2 # Avoid cyclic loop
+  from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
 
   res = []
+
+  doc2_count = Document2.objects.filter(is_history=True).count()
+  if doc2_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('DOCUMENT2_CLEANUP_WARNING', unicode(_('Desktop Document2 has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
+
+  session_count = Session.objects.filter(status_code__gte=-10000).count()
+  if session_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('SESSION_CLEANUP_WARNING', unicode(_('Desktop Session has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
+
   if not get_secret_key():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
@@ -1598,7 +1846,7 @@ def config_validator(user):
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
   except:
-    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. </br>'
+    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
                                                     '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
   if notebook_doc:
     notebook_doc.delete()

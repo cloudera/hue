@@ -15,23 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from jobsub import views as jobsub_views
 
-urlpatterns = patterns(
-  'jobsub.views',
-
+urlpatterns = [
   # The base view is the "list" view, which we alias as /
-  url(r'^$', 'list_designs'),
+  url(r'^$', jobsub_views.list_designs),
 
   # Not available on Hue 4
-  url(r'^not_available$', 'not_available'),
+  url(r'^not_available$', jobsub_views.not_available),
 
   # Actions: get, save, clone, delete, submit, new.
-  url(r'^designs$', 'list_designs'),
-  url(r'^designs/(?P<design_id>\d+)$', 'get_design'),
-  url(r'^designs/(?P<node_type>\w+)/new$', 'new_design'),
-  url(r'^designs/(?P<design_id>\d+)/save$', 'save_design'),
-  url(r'^designs/(?P<design_id>\d+)/clone$', 'clone_design'),
-  url(r'^designs/(?P<design_id>\d+)/delete$', 'delete_design'),
-  url(r'^designs/(?P<design_id>\d+)/restore$', 'restore_design'),
-)
+  url(r'^designs$', jobsub_views.list_designs, name="jobsub.views.list_designs"),
+  url(r'^designs/(?P<design_id>\d+)$', jobsub_views.get_design, name="jobsub.views.get_design"),
+  url(r'^designs/(?P<node_type>\w+)/new$', jobsub_views.new_design, name="jobsub.views.new_design"),
+  url(r'^designs/(?P<design_id>\d+)/save$', jobsub_views.save_design, name="jobsub.views.save_design"),
+  url(r'^designs/(?P<design_id>\d+)/clone$', jobsub_views.clone_design, name="jobsub.views.clone_design"),
+  url(r'^designs/(?P<design_id>\d+)/delete$', jobsub_views.delete_design, name="jobsub.views.delete_design"),
+  url(r'^designs/(?P<design_id>\d+)/restore$', jobsub_views.restore_design, name="jobsub.views.restore_design"),
+]

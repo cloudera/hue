@@ -56,9 +56,9 @@ ${ layout.menubar(section='coordinators') }
           <li class="nav-header">${ _('Properties') }</li>
           <li class="active"><a href="#properties"><i class="fa fa-reorder"></i> ${ _('Edit properties') }</a></li>
 
-          % if coordinator.workflow:
+          % if coordinator.coordinatorworkflow:
             <li class="nav-header">${ _('Workflow') }</li>
-            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank"><i class="fa fa-code-fork"></i> ${ coordinator.workflow }</a></li>
+            <li id="workflowName"><a href="${ coordinator.coordinatorworkflow.get_absolute_url() }" target="_blank"><i class="fa fa-code-fork"></i> ${ coordinator.coordinatorworkflow}</a></li>
           % endif
 
           <li class="nav-header">${ _('Datasets') }</li>
@@ -106,7 +106,7 @@ ${ layout.menubar(section='coordinators') }
             <div class="fieldWrapper">
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
-              ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
+              ${ utils.render_field_no_popover(coordinator_form['coordinatorworkflow'], extra_attrs = {'validate':'true'}) }
               ${ coordinator_form['parameters'] | n,unicode }
               <div class="hide">
                 ${ utils.render_field_no_popover(coordinator_form['is_shared']) }
@@ -153,7 +153,7 @@ ${ layout.menubar(section='coordinators') }
           </div>
 
           <div id="step3" class="stepDetails hide">
-            % if coordinator.workflow:
+            % if coordinator.coordinatorworkflow:
               <div class="alert alert-info"><h3>${ _('Inputs') }</h3>
               ${ _('The inputs and outputs of the workflow must be mapped to some data.') }
               ${ _('The data is represented by some datasets that can be created ') }<a href="#createDataset" class="btn btn-small">${ _('here') }</a>.
@@ -205,7 +205,7 @@ ${ layout.menubar(section='coordinators') }
           </div>
 
           <div id="step4" class="stepDetails hide">
-            % if coordinator.workflow:
+            % if coordinator.coordinatorworkflow:
               <div class="alert alert-info"><h3>${ _('Outputs') }</h3>
                 ${ _('The inputs and outputs of the workflow must be mapped to some data.') }
                 ${ _('The data is represented by some datasets that can be created ') }<a href="#createDataset" class="btn btn-small">${ _('here') }</a>.

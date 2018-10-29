@@ -181,7 +181,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
             <thead>
               <tr>
                 <th>
-                  <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(displayCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
+                  <span data-bind="click: toggleSelectAll, css: {'fa-check': !ko.utils.arrayFilter(displayCollections(), function(collection) {return !collection.selected()}).length}" class="hue-checkbox fa"></span>
                 </th>
                 <th width="60%">${_('Name')}</th>
                 <th width="40%">${_('Collections')}</th>
@@ -190,7 +190,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
             <tbody data-bind="foreach: displayCollections">
               <tr data-bind="routie: 'edit/' + name()" class="pointer">
                 <td data-bind="click: $parent.toggleCollectionSelect.bind($parent), clickBubble: false">
-                  <span data-bind="css: {'fa-check': $parent.displayCollections()[$index()].selected(), 'hueCheckbox fa': ! isAlias()}"></span>
+                  <span data-bind="css: {'fa-check': $parent.displayCollections()[$index()].selected(), 'hue-checkbox fa': ! isAlias()}"></span>
                 </td>
                 <td data-bind="text: name" style="cursor: pointer"></td>
                 <td data-bind="text: collections" style="cursor: pointer"></td>

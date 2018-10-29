@@ -18,7 +18,6 @@
 import logging
 import json
 import StringIO
-import re
 import tempfile
 import zipfile
 
@@ -26,7 +25,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 from django.core import management
-
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
@@ -35,17 +34,18 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from metadata.conf import has_navigator
-from metadata.navigator_api import search_entities as metadata_search_entities, _highlight
-from metadata.navigator_api import search_entities_interactive as metadata_search_entities_interactive
+from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
+from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
 from desktop.lib.django_util import JsonResponse
+from desktop.conf import get_clusters, IS_K8S_ONLY
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
-  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER, get_cluster_config
+  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
 
 
 LOG = logging.getLogger(__name__)
@@ -70,14 +70,157 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_config(request):
-  if request.POST.get(USER_PREFERENCE_CLUSTER):
-    set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST.get(USER_PREFERENCE_CLUSTER))
-
-
   config = get_cluster_config(request.user)
   config['status'] = 0
 
   return JsonResponse(config)
+
+
+@api_error_handler
+def get_context_namespaces(request, interface):
+  response = {}
+  namespaces = []
+
+  clusters = get_clusters(request.user).values()
+
+  namespaces.extend([{
+      'id': cluster['id'],
+      'name': cluster['name'],
+      'status': 'CREATED',
+      'computes': [cluster]
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+  ])
+
+  if interface == 'hive' or interface == 'impala' or interface == 'report':
+    # From Altus SDX
+    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
+      # Note: attaching computes to namespaces might be done via the frontend in the future
+      if interface == 'impala':
+        if IS_K8S_ONLY.get():
+          adb_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+        else:
+          adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
+        for _cluster in adb_clusters: # Add "fake" namespace if needed
+          if not _cluster.get('namespaceCrn'):
+            _cluster['namespaceCrn'] = _cluster['crn']
+            _cluster['id'] = _cluster['crn']
+            _cluster['namespaceName'] = _cluster['clusterName']
+            _cluster['name'] = _cluster['clusterName']
+            _cluster['compute_end_point'] = '%(publicHost)s' % _cluster['coordinatorEndpoint'] if IS_K8S_ONLY.get() else '',
+      else:
+        adb_clusters = []
+
+      if IS_K8S_ONLY.get():
+        sdx_namespaces = []
+      else:
+        sdx_namespaces = SdxApi(request.user).list_namespaces()
+
+      # Adding "fake" namespace for cluster without one
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and _cluster['status'] != 'TERMINATING')])
+
+      namespaces.extend([{
+          'id': namespace.get('crn', 'None'),
+          'name': namespace.get('namespaceName'),
+          'status': namespace.get('status'),
+          'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
+        } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED' or IS_K8S_ONLY.get()
+      ])
+
+  response[interface] = namespaces
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def get_context_computes(request, interface):
+  response = {}
+  computes = []
+
+  clusters = get_clusters(request.user).values()
+  has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type']]
+
+  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
+    computes.extend([{
+        'id': cluster['id'],
+        'name': cluster['name'],
+        'namespace': cluster['id'],
+        'interface': interface,
+        'type': cluster['type']
+      } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+    ])
+
+  if has_altus_clusters:
+    if interface == 'impala' or interface == 'report':
+      if IS_K8S_ONLY.get():
+        dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+      else:
+        dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
+
+      computes.extend([{
+          'id': cluster.get('crn'),
+          'name': cluster.get('clusterName'),
+          'status': cluster.get('status'),
+          'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
+          'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
+          'type': 'altus-dw'
+        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and cluster['status'] != 'TERMINATING')]
+      )
+
+    if interface == 'oozie' or interface == 'spark2':
+      computes.extend([{
+          'id': cluster.get('crn'),
+          'name': cluster.get('clusterName'),
+          'status': cluster.get('status'),
+          'environmentType': cluster.get('environmentType'),
+          'serviceType': cluster.get('serviceType'),
+          'namespace': cluster.get('namespaceCrn'),
+          'type': 'altus-de'
+        } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
+      )
+      # TODO if interface == 'spark2' keep only SPARK type
+
+  response[interface] = computes
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def get_context_clusters(request, interface):
+  response = {}
+  clusters = []
+
+  cluster_configs = get_clusters(request.user).values()
+
+  for cluster in cluster_configs:
+    cluster = {
+      'id': cluster.get('id'),
+      'name': cluster.get('name'),
+      'status': 'CREATED',
+      'environmentType': cluster.get('type'),
+      'serviceType': cluster.get('interface'),
+      'namespace': '',
+      'type': cluster.get('type')
+    }
+
+    if cluster.get('type') == 'altus':
+      cluster['name'] = 'Altus DE'
+      cluster['type'] = 'altus-de'
+      clusters.append(cluster)
+      cluster = cluster.copy()
+      cluster['name'] = 'Altus Data Warehouse'
+      cluster['type'] = 'altus-dw'
+    elif cluster.get('type') == 'altusv2':
+      cluster['name'] = 'Data Warehouse'
+      cluster['type'] = 'altus-dw2'
+
+    clusters.append(cluster)
+
+  response[interface] = clusters
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -228,6 +371,14 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
+      if document.type == 'query-pig': # Import correctly from before Hue 4.0
+        properties = data['snippets'][0]['properties']
+        if 'hadoopProperties' not in properties:
+          properties['hadoopProperties'] = []
+        if 'parameters' not in properties:
+          properties['parameters'] = []
+        if 'resources' not in properties:
+          properties['resources'] = []
       if data.get('uuid') != document.uuid: # Old format < 3.11
         data['uuid'] = document.uuid
 
@@ -366,6 +517,75 @@ def delete_document(request):
 
 @api_error_handler
 @require_POST
+def copy_document(request):
+  uuid = json.loads(request.POST.get('uuid'), '""')
+
+  if not uuid:
+    raise PopupException(_('copy_document requires uuid'))
+
+
+  # Document2 and Document model objects are linked and both are saved when saving
+  document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+  # Document model object
+  document1 = document.doc.get()
+
+  if document.type == 'directory':
+    raise PopupException(_('Directory copy is not supported'))
+
+  name = document.name + '-copy'
+
+  # Make the copy of the Document2 model object
+  copy_document = document.copy(name=name, owner=request.user)
+  # Make the copy of Document model object too
+  document1.copy(content_object=copy_document, name=name, owner=request.user)
+
+  # Import workspace for all oozie jobs
+  if document.type == 'oozie-workflow2' or document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
+    from oozie.models2 import Workflow, Coordinator, Bundle, _import_workspace
+    # Update the name field in the json 'data' field
+    if document.type == 'oozie-workflow2':
+      workflow = Workflow(document=document)
+      workflow.update_name(name)
+      workflow.update_uuid(copy_document.uuid)
+      _import_workspace(request.fs, request.user, workflow)
+      copy_document.update_data({'workflow': workflow.get_data()['workflow']})
+      copy_document.save()
+
+    if document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
+      if document.type == 'oozie-bundle2':
+        bundle_or_coordinator = Bundle(document=document)
+      else:
+        bundle_or_coordinator = Coordinator(document=document)
+      json_data = bundle_or_coordinator.get_data_for_json()
+      json_data['name'] = name
+      json_data['uuid'] = copy_document.uuid
+      copy_document.update_data(json_data)
+      copy_document.save()
+      _import_workspace(request.fs, request.user, bundle_or_coordinator)
+  elif document.type == 'search-dashboard':
+    from dashboard.models import Collection2
+    collection = Collection2(request.user, document=document)
+    collection.data['collection']['label'] = name
+    collection.data['collection']['uuid'] = copy_document.uuid
+    copy_document.update_data({'collection': collection.data['collection']})
+    copy_document.save()
+  # Keep the document and data in sync
+  else:
+    copy_data = copy_document.data_dict
+    if 'name' in copy_data:
+      copy_data['name'] = name
+    if 'uuid' in copy_data:
+      copy_data['uuid'] = copy_document.uuid
+    copy_document.update_data(copy_data)
+    copy_document.save()
+
+  return JsonResponse({
+    'status': 0,
+    'document': copy_document.to_dict()
+  })
+
+@api_error_handler
+@require_POST
 def restore_document(request):
   """
   Accepts a uuid
@@ -455,7 +675,7 @@ def export_documents(request):
 
   if doc_ids:
     doc_ids = ','.join(map(str, doc_ids))
-    management.call_command('dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_keys=True, verbosity=2, stdout=f)
+    management.call_command('dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_foreign_keys=True, verbosity=2, stdout=f)
 
   if request.GET.get('format') == 'json':
     return JsonResponse(f.getvalue(), safe=False)
@@ -540,8 +760,9 @@ def import_documents(request):
 
   stdout = StringIO.StringIO()
   try:
-    management.call_command('loaddata', f.name, verbosity=2, traceback=True, stdout=stdout)
-    Document.objects.sync()
+    with transaction.atomic(): # We wrap both commands to commit loaddata & sync
+      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout, commit=False) # We need to use commit=False because commit=True will close the connection and make Document.objects.sync fail.
+      Document.objects.sync()
 
     if request.POST.get('redirect'):
       return redirect(request.POST.get('redirect'))

@@ -35,8 +35,8 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 import django.db
-from django.http import HttpResponseNotAllowed
-from django.core.urlresolvers import resolve
+from django.http import HttpResponseNotAllowed, HttpResponseForbidden
+from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
@@ -44,6 +44,7 @@ import django.views.static
 
 import desktop.views
 import desktop.conf
+from desktop.conf import IS_EMBEDDED
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import render, render_json
@@ -55,7 +56,7 @@ from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
 
-
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -76,7 +77,7 @@ class AjaxMiddleware(object):
   GET parameters.
   """
   def process_request(self, request):
-    request.ajax = request.is_ajax() or request.REQUEST.get("format", "") == "json"
+    request.ajax = request.is_ajax() or request.GET.get("format", "") == "json"
     return None
 
 
@@ -119,7 +120,7 @@ class ClusterMiddleware(object):
     Sets request.fs and request.jt on every request to point to the
     configured filesystem.
     """
-    request.fs_ref = request.REQUEST.get('fs', view_kwargs.get('fs', 'default'))
+    request.fs_ref = request.GET.get('fs', view_kwargs.get('fs', 'default'))
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
@@ -129,11 +130,8 @@ class ClusterMiddleware(object):
       if request.fs is not None:
         request.fs.setuser(request.user.username)
 
-      request.jt = cluster.get_default_mrcluster() # Deprecated, only there for MR1
-      if request.jt is not None:
-        request.jt.setuser(request.user.username)
-    else:
-      request.jt = None
+    # Deprecated
+    request.jt = None
 
 
 class NotificationMiddleware(object):
@@ -264,6 +262,12 @@ class AppSpecificMiddleware(object):
 
 
 class LoginAndPermissionMiddleware(object):
+  def process_request(self, request):
+    # When local user login, oidc middleware refresh token if oidc_id_token_expiration doesn't exists!
+    if request.session.get('_auth_user_backend', '') == 'desktop.auth.backend.AllowFirstUserDjangoBackend'\
+            and 'desktop.auth.backend.OIDCBackend' in desktop.conf.AUTH.BACKEND.get():
+      request.session['oidc_id_token_expiration'] = time.time() + 300
+
   """
   Middleware that forces all views (except those that opt out) through authentication.
   """
@@ -276,6 +280,10 @@ class LoginAndPermissionMiddleware(object):
     request.ts = time.time()
     request.view_func = view_func
     access_log_level = getattr(view_func, 'access_log_level', None)
+    # skip loop for oidc
+    if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
+      return None
+
     # First, skip views not requiring login
 
     # If the view has "opted out" of login required, skip
@@ -298,8 +306,8 @@ class LoginAndPermissionMiddleware(object):
       try:
         access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
       except Exception, e:
-        access_log(request, 'error checking view perm: %s', e, level=access_log_level)
-        access_view =''
+        access_log(request, 'error checking view perm: %s' % e, level=access_log_level)
+        access_view = ''
 
       # Accessing an app can access an underlying other app.
       # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
@@ -311,18 +319,21 @@ class LoginAndPermissionMiddleware(object):
 
       if app_accessed and \
           app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403") and \
-          not (request.user.has_hue_permission(action="access", app=app_accessed) or
-               request.user.has_hue_permission(action=access_view, app=app_accessed)):
+          not (is_admin(request.user) or request.user.has_hue_permission(action="access", app=app_accessed) or
+               request.user.has_hue_permission(action=access_view, app=app_accessed)) and \
+          not (app_accessed == '__debug__' and desktop.conf.DJANGO_DEBUG_MODE):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException(
             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
       else:
-        log_page_hit(request, view_func, level=access_log_level)
+        if not hasattr(request, 'view_func'):
+          log_page_hit(request, view_func, level=access_log_level)
         return None
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    if request.ajax and not 'libsaml.backend.SAML2Backend' in desktop.conf.AUTH.BACKEND.get():
+    no_idle_backends = ("libsaml.backend.SAML2Backend", "desktop.auth.backend.SpnegoDjangoBackend")
+    if request.ajax and all(no_idle_backend not in desktop.conf.AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
       # request.
@@ -330,11 +341,14 @@ class LoginAndPermissionMiddleware(object):
       response[MIDDLEWARE_HEADER] = 'LOGIN_REQUIRED'
       return response
     else:
-      return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
+      if IS_EMBEDDED.get():
+        return HttpResponseForbidden()
+      else:
+        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
-      log_page_hit(request, request.view_func, level=logging.DEBUG, start_time=request.ts)
+      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts)
     return response
 
 
@@ -552,9 +566,13 @@ class SpnegoMiddleware(object):
       Negotiate. This will cause the browser to re-try the request with the
       AUTHORIZATION header set.
     """
+    view_func = resolve(request.path)[0]
+    if view_func in DJANGO_VIEW_AUTH_WHITELIST:
+      return
+
     # AuthenticationMiddleware is required so that request.user exists.
     if not hasattr(request, 'user'):
-      raise ImproperlyConfigured(
+      raise exceptions.ImproperlyConfigured(
         "The Django remote user auth middleware requires the"
         " authentication middleware to be installed.  Edit your"
         " MIDDLEWARE_CLASSES setting to insert"
@@ -590,6 +608,15 @@ class SpnegoMiddleware(object):
           if user:
             request.user = user
             login(request, user)
+            msg = 'Successful login for user: %s' % request.user.username
+          else:
+            msg = 'Failed login for user: %s' % request.user.username
+          request.audit = {
+            'operation': 'USER_LOGIN',
+            'username': request.user.username,
+            'operationText': msg
+          }
+          access_warn(request, msg)
           return
         except:
           LOG.exception('Unexpected error when authenticating against KDC')
@@ -654,6 +681,9 @@ class EnsureSafeRedirectURLMiddleware(object):
         return response
 
       if is_safe_url(location, request.get_host()):
+        return response
+
+      if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
         return response
 
       response = render("error.mako", request, {

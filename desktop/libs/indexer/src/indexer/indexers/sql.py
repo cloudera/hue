@@ -15,9 +15,10 @@
 # limitations under the License.import logging
 
 import logging
+import urllib
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
@@ -48,16 +49,16 @@ class SQLIndexer(object):
     final_table_name = table_name
 
     table_format = destination['tableFormat']
-    source_type = source['apiHelperType']
+    source_type = source['sourceType']
 
     columns = destination['columns']
     partition_columns = destination['partitionColumns']
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    source_path = source['path']
+    source_path = urllib.unquote(source['path'])
     external = not destination['useDefaultLocation']
-    external_path = destination['nonDefaultLocation']
+    external_path = urllib.unquote(destination['nonDefaultLocation'])
 
     load_data = destination['importData']
     skip_header = destination['hasHeader']
@@ -169,7 +170,7 @@ class SQLIndexer(object):
     if load_data and table_format in ('parquet', 'kudu'):
       file_format = table_format
       if table_format == 'kudu':
-        columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]
+        columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys and col['keep']]]
         extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
         PARTITION BY HASH PARTITIONS 16
         STORED AS %(file_format)s
@@ -198,12 +199,12 @@ class SQLIndexer(object):
           'table_name': table_name
       }
 
-    editor_type = 'impala' if table_format == 'kudu' else destination['apiHelperType']
+    editor_type = 'impala' if table_format == 'kudu' else destination['sourceType']
 
-    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name})
 
     return make_notebook(
-        name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': table_name},
+        name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': final_table_name},
         editor_type=editor_type,
         statement=sql.strip(),
         status='ready',

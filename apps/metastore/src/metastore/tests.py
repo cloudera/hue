@@ -25,7 +25,7 @@ from nose.tools import assert_true, assert_equal, assert_false
 
 from django.utils.encoding import smart_str
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access
@@ -73,7 +73,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   def test_basic_flow(self):
     # Default database should exist
     response = self.client.get("/metastore/databases")
-    assert_true(self.db_name in response.context["databases"])
+    assert_true(self.db_name in response.context[0]["databases"])
 
     # Table should have been created
     response = self.client.get("/metastore/tables/")
@@ -90,7 +90,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(200, response.status_code)
 
     # And have detail
-    response = self.client.get("/metastore/table/%s/test?format=json" % self.db_name)
+    response = self.client.post("/metastore/table/%s/test/?format=json" % self.db_name, {'format': 'json'})
     data = json.loads(response.content)
     assert_true("foo" in [col['name'] for col in data['cols']])
     assert_true("SerDe Library:" in [prop['col_name'] for prop in data['properties']], data)
@@ -100,7 +100,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Show table data.
     response = self.client.get("/metastore/table/%s/test/read" % self.db_name, follow=True)
-    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
+    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context[0]['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     # Note that it may not return all rows at once. But we expect at least 10.
     results = fetch_query_result_data(self.client, response)
@@ -154,18 +154,18 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_false('test_index' in data['tables'])
 
   def test_describe_view(self):
-    resp = self.client.get('/metastore/table/%s/myview?format=json' % self.db_name)
+    resp = self.client.post('/metastore/table/%s/myview' % self.db_name, data={'format': 'json'})
     assert_equal(200, resp.status_code, resp.content)
     data = json.loads(resp.content)
     assert_true(data['is_view'])
     assert_equal("myview", data['name'])
 
   def test_describe_partitions(self):
-    response = self.client.get("/metastore/table/%s/test_partitions?format=json" % self.db_name)
+    response = self.client.post("/metastore/table/%s/test_partitions" % self.db_name, data={'format': 'json'})
     data = json.loads(response.content)
     assert_equal(2, len(data['partition_keys']), data)
 
-    response = self.client.get("/metastore/table/%s/test_partitions/partitions?format=json" % self.db_name, follow=True)
+    response = self.client.post("/metastore/table/%s/test_partitions/partitions" % self.db_name, data={'format': 'json'}, follow=True)
     data = json.loads(response.content)
     partition_columns = [col for cols in data['partition_values_json'] for col in cols['columns']]
     assert_true("baz_one" in partition_columns)
@@ -182,7 +182,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     finish = LIST_PARTITIONS_LIMIT.set_for_testing("1")
     try:
       response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-      partition_values_json = json.loads(response.context['partition_values_json'])
+      partition_values_json = json.loads(response.context[0]['partition_values_json'])
       assert_equal(1, len(partition_values_json))
     finally:
       finish()
@@ -190,7 +190,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     finish = LIST_PARTITIONS_LIMIT.set_for_testing("3")
     try:
       response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-      partition_values_json = json.loads(response.context['partition_values_json'])
+      partition_values_json = json.loads(response.context[0]['partition_values_json'])
       assert_equal(2, len(partition_values_json))
     finally:
       finish()
@@ -201,7 +201,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     partition_spec = "baz='baz_one',boom=12345"
     response = self.client.get("/metastore/table/%s/test_partitions/partitions/%s/read" % (self.db_name, partition_spec), follow=True)
-    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
+    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context[0]['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     results = fetch_query_result_data(self.client, response)
     assert_true(len(results['results']) > 0, results)
@@ -511,5 +511,13 @@ class TestParser(object):
     type = 'array<struct<name:string,age:int>>'
     comment = 'test_parse_nested'
     column = {'name': name, 'type': 'array', 'comment': comment, 'item': {'type': 'struct', 'fields': [{'name': 'name', 'type': 'string'}, {'name': 'age', 'type': 'int'}]}}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+  def test_parse_nested_with_array(self):
+    name = 'nested'
+    type = 'struct<fieldname1:bigint,fieldname2:int,fieldname3:int,fieldname4:array<bigint>,fieldname5:bigint,fieldname6:array<struct<array_elem:string>>,fieldname7:string>'
+    comment = 'test_parse_nested'
+    column = {'comment': 'test_parse_nested', 'fields': [{'type': 'bigint', 'name': 'fieldname1'}, {'type': 'int', 'name': 'fieldname2'}, {'type': 'int', 'name': 'fieldname3'}, {'item': {'type': 'bigint'}, 'type': 'array', 'name': 'fieldname4'}, {'type': 'bigint', 'name': 'fieldname5'}, {'item': {'fields': [{'type': 'string', 'name': 'array_elem'}], 'type': 'struct'}, 'type': 'array', 'name': 'fieldname6'}, {'type': 'string', 'name': 'fieldname7'}], 'type': 'struct', 'name': 'nested'}
     parse_tree = parser.parse_column(name, type, comment)
     assert_equal(parse_tree, column)

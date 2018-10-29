@@ -45,7 +45,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <table id="fileBrowserTable" class="table table-condensed table-huedatatable tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
     <thead>
       <tr>
-        <th class="sorting_disabled" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="sorting_disabled" width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th class="sortable sorting" data-sort="type" width="1%" data-bind="click: sort">&nbsp;</th>
         <th class="sortable sorting_asc" data-sort="name" data-bind="click: sort">${_('Name')}</th>
         <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
@@ -591,7 +591,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <a href="javascript: void(0)" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.trashSelected: void(0)">
     <i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
     % endif
-    <li><a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
+    <li><a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
     <li class="divider" data-bind="visible: isSummaryEnabled()"></li>
     <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: isSummaryEnabled()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
@@ -623,8 +623,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
   <script id="fileTemplate" type="text/html">
     <tr class="row-animated" style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
-      <td class="center" data-bind="click: handleSelect" style="cursor: default" data-bind="enabled: name !== '..' ">
-        <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
+      <td class="center" data-bind="click: name !== '..' ? handleSelect : void(0)" style="cursor: default">
+        <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { 'hue-checkbox': name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
       <td class="left"><i data-bind="click: $root.viewFile, css: { 'fa': true,
        % if 'oozie' in apps:
@@ -636,7 +636,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !$root.isS3()}"></a></strong>
+        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !isBucket()}"></a></strong>
         <!-- /ko -->
       </td>
       <td>
@@ -790,6 +790,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     }
 
     var updateHash = function (hash) {
+      hash = encodeURI(hash);
       %if not is_embeddable:
       window.location.hash = hash;
       %else:
@@ -828,7 +829,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       return {
         name: file.name,
         path: file.path,
-        url: file.url,
+        url: encodeURI(file.url),
         type: file.type,
         permissions: file.rwx,
         mode: file.mode,
@@ -841,7 +842,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           replication: file.stats.replication
         },
         isBucket: ko.pureComputed(function(){
-          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1
+          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1
         }),
         selected: ko.observable(file.highlighted && viewModel.isArchive(file.name) || false),
         highlighted: ko.observable(file.highlighted || false),
@@ -861,7 +862,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         showContextMenu: function (row, e) {
           var cm = $('.context-menu'),
             actions = $('#ch-dropdown'),
-            rect = document.querySelector('body').getBoundingClientRect();
+            rect = document.querySelector(HUE_CONTAINER).getBoundingClientRect();
 
           e.stopPropagation();
 
@@ -871,7 +872,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           // display context menu and ensure it is on-screen
-          if ($.inArray(row.name, ['..', '.', '.Trash']) === -1) {
+          if ($.inArray(row.name, ['..', '.Trash']) === -1) {
             this.selected(true);
             var verticalCorrection = 0;
             %if is_embeddable:
@@ -1050,6 +1051,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.isAdls = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('adl:/') === 0;
+      });
+
       self.scheme = ko.pureComputed(function () {
         var path = self.currentPath();
         return path.substring(0, path.indexOf(':/')) || "hdfs";
@@ -1092,7 +1097,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3();
+        return !self.isS3() && !self.isAdls();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1135,7 +1140,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.showSummary = function () {
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
-        $.getJSON("${url('filebrowser.views.content_summary', path='')}" + self.selectedFile().path, function (data) {
+        $.getJSON("${url('content_summary', path='')}" + self.selectedFile().path, function (data) {
           if (data.status == 0) {
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
@@ -1325,7 +1330,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.searchQuery("");
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
           updateHash(stripHashes(file.path));
-        } else {   
+        } else {
           %if is_embeddable:
           huePubSub.publish('open.link', file.url);
           %else:
@@ -1335,11 +1340,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.editFile = function () {
-        window.location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser_views_edit', path='')}" + encodeURI(self.selectedFile().path);
       };
 
       self.downloadFile = function () {
-        window.location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser_views_download', path='')}" + encodeURI(self.selectedFile().path);
       };
 
       self.renameFile = function () {
@@ -1418,6 +1423,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             error: function(xhr){
               $.jHueNotify.error(xhr.responseText);
               resetPrimaryButtonsStatus();
+              $('#moveDestination').val('');
             }
           });
 
@@ -1451,6 +1457,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
         else {
           $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          $('#moveDestination').val('');
         }
       };
 
@@ -1991,19 +1998,21 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
     $(document).ready(function () {
       // hide context menu
-      $('body').on('click', function (e) {
+      $(HUE_CONTAINER).on('click', function (e) {
         hideContextMenu();
       });
 
-      $('body').on('contextmenu', function (e) {
+      $(HUE_CONTAINER).on('contextmenu', function (e) {
         if ($.inArray(e.toElement, $('.table-huedatatable *')) === -1) {
           hideContextMenu();
         }
       });
 
-      $('body').on('contextmenu', '.context-menu', function (e) {
+      $(HUE_CONTAINER).on('contextmenu', '.context-menu', function (e) {
         hideContextMenu();
       });
+
+      % if show_upload_button:
 
       // Drag and drop uploads from anywhere on filebrowser screen
       if (window.FileReader) {
@@ -2065,7 +2074,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           catch (exc) {
           }
           var options = {
-            url: '/filebrowser/upload/file?dest=' + ops.path,
+            url: '/filebrowser/upload/file?dest=' + encodeURI(ops.path),
             paramName: 'hdfs_file',
             params: {
               dest: ops.path
@@ -2077,7 +2086,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 '<span class="break-word" data-dz-name></span>' +
                 '<div class="pull-right">' +
                 '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
-                '<span data-dz-remove><a href="javascript:undefined;" title="' + DropzoneGlobals.i18n.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
+                '<span data-dz-remove><a href="javascript:undefined;" title="' + HUE_I18n.dropzone.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
                 '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
                 '</div>' +
                 '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
@@ -2099,7 +2108,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 newDest = ops.path + '/' + file.fullPath.substr(0, file.fullPath.length - file.name.length);
               }
               this.options.params.dest = newDest;
-              this.options.url = '/filebrowser/upload/file?dest=' + newDest;
+              this.options.url = '/filebrowser/upload/file?dest=' + encodeURI(newDest);
             },
             uploadprogress: function (file, progress) {
               $('[data-dz-name]').each(function (cnt, item) {
@@ -2116,7 +2125,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
-              $.jHueNotify.info(DropzoneGlobals.i18n.uploadCanceled);
+              $.jHueNotify.info(HUE_I18n.dropzone.uploadCanceled);
             },
             complete: function (data) {
               if (data.xhr.response != '') {
@@ -2124,9 +2133,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 if (response && response.status != null) {
                   if (response.status != 0) {
                     $(document).trigger('error', response.data);
-                  }
-                  else {
-                    $(document).trigger('info', response.path + ' ' + DropzoneGlobals.i18n.uploadSucceeded);
+                  } else {
+                    $(document).trigger('info', response.path + ' ' + HUE_I18n.dropzone.uploadSucceeded);
                     viewModel.filesToHighlight.push(response.path);
                   }
                 }
@@ -2148,6 +2156,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
         });
       }
+      % endif
 
       $("#chownForm select[name='user']").change(function () {
         if ($(this).val() == "__other__") {
@@ -2249,6 +2258,18 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           $("#moveNameRequiredAlert").show();
           $("#moveForm").find("input[name='*dest_path']").addClass("fieldError");
           resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+        var isMoveOnSelf = false;
+        $(viewModel.selectedFiles()).each(function (index, file) {
+          if (file.path == $('#moveDestination').val()) {
+            isMoveOnSelf = true;
+            return false;
+          }
+        });
+        if(isMoveOnSelf){
+          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          $('#moveDestination').val('');
           return false;
         }
         return true;

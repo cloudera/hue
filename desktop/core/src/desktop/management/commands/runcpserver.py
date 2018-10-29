@@ -24,7 +24,8 @@ import sys
 from django.utils.translation import ugettext as _
 
 SERVER_HELP = r"""
-  Run Hue using CherryPy server.
+  Run Hue using either the CherryPy server or the Spawning server, based on
+  the current configuration.
 """
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +40,10 @@ class Command(BaseCommand):
     return SERVER_HELP
 
 def runserver():
-  cmdv = supervisor.DjangoCommandSupervisee("runcherrypyserver").cmdv
+  script_name = "rungunicornserver"
+  if conf.USE_CHERRYPY_SERVER.get():
+    script_name = "runcherrypyserver"
+  cmdv = supervisor.DjangoCommandSupervisee(script_name).cmdv
   os.execv(cmdv[0], cmdv)
   LOG.error("Failed to exec '%s' with argument '%s'" % (cmdv[0], cmdv[1],))
   sys.exit(-1)

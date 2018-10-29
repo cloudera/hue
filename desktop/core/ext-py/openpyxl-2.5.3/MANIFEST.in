@@ -1,0 +1,10 @@
+prune openpyxl/tests
+prune openpyxl/sample
+prune openpyxl/benchmarks
+prune openpyxl/develop
+prune scratchpad
+
+recursive-exclude openpyxl test_*.py tests/*.py
+
+include *.rst
+include openpyxl/.constants.json

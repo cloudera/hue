@@ -35,12 +35,13 @@ from hbase.api import HbaseApi
 from hbase.management.commands import hbase_setup
 from hbase.server.hbase_lib import get_thrift_type
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
 
 def has_write_access(user):
-  return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0]) or is_impersonation_enabled()
+  return is_admin(user) or user.has_hue_permission(action="write", app=DJANGO_APPS[0]) or is_impersonation_enabled()
 
 def app(request):
   return render('app.mako', request, {
@@ -74,7 +75,7 @@ def api_router(request, url): # On split, deserialize anything
                 for arg in decoded_url_params] # Deserialize later
 
   if request.POST.get('dest', False):
-    url_params += [request.FILES.get(request.REQUEST.get('dest'))]
+    url_params += [request.FILES.get(request.GET.get('dest'))]
 
   return api_dump(HbaseApi(request.user).query(*url_params))
 

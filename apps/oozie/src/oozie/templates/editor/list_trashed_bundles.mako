@@ -54,7 +54,7 @@ ${ layout.menubar(section='bundles') }
   <table id="bundleTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="bundleCheck"></div></th>
+        <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="bundleCheck"></div></th>
         <th width="10%">${ _('Name') }</th>
         <th width="20%">${ _('Description') }</th>
         <th width="35%">${ _('Coordinators') }</th>
@@ -68,7 +68,7 @@ ${ layout.menubar(section='bundles') }
       % for bundle in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox bundleCheck fa" data-row-selector-exclude="true" data-bundle-id="${ bundle.id }"></div>
+            <div class="hue-checkbox bundleCheck fa" data-row-selector-exclude="true" data-bundle-id="${ bundle.id }"></div>
           </td>
           <td>${ bundle.name }</td>
           <td>${ bundle.description }</td>
@@ -181,8 +181,8 @@ ${ layout.menubar(section='bundles') }
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox[checked='checked']");
-      var can_write = $(".hueCheckbox[checked='checked'][data-bundle-id]");
+      var selector = $(".hue-checkbox[checked='checked']");
+      var can_write = $(".hue-checkbox[checked='checked'][data-bundle-id]");
       if (can_write.length >= 1 && can_write.length == selector.length) {
         $("#destroy-btn").removeAttr("disabled");
         $("#restore-btn").removeAttr("disabled");
@@ -191,7 +191,7 @@ ${ layout.menubar(section='bundles') }
 
     $("#purge-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox").each(function( index ) {
+      $(".hue-checkbox").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("bundle-id"));
       });
       $("#purge-job").modal("show");
@@ -199,7 +199,7 @@ ${ layout.menubar(section='bundles') }
 
     $("#destroy-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("bundle-id"));
       });
       $("#destroy-job").modal("show");
@@ -207,7 +207,7 @@ ${ layout.menubar(section='bundles') }
 
     $("#restore-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
+      $(".hue-checkbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("bundle-id"));
       });
       $("#restore-job").modal("show");

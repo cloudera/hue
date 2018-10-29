@@ -81,7 +81,7 @@ ${ comps.menubar() }
           <tr>
             <td data-row-selector-exclude="true">
                 %if t.taskAttemptIds:
-                <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
+                <a href="${ url('single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
                 %endif
             </td>
             <td>${t.taskId_short}</td>

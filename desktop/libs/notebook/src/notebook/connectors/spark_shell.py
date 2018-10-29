@@ -326,13 +326,13 @@ class SparkApi(Api):
 
       raise QueryError(msg)
 
-  def download(self, notebook, snippet, format):
+  def download(self, notebook, snippet, format, user_agent=None):
     try:
       api = get_spark_api(self.user)
       session = _get_snippet_session(notebook, snippet)
       cell = snippet['result']['handle']['id']
 
-      return spark_download(api, session['id'], cell, format)
+      return spark_download(api, session['id'], cell, format, user_agent=None)
     except Exception, e:
       raise PopupException(e)
 

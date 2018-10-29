@@ -45,11 +45,16 @@ class LdapSynchronizationMiddleware(object):
 
   def process_request(self, request):
     user = request.user
+    server = None
+
+    # Used by tests only
+    if request.method == "GET":
+      server = request.GET.get('server')
 
     if not user or not user.is_authenticated():
       return
 
-    if not User.objects.filter(username=user.username, userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+    if not User.objects.filter(username=user.username, userprofile__creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
       LOG.warn("User %s is not an Ldap user" % user.username)
       return
 
@@ -60,7 +65,7 @@ class LdapSynchronizationMiddleware(object):
       else:
         connection = ldap_access.get_connection_from_server()
 
-      import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False)
+      import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False, server=server)
 
       request.session[self.USER_CACHE_NAME] = True
       request.session.modified = True
@@ -86,7 +91,10 @@ class LastActivityMiddleware(object):
       logout = True
 
     # Save last activity for user except when polling
-    if not (request.path.strip('/') == 'jobbrowser/jobs' and request.POST.get('format') == 'json') and not (request.path == '/desktop/debug/is_idle'):
+    if not (request.path.strip('/') == 'notebook/api/check_status') \
+        and not (request.path.strip('/') == 'jobbrowser/api/jobs') \
+        and not (request.path.strip('/') == 'jobbrowser/jobs' and request.POST.get('format') == 'json') \
+        and not (request.path.strip('/') == 'desktop/debug/is_idle'):
       try:
         profile.last_activity = datetime.now()
         profile.save()
@@ -109,7 +117,12 @@ class ConcurrentUserSessionMiddleware(object):
   Middleware that remove concurrent user sessions when configured
   """
   def process_response(self, request, response):
-    if request.user.is_authenticated() and request.session.modified and request.user.id:
+    try:
+      user = request.user
+    except AttributeError: # When the request does not store user. We care only about the login request which does store the user.
+      return response
+
+    if request.user.is_authenticated() and request.session.modified and request.user.id: # request.session.modified checks if a user just logged in
       limit = SESSION.CONCURRENT_USER_SESSION_LIMIT.get()
       if limit:
         count = 1;

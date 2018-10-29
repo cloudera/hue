@@ -44,7 +44,7 @@
        <configuration>
          <property>
             <name>wf_application_path</name>
-            <value>${ mapping['wf_%s_dir' % bundled.coordinator.workflow.id] }</value>
+            <value>${ mapping['wf_%s_dir' % bundled.coordinator.coordinatorworkflow.id] }</value>
         </property>
          % for param in bundled.get_parameters():
          <property>

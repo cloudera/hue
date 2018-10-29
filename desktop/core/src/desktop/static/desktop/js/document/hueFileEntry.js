@@ -26,6 +26,9 @@ var HueFileEntry = (function () {
       if (!a.isDirectory() && b.isDirectory()) {
         return 1;
       }
+      if (a.isDirectory() && b.isDirectory()) {
+        return sorts.nameAsc(a, b);
+      }
       return sorts.lastModifiedDesc(a, b);
     },
     nameAsc: function (a, b) {
@@ -82,7 +85,6 @@ var HueFileEntry = (function () {
     self.apiHelper = options.apiHelper;
     self.app = options.app;
     self.user = options.user;
-    self.userGroups = options.userGroups;
     self.superuser = options.superuser;
     self.serverTypeFilter = options.serverTypeFilter || ko.observable({ type: 'all' });
     self.statsVisible = ko.observable(false);
@@ -98,49 +100,7 @@ var HueFileEntry = (function () {
     self.isFilterVisible = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
-    self.availableTypeFilters = ko.pureComputed(function () {
-      var filters = {};
-
-      self.entries().forEach(function (entry) {
-        var type = entry.definition().type;
-        if (!filters[type] && type !== 'directory') {
-
-          var label = DocumentTypeGlobals[type];
-          if (!label) {
-            if (type.indexOf('query-') === 0) {
-              label = type.substring(6);
-            } else {
-              label = type
-            }
-            if (label.length > 0) {
-              label = label.charAt(0).toUpperCase() + label.slice(1);
-            }
-          }
-          if (label) {
-            filters[type] = {
-              type: type,
-              label: label
-            }
-          }
-        }
-      });
-      var result = [];
-      Object.keys(filters).forEach(function (key) {
-        result.push(filters[key]);
-      });
-      result.sort(function (a, b) {
-        return a.label.localeCompare(b.label);
-      });
-
-      result.unshift({
-        type: 'all',
-        label: DocumentTypeGlobals['all']
-      });
-
-      return result;
-    });
-
-    self.typeFilter = options.typeFilter || ko.observable(self.availableTypeFilters()[0]); // First one is always 'all'
+    self.typeFilter = options.typeFilter || ko.observable(DOCUMENT_TYPES[0]); // First one is always 'all'
 
     self.isFilterVisible.subscribe(function (newValue) {
       if (!newValue && self.filter()) {
@@ -156,7 +116,8 @@ var HueFileEntry = (function () {
           var entryType = entry.definition().type;
           return (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory')
             && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
-            (DocumentTypeGlobals[entryType] && DocumentTypeGlobals[entryType].toLowerCase().indexOf(filter) !== -1));
+            (HUE_I18n.documentType[entryType] && HUE_I18n.documentType[entryType].toLowerCase().indexOf(filter) !== -1) ||
+            entry.definition().description.toLowerCase().indexOf(filter) !== -1);
         })
       }
       return self.entries();
@@ -221,7 +182,7 @@ var HueFileEntry = (function () {
             return user.username == self.user;
           }).length > 0
           || perms.write.groups.filter(function (writeGroup) {
-            return self.userGroups.indexOf(writeGroup) !== -1
+            return LOGGED_USERGROUPS.indexOf(writeGroup.name) !== -1
           }).length > 0));
     });
 
@@ -269,6 +230,12 @@ var HueFileEntry = (function () {
       }).length > 0;
     });
 
+    self.directorySelected = ko.pureComputed(function () {
+      return self.selectedEntries().filter(function (entry) {
+        return entry.isDirectory();
+      }).length > 0;
+    });
+
     self.selectedEntry = ko.pureComputed(function () {
       if (self.selectedEntries().length === 1) {
         return self.selectedEntries()[0];
@@ -300,7 +267,7 @@ var HueFileEntry = (function () {
 
   HueFileEntry.prototype.highlightInside = function (uuid) {
     var self = this;
-    self.typeFilter(self.availableTypeFilters()[0]);
+    self.typeFilter(DOCUMENT_TYPES[0]);
     var foundEntry;
     self.entries().forEach(function (entry) {
       entry.highlight(false);
@@ -309,16 +276,23 @@ var HueFileEntry = (function () {
       }
     });
     if (foundEntry) {
-      window.setTimeout(function () {
-        huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
-          foundEntry.highlight(true);
-          // Timeout is for animation effect
-          window.setTimeout(function () {
-            foundEntry.highlight(false);
-          }, 1800);
-        });
-        huePubSub.publish('assist.db.scrollTo', foundEntry);
-      }, 0);
+      if (foundEntry.definition().type === 'directory') {
+        self.activeEntry(foundEntry);
+        if (!foundEntry.entries().length) {
+          foundEntry.load();
+        }
+      } else {
+        window.setTimeout(function () {
+          huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+            foundEntry.highlight(true);
+            // Timeout is for animation effect
+            window.setTimeout(function () {
+              foundEntry.highlight(false);
+            }, 1800);
+          });
+          huePubSub.publish('assist.db.scrollTo', foundEntry);
+        }, 0);
+      }
     }
   };
 
@@ -429,6 +403,31 @@ var HueFileEntry = (function () {
       self.selectedEntry().loadDocument();
       $('#shareDocumentModal').modal('show');
     }
+  };
+
+  HueFileEntry.prototype.copy = function () {
+    var self = this;
+    if (self.selectedEntries().indexOf(self) !== -1) {
+      self.activeEntry(self.parent);
+    }
+    var copyNext = function () {
+      if (self.selectedEntries().length > 0) {
+        var nextUuid = self.selectedEntries().shift().definition().uuid;
+        self.apiHelper.copyDocument({
+          uuid: nextUuid,
+          successCallback: function () {
+            copyNext();
+          },
+          errorCallback: function () {
+            self.activeEntry().load();
+          }
+        });
+      } else {
+        huePubSub.publish('assist.document.refresh');
+        self.activeEntry().load();
+      }
+    };
+    copyNext();
   };
 
   HueFileEntry.prototype.loadDocument = function () {
@@ -660,7 +659,6 @@ var HueFileEntry = (function () {
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       self.removeDocuments(false);
-      huePubSub.publish('assist.document.refresh');
     }
   };
 
@@ -697,6 +695,7 @@ var HueFileEntry = (function () {
           errorCallback: function () {
             self.activeEntry().load();
             $('#deleteEntriesModal').modal('hide');
+            $(".modal-backdrop").remove();
             self.deletingEntries(false);
           }
         });
@@ -704,6 +703,7 @@ var HueFileEntry = (function () {
         self.deletingEntries(false);
         huePubSub.publish('assist.document.refresh');
         $('#deleteEntriesModal').modal('hide');
+        $(".modal-backdrop").remove();
         self.activeEntry().load();
       }
     };

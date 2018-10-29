@@ -20,5 +20,5 @@ from django.conf.urls import url
 from desktop.lib.metrics import views
 
 urlpatterns = [
-  url(r'^$', views.index, name='index'),
+  url(r'^$', views.index, name='desktop.lib.metrics.views.index'),
 ]

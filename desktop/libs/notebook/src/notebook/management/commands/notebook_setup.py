@@ -22,6 +22,7 @@ import pwd
 from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from desktop.models import Directory, Document, Document2, Document2Permission, SAMPLE_USER_OWNERS
 from useradmin.models import get_default_user_group, install_sample_user
@@ -44,8 +45,9 @@ class Command(BaseCommand):
     if not Document2.objects.filter(uuid="7f2ea775-e067-4fde-8f5f-4d704ab9b002").exists():
       sample_user = install_sample_user()
 
-      management.call_command('loaddata', 'initial_notebook_examples.json', verbosity=2)
-      Document.objects.sync()
+      with transaction.atomic():
+        management.call_command('loaddata', 'initial_notebook_examples.json', verbosity=2, commit=False)
+        Document.objects.sync()
 
       # Get or create sample user directories
       home_dir = Directory.objects.get_home_directory(sample_user)

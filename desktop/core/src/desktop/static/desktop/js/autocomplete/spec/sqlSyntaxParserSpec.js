@@ -107,6 +107,22 @@
       expect(result).toBeTruthy();
     });
 
+    it('should find errors for "select * from foo where method = 1;"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * from foo where method = 1;', '', 'impala');
+      expect(result).toBeTruthy();
+      expect(result.expected.some(function (expected) { return expected.text === '`method`' })).toBeTruthy();
+      expect(result.expectedIdentifier).toBeTruthy();
+      expect(result.possibleReserved).toBeTruthy();
+    });
+
+    it('should find errors for "select * from using where a = 1;"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * from using where a = 1;', '', 'hive');
+      expect(result).toBeTruthy();
+      expect(result.expected.some(function (expected) { return expected.text === '`using`' })).toBeTruthy();
+      expect(result.expectedIdentifier).toBeTruthy();
+      expect(result.possibleReserved).toBeTruthy();
+    });
+
     it('should suggest expected words for "SLELECT "', function() {
       var result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
       expect(result).toBeTruthy();
@@ -162,7 +178,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');
         expect(result).toBeTruthy();
-        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'RELOAD', 'ABORT', 'ANALYZE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MSCK', 'REVOKE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'RELOAD', 'ABORT', 'ANALYZE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MERGE', 'MSCK', 'REVOKE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
       });
     });
 
@@ -170,7 +186,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'impala');
         expect(result).toBeTruthy();
-        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'UPSERT', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'COMMENT', 'INSERT', 'UPSERT', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
       });
     })
 

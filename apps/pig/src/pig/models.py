@@ -20,13 +20,14 @@ import posixpath
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
-from django.core.urlresolvers import reverse
+from django.contrib.contenttypes.fields import GenericRelation
+from django.urls import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
+from desktop.auth.backend import is_admin
 
 
 class Document(models.Model):
@@ -35,7 +36,7 @@ class Document(models.Model):
                                      help_text=_t('If the document is not a submitted job but a real query, script, workflow.'))
 
   def is_editable(self, user): # Deprecated
-    return user.is_superuser or self.owner == user
+    return is_admin(user) or self.owner == user
 
   def can_edit_or_exception(self, user, exception_class=PopupException): # Deprecated
     if self.is_editable(user):
@@ -57,7 +58,7 @@ class PigScript(Document):
       'hadoopProperties': []
   }))
 
-  doc = generic.GenericRelation(Doc, related_name='pig_doc')
+  doc = GenericRelation(Doc, related_query_name='pig_doc')
 
   isV2 = False
 

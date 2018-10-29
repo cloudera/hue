@@ -1,0 +1,14 @@
+1.3.5
+-----
+
+1.3.5 fixes several minor issues, including the gathering of tests when using
+package notation, using the coverage plugin with multiprocessing, and several
+others.  See the CHANGELOG for more details.
+
+Also note that nose 1.x is in maintenance mode.  We will not be
+looking to add any features, and you should seriously consider
+looking at nose2 as the way forward.
+
+If you're interested in the future of nose, please take a look at the
+nose2 project on github (https://github.com/nose-devs/nose2) or pypi
+(http://pypi.python.org/pypi/nose2/0.5.0).

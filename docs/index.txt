@@ -1,22 +1,30 @@
 image:images/hue_logo.png[Hue Logo]
 ===================================
 
-Installation
+Hue is an open source graphical user interface to operate and develop applications for
+performing self-service data analytics: link:http://gethue.com[gethue.com].
+
+Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily
+used by hundreds of Cloudera customers executing millions of queries daily.
+
+
+Administrate
 ------------
-The link:manual.html[manual] has instructions to install Hue.
+The link:admin-manual/manual.html[manual] has instructions to install and administrate Hue.
 
 User Guide
 ----------
-The link:user-guide/index.html[user guide] has instructions about how to use Hue.
+The link:user-guide/user-guide.html[user guide] has instructions about how to use Hue.
 
 SDK
 ---
-We encourage you to build an application within the Hue environment. See the
-link:sdk/sdk.html[SDK Documentation] to get started.
+We encourage you to link:sdk/sdk.html[build or extend applications] within the Hue environment.
 
 Release Notes
 -------------
 
+* October 17, 2018 --- link:release-notes/release-notes-4.3.0.html[Version 4.3.0]
+* April 4, 2018 --- link:release-notes/release-notes-4.2.0.html[Version 4.2.0]
 * October 4, 2017 --- link:release-notes/release-notes-4.1.0.html[Version 4.1.0]
 * June 9, 2017 --- link:release-notes/release-notes-4.0.0.html[Version 4.0.0]
 * Feb 6, 2017 --- link:release-notes/release-notes-3.12.0.html[Version 3.12.0]
@@ -45,3 +53,7 @@ Release Notes
 * March 31, 2010 --- link:release-notes/release-notes-0.4.0.html[Version 0.4.0]
 * November 23, 2009 --- link:release-notes/release-notes-0.3.0.html[Version 0.3.0]
 * October 2, 2009 --- Version 0.2.0
+
+
+
+Documentation improvements? link:https://github.com/cloudera/hue/tree/master/docs[Feel free to send a pull request].

@@ -35,8 +35,9 @@ from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from desktop.conf import SASL_MAX_BUFFER
+from desktop.conf import SASL_MAX_BUFFER, CHERRYPY_SERVER_THREADS, ENABLE_SMART_THRIFT_POOL
 
+from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
@@ -44,15 +45,13 @@ from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
 
+LOG = logging.getLogger(__name__)
+
+
 # The maximum depth that we will recurse through a "jsonable" structure
 # while converting to thrift. This prevents us from infinite recursion
 # in the case of circular references.
 MAX_RECURSION_DEPTH = 50
-
-# When a thrift call finishes, the level at which we log its duration
-# depends on the number of millis the call took.
-WARN_LEVEL_CALL_DURATION_MS = 5000
-INFO_LEVEL_CALL_DURATION_MS = 1000
 
 
 class LifoQueue(Queue.Queue):
@@ -94,7 +93,8 @@ class ConnectionConfig(object):
                transport='buffered',
                multiple=False,
                transport_mode='socket',
-               http_url=''):
+               http_url='',
+               coordinator_host=''):
     """
     @param klass The thrift client class
     @param host Host to connect to
@@ -117,6 +117,7 @@ class ConnectionConfig(object):
     @param multiple Whether Use MultiplexedProtocol
     @param transport_mode Can be socket or http
     @param Url used when using http transport mode
+    @param Host for Impala coordinator to create coordinator specific pool
     """
     self.klass = klass
     self.host = host
@@ -137,11 +138,18 @@ class ConnectionConfig(object):
     self.multiple = multiple
     self.transport_mode = transport_mode
     self.http_url = http_url
+    self.coordinator_host = coordinator_host
 
   def __str__(self):
     return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
                                self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport,
-                               self.multiple, self.transport_mode, self.http_url]))
+                               self.multiple, self.transport_mode, self.http_url, self.coordinator_host]))
+
+  def update_coordinator_host(self, coordinator_host):
+    self.coordinator_host = coordinator_host
+
+  def get_coordinator_host(self):
+    return self.coordinator_host
 
 class ConnectionPooler(object):
   """
@@ -165,13 +173,16 @@ class ConnectionPooler(object):
     self.poolsize = poolsize
     self.dictlock = threading.Lock()
 
-  def get_client(self, conf, get_client_timeout=None):
-    """
-    Could block while we wait for the pool to become non-empty.
+  def create_pool_impala(self, conf):
+    self.dictlock.acquire()
+    try:
+      if _get_pool_key(conf) not in self.pooldict:
+        q = LifoQueue(self.poolsize)
+        self.pooldict[_get_pool_key(conf)] = q
+    finally:
+      self.dictlock.release()
 
-    @param get_client_timeout: how long (in seconds) to wait on the pool
-                               to get a client before failing
-    """
+  def create_pool(self, conf):
     # First up, check to see if we have a pool for this endpoint
     if _get_pool_key(conf) not in self.pooldict:
       # Uh-oh, we need to initialise the queue. Take the dict lock.
@@ -207,10 +218,19 @@ class ConnectionPooler(object):
       finally:
         self.dictlock.release()
 
+  def get_client(self, conf, get_client_timeout=None):
+    """
+    Could block while we wait for the pool to become non-empty.
+
+    @param get_client_timeout: how long (in seconds) to wait on the pool
+                               to get a client before failing
+    """
     connection = None
 
     start_pool_get_time = time.time()
     has_waited_for = 0
+
+    self.create_pool(conf)
 
     while connection is None:
       if get_client_timeout is not None:
@@ -219,16 +239,19 @@ class ConnectionPooler(object):
         this_round_timeout = None
 
       try:
-        connection = self.pooldict[_get_pool_key(conf)].get(
-          block=True, timeout=this_round_timeout)
+        connection = self.pooldict[_get_pool_key(conf)].get(block=True, timeout=this_round_timeout)
+        if connection is not None:
+          duration = time.time() - start_pool_get_time
+          message = "Thrift client %s got connection %s after %.2f seconds" % (self, connection.CID, duration)
+          log_if_slow_call(duration=duration, message=message)
       except Queue.Empty:
         has_waited_for = time.time() - start_pool_get_time
         if get_client_timeout is not None and has_waited_for > get_client_timeout:
           raise socket.timeout(
-            ("Timed out after %.2f seconds waiting to retrieve a " +
-             "%s client from the pool.") % (has_waited_for, conf.service_name))
-        logging.warn("Waited %d seconds for a thrift client to %s:%d" %
-          (has_waited_for, conf.host, conf.port))
+            ("Timed out after %.2f seconds waiting to retrieve a %s client from the pool.") % (has_waited_for, conf.service_name))
+        else:
+          message = "Waited %d seconds for a Thrift client to %s:%d %s" % (has_waited_for, conf.host, conf.port, conf.get_coordinator_host())
+          log_if_slow_call(duration=has_waited_for, message=message)
 
     return connection
 
@@ -238,6 +261,12 @@ class ConnectionPooler(object):
     pass back a client that was not retrieved from a pool, and
     you might well get an exception for doing so.
     """
+    if client.get_coordinator_host() is not None:
+      conf.update_coordinator_host(client.get_coordinator_host())
+      self.create_pool_impala(conf)
+    if client.get_coordinator_host() is not None and client.get_coordinator_host() != conf.get_coordinator_host():
+      conf.update_coordinator_host(client.get_coordinator_host())
+
     self.pooldict[_get_pool_key(conf)].put(client)
 
 def _get_pool_key(conf):
@@ -245,7 +274,7 @@ def _get_pool_key(conf):
   Given a ConnectionConfig, return the tuple used as the key in the dictionary
   of connections by the ConnectionPooler class.
   """
-  return (conf.klass, conf.host, conf.port)
+  return (conf.klass, conf.host, conf.port, conf.get_coordinator_host())
 
 def construct_superclient(conf):
   """
@@ -264,6 +293,7 @@ def connect_to_thrift(conf):
   """
   if conf.transport_mode == 'http':
     mode = THttpClient(conf.http_url)
+    mode.set_verify(conf.validate)
   else:
     if conf.use_ssl:
       mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
@@ -306,7 +336,8 @@ def connect_to_thrift(conf):
   return service, protocol, transport
 
 
-_connection_pool = ConnectionPooler()
+_connection_pool = ConnectionPooler(poolsize=CHERRYPY_SERVER_THREADS.get())
+
 
 def get_client(klass, host, port, service_name, **kwargs):
   conf = ConnectionConfig(klass, host, port, service_name, **kwargs)
@@ -322,6 +353,7 @@ def _grab_transport_from_wrapper(outer_transport):
   else:
     raise Exception("Unknown transport type: " + outer_transport.__class__)
 
+
 class PooledClient(object):
   """
   A wrapper for a SuperClient
@@ -334,8 +366,7 @@ class PooledClient(object):
       return self.__dict__[attr_name]
 
     # Fetch the thrift client from the pool
-    superclient = _connection_pool.get_client(self.conf,
-        get_client_timeout=self.conf.timeout_seconds)
+    superclient = _connection_pool.get_client(self.conf, get_client_timeout=self.conf.timeout_seconds)
 
     # Fetch the attribute. If it's callable, wrap it in a wrapper that re-gets
     # the client.
@@ -373,7 +404,6 @@ class PooledClient(object):
             superclient.transport.open()
 
           superclient.set_timeout(self.conf.timeout_seconds)
-
           return attr(*args, **kwargs)
         except TApplicationException, e:
           # Unknown thrift exception... typically IO errors
@@ -409,10 +439,14 @@ class SuperClient(object):
   TODO(todd): get this into the Thrift lib
   """
 
-  def __init__(self, wrapped_client, transport, timeout_seconds=None):
+  def __init__(self, wrapped_client, transport, timeout_seconds=None, coordinator_host=None):
     self.wrapped = wrapped_client
     self.transport = transport
     self.timeout_seconds = timeout_seconds
+    self.coordinator_host = coordinator_host
+
+  def get_coordinator_host(self):
+    return self.coordinator_host
 
   def __getattr__(self, attr):
     if attr in self.__dict__:
@@ -421,6 +455,7 @@ class SuperClient(object):
     res = getattr(self.wrapped, attr)
     if not hasattr(res, '__call__'):
       return res
+
     def wrapper(*args, **kwargs):
       tries_left = 3
       while tries_left:
@@ -433,10 +468,14 @@ class SuperClient(object):
           st = time.time()
 
           str_args = _unpack_guid_secret_in_handle(repr(args))
-          logging.debug("Thrift call: %s.%s(args=%s, kwargs=%s)"
-            % (str(self.wrapped.__class__), attr, str_args, repr(kwargs)))
+          logging.debug("Thrift call: %s.%s(args=%s, kwargs=%s)" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs)))
 
           ret = res(*args, **kwargs)
+
+          if ENABLE_SMART_THRIFT_POOL.get() and 'OpenSession' == attr and 'http_addr' in repr(ret):
+            coordinator_host = re.search('http_addr\':\ \'(.*:[0-9]{2,})\', \'', repr(ret))
+            self.coordinator_host = coordinator_host.group(1)
+
           log_msg = _unpack_guid_secret_in_handle(repr(ret))
 
           # Truncate log message, increase output in DEBUG mode
@@ -445,16 +484,9 @@ class SuperClient(object):
 
           duration = time.time() - st
 
-          # Log the duration at different levels, depending on how long
-          # it took.
-          logmsg = "Thrift call %s.%s returned in %dms: %s" % (
-            str(self.wrapped.__class__), attr, duration * 1000, log_msg)
-          if duration >= WARN_LEVEL_CALL_DURATION_MS:
-            logging.warn(logmsg)
-          elif duration >= INFO_LEVEL_CALL_DURATION_MS:
-            logging.info(logmsg)
-          else:
-            logging.debug(logmsg)
+          # Log the duration at different levels, depending on how long it took.
+          logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs), duration * 1000, log_msg)
+          log_if_slow_call(duration=duration, message=logmsg)
 
           return ret
         except socket.error, e:
@@ -464,6 +496,7 @@ class SuperClient(object):
         except Exception, e:
           logging.exception("Thrift saw exception (this may be expected).")
           raise
+
         self.transport.close()
 
         if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
@@ -751,3 +784,13 @@ def fixup_enums(obj, name_class_map, suffix="AsString"):
 
 def is_thrift_struct(o):
   return hasattr(o.__class__, "thrift_spec")
+
+
+# Same in resource.py for not losing the trace class
+def log_if_slow_call(duration, message):
+  if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
+    LOG.warn('SLOW: %.2f - %s' % (duration, message))
+  elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
+    LOG.info('SLOW: %.2f - %s' % (duration, message))
+  else:
+    LOG.debug(message)

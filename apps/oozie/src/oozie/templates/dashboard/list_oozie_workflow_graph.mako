@@ -113,6 +113,7 @@ ${ dashboard.import_layout() }
                     _w.logsURL(action.log);
                     _w.externalIdUrl(action.externalIdUrl);
                     _w.externalId(action.id);
+                    _w.externalJobId(action.externalJobId);
                   }
                 });
               %endif
@@ -144,6 +145,15 @@ ${ dashboard.import_layout() }
       });
 
     %endif
+    % if layout_json == '':
+      $.ajax({
+        'url': "${oozie_workflow.get_absolute_url()}?format=svg",
+        'type': 'GET',
+        success: function (svgData) {
+          $("#workflow_graph").append(svgData);
+        }
+        });
+    % endif
 
     $(document).ready(function () {
       % if layout_json != '':

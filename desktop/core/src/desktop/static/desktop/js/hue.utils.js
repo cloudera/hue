@@ -119,8 +119,36 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
  * Add utility methods to the HUE object
 */
 
-(function (hueUtils) {
+window.hueUtils = window.hueUtils || (function () {
   'use strict';
+
+  var hueUtils = {};
+
+  hueUtils.bootstrapRatios = {
+    span3: function () {
+      var windowWidth = $(window).width();
+      if (windowWidth >= 1200) {
+        return 23.07692308;
+      } else if (windowWidth >= 768 && windowWidth <= 979) {
+        return 22.9281768;
+      } else {
+        return 23.17073171;
+      }
+    },
+    span9: function () {
+      var windowWidth = $(window).width();
+      if (windowWidth >= 1200) {
+        return 74.35897436;
+      } else if (windowWidth >= 768 && windowWidth <= 979) {
+        return 74.30939227;
+      } else {
+        return 74.3902439;
+      }
+    },
+    margin: function () {
+      return 2.56410256;
+    }
+  };
 
   /*
    * Convert text to URLs
@@ -195,11 +223,42 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     }
   };
 
-  hueUtils.changeURL = function (newURL) {
-    if (window.location.hash !== '' && newURL.indexOf('#') === -1){
-      newURL = newURL + window.location.hash;
+  hueUtils.changeURL = function (newURL, params) {
+    var extraSearch = '';
+    if (params) {
+      var newSearchKeys = Object.keys(params);
+      if (newSearchKeys.length) {
+        while (newSearchKeys.length) {
+          var newKey = newSearchKeys.pop();
+          extraSearch += newKey + '=' + params[newKey];
+          if (newSearchKeys.length) {
+            extraSearch += '&';
+          }
+        }
+      }
     }
-    window.history.pushState(null, null, newURL);
+
+    if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
+      var search = window.location.search;
+      if (extraSearch) {
+        search += (search ? '&' : '?') + extraSearch
+      }
+      newURL = window.location.pathname + search + '#!' + newURL.replace('/hue', '');
+      window.history.pushState(null, null, newURL);
+      return;
+    }
+
+    var hashSplit = newURL.split('#');
+    var url = hashSplit[0];
+    if (extraSearch) {
+      url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;
+    }
+    if (hashSplit.length > 1) {
+      url += '#' + hashSplit[1];
+    } else if (window.location.hash) {
+      url += window.location.hash;
+    }
+    window.history.pushState(null, null, url);
   };
 
   hueUtils.replaceURL = function (newURL) {
@@ -207,27 +266,52 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
   };
 
   hueUtils.changeURLParameter = function (param, value) {
-    var newSearch = '';
-    if (window.location.getParameter(param, true) !== null) {
-      newSearch += '?';
-      window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
-        if (p.split('=')[0] !== param) {
-          newSearch += p;
-        }
-      });
-      if (value){
-        newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+    if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
+      var currentUrl = window.location.hash.replace('#!', '');
+      var parts = currentUrl.split('?');
+      var path = parts[0];
+      var search = parts.length > 1 ? parts[1] : '';
+      if (~search.indexOf(param + '=' + value)) {
+        return;
       }
-    }
-    else {
-      newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
-    }
+      if (~search.indexOf(param + '=')) {
+        if (!value) {
+          search = search.replace(new RegExp(param + '=[^&]*&?'), '');
+        } else {
+          search = search.replace(new RegExp(param + '=[^&]*'), param + '=' + value);
+        }
+      } else if (value) {
+        if (search) {
+          search += '&';
+        }
+        search += param + '=' + value;
+      } else {
+        return;
+      }
 
-    if (newSearch === '?') {
-      newSearch = '';
-    }
+      hueUtils.changeURL(search ? path + '?' + search : path);
+    } else {
+      var newSearch = '';
+      if (window.location.getParameter(param, true) !== null) {
+        newSearch += '?';
+        window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
+          if (p.split('=')[0] !== param) {
+            newSearch += p;
+          }
+        });
+        if (value){
+          newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+        }
+      } else {
+        newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
+      }
 
-    hueUtils.changeURL(window.location.pathname + newSearch);
+      if (newSearch === '?') {
+        newSearch = '';
+      }
+
+      hueUtils.changeURL(window.location.pathname + newSearch);
+    }
   };
 
   hueUtils.removeURLParameter = function (param) {
@@ -319,7 +403,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
 
   hueUtils.scrollbarWidth = function () {
     var $parent, $children, width;
-    $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+    $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(HUE_CONTAINER);
     $children = $parent.children();
     width = $children.innerWidth() - $children.height(99).innerWidth();
     $parent.remove();
@@ -345,24 +429,6 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     }
   };
 
-  hueUtils.initNiceScroll = function ($el, options) {
-    var defaults = {
-      cursorcolor: "#7D7D7D",
-      cursorborder: "1px solid #7D7D7D",
-      cursoropacitymin: 0,
-      cursoropacitymax: navigator.platform.indexOf('Win') > -1 ? 1: 0.7,
-      mousescrollstep: 60,
-      cursorwidth: "6px",
-      railpadding: { top: 1, right: 1, left: 1, bottom: 1 },
-      hidecursordelay: 0,
-      scrollspeed: 100,
-      cursorminheight: 20,
-      horizrailenabled: true,
-      autohidemode: "leave"
-    };
-    return $el.niceScroll($.extend(defaults, options || {}));
-  };
-
   hueUtils.equalIgnoreCase = function (a, b) {
     return a && b && a.toLowerCase() === b.toLowerCase();
   };
@@ -374,7 +440,63 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     return str;
   }
 
-}(hueUtils = window.hueUtils || {}));
+  hueUtils.getStyleFromCSSClass = function (cssClass) {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+      for (var x = 0; x < cssClasses.length; x++) {
+        if (cssClasses[x].selectorText == cssClass) {
+          return (cssClasses[x].style) ? cssClasses[x].style : cssClasses[x];
+        }
+      }
+    }
+  };
+
+  hueUtils.highlight = function (text, searchTerm) {
+    if (searchTerm === '' || text === '') {
+      return text;
+    }
+
+    var remText = text;
+    var highLightedText = '';
+    searchTerm = searchTerm.toLowerCase();
+
+    do {
+      var remLowerText = remText.toLowerCase();
+      var startIndex = remLowerText.indexOf(searchTerm);
+      if(startIndex >= 0) {
+        highLightedText += remText.substring(0, startIndex) + '<strong>' + remText.substring(startIndex, startIndex + searchTerm.length) + '</strong>';
+        remText = remText.substring(startIndex + searchTerm.length);
+      } else {
+         highLightedText += remText;
+      }
+    } while (startIndex >= 0);
+
+    return highLightedText;
+  };
+
+  hueUtils.dfs = function(node, callback) {
+    if (!node || typeof(node) !== 'object') {
+      return;
+    }
+    Object.keys(node).forEach(function(key) {
+      callback(node, key);
+      hueUtils.dfs(node[key], callback);
+    });
+  };
+
+  hueUtils.deleteAllEmptyStringKey = function(node) {
+    var fDeleteEmptyStringKey = function (node, key) {
+      if (node[key] || typeof(node[key]) !== 'string') {
+        return;
+      }
+      delete node[key];
+    };
+    hueUtils.dfs(node, fDeleteEmptyStringKey);
+  };
+
+  return hueUtils;
+
+})();
 
 if (!Object.keys) {
 
@@ -599,6 +721,26 @@ var hueDrop = (function () {
   };
 })();
 
+if (!window.hueDebug) {
+  window.hueDebug = {};
+}
+
+window.hueDebug.clearCaches = function () {
+  var promises = [];
+  var clearInstance = function(prefix) {
+    promises.push(localforage.createInstance({ name: prefix + LOGGED_USERNAME }).clear());
+  };
+  clearInstance('HueContextCatalog_');
+  clearInstance('HueDataCatalog_');
+  clearInstance('HueDataCatalog_hive_');
+  clearInstance('HueDataCatalog_hive_multiTable_');
+  clearInstance('HueDataCatalog_impala_');
+  clearInstance('HueDataCatalog_impala_multiTable_');
+  Promise.all(promises).then(function () {
+    console.log('Done! Refresh the browser.');
+  })
+};
+
 var hueDebugTimer = (function () {
   var initialTime = null;
   var times = [];
@@ -661,7 +803,7 @@ Number.prototype.toHHMMSS = function (skipZeroSeconds) {
     val = val.substr(0, val.length - 1);
   }
   return val;
-}
+};
 
 String.prototype.hashCode = function() {
   var hash = 0, i, chr, len;
@@ -672,6 +814,23 @@ String.prototype.hashCode = function() {
     hash |= 0; // Convert to 32bit integer
   }
   return hash;
+};
+
+String.prototype.regexLastIndexOf = function (regex, startpos) {
+  regex = (regex.global) ? regex : new RegExp(regex.source, "g" + (regex.ignoreCase ? "i" : "") + (regex.multiLine ? "m" : ""));
+  if (typeof (startpos) == "undefined") {
+    startpos = this.length;
+  } else if (startpos < 0) {
+    startpos = 0;
+  }
+  var stringToWorkWith = this.substring(0, startpos + 1);
+  var lastIndexOf = -1;
+  var nextStop = 0;
+  while ((result = regex.exec(stringToWorkWith)) != null) {
+    lastIndexOf = result.index;
+    regex.lastIndex = ++nextStop;
+  }
+  return lastIndexOf;
 };
 
 if (!('getParameter' in window.location)) {

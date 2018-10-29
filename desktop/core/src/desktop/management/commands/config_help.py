@@ -14,10 +14,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 import desktop.appmanager
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   """Prints documentation for configuration."""
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     desktop.lib.conf.GLOBAL_CONFIG.print_help(skip_header=True)

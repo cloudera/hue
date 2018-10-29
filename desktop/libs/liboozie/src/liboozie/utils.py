@@ -29,6 +29,7 @@ import re
 import time
 
 from datetime import datetime
+from dateutil.parser import parse
 from time import strftime
 from xml.sax.saxutils import escape
 
@@ -41,7 +42,7 @@ def catch_unicode_time(u_time):
   if type(u_time) == time.struct_time:
     return u_time
   else:
-    return datetime.timetuple(datetime.strptime(u_time, '%a, %d %b %Y %H:%M:%S %Z'))
+    return datetime.timetuple(parse(u_time))
 
 
 def parse_timestamp(timestamp, time_format=None):
@@ -88,7 +89,19 @@ def format_time(time, format='%d %b %Y %H:%M:%S'):
   if time is None:
     return ''
 
+  fmt_time = None
   if type(time) == unicode:
     return time
   else:
-    return strftime(format, time)
+    try:
+      fmt_time = strftime(format, time)
+    except:
+      fmt_time = None
+
+    if fmt_time is None:
+      try:
+        fmt_time = strftime(format+" %f", time)
+      except:
+        fmt_time = None
+
+    return fmt_time

@@ -58,16 +58,16 @@ ${ assist.assistPanel() }
   <h1>
     <!-- ko with: index() -->
     <div class="inline-block pull-right">
-      <a class="inactive-action" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Search the index')}" href="javascript:void(0)">
-        <i class="fa fa-search fa-fw"></i>
+      <a class="btn btn-default" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Query in a Dashboard')}" href="javascript:void(0)">
+        <i class="fa fa-search fa-fw"></i> ${_('Query')}
       </a>
 
-      <a class="inactive-action" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Add Data')}">
-        <i class="fa fa-upload fa-fw"></i>
+      <a class="btn btn-default" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Add data to the index')}">
+        <i class="fa fa-upload fa-fw"></i> ${_('Index')}
       </a>
 
-      <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }">
-        <i class="fa fa-times fa-fw"></i>
+      <a class="btn btn-default" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }" title="${_('Delete the index')}">
+        <i class="fa fa-times fa-fw"></i> ${_('Delete')}
       </a>
     </div>
     <!-- /ko -->
@@ -136,7 +136,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         % endif
-        <div class="content-panel" ${ not is_embeddable and 'data-bind="niceScroll"' or ''}>
+        <div class="content-panel">
 
 
           <div class="indexer-main">
@@ -227,7 +227,7 @@ ${ assist.assistPanel() }
                 <thead>
                   <tr>
                     <th style="width: 1%">
-                      <div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: alias.availableCollections, selectedValues: alias.chosenCollections }"></div>
+                      <div class="hue-checkbox fa" data-bind="hueCheckAll: { allValues: alias.availableCollections, selectedValues: alias.chosenCollections }"></div>
                     </th>
                     <th>${_('Collection')}</th>
                   </tr>
@@ -236,7 +236,7 @@ ${ assist.assistPanel() }
                 <!-- ko foreach: alias.availableCollections -->
                 <tr>
                   <td>
-                    <div class="hueCheckbox fa" data-bind="multiCheck: '#indexesChecksTable', value: $data, hueChecked: $parent.alias.chosenCollections"></div>
+                    <div class="hue-checkbox fa" data-bind="multiCheck: '#indexesChecksTable', value: $data, hueChecked: $parent.alias.chosenCollections"></div>
                   </td>
                   <td data-bind="text: name"></td>
                 </tr>
@@ -265,7 +265,7 @@ ${ assist.assistPanel() }
   <table class="table table-condensed datatables" id="list-indexes-table">
     <thead>
       <tr>
-        <th class="vertical-align-middle" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="vertical-align-middle" width="1%"><div data-bind="click: selectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Type') }</th>
         <th>${ _('Collections') }</th>
@@ -274,7 +274,7 @@ ${ assist.assistPanel() }
     <tbody data-bind="foreach: { data: filteredIndexes }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
-          <div data-bind="multiCheck: '#list-indexes-table', css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
+          <div data-bind="multiCheck: '#list-indexes-table', css: { 'hue-checkbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
         <td><a class="pointer" data-bind="text: name, click: function() { $root.fetchIndex($data); }"></a></td>
         <td data-bind="text: type"></td>
@@ -295,6 +295,7 @@ ${ assist.assistPanel() }
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')} (<span data-bind="text: sample().length"></span>)</a></li>
+    <li><a href="#index-config" data-toggle="tab" data-bind="click: function(){ if (!config()) { getConfig(); }; $root.tab('index-config'); }">${_('Config')}</a></li>
   </ul>
 
   <div class="tab-content" style="border: none; overflow: hidden">
@@ -316,7 +317,18 @@ ${ assist.assistPanel() }
         <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
       <!-- /ko -->
       <!-- ko if: !sample() || sample().length === 0 -->
-      <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
+        <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
+      <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="index-config">
+      <!-- ko hueSpinner: { spin: $root.index().loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
+
+      <!-- ko if: config() -->
+        <div data-bind="readOnlyAce: config, type: 'json'"></div>
+      <!-- /ko -->
+      <!-- ko if: !config() -->
+        <div class="margin-top-10 margin-left-10">${ _('The config could not be retrieved.')}</div>
       <!-- /ko -->
     </div>
   </div>
@@ -363,7 +375,7 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="indexes-index-fields-fields">
-  <div>
+  <div style="overflow: auto">
     <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
@@ -371,10 +383,18 @@ ${ assist.assistPanel() }
           <th style="width: 2%"></th>
           <th>${ _('Name') }</th>
           <th>${ _('Type') }</th>
-          <th>${ _('Required') }</th>
-          <th>${ _('Stored') }</th>
           <th>${ _('Indexed') }</th>
+          <th>${ _('Stored') }</th>
+          <th>${ _('Required') }</th>
           <th>${ _('Multivalued') }</th>
+          <th>${ _('Term Vectors') }</th>
+          <th>${ _('Tokenized') }</th>
+          <th>${ _('Term Positions') }</th>
+          <th>${ _('Term Offsets') }</th>
+          <th>${ _('Omit Norms') }</th>
+          <th>${ _('Omit TermFreq and Positions') }</th>
+          <th>${ _('Sort Missing Last') }</th>
+          <th>${ _('DocValues') }</th>
         </tr>
       </thead>
       <tbody data-bind="foreach: $data">
@@ -385,10 +405,18 @@ ${ assist.assistPanel() }
           </td>
           <td data-bind="text: name"></td>
           <td data-bind="text: type"></td>
-          <td><i data-bind="visible: $data.required" class="fa fa-check muted"></i></td>
-          <td><i data-bind="visible: $data.stored" class="fa fa-check muted"></i></td>
-          <td><i data-bind="visible: $data.indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: typeof $data.indexed == 'undefined' || $data.indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: typeof $data.stored == 'undefined' || $data.stored" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.required " class="fa fa-check muted"></i></td>
           <td><i data-bind="visible: $data.multiValued" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.termVectors" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.tokenized" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.termPositions" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.termOffsets" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: (typeof $data.omitNorms == 'undefined' && type().indexOf('text') == -1) || $data.omitNorms" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: (typeof $data.omitTermFreqAndPositions == 'undefined' && type().indexOf('text') == -1) || $data.omitTermFreqAndPositions" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: !$data.sortMissingLast" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.docValues" class="fa fa-check muted"></i></td>
         </tr>
       </tbody>
     </table>
@@ -549,6 +577,7 @@ ${ assist.assistPanel() }
 
       self.dynamicFields = ko.mapping.fromJS(index.schema.dynamicFields);
       self.copyFields = ko.mapping.fromJS(index.schema.copyFields);
+      self.config = ko.observable('');
 
       self.sample = ko.observableArray();
       self.samplePreview = ko.pureComputed(function () {
@@ -556,6 +585,7 @@ ${ assist.assistPanel() }
       });
 
       self.loadingSample = ko.observable(false);
+      self.loadingConfig = ko.observable(false);
 
       self.getSample = function () {
         self.loadingSample(true);
@@ -572,6 +602,23 @@ ${ assist.assistPanel() }
           $(document).trigger("error", xhr.responseText);
         }).always(function () {
           self.loadingSample(false);
+        });
+      };
+
+      self.getConfig = function () {
+        self.loadingConfig(true);
+        $.post("${ url('indexer:config_index') }", {
+          name: self.name()
+        }, function (data) {
+          if (data.status == 0) {
+            self.config(data.config);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.loadingConfig(false);
         });
       };
 
@@ -599,6 +646,15 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
+
+      self.activeNamespace = ko.observable();
+      self.activeCompute = ko.observable();
+
+      ContextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
+        // TODO: Namespace selection
+        self.activeNamespace(context.namespaces[0]);
+        self.activeCompute(context.namespaces[0].computes[0]);
+      });
 
       self.assistAvailable = ko.observable(true);
       self.apiHelper = ApiHelper.getInstance();
@@ -755,7 +811,7 @@ ${ assist.assistPanel() }
           }
         });
         return found;
-      }
+      };
 
       self.fetchIndex = function (index) {
         $.post("${ url('indexer:list_index') }", {
@@ -801,13 +857,15 @@ ${ assist.assistPanel() }
         huePubSub.publish('context.popover.show', {
           data: {
             type: 'collection',
-            definition: ko.mapping.toJS(field),
-            parent: {
-              definition: ko.mapping.toJS(self.index),
-              key: ko.observable(self.index().uniqueKey)
-            }
+            identifierChain: [
+              {}, // empty, needed by the context popover
+              ko.mapping.toJS(self.index),
+              ko.mapping.toJS(field)
+            ]
           },
-          showInAssistEnabled: false,
+          namespace: self.activeNamespace(),
+          compute: self.activeCompute(),
+          showInAssistEnabled: true,
           orientation: 'right',
           pinEnabled: false,
           source: {

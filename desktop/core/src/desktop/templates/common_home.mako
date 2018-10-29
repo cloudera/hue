@@ -18,6 +18,7 @@
 
   from desktop.views import commonheader, commonfooter, _ko
   from desktop import conf
+  from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="docBrowser" file="/document_browser.mako" />
@@ -28,7 +29,6 @@
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
   <script src="${ static('desktop/js/ko.editable.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
   <script src="${ static('desktop/js/home2.vm.js') }"></script>
 
   ${ docBrowser.docBrowser(is_embeddable) }
@@ -42,7 +42,7 @@
       <div class="nav-collapse">
         <ul class="nav">
           <li class="app-header">
-            <a href="${ url('desktop.views.home2') }">
+            <a href="${ url('desktop_views_home2') }">
               <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('My documents') }
             </a>
@@ -65,18 +65,14 @@
 
 <script type="text/javascript">
   (function () {
-    ko.options.deferUpdates = true;
-
-    var userGroups = [];
-    % for group in user.groups.all():
-      userGroups.push('${ group }');
-    % endfor
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
-        userGroups: userGroups,
-        superuser: '${ user.is_superuser }' === 'True',
+        superuser: '${ is_admin(user) }' === 'True',
         i18n: {
           errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',
           errorFetchingTableFields: '${_('An error occurred fetching the table fields. Please try again.')}',

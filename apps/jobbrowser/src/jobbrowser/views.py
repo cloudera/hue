@@ -28,7 +28,7 @@ from lxml import html
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.log.access import access_log_level
 from desktop.lib.rest.http_client import RestException
@@ -38,10 +38,11 @@ from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.views import register_status_bar_view
+
 from hadoop import cluster
-from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 from hadoop.yarn.clients import get_log_client
 from hadoop.yarn import resource_manager_api as resource_manager_api
+from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -55,7 +56,7 @@ except:
 
 from jobbrowser.conf import LOG_OFFSET, SHARE_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
-from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, LinkJobLogs, can_kill_job
+from jobbrowser.models import can_view_job, can_kill_job, LinkJobLogs
 from jobbrowser.yarn_models import Application
 
 
@@ -75,7 +76,7 @@ def check_job_permission(view_func):
       LOG.warn('Job %s has not yet been accepted by the RM, will poll for status.' % jobid)
       return job_not_assigned(request, jobid, request.path)
 
-    if not SHARE_JOBS.get() and not request.user.is_superuser \
+    if not SHARE_JOBS.get() and not is_admin(request.user) \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
@@ -179,7 +180,7 @@ def massage_job_for_json(job, request=None, user=None):
     'user': job.user,
     'isRetired': job.is_retired,
     'isMR2': job.is_mr2,
-    'progress': hasattr(job, 'progress') and job.progress or '',
+    'progress': hasattr(job, 'progress') and job.progress or 0,
     'mapProgress': hasattr(job, 'mapProgress') and job.mapProgress or '',
     'reduceProgress': hasattr(job, 'reduceProgress') and job.reduceProgress or '',
     'setupProgress': hasattr(job, 'setupProgress') and job.setupProgress or '',
@@ -201,7 +202,8 @@ def massage_job_for_json(job, request=None, user=None):
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user if request else user),
-    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
+    'killUrl': job.jobId and reverse('kill_job', kwargs={'job': job.jobId}) or '',
+    'diagnostics': hasattr(job, 'diagnostics') and job.diagnostics or '',
   }
   return job
 
@@ -211,14 +213,14 @@ def massage_task_for_json(task):
     'id': task.taskId,
     'shortId': task.taskId_short,
     'url': task.taskId and reverse('jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
-    'logs': task.taskAttemptIds and reverse('jobbrowser.views.single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
+    'logs': task.taskAttemptIds and reverse('single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
     'type': task.taskType
   }
   return task
 
 
 def single_spark_job(request, job):
-  if request.REQUEST.get('format') == 'json':
+  if request.GET.get('format') == 'json':
     json_job = {
       'job': massage_job_for_json(job, request)
     }
@@ -242,7 +244,7 @@ def single_job(request, job):
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
   recent_tasks.sort(cmp_exec_time, reverse=True)
 
-  if request.REQUEST.get('format') == 'json':
+  if request.GET.get('format') == 'json':
     json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
     json_recent_tasks = [massage_task_for_json(task) for task in recent_tasks]
     json_job = {
@@ -290,15 +292,29 @@ def kill_job(request, job):
       LOG.warn('Failed to get job with ID %s: %s' % (job.jobId, e))
     else:
       if job.status not in ["RUNNING", "QUEUED"]:
-        if request.REQUEST.get("next"):
-          return HttpResponseRedirect(request.REQUEST.get("next"))
-        elif request.REQUEST.get("format") == "json":
+        if request.GET.get("next"):
+          return HttpResponseRedirect(request.GET.get("next"))
+        elif request.GET.get("format") == "json":
           return JsonResponse({'status': 0}, encoder=JSONEncoderForHTML)
         else:
           raise MessageException("Job Killed")
     time.sleep(1)
 
   raise Exception(_("Job did not appear as killed within 15 seconds."))
+
+@check_job_permission
+def job_executor_logs(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES):
+  response = {'status': -1}
+  try:
+    log = ''
+    if job.status not in ('NEW', 'SUBMITTED', 'ACCEPTED'):
+      log = job.history_server_api.download_executors_logs(request, job, name, offset)
+    response['status'] = 0
+    response['log'] = LinkJobLogs._make_hdfs_links(log)
+  except Exception, e:
+    response['log'] = _('Failed to retrieve executor log: %s' % e)
+
+  return JsonResponse(response)
 
 
 @check_job_permission
@@ -311,7 +327,7 @@ def job_attempt_logs(request, job, attempt_index=0):
 
 
 @check_job_permission
-def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES):
+def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES, is_embeddable=False):
   """For async log retrieval as Yarn servers are very slow"""
   log_link = None
   response = {'status': -1}
@@ -333,6 +349,8 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
           log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
+    elif app['applicationType'] == 'Oozie Launcher':
+      log_link = app['amContainerLogs']
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
   except Exception, e:
@@ -340,9 +358,12 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
   if log_link:
     link = '/%s/' % name
-    params = {
-      'doAs': request.user.username
-    }
+    if app['applicationType'] == 'Oozie Launcher' and app['state'] != 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
+      params = {}
+    else:
+      params = {
+        'doAs': request.user.username
+      }
     if offset != 0:
       params['start'] = offset
 
@@ -354,7 +375,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
       log = html.fromstring(api_resp, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
 
       response['status'] = 0
-      response['log'] = LinkJobLogs._make_hdfs_links(log)
+      response['log'] = LinkJobLogs._make_hdfs_links(log, is_embeddable)
     except Exception, e:
       response['log'] = _('Failed to retrieve log: %s' % e)
       try:
@@ -377,6 +398,9 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
 
+  if job.applicationType == 'SPARK':
+    return job.history_server_api.download_logs(job.app)
+
   task = None
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
@@ -395,9 +419,12 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
       task = recent_tasks[0]
 
   if task is None or not task.taskAttemptIds:
-    raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
-
-  params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
+    if request.GET.get('format') == 'link':
+      params = {'job': job.jobId, 'offset': offset}
+    else:
+      raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
+  else:
+    params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
 
   if request.GET.get('format') == 'link':
     return JsonResponse(params)
@@ -503,10 +530,6 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
     log_tab = [i for i, log in enumerate(logs) if log]
     if log_tab:
       first_log_tab = log_tab[0]
-  except TaskTrackerNotFoundException:
-    # Four entries,
-    # for diagnostic, stdout, stderr and syslog
-    logs = [_("Failed to retrieve log. TaskTracker not found.")] * 4
   except urllib2.URLError:
     logs = [_("Failed to retrieve log. TaskTracker not ready.")] * 4
 

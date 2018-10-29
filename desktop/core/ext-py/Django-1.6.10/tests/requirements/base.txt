@@ -1,7 +1,0 @@
-bcrypt
-docutils
-numpy < 1.9
-Pillow
-PyYAML
-pytz
-selenium

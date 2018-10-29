@@ -24,10 +24,12 @@ from nose.tools import assert_equal, assert_true, assert_not_equal
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
-from liboozie.submittion import Submission
-from oozie.tests import OozieMockBase
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
+from oozie.tests import OozieMockBase
+from useradmin.views import ensure_home_directory
+
+from liboozie.submittion import Submission
 
 
 LOG = logging.getLogger(__name__)
@@ -40,11 +42,12 @@ def test_copy_files():
   try:
     c = make_logged_in_client()
     user = User.objects.get(username='test')
+    ensure_home_directory(cluster.fs, user)
 
     prefix = '/tmp/test_copy_files'
 
     if cluster.fs.exists(prefix):
-      cluster.fs.rmtree(prefix)
+      cluster.fs.rmtree(prefix, skip_trash=True) # admin user might not have a home directory
 
     # Jars in various locations
     deployment_dir = '%s/workspace' % prefix
@@ -118,7 +121,7 @@ def test_copy_files():
 
   finally:
     try:
-      cluster.fs.rmtree(prefix)
+      cluster.fs.rmtree(prefix, skip_trash=True)
     except:
       LOG.exception('failed to remove %s' % prefix)
 
@@ -186,13 +189,12 @@ class TestSubmission(OozieMockBase):
 
       clear_sys_caches()
       fs = cluster.get_hdfs()
-      jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
       final_properties.update({
         'jobTracker': 'jtaddress',
         'nameNode': fs.fs_defaultfs
       })
-      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
@@ -201,16 +203,13 @@ class TestSubmission(OozieMockBase):
       finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
       clear_sys_caches()
       fs = cluster.get_hdfs()
-      jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
       final_properties.update({
         'jobTracker': 'jobtracker',
         'nameNode': 'namenode'
       })
-      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
-      submission._update_properties('jtaddress', 'deployment-directory')
-      assert_equal(final_properties, submission.properties)
     finally:
       clear_sys_caches()
       for reset in finish:

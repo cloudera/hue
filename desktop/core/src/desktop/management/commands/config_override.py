@@ -18,7 +18,6 @@
 from configobj import ConfigObj
 
 from django.core.management.base import BaseCommand, CommandError
-from optparse import make_option
 
 import simplejson as json
 
@@ -38,19 +37,15 @@ class Command(BaseCommand):
   e.g. hue override_config --inline_override="{\"desktop\":{\"cherrypy_server_threads\":50}}"
   to override [desktop] cherrypy_server_threads entry
   """
+  def add_arguments(self, parser):
+    parser.add_argument('-c', '--config_path', default=DEFAULT_HUE_CONFIG_PATH, action='store', dest='config_path',
+                  help='Absolute hue.ini file path where config should be written or merged to')
 
-  args = ''
+    parser.add_argument('-o', '--override_path', dest='override_path', action='store',
+                  help='Absolute file path of a local JSON file to be merged with hue.ini')
 
-  option_list = BaseCommand.option_list + (
-      make_option('-c', '--config_path', default=DEFAULT_HUE_CONFIG_PATH, action='store', dest='config_path',
-                  help='Absolute hue.ini file path where config should be written or merged to'),
-
-      make_option('-o', '--override_path', dest='override_path', action='store',
-                  help='Absolute file path of a local JSON file to be merged with hue.ini'),
-
-      make_option('-i', '--inline_override', dest='inline_override', action='store',
-                  help='A JSON dictionary to be merged with hue.ini'),
-  )
+    parser.add_argument('-i', '--inline_override', dest='inline_override', action='store',
+                  help='A JSON dictionary to be merged with hue.ini')
 
   def handle(self, *args, **options):
 

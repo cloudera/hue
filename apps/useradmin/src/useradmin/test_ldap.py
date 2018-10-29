@@ -27,7 +27,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.lib.django_test_util import make_logged_in_client
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from useradmin.models import LdapGroup, UserProfile
 from useradmin.models import get_profile
@@ -41,8 +41,8 @@ import ldap_access
 from tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
 
 
-def get_nonsense_config():
-  return {'nonsense': {
+def get_multi_ldap_config():
+  return {'multi_ldap_conf': {
     'users': {},
     'groups': {}
   }}
@@ -62,7 +62,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Import curly who is part of TestUsers and Test Administrators
@@ -79,7 +79,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       # Make an authenticated request as curly so that we can see call middleware.
       c = make_logged_in_client('curly', 'test', is_superuser=False)
       grant_access("curly", "test", "useradmin")
-      response = c.get('/useradmin/users')
+      response = c.get('/useradmin/users', dict(server='multi_ldap_conf'))
 
       # Refresh user groups
       user = User.objects.get(username='curly')
@@ -91,7 +91,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       old_group = ldap_access.CACHED_LDAP_CONN._instance.users['curly']['groups'].pop()
 
       # Make an authenticated request as curly so that we can see call middleware.
-      response = c.get('/useradmin/users')
+      response = c.get('/useradmin/users', dict(server='multi_ldap_conf'))
 
       # Refresh user groups
       user = User.objects.get(username='curly')
@@ -116,7 +116,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Import groups only
@@ -182,7 +182,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Import groups only
@@ -267,7 +267,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Import groups only
@@ -333,7 +333,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Import groups only
@@ -408,7 +408,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
@@ -420,7 +420,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       assert_true(larry.first_name == 'Larry')
       assert_true(larry.last_name == 'Stooge')
       assert_true(larry.email == 'larry@stooges.com')
-      assert_true(get_profile(larry).creation_method == str(UserProfile.CreationMethod.EXTERNAL))
+      assert_true(get_profile(larry).creation_method == UserProfile.CreationMethod.EXTERNAL.name)
 
       # Should be a noop
       sync_ldap_users(ldap_access.CACHED_LDAP_CONN)
@@ -433,19 +433,19 @@ class TestUserAdminLdap(BaseUserAdminTests):
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'otherguy', sync_groups=False, import_by_dn=False)
       hue_user = User.objects.get(username='otherguy')
-      assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
+      assert_equal(get_profile(hue_user).creation_method, UserProfile.CreationMethod.HUE.name)
       assert_equal(hue_user.first_name, 'Different')
 
       # Make sure LDAP groups exist or they won't sync
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
       # Try importing a user and sync groups
-      import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'curly', sync_groups=True, import_by_dn=False)
+      import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'curly', sync_groups=True, import_by_dn=False, server='multi_ldap_conf')
       curly = User.objects.get(username='curly')
       assert_equal(curly.first_name, 'Curly')
       assert_equal(curly.last_name, 'Stooge')
       assert_equal(curly.email, 'curly@stooges.com')
-      assert_equal(get_profile(curly).creation_method, str(UserProfile.CreationMethod.EXTERNAL))
+      assert_equal(get_profile(curly).creation_method, UserProfile.CreationMethod.EXTERNAL.name)
       assert_equal(2, curly.groups.all().count(), curly.groups.all())
 
       reset_all_users()
@@ -487,7 +487,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
@@ -514,7 +514,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       URL = reverse(add_ldap_users)
@@ -526,15 +526,15 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
       assert_true(c.get(URL))
 
-      response = c.post(URL, dict(server='nonsense', username_pattern='moe', password1='test', password2='test'))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='moe', password1='test', password2='test'))
       assert_true('Location' in response, response)
       assert_true('/useradmin/users' in response['Location'], response)
 
-      response = c.post(URL, dict(server='nonsense', username_pattern='bad_name', password1='test', password2='test'))
-      assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='bad_name', password1='test', password2='test'))
+      assert_true('Could not' in response.context[0]['form'].errors['username_pattern'][0], response)
 
       # Test wild card
-      response = c.post(URL, dict(server='nonsense', username_pattern='*rr*', password1='test', password2='test'))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='*rr*', password1='test', password2='test'))
       assert_true('/useradmin/users' in response['Location'], response)
 
       # Test ignore case
@@ -542,7 +542,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       User.objects.filter(username='moe').delete()
       assert_false(User.objects.filter(username='Moe').exists())
       assert_false(User.objects.filter(username='moe').exists())
-      response = c.post(URL, dict(server='nonsense', username_pattern='Moe', password1='test', password2='test'))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='Moe', password1='test', password2='test'))
       assert_true('Location' in response, response)
       assert_true('/useradmin/users' in response['Location'], response)
       assert_false(User.objects.filter(username='Moe').exists())
@@ -553,24 +553,24 @@ class TestUserAdminLdap(BaseUserAdminTests):
       User.objects.filter(username__iexact='Rock').delete()
       assert_false(User.objects.filter(username='Rock').exists())
       assert_false(User.objects.filter(username='rock').exists())
-      response = c.post(URL, dict(server='nonsense', username_pattern='rock', password1='test', password2='test'))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='rock', password1='test', password2='test'))
       assert_true('Location' in response, response)
       assert_true('/useradmin/users' in response['Location'], response)
       assert_false(User.objects.filter(username='Rock').exists())
       assert_true(User.objects.filter(username='rock').exists())
 
       # Test regular with spaces (should fail)
-      response = c.post(URL, dict(server='nonsense', username_pattern='user with space', password1='test', password2='test'))
-      assert_true("Username must not contain whitespaces and ':'" in response.context['form'].errors['username_pattern'][0], response)
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='user with space', password1='test', password2='test'))
+      assert_true("Username must not contain whitespaces and ':'" in response.context[0]['form'].errors['username_pattern'][0], response)
 
       # Test dn with spaces in username and dn (should fail)
-      response = c.post(URL, dict(server='nonsense', username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
       assert_true("Could not get LDAP details for users in pattern" in response.content, response.content)
       response = c.get(reverse(desktop.views.log_view))
       assert_true("{username}: Username must not contain whitespaces".format(username='user with space') in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
-      response = c.post(URL, dict(server='nonsense', username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
       assert_true(User.objects.filter(username='spaceless').exists())
 
     finally:
@@ -586,7 +586,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       URL = reverse(add_ldap_users)
@@ -607,7 +607,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       assert_false(User.objects.filter(username='Rock').exists())
       assert_false(User.objects.filter(username='ROCK').exists())
 
-      response = c.post(URL, dict(server='nonsense', username_pattern='Rock', password1='test', password2='test'))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='Rock', password1='test', password2='test'))
       assert_true('Location' in response, response)
       assert_true('/useradmin/users' in response['Location'], response)
       assert_true(User.objects.filter(username='ROCK').exists())
@@ -638,37 +638,37 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
 
       assert_true(c.get(URL))
 
-      response = c.post(URL, dict(server='nonsense', groupname_pattern='TestUsers'))
+      response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='TestUsers'))
       assert_true('Location' in response, response)
       assert_true('/useradmin/groups' in response['Location'])
 
       # Test warning notification for failed users on group import
       # Import test_longfirstname user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=test_longfirstname,ou=People,dc=example,dc=com', 'TestUsers')
-      response = c.post(URL, dict(server='nonsense', groupname_pattern='TestUsers', import_members=True), follow=True)
+      response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='TestUsers', import_members=True), follow=True)
       assert_true('Failed to import following users: test_toolongusernametoolongusername, test_longfirstname' in response.content, response.content)
 
       # Test with space
-      response = c.post(URL, dict(server='nonsense', groupname_pattern='Test Administrators'))
+      response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='Test Administrators'))
       assert_true('Location' in response, response)
       assert_true('/useradmin/groups' in response['Location'], response)
 
-      response = c.post(URL, dict(server='nonsense', groupname_pattern='toolongnametoolongnametoolongnametoolongname'
+      response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='toolongnametoolongnametoolongnametoolongname'
                                                                        'toolongnametoolongnametoolongnametoolongname'
                                                                        'toolongnametoolongnametoolongnametoolongname'
                                                                        'toolongnametoolongnametoolongnametoolongname'
                                                                        'toolongnametoolongnametoolongnametoolongname'
                                                                        'toolongnametoolongnametoolongnametoolongname'))
-      assert_true('Ensure this value has at most 256 characters' in response.context['form'].errors['groupname_pattern'][0], response)
+      assert_true('Ensure this value has at most 256 characters' in response.context[0]['form'].errors['groupname_pattern'][0], response)
 
       # Test wild card
-      response = c.post(URL, dict(server='nonsense', groupname_pattern='*r*'))
+      response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='*r*'))
       assert_true('/useradmin/groups' in response['Location'], response)
     finally:
       for finish in reset:
@@ -686,7 +686,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       assert_true(c.get(URL))
@@ -708,10 +708,10 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
-      response = c.post(reverse(add_ldap_users), dict(server='nonsense', username_pattern='moe', password1='test', password2='test'), follow=True)
+      response = c.post(reverse(add_ldap_users), dict(server='multi_ldap_conf', username_pattern='moe', password1='test', password2='test'), follow=True)
       assert_true('There was an error when communicating with LDAP' in response.content, response)
     finally:
       for finish in reset:
@@ -735,29 +735,29 @@ class TestUserAdminLdapWithHadoop(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
       assert_true(c.get(URL))
 
-      response = c.post(URL, dict(server='nonsense', username_pattern='moe', password1='test', password2='test'))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='moe', password1='test', password2='test'))
       assert_true('/useradmin/users' in response['Location'])
       assert_false(cluster.fs.exists('/user/moe'))
 
       # Try same thing with home directory creation.
-      response = c.post(URL, dict(server='nonsense', username_pattern='curly', password1='test', password2='test', ensure_home_directory=True))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='curly', password1='test', password2='test', ensure_home_directory=True))
       assert_true('/useradmin/users' in response['Location'])
       assert_true(cluster.fs.exists('/user/curly'))
 
-      response = c.post(URL, dict(server='nonsense', username_pattern='bad_name', password1='test', password2='test'))
-      assert_true('Could not' in response.context['form'].errors['username_pattern'][0])
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='bad_name', password1='test', password2='test'))
+      assert_true('Could not' in response.context[0]['form'].errors['username_pattern'][0])
       assert_false(cluster.fs.exists('/user/bad_name'))
 
       # See if moe, who did not ask for his home directory, has a home directory.
       assert_false(cluster.fs.exists('/user/moe'))
 
       # Try wild card now
-      response = c.post(URL, dict(server='nonsense', username_pattern='*rr*', password1='test', password2='test', ensure_home_directory=True))
+      response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='*rr*', password1='test', password2='test', ensure_home_directory=True))
       assert_true('/useradmin/users' in response['Location'])
       assert_true(cluster.fs.exists('/user/curly'))
       assert_true(cluster.fs.exists(u'/user/lårry'))
@@ -788,12 +788,12 @@ class TestUserAdminLdapWithHadoop(BaseUserAdminTests):
 
     # Set to nonsensical value just to force new config usage.
     # Should continue to use cached connection.
-    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+    reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
-      c.post(reverse(add_ldap_users), dict(server='nonsense', username_pattern='curly', password1='test', password2='test'))
+      c.post(reverse(add_ldap_users), dict(server='multi_ldap_conf', username_pattern='curly', password1='test', password2='test'))
       assert_false(cluster.fs.exists('/user/curly'))
-      assert_true(c.post(URL, dict(server='nonsense', ensure_home_directory=True)))
+      assert_true(c.post(URL, dict(server='multi_ldap_conf', ensure_home_directory=True)))
       assert_true(cluster.fs.exists('/user/curly'))
     finally:
       for finish in reset:

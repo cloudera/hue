@@ -18,8 +18,9 @@ from django.utils.translation import ugettext as _
 
 from desktop.views import commonheader, commonfooter
 
-from useradmin.password_policy import is_password_policy_enabled, get_password_hint
+from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 from useradmin.views import is_user_locked_out
+from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -52,9 +53,9 @@ ${ layout.menubar(section='users') }
           % endif
           </a>
         </li>
-        <li><a href="javascript:void(0)" class="step" data-step="step2">${ user.is_superuser and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
+        <li><a href="javascript:void(0)" class="step" data-step="step2">${ is_admin(user) and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
         </li>
-        % if user.is_superuser:
+        % if is_admin(user):
             <li><a href="javascript:void(0)" class="step" data-step="step3">${ _('Step 3: Advanced') }</a></li>
         % endif
       </ul>
@@ -88,11 +89,11 @@ ${ layout.menubar(section='users') }
             ${layout.render_field(form["language"])}
           % endif
 
-          % if user.is_superuser:
+          % if is_admin(user):
             ${layout.render_field(form["groups"])}
           % endif
         </div>
-      % if user.is_superuser:
+      % if is_admin(user):
         <div id="step3" class="stepDetails hide">
           ${layout.render_field(form["is_active"])}
           ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}

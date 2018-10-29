@@ -24,7 +24,6 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from search.models import Collection
 
 from indexer.controller import CollectionManagerController
 from indexer.solr_client import SolrClient
@@ -162,7 +161,7 @@ def collections_create(request):
         table = request.POST.get('table')
         columns = [field['name'] for field in collection.get('fields', [])]
 
-        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns)
+        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns) # Not up to date
 
       response['status'] = 0
       response['message'] = _('Collection created!')

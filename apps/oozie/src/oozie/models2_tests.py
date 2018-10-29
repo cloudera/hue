@@ -21,10 +21,10 @@ import logging
 import re
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION, USE_NEW_EDITOR
 from desktop.lib.django_test_util import make_logged_in_client
@@ -34,7 +34,7 @@ from desktop.models import DefaultConfiguration, Document, Document2
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
-    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder
+    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder, WorkflowDepthReached
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
 from notebook.models import make_notebook, make_notebook2
 from notebook.api import _save_notebook
@@ -351,7 +351,7 @@ LIMIT $limit"""))
     reset = ENABLE_V2.set_for_testing(True)
     try:
       response = self.c.get(reverse('oozie:submit_single_action', args=[wf_doc.id, '3f107997-04cc-8733-60a9-a4bb62cebabc']))
-      assert_equal([{'name':'Dryrun', 'value': False}, {'name':'ls_arg', 'value': '-l'}], response.context['params_form'].initial)
+      assert_equal([{'name':'Dryrun', 'value': False}, {'name':'ls_arg', 'value': '-l'}], response.context[0]._data['params_form'].initial)
     except Exception, ex:
       logging.exception(ex)
     finally:
@@ -360,7 +360,7 @@ LIMIT $limit"""))
 
   def test_list_bundles_page(self):
     response = self.c.get(reverse('oozie:list_editor_bundles'))
-    assert_true('bundles_json' in response.context, response.context)
+    assert_true('bundles_json' in response.context[0]._data, response.context)
 
   def test_workflow_dependencies(self):
     wf_data = """{"layout": [{"oozieRows": [{"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Sub workflow", "widgetType": "subworkflow-widget", "oozieMovable": true, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "9a24c7b1-b031-15d6-4086-e8af63be7ed4", "size": 12}], "id": "a566315f-e0e0-f408-fabd-c4576cc4041d", "columns": []}], "rows": [{"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Start", "widgetType": "start-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "size": 12}], "id": "ec1fbd7f-ff6c-95eb-a865-ed3a3a00fc59", "columns": []}, {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Sub workflow", "widgetType": "subworkflow-widget", "oozieMovable": true, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "9a24c7b1-b031-15d6-4086-e8af63be7ed4", "size": 12}], "id": "a566315f-e0e0-f408-fabd-c4576cc4041d", "columns": []}, {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "End", "widgetType": "end-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "size": 12}], "id": "cd1a181a-9db0-c295-78e4-4d67ecedd057", "columns": []}, {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Kill", "widgetType": "kill-widget", "oozieMovable": true, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "size": 12}], "id": "caf2a089-c5d2-4a55-5b90-2a691be25884", "columns": []}], "oozieEndRow": {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "End", "widgetType": "end-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "size": 12}], "id": "cd1a181a-9db0-c295-78e4-4d67ecedd057", "columns": []}, "oozieKillRow": {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Kill", "widgetType": "kill-widget", "oozieMovable": true, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "size": 12}], "id": "caf2a089-c5d2-4a55-5b90-2a691be25884", "columns": []}, "enableOozieDropOnAfter": true, "oozieStartRow": {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Start", "widgetType": "start-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "externalIdUrl": "", "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "size": 12}], "id": "ec1fbd7f-ff6c-95eb-a865-ed3a3a00fc59", "columns": []}, "klass": "card card-home card-column span12", "enableOozieDropOnBefore": true, "drops": ["temp"], "id": "f162ea58-e396-9703-c2b4-329bad4c9fa9", "size": 12}], "workflow": {"properties": {"job_xml": "", "description": "", "parameters": [{"name": "oozie.use.system.libpath", "value": true}], "sla_enabled": false, "deployment_dir": "/user/hue/oozie/workspaces/hue-oozie-1462236042.61", "schema_version": "uri:oozie:workflow:0.5", "sla": [{"value": false, "key": "enabled"}, {"value": "${nominal_time}", "key": "nominal-time"}, {"value": "", "key": "should-start"}, {"value": "${30 * MINUTES}", "key": "should-end"}, {"value": "", "key": "max-duration"}, {"value": "", "key": "alert-events"}, {"value": "", "key": "alert-contact"}, {"value": "", "key": "notification-msg"}, {"value": "", "key": "upstream-apps"}], "show_arrows": true, "wf1_id": null, "properties": []}, "name": "test-sub", "versions": ["uri:oozie:workflow:0.4", "uri:oozie:workflow:0.4.5", "uri:oozie:workflow:0.5"], "isDirty": true, "movedNode": null, "linkMapping": {"17c9c895-5a16-7443-bb81-f34b30b21548": [], "33430f0f-ebfa-c3ec-f237-3e77efa03d0a": [], "9a24c7b1-b031-15d6-4086-e8af63be7ed4": ["33430f0f-ebfa-c3ec-f237-3e77efa03d0a"], "3f107997-04cc-8733-60a9-a4bb62cebffc": ["9a24c7b1-b031-15d6-4086-e8af63be7ed4"]}, "nodeIds": ["3f107997-04cc-8733-60a9-a4bb62cebffc", "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "17c9c895-5a16-7443-bb81-f34b30b21548", "9a24c7b1-b031-15d6-4086-e8af63be7ed4"], "nodes": [{"properties": {"uuid": "7705a9dd-164e-67eb-8758-2573800c86e1", "workflow": "7705a9dd-164e-67eb-8758-2573800c86e6", "retry_interval": [], "retry_max": [], "job_properties": [], "credentials": [], "propagate_configuration": true, "sla": [{"key": "enabled", "value": false}, {"key": "nominal-time", "value": "${nominal_time}"}, {"key": "should-start", "value": ""}, {"key": "should-end", "value": "${30 * MINUTES}"}, {"key": "max-duration", "value": ""}, {"key": "alert-events", "value": ""}, {"key": "alert-contact", "value": ""}, {"key": "notification-msg", "value": ""}, {"key": "upstream-apps", "value": ""}]}, "name": "hive-sql", "children": [{"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"}, {"error": "17c9c895-5a16-7443-bb81-f34b30b21548"}], "actionParametersFetched": false, "type": "hive-document-widget", "id": "9a24c7b1-b031-15d6-4086-e8af63be7ed3", "actionParameters": []}, {"properties": {}, "name": "Start", "children": [{"to": "9a24c7b1-b031-15d6-4086-e8af63be7ed4"}], "actionParametersFetched": false, "type": "start-widget", "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "actionParameters": []}, {"properties": {}, "name": "End", "children": [], "actionParametersFetched": false, "type": "end-widget", "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "actionParameters": []}, {"properties": {"body": "", "cc": "", "to": "", "enableMail": false, "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]", "subject": ""}, "name": "Kill", "children": [], "actionParametersFetched": false, "type": "kill-widget", "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "actionParameters": []}, {"properties": {"workflow": "7705a9dd-164e-67eb-8758-2573800c86e5", "retry_interval": [], "retry_max": [], "job_properties": [], "credentials": [], "propagate_configuration": true, "sla": [{"value": false, "key": "enabled"}, {"value": "${nominal_time}", "key": "nominal-time"}, {"value": "", "key": "should-start"}, {"value": "${30 * MINUTES}", "key": "should-end"}, {"value": "", "key": "max-duration"}, {"value": "", "key": "alert-events"}, {"value": "", "key": "alert-contact"}, {"value": "", "key": "notification-msg"}, {"value": "", "key": "upstream-apps"}]}, "name": "subworkflow-9a24", "children": [{"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"}, {"error": "17c9c895-5a16-7443-bb81-f34b30b21548"}], "actionParametersFetched": false, "type": "subworkflow-widget", "id": "9a24c7b1-b031-15d6-4086-e8af63be7ed4", "actionParameters": []}], "id": null, "nodeNamesMapping": {"17c9c895-5a16-7443-bb81-f34b30b21548": "Kill", "33430f0f-ebfa-c3ec-f237-3e77efa03d0a": "End", "9a24c7b1-b031-15d6-4086-e8af63be7ed4": "subworkflow-9a24", "3f107997-04cc-8733-60a9-a4bb62cebffc": "Start"}, "uuid": "73c6219d-272f-db98-3cd9-d413ea2625ac"}}"""
@@ -494,7 +494,7 @@ LIMIT $limit"""))
     try:
       response = self.c.get(reverse('oozie:list_editor_workflows'))
       assert_equal(response.status_code, 200)
-      data = json.loads(response.context['workflows_json'])
+      data = json.loads(response.context[0]['workflows_json'])
       uuids = [doc['uuid'] for doc in data]
       assert_true(wf_doc.uuid in uuids, data)
 
@@ -502,7 +502,7 @@ LIMIT $limit"""))
       response = self.c.post('/desktop/api2/doc/delete', {'uuid': json.dumps(wf_doc.uuid)})
       response = self.c.get(reverse('oozie:list_editor_workflows'))
       assert_equal(response.status_code, 200)
-      data = json.loads(response.context['workflows_json'])
+      data = json.loads(response.context[0]['workflows_json'])
       uuids = [doc['uuid'] for doc in data]
       assert_false(wf_doc.uuid in uuids, data)
     finally:
@@ -1230,6 +1230,447 @@ class TestExternalWorkflowGraph(object):
     assert_true(len(workflow_data['workflow']['nodes']) == 5)
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'generic-widget')
     assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
+
+  def test_get_hierarchy_from_adj_list_throws_exception(self):
+      self.wf.definition = """<workflow-app
+    name="${Payer} ${Project_Name} Sub Workflow Group7_8 ${YYYYMMDDHHMM}"
+    xmlns="uri:oozie:workflow:0.5">
+    <global>
+    <job-tracker>${JobTracker}</job-tracker>
+    <name-node>${NameNode}</name-node>
+    <configuration>
+      <property>
+        <name>mapred.job.queue.name</name>
+        <value>${QueueName}</value>
+      </property>
+      <property>
+        <name>oozie.launcher.mapred.map.child.java.opts</name>
+        <value>-Xmx2048m</value>
+      </property>
+      <property>
+        <name>mapred.map.child.java.opts</name>
+        <value>-Xmx8192m</value>
+      </property>
+      <property>
+        <name>mapred.reduce.child.java.opts</name>
+        <value>-Xmx6144m</value>
+      </property>
+    </configuration>
+    </global>
+    <start to="AAA_Check"/>
+    <decision name="AAA_Check">
+    <switch>
+      <case to="Sqoop_AAA_Sub_WF1a">${fs:dirSize(AAA_WC_Path) eq 6 }</case>
+      <case to="Sqoop_AAA_Sub_WF1b">${fs:dirSize(AAA_WC_Path) gt 0 }</case>
+      <default to="BBB_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_AAA_Sub_WF1a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="BBB_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_AAA_Sub_WF1b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="BBB_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="BBB_Check">
+    <switch>
+      <case to="Sqoop_BBB_Sub_WF2a">${fs:dirSize(BBB_WC_Path) eq 6 }</case>
+      <case to="Sqoop_BBB_Sub_WF2b">${fs:dirSize(BBB_WC_Path) gt 0 }</case>
+      <default to="CCC_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_BBB_Sub_WF2a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="CCC_Check" />
+    <error to="kill" />
+    </action>
+
+    <action name="Sqoop_BBB_Sub_WF2b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="CCC_Check" />
+    <error to="kill" />
+    </action>
+
+    <decision name="CCC_Check">
+    <switch>
+      <case to="Sqoop_CCC_Sub_WF3a">${fs:dirSize(CCC_WC_Path) eq 6 }</case>
+      <case to="Sqoop_CCC_Sub_WF3b">${fs:dirSize(CCC_WC_Path) gt 0 }</case>
+      <default to="DDD_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_CCC_Sub_WF3a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="DDD_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_CCC_Sub_WF3b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="DDD_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="DDD_Check">
+    <switch>
+      <case to="Sqoop_DDD_Sub_WF4a">${fs:dirSize(DDD_WC_Path) eq 6 }</case>
+      <case to="Sqoop_DDD_Sub_WF4b">${fs:dirSize(DDD_WC_Path) gt 0 }</case>
+      <default to="EEE_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_DDD_Sub_WF4a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="EEE_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_DDD_Sub_WF4b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="EEE_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="EEE_Check">
+    <switch>
+      <case to="Sqoop_EEE_Sub_WF5a">${fs:dirSize(EEE_WC_Path) eq 6 }</case>
+      <case to="Sqoop_EEE_Sub_WF5b">${fs:dirSize(EEE_WC_Path) gt 0 }</case>
+      <default to="FFF_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_EEE_Sub_WF5a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="FFF_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_EEE_Sub_WF5b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="FFF_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="FFF_Check">
+    <switch>
+      <case to="Sqoop_FFF_Sub_WF6a">${fs:dirSize(FFF_WC_Path) eq 6 }</case>
+      <case to="Sqoop_FFF_Sub_WF6b">${fs:dirSize(FFF_WC_Path) gt 0 }</case>
+      <default to="GGG_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_FFF_Sub_WF6a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="GGG_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_FFF_Sub_WF6b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="GGG_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="GGG_Check">
+    <switch>
+      <case to="Sqoop_GGG_Sub_WF7a">${fs:dirSize(GGG_WC_Path) eq 6 }</case>
+      <case to="Sqoop_GGG_Sub_WF7b">${fs:dirSize(GGG_WC_Path) gt 0 }</case>
+      <default to="HHH_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_GGG_Sub_WF7a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="HHH_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_GGG_Sub_WF7b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="HHH_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="HHH_Check">
+    <switch>
+      <case to="Sqoop_HHH_Sub_WF8a">${fs:dirSize(HHH_WC_Path) eq 6 }</case>
+      <case to="Sqoop_HHH_Sub_WF8b">${fs:dirSize(HHH_WC_Path) gt 0 }</case>
+      <default to="IIII_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_HHH_Sub_WF8a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="IIII_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_HHH_Sub_WF8b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="IIII_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="IIII_Check">
+    <switch>
+      <case to="Sqoop_IIII_Sub_WF9a">${fs:dirSize(IIII_WC_Path) eq 6 }</case>
+      <case to="Sqoop_IIII_Sub_WF9b">${fs:dirSize(IIII_WC_Path) gt 0 }</case>
+      <default to="JJJ_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_IIII_Sub_WF9a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="JJJ_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_IIII_Sub_WF9b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="JJJ_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="JJJ_Check">
+    <switch>
+      <case to="Sqoop_JJJ_Sub_WF10a">${fs:dirSize(JJJ_WC_Path) eq 6 }</case>
+      <case to="Sqoop_JJJ_Sub_WF10b">${fs:dirSize(JJJ_WC_Path) gt 0 }</case>
+      <default to="KKK_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_JJJ_Sub_WF10a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="KKK_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_JJJ_Sub_WF10b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="KKK_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="KKK_Check">
+    <switch>
+      <case to="Sqoop_KKK_Sub_WF11a">${fs:dirSize(KKK_WC_Path) eq 6 }</case>
+      <case to="Sqoop_KKK_Sub_WF11b">${fs:dirSize(KKK_WC_Path) gt 0 }</case>
+      <default to="LLL_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_KKK_Sub_WF11a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="LLL_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_KKK_Sub_WF11b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="LLL_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="LLL_Check">
+    <switch>
+      <case to="Sqoop_LLL_Sub_WF12a">${fs:dirSize(LLL_WC_Path) eq 6 }</case>
+      <case to="Sqoop_LLL_Sub_WF12b">${fs:dirSize(LLL_WC_Path) gt 0 }</case>
+      <default to="MMM_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_LLL_Sub_WF12a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMM_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_LLL_Sub_WF12b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMM_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="MMM_Check">
+    <switch>
+      <case to="Sqoop_MMM_Sub_WF13a">${fs:dirSize(MMM_WC_Path) eq 6 }</case>
+      <case to="Sqoop_MMM_Sub_WF13b">${fs:dirSize(MMM_WC_Path) gt 0 }</case>
+      <default to="MMMDxcd_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_MMM_Sub_WF13a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMMDxcd_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_MMM_Sub_WF13b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMMDxcd_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="MMMDxcd_Check">
+    <switch>
+      <case to="Sqoop_MMMDxcd_Sub_WF14a">${fs:dirSize(MMMDxcd_WC_Path) eq 6 }</case>
+      <case to="Sqoop_MMMDxcd_Sub_WF14b">${fs:dirSize(MMMDxcd_WC_Path) gt 0 }</case>
+      <default to="NNN_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_MMMDxcd_Sub_WF14a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="NNN_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_MMMDxcd_Sub_WF14b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="NNN_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="NNN_Check">
+    <switch>
+      <case to="Sqoop_NNN_Sub_WF15a">${fs:dirSize(NNN_WC_Path) eq 6 }</case>
+      <case to="Sqoop_NNN_Sub_WF15b">${fs:dirSize(NNN_WC_Path) gt 0 }</case>
+      <default to="VCHI_HomeHealthMedicare_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_NNN_Sub_WF15a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="OOO_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_NNN_Sub_WF15b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="OOO_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="OOO_Check">
+    <switch>
+      <case to="Sqoop_OOO_Sub_WF18a">${fs:dirSize(OOO_WC_Path) eq 6 }</case>
+      <case to="Sqoop_OOO_Sub_WF18b">${fs:dirSize(OOO_WC_Path) gt 0 }</case>
+      <default to="end"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_OOO_Sub_WF18a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="end" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_OOO_Sub_WF18b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="end" />
+    <error to="kill" />
+    </action>
+    <kill name="kill">
+    <message>"Killed job due to error: ${wf:errorMessage(wf:lastErrorNode())}"</message>
+    </kill>
+    <end name="end" />
+    </workflow-app>
+    """
+      self.node_list = generate_v2_graph_nodes(self.wf.definition)
+      adj_list = _create_graph_adjaceny_list(self.node_list)
+      node_hierarchy = ['start']
+      assert_raises(WorkflowDepthReached, _get_hierarchy_from_adj_list, adj_list, adj_list['start']['ok_to'],
+                    node_hierarchy)
 
 class TestModelAPI(OozieMockBase):
 

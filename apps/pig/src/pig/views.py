@@ -18,7 +18,7 @@
 import json
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -246,7 +246,7 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      pig_setup.Command().handle_noargs()
+      pig_setup.Command().handle()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)

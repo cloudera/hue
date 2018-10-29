@@ -1,0 +1,155 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.hue-nav-properties {
+  position: relative;
+  margin: 5px 0 5px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  padding-left: 6px;
+
+  .hue-nav-properties-empty {
+    cursor: pointer;
+    overflow: hidden;
+    font-style: italic;
+    display: inline-block;
+    font-size: 13px;
+    color: @cui-gray-700;
+    margin-left: 3px;
+  }
+
+  &.hue-nav-properties-edit {
+    padding-right: 40px;
+
+    .hue-nav-properties-edit-actions {
+      position: absolute;
+      font-size: 18px;
+      right: 2px;
+      top: 2px;
+
+      a {
+        color: @cui-gray-600;
+
+        &:hover {
+          color: @hue-primary-color-dark;
+        }
+      }
+    }
+
+    .hue-nav-property-add {
+      line-height: 26px;
+      display: inline-block;
+      overflow: hidden; // Somehow vertical align is affected by overflow on the property keys and values
+      margin-left: 5px;
+    }
+  }
+
+  .hue-nav-property {
+    display: inline-block;
+    padding: 2px;
+    height: 20px;
+    overflow: hidden;
+
+    &.hue-nav-property-edit {
+      background-color: @cui-gray-050;
+      color: @cui-gray-700;
+      border-radius: 9px;
+      border: 1px solid @cui-gray-050;
+      font-size: 13px;
+      padding: 2px 4px;
+
+      &.hue-nav-property-invalid {
+        background-color: @cui-red-100;
+        border-color: @cui-red-300;
+      }
+
+      &:hover {
+        border-color: @cui-gray-200;
+      }
+
+      .hue-nav-property-key {
+        cursor: pointer;
+        padding: 0 5px;
+        color: @cui-gray-700;
+        font-weight: bold;
+      }
+
+      .hue-nav-property-value {
+        cursor: pointer;
+        background-color: @hue-primary-color-dark;
+        color: @cui-gray-050;
+        font-size: 12px;
+        padding: 0 9px;
+        border-radius: 4px;
+      }
+
+      .hue-nav-property-remove {
+        float:right;
+        margin: 0 3px;
+        height: 20px;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+
+    .hue-nav-property-key {
+      display: inline-block;
+      color: @cui-gray-700;
+      margin-right: 3px;
+      max-width: 180px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .hue-nav-property-value {
+      display: inline-block;
+      background-color: @cui-white;
+      max-width: 220px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  .editable-inline-action {
+    overflow: hidden;
+    display: inline-block;
+    line-height: 26px;
+  }
+}
+
+.hue-nav-property-edit-content {
+  position:relative;
+  padding-top: 5px;
+
+  a.close-popover {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: @font-size-base;
+
+    color: @cui-gray-600;
+
+    &:hover {
+      color: @hue-primary-color-dark;
+    }
+  }
+}

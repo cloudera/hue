@@ -18,14 +18,14 @@
 import os
 
 from django.conf import settings
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from desktop.lib.paths import get_desktop_root
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     cdh_path = os.path.join(get_desktop_root(), '..', 'cloudera', 'cdh_version.properties')
     if os.path.exists(cdh_path):
       print open(cdh_path).read()

@@ -117,6 +117,13 @@ DOWNLOAD_ROW_LIMIT = Config(
   help=_t('A limit to the number of rows that can be downloaded from a query before it is truncated. '
           'A value of -1 means there will be no limit.'))
 
+DOWNLOAD_BYTES_LIMIT = Config(
+  key='download_bytes_limit',
+  default=-1,
+  type=int,
+  help=_t('A limit to the number of bytes that can be downloaded from a query before it is truncated. '
+          'A value of -1 means there will be no limit.'))
+
 APPLY_NATURAL_SORT_MAX = Config(
   key="apply_natural_sort_max",
   help=_t("The max number of records in the result set permitted to apply a natural sort to the database or tables list."),

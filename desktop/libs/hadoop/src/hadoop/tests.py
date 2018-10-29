@@ -33,34 +33,6 @@ from hadoop import confparse
 from hadoop import pseudo_hdfs4
 
 
-@attr('requires_hadoop')
-def test_live_jobtracker():
-  """
-  Checks that LiveJobTracker never raises
-  exceptions for most of its calls.
-  """
-  raise SkipTest
-
-  minicluster = pseudo_hdfs4.shared_cluster()
-
-  jt = minicluster.jt
-  # Make sure that none of the following
-  # raise.
-  assert_true(jt.queues())
-  assert_true(jt.cluster_status())
-  assert_true(jt.all_task_trackers())
-  assert_true(jt.active_trackers())
-  assert_true(jt.blacklisted_trackers())
-  # not tested: task_tracker
-  assert_true(jt.running_jobs())
-  assert_true(jt.completed_jobs())
-  assert_true(jt.failed_jobs())
-  assert_true(jt.all_jobs())
-  # not tested: get_job_counters
-  assert_true(jt.get_current_time())
-  # not tested: get_job_xml
-
-
 def test_confparse():
   data = """
     <configuration>
@@ -164,9 +136,7 @@ def test_non_default_cluster():
   try:
     # This is indeed the only hdfs/mr cluster
     assert_equal(1, len(cluster.get_all_hdfs()))
-    assert_equal(1, len(cluster.all_mrclusters()))
     assert_true(cluster.get_hdfs(NON_DEFAULT_NAME))
-    assert_true(cluster.get_mrcluster(NON_DEFAULT_NAME))
 
     cli = make_logged_in_client()
     # That we can get to a view without errors means that the middlewares work

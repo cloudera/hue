@@ -21,19 +21,69 @@ var EditorViewModel = (function() {
       'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
       'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
       'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
-      'snippetImage', 'user', 'positionStatement', 'lastExecutedStatement'
+      'snippetImage', 'user', 'positionStatement', 'lastExecutedStatement', 'downloadResultViewModel'
     ]
+  };
+
+  var COMPATIBILITY_SOURCE_PLATFORMS ={
+    teradata: { name: 'Teradata', value: 'teradata' },
+    oracle: { name: 'Oracle', value: 'oracle' },
+    netezza: { name: 'Netezza', value: 'netezza' },
+    impala: { name: 'Impala', value: 'impala' },
+    hive: { name: 'Hive', value: 'hive' },
+    db2: { name: 'DB2', value: 'db2' },
+    greenplum: { name: 'Greenplum', value: 'greenplum' },
+    mysql: { name: 'MySQL', value: 'mysql' },
+    postgresql: { name: 'PostgreSQL', value: 'postgresql' },
+    informix: { name: 'Informix', value: 'informix' },
+    sqlserver: { name: 'SQL Server', value: 'sqlserver' },
+    sybase: { name: 'Sybase', value: 'sybase' },
+    access: { name: 'Access', value: 'access' },
+    firebird: { name: 'Firebird', value: 'firebird' },
+    ansisql: { name: 'ANSISQL', value: 'ansisql' },
+    generic: { name: 'Generic', value: 'generic' }
+  };
+
+  var COMPATIBILITY_TARGET_PLATFORMS ={
+    impala: { name: 'Impala', value: 'impala' },
+    hive: { name: 'Hive', value: 'hive' }
   };
 
   var Result = function (snippet, result) {
     var self = this;
 
+    snippet = $.extend(snippet, snippet.chartType == 'lines' && { // Retire line chart
+        chartType: 'bars',
+        chartTimelineType: 'line'
+    });
     self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
     self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
     self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true)
       .extend("throttle", 100);
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
+
+    var adaptMeta = function () {
+      var i = 0;
+      self.meta().forEach(function (item) {
+        if (typeof item.checked === 'undefined') {
+          item.checked = ko.observable(true);
+          item.checked.subscribe(function () {
+            self.filteredMetaChecked(self.filteredMeta().some(function (item) { return item.checked(); }));
+          });
+        }
+        item.type = item.type.replace(/_type/i, '').toLowerCase();
+        if (typeof item.originalIndex === 'undefined') {
+          item.originalIndex = i;
+        }
+        i++;
+      })
+    };
+
+    adaptMeta();
+    self.meta.subscribe(adaptMeta);
+
+
     self.rows = ko.observable(typeof result.rows != "undefined" && result.rows != null ? result.rows : null);
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
@@ -54,47 +104,47 @@ var EditorViewModel = (function() {
         return item.name != ''
       });
     });
-    self.metaFilter = ko.observable('');
+    self.metaFilter = ko.observable();
+
     self.isMetaFilterVisible = ko.observable(false);
     self.filteredMetaChecked = ko.observable(true);
     self.filteredMeta = ko.pureComputed(function () {
-      return ko.utils.arrayFilter(self.meta(), function (item, i) {
-        if (typeof item.checked === 'undefined') {
-          item.checked = ko.observable(true);
-          item.checked.subscribe(function () {
-            self.filteredMetaChecked(ko.utils.arrayFilter(self.filteredMeta(), function (item) {
-                return !item.checked();
-              }).length == 0);
+      if (!self.metaFilter() || self.metaFilter().query === '') {
+        return self.meta();
+      }
+
+      return self.meta().filter(function (item) {
+        var facets = self.metaFilter().facets;
+        var isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+        var isTextMatch = !self.metaFilter().text || self.metaFilter().text.length === 0;
+        var match = true;
+
+        if (!isFacetMatch) {
+          match = !!facets['type'][item.type];
+        }
+
+        if (match && !isTextMatch) {
+          match = self.metaFilter().text.every(function (text) {
+            return item.name.toLowerCase().indexOf(text.toLowerCase()) !== -1;
           });
         }
-        if (typeof item.originalIndex === 'undefined') {
-          item.originalIndex = i;
-        }
-        var metaFilterValue = self.metaFilter().toLowerCase();
-        var metaFilterValues = metaFilterValue.split(' ');
-        var toBeReturned = item.name !== '';
-        var hasPartial = false;
-        metaFilterValues.forEach(function (partial) {
-          if (partial.indexOf('column:') > -1) {
-            partial = $.trim(partial.split('column:')[1]);
-            toBeReturned = toBeReturned && item.name.toLowerCase().indexOf(partial) > -1;
-            hasPartial = true;
-          }
-          if (partial.indexOf('type:') > -1) {
-            partial = $.trim(partial.split('type:')[1]);
-            toBeReturned = toBeReturned && item.type.toLowerCase().indexOf(partial) > -1;
-            hasPartial = true;
-          }
-          if (partial.indexOf('column:') === -1 && partial.indexOf('type:') === -1) {
-            if (!hasPartial) {
-              toBeReturned = toBeReturned && (item.name.toLowerCase().indexOf(partial) > -1 || item.type.toLowerCase().indexOf(partial) > -1);
-            }
-          }
-        });
-        return toBeReturned;
+        return match;
       });
     });
 
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.meta().forEach(function (column) {
+        if (column.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + column.name.substring(partial.length))
+        } else if (column.name.toLowerCase().indexOf('.' + partialLower) !== -1) {
+          result.push(nonPartial + partial + column.name.substring(partial.length + column.name.toLowerCase().indexOf('.' + partialLower) + 1))
+        }
+      });
+
+      return result;
+    };
     self.clickFilteredMetaCheck = function () {
       self.filteredMeta().forEach(function (item) {
         item.checked(self.filteredMetaChecked());
@@ -109,15 +159,19 @@ var EditorViewModel = (function() {
     });
 
     function isNumericColumn(type) {
-      return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1;
+      return $.inArray(type, ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real']) > -1;
     }
 
     function isDateTimeColumn(type) {
-      return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+      return $.inArray(type, ['timestamp', 'date', 'datetime']) > -1;
+    }
+
+    function isComplexColumn(type) {
+      return $.inArray(type, ['array', 'map', 'struct']) > -1;
     }
 
     function isStringColumn(type) {
-      return !isNumericColumn(type) && !isDateTimeColumn(type);
+      return !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
     }
 
     self.cleanedNumericMeta = ko.computed(function () {
@@ -271,13 +325,19 @@ var EditorViewModel = (function() {
           || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
     });
 
+    self.autocompleteSettings = {
+      temporaryOnly: false
+    };
+
     // Ace stuff
+    self.aceCursorPosition = ko.observable(notebook.isHistory() ? snippet.aceCursorPosition : null);
+
     var aceEditor = null;
 
     self.ace = function (newVal) {
       if (newVal) {
         aceEditor = newVal;
-        if (!vm.isPresentationMode()) {
+        if (!notebook.isPresentationMode()) {
           aceEditor.focus();
         }
       }
@@ -304,6 +364,8 @@ var EditorViewModel = (function() {
       }
     });
 
+    self.editorMode = vm.editorMode;
+
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };
@@ -322,8 +384,13 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
+    self.namespace = ko.observable(snippet.namespace);
+    self.compute = ko.observable(snippet.compute);
+
+    self.availableDatabases = ko.observableArray();
     self.database = ko.observable();
     var previousDatabase = null;
+
     self.database.subscribe(function (newValue) {
       if (newValue !== null) {
         self.getApiHelper().setInTotalStorage('editor', 'last.selected.database', newValue);
@@ -333,20 +400,8 @@ var EditorViewModel = (function() {
         previousDatabase = newValue;
       }
     });
-    self.database(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
-    self.availableDatabases = ko.observableArray();
 
-    self.updateDatabases = function () {
-      if (self.isSqlDialect()) {
-        self.getApiHelper().loadDatabases({
-          sourceType: self.type(),
-          silenceErrors: true,
-          successCallback: self.availableDatabases
-        });
-      } else {
-        self.availableDatabases([]);
-      }
-    };
+    self.database(typeof snippet.database !== "undefined" && snippet.database != null ? snippet.database : null);
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
@@ -425,9 +480,6 @@ var EditorViewModel = (function() {
       }
     };
 
-    self.isSqlDialect.subscribe(self.updateDatabases);
-    self.updateDatabases();
-
     huePubSub.subscribeOnce('assist.source.set', function (source) {
       if (source !== self.type()) {
         huePubSub.publish('assist.set.source', self.type());
@@ -440,13 +492,18 @@ var EditorViewModel = (function() {
     self.handleAssistSelection = function (databaseDef) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
-        self.database(databaseDef.name);
+      } else if (databaseDef.sourceType === self.type()) {
+        if (self.namespace() !== databaseDef.namespace) {
+          self.namespace(databaseDef.namespace)
+        }
+        if (self.database() !== databaseDef.name) {
+          self.database(databaseDef.name);
+        }
       }
     };
 
     if (!self.database()) {
-      huePubSub.publish("assist.get.database.callback", { source: self.type(), callback: function (databaseDef) {
+      huePubSub.publish('assist.get.database.callback', { source: self.type(), callback: function (databaseDef) {
         self.handleAssistSelection(databaseDef);
       }});
     }
@@ -515,7 +572,21 @@ var EditorViewModel = (function() {
         } else {
           self.statementsList([]);
         }
+        if (!notebook.isPresentationModeInitialized()) {
+          if (notebook.isPresentationModeDefault()) {
+            // When switching to presentation mode, the snippet in non presentation mode cannot get status notification.
+            // On initiailization, status is set to loading and does not get updated, because we moved to presentation mode.
+            self.status('ready');
+          }
+          // Changing to presentation mode requires statementsList to be initialized. statementsList is initialized asynchronously.
+          // When presentation mode is default, we cannot change before statementsList has been calculated.
+          // Cleaner implementation would be to make toggleEditorMode statementsList asynchronous
+          // However this is currently impossible due to delete _notebook.presentationSnippets()[key];
+          notebook.isPresentationModeInitialized(true);
+          notebook.isPresentationMode(notebook.isPresentationModeDefault());
+        }
       }
+
     }, vm.huePubSubId);
 
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
@@ -553,7 +624,12 @@ var EditorViewModel = (function() {
     if (snippet.variables) {
       snippet.variables.forEach(function (variable) {
         variable.meta = (typeof variable.defaultValue === "object" && variable.defaultValue) || {type: "text", placeholder: ""};
-        variable.value = variable.value || "";
+        variable.value = variable.value || '';
+        variable.type = variable.type || 'text';
+        variable.sample = [];
+        variable.sampleUser = variable.sampleUser || [];
+        variable.path = variable.path || '';
+        variable.step = '';
         delete variable.defaultValue;
       });
     }
@@ -632,27 +708,27 @@ var EditorViewModel = (function() {
         var reList = /(?!\s*$)\s*(?:(?:([^,|()\\]*)\(\s*([^,|()\\]*)\)(?:\\[\S\s][^,|()\\]*)?)|([^,|\\]*(?:\\[\S\s][^,|\\]*)*))\s*(?:,|\||$)/g
         var statement = self.statement_raw();
         var matchComment = reComment.exec(statement);
-        //if re is n & reComment is m
-        //finding variables is O(n+m)
+        // if re is n & reComment is m
+        // finding variables is O(n+m)
         while (match = re.exec(statement)) {
-          while (matchComment && match.index > matchComment.index + matchComment[0].length) { //comments before our match
+          while (matchComment && match.index > matchComment.index + matchComment[0].length) { // Comments before our match
             matchComment = reComment.exec(statement);
           }
           var isWithinComment = matchComment && match.index >= matchComment.index;
           if (isWithinComment) continue;
 
-          //If 1 match, text value
-          //If multiple matches, list value
-          var value = {type:"text"};
+          // If 1 match, text value
+          // If multiple matches, list value
+          var value = { type: 'text', placeholder: '' };
           while (matchList = reList.exec(match[2])) {
             var option = {text:matchList[2] || matchList[3], value:matchList[3] || matchList[1]};
             option.text = option.text && option.text.trim();
-            option.value = option.value && option.value.trim();
+            option.value = option.value && option.value.trim().replace('\,', ',').replace('\(', '(').replace('\)', ')');
 
-            if (value.placeholder || matchList[2]){
+            if (value.placeholder || matchList[2]) {
               if (!value.options) {
                 value.options = [];
-                value.type = "select";
+                value.type = 'select';
               }
               value.options.push(option);
             }
@@ -662,30 +738,38 @@ var EditorViewModel = (function() {
             return current.value == value.placeholder;
           });
           if (!isPlaceholderInOptions) {
-            value.options.push({text: value.placeholder, value: value.placeholder});
+            value.options.unshift({ text: value.placeholder, value: value.placeholder });
           }
           matches[match[1]] = matches[match[1]] || value;
         }
       }
       return $.map(matches, function (match, key) {
-        var isMatchObject = typeof matches[key] === "object";
-        var meta = isMatchObject ? matches[key] : {type: "text", placeholder: matches[key]};
-        return {name: key, meta: meta};
+        var isMatchObject = typeof matches[key] === 'object';
+        var meta = isMatchObject ? matches[key] : { type: 'text', placeholder: matches[key] };
+        return { name: key, meta: meta };
       });
     });
     self.variableValues = {};
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
-      var diffLengthVariables = self.variables().length - newVal.length;
+      var variablesLength = self.variables().length;
+      var diffLengthVariables = variablesLength - newVal.length;
       var needsMore = diffLengthVariables < 0;
       var needsLess = diffLengthVariables > 0;
       self.variableValues = self.variables().reduce(function (variableValues, variable) {
-        variableValues[variable.name()] = {value:variable.value()};
+        if (!variableValues[variable.name()]) {
+          variableValues[variable.name()] = { sampleUser: [] };
+        }
+        variableValues[variable.name()].value = variable.value();
+        variableValues[variable.name()].sampleUser = variable.sampleUser();
+        variableValues[variable.name()].catalogEntry = variable.catalogEntry;
+        variableValues[variable.name()].path = variable.path();
+        variableValues[variable.name()].type = variable.type();
         return variableValues;
       }, self.variableValues);
       if (needsMore) {
         for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          self.variables.push(ko.mapping.fromJS({ name: "", value: "", meta: {type: "text", placeholder: ""}}));
+          self.variables.push(ko.mapping.fromJS({ name: '', value: '', meta: { type: 'text', placeholder: '', options: [] }, sample: [], sampleUser: [], type: 'text', step: '', path: ''}));
         }
       } else if (needsLess) {
         self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
@@ -693,8 +777,102 @@ var EditorViewModel = (function() {
       newVal.forEach(function (item, index) {
         var variable = self.variables()[index];
         variable.name(item.name);
-        variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || "");
+        setTimeout(function(){
+          variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
+        },0);
         variable.meta = ko.mapping.fromJS(item.meta, {}, variable.meta);
+        variable.sample(variable.meta.options ? variable.meta.options().concat(variable.sampleUser()) : variable.sampleUser())
+        variable.sampleUser(self.variableValues[item.name] ? self.variableValues[item.name].sampleUser : []);
+        variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type || 'text' : 'text');
+        variable.path(self.variableValues[item.name] ? self.variableValues[item.name].path || '' : '');
+        variable.catalogEntry = self.variableValues[item.name] && self.variableValues[item.name].catalogEntry;
+      });
+    });
+
+    var activeSourcePromises = [];
+    huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
+      while (activeSourcePromises.length) {
+        var promise = activeSourcePromises.pop();
+        if (promise.cancel) {
+          promise.cancel();
+        }
+      }
+      var sourceType = self.type();
+      var oLocations = e.data.locations
+      .filter(function (location) {
+        return location.type === 'variable' && location.colRef;
+      })
+      .reduce(function (variables, location) {
+        var re = /\${(\w*)\=?([^{}]*)}/g;
+        var name = re.exec(location.value)[1];
+        variables[name] = location;
+        return variables;
+      }, {});
+      var updateVariableType = function (variable, sourceMeta) {
+        var type;
+        if (sourceMeta && sourceMeta.type) {
+          type = sourceMeta.type.toLowerCase();
+        } else {
+          type = 'string';
+        }
+        var variablesValues = {};
+        var value = variable.value();
+        switch (type) {
+          case 'timestamp':
+            variablesValues.type = 'datetime-local';
+            variablesValues.step = '1';
+            variablesValues.value = value && moment.utc(value).format("YYYY-MM-DD HH:mm:ss.S") || moment(Date.now()).format("YYYY-MM-DD 00:00:00.0");
+            break;
+          case 'decimal':
+          case 'double':
+          case 'float':
+            variablesValues.type = 'number';
+            variablesValues.step = 'any';
+            break;
+          case 'int':
+          case 'smallint':
+          case 'tinyint':
+          case 'bigint':
+            variablesValues.type = 'number';
+            variablesValues.step = '1';
+            break;
+          case 'date':
+            variablesValues.type = 'date';
+            variablesValues.step = '';
+            variablesValues.value = value && moment.utc(value).format("YYYY-MM-DD") || moment(Date.now()).format("YYYY-MM-DD");
+            break;
+          case 'boolean':
+            variablesValues.type = 'checkbox';
+            variablesValues.step = '';
+            break;
+          default:
+            variablesValues.type = 'text';
+            variablesValues.step = '';
+        }
+        if (variablesValues.value) {
+          setTimeout(function () {
+            variable.value(variablesValues.value);
+          }, 0);
+        }
+        variable.type(variablesValues.type);
+        variable.step(variablesValues.step);
+      };
+      self.variables().forEach(function (variable) {
+        if (oLocations[variable.name()]) {
+          activeSourcePromises.push(oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).done(function (entry) {
+            variable.path(entry.path.join('.'));
+            variable.catalogEntry = entry;
+
+            activeSourcePromises.push(entry.getSourceMeta({
+              silenceErrors: true,
+              cancellable: true
+            }).then(updateVariableType.bind(self, variable)));
+          }));
+        } else {
+          updateVariableType(variable, {
+            type: 'text'
+          });
+        }
       });
     });
     self.statement = ko.computed(function () {
@@ -707,7 +885,9 @@ var EditorViewModel = (function() {
         var variablesString = self.variables().map(function(variable) { return variable.name(); }).join("|");
         statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{(" : "(") + variablesString + ")(=[^}]*)?" + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), function(match, p1, p2){
           var variable = variables[p2];
-          return p1 + (variable && (variable.value() || (variable.meta.placeholder && variable.meta.placeholder())));
+          var pad = variable.type() == 'datetime-local' && variable.value().length == 16 ? ':00' : ''; // Chrome drops the seconds from the timestamp when it's at 0 second.
+          var value = variable.value();
+          return p1 + (value !== undefined && value !== null ? value + pad : variable.meta.placeholder && variable.meta.placeholder());
         });
       }
       return statement;
@@ -719,27 +899,46 @@ var EditorViewModel = (function() {
     }
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
     self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
-    var defaultShowLogs = false;
+    var defaultShowLogs = true;
     if (vm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
-    self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : defaultShowLogs);
-    self.progress = ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
-    self.jobs = ko.observableArray(typeof snippet.jobs != "undefined" && snippet.jobs != null ? snippet.jobs : []);
+    self.showLogs = ko.observable(typeof snippet.showLogs !== "undefined" && snippet.showLogs != null ? snippet.showLogs : defaultShowLogs);
+    self.progress = ko.observable(typeof snippet.progress !== "undefined" && snippet.progress != null ? snippet.progress : 0);
+    self.jobs = ko.observableArray(typeof snippet.jobs !== "undefined" && snippet.jobs != null ? snippet.jobs : []);
 
-    self.ddlNotification = ko.observable();
-    self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-    window.setTimeout(function () {
-      self.delayedDDLNotification.subscribe(function (val) {
-        var match = self.statement().match(/(?:CREATE|DROP) (?:TABLE|DATABASE) `([^`]+)`/i); // For importer/metastore generated DDL only currently
+    var executeNextTimeout = -1;
+    var refreshTimeouts = {};
+    self.onDdlExecute = function () {
+      if (self.result.handle() && self.result.handle().has_more_statements) {
+        window.clearTimeout(executeNextTimeout);
+        executeNextTimeout = setTimeout(function () {
+          self.execute(true); // Execute next, need to wait as we disabled fast click
+        }, 1000);
+      }
+      var match = self.statement().match(/(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i);
+      var path = [];
+      if (match) {
+        path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+      } else {
+        match = self.statement().match(/(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i);
         if (match) {
-          var db = match[1];
-          huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
+          path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+        } else if (self.database()) {
+          path.push(self.database());
         }
-        ignoreNextAssistDatabaseUpdate = true;
-        huePubSub.publish('assist.db.refresh', { sourceTypes: [self.type()] });
-      });
-    }, 0);
+      }
+
+      if (path.length) {
+        window.clearTimeout(refreshTimeouts[path.join('.')]);
+        refreshTimeouts[path.join('.')] = window.setTimeout(function () {
+          ignoreNextAssistDatabaseUpdate = true;
+          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: path }).done(function (entry) {
+            entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+          });
+        }, 5000);
+      }
+    };
 
     self.progress.subscribe(function (val) {
       $(document).trigger("progress", {data: val, snippet: self});
@@ -850,6 +1049,9 @@ var EditorViewModel = (function() {
     self.chartMapType = ko.observable(typeof snippet.chartMapType != "undefined" && snippet.chartMapType != null ? snippet.chartMapType : 'marker');
     self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
     self.chartMapHeat = ko.observable(typeof snippet.chartMapHeat != "undefined" && snippet.chartMapHeat != null ? snippet.chartMapHeat : null);
+    self.hideStacked = ko.computed(function() {
+      return self.chartYMulti().length <= 1;
+    });
 
     self.hasDataForChart = ko.computed(function () {
       if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART || self.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART) {
@@ -932,11 +1134,13 @@ var EditorViewModel = (function() {
         status: self.status,
         statementType: self.statementType,
         statement: self.statement,
+        aceCursorPosition: self.aceCursorPosition,
         statementPath: self.statementPath,
         associatedDocumentUuid: self.associatedDocumentUuid,
         properties: self.properties,
         result: self.result.getContext(),
         database: self.database,
+        compute: self.compute(),
         wasBatchExecuted: self.wasBatchExecuted()
       };
     };
@@ -960,37 +1164,26 @@ var EditorViewModel = (function() {
     self.hasSuggestion = ko.observable(null);
 
     self.compatibilityCheckRunning = ko.observable(false);
-    self.compatibilitySourcePlatform = ko.observable(self.type());
+
+    self.compatibilitySourcePlatforms = [];
+    Object.keys(COMPATIBILITY_SOURCE_PLATFORMS).forEach(function (key) {
+      self.compatibilitySourcePlatforms.push(COMPATIBILITY_SOURCE_PLATFORMS[key]);
+    });
+
+    self.compatibilitySourcePlatform = ko.observable(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
     self.compatibilitySourcePlatform.subscribe(function(newValue) {
-      if (newValue != self.type()) {
+      if (newValue && newValue.value !== self.type()) {
         self.hasSuggestion(null);
-        self.compatibilityTargetPlatform(self.type());
+        self.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
         self.queryCompatibility();
       }
     });
-    self.compatibilitySourcePlatforms = ko.observableArray([
-      {'name': 'Teradata', 'value': 'teradata'},
-      {'name': 'Oracle', 'value': 'oracle'},
-      {'name': 'Netezza', 'value': 'netezza'},
-      {'name': 'Impala', 'value': 'impala'},
-      {'name': 'Hive', 'value': 'hive'},
-      {'name': 'DB2', 'value': 'db2'},
-      {'name': 'Greenplum', 'value': 'greenplum'},
-      {'name': 'MySQL', 'value': 'mysql'},
-      {'name': 'PostgreSQL', 'value': 'postgresql'},
-      {'name': 'Informix', 'value': 'informix'},
-      {'name': 'SQL Server', 'value': 'sqlserver'},
-      {'name': 'Sybase', 'value': 'sybase'},
-      {'name': 'Access', 'value': 'access'},
-      {'name': 'Firebird', 'value': 'firebird'},
-      {'name': 'ANSISQL', 'value': 'ansisql'},
-      {'name': 'Generic', 'value': 'generic'}
-    ]);
-    self.compatibilityTargetPlatform = ko.observable(self.type());
-    self.compatibilityTargetPlatforms = ko.observableArray([
-      {'name': 'Impala', 'value': 'impala'},
-      {'name': 'Hive', 'value': 'hive'}
-    ]);
+
+    self.compatibilityTargetPlatforms = [];
+    Object.keys(COMPATIBILITY_TARGET_PLATFORMS).forEach(function (key) {
+      self.compatibilityTargetPlatforms.push(COMPATIBILITY_TARGET_PLATFORMS[key]);
+    });
+    self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
 
     self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
     self.showOptimizer.subscribe(function (newValue) {
@@ -1115,12 +1308,10 @@ var EditorViewModel = (function() {
         if (self.statement_raw()) {
           window.setTimeout(function(){
             self.checkComplexity();
-            //self.querySyntaxCompatibility();
           }, 2000);
         }
         self.delayedStatement.subscribe(function () {
           self.checkComplexity();
-          //self.querySyntaxCompatibility(); Off for now
         });
       }
     }
@@ -1136,7 +1327,7 @@ var EditorViewModel = (function() {
       } else if (data.status == -3) { // Statement expired
         self.status('expired');
         if (data.message) {
-          self.errors.push({message: data.message, line: null, col: null});
+          self.errors.push({message: data.message, help: null, line: null, col: null});
           huePubSub.publish('editor.snippet.result.normal', self);
         }
       } else if (data.status == -4) { // Operation timed out
@@ -1172,12 +1363,14 @@ var EditorViewModel = (function() {
 
           self.errors.push({
             message: data.message.replace(match[0], 'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')),
+            help: null,
             line: errorLine - 1,
             col: errorCol
           })
         } else {
           self.errors.push({
             message: data.message,
+            help: data.help,
             line: null,
             col: null
           });
@@ -1225,16 +1418,27 @@ var EditorViewModel = (function() {
       self.showLongOperationWarning(false);
     }
 
-    self.execute = function () {
+    self.execute = function (automaticallyTriggered) {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
+      if (!automaticallyTriggered && (self.status() === 'running' || self.status() === 'loading')) { // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
+        self.cancel();
+      } else if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
+
+      if (self.type() === 'impala') {
+        huePubSub.publish('assist.clear.execution.analysis');
+      }
+
+      self.status('running');
+      self.statusForButtons('executing');
+
       if (self.isSqlDialect()) {
         huePubSub.publish('editor.refresh.statement.locations', self);
       }
 
       if (self.ace()) {
+        huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: self });
         var selectionRange = self.ace().getSelectionRange();
         self.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
       }
@@ -1245,9 +1449,10 @@ var EditorViewModel = (function() {
       $(".jHueNotify").remove();
       hueAnalytics.log('notebook', 'execute/' + self.type());
 
+      notebook.forceHistoryInitialHeight(true);
+
       if (self.result.handle()) {
         self.close();
-        self.statusForButtons('executed');
       }
 
       if (self.isSqlDialect() && self.positionStatement()) {
@@ -1256,8 +1461,6 @@ var EditorViewModel = (function() {
         self.lastExecutedStatement(null);
       }
 
-      self.status('running');
-      self.statusForButtons('executing');
       self.errors([]);
       huePubSub.publish('editor.clear.highlighted.errors', self.ace());
       self.result.clear();
@@ -1292,6 +1495,7 @@ var EditorViewModel = (function() {
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
+        huePubSub.publish('ace.set.autoexpand', { autoExpand: true, snippet: self });
         stopLongOperationTimeout();
 
         if (vm.editorMode() && data.history_id) {
@@ -1308,13 +1512,14 @@ var EditorViewModel = (function() {
           notebook.parentSavedQueryUuid(data.history_parent_uuid);
         }
 
-        if (data.status == 0) {
+        if (data.status === 0) {
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
           if (data.handle.sync) {
             self.loadData(data.result, 100);
             self.status('available');
             self.progress(100);
+            self.result.endTime(new Date());
           } else {
             if (! notebook.unloaded()) {
               self.checkStatus();
@@ -1325,13 +1530,14 @@ var EditorViewModel = (function() {
           }
         } else {
           self._ajaxError(data, self.execute);
+          notebook.isExecutingAll(false);
         }
 
         if (data.handle) {
           if (vm.editorMode()) {
             if (vm.isNotificationManager()) { // Update task status
               var tasks = $.grep(notebook.history(), function(row) { return row.uuid() == notebook.uuid()});
-              if (tasks.length == 1) {
+              if (tasks.length === 1) {
                 tasks[0].status(self.status());
                 self.result.logs(data.message);
               }
@@ -1395,7 +1601,7 @@ var EditorViewModel = (function() {
 
     self.format = function () {
       if (self.isSqlDialect()) {
-        self.getApiHelper().formatSql(self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw()).done(function (data) {
+        self.getApiHelper().formatSql({ statements: self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw() }).done(function (data) {
           if (data.status == 0) {
             if (self.ace().getSelectedText() != '') {
               self.ace().session.replace(self.ace().session.selection.getRange(), data.formatted_statements);
@@ -1446,10 +1652,10 @@ var EditorViewModel = (function() {
 
     var lastCompatibilityRequest;
 
-    self.querySyntaxCompatibility = function () {
-      self.compatibilitySourcePlatform(self.type());
-      self.compatibilityTargetPlatform(self.type());
-
+    self.checkCompatibility = function () {
+      self.hasSuggestion(null);
+      self.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
+      self.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[self.type() === 'hive' ? 'impala' : 'hive']);
       self.queryCompatibility();
     };
 
@@ -1464,14 +1670,14 @@ var EditorViewModel = (function() {
       lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
-        sourcePlatform: self.compatibilitySourcePlatform(),
-        targetPlatform: self.compatibilityTargetPlatform()
+        sourcePlatform: self.compatibilitySourcePlatform().value,
+        targetPlatform: self.compatibilityTargetPlatform().value
       }, function (data) {
-        if (data.status == 0) {
+        if (data.status === 0) {
           self.aceErrorsHolder([]);
           self.aceWarningsHolder([]);
           self.suggestion(ko.mapping.fromJS(data.query_compatibility));
-          if (self.suggestion().queryError.errorString()) {
+          if (self.suggestion().queryError && self.suggestion().queryError.errorString()) {
             var match = ERROR_REGEX.exec(self.suggestion().queryError.errorString());
             var line = null;
             if (match) {
@@ -1497,6 +1703,7 @@ var EditorViewModel = (function() {
             });
             self.status('with-optimizer-report');
           }
+          self.showOptimizer(true);
           self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
@@ -1522,7 +1729,7 @@ var EditorViewModel = (function() {
 
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
-        if (self.status() == 'available') {
+        if (self.status() === 'available') {
           startLongOperationTimeout();
           self.isFetchingData = true;
           hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
@@ -1534,7 +1741,7 @@ var EditorViewModel = (function() {
           }, function (data) {
             stopLongOperationTimeout();
             data = JSON.bigdataParse(data);
-            if (data.status == 0) {
+            if (data.status === 0) {
               self.loadData(data.result, rows);
             } else {
               self._ajaxError(data, function() {self.isFetchingData = false; self.fetchResultData(rows, startOver); });
@@ -1586,7 +1793,7 @@ var EditorViewModel = (function() {
       self.result.meta().forEach(function (meta) {
         if ($.inArray(meta.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1) {
           meta.cssClass = 'sort-numeric';
-        } else if ($.inArray(meta.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1) {
+        } else if ($.inArray(meta.type, ['TIMESTAMP_TYPE', 'DATE_TYPE', 'DATETIME_TYPE']) > -1) {
           meta.cssClass = 'sort-date';
         } else {
           meta.cssClass = 'sort-string';
@@ -1599,7 +1806,7 @@ var EditorViewModel = (function() {
         setTimeout(function () {
           self.fetchResultData(rows, false);
         }, 500);
-      } else if (! vm.editorMode() && ! vm.isPresentationMode() && notebook.snippets()[notebook.snippets().length - 1] == self) {
+      } else if (! vm.editorMode() && ! notebook.isPresentationMode() && notebook.snippets()[notebook.snippets().length - 1] == self) {
         notebook.newSnippet();
       }
     };
@@ -1655,9 +1862,6 @@ var EditorViewModel = (function() {
         if (self.statusForButtons() == 'canceling' || self.status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
         } else {
-          if (vm.editorMode()) {
-            self.getLogs();
-          }
           self.result.endTime(new Date());
 
           if (data.status === 0) {
@@ -1669,6 +1873,15 @@ var EditorViewModel = (function() {
                 self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
               }
             } else if (self.status() === 'available') {
+              if (self.type() === 'impala' && self.compute() && self.compute().crn && self.compute().crn.indexOf('altus') !== -1) {
+
+                // TODO: Use real query ID
+                huePubSub.publish('assist.update.execution.analysis', {
+                  compute: self.compute(),
+                  queryId: '56433486cd84d475:3a86f97000000000'
+                });
+
+              }
               self.fetchResult(100);
               self.progress(100);
               if (self.isSqlDialect()) {
@@ -1683,13 +1896,7 @@ var EditorViewModel = (function() {
                   if (self.lastExecutedStatement()) {
                     self.checkDdlNotification();
                   } else {
-                    self.ddlNotification(Math.random());
-                  }
-
-                  if (self.result.handle().has_more_statements) {
-                    setTimeout(function () {
-                      self.execute(); // Execute next, need to wait as we disabled fast click
-                    }, 1000);
+                    self.onDdlExecute();
                   }
                 }
               }
@@ -1714,6 +1921,7 @@ var EditorViewModel = (function() {
             self._ajaxError(data);
             notebook.isExecutingAll(false);
           }
+          self.getLogs(); // Need to execute at the end, because updating the status impacts log progress results
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         if (xhr.status !== 502) {
@@ -1726,9 +1934,9 @@ var EditorViewModel = (function() {
 
     self.checkDdlNotification = function() {
       if (self.lastExecutedStatement() && /CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
-        self.ddlNotification(Math.random());
+        self.onDdlExecute();
       }
-    }
+    };
 
     self.isCanceling = ko.observable(false);
 
@@ -1794,7 +2002,7 @@ var EditorViewModel = (function() {
         if (xhr.status !== 502) {
           // $(document).trigger("error", xhr.responseText);
         }
-        self.status('failed');
+        // self.status('failed'); // Can conflict with slow close and new query execution
       });
     };
 
@@ -1837,8 +2045,14 @@ var EditorViewModel = (function() {
               if (_found.length === 0) {
                 if (typeof job.percentJob === 'undefined') {
                   job.percentJob = ko.observable(-1);
+                } else {
+                  job.percentJob = ko.observable(job.percentJob);
                 }
                 self.jobs.push(job);
+              } else if (typeof job.percentJob !== 'undefined') {
+                for (var i = 0; i < _found.length; i++) {
+                  _found[i].percentJob(job.percentJob)
+                }
               }
             });
             self.jobs().forEach(function (job) {
@@ -1898,14 +2112,15 @@ var EditorViewModel = (function() {
           return table.databaseName + '.' + table.tableName;
         })),
         sourcePlatform: ko.mapping.toJSON(self.type()),
-        with_columns: ko.mapping.toJSON(true),
-        with_ddl: ko.mapping.toJSON(true)
+        with_ddl: ko.mapping.toJSON(true),
+        with_table_stats: ko.mapping.toJSON(true),
+        with_columns_stats: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
           if (options.showProgress) {
             $(document).trigger("info", $.map(options.activeTables, function(table) { return table.tableName; }) + " stats sent to analyse");
           }
-          if (data.upload_table_ddl) {
+          if (data.upload_table_ddl && options.showProgress) { // With showProgress only currently as can be very slow
             self.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
           }
         } else {
@@ -1970,7 +2185,7 @@ var EditorViewModel = (function() {
     });
 
     self.init = function () {
-      if (self.status() == 'running' || self.status() == 'available') {
+      if ((self.status() == 'running' || self.status() == 'available') && notebook.isHistory()) {
         self.checkStatus();
       }
       else if (self.status() == 'loading') {
@@ -1981,6 +2196,16 @@ var EditorViewModel = (function() {
       else if (self.status() == 'ready-execute') {
         self.execute();
       }
+    };
+
+    self.onKeydownInVariable = function (context, e) {
+      if ((e.ctrlKey || e.metaKey) && e.which === 13) { // Ctrl-enter
+        self.ace().commands.commands['execute'].exec();
+      } else if ((e.ctrlKey || e.metaKey) && e.which === 83) { // Ctrl-s
+        self.ace().commands.commands['save'].exec();
+        e.preventDefault(); // Prevent browser page save dialog
+      }
+      return true;
     };
   };
 
@@ -2016,6 +2241,7 @@ var EditorViewModel = (function() {
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
+    self.initialType = self.type().replace('query-', '');
     self.coordinatorUuid = ko.observable(typeof notebook.coordinatorUuid != "undefined" && notebook.coordinatorUuid != null ? notebook.coordinatorUuid : null);
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.isManaged = ko.observable(typeof notebook.isManaged != "undefined" && notebook.isManaged != null ? notebook.isManaged : false);
@@ -2024,7 +2250,21 @@ var EditorViewModel = (function() {
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
+    self.isPresentationModeDefault = ko.observable(typeof notebook.isPresentationModeDefault != "undefined" && notebook.isPresentationModeDefault != null ? notebook.isPresentationModeDefault : false);
+    self.isPresentationMode = ko.observable(false);
+    self.isPresentationModeInitialized = ko.observable(false);
+    self.isPresentationMode.subscribe(function(newValue) {
+      if (! newValue) {
+        self.cancelExecutingAll();
+      }
+      huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
+      vm.togglePresentationMode();
+      if (newValue) {
+        hueAnalytics.convert('editor', 'presentation');
+      }
+    });
     self.presentationSnippets = ko.observable({});
+    self.isHidingCode = ko.observable(typeof notebook.isHidingCode != "undefined" && notebook.isHidingCode != null ? notebook.isHidingCode : false);
 
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
@@ -2045,7 +2285,7 @@ var EditorViewModel = (function() {
     self.history = ko.observableArray(vm.selectedNotebook() && vm.selectedNotebook().history().length > 0 && vm.selectedNotebook().history()[0].type == self.type() ? vm.selectedNotebook().history() : []);
     self.history.subscribe(function(val) {
       if (self.id() == null && val.length == 0 && self.historyFilter() === '' && ! vm.isNotificationManager()) {
-        self.snippets()[0].currentQueryTab('savedQueries');
+        self.snippets()[0].currentQueryTab((typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) ? 'queryHistory' : 'savedQueries');
       }
     });
     self.historyFilter = ko.observable('');
@@ -2059,6 +2299,8 @@ var EditorViewModel = (function() {
       }
     });
     self.loadingHistory = ko.observable(self.history().length == 0);
+    self.historyInitialHeight = ko.observable(0).extend({ throttle: 1000 });
+    self.forceHistoryInitialHeight = ko.observable(false);
     self.historyCurrentPage = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1);
     self.historyCurrentPage.subscribe(function(val) {
       self.fetchHistory();
@@ -2088,6 +2330,8 @@ var EditorViewModel = (function() {
     self.retryModalCancel = null;
 
     self.avoidClosing = false;
+
+    self.canSave = vm.canSave;
 
 
     self.getSession = function (session_type) {
@@ -2188,8 +2432,12 @@ var EditorViewModel = (function() {
         self.creatingSessionLocks.push(session.type());
       }
 
+      var compute = null;
       $.each(self.getSnippets(session.type()), function(index, snippet) {
         snippet.status('loading');
+        if (index == 0) {
+          compute = snippet.compute();
+        }
       });
 
       var fail = function (message) {
@@ -2204,7 +2452,8 @@ var EditorViewModel = (function() {
 
       $.post("/notebook/api/create_session", {
         notebook: ko.mapping.toJSON(self.getContext()),
-        session: ko.mapping.toJSON(session) // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
+        session: ko.mapping.toJSON(session), // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
+        cluster: ko.mapping.toJSON(compute ? compute : '')
       }, function (data) {
         if (data.status == 0) {
           ko.mapping.fromJS(data.session, {}, session);
@@ -2304,10 +2553,11 @@ var EditorViewModel = (function() {
       if (cp.schedulerViewModel) {
         cp.schedulerViewModel.availableTimezones = [];
       }
+      var editorMode = vm.editorMode() || (self.isPresentationMode() && vm.editorType() != 'notebook'); // Editor should not convert to Notebook in presentation mode
 
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
-        "editorMode": vm.editorMode()
+        "editorMode": editorMode
       }, function (data) {
         if (data.status == 0) {
           self.id(data.id);
@@ -2315,7 +2565,7 @@ var EditorViewModel = (function() {
           var wasHistory = self.isHistory();
           self.isHistory(false);
           $(document).trigger("info", data.message);
-          if (vm.editorMode()) {
+          if (editorMode) {
             if (! data.save_as) {
               var existingQuery = self.snippets()[0].queries().filter(function (item) {
                 return item.uuid() === data.uuid
@@ -2337,10 +2587,15 @@ var EditorViewModel = (function() {
               self.loadScheduler();
             }
 
-            if (vm.isHue4()){
-              vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
-            } else {
-              vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            if (self.snippets()[0].downloadResultViewModel && self.snippets()[0].downloadResultViewModel().saveTarget() === 'dashboard') {
+              huePubSub.publish('open.link', vm.URLS.report + '&uuid=' + data.uuid + '&statement=' + self.snippets()[0].result.handle().statement_id);
+            }
+            else {
+              if (vm.isHue4()){
+                vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
+              } else {
+                vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+              }
             }
           } else {
             if (vm.isHue4()){
@@ -2378,7 +2633,7 @@ var EditorViewModel = (function() {
     };
 
     self.executeAll = function () {
-      if (self.isExecutingAll()) {
+      if (self.isExecutingAll() || self.snippets().length === 0) {
         return;
       }
 
@@ -2655,17 +2910,6 @@ var EditorViewModel = (function() {
     self.loadingScheduler = ko.observable(false);
 
 
-    huePubSub.subscribeOnce('assist.db.panel.ready', function () {
-      if (self.type().indexOf('query') === 0 && self.snippets().length == 1) {
-        huePubSub.publish('assist.set.database', {
-          source: self.snippets()[0].type(),
-          name: self.snippets()[0].database()
-        });
-      }
-    }, vm.huePubSubId);
-
-    huePubSub.publish('assist.is.db.panel.ready');
-
     // Init
     if (notebook.snippets) {
       $.each(notebook.snippets, function (index, snippet) {
@@ -2673,6 +2917,7 @@ var EditorViewModel = (function() {
       });
       if (typeof notebook.presentationSnippets != "undefined" && notebook.presentationSnippets != null) { // Load
         $.each(notebook.presentationSnippets, function(key, snippet) {
+          snippet.status = 'ready' // Protect from storm of check_statuses
           var _snippet = new Snippet(vm, self, snippet);
           _snippet.init();
           _snippet.previousChartOptions = vm._getPreviousChartOptions(_snippet);
@@ -2686,6 +2931,54 @@ var EditorViewModel = (function() {
         });
       }
     }
+
+    huePubSub.subscribeOnce('assist.db.panel.ready', function () {
+      if (self.type().indexOf('query') === 0) {
+
+        var whenDatabaseAvailable = function (snippet) {
+          huePubSub.publish('assist.set.database', {
+            source: snippet.type(),
+            namespace: snippet.namespace(),
+            name: snippet.database()
+          });
+        };
+
+        var whenNamespaceAvailable = function (snippet) {
+          if (snippet.database()) {
+            whenDatabaseAvailable(snippet);
+          } else {
+            var databaseSub = snippet.database.subscribe(function () {
+              databaseSub.dispose();
+              whenDatabaseAvailable(snippet);
+            })
+          }
+        };
+
+        var whenSnippetAvailable = function (snippet) {
+          if (snippet.namespace()) {
+            whenNamespaceAvailable(snippet);
+          } else {
+            var namespaceSub = snippet.namespace.subscribe(function () {
+              namespaceSub.dispose();
+              whenNamespaceAvailable(snippet);
+            })
+          }
+        };
+
+        if (self.snippets().length === 1) {
+          whenSnippetAvailable(self.snippets()[0]);
+        } else {
+          var snippetsSub = self.snippets.subscribe(function (snippets) {
+            if (snippets.length === 1) {
+              whenSnippetAvailable(snippets[0])
+            }
+            snippetsSub.dispose();
+          })
+        }
+      }
+    }, vm.huePubSubId);
+
+    huePubSub.publish('assist.is.db.panel.ready');
   };
 
   function EditorViewModel(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -2696,7 +2989,8 @@ var EditorViewModel = (function() {
       editorMobile: '/notebook/editor_m',
       notebook: '/notebook/notebook',
       hue4: '/hue/editor',
-      hue4_notebook: '/hue/notebook'
+      hue4_notebook: '/hue/notebook',
+      report: '/hue/dashboard/new_search?engine=report'
     };
 
     self.huePubSubId = options.huePubSubId || 'editor';
@@ -2741,7 +3035,8 @@ var EditorViewModel = (function() {
                 _statement.push(line);
               }
             });
-            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: _variables}, skipSession=true);
+            _snippet = new Snippet(self, _notebook, {type: _notebook.initialType, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: ko.mapping.toJS(_variables)}, skipSession=true);
+            _snippet.variables = _notebook.snippets()[0].variables;
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
@@ -2754,10 +3049,10 @@ var EditorViewModel = (function() {
           }
         });
       } else {
-        self.editorType(options.editor_type);
+        self.editorType(_notebook.initialType);
         // Revert to one statement
         _newSnippets.push(self.preEditorTogglingSnippet());
-        _notebook.type('query-' + options.editor_type);
+        _notebook.type('query-' + _notebook.initialType);
       }
       _notebook.snippets(_newSnippets);
       _newSnippets.forEach(function (snippet) {
@@ -2765,7 +3060,7 @@ var EditorViewModel = (function() {
       });
     };
     self.togglePresentationMode = function() {
-      if (options.editor_type != 'notebook') {
+      if (self.selectedNotebook().initialType != 'notebook') {
         self.toggleEditorMode();
       }
     };
@@ -2780,9 +3075,16 @@ var EditorViewModel = (function() {
     self.selectedNotebook = ko.observable();
 
     self.combinedContent = ko.observable();
-    self.isPresentationMode = ko.observable(false);
+    self.isPresentationModeEnabled = ko.pureComputed(function () {
+      return self.selectedNotebook() && self.selectedNotebook().snippets().length === 1 && self.selectedNotebook().snippets()[0].isSqlDialect()
+    });
     self.isResultFullScreenMode = ko.observable(false);
-    self.isHidingCode = ko.observable(false);
+    self.isPresentationMode = ko.computed(function() {
+      return self.selectedNotebook() && self.selectedNotebook().isPresentationMode();
+    });
+    self.isHidingCode = ko.computed(function() {
+      return self.selectedNotebook() && self.selectedNotebook().isHidingCode();
+    })
     self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
@@ -2845,7 +3147,7 @@ var EditorViewModel = (function() {
     };
 
     self.isEditing = ko.observable(false);
-    self.isEditing.subscribe(function (newVal) {
+    self.isEditing.subscribe(function () {
       $(document).trigger("editingToggled");
     });
     self.toggleEditing = function () {
@@ -2935,17 +3237,6 @@ var EditorViewModel = (function() {
       withActiveSnippet(function (activeSnippet) {
         huePubSub.publish('set.active.snippet.type', activeSnippet.type());
       })
-    }, self.huePubSubId);
-
-    huePubSub.subscribe('assist.db.refresh', function (options) {
-      var notebook = self.selectedNotebook();
-      if (notebook) {
-        notebook.snippets().forEach(function (snippet) {
-          if (options.sourceTypes.indexOf(snippet.type()) !== -1) {
-            snippet.updateDatabases();
-          }
-        });
-      }
     }, self.huePubSubId);
 
     huePubSub.subscribe('save.snippet.to.file', function() {
@@ -3059,6 +3350,7 @@ var EditorViewModel = (function() {
           notebook.snippets()[0].queries(currentQueries);
         }
         notebook.snippets().forEach(function (snippet) {
+          snippet.aceAutoExpand = false;
           snippet.statement_raw.valueHasMutated();
           if (snippet.result.handle().statements_count > 1 && snippet.result.handle().start != null && snippet.result.handle().end != null) {
             var aceLineOffset = snippet.result.handle().aceLineOffset || 0;
@@ -3110,6 +3402,7 @@ var EditorViewModel = (function() {
     };
 
     self.openNotebook = function (uuid, queryTab, skipUrlChange, callback) {
+      var deferredOpen = new $.Deferred();
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true,
@@ -3140,15 +3433,19 @@ var EditorViewModel = (function() {
           if (typeof callback !== 'undefined'){
             callback();
           }
+          deferredOpen.resolve();
         }
         else {
           $(document).trigger("error", data.message);
+          deferredOpen.reject();
           self.newNotebook();
         }
       });
+      return deferredOpen.promise();
     };
 
     self.newNotebook = function (editorType, callback, queryTab) {
+      huePubSub.publish('active.snippet.type.changed', editorType);
       $.post("/notebook/api/create_notebook", {
         type: editorType || options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')
@@ -3182,6 +3479,30 @@ var EditorViewModel = (function() {
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.selectedNotebook().save(function () {
         huePubSub.publish('assist.document.refresh');
+      });
+    };
+
+    self.showContextPopover = function (field, event) {
+      var $source = $(event.target && event.target.nodeName !== 'A' ? event.target.parentElement : event.target);
+      var offset = $source.offset();
+      huePubSub.publish('context.popover.show', {
+        data: {
+          type: 'catalogEntry',
+          catalogEntry: field.catalogEntry
+        },
+        onSampleClick: field.value,
+        showInAssistEnabled: true,
+        sourceType: self.editorType(),
+        orientation: 'bottom',
+        defaultDatabase: 'default',
+        pinEnabled: false,
+        source: {
+          element: event.target,
+          left: offset.left,
+          top: offset.top - 3,
+          right: offset.left + $source.width() + 1,
+          bottom: offset.top + $source.height() - 3
+        }
       });
     };
   }

@@ -1,7 +1,7 @@
 <table class="table table-condensed datatables">
   <thead>
     <tr>
-      <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
+      <th width="1%"><div class="hue-checkbox selectAll" data-selectables="savedCheck"></div></th>
       <th>{{ name }}</th>
       <th>{{ description }}</th>
       <th>{{ owner }}</th>
@@ -13,7 +13,7 @@
   <tbody data-bind="foreach: designs">
     <tr data-bind="with: design">
       <td data-row-selector-exclude="true">
-        <div class="hueCheckbox savedCheck" data-row-selector-exclude="true"></div>
+        <div class="hue-checkbox savedCheck" data-row-selector-exclude="true"></div>
       </td>
       <td><a href="javascript:void(0);" data-row-selector="true" data-bind="text: name, click: function(data, event) {$root.selectByIndex.call($root, $index()); $root.showDesign.call($root, data, event);}"></a></td>
       <td data-bind="text: description"></td>
@@ -31,5 +31,5 @@
         <li><a title="{{ next }}" ${nextpage(page)}>{{ next }}</a></li>
         <li class="next"><a title="{{ last }}" ${bottompage(page)}>{{ last }} &rarr;</a></li>
     </ul>
-    <!-- <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=page.total_count(),page=page.number,pages=page.num_pages())}</p> -->
+    <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=paginator.total_count,page=page.number,pages=paginator.num_pages)}</p> 
 </div>

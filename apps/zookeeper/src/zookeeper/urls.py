@@ -15,16 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from zookeeper import views as zookeeper_views
 
-
-urlpatterns = patterns('zookeeper.views',
-  url(r'^$', 'index', name='index'),
-  url(r'view/(?P<id>\w+)$', 'view', name='view'),
-  url(r'clients/(?P<id>\w+)/(?P<host>.+)$', 'clients', name='clients'),
-  url(r'tree/(?P<id>\w+)/(?P<path>.+)$', 'tree', name='tree'),
-  url(r'create/(?P<id>\w+)/(?P<path>.*)$', 'create', name='create'),
-  url(r'delete/(?P<id>\w+)/(?P<path>.*)$', 'delete', name='delete'),
-  url(r'edit/base64/(?P<id>\w+)/(?P<path>.*)$', 'edit_as_base64', name='edit_as_base64'),
-  url(r'edit/text/(?P<id>\w+)/(?P<path>.*)$', 'edit_as_text', name='edit_as_text'),
-)
+urlpatterns = [
+  url(r'^$', zookeeper_views.index, name='index'),
+  url(r'view/(?P<id>\w+)$', zookeeper_views.view, name='view'),
+  url(r'clients/(?P<id>\w+)/(?P<host>.+)$', zookeeper_views.clients, name='clients'),
+  url(r'tree/(?P<id>\w+)/(?P<path>.+)$', zookeeper_views.tree, name='tree'),
+  url(r'create/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.create, name='create'),
+  url(r'delete/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.delete, name='delete'),
+  url(r'edit/base64/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.edit_as_base64, name='edit_as_base64'),
+  url(r'edit/text/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.edit_as_text, name='edit_as_text'),
+]

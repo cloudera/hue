@@ -35,6 +35,8 @@ module.exports = function(grunt) {
           banner: '/*!\nLicensed to Cloudera, Inc. under one\nor more contributor license agreements.  See the NOTICE file\ndistributed with this work for additional information\nregarding copyright ownership.  Cloudera, Inc. licenses this file\nto you under the Apache License, Version 2.0 (the\n"License"); you may not use this file except in compliance\nwith the License.  You may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n */'
         },
         files: {
+          'desktop/core/src/desktop/static/desktop/css/hue-bootstrap-embedded.css': 'desktop/core/src/desktop/static/desktop/less/hue-bootstrap-embedded.less',
+          'desktop/core/src/desktop/static/desktop/css/hue-embedded.css': 'desktop/core/src/desktop/static/desktop/less/hue-embedded.less',
           'desktop/core/src/desktop/static/desktop/css/home.css': 'desktop/core/src/desktop/static/desktop/less/home.less',
           'desktop/core/src/desktop/static/desktop/css/hue.css': 'desktop/core/src/desktop/static/desktop/less/hue.less',
           'desktop/core/src/desktop/static/desktop/css/hue3-extra.css': 'desktop/core/src/desktop/static/desktop/less/hue3-extra.less',
@@ -63,7 +65,7 @@ module.exports = function(grunt) {
           'apps/security/src/security/static/security/css/security.css': 'apps/security/src/security/static/security/less/security.less',
           'apps/sqoop/src/sqoop/static/sqoop/css/sqoop.css': 'apps/sqoop/src/sqoop/static/sqoop/less/sqoop.less',
           'desktop/libs/indexer/src/indexer/static/indexer/css/indexes.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/indexes.less',
-          'desktop/libs/indexer/src/indexer/static/indexer/css/importer.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/importer.less',
+          'desktop/libs/indexer/src/indexer/static/indexer/css/importer.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/importer.less'
         }
       }
     },
@@ -94,7 +96,7 @@ module.exports = function(grunt) {
           'apps/security/src/security/static/security/less/*.less',
           'apps/security/src/security/static/security/less/**/*.less',
           'apps/sqoop/src/sqoop/static/sqoop/less/*.less',
-          'apps/sqoop/src/sqoop/static/sqoop/less/**/*.less',
+          'apps/sqoop/src/sqoop/static/sqoop/less/**/*.less'
         ],
         tasks: ['less']
       }
@@ -120,9 +122,14 @@ module.exports = function(grunt) {
           'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/globalSearchParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/globalSearchParser.js']
         }
       },
-      solrExpressionParser: {
+      solrFormulaParser: {
         files: {
-          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrExpressionParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrExpressionParser.js']
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrFormulaParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrFormulaParser.js']
+        }
+      },
+      solrQueryParser: {
+        files: {
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrQueryParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrQueryParser.js']
         }
       }
     }

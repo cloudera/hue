@@ -27,10 +27,11 @@ from notebook.conf import ENABLE_SQL_INDEXER
 LOG = logging.getLogger(__name__)
 
 try:
-  from beeswax.conf import DOWNLOAD_ROW_LIMIT
+  from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
 except ImportError, e:
   LOG.warn("Hive app is not enabled")
   DOWNLOAD_ROW_LIMIT = None
+  DOWNLOAD_BYTES_LIMIT = None
 %>
 
 <%def name="addSnippetMenu()">
@@ -168,8 +169,8 @@ except ImportError, e:
       <input type="hidden" name="format"/>
     </form>
 
-    <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
-      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }">
+    <div class="hover-dropdown" data-bind="visible: snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
+      <a class="inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }" data-bind="css: {'grid-side-btn': gridSideBtn, 'snippet-side-btn': !gridSideBtn()}">
         <!-- ko ifnot: isDownloading -->
         <i class="fa fa-fw fa-download"></i>
         <!-- /ko -->
@@ -180,12 +181,28 @@ except ImportError, e:
       </a>
       <ul class="dropdown-menu less-padding" style="z-index: 1040">
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }">
+          <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
+          % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
+          title="${ _('Download first %s rows or %s MB as CSV') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }"
+          % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
+          title="${ _('Download first %s MB as CSV') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }"
+          % else:
+          title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
+          % endif
+          >
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as XLS') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }">
+          <a class="download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
+          % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
+          title="${ _('Download first %s rows or %s MB as XLS') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }"
+          % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
+          title="${ _('Download first %s MB as XLS') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }"
+          % else:
+          title="${ _('Download first %s rows as XLS') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
+          % endif
+          >
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
@@ -196,20 +213,25 @@ except ImportError, e:
         </li>
         % if ENABLE_SQL_INDEXER.get():
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); if (notebook.canSave() ) { notebook.save() } else { $('#saveAsModaleditor').modal('show');} }" title="${ _('Visually explore the result') }">
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'report' } } --><!-- /ko --> ${ _('Report') }
+          </a>
+        </li>
+        <li>
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); trySaveResults(); }" title="${ _('Visually explore the result') }">
             <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
           </a>
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
-            <i class="fa fa-fw fa-save"></i> ${ _('Save') }
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
+            <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
       </ul>
     </div>
 
-    <div id="saveResultsModal" class="modal hide fade">
+    <div class="modal hide fade saveResultsModal" data-bind="attr: { 'id': 'saveResultsModal' + snippet.id() }">
       <div class="loader hide">
         <div class="overlay"></div>
         <i class="fa fa-spinner fa-spin"></i>
@@ -217,20 +239,31 @@ except ImportError, e:
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Save query result in a')}</h2>
+        <h2 class="modal-title">${_('Export the query result in a')} </h2>
       </div>
       <div class="modal-body" style="padding-left: 30px">
-        <form id="saveResultsForm" method="POST" class="form form-inline">
+        <form method="POST" class="form form-inline">
           ${ csrf_token(request) | n,unicode }
           <fieldset>
+            ${ _('File') }
+            <br>
             <div class="control-group">
               <div class="controls">
                  <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('File (first %s rows)') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }
+                  <span style="width: 190px; overflow: hidden; text-overflow: ellipsis; display: inline-block; white-space: nowrap;">
+                  &nbsp;
+                  % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
+                    ${ _('First %s rows or %s MB') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }
+                  % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
+                    ${ _('First %s MB') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }
+                  % else:
+                    ${ _('First %s rows') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }
+                  % endif
+                  </span>
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
+                  <input data-bind="value: savePath, valueUpdate: 'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
                 </div>
                 <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
                   <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
@@ -242,16 +275,18 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('Directory') }
+                  &nbsp;${ _('All') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
                 </div>
-                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save a large result as TSV") }', placement: 'top' }" style="padding: 8px">
+                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save the complete result as TSV") }', placement: 'top' }" style="padding: 8px">
                   <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
               </div>
             </div>
+            ${ _('Dashboard') }
+            <br>
             <div class="control-group">
               <div class="controls">
                 <label class="radio">
@@ -270,8 +305,11 @@ except ImportError, e:
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
                   &nbsp;${ _('Index') }
                 </label>
+                <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Index the data to make Dashboard explorations faster") }', placement: 'top' }">
+                  <i class="fa fa-fw fa-question-circle muted"></i>
+                </div>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
+                  <input data-bind="value: savePath, valueUpdate: 'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
                 </div>
               </div>
             </div>
@@ -281,11 +319,11 @@ except ImportError, e:
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-        <button data-bind="click: trySaveResults, css: {'disabled': !isValidDestination()}" class="btn btn-primary disable-enter disable-feedback">${_('Save')}</button>
+        <button data-bind="click: trySaveResults, css: {'disabled': !isValidDestination()}" class="btn btn-primary disable-enter disable-feedback">${_('Export')}</button>
       </div>
     </div>
 
-    <div id="downloadProgressModal" class="modal hide fade">
+    <div class="modal hide fade downloadProgressModal" data-bind="attr: { 'id': 'downloadProgressModal' + snippet.id() }">
       <div class="modal-header">
         <!-- ko if: isDownloading -->
         <h2 class="modal-title">${_('Your download is being prepared')}</h2>
@@ -323,6 +361,7 @@ except ImportError, e:
         self.$downloadForm = $(element).find(".download-form");
         self.snippet = params.snippet;
         self.notebook = params.notebook;
+        self.gridSideBtn = ko.observable(params.gridSideBtn);
 
         self.saveTarget = ko.observable('hdfs-file');
         self.savePath = ko.observable('');
@@ -334,16 +373,23 @@ except ImportError, e:
 
         self.checkDownloadInterval = -1;
 
-        $('#saveResultsModal, #downloadProgressModal').on('show', function () {
+        if (!self.snippet.downloadResultViewModel) {
+          self.snippet.downloadResultViewModel = ko.observable({saveTarget: self.saveTarget});
+        }
+
+        self.saveResultsModalId = '#saveResultsModal' + self.snippet.id();
+        self.downloadProgressModalId = '#downloadProgressModal' + self.snippet.id();
+
+        $('.saveResultsModal, .downloadProgressModal').on('show', function () {
           self.snippet.saveResultsModalVisible(true);
         });
 
-        $('#saveResultsModal, #downloadProgressModal').on('hide', function () {
+        $('.saveResultsModal, .downloadProgressModal').on('hide', function () {
           self.snippet.saveResultsModalVisible(false);
         });
 
         self.isValidDestination = ko.pureComputed(function () {
-          return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath()));
+          return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath())) || self.saveTarget() == 'dashboard';
         });
 
         self.clipboardClass = ko.pureComputed(function () {
@@ -366,23 +412,22 @@ except ImportError, e:
                 result += '\n';
               });
               return result;
-            }
-            else {
-              return CopyToClipboardGlobals.i18n.ERROR;
+            } else {
+              return HUE_I18n.copyToClipboard.error;
             }
           }
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info(self.snippet.result.data().length + ' ' + CopyToClipboardGlobals.i18n.SUCCESS)
+          $.jHueNotify.info(self.snippet.result.data().length + ' ' + HUE_I18n.copyToClipboard.success);
           e.clearSelection();
         });
 
         self.trySaveResults = function () {
           if (self.isValidDestination()) {
             self.saveResults();
-            $("#saveResultsModal button.btn-primary").button('loading');
-            $("#saveResultsModal .loader").show();
+            $(self.saveResultsModalId + ' button.btn-primary').button('loading');
+            $(self.saveResultsModalId + ' .loader').show();
           }
         };
 
@@ -402,16 +447,20 @@ except ImportError, e:
             if (resp.status == 0) {
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
-                if (self.saveTarget() == 'hdfs-file' || (self.saveTarget() == 'search-index' && typeof resp.rowcount !== 'undefined')) {
-                  $("#saveResultsModal").modal("hide");
+                if (self.saveTarget() == 'hdfs-file') {
+                  $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.link', resp.watch_url);
-                } else {
-                  if (resp.history_uuid) {
-                    $("#saveResultsModal").modal("hide");
-                    huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-                  } else if (resp && resp.message) {
-                    $(document).trigger("error", resp.message);
-                  }
+                } else if (self.saveTarget() == 'search-index') {
+                  $(self.saveResultsModalId).modal('hide');
+                  huePubSub.publish('open.importer.query', resp);
+                } else if (self.saveTarget() == 'dashboard') {
+                   $(self.saveResultsModalId).modal('hide');
+                  huePubSub.publish('open.link', resp.watch_url);
+                } else if (resp.history_uuid) {
+                  $(self.saveResultsModalId).modal('hide');
+                  huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+                } else if (resp && resp.message) {
+                  $(document).trigger("error", resp.message);
                 }
               } else {
                 window.location.href = resp.watch_url;
@@ -422,8 +471,8 @@ except ImportError, e:
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
           }).done(function() {
-            $("#saveResultsModal button.btn-primary").button('reset');
-            $("#saveResultsModal .loader").hide();
+            $(self.saveResultsModalId + ' button.btn-primary').button('reset');
+            $(self.saveResultsModalId + ' .loader').hide();
           });
         };
 
@@ -431,7 +480,7 @@ except ImportError, e:
           console.log('Cancel download');
           self.isDownloading(false);
           window.clearInterval(self.checkDownloadInterval);
-          $('#downloadProgressModal').modal('hide');
+          $(self.downloadProgressModalId).modal('hide');
         };
       }
 
@@ -454,7 +503,7 @@ except ImportError, e:
         self.checkDownloadInterval = window.setInterval(function () {
           if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined') {
             if (timesChecked == 10) {
-              $('#downloadProgressModal').modal('show');
+              $(self.downloadProgressModalId).modal('show');
             }
           }
           else {
@@ -467,15 +516,15 @@ except ImportError, e:
               self.isDownloading(false);
               self.notebook.avoidClosing = false;
               if (self.downloadTruncated()) {
-                $('#downloadProgressModal').modal('show');
+                $(self.downloadProgressModalId).modal('show');
               }
               else {
-                $('#downloadProgressModal').modal('hide');
+                $(self.downloadProgressModalId).modal('hide');
               }
             }
             catch (e) {
               self.isDownloading(false);
-              $('#downloadProgressModal').modal('hide');
+              $(self.downloadProgressModalId).modal('hide');
               self.notebook.avoidClosing = false;
             }
           }
@@ -508,34 +557,221 @@ except ImportError, e:
 
 <%def name="aceKeyboardShortcuts()">
   <script type="text/html" id="ace-keyboard-shortcuts-template">
-    <div class="editor-help">
-      <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
-      <!-- ko if: activeCategory() &&  activeCategory().filteredShortcuts().length === 0 -->
-        <em>${ _('No matches found for your search.') }</em>
-      <!-- /ko -->
-      <ul class="nav nav-pills" data-bind="foreach: categories">
-        <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
-      </ul>
-      <div class="tab-content" data-bind="with: activeCategory">
-        <div class="tab-pane active">
-          <!-- ko if: filteredShortcuts().length > 0 -->
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>${ _('Windows/Linux')}</th>
-                <th>${ _('Mac')}</th>
-                <th>${ _('Action')}</th>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: filteredShortcuts">
-              <tr>
-                <td data-bind="text: shortcut"></td>
-                <td data-bind="text: macShortcut"></td>
-                <td data-bind="text: description"></td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="editor-help two-pane">
+      <div class="two-pane-left">
+        <ul class="nav nav-list">
+          <li class="active">
+            <a href="#help-editor-syntax" data-bind="click: function(){ $('a[href=\'#help-editor-syntax\']').tab('show'); }">
+            ${ _('Syntax')}
+            </a>
+          </li>
+          <li>
+            <a href="#help-editor-shortcut" data-bind="click: function(){ $('a[href=\'#help-editor-shortcut\']').tab('show'); }">
+            ${ _('Keyboard Shortcuts')}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane" id="help-editor-shortcut" style="min-height: 500px">
+          <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          <div class="clearfix"></div>
+          <!-- ko ifnot: query -->
+          <ul class="nav nav-tabs" data-bind="foreach: categories">
+            <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
+          </ul>
+          <div class="tab-content" data-bind="with: activeCategory">
+            <div class="tab-pane active">
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>${ _('Windows/Linux')}</th>
+                    <th>${ _('Mac')}</th>
+                    <th>${ _('Action')}</th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: shortcuts">
+                  <tr>
+                    <td data-bind="text: shortcut" style="width: 25%;"></td>
+                    <td data-bind="text: macShortcut" style="width: 25%;"></td>
+                    <td data-bind="text: description" style="width: 50%;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <!-- /ko -->
+          <!-- ko if: query -->
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="javascript:void(0);">${ _('Search result')}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active">
+              <!-- ko if: filteredShortcuts().length -->
+              <table class="table table-condensed">
+                <thead>
+                <tr>
+                  <th>${ _('Windows/Linux')}</th>
+                  <th>${ _('Mac')}</th>
+                  <th>${ _('Action')}</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: filteredShortcuts">
+                <tr>
+                  <td data-bind="text: shortcut" style="width: 25%;"></td>
+                  <td data-bind="text: macShortcut" style="width: 25%;"></td>
+                  <td data-bind="text: description" style="width: 50%;"></td>
+                </tr>
+                </tbody>
+              </table>
+              <!-- /ko -->
+              <!-- ko ifnot: filteredShortcuts().length -->
+              <div>
+                <em>${ _('No shortcuts found.') }</em>
+              </div>
+              <!-- /ko -->
+            </div>
+          </div>
+          <!-- /ko -->
+        </div>
+        <div class="tab-pane active" id="help-editor-syntax">
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#help-editor-syntax-comment" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-comment\']').tab('show'); }">
+                ${ _('Comments')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-click" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-click\']').tab('show'); }">
+                ${ _('Click')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-multiquery" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-multiquery\']').tab('show'); }">
+                ${ _('Multi Query')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-variable" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-variable\']').tab('show'); }">
+                ${ _('Variables')}
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="help-editor-syntax-comment">
+              <div>${ _('A comment is text that is not executed. It can be of two types:')}</div>
+              <ul class="nav help-list-spacing margin-top-10">
+                <li>
+                  <b>${ _('Single Line') }</b>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('-- Comment')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
+                </li>
+                <li>
+                  <b>${ _('Multi Line') }</b>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('/* Multi Line\\n  Comment */')}'),
+                    lines: 2,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
+                </li>
+                <li>
+                  <b>${ _('Tip') }</b>
+                  <div>
+                    ${ _('Use ') } <span class="muted">CTRL + ?</span> ${ _('or') } <span class="muted">Cmd + ?</span> ${ _('to comment/uncomment the selection.') }
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-click">
+              <ul class="nav help-list-spacing">
+                <li>
+                  <b>${ _('Double Click')}</b>
+                  <div>${ _('Double clicking the row number selects all rows.')}</div>
+                </li>
+                <li>
+                  <b>${ _('Drag & Drop')}</b>
+                  <div>${ _('Dragging and dropping a table name from the assistant onto the editor inserts sample queries in the editor.')}</div>
+                </li>
+                <li>
+                  <b>${ _('Right Click')}</b>
+                  <div>${ _('Right clicking on an element of a query will bring up the appropriate browser for that element.')}</div>
+                  <div>${ _('Clickable items are highlighted on mouse hover.')}</div>
+                  <div><span class="muted">${ _('e.g.: function, column, table names, SELECT *') }</span></div>
+                </li>
+                <li>
+                  <b>${ _('Single Click')}</b>
+                  <div>${ _('Single clicking the row number selects the whole row.')}</div>
+                </li>
+              </ul>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-multiquery">
+              <div>${ _('Multiple queries can be embedded in a single editor and separated via semicolon.')}</div>
+              <div>${ _('The cursor points to the query that will be executed.')}</div>
+              <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                  value: ko.observable('${ _('select * from customers;\\nselect * from web_logs;')}'),
+                  lines: 2,
+                  mode: 'impala',
+                  aceOptions: {
+                    readOnly: true
+                  }}}" class="margin-top-10 margin-bottom-20"></div>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-variable">
+              <span>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</span>
+              <ul class="nav help-list-spacing">
+                <li>
+                  <div class="margin-top-20"><b>${ _('Single Valued')}</b><span class="muted padding-left-20">${ _('${variable_name}')}</span></div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code}"')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-10"></div>
+                  <div>${ _('The variable can have a default value.')}</div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code=US}"')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-10"></div>
+                </li>
+                <li>
+                  <div class="margin-top-30"><b>${ _('Multi Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value1, variable_value2,...}')}</span></div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code=CA, FR, US}"')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-10"></div>
+                  <div>${ _('The displayed text can be changed.')}</div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
+                </li>
+                <span>${ _('For values that are not textual, omit the quotes.')}</span>
+                <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from boolean_table where boolean_column = ${boolean_column}')}'),
+                    lines: 1,
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -623,7 +859,13 @@ except ImportError, e:
             { shortcut: 'Alt-Shift-0', macShortcut: 'Command-Option-Shift-0', description: '${ _('Unfold all')}' }]
         },{
           label: '${ _('Other')}',
-          shortcuts: [{ shortcut: 'Ctrl-Space', macShortcut: 'Ctrl-Space', description: '${ _('Autocomplete when Live Autocompletion is off')}' },
+          shortcuts: [
+            { shortcut: 'Ctrl-Space', macShortcut: 'Ctrl-Space', description: '${ _('Autocomplete when Live Autocompletion is off')}' },
+            { shortcut: 'Ctrl-Enter', macShortcut: 'Command-Enter', description: '${ _('Execute the active query')}' },
+            { shortcut: 'Ctrl-E', macShortcut: 'Command-E', description: '${ _('Create a new query')}' },
+            { shortcut: 'Ctrl-S', macShortcut: 'Command-S', description: '${ _('Save the query')}' },
+            { shortcut: 'Ctrl-Shift-P', macShortcut: 'Command-Shift-P', description: '${ _('Switch to/from presentation mode')}' },
+            { shortcut: 'Ctrl-Alt-T', macShortcut: 'Command-Option-T', description: '${ _('Switch to/from dark editor theme')}' },
             { shortcut: 'Ctrl-i|Ctrl-Shift-f', macShortcut: 'Command-i|Command-Shift-f', description: '${ _('Format selection or all')}' },
             { shortcut: 'Tab', macShortcut: 'Tab', description: '${ _('Indent')}' },
             { shortcut: 'Shift-Tab', macShortcut: 'Shift-Tab', description: '${ _('Outdent')}' },
@@ -641,40 +883,30 @@ except ImportError, e:
         },{
           id: 'settings',
           label: '${ _('Settings')}',
-          shortcuts: [{ shortcut: 'Ctrl - ,', macShortcut: 'Command - ,', description: '${ _('Show the settings menu')}' }]
+          shortcuts: [{ shortcut: 'Ctrl - ,', macShortcut: 'Command - ,', description: '${ _('Show the settings menu where you can control autocomplete behaviour, syntax checker, dark theme and various editor settings.')}' }]
         }];
 
         self.query = ko.observable('');
 
         self.activeCategory = ko.observable(self.categories[0]);
 
-        self.categories.forEach(function (category) {
-          category.filteredShortcuts = ko.pureComputed(function () {
-            var query = (self.query() || '').toLowerCase();
-            if (query !== '') {
-              var result = $.grep(category.shortcuts, function (shortcut) {
-                return shortcut.description.toLowerCase().indexOf(query) !== -1;
-              });
-              return result;
-            } else {
-              return category.shortcuts;
-            }
-          });
-
-          category.filteredShortcuts.subscribe(function (newVal) {
-            if (category === self.activeCategory() && newVal.length === 0) {
-              self.categories.every(function (category) {
-                if (category.filteredShortcuts().length > 0) {
-                  self.activeCategory(category);
-                  return false;
-                }
-                return true;
+        self.filteredShortcuts = ko.pureComputed(function () {
+          var query = (self.query() || '').toLowerCase();
+          if (query !== '') {
+            var result = [];
+            self.categories.forEach(function (category) {
+              category.shortcuts.forEach(function (shortcut) {
+                if (shortcut.description.toLowerCase().indexOf(query) !== -1 ||
+                  shortcut.shortcut.toLowerCase().indexOf(query) !== -1 ||
+                  shortcut.macShortcut.toLowerCase().indexOf(query) !== -1) {
+                  result.push(shortcut);
+                };
               })
-            }
-          })
-
+            });
+            return result;
+          }
+          return [];
         });
-
       }
 
       ko.components.register('aceKeyboardShortcuts', {

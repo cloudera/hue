@@ -32,8 +32,10 @@ try:
   from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_OOZIE_BACKEND_FILTERING
   from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json, \
       has_job_edition_permission
+  has_oozie_installed = True
 except Exception, e:
-  LOG.exception('Some applications are not enabled for Job Browser v2: %s' % e)
+  LOG.warn('Some applications are not enabled for Job Browser v2: %s' % e)
+  has_oozie_installed = False
 
 
 class WorkflowApi(Api):
@@ -101,7 +103,7 @@ class WorkflowApi(Api):
     return _manage_oozie_job(self.user, action, app_ids)
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     if '@' in appid:
       return WorkflowActionApi(self.user).logs(appid, app_type)
 
@@ -200,7 +202,7 @@ def _manage_oozie_job(user, action, app_ids):
 def _filter_oozie_jobs(user, filters, kwargs):
     text_filters = _extract_query_params(filters)
 
-    if not has_dashboard_jobs_access(user):
+    if has_oozie_installed and not has_dashboard_jobs_access(user):
       kwargs['filters'].append(('user', user.username))
     elif 'username' in text_filters:
       kwargs['filters'].append(('user', text_filters['username']))
@@ -208,12 +210,12 @@ def _filter_oozie_jobs(user, filters, kwargs):
     if 'time' in filters:
       kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
 
-    if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
+    if has_oozie_installed and ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
       kwargs['filters'].extend([('text', text_filters.get('text'))])
 
     if filters['pagination']:
       kwargs['offset'] = filters['pagination']['offset']
-      kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT.get())
+      kwargs['cnt'] = min(filters['pagination']['limit'], hasattr(OOZIE_JOBS_COUNT, 'get') and OOZIE_JOBS_COUNT.get())
 
     if filters.get('states'):
       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}

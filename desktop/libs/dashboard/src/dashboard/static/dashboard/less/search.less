@@ -18,6 +18,45 @@
 
 @import (reference) "hue-mixins.less";
 
+/* Hue 4 specifics */
+#embeddable_dashboard {
+  min-height: 100%;
+}
+
+#searchComponents {
+  .search-bar, .card-toolbar {
+    position: static !important;
+    width: auto !important;
+    z-index: auto !important;
+  }
+  .card-toolbar-fixed {
+    position: fixed !important;
+    margin-top: 35px;
+    margin-left: 60px;
+    border: 1px solid @cui-gray-200;
+    padding-bottom: 10px;
+  }
+  .add-widget {
+    margin-top: 15px;
+    margin-left: 10px;
+    opacity: .45;
+    &:hover {
+      opacity: .65;
+    }
+  }
+  .card-toolbar {
+    a, .draggable-widget {
+      float: left;
+      a {
+        float: none;
+      }
+    }
+  }
+  .with-top-margin {
+    margin-top: 10px;
+  }
+}
+
 .dashboard-container {
   .dropdown-menu li {
     font-size: 14px;
@@ -35,19 +74,19 @@
     -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     margin: 0;
-    padding: 10px;
+    padding: 8px;
     padding-left: 20px;
     padding-right: 20px;
     text-align: left;
     width: 100%;
     position: fixed;
     top: 28px;
-    z-index: 1010;
+    z-index: 999;
   }
 
   .search-bar .app-header {
     padding-top: 5px;
-    margin-right: 15px;
+    margin-right: 0;
   }
 
   .search-bar form, .search-bar form select {
@@ -55,8 +94,75 @@
   }
 
   .search-bar input {
-    margin-left: 10px;
     padding-right: 20px;
+  }
+
+  .search-bar-header {
+    .display-flex();
+    width: 100%;
+    height: 100%;
+
+    .search-bar-logo {
+      .flex(1 0 160px);
+    }
+
+    .search-bar-middle {
+      .flex(1 1 100%);
+      padding: 0;
+      white-space: nowrap;
+
+      .search-bar-query-container {
+        .display-flex();
+        width: 100%;
+        height: 100%;
+
+        .search-bar-collection {
+          .flex(1 1 120px);
+          white-space: nowrap;
+
+
+          > div {
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+          }
+          &.report-mode {
+            .flex(none);
+            > div {
+              border-right: 1px solid @cui-gray-400;
+              border-radius: 4px;
+            }
+          }
+        }
+
+        .search-bar-query-operations {
+          .flex(1);
+          white-space: nowrap;
+          padding-right: 45px;
+        }
+
+        .search-bar-query {
+          .flex(1 1 100%);
+
+          .simple-ace-single-line {
+            height: 30px;
+            border-radius: 0 4px 4px 0;
+            min-width: 100px;
+
+            .ace-editor {
+              margin-top: 3px;
+
+              .ace_emptyMessage {
+                padding-left:4px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .search-bar-operations {
+      .flex(none);
+    }
   }
 
   .search-bar input.deletable {
@@ -151,7 +257,7 @@
     margin: 0;
     margin-left: 5px;
     min-height: 29px;
-    min-width: 120px;
+    width: 120px;
     padding: 0 8px;
     text-shadow: none;
     vertical-align: middle;
@@ -180,6 +286,7 @@
   .fields-chooser li {
     cursor: pointer;
     margin-bottom: 10px;
+    padding: 0px;
   }
 
   .fields-chooser li .badge {
@@ -201,8 +308,18 @@
     cursor: pointer;
   }
 
-  .editable-click {
+  .editable-click, a.editable-click {
     cursor: pointer;
+    border-bottom-color: transparent !important;
+    &:hover {
+      border-bottom-color: @cui-blue-700 !important;
+    }
+  }
+
+  .colorpanel {
+    background-color: @cui-white;
+    padding: 4px;
+    border-radius: 0;
   }
 
   .CodeMirror {
@@ -242,8 +359,7 @@
 
   .editor-title {
     font-weight: bold;
-    color: @cui-gray-900;
-    border-bottom: 1px solid @hue-primary-color-dark;
+    color: @hue-primary-color-dark;
   }
 
   .document-details-actions {
@@ -325,6 +441,7 @@
   }
 
   .demi-modal {
+    z-index: 1038;
     min-height: 80px;
     .typeahead {
       position: fixed;
@@ -690,9 +807,53 @@
   }
 
   .card-widget .selectize-control {
-    width: 200px;
     display: inline-block;
     vertical-align: middle;
+  }
+
+  .facet-count {
+    overflow: auto;
+    max-height: 240px;
+    margin-top: 5px;
+    .no-results {
+      color: @cui-gray-600;
+      font-style: italic;
+      white-space: normal;
+    }
+  }
+
+  .form-search {
+    div.selectize-input {
+      text-overflow: ellipsis;
+    }
+  }
+
+  .gridster {
+    .remove-widget, .remove-empty-gridster {
+      opacity: 0;
+      .hue-ease-transition(opacity);
+    }
+    .gs-w:hover {
+      .remove-widget, .remove-empty-gridster {
+        opacity: 1;
+      }
+    }
+    .ui-sortable {
+      background-color: transparent !important;
+      min-height: auto !important;
+    }
+  }
+
+  .selectize-control {
+    height: 37px;
+    max-height: 37px;
+  }
+
+  .query-chooser {
+    float: right;
+    .selectize-control {
+      min-width: 300px;
+    }
   }
 
   @media screen and (max-width: 1000px) {

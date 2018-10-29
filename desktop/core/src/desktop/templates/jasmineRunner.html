@@ -8,19 +8,12 @@
   <link rel="stylesheet" href="../static/desktop/ext/js/jasmine-2.3.4/jasmine.css">
 
   <script type="text/javascript" charset="utf-8">
-    var ApiHelperGlobals = {
-      i18n: {
-        errorLoadingDatabases: 'errorLoadingDatabases',
-        errorLoadingTablePreview: 'errorLoadingTablePreview'
-      },
-      user: 'user'
-    };
-
-
     var AUTOCOMPLETE_TIMEOUT = 0;
 
-    var AutocompleterGlobals = {
-      i18n: {
+    var LOGGED_USERNAME = 'test';
+
+    var HUE_I18n = {
+      autocomplete: {
         category: {
           all: 'All',
           column: 'Columns',
@@ -56,7 +49,12 @@
 
     var HAS_OPTIMIZER = false;
 
-    var CACHEABLE_TTL = 0;
+    var CACHEABLE_TTL = {
+      default: 0,
+      optmizer: 0
+    };
+
+    var DEFAULT_CLUSTER_ID = 'default';
   </script>
 
   <script type="text/javascript" src="../static/desktop/ext/js/jquery/jquery-2.2.4.min.js"></script>
@@ -70,6 +68,8 @@
   <script type="text/javascript" src="../static/desktop/js/ace.extended.js"></script>
   <script type="text/javascript" src="../static/desktop/ext/js/knockout.min.js"></script>
   <script type="text/javascript" src="../static/desktop/ext/js/knockout-mapping.min.js"></script>
+  <script type="text/javascript" src="../static/desktop/ext/js/localforage.min.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/dataCatalog.js"></script>
   <script type="text/javascript" src="../static/desktop/js/apiHelper.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocompleterTestUtils.js"></script>
 
@@ -82,9 +82,6 @@
   <script type="text/javascript" src="../static/desktop/spec/hue4UtilsSpec.js"></script>
 
   <script type="text/javascript" src="../static/desktop/spec/apiHelperSpec.js"></script>
-
-  <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter.js"></script>
-  <script type="text/javascript" src="../static/desktop/spec/sqlAutocompleterSpec.js"></script>
 
   <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter2.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/sqlAutocompleter2Spec.js"></script>
@@ -134,8 +131,11 @@
   <script type="text/javascript" src="../static/desktop/js/autocomplete/globalSearchParser.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/globalSearchParserSpec.js"></script>
 
-  <script type="text/javascript" src="../static/desktop/js/autocomplete/solrExpressionParser.js"></script>
-  <script type="text/javascript" src="../static/desktop/spec/autocomplete/solrExpressionParserSpec.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/autocomplete/solrFormulaParser.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/autocomplete/solrFormulaParserSpec.js"></script>
+
+  <script type="text/javascript" src="../static/desktop/js/autocomplete/solrQueryParser.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/autocomplete/solrQueryParserSpec.js"></script>
 
   <script type="text/javascript" charset="utf-8">
     if (/PhantomJS/.test(window.navigator.userAgent)) {

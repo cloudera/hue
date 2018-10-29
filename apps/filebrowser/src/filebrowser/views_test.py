@@ -27,7 +27,7 @@ from avro import schema, datafile, io
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
@@ -38,7 +38,7 @@ from desktop.lib.test_utils import grant_access, add_to_group, add_permission, r
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
-from filebrowser.views import location_to_url
+from desktop.lib.view_util import location_to_url
 
 from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode
@@ -149,6 +149,8 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(SUB_PATH2_2))
     assert_true(self.cluster.fs.exists(SUB_PATH2_3))
 
+    response = self.c.post('/filebrowser/move', dict(src_path=[SUB_PATH1_2, SUB_PATH1_3], dest_path=SUB_PATH1_2))
+    assert_equal(500, response.status_code)
 
   def test_copy(self):
     prefix = self.cluster.fs_prefix + '/test-copy'
@@ -210,7 +212,7 @@ class TestFileBrowserWithHadoop(object):
 
     # Read the parent dir and make sure we created 'success_path' only.
     response = self.c.get('/filebrowser/view=' + prefix)
-    dir_listing = response.context['files']
+    dir_listing = response.context[0]['files']
     assert_equal(3, len(dir_listing))
     assert_equal(dir_listing[2]['name'], success_path)
 
@@ -233,7 +235,7 @@ class TestFileBrowserWithHadoop(object):
 
     # Read the parent dir and make sure we created 'success_path' only.
     response = self.c.get('/filebrowser/view=' + prefix)
-    file_listing = response.context['files']
+    file_listing = response.context[0]['files']
     assert_equal(3, len(file_listing))
     assert_equal(file_listing[2]['name'], success_path)
 
@@ -380,7 +382,7 @@ class TestFileBrowserWithHadoop(object):
 
     response = self.c.get('/filebrowser/')
     # Since we deleted the home directory... home_directory context should be None.
-    assert_false(response.context['home_directory'], response.context['home_directory'])
+    assert_false(response.context[0]['home_directory'], response.context[0]['home_directory'])
 
     self.cluster.fs.do_as_superuser(self.cluster.fs.mkdir, home)
     self.cluster.fs.do_as_superuser(self.cluster.fs.chown, home, 'test', 'test')
@@ -403,7 +405,7 @@ class TestFileBrowserWithHadoop(object):
     # Read the parent dir
     response = self.c.get('/filebrowser/view=' + prefix)
 
-    dir_listing = response.context['files']
+    dir_listing = response.context[0]['files']
     assert_equal(len(orig_paths) + 2, len(dir_listing))
 
     for dirent in dir_listing:
@@ -418,18 +420,18 @@ class TestFileBrowserWithHadoop(object):
       resp = self.c.get(url)
 
       # We are actually reading a directory
-      assert_equal('.', resp.context['files'][1]['name'])
-      assert_equal('..', resp.context['files'][0]['name'])
+      assert_equal('.', resp.context[0]['files'][1]['name'])
+      assert_equal('..', resp.context[0]['files'][0]['name'])
 
     # Test's home directory now exists. Should be returned.
     response = self.c.get('/filebrowser/view=' + prefix)
-    assert_equal(response.context['home_directory'], home)
+    assert_equal(response.context[0]['home_directory'], home)
 
     # Test URL conflicts with filenames
     stat_dir = '%sstat/dir' % prefix
     self.cluster.fs.do_as_user('test', self.cluster.fs.mkdir, stat_dir)
     response = self.c.get('/filebrowser/view=%s' % stat_dir)
-    assert_equal(stat_dir, response.context['path'])
+    assert_equal(stat_dir, response.context[0]['path'])
 
     response = self.c.get('/filebrowser/view=/test-filebrowser/?default_to_home')
     assert_true(re.search('%s$' % home, response['Location']))
@@ -437,7 +439,7 @@ class TestFileBrowserWithHadoop(object):
     # Test path relative to home directory
     self.cluster.fs.do_as_user('test', self.cluster.fs.mkdir, '%s/test_dir' % home)
     response = self.c.get('/filebrowser/home_relative_view=/test_dir')
-    assert_equal('%s/test_dir' % home, response.context['path'])
+    assert_equal('%s/test_dir' % home, response.context[0]['path'])
 
 
   def test_listdir_sort_and_filter(self):
@@ -459,60 +461,60 @@ class TestFileBrowserWithHadoop(object):
     expect = [ '..', '.', FUNNY_NAME] + [ str(i) for i in range(1, 11) ]
 
     # Check pagination
-    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=20').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=20').context[0]['files']
     assert_equal(len(expect), len(listing))
 
-    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=10').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=10').context[0]['files']
     assert_equal(12, len(listing))
 
-    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=10&pagenum=1').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=10&pagenum=1').context[0]['files']
     assert_equal(12, len(listing))
 
-    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=10&pagenum=2').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=10&pagenum=2').context[0]['files']
     assert_equal(3, len(listing))
 
     # Check sorting (name)
-    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name').context[0]['files']
     assert_equal(sorted(expect[2:]), [ f['name'] for f in listing ][2:])
 
-    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name&descending=false').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name&descending=false').context[0]['files']
     assert_equal(sorted(expect[2:]), [ f['name'] for f in listing ][2:])
 
-    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name&descending=true').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name&descending=true').context[0]['files']
     assert_equal(".", listing[1]['name'])
     assert_equal("..", listing[0]['name'])
     assert_equal(FUNNY_NAME, listing[2]['name'])
 
     # Check sorting (size)
-    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=size').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=size').context[0]['files']
     assert_equal(expect, [ f['name'] for f in listing ])
 
     # Check sorting (mtime)
-    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=mtime').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=mtime').context[0]['files']
     assert_equal(".", listing[1]['name'])
     assert_equal("..", listing[0]['name'])
     assert_equal(FUNNY_NAME, listing[-1]['name'])
 
     # Check filter
-    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1').context[0]['files']
     assert_equal(['..', '.', '1', '10'], [ f['name'] for f in listing ])
 
-    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=' + FUNNY_NAME).context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=' + FUNNY_NAME).context[0]['files']
     assert_equal(['..', '.', FUNNY_NAME], [ f['name'] for f in listing ])
 
     # Check filter + sorting
-    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true').context[0]['files']
     assert_equal(['..', '.', '10', '1'], [ f['name'] for f in listing ])
 
     # Check filter + sorting + pagination
-    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context['files']
+    listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context[0]['files']
     assert_equal(['..', '.', '1'], [ f['name'] for f in listing ])
 
     # Check filter with empty results
     resp = self.c.get('/filebrowser/view=' + BASE + '?filter=empty&sortby=name&descending=true&pagesize=1&pagenum=2')
-    listing = resp.context['files']
+    listing = resp.context[0]['files']
     assert_equal([], listing)
-    page = resp.context['page']
+    page = resp.context[0]['page']
     assert_equal({}, page)
 
 
@@ -541,22 +543,22 @@ class TestFileBrowserWithHadoop(object):
 
       # Snappy compressed fail
       response = self.c.get('/filebrowser/view=%s/test-view.notsnappy?compression=snappy' % prefix)
-      assert_true('Failed to decompress' in response.context['message'], response)
+      assert_true('Failed to decompress' in response.context[0]['message'], response)
 
       # Snappy compressed succeed
       response = self.c.get('/filebrowser/view=%s/test-view.snappy' % prefix)
-      assert_equal('snappy', response.context['view']['compression'])
-      assert_equal(response.context['view']['contents'], 'This is a test of the emergency broadcasting system.', response)
+      assert_equal('snappy', response.context[0]['view']['compression'])
+      assert_equal(response.context[0]['view']['contents'], 'This is a test of the emergency broadcasting system.', response)
 
       # Snappy compressed succeed
       response = self.c.get('/filebrowser/view=%s/test-view.stillsnappy' % prefix)
-      assert_equal('snappy', response.context['view']['compression'])
-      assert_equal(response.context['view']['contents'], 'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.', response)
+      assert_equal('snappy', response.context[0]['view']['compression'])
+      assert_equal(response.context[0]['view']['contents'], 'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.', response)
 
       # Largest snappy compressed file
       finish.append( MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1) )
       response = self.c.get('/filebrowser/view=%s/test-view.stillsnappy?compression=snappy' % prefix)
-      assert_true('File size is greater than allowed max snappy decompression size of 1' in response.context['message'], response)
+      assert_true('File size is greater than allowed max snappy decompression size of 1' in response.context[0]['message'], response)
 
     finally:
       for done in finish:
@@ -604,8 +606,8 @@ class TestFileBrowserWithHadoop(object):
 
       # Snappy compressed succeed
       response = self.c.get('/filebrowser/view=%s/test-view.compressed.avro' % prefix)
-      assert_equal('avro', response.context['view']['compression'])
-      assert_equal(eval(response.context['view']['contents']), dummy_datum, response)
+      assert_equal('avro', response.context[0]['view']['compression'])
+      assert_equal(eval(response.context[0]['view']['contents']), dummy_datum, response)
 
     finally:
       for done in finish:
@@ -642,11 +644,11 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=%s/test-view.avro' % prefix)
     # (Note: we use eval here cause of an incompatibility issue between
     # the representation string of JSON dicts in simplejson vs. json)
-    assert_equal(eval(response.context['view']['contents']), dummy_datum)
+    assert_equal(eval(response.context[0]['view']['contents']), dummy_datum)
 
     # offsetting should work as well
     response = self.c.get('/filebrowser/view=%s/test-view.avro?offset=1' % prefix)
-    assert_equal('avro', response.context['view']['compression'])
+    assert_equal('avro', response.context[0]['view']['compression'])
 
     f = self.cluster.fs.open(prefix + '/test-view2.avro', "w")
     f.write("hello")
@@ -654,11 +656,11 @@ class TestFileBrowserWithHadoop(object):
 
     # we shouldn't autodetect non avro files
     response = self.c.get('/filebrowser/view=%s/test-view2.avro' % prefix)
-    assert_equal(response.context['view']['contents'], "hello")
+    assert_equal(response.context[0]['view']['contents'], "hello")
 
     # we should fail to do a bad thing if they specify compression when it's not set.
     response = self.c.get('/filebrowser/view=%s/test-view2.avro?compression=gzip' % prefix)
-    assert_true('Failed to decompress' in response.context['message'])
+    assert_true('Failed to decompress' in response.context[0]['message'])
 
 
   def test_view_parquet(self):
@@ -674,7 +676,7 @@ class TestFileBrowserWithHadoop(object):
     # autodetect
     response = self.c.get('/filebrowser/view=%s/test-parquet.parquet' % prefix)
 
-    assert_true('FRANCE' in response.context['view']['contents'])
+    assert_true('FRANCE' in response.context[0]['view']['contents'])
 
 
   def test_view_parquet_snappy(self):
@@ -691,7 +693,7 @@ class TestFileBrowserWithHadoop(object):
     # autodetect
     response = self.c.get('/filebrowser/view=%s/test-parquet-snappy.parquet' % prefix)
 
-    assert_true('SR3_ndw_otlt_cmf_xref_INA' in response.context['view']['contents'], response.context['view']['contents'])
+    assert_true('SR3_ndw_otlt_cmf_xref_INA' in response.context[0]['view']['contents'], response.context[0]['view']['contents'])
 
 
   def test_view_bz2(self):
@@ -706,10 +708,10 @@ class TestFileBrowserWithHadoop(object):
 
     # autodetect
     response = self.c.get('/filebrowser/view=%s/test-view.bz2?compression=bz2' % prefix)
-    assert_true('test' in response.context['view']['contents'])
+    assert_true('test' in response.context[0]['view']['contents'])
 
     response = self.c.get('/filebrowser/view=%s/test-view.bz2' % prefix)
-    assert_true('test' in response.context['view']['contents'])
+    assert_true('test' in response.context[0]['view']['contents'])
 
 
   def test_view_gz(self):
@@ -722,19 +724,19 @@ class TestFileBrowserWithHadoop(object):
     f.close()
 
     response = self.c.get('/filebrowser/view=%s/test-view.gz?compression=gzip' % prefix)
-    assert_equal(response.context['view']['contents'], "sdf\n")
+    assert_equal(response.context[0]['view']['contents'], "sdf\n")
 
     # autodetect
     response = self.c.get('/filebrowser/view=%s/test-view.gz' % prefix)
-    assert_equal(response.context['view']['contents'], "sdf\n")
+    assert_equal(response.context[0]['view']['contents'], "sdf\n")
 
     # ensure compression note is rendered
-    assert_equal(response.context['view']['compression'], "gzip")
+    assert_equal(response.context[0]['view']['compression'], "gzip")
     assert_true('Output rendered from compressed' in response.content, response.content)
 
     # offset should do nothing
     response = self.c.get('/filebrowser/view=%s/test-view.gz?compression=gzip&offset=1' % prefix)
-    assert_true("Offsets are not supported" in response.context['message'], response.context['message'])
+    assert_true("Offsets are not supported" in response.context[0]['message'], response.context[0]['message'])
 
     f = self.cluster.fs.open(prefix + '/test-view2.gz', "w")
     f.write("hello")
@@ -742,11 +744,11 @@ class TestFileBrowserWithHadoop(object):
 
     # we shouldn't autodetect non gzip files
     response = self.c.get('/filebrowser/view=%s/test-view2.gz' % prefix)
-    assert_equal(response.context['view']['contents'], "hello")
+    assert_equal(response.context[0]['view']['contents'], "hello")
 
     # we should fail to do a bad thing if they specify compression when it's not set.
     response = self.c.get('/filebrowser/view=%s/test-view2.gz?compression=gzip' % prefix)
-    assert_true("Failed to decompress" in response.context['message'])
+    assert_true("Failed to decompress" in response.context[0]['message'])
 
 
   def test_view_i18n(self):
@@ -766,9 +768,9 @@ class TestFileBrowserWithHadoop(object):
 
     # Test that the default view is home
     response = self.c.get('/filebrowser/view=/')
-    assert_equal(response.context['path'], '/')
+    assert_equal(response.context[0]['path'], '/')
     response = self.c.get('/filebrowser/view=/?default_to_home=1')
-    assert_equal("http://testserver/filebrowser/view=/user/test", response["location"])
+    assert_equal("/filebrowser/view=/user/test", response["location"])
 
 
   def test_view_access(self):
@@ -779,10 +781,10 @@ class TestFileBrowserWithHadoop(object):
 
     c_no_perm = make_logged_in_client(username='no_home')
     response = c_no_perm.get('/filebrowser/view=%s' % NO_PERM_DIR)
-    assert_true('Cannot access' in response.context['message'])
+    assert_true('Cannot access' in response.context[0]['message'])
 
     response = self.c.get('/filebrowser/view=/test-does-not-exist')
-    assert_true('Cannot access' in response.context['message'])
+    assert_true('Cannot access' in response.context[0]['message'])
 
 
   def test_index(self):
@@ -796,12 +798,12 @@ class TestFileBrowserWithHadoop(object):
     assert_false(self.cluster.fs.exists(NO_HOME_DIR))
 
     response = self.c.get('/filebrowser', follow=True)
-    assert_equal(HOME_DIR, response.context['path'])
-    assert_equal(HOME_DIR, response.context['home_directory'])
+    assert_equal(HOME_DIR, response.context[0]['path'])
+    assert_equal(HOME_DIR, response.context[0]['home_directory'])
 
     response = c_no_home.get('/filebrowser', follow=True)
-    assert_equal('/', response.context['path'])
-    assert_equal(None, response.context['home_directory'])
+    assert_equal('/', response.context[0]['path'])
+    assert_equal(None, response.context[0]['home_directory'])
 
 
   def test_download(self):
@@ -833,7 +835,7 @@ alert("XSS")
     not_me = make_logged_in_client("not_me", is_superuser=False)
     grant_access("not_me", "not_me", "filebrowser")
     response = not_me.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=True)
-    assert_true('User not_me is not authorized to download' in response.context['message'], response.context['message'])
+    assert_true('User not_me is not authorized to download' in response.context[0]['message'], response.context[0]['message'])
 
 
   def test_edit_i18n(self):
@@ -1081,10 +1083,10 @@ def view_i18n_helper(c, cluster, encoding, content):
     f.close()
 
     response = c.get('/filebrowser/view=%s?encoding=%s' % (filename, encoding))
-    assert_equal(response.context['view']['contents'], content)
+    assert_equal(response.context[0]['view']['contents'], content)
 
     response = c.get('/filebrowser/view=%s?encoding=%s&end=8&begin=1' % (filename, encoding))
-    assert_equal(response.context['view']['contents'],
+    assert_equal(response.context[0]['view']['contents'],
                  unicode(bytestring[0:8], encoding, errors='replace'))
   finally:
     cleanup_file(cluster, filename)
@@ -1100,8 +1102,8 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
   # File doesn't exist - should be empty
   edit_url = '/filebrowser/edit=' + filename
   response = c.get(edit_url)
-  assert_equal(response.context['form'].data['path'], filename)
-  assert_equal(response.context['form'].data['contents'], "")
+  assert_equal(response.context[0]['form'].data['path'], filename)
+  assert_equal(response.context[0]['form'].data['contents'], "")
 
   # Just going to the edit page and not hitting save should not
   # create the file
@@ -1113,8 +1115,8 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
         path=filename,
         contents=contents_pass_1,
         encoding=encoding), follow=True)
-    assert_equal(response.context['form'].data['path'], filename)
-    assert_equal(response.context['form'].data['contents'], contents_pass_1)
+    assert_equal(response.context[0]['form'].data['path'], filename)
+    assert_equal(response.context[0]['form'].data['contents'], contents_pass_1)
 
     # File should now exist
     assert_true(cluster.fs.exists(filename))
@@ -1129,8 +1131,8 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
         path=filename,
         contents=contents_pass_2,
         encoding=encoding), follow=True)
-    assert_equal(response.context['form'].data['path'], filename)
-    assert_equal(response.context['form'].data['contents'], contents_pass_2)
+    assert_equal(response.context[0]['form'].data['path'], filename)
+    assert_equal(response.context[0]['form'].data['contents'], contents_pass_2)
     f = cluster.fs.open(filename)
     assert_equal(f.read(), contents_pass_2.encode(encoding))
     assert_false('\r\n' in f.read()) # No CRLF line terminators
@@ -1145,8 +1147,9 @@ def test_location_to_url():
   prefix = '/filebrowser/view='
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('/var/lib/hadoop-hdfs', False))
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs'))
+  assert_equal('/hue' + prefix + '/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs', False, True))
   assert_equal(prefix + '/', location_to_url('hdfs://localhost:8020'))
-  assert_equal(prefix + 's3a%3A//bucket/key', location_to_url('s3a://bucket/key'))
+  assert_equal(prefix + 's3a://bucket/key', location_to_url('s3a://bucket/key'))
 
 
 class TestS3AccessPermissions(object):

@@ -25,6 +25,7 @@ from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 
 from dashboard.models import Collection2
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -50,13 +51,13 @@ class DashboardController(object):
 
   def get_owner_search_collections(self):
     if USE_NEW_EDITOR.get():
-      if self.user.is_superuser:
+      if is_admin(self.user):
         docs = Document2.objects.filter(type='search-dashboard')
       else:
         docs = Document2.objects.filter(type='search-dashboard', owner=self.user)
       return docs
     else:
-      if self.user.is_superuser:
+      if is_admin(self.user):
         docs = Document.objects.filter(extra='search-dashboard')
       else:
         docs = Document.objects.filter(extra='search-dashboard', owner=self.user)
@@ -113,5 +114,5 @@ class DashboardController(object):
     return result
 
 
-def can_edit_index(user):
-  return user.is_superuser
+def can_edit_index(user): # Deprecated by Sentry now
+  return True

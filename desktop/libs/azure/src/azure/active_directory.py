@@ -18,7 +18,7 @@ from __future__ import absolute_import
 import logging
 
 from time import time
-from azure.conf import get_default_region, get_default_client_id, get_default_authentication_code, get_default_refresh_url
+from azure.conf import AZURE_ACCOUNTS, get_default_refresh_url
 from desktop.lib.rest import http_client, resource
 
 LOG = logging.getLogger(__name__)
@@ -50,8 +50,8 @@ class ActiveDirectory(object):
 
   @classmethod
   def from_config(cls, conf):
-    access_key_id = get_default_client_id()
-    secret_access_key = get_default_authentication_code()
+    access_key_id = AZURE_ACCOUNTS['default'].CLIENT_ID.get()
+    secret_access_key = AZURE_ACCOUNTS['default'].CLIENT_SECRET.get()
 
     if None in (access_key_id, secret_access_key):
       raise ValueError('Can\'t create azure client, credential is not configured')

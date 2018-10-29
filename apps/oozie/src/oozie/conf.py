@@ -108,6 +108,13 @@ ENABLE_IMPALA_ACTION = Config(
   default=False
 )
 
+ENABLE_ALTUS_ACTION = Config(
+  key="enable_altus_action",
+  help=_t("Flag to enable the Altus action."),
+  type=bool,
+  default=False
+)
+
 
 def config_validator(user):
   res = []

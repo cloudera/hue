@@ -142,11 +142,6 @@ var SqlSetOptions = (function () {
   var SET_OPTIONS = {
     hive: {},
     impala: {
-      'ABORT_ON_DEFAULT_LIMIT_EXCEEDED': {
-        description: 'When this option is enabled, Impala cancels a query immediately when any of the nodes encounters an error, rather than continuing and possibly returning incomplete results. This option is disabled by default, to help gather maximum diagnostic information when an error occurs, for example, whether the same problem occurred on all nodes or only a single node. Currently, the errors that Impala can skip over involve data corruption, such as a column that contains a string value when expected to contain an integer value.\n\nTo control how much logging Impala does for non-fatal errors when ABORT_ON_ERROR is turned off, use the MAX_ERRORS option.',
-        type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
-        default: 'false (shown as 0 in output of SET statement)'
-      },
       'APPX_COUNT_DISTINCT': {
         description: 'Allows multiple COUNT(DISTINCT) operations within a single query, by internally rewriting each COUNT(DISTINCT) to use the NDV() function. The resulting count is approximate rather than precise.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
@@ -166,6 +161,11 @@ var SqlSetOptions = (function () {
         description: 'When Impala writes Parquet data files using the INSERT statement, the underlying compression is controlled by the COMPRESSION_CODEC query option.',
         type: 'String; SNAPPY, GZIP or NONE',
         default: 'SNAPPY'
+      },
+      'COMPUTE_STATS_MIN_SAMPLE_SIZE': {
+        description: 'The COMPUTE_STATS_MIN_SAMPLE_SIZE query option specifies the minimum number of bytes that will be scanned in COMPUTE STATS TABLESAMPLE, regardless of the user-supplied sampling percent. This query option prevents sampling for very small tables where accurate stats can be obtained cheaply without sampling because the minimum sample size is required to get meaningful stats.',
+        type: 'Integer',
+        default: '1073741824 (1GB)'
       },
       'DEFAULT_JOIN_DISTRIBUTION_MODE': {
         description: 'This option determines the join distribution that Impala uses when any of the tables involved in a join query is missing statistics.\n\nThe setting DEFAULT_JOIN_DISTRIBUTION_MODE=SHUFFLE is recommended when setting up and deploying new clusters, because it is less likely to result in serious consequences such as spilling or out-of-memory errors if the query plan is based on incomplete information.',
@@ -201,6 +201,11 @@ var SqlSetOptions = (function () {
         description: 'This setting controls the cutoff point (in terms of number of rows scanned) below which Impala treats a query as a "small" query, turning off optimizations such as parallel execution and native code generation. The overhead for these optimizations is applicable for queries involving substantial amounts of data, but it makes sense to skip them for queries involving tiny amounts of data. Reducing the overhead for small queries allows Impala to complete them more quickly, keeping YARN resources, admission control slots, and so on available for data-intensive queries.',
         type: 'Numeric',
         default: '100'
+      },
+      'EXEC_TIME_LIMIT_S': {
+        description: 'The EXEC_TIME_LIMIT_S query option sets a time limit on query execution. If a query is still executing when time limit expires, it is automatically canceled. The option is intended to prevent runaway queries that execute for much longer than intended.',
+        type: 'Numeric',
+        default: '0 (no time limit)'
       },
       'EXPLAIN_LEVEL': {
         description: 'Controls the amount of detail provided in the output of the EXPLAIN statement. The basic output can help you identify high-level performance issues such as scanning a higher volume of data or more partitions than you expect. The higher levels of detail show how intermediate results flow between nodes and how different SQL operations such as ORDER BY, GROUP BY, joins, and WHERE clauses are implemented within a distributed query.',
@@ -274,7 +279,7 @@ var SqlSetOptions = (function () {
       },
       'PARQUET_FALLBACK_SCHEMA_RESOLUTION': {
         description: 'Allows Impala to look up columns within Parquet files by column name, rather than column order, when necessary.',
-        type: 'integer or string. Allowed values are 0 or position, 1 or name.',
+        type: 'integer or string. Allowed values are 0 for POSITION and 1 for NAME.',
         default: '0'
       },
       'PARQUET_FILE_SIZE': {
@@ -298,8 +303,8 @@ var SqlSetOptions = (function () {
         default: 'empty (use the user-to-pool mapping defined by an impalad startup option in the Impala configuration file)'
       },
       'REPLICA_PREFERENCE': {
-        description: 'The REPLICA_PREFERENCE query option lets you spread the load more evenly if hotspots and bottlenecks persist, by allowing hosts to do local reads, or even remote reads, to retrieve the data for cached blocks if Impala can determine that it would be too expensive to do all such processing on a particular host.',
-        type: 'Numeric (0, 3, 5) or corresponding mnemonic strings (CACHE_LOCAL, DISK_LOCAL, REMOTE). The gaps in the numeric sequence are to accomodate other intermediate values that might be added in the future.',
+        description: 'The REPLICA_PREFERENCE query option lets you distribute the work more evenly if hotspots and bottlenecks persist. It causes the access cost of all replicas of a data block to be considered equal to or worse than the configured value. This allows Impala to schedule reads to suboptimal replicas (e.g. local in the presence of cached ones) in order to distribute the work across more executor nodes.',
+        type: 'Numeric (0, 2, 4) or corresponding mnemonic strings (CACHE_LOCAL, DISK_LOCAL, REMOTE). The gaps in the numeric sequence are to accomodate other intermediate values that might be added in the future.',
         default: '0 (equivalent to CACHE_LOCAL)'
       },
       'RUNTIME_BLOOM_FILTER_SIZE': {
@@ -332,11 +337,6 @@ var SqlSetOptions = (function () {
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
         default: 'true (shown as 1 in output of SET statement)'
       },
-      'SCAN_NODE_CODEGEN_THRESHOLD': {
-        description: 'The SCAN_NODE_CODEGEN_THRESHOLD query option adjusts the aggressiveness of the code generation optimization process when performing I/O read operations. It can help to work around performance problems for queries where the table is small and the WHERE clause is complicated.',
-        type: 'Integer',
-        default: '1800000 (1.8 million)'
-      },
       'SCHEDULE_RANDOM_REPLICA': {
         description: 'The SCHEDULE_RANDOM_REPLICA query option fine-tunes the algorithm for deciding which host processes each HDFS data block. It only applies to tables and partitions that are not enabled for the HDFS caching feature.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
@@ -347,8 +347,8 @@ var SqlSetOptions = (function () {
         type: 'Numeric, with optional unit specifier',
         default: '-1 (amount of spill space is unlimited)'
       },
-      'SUPPORT_START_OVER': {
-        description: 'Leave this setting at its default value. It is a read-only setting, tested by some client applications such as Hue.\n\nIf you accidentally change it through impala-shell, subsequent queries encounter errors until you undo the change by issuing UNSET support_start_over.',
+      'SHUFFLE_DISTINCT_EXPRS': {
+        description: 'The SHUFFLE_DISTINCT_EXPRS query option controls the shuffling behavior when a query has both grouping and distinct expressions. Impala can optionally include the distinct expressions in the hash exchange to spread the data among more nodes. However, this plan requires one more hash exchange phase. It is recommended that you turn off this option if the NDVs of the grouping expressions are high.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
         default: 'false (shown as 0 in output of SET statement)'
       },
@@ -1010,6 +1010,13 @@ var SqlFunctions = (function () {
         draggable: 'mod()',
         description: 'Returns the modulus of a number. Equivalent to the % arithmetic operator. Works with any size integer type, any size floating-point type, and DECIMAL with any precision and scale.'
       },
+      murmur_hash: {
+        returnTypes: ['BIGINT'],
+        arguments: [[{type: 'T'}]],
+        signature: 'murmur_hash(T a)',
+        draggable: 'murmur_hash()',
+        description: 'Returns a consistent 64-bit value derived from the input argument, for convenience of implementing MurmurHash2 non-cryptographic hash function.'
+      },
       negative: {
         returnTypes: ['T'],
         arguments: [[{type: 'T'}]],
@@ -1240,47 +1247,19 @@ var SqlFunctions = (function () {
         draggable: 'avg()',
         description: 'Returns the average of the elements in the group or the average of the distinct values of the column in the group.'
       },
-      count: {
-        returnTypes: ['BIGINT'],
+      collect_set: {
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}]],
-        signature: 'count([DISTINCT] col)',
-        draggable: 'count()',
-        description: 'count(*) - Returns the total number of retrieved rows, including rows containing NULL values. count(expr) - Returns the number of rows for which the supplied expression is non-NULL. count(DISTINCT expr[, expr]) - Returns the number of rows for which the supplied expression(s) are unique and non-NULL. Execution of this can be optimized with hive.optimize.distinct.rewrite.'
+        signature: 'collect_set(col)',
+        draggable: 'collect_set()',
+        description: 'Returns a set of objects with duplicate elements eliminated.'
       },
-      stddev_pop: {
-        returnTypes: ['DOUBLE'],
+      collect_list: {
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}]],
-        signature: 'stddev_pop(col)',
-        draggable: 'stddev_pop()',
-        description: 'Returns the standard deviation of a numeric column in the group.'
-      },
-      stddev_samp: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'stddev_samp(col)',
-        draggable: 'stddev_samp()',
-        description: 'Returns the unbiased sample standard deviation of a numeric column in the group.'
-      },
-      sum: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'sum(col)',
-        draggable: 'sum()',
-        description: 'Returns the sum of the elements in the group or the sum of the distinct values of the column in the group.'
-      },
-      max: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'max(col)',
-        draggable: 'max()',
-        description: 'Returns the maximum value of the column in the group.'
-      },
-      min: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'min(col)',
-        draggable: 'min()',
-        description: 'Returns the minimum of the column in the group.'
+        signature: 'collect_list(col)',
+        draggable: 'collect_list()',
+        description: 'Returns a list of objects with duplicates. (As of Hive 0.13.0.)'
       },
       corr: {
         returnTypes: ['DOUBLE'],
@@ -1288,6 +1267,13 @@ var SqlFunctions = (function () {
         signature: 'corr(col1, col2)',
         draggable: 'corr()',
         description: 'Returns the Pearson coefficient of correlation of a pair of a numeric columns in the group.'
+      },
+      count: {
+        returnTypes: ['BIGINT'],
+        arguments: [[{type: 'T'}]],
+        signature: 'count([DISTINCT] col)',
+        draggable: 'count()',
+        description: 'count(*) - Returns the total number of retrieved rows, including rows containing NULL values. count(expr) - Returns the number of rows for which the supplied expression is non-NULL. count(DISTINCT expr[, expr]) - Returns the number of rows for which the supplied expression(s) are unique and non-NULL. Execution of this can be optimized with hive.optimize.distinct.rewrite.'
       },
       covar_pop: {
         returnTypes: ['DOUBLE'],
@@ -1303,26 +1289,26 @@ var SqlFunctions = (function () {
         draggable: 'covar_samp()',
         description: 'Returns the sample covariance of a pair of a numeric columns in the group.'
       },
-      collect_set: {
-        returnTypes: ['ARRAY'],
-        arguments: [[{type: 'T'}]],
-        signature: 'collect_set(col)',
-        draggable: 'collect_set()',
-        description: 'Returns a set of objects with duplicate elements eliminated.'
-      },
-      collect_list: {
-        returnTypes: ['ARRAY'],
-        arguments: [[{type: 'T'}]],
-        signature: 'collect_list(col)',
-        draggable: 'collect_list()',
-        description: 'Returns a list of objects with duplicates. (As of Hive 0.13.0.)'
-      },
       histogram_numeric: {
         returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}], [{type: 'INT'}]],
-        signature: 'array<struct {\'x\', \'y\'}> histogram_numeric(col, b)',
-        draggable: 'array<struct {\'x\', \'y\'}> histogram_numeric()',
-        description: 'Computes a histogram of a numeric column in the group using b non-uniformly spaced bins. The output is an array of size b of double-valued (x,y) coordinates that represent the bin centers and heights'
+        signature: 'histogram_numeric(col, b)',
+        draggable: 'histogram_numeric()',
+        description: 'Computes a histogram of a numeric column in the group using b non-uniformly spaced bins. The output is an array of size b of double-valued (x,y) coordinates that represent the bin centers and heights.'
+      },
+      max: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'max(col)',
+        draggable: 'max()',
+        description: 'Returns the maximum value of the column in the group.'
+      },
+      min: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'min(col)',
+        draggable: 'min()',
+        description: 'Returns the minimum of the column in the group.'
       },
       ntile: {
         returnTypes: ['INT'],
@@ -1344,27 +1330,6 @@ var SqlFunctions = (function () {
         signature: 'percentile_approx(DOUBLE col, p, [, B]), array<DOUBLE> percentile_approx(DOUBLE col, array(p1 [, p2]...), [, B])',
         draggable: 'percentile_approx()',
         description: 'Returns an approximate pth percentile (or percentiles p1, p2, ..) of a numeric column (including floating point types) in the group. The B parameter controls approximation accuracy at the cost of memory. Higher values yield better approximations, and the default is 10,000. When the number of distinct values in col is smaller than B, this gives an exact percentile value.'
-      },
-      variance: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'variance(col)',
-        draggable: 'variance()',
-        description: 'Returns the variance of a numeric column in the group.'
-      },
-      var_pop: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'var_pop(col)',
-        draggable: 'var_pop()',
-        description: 'Returns the variance of a numeric column in the group.'
-      },
-      var_samp: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'var_samp(col)',
-        draggable: 'var_samp()',
-        description: 'Returns the unbiased sample variance of a numeric column in the group.'
       },
       regr_avgx: {
         returnTypes: ['DOUBLE'],
@@ -1428,6 +1393,48 @@ var SqlFunctions = (function () {
         signature: 'regr_syy(T independent, T dependent)',
         draggable: 'regr_syy()',
         description: 'Equivalent to regr_count(independent, dependent) * var_pop(independent). As of Hive 2.2.0.'
+      },
+      stddev_pop: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'stddev_pop(col)',
+        draggable: 'stddev_pop()',
+        description: 'Returns the standard deviation of a numeric column in the group.'
+      },
+      stddev_samp: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'stddev_samp(col)',
+        draggable: 'stddev_samp()',
+        description: 'Returns the unbiased sample standard deviation of a numeric column in the group.'
+      },
+      sum: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'sum(col)',
+        draggable: 'sum()',
+        description: 'Returns the sum of the elements in the group or the sum of the distinct values of the column in the group.'
+      },
+      variance: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'variance(col)',
+        draggable: 'variance()',
+        description: 'Returns the variance of a numeric column in the group.'
+      },
+      var_pop: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'var_pop(col)',
+        draggable: 'var_pop()',
+        description: 'Returns the variance of a numeric column in the group.'
+      },
+      var_samp: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'var_samp(col)',
+        draggable: 'var_samp()',
+        description: 'Returns the unbiased sample variance of a numeric column in the group.'
       }
     },
     impala: {
@@ -1452,6 +1459,13 @@ var SqlFunctions = (function () {
         draggable: 'count()',
         description: 'An aggregate function that returns the number of rows, or the number of non-NULL rows.'
       },
+      group_concat: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'T'}], [{type: 'STRING', optional: true}]],
+        signature: 'group_concat([ALL] col [, separator])',
+        draggable: 'group_concat()',
+        description: 'An aggregate function that returns a single string representing the argument value concatenated together for each row of the result set. If the optional separator string is specified, the separator is added between each pair of concatenated values. The default separator is a comma followed by a space.'
+      },
       max: {
         returnTypes: ['T'],
         arguments: [[{type: 'T'}]],
@@ -1465,20 +1479,6 @@ var SqlFunctions = (function () {
         signature: 'min([DISTINCT | ALL] T col)',
         draggable: 'min()',
         description: 'An aggregate function that returns the minimum value from a set of numbers. Opposite of the MAX function. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to MIN are NULL, MIN returns NULL.'
-      },
-      sum: {
-        returnTypes: ['BIGINT', 'DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'sum([DISTINCT | ALL] col)',
-        draggable: 'sum()',
-        description: 'An aggregate function that returns the sum of a set of numbers. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to MIN are NULL, SUM returns NULL.'
-      },
-      group_concat: {
-        returnTypes: ['STRING'],
-        arguments: [[{type: 'T'}], [{type: 'STRING', optional: true}]],
-        signature: 'group_concat([ALL] col [, separator])',
-        draggable: 'group_concat()',
-        description: 'An aggregate function that returns a single string representing the argument value concatenated together for each row of the result set. If the optional separator string is specified, the separator is added between each pair of concatenated values. The default separator is a comma followed by a space.'
       },
       ndv: {
         returnTypes: ['DOUBLE'],
@@ -1505,8 +1505,15 @@ var SqlFunctions = (function () {
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'T'}]],
         signature: 'stddev_samp([DISTINCT | ALL] col)',
-				draggable: 'stddev_samp()',
+        draggable: 'stddev_samp()',
         description: 'Returns the unbiased sample standard deviation of a numeric column in the group.'
+      },
+      sum: {
+        returnTypes: ['BIGINT', 'DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'sum([DISTINCT | ALL] col)',
+        draggable: 'sum()',
+        description: 'An aggregate function that returns the sum of a set of numbers. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to MIN are NULL, SUM returns NULL.'
       },
       variance: {
         returnTypes: ['DOUBLE'],
@@ -1850,6 +1857,13 @@ var SqlFunctions = (function () {
         draggable: 'date_sub()',
         description: 'Subtracts a specified number of days from a TIMESTAMP value. The first argument can be a string, which is automatically cast to TIMESTAMP if it uses the recognized format. With an INTERVAL expression as the second argument, you can calculate a delta value using other units such as weeks, years, hours, seconds, and so on.'
       },
+      date_trunc: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'STRING'}], [{type: 'TIMESTAMP'}]],
+        signature: 'date_trunc(STRING unit, TIMESTAMP timestamp)',
+        draggable: 'date_trunc()',
+        description: 'Truncates a TIMESTAMP value to the specified precision. The unit argument value for truncating TIMESTAMP values is not case-sensitive. This argument string can be one of: \'microseconds\', \'milliseconds\', \'second\', \'minute\', \'hour\', \'day\', \'week\', \'month\', \'year\', \'decade\', \'century\' or \'millennium\'.'
+      },
       datediff: {
         returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
@@ -1962,6 +1976,13 @@ var SqlFunctions = (function () {
         draggable: 'int_months_between()',
         description: 'Returns the number of months between the date portions of two TIMESTAMP values, as an INT representing only the full months that passed.'
       },
+      last_day: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'last_day(TIMESTAMP t)',
+        draggable: 'last_day()',
+        description: 'Returns a TIMESTAMP corresponding to the beginning of the last calendar day in the same month as the TIMESTAMP argument.'
+      },
       microseconds_add: {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'BIGINT'}, {type: 'INT'}]],
@@ -1976,11 +1997,11 @@ var SqlFunctions = (function () {
 				draggable: 'microseconds_sub()',
         description: 'Returns the specified date and time minus some number of microseconds.'
       },
-      milliseconds: {
+      millisecond: {
         returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}]],
-        signature: 'milliseconds(TIMESTAMP date)',
-        draggable: 'milliseconds()',
+        signature: 'millisecond(TIMESTAMP date)',
+        draggable: 'millisecond()',
         description: 'Returns the millisecond portion of a TIMESTAMP value.'
       },
       milliseconds_add: {
@@ -2025,6 +2046,13 @@ var SqlFunctions = (function () {
 				draggable: 'month()',
         description: 'Returns the month field, represented as an integer, from the date portion of a TIMESTAMP.'
       },
+      monthname: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'monthname(TIMESTAMP date)',
+        draggable: 'monthname()',
+        description: 'Returns the month field from TIMESTAMP value, converted to the string corresponding to that month name.'
+      },
       months_add: {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'BIGINT'}, {type: 'INT'}]],
@@ -2066,6 +2094,13 @@ var SqlFunctions = (function () {
         signature: 'now()',
 				draggable: 'now()',
         description: 'Returns the current date and time (in the local time zone) as a timestamp value.'
+      },
+      quarter: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'quarter(TIMESTAMP date)',
+        draggable: 'quarter()',
+        description: 'Returns the quarter in the input TIMESTAMP expression as an integer value, 1, 2, 3, or 4, where 1 represents January 1 through March 31.'
       },
       second: {
         returnTypes: ['INT'],
@@ -2145,6 +2180,13 @@ var SqlFunctions = (function () {
         signature: 'unix_timestamp([STRING datetime [, STRING format]]|[TIMESTAMP datetime])',
 				draggable: 'unix_timestamp()',
         description: 'Returns an integer value representing the current date and time as a delta from the Unix epoch, or converts from a specified date and time value represented as a TIMESTAMP or STRING.'
+      },
+      utc_timestamp: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [],
+        signature: 'utc_timestamp()',
+        draggable: 'utc_timestamp()',
+        description: 'Returns a TIMESTAMP corresponding to the current date and time in the UTC time zone.'
       },
       weekofyear: {
         returnTypes: ['INT'],
@@ -2714,6 +2756,20 @@ var SqlFunctions = (function () {
 				draggable: 'ascii()',
         description: 'Returns the numeric ASCII code of the first character of the argument.'
       },
+      base64decode: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'base64decode(STRING str)',
+        draggable: 'base64decode()',
+        description: 'Decodes the given string from Base64, an ACSII string format. It\'s typically used in combination with base64encode(), to store data in an Impala table string that is problematic to store or transmit'
+      },
+      base64encode: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'base64encode(STRING str)',
+        draggable: 'base64encode()',
+        description: 'Encodes the given string to Base64, an ACSII string format. It\'s typically used in combination with base64decode(), to store data in an Impala table string that is problematic to store or transmit'
+      },
       btrim: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
@@ -2784,6 +2840,13 @@ var SqlFunctions = (function () {
 				draggable: 'instr()',
         description: 'Returns the position (starting from 1) of the first occurrence of a substring within a longer string. The optional third and fourth arguments let you find instances of the substring other than the first instance starting from the left.'
       },
+      left: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT'}]],
+        signature: 'left(STRING a, INT num_chars)',
+        draggable: 'left()',
+        description: 'Returns the leftmost characters of the string. Same as strleft().'
+      },
       length: {
         returnTypes: ['INT'],
         arguments: [[{type: 'STRING'}]],
@@ -2821,10 +2884,10 @@ var SqlFunctions = (function () {
       },
       ltrim: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'ltrim(STRING a)',
+        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        signature: 'ltrim(STRING a [, STRING charsToTrim])',
 				draggable: 'ltrim()',
-        description: 'Returns the argument string with any leading spaces removed from the left side.'
+        description: 'Returns the argument string with all occurrences of characters specified by the second argument removed from the left side. Removes spaces if the second argument is not specified.'
       },
       parse_url: {
         returnTypes: ['STRING'],
@@ -2832,6 +2895,13 @@ var SqlFunctions = (function () {
         signature: 'parse_url(STRING urlString, STRING partToExtract [, STRING keyToExtract])',
 				draggable: 'parse_url()',
         description: 'Returns the portion of a URL corresponding to a specified part. The part argument can be \'PROTOCOL\', \'HOST\', \'PATH\', \'REF\', \'AUTHORITY\', \'FILE\', \'USERINFO\', or \'QUERY\'. Uppercase is required for these literal values. When requesting the QUERY portion of the URL, you can optionally specify a key to retrieve just the associated value from the key-value pairs in the query string.'
+      },
+      regexp_escape: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'regexp_escape(STRING source)',
+        draggable: 'regexp_escape()',
+        description: 'The regexp_escape function returns a string escaped for the special character in RE2 library so that the special characters are interpreted literally rather than as special characters. The following special characters are escaped by the function: .\\+*?[^]$(){}=!<>|:-'
       },
       regexp_extract: {
         returnTypes: ['STRING'],
@@ -2875,6 +2945,13 @@ var SqlFunctions = (function () {
 				draggable: 'reverse()',
         description: 'Returns the argument string with characters in reversed order.'
       },
+      right: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT'}]],
+        signature: 'right(STRING a, INT num_chars)',
+        draggable: 'right()',
+        description: 'Returns the rightmost characters of the string. Same as strright().'
+      },
       rpad: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING'}], [{type: 'INT'}], [{type: 'STRING'}]],
@@ -2884,10 +2961,10 @@ var SqlFunctions = (function () {
       },
       rtrim: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'rtrim(STRING a)',
+        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        signature: 'rtrim(STRING a [, STRING charsToTrim])',
 				draggable: 'rtrim()',
-        description: 'Returns the argument string with any trailing spaces removed from the right side.'
+        description: 'Returns the argument string with all occurrences of characters specified by the second argument removed from the right side. Removes spaces if the second argument is not specified.'
       },
       space: {
         returnTypes: ['STRING'],
@@ -3115,6 +3192,13 @@ var SqlFunctions = (function () {
         signature: 'java_method(class, method[, arg1[, arg2..]])',
 				draggable: 'java_method()',
         description: 'Calls a Java method by matching the argument signature, using reflection. (As of Hive 0.9.0.)'
+      },
+      logged_in_user: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'logged_in_user()',
+        draggable: 'logged_in_user()',
+        description: 'Returns current user name from the session state (as of Hive 2.2.0). This is the username provided when connecting to Hive.'
       },
       md5: {
         returnTypes: ['STRING'],
@@ -3658,6 +3742,9 @@ var SqlFunctions = (function () {
   var matchesType = function (dialect, expectedTypes, actualRawTypes) {
     if (dialect !== 'hive') {
       dialect = 'impala';
+    }
+    if (expectedTypes.length === 1 && expectedTypes[0] === 'T') {
+      return true;
     }
     var actualTypes = stripPrecision(actualRawTypes);
     if (actualTypes.indexOf('ARRAY') !== -1 || actualTypes.indexOf('MAP') !== -1 || actualTypes.indexOf('STRUCT') !== -1) {

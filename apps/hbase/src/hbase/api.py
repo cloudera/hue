@@ -101,7 +101,8 @@ class HbaseApi(object):
         timeout_seconds=30,
         transport=conf.THRIFT_TRANSPORT.get(),
         transport_mode='http' if is_using_thrift_http() else 'socket',
-        http_url=('https://' if is_using_thrift_ssl() else 'http://') + target['host'] + ':' + str(target['port'])
+        http_url=('https://' if is_using_thrift_ssl() else 'http://') + target['host'] + ':' + str(target['port']),
+        validate=conf.SSL_CERT_CA_VERIFY.get()
     )
 
     return client

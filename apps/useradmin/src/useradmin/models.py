@@ -57,17 +57,15 @@ from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _t
+import django.utils.timezone as dtz
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
 from hadoop import cluster
 
 import useradmin.conf
 
-
 LOG = logging.getLogger(__name__)
-
 
 class UserProfile(models.Model):
   """
@@ -89,14 +87,16 @@ class UserProfile(models.Model):
   PROPERLY
   """
   # Enum for describing the creation method of a user.
-  CreationMethod = Enum('HUE', 'EXTERNAL')
+  class CreationMethod(Enum):
+    HUE = 1
+    EXTERNAL = 2
 
-  user = models.ForeignKey(auth_models.User, unique=True)
+  user = models.OneToOneField(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
-  creation_method = models.CharField(editable=True, null=False, max_length=64, default=str(CreationMethod.HUE))
+  creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
                                    help_text=_t('If this is users first login.'))
-  last_activity = models.DateTimeField(default=datetime.fromtimestamp(0), db_index=True)
+  last_activity = models.DateTimeField(auto_now=True, db_index=True)
 
   def get_groups(self):
     return self.user.groups.all()
@@ -119,10 +119,8 @@ class UserProfile(models.Model):
     if self.user.is_superuser:
       return True
 
-    for group in self.user.groups.all():
-      if group_has_permission(group, perm):
-        return True
-    return False
+    group_ids = self.user.groups.values_list('id', flat=True)
+    return GroupPermission.objects.filter(group__id__in=group_ids, hue_permission=perm).exists()
 
   def check_hue_permission(self, perm=None, app=None, action=None):
     """
@@ -162,7 +160,7 @@ def group_permissions(group):
 def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
-  p.last_activity = datetime.now()
+  p.last_activity = dtz.now()
   p.home_directory = "/user/%s" % p.user.username
   try:
     p.save()
@@ -277,6 +275,7 @@ def update_app_permissions(**kwargs):
     if default_group:
       for new_dp in added:
         if not (new_dp.app == 'useradmin' and new_dp.action == 'access') and \
+           not (new_dp.app == 'useradmin' and new_dp.action == 'superuser') and \
            not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
            not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
            not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
@@ -293,14 +292,16 @@ def update_app_permissions(**kwargs):
             uptodate,
             available - len(added) - updated - uptodate))
 
-models.signals.post_syncdb.connect(update_app_permissions)
-models.signals.post_syncdb.connect(get_default_user_group)
+models.signals.post_migrate.connect(update_app_permissions)
+models.signals.post_migrate.connect(get_default_user_group)
 
 
 def install_sample_user():
   """
   Setup the de-activated sample user with a certain id. Do not create a user profile.
   """
+  #Moved to avoid circular import with is_admin
+  from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
   user = None
 
   try:

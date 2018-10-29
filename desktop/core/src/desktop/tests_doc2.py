@@ -28,14 +28,20 @@ from django.db.utils import OperationalError
 
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2
+from desktop.models import Directory, Document2, Document
 from notebook.models import import_saved_beeswax_query
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
 from useradmin.models import get_default_user_group
+from oozie.models2 import Workflow
 
+
+class MockFs():
+  def __init__(self):
+    pass
 
 class TestDocument2(object):
 
@@ -167,6 +173,56 @@ class TestDocument2(object):
     # Verify that last_modified is intact
     doc = Document2.objects.get(id = doc.id)
     assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+
+  def test_file_copy(self):
+
+    workflow_doc = Document2.objects.create(name='Copy Test', type='oozie-workflow2', owner=self.user, data={},
+                                            parent_directory=self.home_dir)
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name,
+                          description=workflow_doc.description, extra='workflow2')
+
+    workflow = Workflow(user=self.user)
+    workflow.update_name('Copy Test')
+    workflow.set_workspace(self.user)
+
+    # Monkey patch check_workspace for both new wor
+    if not hasattr(Workflow, 'real_check_workspace'):
+      Workflow.real_check_workspace = Workflow.check_workspace
+
+    try:
+      Workflow.check_workspace = lambda a, b, c: None
+      workflow.check_workspace(MockFs(), self.user)
+      workflow_doc.update_data({'workflow': workflow.get_data()['workflow']})
+      workflow_doc.save()
+
+      def copy_remote_dir(self, src, dst, *args, **kwargs):
+        pass
+
+      # Monkey patch as we don't want to do real copy
+      if not hasattr(ProxyFS, 'real_copy_remote_dir'):
+        ProxyFS.real_copy_remote_dir = ProxyFS.copy_remote_dir
+
+      ProxyFS.copy_remote_dir = copy_remote_dir
+      response = self.client.post('/desktop/api2/doc/copy', {
+        'uuid': json.dumps(workflow_doc.uuid)
+      })
+    finally:
+      Workflow.check_workspace = Workflow.real_check_workspace
+      ProxyFS.copy_remote_dir = ProxyFS.real_copy_remote_dir
+
+    copy_doc_json = json.loads(response.content)
+    copy_doc = Document2.objects.get(type='oozie-workflow2', uuid=copy_doc_json['document']['uuid'])
+    copy_workflow = Workflow(document=copy_doc)
+
+    # Check if document2 and data are in sync
+    assert_equal(copy_doc.name, copy_workflow.get_data()['workflow']['name'])
+    assert_equal(copy_doc.uuid, copy_workflow.get_data()['workflow']['uuid'])
+
+    assert_equal(copy_workflow.name, workflow.name + "-copy")
+    assert_not_equal(copy_workflow.deployment_dir, workflow.deployment_dir)
+    assert_not_equal(copy_doc.uuid, workflow_doc.uuid)
+    assert_not_equal(copy_workflow.get_data()['workflow']['uuid'], workflow.get_data()['workflow']['uuid'])
+
 
 
   def test_directory_move(self):
@@ -901,6 +957,61 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert_true('history.sql' in doc_names)
 
+  def test_x_share_directory_y_add_file_x_share(self):
+    # Test that when another User, Y, adds a doc to dir shared by User X, User X doesn't fail to share the dir next time:
+    # /
+    #   test_dir/
+    #     query1.sql
+
+
+    # Dir owned by self.user
+    parent_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    child_doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=parent_dir)
+
+    user_y = User.objects.create(username='user_y', password="user_y")
+
+    # Share the dir with user_not_me
+    response = self.client.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(parent_dir.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': []
+        },
+        'write': {
+          'user_ids': [user_y.id],
+          'group_ids': []
+        }
+      })
+    })
+
+    user_y_child_doc = Document2.objects.create(name='other_query1.sql', type='query-hive', owner=user_y, data={},
+                                          parent_directory=parent_dir)
+
+    share_test_user = User.objects.create(username='share_test_user', password="share_test_user")
+
+    # Share the dir with another user - share_test_user
+    response = self.client.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(parent_dir.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': []
+        },
+        'write': {
+          'user_ids': [share_test_user.id],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+    for doc in [parent_dir, child_doc, user_y_child_doc]:
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(share_test_user))
+      assert_true(doc.can_write(share_test_user))
+
 
   def test_unicode_name(self):
     doc = Document2.objects.create(name='My Bundle a voté « non » à l’accord', type='oozie-workflow2', owner=self.user,
@@ -996,11 +1107,11 @@ class TestDocument2ImportExport(object):
 
     # Test that exporting to a file includes the date and number of documents in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
-    assert_equal(response['Content-Disposition'], 'attachment; filename=hue-documents-%s-(4).json' % datetime.today().strftime('%Y-%m-%d'))
+    assert_equal(response['Content-Disposition'], 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d'))
 
     # Test that exporting single file gets the name of the document in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})
-    assert_equal(response['Content-Disposition'], 'attachment; filename=' + workflow.name + '.json')
+    assert_equal(response['Content-Disposition'], 'attachment; filename="' + workflow.name + '.json"')
 
 
   def test_export_directories_with_children(self):
@@ -1038,7 +1149,7 @@ class TestDocument2ImportExport(object):
       name='query.sql',
       type='query-hive',
       owner=self.user,
-      data={'description': 'original_query'},
+      data=json.dumps({'description': 'original_query'}),
       parent_directory=self.home_dir
     )
 

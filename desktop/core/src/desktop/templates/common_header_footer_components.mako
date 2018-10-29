@@ -18,222 +18,20 @@ from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
 
 from desktop import conf
+from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
+from desktop.views import _ko
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
-
+from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
-<%def name="header_i18n_redirection(user, is_s3_enabled, apps)">
-  <script type="text/javascript">
-
-    var LOGGED_USERNAME = '${ user.username }';
-    var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
-    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
-
-    %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
-    window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';
-    %else:
-    window.CSRF_TOKEN = '';
-    %endif
-
-    var BOOTSTRAP_RATIOS = {
-      SPAN3: function () {
-        var _w = $(window).width();
-        if (_w >= 1200) {
-          return 23.07692308;
-        }
-        else if (_w >= 768 && _w <= 979) {
-          return 22.9281768;
-        }
-        else {
-          return 23.17073171;
-        }
-      },
-      SPAN9: function () {
-        var _w = $(window).width();
-        if (_w >= 1200) {
-          return 74.35897436;
-        }
-        else if (_w >= 768 && _w <= 979) {
-          return 74.30939227;
-        }
-        else {
-          return 74.3902439;
-        }
-      },
-      MARGIN: function () {
-        return 2.56410256;
-      }
-    };
-
-    var CACHEABLE_TTL = {
-      default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-      optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
-    };
-
-    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
-
-    var ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
-
-    var DocumentTypeGlobals = {
-      'all': '${_('All')}',
-      'directory': '${ _('Directory') }',
-      'link-pigscript': '${_('Pig Design')}',
-      'link-workflow': '${_('Job Design')}',
-      'notebook': '${_('Notebook')}',
-      'oozie-bundle2': '${_('Oozie Bundle')}',
-      'oozie-coordinator2': (IS_HUE_4 ? '${_('Oozie Schedule')}' : '${_('Oozie Coordinator')}'),
-      'oozie-workflow2': '${_('Oozie Workflow')}',
-      'query-hive': '${_('Hive Query')}',
-      'query-impala': '${_('Impala Query')}',
-      'search-dashboard': '${_('Search Dashboard')}',
-      'query-mapreduce': '${_('MapReduce Job')}',
-      'query-sqoop1': '${_('Import Job')}',
-      'query-spark2': '${_('Spark Job')}',
-      'query-java': '${_('Java Job')}',
-      'query-pig': '${_('Pig Script')}',
-      'query-shell': '${_('Shell Script')}',
-      'query-distcp': '${_('DistCp Job')}'
-    };
-
-    var SyntaxCheckerGlobals = {
-      i18n: {
-        didYouMean: '${_('Did you mean')}',
-        expectedStatementEnd: '${_('Expected end of statement')}',
-        suppressError: '${_('Ignore this type of error')}',
-        couldNotFind: '${_('Could not find')}'
-      }
-    };
-
-    // jHue plugins global configuration
-    var jHueFileChooserGlobals = {
-      labels: {
-        BACK: "${_('Back')}",
-        SELECT_FOLDER: "${_('Select this folder')}",
-        CREATE_FOLDER: "${_('Create folder')}",
-        FOLDER_NAME: "${_('Folder name')}",
-        CANCEL: "${_('Cancel')}",
-        FILE_NOT_FOUND: "${_('The file has not been found')}",
-        UPLOAD_FILE: "${_('Upload a file')}",
-        FAILED: "${_('Failed')}"
-      },
-      user: "${ user.username }"
-    };
-
-    var jHueHdfsTreeGlobals = {
-      labels: {
-        CREATE_FOLDER: "${_('Create folder')}",
-        FOLDER_NAME: "${_('Folder name')}",
-        CANCEL: "${_('Cancel')}"
-      }
-    };
-
-    var jHueTableExtenderGlobals = {
-      labels: {
-        GO_TO_COLUMN: "${_('Go to column:')}",
-        PLACEHOLDER: "${_('column name...')}",
-        LOCK: "${_('Lock this row')}",
-        UNLOCK: "${_('Unlock this row')}",
-        ROW_DETAILS: "${_('Show row details')}"
-      }
-    };
-
-    var LeafletGlobals = {
-      layer: '${ leaflet['layer'] |n,unicode }',
-      attribution: '${ leaflet['attribution'] |n,unicode }',
-      mapOptions: JSON.parse('${ leaflet['map_options'] |n,unicode }'),
-      layerOptions: JSON.parse('${ leaflet['layer_options'] |n,unicode }')
-    };
-
-    var ApiHelperGlobals = {
-      i18n: {
-        errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
-        errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
-      },
-      user: '${ user.username }'
-    };
-
-    var DropzoneGlobals = {
-      homeDir: '${ user.get_home_directory() if not user.is_anonymous() else "" }',
-      i18n: {
-        cancelUpload: '${ _('Cancel upload') }',
-        uploadCanceled: '${ _('The upload has been canceled') }',
-        uploadSucceeded: '${ _('uploaded successfully') }'
-      }
-    };
-
-    var MetastoreGlobals = {
-      partitionsLimit: ${ hasattr(LIST_PARTITIONS_LIMIT, 'get') and LIST_PARTITIONS_LIMIT.get() or 1000 },
-      i18n: {
-        errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
-        errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
-        errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
-      }
-    };
-
-    var AutocompleterGlobals = {
-      i18n: {
-        category: {
-          all: '${ _('All') }',
-          column: '${ _('Columns') }',
-          cte: '${ _('CTEs') }',
-          database: '${ _('Databases') }',
-          identifier: '${ _('Identifiers') }',
-          keyword: '${ _('Keywords') }',
-          popular: '${ _('Popular') }',
-          sample: '${ _('Samples') }',
-          table: '${ _('Tables') }',
-          udf: '${ _('UDFs') }',
-          option: '${ _('Options') }',
-          variable: '${ _('Variables') }'
-        },
-        meta: {
-          aggregateFunction: '${ _('aggregate') }',
-          alias: '${ _('alias') }',
-          commonTableExpression: '${ _('cte') }',
-          database: '${ _('database') }',
-          filter: '${ _('filter') }',
-          groupBy: '${ _('group by') }',
-          join: '${ _('join') }',
-          joinCondition: '${ _('condition') }',
-          keyword: '${ _('keyword') }',
-          orderBy: '${ _('order by') }',
-          table: '${ _('table') }',
-          sample: '${ _('sample') }',
-          variable: '${ _('variable') }',
-          view: '${ _('view') }',
-          virtual: '${ _('virtual') }'
-        }
-      }
-    };
-
-    var QueryBuilderGlobals = {
-      i18n: {
-        INSERT_VALUE_HERE: "${ _('Insert value here') }",
-        QUERY_REQUIRE: "${ _('Query requires a select or aggregate.') }"
-      }
-    }
-
-    var CopyToClipboardGlobals = {
-      i18n: {
-        ERROR: "${ _('Error while copying results.') }",
-        SUCCESS: "${ _('result(s) copied to the clipboard') }",
-      }
-    }
-
-    var SelectizeGlobals = {
-      i18n: {
-        CHOOSE: "${ _('Choose...') }"
-      }
-    }
-  </script>
-
+<%def name="header_i18n_redirection()">
   <!--[if lt IE 9]>
   <script type="text/javascript">
     if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop.views.unsupported') }";
+      location.href = "${ url('desktop_views_unsupported') }";
     }
   </script>
   <![endif]-->
@@ -244,13 +42,13 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var _UA = navigator.userAgent.toLowerCase();
     for (var i = 1; i < 7; i++) {
       if (_UA.indexOf("firefox/" + i + ".") > -1) {
-        location.href = "${ url('desktop.views.unsupported') }";
+        location.href = "${ url('desktop_views_unsupported') }";
       }
     }
 
     // check for IE document modes
     if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop.views.unsupported') }";
+      location.href = "${ url('desktop_views_unsupported') }";
     }
 
     // sets a global variable to see if it's IE11 or not
@@ -459,13 +257,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
         }
       });
 
-      window.hueDebug = {
-        viewModel: function (element) {
-          if (typeof element !== 'undefined' && typeof element === 'string') {
-            element = $(element)[0];
-          }
-          return ko.dataFor(element || document.body);
+      if (typeof window.hueDebug === 'undefined') {
+        window.hueDebug = {};
+      }
+      window.hueDebug.viewModel = function (element) {
+        if (typeof element !== 'undefined' && typeof element === 'string') {
+          element = $(element)[0];
         }
+        return ko.dataFor(element || document.body);
       }
     });
   </script>
@@ -495,9 +294,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
   <div class="modal-footer"></div>
 </div>
 
-<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important;z-index:1071">
+<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:90%;margin-left:-45%!important;z-index:1071">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <input class="input-medium hue-modal-search" type="text" placeholder="${ _('Search...') }">
     <h2 class="modal-title">${_('Row details')}</h2>
   </div>
   <div class="modal-body">
@@ -514,7 +314,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       set: version
     }, function (data) {
       if (data && data.status == 0) {
-        location.href = version === 3 ? window.location.pathname.substr(4) + window.location.search : '/hue' + window.location.pathname + window.location.search
+        location.href = version === 3 && '${ conf.DISABLE_HUE_3.get() }' == 'False' ? window.location.pathname.substr(4) + window.location.search : '/hue' + window.location.pathname + window.location.search
       }
       else {
         $.jHueNotify.error("${ _('An error occurred while saving your default Hue preference. Please try again...') }");
@@ -529,11 +329,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
       hueAnalytics.convert('hue', 'pageReloaded' + window.location.pathname);
     }
 
-    huePubSub.subscribe('table.row.dblclick', function (data) {
+    var multiLineHandlers = [];
+
+    huePubSub.subscribe('table.row.show.details', function (data) {
       var $el = $(data.table);
       var $t = $('#rowDetailsModal').find('table');
       $t.html('');
       var html = '';
+      multiLineHandlers = [];
       $el.find('thead th').each(function (colIdx, col) {
         if (colIdx > 0) {
           var value = '';
@@ -544,16 +347,50 @@ from metadata.conf import has_optimizer, OPTIMIZER
             value = $el.data('data')[data.idx][colIdx];
           }
           var link = typeof value == 'string' && value.match(/^https?:\/\//i) ? '<a href="' + escapeOutput(value) + '" target="_blank">' + value + ' <i class="fa fa-external-link"></i></a>' : value;
-          html += '<tr><th width="10%">' + hueUtils.deXSS($(col).text()) + '</th><td>' + hueUtils.deXSS(link) + '</td></tr>';
+          html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td class="multi-line-ellipsis" style="word-break: break-all"><div style="position: relative">' + $('<span>').text(hueUtils.deXSS(link)).html() + '</div></td></tr>';
         }
       });
+      html += '<tr class="hide no-results"><td class="muted" colspan="2">${ _ko('Your search did not return any result.') }</td></tr>';
       $t.html(html);
+      $t.find('.multi-line-ellipsis div').each(function(cnt, el){
+        multiLineHandlers.push(new MultiLineEllipsisHandler({
+          element: el,
+          text: el.textContent,
+          overflowHeight: 48,
+          expandable: true
+        }));
+      });
       $('#rowDetailsModal').modal('show');
     });
 
     $('#rowDetailsModal').on('shown', function () {
       $('.modal-backdrop').css('z-index', '1070');
       $('#rowDetailsModal .modal-body').scrollTop(0);
+      $('#rowDetailsModal .modal-body').scrollLeft(0);
+    });
+
+    $('#rowDetailsModal').on('hidden', function () {
+      multiLineHandlers.forEach(function (multiLineEllipsisHandler) {
+        multiLineEllipsisHandler.dispose();
+      });
+    });
+
+    $('#rowDetailsModal .hue-modal-search').jHueDelayedInput(function () {
+      var $t = $('#rowDetailsModal').find('table');
+      $('#rowDetailsModal .no-results').addClass('hide');
+      $t.find('tr').removeClass('hide');
+      var shown = 0;
+      $t.find('tr').each(function () {
+        if ($(this).text().toLowerCase().indexOf($('#rowDetailsModal .hue-modal-search').val().toLowerCase()) == -1) {
+          $(this).addClass('hide');
+        }
+        else {
+          shown++;
+        }
+      });
+      if (shown === 0) {
+        $('#rowDetailsModal .no-results').removeClass('hide');
+      }
     });
 
     if ($.fn.editableform) {
@@ -602,7 +439,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
           $('#login-modal .link-message').hide();
           if (isAutoLogout) {
-            $('body').children(':not(#login-modal)').addClass('blurred');
+            $(HUE_CONTAINER).children(':not(#login-modal)').addClass('blurred');
             $('#login-modal .auto-logged-out').show();
             $('#login-modal').modal({
               backdrop: 'static',
@@ -763,7 +600,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
   }
 
 
-  %if collect_usage:
+  %if collect_usage and not IS_EMBEDDED.get():
 
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

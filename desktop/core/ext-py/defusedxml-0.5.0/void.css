@@ -1,0 +1,449 @@
+/*
+Stylesheet for Docutils.
+Based on `blue_box.css` by Ian Bicking
+and `voidspace.css` by Ian Bicking, Michael Foord
+and `html4css1.css` 
+
+*/
+
+.borderless, table.borderless td, table.borderless th
+{
+	border: 0;
+}
+table.borderless td, table.borderless th
+{
+	padding: 0 0.5em 0 0 ! important;
+}
+.first
+{
+	margin-top: 0 ! important;
+}
+.last, .with-subtitle
+{
+	margin-bottom: 0 ! important;
+}
+.hidden
+{
+	display: none;
+}
+a.toc-backref
+{
+	color: black;
+	text-decoration: none;
+}
+blockquote.epigraph
+{
+	margin: 2em 5em;
+}
+dl.docutils dd
+{
+	margin-bottom: 0.5em;
+}
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"]
+{
+	overflow: hidden;
+}
+div.abstract
+{
+	margin: 2em 5em;
+}
+div.abstract p.topic-title
+{
+	font-weight: bold;
+	text-align: center;
+}
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning
+{
+	border: medium outset;
+	margin: 2em;
+	padding: 1em;
+}
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title
+{
+	font-family: sans-serif;
+	font-weight: bold;
+}
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title
+{
+	color: red;
+	font-family: sans-serif;
+	font-weight: bold;
+}
+div.dedication
+{
+	font-style: italic;
+	margin: 2em 5em;
+	text-align: center;
+}
+div.dedication p.topic-title
+{
+	font-style: normal;
+	font-weight: bold;
+}
+div.figure
+{
+	margin-left: 2em;
+	margin-right: 2em;
+}
+div.footer, div.header
+{
+	clear: both;
+	font-size: smaller;
+}
+div.line-block
+{
+	display: block;
+	margin-bottom: 1em;
+	margin-top: 1em;
+}
+div.line-block div.line-block
+{
+	margin-bottom: 0;
+	margin-left: 1.5em;
+	margin-top: 0;
+}
+div.sidebar
+{
+	background-color: #ffffee;
+	border: medium outset;
+	clear: right;
+	float: right;
+	margin: 0 0 0.5em 1em;
+	padding: 1em;
+	width: 40%;
+}
+div.sidebar p.rubric
+{
+	font-family: sans-serif;
+	font-size: medium;
+}
+div.system-messages
+{
+	margin: 5em;
+}
+div.system-messages h1
+{
+	color: red;
+}
+div.system-message
+{
+	border: medium outset;
+	padding: 1em;
+}
+div.system-message p.system-message-title
+{
+	color: red;
+	font-weight: bold;
+}
+div.topic
+{
+	margin: 2em;
+}
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle
+{
+	margin-top: 0.4em;
+}
+h1.title
+{
+	text-align: center;
+}
+h2.subtitle
+{
+	text-align: center;
+}
+hr.docutils
+{
+	width: 75%;
+}
+img.align-left, .figure.align-left, object.align-left
+{
+	clear: left;
+	float: left;
+	margin-right: 1em;
+}
+img.align-right, .figure.align-right, object.align-right
+{
+	clear: right;
+	float: right;
+	margin-left: 1em;
+}
+img.align-center, .figure.align-center, object.align-center
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.align-left
+{
+	text-align: left;
+}
+.align-center
+{
+	clear: both;
+	text-align: center;
+}
+.align-right
+{
+	text-align: right;
+}
+div.align-right
+{
+	text-align: inherit;
+}
+ol.simple, ul.simple
+{
+	margin-bottom: 1em;
+}
+ol.arabic
+{
+	list-style: decimal;
+}
+ol.loweralpha
+{
+	list-style: lower-alpha;
+}
+ol.upperalpha
+{
+	list-style: upper-alpha;
+}
+ol.lowerroman
+{
+	list-style: lower-roman;
+}
+ol.upperroman
+{
+	list-style: upper-roman;
+}
+p.attribution
+{
+	margin-left: 50%;
+	text-align: right;
+}
+p.caption
+{
+	font-style: italic;
+}
+p.credits
+{
+	font-size: smaller;
+	font-style: italic;
+}
+p.label
+{
+	white-space: nowrap;
+}
+p.rubric
+{
+	color: maroon;
+	font-size: larger;
+	font-weight: bold;
+	text-align: center;
+}
+p.sidebar-title
+{
+	font-family: sans-serif;
+	font-size: larger;
+	font-weight: bold;
+}
+p.sidebar-subtitle
+{
+	font-family: sans-serif;
+	font-weight: bold;
+}
+p.topic-title
+{
+	font-weight: bold;
+}
+pre.address
+{
+	font: inherit;
+	margin-bottom: 0;
+	margin-top: 0;
+}
+pre.literal-block, pre.doctest-block, pre.math
+{
+	margin-left: 2em;
+	margin-right: 2em;
+	background-color: #eeeeee;
+
+}
+span.classifier
+{
+	font-family: sans-serif;
+	font-style: oblique;
+}
+span.classifier-delimiter
+{
+	font-family: sans-serif;
+	font-weight: bold;
+}
+span.interpreted
+{
+	font-family: sans-serif;
+}
+span.option
+{
+	white-space: nowrap;
+}
+span.pre
+{
+	white-space: pre;
+}
+span.problematic
+{
+	color: red;
+}
+span.section-subtitle
+{
+	font-size: 80%;
+}
+table.citation
+{
+	border-left: solid 1px gray;
+	margin-left: 1px;
+}
+table.docinfo
+{
+	margin: 2em 4em;
+}
+table.docutils
+{
+	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+}
+table.footnote
+{
+	border-left: solid 1px black;
+	margin-left: 1px;
+}
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th
+{
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	vertical-align: top;
+}
+table.docutils th.field-name, table.docinfo th.docinfo-name
+{
+	font-weight: bold;
+	padding-left: 0;
+	text-align: left;
+	white-space: nowrap;
+}
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils
+{
+	font-size: 100%;
+}
+ul.auto-toc
+{
+	list-style-type: none;
+}
+body
+{
+	font-family: Arial, sans-serif;
+	margin-left: auto;
+	margin-right: auto;
+	width: 800px;
+}
+em, i
+{
+	font-family: Times New Roman, Times, serif;
+}
+a.target
+{
+	color: blue;
+}
+a.target
+{
+	color: blue;
+}
+a.toc-backref
+{
+	color: black;
+	text-decoration: none;
+}
+a.toc-backref:hover
+{
+	background-color: inherit;
+}
+a:hover
+{
+	background-color: #cccccc;
+}
+div.attention, div.caution, div.danger, div.error, div.hint,
+div.important, div.note, div.tip, div.warning
+{
+	padding: 3px;
+	width: 80%;
+}
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title
+{
+	display: block;
+	margin: 0;
+	text-align: center;
+}
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title
+{
+	display: block;
+	font-family: sans-serif;
+	margin: 0;
+	text-align: center;
+}
+h1.title
+{
+	text-align: center;
+}
+table.footnote
+{
+	padding-left: 0.5ex;
+}
+table.citation
+{
+	padding-left: 0.5ex;
+}
+pre.literal-block, pre.doctest-block
+{
+	padding: 5px;
+}
+h1 tt, h2 tt, h3 tt, h4 tt, h5 tt, h6 tt
+{
+	font-size: 100%;
+}
+code, tt
+{
+	color: #000066;
+}
+p
+{
+	text-align: justify;
+}
+dt
+{
+	font-weight: bold;
+}
+tt.literal
+{
+	background-color: #eeeeee;
+}
+h1
+{
+	border-bottom: solid 1px black;
+	padding-top: 20px;
+}
+caption
+{
+	margin-bottom: 0.4em;
+	font-weight: bold;
+	font-size: 120%;
+}

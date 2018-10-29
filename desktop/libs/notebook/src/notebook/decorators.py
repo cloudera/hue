@@ -17,6 +17,8 @@
 
 import json
 import logging
+import math
+import re
 
 from django.forms import ValidationError
 from django.http import Http404
@@ -28,7 +30,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
-from dashboard.api import extract_solr_exception_message
+from dashboard.models import extract_solr_exception_message
 
 from notebook.conf import check_permissions
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout,\
@@ -111,9 +113,18 @@ def api_error_handler(func):
       response['status'] = 2
       response['message'] = e.message
     except QueryError, e:
-      LOG.exception('Error running %s' % func)
+      LOG.exception('Error running %s' % func.__name__)
       response['status'] = 1
       response['message'] = smart_unicode(e)
+      if response['message'].index("max_row_size"):
+        size = re.search(r"(\d+.?\d*) (.B)", response['message'])
+        if size and size.group(1):
+          response['help'] = {
+            'setting': {
+              'name': 'max_row_size',
+              'value':str(int(_closest_power_of_2(_to_size_in_bytes(size.group(1), size.group(2)))))
+            }
+          }
       if e.handle:
         response['handle'] = e.handle
       if e.extra:
@@ -126,7 +137,7 @@ def api_error_handler(func):
       response['status'] = 1
       response['message'] = message.get('error')
     except Exception, e:
-      LOG.exception('Error running %s' % func)
+      LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
       response['message'] = smart_unicode(e)
     finally:
@@ -135,6 +146,22 @@ def api_error_handler(func):
 
   return decorator
 
+def _closest_power_of_2(number):
+  return math.pow(2, math.ceil(math.log(number, 2)))
+
+def _to_size_in_bytes(size, unit):
+  unit_size = 1
+  unit = unit.upper()
+  if unit[0] == 'K':
+    unit_size = unit_size * 1024
+  elif unit[0] == 'M':
+    unit_size = unit_size * 1024 * 1024
+  elif unit[0] == 'G':
+    unit_size = unit_size * 1024 * 1024 * 1024
+  elif unit[0] == 'T':
+    unit_size = unit_size * 1024 * 1024 * 1024 * 1024
+
+  return float(size) * unit_size
 
 def json_error_handler(view_fn):
   def decorator(*args, **kwargs):

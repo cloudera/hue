@@ -47,7 +47,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   <table data-datasource="${datasource}" class="table table-condensed datatables tablescroller-disable" style="padding-left: 0;padding-right: 0">
       <thead>
         <tr>
-          <th width="1%"><div data-bind="click: ${datasource}.toggleSelectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': ${datasource}.allVisibleSelected() }"></div></th>
+          <th width="1%"><div data-bind="click: ${datasource}.toggleSelectAll, css: { 'hue-checkbox': true, 'fa': true, 'fa-check': ${datasource}.allVisibleSelected() }"></div></th>
           <!-- ko foreach: ${datasource}.columns() -->
             <th data-bind="text:$data"></th> <!-- need to i18n first -->
           <!-- /ko -->
@@ -169,7 +169,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         % endif
         % if can_write:
         <span class="pull-right">
-          <a href="#new_table_modal" role="button" data-bind="click: function(){prepareNewTableForm(); hbaseApp.focusModel(hbaseApp.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
+          <a href="#new_table_modal" role="button" data-bind="click: function(){ huePubSub.publish('hbase.prepare.new.form'); hbaseApp.focusModel(hbaseApp.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
         </span>
         % endif
       </div>
@@ -179,7 +179,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
     <script id="itemTemplate" type="text/html">
       <tr>
-        <td><div data-bind="click: $data.select, css: {hueCheckbox: true,'fa': true, 'fa-check':$data.isSelected}" data-row-selector-exclude="true"></div></td>
+        <td><div data-bind="click: $data.select, css: { 'hue-checkbox': true,'fa': true, 'fa-check':$data.isSelected}" data-row-selector-exclude="true"></div></td>
         <td width="90%"><a data-bind="text:$data.name,attr: {href: '#'+hbaseApp.cluster()+'/'+$data.name}" data-row-selector="true"></a></td>
         <td width="5%"><i data-bind="click: $data.toggle, css: {'fa': true, 'fa-check-square':$data.enabled, 'fa-square-o':$data.enabled != true}" data-row-selector-exclude="true"></i></td>
       </tr>
@@ -390,7 +390,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
                 <li class="nav-header">${_('Cell History:')}</li>
                 <li data-bind="css: { 'active': showingCurrent }"><a data-bind="click: switchToCurrent()" class="pointer">${_('Current Version')}<span data-bind="if: (originalValue !== value() && showingCurrent()) || (originalValue !== currentValue() && !showingCurrent())"> (${_('Edited')})</span></a></li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li data-bind="css: { 'active': $data.timestamp == $parent.timestamp() }"><a data-bind="click: function() { hbaseApp.switchToHistorical($data) }, text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
+                  <li data-bind="css: { 'active': $data.timestamp == $parent.timestamp() }"><a data-bind="click: function() { $parent.switchToHistorical($data) }, text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><i class="fa fa-spinner fa-spin"></i></li>
               </ul>
@@ -2515,10 +2515,10 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       $(this).trigger('reset');
     });
 
-    var prepareNewTableForm = function () {
+    huePubSub.subscribe('hbase.prepare.new.form', function () {
       $("#new_table_modal .modal-body ul").empty();
       addColumnToNewTableForm();
-    }
+    }, 'hbase');
 
     var addColumnToNewTableForm = function () {
       var $li = $("<li>").addClass("column").css("marginBottom", "10px").html($("#columnTemplate").html());
