@@ -159,11 +159,10 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_port = DATABASES[rdbms_name].PORT.get()
       rdbms_user_name = DATABASES[rdbms_name].USER.get()
       rdbms_password = get_database_password(rdbms_name)
-      url = "jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s" % {
+      url = "jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s" % {
         'rdbmsType': rdbms_name,
         'rdbmsHost': rdbms_host,
-        'rdbmsPort': rdbms_port,
-        'rdbmsDatabaseName': rdbms_database_name,
+        'rdbmsPort': rdbms_port
       }
     else:
       rdbms_host = source['rdbmsHostname']
