@@ -656,7 +656,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
-      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context[0]["form"].errors)
+      assert_equal({ 'username': ['Username already exists.']}, response.context[0]["form"].errors)
 
       # Create a new regular user (for real)
       response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
