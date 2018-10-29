@@ -1,7 +1,7 @@
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
 
-#Welcome to the repository for the Hue Dockerfiles
+# Welcome to the repository for the Hue Dockerfiles
 
 
 Hue is an open source Web interface for analyzing data with any Apache Hadoop: [gethue.com](http://gethue.com)
@@ -13,16 +13,16 @@ You can catch us on [Docker Hub](https://hub.docker.com/u/gethue/) as well.
 [![DockerPulls](https://img.shields.io/docker/pulls/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
 [![DockerStars](https://img.shields.io/docker/stars/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
 
-##Get the docker image
+## Get the docker image
 
 Just pull the latest from the Internet or build it yourself from the Hue repository.
 
-###Pull the image from Docker Hub
+### Pull the image from Docker Hub
 ```
 sudo docker pull gethue/hue:latest
 ```
 
-###Build the image
+### Build the image
 ```
 cd tools/docker/hue-base
 sudo docker build --rm -t gethue/hue:latest .
