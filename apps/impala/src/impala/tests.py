@@ -120,48 +120,52 @@ class TestImpalaIntegration:
     cls.db = dbms.get(cls.user, get_query_server_config(name='impala'))
     cls.DATABASE = get_db_prefix(name='impala')
 
-    hql = """
-      USE default;
+    queries = ["""
       DROP TABLE IF EXISTS %(db)s.tweets;
+    """ % {'db': cls.DATABASE}, """
       DROP DATABASE IF EXISTS %(db)s CASCADE;
+    """ % {'db': cls.DATABASE}, """
       CREATE DATABASE %(db)s;
+    """ % {'db': cls.DATABASE}]
 
-      USE %(db)s;
-    """ % {'db': cls.DATABASE}
+    for query in queries:
+       resp = _make_query(cls.client, query, database='default', local=False, server_name='impala')
+       resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
+       content = json.loads(resp.content)
+       assert_true(content['status'] == 0, resp.content)
 
-    resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
-    resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
-
-    content = json.loads(resp.content)
-    assert_true(content['status'] == 0, resp.content)
-
-    hql = """
+    queries = ["""
       CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
-
+    """, """
       INSERT INTO TABLE tweets VALUES (1, "531091827395682000", "My dad looks younger than costa");
+    """, """
       INSERT INTO TABLE tweets VALUES (2, "531091827781550000", "There is a thin line between your partner being vengeful and you reaping the consequences of your bad actions towards your partner.");
+    """, """
       INSERT INTO TABLE tweets VALUES (3, "531091827768979000", "@Mustang_Sally83 and they need to get into you :))))");
+    """, """
       INSERT INTO TABLE tweets VALUES (4, "531091827114668000", "@RachelZJohnson thank you rach!xxx");
+    """, """
       INSERT INTO TABLE tweets VALUES (5, "531091827949309000", "i think @WWERollins was robbed of the IC title match this week on RAW also i wonder if he will get a rematch i hope so @WWE");
-    """
+    """]
 
-    resp = _make_query(cls.client, hql, database=cls.DATABASE, local=False, server_name='impala')
-    resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
-
-    content = json.loads(resp.content)
-    assert_true(content['status'] == 0, resp.content)
+    for query in queries:
+       resp = _make_query(cls.client, query, database=cls.DATABASE, local=False, server_name='impala')
+       resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
+       content = json.loads(resp.content)
+       assert_true(content['status'] == 0, resp.content)
 
 
   @classmethod
   def teardown_class(cls):
     # We need to drop tables before dropping the database
-    hql = """
-    USE default;
-    DROP TABLE IF EXISTS %(db)s.tweets;
-    DROP DATABASE %(db)s CASCADE;
-    """ % {'db': cls.DATABASE}
-    resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
-    resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
+    queries = ["""
+      DROP TABLE IF EXISTS %(db)s.tweets;
+    """ % {'db': cls.DATABASE}, """
+      DROP DATABASE %(db)s CASCADE;
+    """ % {'db': cls.DATABASE}]
+    for query in queries:
+      resp = _make_query(cls.client, query, database='default', local=False, server_name='impala')
+      resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
 
     # Check the cleanup
     databases = cls.db.get_databases()
