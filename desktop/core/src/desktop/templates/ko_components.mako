@@ -32,6 +32,7 @@
 <%namespace name="koMultiClusterSidebar" file="/ko_components/ko_multi_cluster_sidebar.mako" />
 <%namespace name="koNavProperties" file="/ko_components/ko_nav_properties.mako" />
 <%namespace name="koNavTags" file="/ko_components/ko_nav_tags.mako" />
+<%namespace name="koPerformanceGraph" file="/ko_components/ko_performance_graph.mako" />
 <%namespace name="koSentryPrivileges" file="/ko_components/ko_sentry_privileges.mako" />
 <%namespace name="koSimpleAceEditor" file="/ko_components/ko_simple_ace_editor.mako" />
 <%namespace name="koSqlColumnsTable" file="/ko_components/ko_sql_columns_table.mako" />
@@ -55,6 +56,7 @@
   ${ koMultiClusterSidebar.multiClusterSidebar() }
   ${ koNavProperties.navProperties() }
   ${ koNavTags.navTags() }
+  ${ koPerformanceGraph.performanceGraph() }
   ${ koSentryPrivileges.sentryPrivileges() }
   ${ koSimpleAceEditor.simpleAceEditor() }
   ${ koSqlColumnsTable.sqlColumnsTable() }
