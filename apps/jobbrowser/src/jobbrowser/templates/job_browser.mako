@@ -1305,7 +1305,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
               <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-                <img src="${ static('desktop/art/wxm_fake/trend.svg') }" style="height: 440px"/>
+                <!-- ko component: { name: 'performance-graph', params: { type: 'cpu' } } --><!-- /ko -->
               </div>
             </div>
           </div>
