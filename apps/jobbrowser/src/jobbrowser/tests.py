@@ -514,6 +514,7 @@ class TestResourceManagerHaNoHadoop:
 
   def tearDown(self):
     resource_manager_api.ResourceManagerApi = getattr(resource_manager_api, 'old_ResourceManagerApi')
+    resource_manager_api.API_CACHE = None
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
 
