@@ -23,6 +23,8 @@ import subprocess
 
 import xxd
 
+from nose.plugins.skip import SkipTest
+
 from subprocess import Popen, PIPE
 
 LOG = logging.getLogger(__name__)
