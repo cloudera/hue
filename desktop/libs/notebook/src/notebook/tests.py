@@ -24,6 +24,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from azure.conf import is_adls_enabled
 
+from desktop import appmanager
 from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
@@ -456,6 +457,9 @@ def test_get_interpreters_to_show():
     ))
 
   try:
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
     resets = [INTERPRETERS.set_for_testing(default_interpreters), APP_BLACKLIST.set_for_testing('')]
 
     interpreters_shown_on_wheel_unset = get_ordered_interpreters()
@@ -471,3 +475,6 @@ def test_get_interpreters_to_show():
   finally:
     for reset in resets:
       reset()
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
