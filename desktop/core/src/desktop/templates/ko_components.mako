@@ -19,8 +19,11 @@
 <%namespace name="koCatalogEntriesTable" file="/ko_components/ko_catalog_entries_table.mako" />
 <%namespace name="koContextPopover" file="/ko_components/ko_context_popover.mako" />
 <%namespace name="koContextSelector" file="/ko_components/ko_context_selector.mako" />
+<%namespace name="koCreateDirModal" file="/ko_components/ko_create_directory_modal.mako" />
+<%namespace name="koDeleteDocModal" file="/ko_components/ko_delete_doc_modal.mako" />
 <%namespace name="koDropDown" file="/ko_components/ko_drop_down.mako" />
 <%namespace name="koDwSidebar" file="/ko_components/ko_dw_sidebar.mako" />
+<%namespace name="koExecutionAnalysis" file="/ko_components/ko_execution_analysis.mako" />
 <%namespace name="koFavoriteApp" file="/ko_components/ko_favorite_app.mako" />
 <%namespace name="koGlobalSearch" file="/ko_components/ko_global_search.mako" />
 <%namespace name="koHistoryPanel" file="/ko_components/ko_history_panel.mako" />
@@ -29,11 +32,9 @@
 <%namespace name="koMultiClusterSidebar" file="/ko_components/ko_multi_cluster_sidebar.mako" />
 <%namespace name="koNavProperties" file="/ko_components/ko_nav_properties.mako" />
 <%namespace name="koNavTags" file="/ko_components/ko_nav_tags.mako" />
+<%namespace name="koSentryPrivileges" file="/ko_components/ko_sentry_privileges.mako" />
 <%namespace name="koSimpleAceEditor" file="/ko_components/ko_simple_ace_editor.mako" />
 <%namespace name="koSqlColumnsTable" file="/ko_components/ko_sql_columns_table.mako" />
-<%namespace name="koDeleteDocModal" file="/ko_components/ko_delete_doc_modal.mako" />
-<%namespace name="koSentryPrivileges" file="/ko_components/ko_sentry_privileges.mako" />
-<%namespace name="koCreateDirModal" file="/ko_components/ko_create_directory_modal.mako" />
 
 <%def name="all()">
   ${ koAppSwitcher.appSwitcher() }
@@ -41,8 +42,11 @@
   ${ koCatalogEntriesTable.catalogEntriesTable() }
   ${ koContextPopover.contextPopover() }
   ${ koContextSelector.contextSelector() }
+  ${ koCreateDirModal.createDirectory() }
+  ${ koDeleteDocModal.deleteDoc() }
   ${ koDropDown.dropDown() }
   ${ koDwSidebar.dwSidebar() }
+  ${ koExecutionAnalysis.executionAnalysis() }
   ${ koFavoriteApp.favoriteApp() }
   ${ koGlobalSearch.globalSearch() }
   ${ koHistoryPanel.historyPanel() }
@@ -51,9 +55,7 @@
   ${ koMultiClusterSidebar.multiClusterSidebar() }
   ${ koNavProperties.navProperties() }
   ${ koNavTags.navTags() }
+  ${ koSentryPrivileges.sentryPrivileges() }
   ${ koSimpleAceEditor.simpleAceEditor() }
   ${ koSqlColumnsTable.sqlColumnsTable() }
-  ${ koDeleteDocModal.deleteDoc() }
-  ${ koSentryPrivileges.sentryPrivileges() }
-  ${ koCreateDirModal.createDirectory() }
 </%def>

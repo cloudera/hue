@@ -1427,7 +1427,7 @@ var EditorViewModel = (function() {
       }
 
       if (self.type() === 'impala') {
-        huePubSub.publish('assist.clear.execution.analysis');
+        huePubSub.publish('editor.clear.execution.analysis');
       }
 
       self.status('running');
@@ -1876,11 +1876,16 @@ var EditorViewModel = (function() {
               if (self.type() === 'impala' && self.compute() && self.compute().crn && self.compute().crn.indexOf('altus') !== -1) {
 
                 // TODO: Use real query ID
-                huePubSub.publish('assist.update.execution.analysis', {
+                huePubSub.publish('editor.update.execution.analysis', {
+                  analysisPossible: true,
                   compute: self.compute(),
                   queryId: '56433486cd84d475:3a86f97000000000'
                 });
 
+              } else {
+                huePubSub.publish('editor.update.execution.analysis', {
+                  analysisPossible: false
+                });
               }
               self.fetchResult(100);
               self.progress(100);
