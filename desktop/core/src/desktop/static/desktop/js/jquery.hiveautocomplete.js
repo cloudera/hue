@@ -54,7 +54,11 @@
       self.namespaceDeferred.resolve(self.options.namespace);
     } else {
       ContextCatalog.getNamespaces({ sourceType: options.apiHelperType }).done(function (context) {
-        self.namespaceDeferred.resolve(context.namespaces[0]);
+        if (context.namespaces && context.namespaces.length) {
+          self.namespaceDeferred.resolve(context.namespaces[0]);
+        } else {
+          self.namespaceDeferred.reject();
+        }
       })
     }
     self.namespaceDeferred.done(function (namespace) {
