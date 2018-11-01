@@ -457,10 +457,10 @@ def test_get_interpreters_to_show():
     ))
 
   try:
+    resets = [INTERPRETERS.set_for_testing(default_interpreters), APP_BLACKLIST.set_for_testing('')]
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
-    resets = [INTERPRETERS.set_for_testing(default_interpreters), APP_BLACKLIST.set_for_testing('')]
 
     interpreters_shown_on_wheel_unset = get_ordered_interpreters()
     assert_equal(default_interpreters.values(), interpreters_shown_on_wheel_unset,
