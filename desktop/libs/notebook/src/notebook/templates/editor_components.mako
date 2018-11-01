@@ -769,22 +769,26 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </a>
         </li>
         <!-- /ko -->
+
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
+        <li data-bind="click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Execution Analysis')}</a></li>
+        <!-- /ko -->
       </ul>
+
       <div class="tab-content" style="border: none; overflow-x: hidden">
         <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
           <!-- ko if: $parent.loadingHistory -->
-          <div style="padding: 20px">
+          <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
           </div>
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.loadingHistory -->
-
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() === '' -->
-            <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
+            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
             <!-- /ko -->
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() !== '' -->
-            <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
+            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
             <!-- /ko -->
 
 
@@ -831,18 +835,18 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}" style="overflow: hidden">
           <!-- ko if: loadingQueries -->
-          <div style="padding: 20px">
+          <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
           </div>
           <!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length > 0 -->
           <table class="table table-condensed margin-top-10 history-table">
@@ -896,9 +900,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
           <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
         </div>
+
         <!-- ko if: result.explanation().length > 0 -->
         <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
           <!-- ko template: { name: 'snippet-explain${ suffix }' } --><!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
+        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" style="padding: 10px;">
+          <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
         </div>
         <!-- /ko -->
 
