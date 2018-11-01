@@ -2690,7 +2690,7 @@ from desktop.views import _ko
             } --><!-- /ko -->
           </div>
         </div>
-        <div class="assist-flex-half assist-db-scrollable" data-bind="delayedOverflow">
+        <div class="assist-flex-fill assist-db-scrollable" data-bind="delayedOverflow">
           <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
           <div class="assist-no-entries">
             <!-- ko if: isSolr -->
@@ -2729,7 +2729,7 @@ from desktop.views import _ko
 
         <!-- ko if: HAS_OPTIMIZER && !isSolr() -->
         <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Query Analysis') }</div></div>
-        <div data-bind="css: HAS_WORKLOAD_ANALYTICS ? 'assist-flex-quarter' : 'assist-flex-half'">
+        <div class="assist-flex-third">
           <!-- ko if: ! activeRisks().hints -->
           <div class="assist-no-entries">${ _('Select a query or start typing to get optimization hints.') }</div>
           <!-- /ko -->
@@ -2759,84 +2759,56 @@ from desktop.views import _ko
           <!-- /ko -->
         </div>
         <!-- /ko -->
-
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && !isSolr() -->
-          <div class="assist-flex-header" data-bind="css: { 'assist-divider': !HAS_OPTIMIZER }"><div class="assist-inner-header">${ _('Execution Analysis') }</div></div>
-          <div data-bind="css: HAS_OPTIMIZER ? 'assist-flex-quarter' : 'assist-flex-half'">
-          <!-- ko hueSpinner: { spin: loadingExecutionAnalysis, inline: true} --><!-- /ko -->
-            <!-- ko ifnot: loadingExecutionAnalysis -->
-            <!-- ko if: !executionAnalysis() -->
-            <div class="assist-no-entries">${ _('Execute a query to get query execution analysis.') }</div>
-            <!-- /ko -->
-            <!-- ko with: executionAnalysis -->
-            <ul class="risk-list" data-bind="foreach: healthChecks">
-              <li data-bind="templatePopover : { placement: 'left', contentTemplate: 'health-check-details-content', titleTemplate: 'health-check-details-title', minWidth: '320px', trigger: 'hover' }">
-                <div class="risk-list-title risk-list-normal"><span data-bind="text: name"></span></div>
-              </li>
-            </ul>
-            <!-- /ko -->
-          <!-- /ko -->
-          </div>
-        <!-- /ko -->
       </div>
     </div>
   </script>
 
-  <script type="text/html" id="health-check-details-content">
-    <div data-bind="text: description"></div>
-  </script>
-
-  <script type="text/html" id="health-check-details-title">
-    <span data-bind="text: name"></span>
-  </script>
-
   <script type="text/javascript">
     var AssistantUtils = (function () {
-          return {
-            getFilteredTablesPureComputed: function (vm) {
-              var openedByFilter = [];
-              return ko.pureComputed(function () {
-                if (vm.filter === null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
-                  while (openedByFilter.length) {
-                    openedByFilter.pop().open(false);
-                  }
-                  return vm.activeTables();
-                }
-
-                var facets = vm.filter.querySpec().facets;
-
-                var result = [];
-                $.each(vm.activeTables(), function (index, entry) {
-                  var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
-                  if (!facetMatch && facets['type']['table']) {
-                    facetMatch = entry.catalogEntry.isTable();
-                  }
-                  if (!facetMatch && facets['type']['view']) {
-                    facetMatch = entry.catalogEntry.isView();
-                  }
-
-                  var textMatch = !vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0;
-                  if (!textMatch) {
-                    var nameLower = entry.catalogEntry.name.toLowerCase();
-                    textMatch = vm.filter.querySpec().text.every(function (text) {
-                      return nameLower.indexOf(text.toLowerCase()) !== -1;
-                    });
-                  }
-                  entry.filterColumnNames(!textMatch);
-                  if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
-                    if (!entry.open()) {
-                      entry.open(true);
-                      openedByFilter.push(entry);
-                    }
-                    result.push(entry);
-                  }
-                });
-                return result;
-              });
+      return {
+        getFilteredTablesPureComputed: function (vm) {
+          var openedByFilter = [];
+          return ko.pureComputed(function () {
+            if (vm.filter === null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
+              while (openedByFilter.length) {
+                openedByFilter.pop().open(false);
+              }
+              return vm.activeTables();
             }
-          }
-        })();
 
+            var facets = vm.filter.querySpec().facets;
+
+            var result = [];
+            $.each(vm.activeTables(), function (index, entry) {
+              var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
+              if (!facetMatch && facets['type']['table']) {
+                facetMatch = entry.catalogEntry.isTable();
+              }
+              if (!facetMatch && facets['type']['view']) {
+                facetMatch = entry.catalogEntry.isView();
+              }
+
+              var textMatch = !vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0;
+              if (!textMatch) {
+                var nameLower = entry.catalogEntry.name.toLowerCase();
+                textMatch = vm.filter.querySpec().text.every(function (text) {
+                  return nameLower.indexOf(text.toLowerCase()) !== -1;
+                });
+              }
+              entry.filterColumnNames(!textMatch);
+              if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
+                if (!entry.open()) {
+                  entry.open(true);
+                  openedByFilter.push(entry);
+                }
+                result.push(entry);
+              }
+            });
+            return result;
+          });
+        }
+      }
+    })();
 
     (function () {
       function EditorAssistantPanel(params) {
@@ -2859,9 +2831,6 @@ from desktop.views import _ko
         self.activeLocations = ko.observable();
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
-
-        self.loadingExecutionAnalysis = ko.observable(false);
-        self.executionAnalysis = ko.observable();
 
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
@@ -3203,39 +3172,9 @@ from desktop.views import _ko
           }
         });
 
-        var lastExecutionAnalysisPromise = undefined;
-
-        var clearAnalysisSub = huePubSub.subscribe('assist.clear.execution.analysis', function() {
-          if (!HAS_WORKLOAD_ANALYTICS) {
-            return;
-          }
-          if (lastExecutionAnalysisPromise) {
-            lastExecutionAnalysisPromise.cancel();
-          }
-          self.executionAnalysis(undefined);
-        });
-
-        var executionAnalysisSub = huePubSub.subscribe('assist.update.execution.analysis', function (details) {
-          if (!HAS_WORKLOAD_ANALYTICS) {
-            return;
-          }
-          self.loadingExecutionAnalysis(true);
-          lastExecutionAnalysisPromise = ApiHelper.getInstance().fetchQueryExecutionAnalysis({
-            silenceErrors: true,
-            compute: details.compute,
-            queryId: details.queryId
-          }).done(function (response) {
-            self.executionAnalysis(response.query)
-          }).always(function () {
-            self.loadingExecutionAnalysis(false);
-          });
-        });
-
         self.disposals.push(function () {
           entryRefreshedSub.remove();
           activeTabSub.dispose();
-          clearAnalysisSub.remove();
-          executionAnalysisSub.remove();
         });
 
         var activeLocationsSub = huePubSub.subscribe('editor.active.locations', function (activeLocations) {
@@ -3262,7 +3201,6 @@ from desktop.views import _ko
           activeLocationsSub.remove();
           activeRisksSub.remove();
         });
-
       }
 
       EditorAssistantPanel.prototype.addFilter = function (riskId) {
