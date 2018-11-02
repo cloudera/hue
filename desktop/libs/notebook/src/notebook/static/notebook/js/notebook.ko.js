@@ -380,9 +380,9 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
-    self.namespace = ko.observable(snippet.namespace);
-
-    self.compute = ko.observable(snippet.compute);
+    // namespace and compute might be initialized as empty object {}
+    self.namespace = ko.observable(snippet.namespace && snippet.namespace.id ? snippet.namespace : undefined);
+    self.compute = ko.observable(snippet.compute && snippet.compute.id ? snippet.compute : undefined);
 
     self.availableDatabases = ko.observableArray();
     self.database = ko.observable();
