@@ -1683,7 +1683,7 @@ var ApiHelper = (function () {
         deferred.resolve(data);
       } else {
         cancellablePromises.push(
-          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, compute: options.compute, silenceErrors: options.silenceErrors }).done(function () {
             var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
               notebook: notebookJson,
               snippet: snippetJson,
