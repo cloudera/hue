@@ -1688,55 +1688,6 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  /**
-   * Waits for the snippet to have a compute and namespace set, this prevents js exceptions and garbled editor
-   * output when autocomplete is triggered while loading the context.
-   *
-   * @return {Promise}
-   */
-  SqlAutocompleter3.prototype.whenContextSet = function () {
-    var self = this;
-
-    // Fail any queued requests, only the last update should succeed
-    if (self.computeDeferred) {
-      self.computeDeferred.reject();
-    }
-    if (self.namespaceDeferred) {
-      self.namespaceDeferred.reject();
-    }
-    if (self.waitForNamespaceSub) {
-      self.waitForNamespaceSub.dispose();
-    }
-    if (self.waitForComputeSub) {
-      self.waitForComputeSub.dispose();
-    }
-
-    self.computeDeferred = $.Deferred();
-    if (self.snippet.compute()) {
-      self.computeDeferred.resolve();
-    } else {
-      self.waitForComputeSub = self.snippet.compute.subscribe(function (newVal) {
-        if (newVal) {
-          self.computeDeferred.resolve();
-          self.waitForComputeSub.dispose();
-        }
-      })
-    }
-
-    self.namespaceDeferred = $.Deferred();
-    if (self.snippet.namespace()) {
-      self.namespaceDeferred.resolve();
-    } else {
-      self.waitForNamespaceSub = self.snippet.namespace.subscribe(function (newVal) {
-        if (newVal) {
-          self.namespaceDeferred.resolve();
-          self.waitForNamespaceSub.dispose();
-        }
-      })
-    }
-    return $.when(self.computeDeferred, self.namespaceDeferred);
-  };
-
   SqlAutocompleter3.prototype.autocomplete = function () {
     var self = this;
     var parseResult;
@@ -1776,7 +1727,10 @@ var SqlAutocompleter3 = (function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     } else {
       try {
-        self.whenContextSet().done(function () {
+        if (self.lastContextRequest) {
+          self.lastContextRequest.dispose();
+        }
+        self.lastContextRequest = self.snippet.whenContextSet().done(function () {
           self.suggestions.update(parseResult);
         }).fail(function () {
           huePubSub.publish('hue.ace.autocompleter.done');

@@ -388,6 +388,48 @@ var EditorViewModel = (function() {
     self.namespace = ko.observable(snippet.namespace && snippet.namespace.id ? snippet.namespace : undefined);
     self.compute = ko.observable(snippet.compute && snippet.compute.id ? snippet.compute : undefined);
 
+    self.whenContextSet = function () {
+      var namespaceSub;
+      var namespaceDeferred = $.Deferred();
+      if (self.namespace()) {
+        namespaceDeferred.resolve(self.namespace());
+      } else {
+        namespaceSub = self.namespace.subscribe(function (newVal) {
+          if (newVal) {
+            namespaceDeferred.resolve(newVal);
+            namespaceSub.dispose();
+          }
+        })
+      }
+      var computeSub;
+      var computeDeferred = $.Deferred();
+      if (self.compute()) {
+        computeDeferred.resolve(self.compute());
+      } else {
+        computeSub = self.compute.subscribe(function (newVal) {
+          if (newVal) {
+            computeDeferred.resolve(newVal);
+            computeSub.dispose();
+          }
+        })
+      }
+
+      var result = $.when(namespaceDeferred, computeDeferred);
+
+      result.dispose = function () {
+        if (namespaceSub) {
+          namespaceSub.dispose();
+        }
+        if (computeSub) {
+          computeSub.dispose();
+        }
+        namespaceDeferred.reject();
+        computeDeferred.reject();
+      };
+
+      return result;
+    };
+
     self.availableDatabases = ko.observableArray();
     self.database = ko.observable();
     var previousDatabase = null;
