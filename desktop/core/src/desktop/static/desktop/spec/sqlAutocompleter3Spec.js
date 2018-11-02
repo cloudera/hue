@@ -34,6 +34,9 @@
           },
           compute: function () {
             return { id: 'defaultCompute' }
+          },
+          whenContextSet: function () {
+            return $.Deferred().resolve();
           }
         },
         editor: function () {
@@ -430,6 +433,9 @@
             },
             compute: function () {
               return { id: 'defaultCompute' }
+            },
+            whenContextSet: function () {
+              return $.Deferred().resolve();
             },
             positionStatement: ko.observable(positionStatement)
           },

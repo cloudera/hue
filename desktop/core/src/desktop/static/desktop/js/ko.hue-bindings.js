@@ -5104,18 +5104,24 @@
         locationWorkerSub.remove();
       });
 
+      var lastContextRequest;
       var statementSubscription = huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
         if (statementDetails.id !== self.editorId) {
           return;
         }
         if (self.snippet.type() === 'hive' || self.snippet.type() === 'impala') {
-          huePubSub.publish('ace.sql.location.worker.post', {
-            id: self.snippet.id(),
-            statementDetails: statementDetails,
-            type: self.snippet.type(),
-            namespace: self.snippet.namespace(),
-            compute: self.snippet.compute(),
-            defaultDatabase: self.snippet.database()
+          if (lastContextRequest) {
+            lastContextRequest.dispose();
+          }
+          lastContextRequest = self.snippet.whenContextSet().done(function () {
+            huePubSub.publish('ace.sql.location.worker.post', {
+              id: self.snippet.id(),
+              statementDetails: statementDetails,
+              type: self.snippet.type(),
+              namespace: self.snippet.namespace(),
+              compute: self.snippet.compute(),
+              defaultDatabase: self.snippet.database()
+            })
           });
         }
       });
