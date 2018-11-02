@@ -255,7 +255,7 @@ from desktop.views import _ko
         if (self[TYPES_INDEX.compute.name]) {
           // Select the first corresponding compute when a namespace is selected (unless selected)
           self[TYPES_INDEX.compute.lastPromise].done(function () {
-            if (!self[TYPES_INDEX.compute.name]() || self[TYPES_INDEX.compute.name]().namespace !== namespace.id) {
+            if (!self[TYPES_INDEX.compute.name]() || (self[TYPES_INDEX.compute.name]().namespace && self[TYPES_INDEX.compute.name]().namespace !== namespace.id)) {
               var found = self[TYPES_INDEX.compute.available]().some(function (compute) {
                 if (namespace.id === compute.namespace) {
                   self[TYPES_INDEX.compute.name](compute);
@@ -286,6 +286,15 @@ from desktop.views import _ko
               available = available.namespaces;
             }
             self[type.available](available);
+
+            // If we only get one and hue is not configured for multi-cluster we always fallback to the returned
+            // compute or namespace from the backend. This also guarantees a compute and namespace is always set.
+            if (available.length === 1 && !window.HAS_MULTI_CLUSTER) {
+              if (!self[type.name]() || self[type.name]().id !== available[0].id) {
+                self[type.name](available[0]);
+              }
+              return;
+            }
 
             // In some cases we could have a namespace or compute without the name attribute, or the name might have changed.
             if (self[type.name]() && !self[type.name]().name) {
