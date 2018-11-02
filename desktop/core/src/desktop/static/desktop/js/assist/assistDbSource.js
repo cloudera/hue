@@ -163,13 +163,17 @@ var AssistDbSource = (function () {
         assistNamespaces.push(assistNamespace);
       });
       self.namespaces(assistNamespaces);
-      if (!refresh && activeNamespace) {
-        self.selectedNamespace(activeNamespace);
-      } else if (!refresh && assistNamespaces.length) {
-        self.selectedNamespace(assistNamespaces[0]);
-      }
-      if (!refresh && activeCompute) {
-        self.selectedNamespace().compute(activeCompute);
+      if (!refresh) {
+        if (activeNamespace) {
+          self.selectedNamespace(activeNamespace);
+        } else if (assistNamespaces.length) {
+          self.selectedNamespace(assistNamespaces[0]);
+        }
+        if (activeCompute) {
+          self.selectedNamespace().compute(activeCompute);
+        } else if (self.selectedNamespace() && self.selectedNamespace().namespace && self.selectedNamespace().namespace.computes && self.selectedNamespace().namespace.computes.length) {
+          self.selectedNamespace().compute(self.selectedNamespace().namespace.computes[0]);
+        }
       }
     }).fail(function () {
       self.hasErrors(true);
