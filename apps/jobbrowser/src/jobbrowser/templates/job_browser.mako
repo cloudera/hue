@@ -193,6 +193,50 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </table>
   </script>
 
+  <script type="text/html" id="create-cluster-title">
+  </script>
+
+  <script type="text/html" id="create-cluster-content">
+    <form>
+      <fieldset>
+        <label for="clusterCreateName">${ _('Name') }</label>
+        <input id="clusterCreateName" type="text" placeholder="${ _('Name') }" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'">
+
+        <!-- ko if: $root.interface() == 'dataware2-clusters' -->
+        <label for="clusterCreateWorkers">${ _('Workers') }</label>
+        <input id="clusterCreateWorkers" type="number" min="1" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+        <label class="checkbox" style="float: right;">
+          <input type="checkbox" data-bind="checked: jobs.createClusterAutoPause"> ${ _('Auto pause') }
+        </label>
+        <label class="checkbox" style="margin-right: 10px; float: right;">
+          <input type="checkbox" data-bind="checked: jobs.createClusterAutoResize"> ${ _('Auto resize') }
+        </label>
+        <!-- /ko -->
+        <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
+        <label for="clusterCreateSize">${ _('Size') }</label>
+        <select id="clusterCreateSize" class="input-small" data-bind="visible: !jobs.createClusterShowWorkers()">
+          <option>${ _('X-Large') }</option>
+          <option>${ _('Large') }</option>
+          <option>${ _('Medium') }</option>
+          <option>${ _('Small') }</option>
+          <option>${ _('X-Small') }</option>
+        </select>
+        <label for="clusterCreateEnvironment">${ _('Environment') }</label>
+        <select id="clusterCreateEnvironment">
+          <option>AWS-finance-secure</option>
+          <option>GCE-east</option>
+          <option>OpenShift-prem</option>
+        </select>
+        <!-- /ko -->
+      </fieldset>
+    </form>
+    <div style="width: 100%; text-align: right;">
+      <button class="btn close-template-popover" title="${ _('Cancel') }">${ _('Cancel') }</button>
+      <button class="btn btn-primary close-template-popover" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
+        ${ _('Create') }
+      </button>
+    </div>
+  </script>
 
   <div class="main-content">
     <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
@@ -260,48 +304,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   </a>
                   <!-- /ko -->
 
-                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.interface() == 'dataware2-clusters', toggle: jobs.createClusterShow">
-                    <!-- ko if: jobs.createClusterShow -->
-                      ${ _('Cancel') }
-                    <!-- /ko -->
-                    <!-- ko if: !jobs.createClusterShow() && $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
+                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'create-cluster-content', minWidth: '320px', trigger: 'click' }">
+                    <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
                       ${ _('Add Warehouse') }
                     <!-- /ko -->
-                    <!-- ko if: !jobs.createClusterShow() && $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
+                    <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
                       ${ _('Create / Register') }
                     <!-- /ko -->
+                    <i class="fa fa-chevron-down"></i>
                   </a>
-
-                  <span data-bind="visible: jobs.createClusterShow() && $root.interface() == 'dataware2-clusters'">
-                    <input type="text" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'" class="input-medium" placeholder="${_('Name')}">
-                    <!-- ko if: $root.interface() == 'dataware2-clusters' -->
-                      <span data-bind="visible: jobs.createClusterShowWorkers">
-                        <input type="number" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
-                        ${ _('workers') }
-                      </span>
-                      <select class="input-small" data-bind="visible: !jobs.createClusterShowWorkers()">
-                        <option>X-Small</option>
-                        <option>Small</option>
-                        <option>Medium</option>
-                        <option>Large</option>
-                        <option>x-Large</option>
-                      </select>
-                      <input type="checkbox" data-bind="checked: jobs.createClusterShowWorkers">
-                    <!-- /ko -->
-                    <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
-                      ${ _('nodes') }
-                      Environment
-                      <select>
-                        <option>AWS-finance-secure</option>
-                        <option>GCE-east</option>
-                        <option>OpenShift-prem</option>
-                      </select>
-                    <!-- /ko -->
-
-                    <button class="btn" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
-                      <i class="fa fa-plus"></i>
-                    </button>
-                  </span>
                 <!-- /ko -->
 
                 <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
@@ -1245,17 +1256,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position:relative;">
-
-
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position: relative;">
       <div style="position: absolute; top: 0; right: 0">
-        <span data-bind="visible: updateClusterShow">
-          <input type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">${ _('workers') }
+        <!-- ko if: updateClusterShow -->
+        <input style="margin-bottom: 0;" type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}"> ${ _('workers') }
 
-          <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-            <i class="fa fa-check"></i>
-          </button>
-        </span>
+        <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
+          <i class="fa fa-check"></i>
+        </button>
+        <!-- /ko -->
 
         <button class="btn" title="${ _('Resize warehouse') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
           <!-- ko if: updateClusterShow-->
@@ -1266,12 +1275,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
         </button>
 
-        <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
-          <i class="fa fa-refresh"></i>
-        </a>
-
         <a class="btn" title="${ _('Pause') }">
           <i class="fa fa-pause"></i>
+        </a>
+
+        <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
+          <i class="fa fa-refresh"></i>
         </a>
       </div>
 
@@ -2982,6 +2991,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.createClusterName = ko.observable('');
       self.createClusterWorkers = ko.observable(1);
       self.createClusterShowWorkers = ko.observable(false);
+      self.createClusterAutoPause = ko.observable(false);
+      self.createClusterAutoResize = ko.observable(true);
 
       self.createCluster = function() {
         if (vm.interface().indexOf('dataeng') != -1) {

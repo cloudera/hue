@@ -1508,8 +1508,16 @@
       var afterRender = function () {
         options.content = $content.html();
         options.title = $title.html();
+        var triggerTitle;
+        if ($element.attr('title')) {
+          triggerTitle = $element.attr('title');
+          $element.attr('title', null);
+        }
         $element.popover(options);
         $element.popover('show');
+        if (triggerTitle) {
+          $element.attr('title', triggerTitle);
+        }
         var $tip = $element.data('popover').$tip;
         if (HUE_CONTAINER !== 'body') {
           $tip.css({ 'position': 'fixed', 'z-index': 2000 });
@@ -1522,7 +1530,7 @@
         }
         ko.cleanNode($tip.get(0));
         ko.applyBindings(viewModel, $tip.get(0));
-        $tip.find(".close-popover").click(function (event) {
+        $tip.find(".close-popover, .close-template-popover").click(function (event) {
           hidePopover();
           event.stopPropagation();
         });
