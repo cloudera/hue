@@ -193,9 +193,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </table>
   </script>
 
-  <script type="text/html" id="create-cluster-title">
-  </script>
-
   <script type="text/html" id="create-cluster-content">
     <form>
       <fieldset>
@@ -234,6 +231,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <button class="btn close-template-popover" title="${ _('Cancel') }">${ _('Cancel') }</button>
       <button class="btn btn-primary close-template-popover" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
         ${ _('Create') }
+      </button>
+    </div>
+  </script>
+
+  <script type="text/html" id="configure-cluster-content">
+  <form>
+      <fieldset>
+        <label for="clusterConfigureWorkers">${ _('Workers') }</label>
+        <input id="clusterConfigureWorkers" type="number" min="1" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+        <label class="checkbox" style="float: right;">
+          <input type="checkbox" data-bind="checked: updateClusterAutoPause"> ${ _('Auto pause') }
+        </label>
+        <label class="checkbox" style="margin-right: 10px; float: right;">
+          <input type="checkbox" data-bind="checked: updateClusterAutoResize"> ${ _('Auto resize') }
+        </label>
+      </fieldset>
+    </form>
+    <div style="width: 100%; text-align: right;">
+      <button class="btn close-template-popover" title="${ _('Cancel') }">${ _('Cancel') }</button>
+      <button class="btn btn-primary close-template-popover" data-bind="click: updateCluster, enable: clusterConfigModified" title="${ _('Update') }">
+        ${ _('Update') }
       </button>
     </div>
   </script>
@@ -1262,21 +1280,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position: relative;">
       <div style="position: absolute; top: 0; right: 0">
-        <!-- ko if: updateClusterShow -->
-        <input style="margin-bottom: 0;" type="number" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}"> ${ _('workers') }
-
-        <button class="btn" data-bind="click: updateCluster, enable: updateClusterWorkers() > 0 && updateClusterWorkers() != properties['properties']['workerReplicas']()" title="${ _('Start resizing') }">
-          <i class="fa fa-check"></i>
-        </button>
-        <!-- /ko -->
-
-        <button class="btn" title="${ _('Resize warehouse') }" data-bind="enable: status() == 'ONLINE', visible: $root.cluster() && $root.cluster()['type'] == 'altus-dw2', toggle: updateClusterShow">
-          <!-- ko if: updateClusterShow-->
-            ${ _('Cancel') }
-          <!-- /ko -->
-          <!-- ko ifnot: updateClusterShow-->
-            ${ _('Resize') } <i class="fa fa-exchange fa-rotate-90"></i>
-          <!-- /ko -->
+        <button class="btn" title="Create cluster" data-bind="enable: status() == 'ONLINE', visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'configure-cluster-content', minWidth: '320px', trigger: 'click' }" style="">
+            ${ _('Configure') }
+          <i class="fa fa-chevron-down"></i>
         </button>
 
         <a class="btn" title="${ _('Pause') }">
@@ -2662,7 +2668,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.fetchStatus();
           });
         }
-      }
+      };
+
+      self.updateClusterWorkers = ko.observable(1);
+      self.updateClusterAutoPause = ko.observable();
+      self.updateClusterAutoResize = ko.observable();
 
       self.updateClusterShow = ko.observable(false);
       self.updateClusterShow.subscribe(function(newVal) {
@@ -2670,7 +2680,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
         }
       });
-      self.updateClusterWorkers = ko.observable(1);
+
+      self.clusterConfigModified = ko.pureComputed(function () {
+        // TODO: Add auto resize/pause as condition once in properties
+        return self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()
+      });
 
       ## TODO Move to control
       self.updateCluster = function() {
