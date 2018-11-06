@@ -1535,12 +1535,16 @@
           event.stopPropagation();
         });
         if (options.minWidth) {
-          var heightBefore = $tip.height();
+          var heightBefore = $tip.outerHeight(true);
+          var widthBefore = $tip.outerWidth(true);
           $tip.css('min-width', options.minWidth);
-          // The width might affect the height in which case we need to reposition the popover
-          var diff = (heightBefore - $tip.height()) / 2;
-          if (diff !== 0) {
-            $tip.css('top', ($tip.position().top + diff) + 'px');
+          // The min-width might affect the height/width in which case we reposition the popover depending on placement
+          var heightDiff = (heightBefore - $tip.outerHeight(true)) / 2;
+          var widthDiff = (widthBefore - $tip.outerWidth(true)) / 2;
+          if ((!options.placement || options.placement === 'left' || options.placement === 'right') && heightDiff !== 0) {
+            $tip.css('top', ($tip.position().top + heightDiff) + 'px');
+          } else if (options.placement && (options.placement === 'bottom' || options.placement === 'top') && widthDiff !== 0) {
+            $tip.css('left', ($tip.position().left + widthDiff) + 'px');
           }
         }
         var lastWidth = $element.outerWidth(true);
