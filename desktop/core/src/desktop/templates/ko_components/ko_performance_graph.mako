@@ -39,19 +39,20 @@ from django.utils.translation import ugettext as _
 
 
     (function () {
-      var generateFakeData = function () {
+      var generateFakeData = function (min, max) {
         var entries = 100;
         var timeDiff = 300000; // 5 minutes
         var startTime = Date.now() - entries * timeDiff;
-        var time = ['x'];
-        var workerData = ['worker1'];
-        var result = [time, workerData];
+        var result = [['time', 'worker 1', 'worker 2', 'worker 3']];
 
-        var lastVal = 0;
+        var lastVal1 = min;
+        var lastVal2 = min;
+        var lastVal3 = min;
         for (var i = 0; i < 100; i++) {
-          lastVal = Math.round(Math.max(Math.min(lastVal + (Math.random()-0.5) * 20, 100), 0));
-          time.push(startTime + timeDiff * i);
-          workerData.push(lastVal);
+          lastVal1 = Math.round(Math.max(Math.min(lastVal1 + (Math.random() - 0.5) * 20, max), min));
+          lastVal2 = Math.round(Math.max(Math.min(lastVal2 + (Math.random() - 0.5) * 20, max), min));
+          lastVal3 = Math.round(Math.max(Math.min(lastVal3 + (Math.random() - 0.5) * 20, max), min));
+          result.push([startTime + timeDiff * i, lastVal1, lastVal2, lastVal3]);
         }
         return result;
       };
@@ -74,7 +75,7 @@ from django.utils.translation import ugettext as _
         self.header = AVAILABLE_TYPES[self.type].header;
         self.graphHeight = 300;
         self.graphWidth = 750;
-        self.graphMargin = { top: 15, right: 30, bottom: 20, left: 25 };
+        self.graphPadding = { top: 15, right: 30, bottom: 20, left: 30 };
 
         self.average = ko.observable('-');
         self.max = ko.observable('-');
@@ -86,24 +87,43 @@ from django.utils.translation import ugettext as _
         self.graphContainerRendered = function (domTree) {
           var graphElement = domTree[1];
 
-          var chart = c3.generate({
+          c3.generate({
             bindto: graphElement,
+            size: {
+              height: self.graphHeight,
+              width: self.graphWidth
+            },
+            padding: self.graphPadding,
             data: {
-              x: 'x',
-              columns: self.chartData()
+              x: 'time',
+              rows: self.chartData(),
+              colors: {
+                'worker 1': '#29A7DE',
+                'worker 2': '#B0BEC5',
+                'worker 3': '#1C749B'
+              }
             },
             axis: {
               y: {
+                default: [0, 100],
                 min: 0,
                 max: 100,
-                padding: { top:0, bottom:0 }
+                padding: { top: 0, bottom: 0 }
               },
               x: {
                 type: 'timeseries',
                 tick: {
-                  format: '%H:%M:%S'
+                  format: '%H:%M:%S',
+                  count: 9
                 }
               }
+            },
+            point: {
+              r: 1.5
+            },
+            zoom: {
+              enabled: true,
+              type: 'drag'
             }
           });
 
@@ -113,19 +133,19 @@ from django.utils.translation import ugettext as _
       PerformanceGraph.prototype.fetchData = function () {
         var self = this;
 
-        var charData = generateFakeData();
-        var workerData = charData[1];
+        var chartData = generateFakeData(0, 100);
         var max = 0, min = 0, average = 0;
-        workerData.slice(1).forEach(function (val) {
-          max = Math.max(val, max);
-          min = Math.min(val, min)
-          average += val;
+        chartData.slice(1).forEach(function (val) {
+
+          max = Math.max(val[1], val[2], val[3], max);
+          max = Math.min(val[1], val[2], val[3], min);
+          average += (val[1] + val[2] + val[3]) / 3;
         });
-        average = average / (workerData.length - 1);
+        average = average / (chartData.length - 1);
         self.min(min + '%');
         self.max(max + '%');
         self.average(Math.round(average) + '%');
-        self.chartData(charData);
+        self.chartData(chartData);
       };
 
       ko.components.register('performance-graph', {
