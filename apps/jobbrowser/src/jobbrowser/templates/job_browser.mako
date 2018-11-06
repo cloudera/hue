@@ -341,11 +341,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   </ul>
                   <!-- /ko -->
                   <!-- ko ifnot: $root.isMini -->
-                    ${ _('Running') }
-                    <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: {apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
-
-                    ${ _('Completed') }
-                    <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: {apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                  <h4>${ _('Running') }</h4>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                  <h4>${ _('Completed') }</h4>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs } }"></div>
                   <!-- /ko -->
                 <!-- /ko -->
               </div>
@@ -497,7 +496,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko ifnot: hasPagination -->
   <div class="inline">
     <span data-bind="text: totalApps()"></span>
+    <!-- ko if: $root.interface() === 'dataware2-clusters' -->
+    ${ _('warehouses') }
+    <!-- /ko -->
+    <!-- ko if: $root.interface() !== 'dataware2-clusters' -->
     ${ _('jobs') }
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 
