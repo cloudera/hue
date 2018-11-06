@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%def name="performanceGraph()">
 
   <script type="text/html" id="performance-graph-d3-template">
-    <svg data-bind="style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></svg>
+    <div data-bind="attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></div>
   </script>
 
   <script type="text/html" id="performance-graph-template">
@@ -43,15 +43,15 @@ from django.utils.translation import ugettext as _
         var entries = 100;
         var timeDiff = 300000; // 5 minutes
         var startTime = Date.now() - entries * timeDiff;
-        var result = [];
+        var time = ['x'];
+        var workerData = ['worker1'];
+        var result = [time, workerData];
 
         var lastVal = 0;
         for (var i = 0; i < 100; i++) {
           lastVal = Math.round(Math.max(Math.min(lastVal + (Math.random()-0.5) * 20, 100), 0));
-          result.push({
-            x: startTime + timeDiff * i,
-            y: lastVal
-          });
+          time.push(startTime + timeDiff * i);
+          workerData.push(lastVal);
         }
         return result;
       };
@@ -69,6 +69,7 @@ from django.utils.translation import ugettext as _
        */
       function PerformanceGraph(params) {
         var self = this;
+        self.id = UUID();
         self.type = params.type;
         self.header = AVAILABLE_TYPES[self.type].header;
         self.graphHeight = 300;
@@ -78,60 +79,53 @@ from django.utils.translation import ugettext as _
         self.average = ko.observable('-');
         self.max = ko.observable('-');
         self.min = ko.observable('-');
-        self.datum = ko.observable();
+        self.chartData = ko.observable();
 
         self.fetchData();
 
         self.graphContainerRendered = function (domTree) {
           var graphElement = domTree[1];
 
-          var chart = nv.models.lineChart()
-                  .margin(self.graphMargin)
-                  .useInteractiveGuideline(true)
-                  .transitionDuration(350)
-                  .yDomain([0, 100])
-                  .showLegend(false)
-                  .showYAxis(true)
-                  .showXAxis(true);
+          var chart = c3.generate({
+            bindto: graphElement,
+            data: {
+              x: 'x',
+              columns: self.chartData()
+            },
+            axis: {
+              y: {
+                min: 0,
+                max: 100,
+                padding: { top:0, bottom:0 }
+              },
+              x: {
+                type: 'timeseries',
+                tick: {
+                  format: '%H:%M:%S'
+                }
+              }
+            }
+          });
 
-          chart.xAxis
-                  .tickFormat(function(d){return moment(d).format('HH:mm:ss');})
-                  .showMaxMin(false)
-                  .tickPadding(10);
-
-          chart.yAxis
-                  .axisLabel('Percentage');
-
-          d3.select(graphElement).datum(self.datum()).call(chart);
         }
       }
 
       PerformanceGraph.prototype.fetchData = function () {
         var self = this;
-        var series = [];
 
-        var values = generateFakeData();
+        var charData = generateFakeData();
+        var workerData = charData[1];
         var max = 0, min = 0, average = 0;
-        values.forEach(function (val) {
-          if (val.y > max) {
-            max = val.y;
-          }
-          if (val.y < min) {
-            min = val.y
-          }
-          average += val.y;
+        workerData.slice(1).forEach(function (val) {
+          max = Math.max(val, max);
+          min = Math.min(val, min)
+          average += val;
         });
-        average = average / values.length;
-
-        series.push({
-          values: values,
-          key: AVAILABLE_TYPES[self.type].label,
-          color: '#0B7FAD'
-        });
+        average = average / (workerData.length - 1);
         self.min(min + '%');
         self.max(max + '%');
         self.average(Math.round(average) + '%');
-        self.datum(series);
+        self.chartData(charData);
       };
 
       ko.components.register('performance-graph', {
