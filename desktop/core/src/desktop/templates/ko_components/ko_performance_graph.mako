@@ -103,6 +103,11 @@ from django.utils.translation import ugettext as _
                 'worker 3': '#1C749B'
               }
             },
+            grid: {
+              y: {
+                lines: [{ value: 80, text: '${ _("Auto resize") }' }]
+              }
+            },
             axis: {
               y: {
                 default: [0, 100],
@@ -122,8 +127,7 @@ from django.utils.translation import ugettext as _
               r: 1.5
             },
             zoom: {
-              enabled: true,
-              type: 'drag'
+              enabled: true
             }
           });
 
@@ -136,9 +140,8 @@ from django.utils.translation import ugettext as _
         var chartData = generateFakeData(0, 100);
         var max = 0, min = 0, average = 0;
         chartData.slice(1).forEach(function (val) {
-
           max = Math.max(val[1], val[2], val[3], max);
-          max = Math.min(val[1], val[2], val[3], min);
+          min = Math.min(val[1], val[2], val[3], min);
           average += (val[1] + val[2] + val[3]) / 3;
         });
         average = average / (chartData.length - 1);
