@@ -1490,6 +1490,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <!-- ko if: widgetType() != 'resultset-widget' -->
             <input type="hidden" name="facet" data-bind="value: ko.mapping.toJSON($data)">
           <!-- /ko -->
+          % if conf.ENABLE_DOWNLOAD.get():
           <div class="dropdown">
             <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
               <i class="fa fa-download fa-fw"></i>
@@ -1517,6 +1518,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               ##</li>
             </ul>
           </div>
+          % endif
         </form>
         <!-- /ko -->
 
