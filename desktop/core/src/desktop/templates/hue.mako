@@ -976,19 +976,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (self.currentContextParams() !== null) {
               if (loadDeep && self.currentContextParams()[0]) {
                 baseURL += self.currentContextParams()[0];
-              }
-              else {
+              } else {
                 var route = new page.Route(baseURL);
                 route.keys.forEach(function (key) {
                   if (key.name === 0) {
                     if (typeof self.currentContextParams()[key.name] !== 'undefined') {
-                      baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
-                    }
-                    else {
+                      if (app === 'filebrowser') {
+                        baseURL = baseURL.replace('*', self.currentContextParams()[key.name]).replace(/#/g, '%23');
+                      } else {
+                        baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                      }
+                    } else {
                       baseURL = baseURL.replace('*', '');
                     }
-                  }
-                  else {
+                  } else {
                     baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
                   }
                 });
