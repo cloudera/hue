@@ -824,6 +824,11 @@ from desktop.views import _ko
             positionStatement: ko.observable({
               location: { first_line: 1, last_line: 1, first_column: 0, last_column: editor.getValue().length }
             }),
+            whenContextSet: function() {
+              var promise = $.Deferred().resolve().promise();
+              promise.dispose = function () {};
+              return promise;
+            },
             isSqlDialect: ko.observable(true),
             aceCursorPosition: ko.observable(),
             inFocus: ko.observable()
