@@ -21,16 +21,21 @@ from django.utils.translation import ugettext as _
 
 <%def name="performanceGraph()">
 
+  <script type="text/html" id="performance-graph-stats">
+    <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Min") } <span style="font-weight: 300;" data-bind="text: min"></span></div>
+    <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Max") } <span style="font-weight: 300;" data-bind="text: max"></span></div>
+    <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Avg") } <span style="font-weight: 300; margin-right: 10px" data-bind="text: average"></span></div>
+  </script>
+
   <script type="text/html" id="performance-graph-d3-template">
     <div data-bind="attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></div>
   </script>
 
   <script type="text/html" id="performance-graph-template">
     <div class="performance-graph" style="position: relative">
-      <h3 data-bind="text: header"></h3>
-      <div style="position: absolute; right: 20px; top: 3px;">
-        ${ _("Min") } <span style="font-weight: 300; margin-right: 10px" data-bind="text: min"></span> ${ _("Max") } <span style="font-weight: 300; margin-right: 10px" data-bind="text: max"></span> ${ _("Average") } <span style="font-weight: 300; margin-right: 10px" data-bind="text: average"></span>
-      </div>
+      <h3>${ _('Resources') }</h3>
+      <div style="font-size: 12px; position: absolute; right: 0; top: 0;" data-bind="template: { name: 'performance-graph-stats', data: cpuStats }"></div>
+      <div style="font-size: 12px; position: absolute; right: 0; top: 14px;" data-bind="template: { name: 'performance-graph-stats', data: memoryStats }"></div>
       <!-- ko template: { name: 'performance-graph-d3-template', afterRender: graphContainerRendered } --><!-- /ko -->
     </div>
   </script>
@@ -39,28 +44,40 @@ from django.utils.translation import ugettext as _
 
 
     (function () {
-      var generateFakeData = function (min, max) {
+      var generateFakeData = function () {
         var entries = 100;
         var timeDiff = 300000; // 5 minutes
         var startTime = Date.now() - entries * timeDiff;
-        var result = [['time', 'worker 1', 'worker 2', 'worker 3']];
+        var result = [['time', 'cpu', 'memory']];
 
-        var lastVal1 = min;
-        var lastVal2 = min;
-        var lastVal3 = min;
+        var lastCpuVal = 0;
+        var lastMemVal = 0;
         for (var i = 0; i < 100; i++) {
-          lastVal1 = Math.round(Math.max(Math.min(lastVal1 + (Math.random() - 0.5) * 20, max), min));
-          lastVal2 = Math.round(Math.max(Math.min(lastVal2 + (Math.random() - 0.5) * 20, max), min));
-          lastVal3 = Math.round(Math.max(Math.min(lastVal3 + (Math.random() - 0.5) * 20, max), min));
-          result.push([startTime + timeDiff * i, lastVal1, lastVal2, lastVal3]);
+          lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal + (Math.random() - 0.5) * 20, 100), 0));
+          lastMemVal = Math.round(Math.max(Math.min(lastMemVal + (Math.random() - 0.5) * 20, 100), 0)); // Percentage of total mem
+          result.push([startTime + timeDiff * i, lastCpuVal, lastMemVal]);
         }
         return result;
       };
 
       var AVAILABLE_TYPES = {
         'cpu': {
-          header: '${ _("CPU") }'
+          header: '${ _("CPU") }',
+          color: '#29A7DE'
+        },
+        'memory': {
+          header: '${ _("Memory") }',
+          color: '#5D8A8A'
         }
+      };
+
+      function bytesToSize(bytes) {
+        var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) {
+          return '0 B';
+        }
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
       };
 
       /**
@@ -73,14 +90,14 @@ from django.utils.translation import ugettext as _
         self.id = UUID();
         self.type = params.type;
         self.header = AVAILABLE_TYPES[self.type].header;
-        self.graphHeight = 300;
+        self.graphHeight = 500;
         self.graphWidth = 750;
-        self.graphPadding = { top: 15, right: 30, bottom: 20, left: 30 };
+        self.graphPadding = { top: 15, right: 50, bottom: 20, left: 40 };
 
-        self.average = ko.observable('-');
-        self.max = ko.observable('-');
-        self.min = ko.observable('-');
+        self.cpuStats = ko.observable({ average: '-', min: '-', max: '-', color: AVAILABLE_TYPES.cpu.color });
+        self.memoryStats = ko.observable({ average: '-', min: '-', max: '-', color: AVAILABLE_TYPES.memory.color });
         self.chartData = ko.observable();
+        self.memoryLimit = 64 * 1024 * 1024 * 1024; // 64GB should be fetched from API
 
         self.fetchData();
 
@@ -98,14 +115,34 @@ from django.utils.translation import ugettext as _
               x: 'time',
               rows: self.chartData(),
               colors: {
-                'worker 1': '#29A7DE',
-                'worker 2': '#B0BEC5',
-                'worker 3': '#1C749B'
+                'cpu': AVAILABLE_TYPES.cpu.color,
+                'memory': AVAILABLE_TYPES.memory.color
+              },
+              names: {
+                cpu: AVAILABLE_TYPES.cpu.header,
+                memory: AVAILABLE_TYPES.memory.header
               }
+            },
+            tooltip: {
+              format: {
+                value: function (value, ratio, id, index) {
+                  if (id === 'cpu') {
+                    return value + '%';
+                  }
+                  if (id === 'memory') {
+                    return bytesToSize(self.memoryLimit * value / 100);
+                  }
+                  return value;
+                }
+              }
+            },
+            axes: {
+              'cpu': 'y',
+              'memory': 'y2'
             },
             grid: {
               y: {
-                lines: [{ value: 80, text: '${ _("Auto resize") }' }]
+                lines: [{ value: 80, text: '${ _("Auto resize") }', position: 'start' }]
               }
             },
             axis: {
@@ -113,7 +150,22 @@ from django.utils.translation import ugettext as _
                 default: [0, 100],
                 min: 0,
                 max: 100,
-                padding: { top: 0, bottom: 0 }
+                padding: { top: 0, bottom: 0 },
+                tick: {
+                  format: function (value) { return value + '%' }
+                }
+              },
+              y2: {
+                default: [0, 100],
+                min: 0,
+                max: 100,
+                show: true,
+                padding: { top: 0, bottom: 0},
+                tick: {
+                  format: function (value) {
+                    return bytesToSize(self.memoryLimit * value / 100);
+                  }
+                }
               },
               x: {
                 type: 'timeseries',
@@ -128,6 +180,9 @@ from django.utils.translation import ugettext as _
             },
             zoom: {
               enabled: true
+            },
+            subchart: {
+              show: true
             }
           });
 
@@ -137,17 +192,28 @@ from django.utils.translation import ugettext as _
       PerformanceGraph.prototype.fetchData = function () {
         var self = this;
 
-        var chartData = generateFakeData(0, 100);
-        var max = 0, min = 0, average = 0;
+        var chartData = generateFakeData();
+        var cpuStats = { average: 0, min: 0, max: 0, color: AVAILABLE_TYPES.cpu.color };
+        var memoryStats = { average: 0, min: 0, max: 0, color: AVAILABLE_TYPES.memory.color };
         chartData.slice(1).forEach(function (val) {
-          max = Math.max(val[1], val[2], val[3], max);
-          min = Math.min(val[1], val[2], val[3], min);
-          average += (val[1] + val[2] + val[3]) / 3;
+          cpuStats.max = Math.max(val[1], cpuStats.max);
+          cpuStats.min = Math.min(val[1], cpuStats.min);
+          cpuStats.average += val[1];
+          memoryStats.max = Math.max(val[2], memoryStats.max);
+          memoryStats.min = Math.min(val[2], memoryStats.min);
+          memoryStats.average += val[2];
         });
-        average = average / (chartData.length - 1);
-        self.min(min + '%');
-        self.max(max + '%');
-        self.average(Math.round(average) + '%');
+        cpuStats.average = cpuStats.average / (chartData.length - 1);
+        memoryStats.average = memoryStats.average / (chartData.length - 1);
+
+        cpuStats.average += '%';
+        cpuStats.min += '%';
+        cpuStats.max += '%';
+        memoryStats.average = bytesToSize(self.memoryLimit * memoryStats.average / 100);
+        memoryStats.min = bytesToSize(self.memoryLimit * memoryStats.min / 100);
+        memoryStats.max = bytesToSize(self.memoryLimit * memoryStats.max / 100);
+        self.cpuStats(cpuStats);
+        self.memoryStats(memoryStats);
         self.chartData(chartData);
       };
 
