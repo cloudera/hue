@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,17 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
 
-from beeswax.urls import urlpatterns as beeswax_urls
-from impala import api as impala_api
+ifeq ($(ROOT),)
+  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
+endif
 
-urlpatterns = [
-  url(r'^api/invalidate$', impala_api.invalidate, name='invalidate'),
-  url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', impala_api.refresh_table, name='refresh_table'),
-  url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', impala_api.get_exec_summary, name='get_exec_summary'),
-  url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', impala_api.get_runtime_profile, name='get_runtime_profile'),
-  url(r'^api/query/alanize', impala_api.alanize, name='alanize'),
-]
+include $(ROOT)/Makefile.sdk
 
-urlpatterns += beeswax_urls
+default::
+	@echo '  env-install    : Install into virtual-env'
+
+#
+# env-install
+#   Install app into the virtual environment.
+#
+.PHONY: env-install
+env-install: compile ext-env-install
+	@echo '--- Installing $(APP_NAME) into virtual-env'
+	@$(ENV_PYTHON) setup.py develop -N -q

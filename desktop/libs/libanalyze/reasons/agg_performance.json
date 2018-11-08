@@ -1,0 +1,12 @@
+{
+  "type": "SQLOperator",
+  "node_name": "AGGREGATION_NODE",
+  "metric_names": [
+    "LocalTime"
+  ],
+  "rule": {
+    "expr": "vars['LocalTime'] - float(vars['InputRows']) / 0.01",
+    "message": "Excess time (over expected time) spent in the aggregate; might be caused by complex group by",
+    "label": "Slow Aggregate"
+  }
+}

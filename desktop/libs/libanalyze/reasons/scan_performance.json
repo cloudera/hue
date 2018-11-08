@@ -1,0 +1,15 @@
+{
+  "type": "SQLOperator",
+  "node_name": "HDFS_SCAN_NODE",
+  "metric_names": [
+    "RowsRead",
+    "ScannerThreadsUserTime",
+    "ScannerThreadsSysTime",
+    "AverageScannerThreadConcurrency"
+  ],
+  "rule": {
+    "expr": "(vars['ScannerThreadsUserTime'] + vars['ScannerThreadsSysTime'] - vars['RowsRead'] * 100) / max(1,vars['AverageScannerThreadConcurrency'])",
+    "message": "Predicates might be expensive (expectes speed 10m rows per sec per core)",
+    "label": "Slow HDFS Scan"
+  }
+}

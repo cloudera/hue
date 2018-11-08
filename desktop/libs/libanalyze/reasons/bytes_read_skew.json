@@ -1,0 +1,19 @@
+{
+  "type": "SQLOperator",
+  "node_name": "HDFS_SCAN_NODE",
+  "metric_names": [
+    "BytesRead"
+  ],
+  "exprs": [
+    "max",
+    "avg"
+  ],
+  "unit_id": 0,
+  "rule": {
+    "condition": "vars['IOBound']==True",
+    "expr": "(vars['max'] - vars['avg']) / 100000000 / 5",
+    "message": "Addition IO time cost by the skew (assuming 5 disks)",
+    "label": "Bytes Read Skew",
+    "prio": 2
+  }
+}

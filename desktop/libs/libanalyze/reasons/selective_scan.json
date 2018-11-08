@@ -1,0 +1,15 @@
+{
+  "type": "SQLOperator",
+  "node_name": "HDFS_SCAN_NODE",
+  "metric_names": [
+    "RowsRead",
+    "RowsReturned",
+    "LocalTime"
+  ],
+  "rule": {
+    "condition": "vars['RowsRead']>8000000",
+    "expr": "float(vars['RowsRead'] - vars['RowsReturned']) / vars['LocalTime']",
+    "message": "Filters are selective. Consider a more aggresive partitioning scheme",
+    "label": "Insufficient Partitioning"
+  }
+}

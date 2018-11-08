@@ -1,0 +1,16 @@
+{
+  "type": "SQLOperator",
+  "node_name": "HdfsTableSink",
+  "collapse": true,
+  "metric_names": [
+    "BytesWritten",
+    "LocalTime"
+  ],
+  "unit_id": 5,
+  "rule": {
+    "condition": "vars['BytesWritten'] > 0",
+    "expr": "float(vars['LocalTime']) - 0.01 / float(vars['BytesWritten'])",
+    "message": "Write speed should be at least 1MB/sec. It's slower than expected",
+    "label": "Slow write speed"
+  }
+}

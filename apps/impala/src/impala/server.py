@@ -281,3 +281,25 @@ class ImpalaDaemonApi(object):
         return resp
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_finstances did not return valid JSON: %s' % e)
+
+  def get_query_summary(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_summary', params=params)
+    try:
+      if isinstance(resp, basestring):
+        return json.loads(resp)
+      else:
+        return resp
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_summary did not return valid JSON: %s' % e)
+
+  def get_query_profile_encoded(self, query_id):
+    params = {
+      'query_id': query_id
+    }
+
+    return self._root.get('query_profile_encoded', params=params)

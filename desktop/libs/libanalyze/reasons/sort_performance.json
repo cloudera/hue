@@ -1,0 +1,12 @@
+{
+  "type": "SQLOperator",
+  "node_name": "SORT_NODE",
+  "metric_names": [
+    "LocalTime"
+  ],
+  "rule": {
+    "expr": "vars['LocalTime'] - float(vars['InputRows']) / 0.01",
+    "message": "Excess time (over expected time) spent in the sort; might be caused by too many sorting column",
+    "label": "Slow Sorting"
+  }
+}
