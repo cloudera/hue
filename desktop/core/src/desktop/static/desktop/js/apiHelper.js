@@ -543,7 +543,7 @@ var ApiHelper = (function () {
     if (clonedPath.length && clonedPath[0] === '/') {
       clonedPath.shift();
     }
-    url += clonedPath.join('/').replace(/#/, '%23') + '?compression=none&mode=text';
+    url += clonedPath.join('/').replace(/#/g, '%23') + '?compression=none&mode=text';
     url += '&offset=' + (options.offset || 0);
     url += '&length=' + (options.length || 118784);
 
