@@ -1,0 +1,16 @@
+{
+  "type": "SQLOperator",
+  "node_name": "HDFS_SCAN_NODE",
+  "collapse": true,
+  "metric_names": [
+    "NumColumns",
+    "LocalTime"
+  ],
+  "unit_id": 5,
+  "rule": {
+    "condition": "vars['NumColumns'] > 15",
+    "expr": "float(vars['NumColumns'] - 15) / float(vars['NumColumns']) * vars['LocalTime']",
+    "message": "Number of materialized columns is high (>15). Consider materializing less columns to improve the performance.",
+    "label": "Many Materialized Columns"
+  }
+}

@@ -44,6 +44,7 @@ APPS := core \
 	libs/azure \
 	libs/hadoop \
 	libs/indexer \
+	libs/libanalyze \
 	libs/liboauth \
 	libs/liboozie \
 	libs/libopenid \

@@ -14,18 +14,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+def expr_min(data):
+    result = (data[0], 0)
+    for i, v in enumerate(data):
+        if v < result[0]:
+            result = (v, i)
+    return result
 
-from django.conf.urls import url
 
-from beeswax.urls import urlpatterns as beeswax_urls
-from impala import api as impala_api
+def expr_max(data):
+    result = (data[0], 0)
+    for i, v in enumerate(data):
+        if v > result[0]:
+            result = (v, i)
+    return result
 
-urlpatterns = [
-  url(r'^api/invalidate$', impala_api.invalidate, name='invalidate'),
-  url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', impala_api.refresh_table, name='refresh_table'),
-  url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', impala_api.get_exec_summary, name='get_exec_summary'),
-  url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', impala_api.get_runtime_profile, name='get_runtime_profile'),
-  url(r'^api/query/alanize', impala_api.alanize, name='alanize'),
-]
 
-urlpatterns += beeswax_urls
+def expr_avg(data):
+    return (sum(data) / float(len(data)), None)
+
+
+def expr_sum(data):
+    return (sum(data), None)
+
+
+class Expr:
+
+    @classmethod
+    def evaluate(self, expr, vars):
+        return eval(compile(expr, "<string>", "eval"), vars)

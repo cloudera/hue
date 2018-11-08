@@ -1,0 +1,16 @@
+{
+  "type": "SQLOperator",
+  "node_name": "HDFS_SCAN_NODE",
+  "metric_names": [
+    "AverageScannerThreadConcurrency",
+    "LocalTime"
+  ],
+  "unit_id": 0,
+  "rule": {
+    "condition": "vars['IOBound']==False",
+    "expr": "(8 - vars['AverageScannerThreadConcurrency']) / 8 * vars['LocalTime']",
+    "message": "Speed can be improved by that much if there's 8 scanner threads",
+    "label": "Lack of scanner thread parallelism",
+    "prio": 2
+  }
+}

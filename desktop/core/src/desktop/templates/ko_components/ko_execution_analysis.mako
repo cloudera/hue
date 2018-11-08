@@ -25,14 +25,8 @@ from desktop.views import _ko
 %>
 
 <%def name="executionAnalysis()">
-  <script type="text/html" id="health-check-details-content">
-    <div data-bind="text: description"></div>
-  </script>
-
-  <script type="text/html" id="health-check-details-title">
-    <span data-bind="text: name"></span>
-  </script>
-
+  <script src="${ static('desktop/ext/js/d3-tip.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/sprintf.min.js') }"></script>
   <script type="text/html" id="hue-execution-analysis-template">
     <div class="hue-execution-analysis">
       <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
@@ -46,11 +40,34 @@ from desktop.views import _ko
         <div class="no-analysis">${ _('Analysis was not possible for the executed query.') }</div>
         <!-- /ko -->
         <!-- ko with: analysis -->
-        <ul class="risk-list" data-bind="foreach: healthChecks">
-          <li data-bind="templatePopover : { placement: 'right', contentTemplate: 'health-check-details-content', titleTemplate: 'health-check-details-title', minWidth: '320px', trigger: 'hover' }">
-            <div class="risk-list-title risk-list-normal"><span data-bind="text: name"></span></div>
-          </li>
-        </ul>
+        <div>
+          <h4>${_('Heatmap')}</h4>
+          <div>
+              <select data-bind="options: heatmapMetrics, event: { change: $parent.heatmapMetricChanged.bind($parent) }"></select>
+              <svg class="heatmap"/>
+          </div>
+        </div>
+        <div>
+          <h4>${_('Summary')}</h4>
+          <ul class="risk-list" data-bind="foreach: summary" style="margin-bottom: 10px">
+            <li>
+              <span data-bind="text: key"></span>: <strong><span data-bind="numberFormat: { value: value, unit: unit }"></strong></span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4>${_('Top down analysis')}</h4>
+          <ul class="risk-list" data-bind="foreach: healthChecks">
+            <li>
+              <div><span data-bind="text: contribution_factor_str"></span> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
+              <ul class="risk-list" data-bind="foreach: reason">
+                <li>
+                  <span data-bind="text: message"></span><strong> - <span data-bind="duration: impact"></span></strong>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
         <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -65,6 +82,14 @@ from desktop.views import _ko
         self.loading = ko.observable(false);
         self.analysis = ko.observable();
         self.analysisPossible = ko.observable(true);
+        self.analysisCount = ko.pureComputed(function () {
+          if (!self.analysis()) {
+            return '';
+          }
+          return '(' + self.analysis().healthChecks.reduce(function (count, check) {
+            return count + check.reason.length;
+          }, 0) + ')';
+        });
 
         self.lastAnalysisPromise = undefined;
 
@@ -76,6 +101,9 @@ from desktop.views import _ko
             self.lastAnalysisPromise.cancel();
           }
           self.analysis(undefined);
+          $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
+          $(".d3-tip");
+          d3.select(".heatmap").remove();
         });
 
         var executionAnalysisSub = huePubSub.subscribe('editor.update.execution.analysis', function (details) {
@@ -95,7 +123,10 @@ from desktop.views import _ko
           executionAnalysisSub.remove();
         });
       };
-
+      ExecutionAnalysis.prototype.heatmapMetricChanged = function (model, el) {
+        var self = this;
+        self.updateHeatMap(self.analysis()['heatmap'][el.target.value], el.target.value);
+      };
       ExecutionAnalysis.prototype.loadAnalysis = function (compute, queryId) {
         var self = this;
         self.loading(true);
@@ -104,11 +135,72 @@ from desktop.views import _ko
           compute: compute,
           queryId: queryId
         }).done(function (response) {
-          self.analysis(response.query)
+          self.analysis(response.query);
+          $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
+          setTimeout(function () { // Wait for analysis to render
+            self.updateHeatMap(response.query['heatmap'][response.query.heatmapMetrics[0]], response.query.heatmapMetrics[0]);
+          }, 0);
         }).always(function () {
           self.loading(false);
         });
       };
+
+      ExecutionAnalysis.prototype.updateHeatMap = function(data, counterName) {
+        // Heatmap block and gap sizes
+        var blockWidth = 40;
+        var blockGap = 5;
+
+        // Create tooltip
+        var d3 = window.d3v3;
+        $(".d3-tip").remove();
+        var tip = d3.d3tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+            var host = d[0];
+            if (host.indexOf(":") >= 0) {
+                host = host.substring(0, host.indexOf(":"));
+            }
+            var value = d[2];
+            var formattedValue = String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return "<strong style='color:cyan'>" + host + "</strong><br><strong>" + counterName + ":</strong> <span style='color:red'>" + formattedValue + "</span>";
+          });
+        d3.select(".heatmap").call(tip);
+
+        // Color gradient
+        var colors = ['#f6faaa', '#9E0142'];
+        var colorScale = d3.scale.linear()
+            .domain([0, 1])
+            .interpolate(d3.interpolateHsl)
+            .range(colors);
+
+        // Define map dimensions
+        var svgWidth = $(".heatmap").width();
+        var cols = Math.trunc(svgWidth / (blockWidth + blockGap));
+        $(".heatmap").height((Math.trunc((data.data.length - 1) / cols) + 1) * (blockWidth + blockGap));
+
+        // Attribute functions
+        var x = function(d, i) { return (i % cols) * (blockWidth + blockGap) + 1; };
+        var y = function(d, i) { return Math.trunc(i / cols) * (blockWidth + blockGap) + 1; };
+        var c = function(d, i) { return colorScale(d[3]); };
+
+        d3.select(".heatmap").selectAll(".box")
+            .data([])
+          .exit()
+            .remove();
+        d3.select(".heatmap").selectAll(".box")
+            .data(data.data)
+          .enter()
+            .append("rect")
+            .attr("class", "box")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("height", blockWidth)
+            .attr("width", blockWidth)
+            .attr("fill", c)
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide);
+      }
 
       ExecutionAnalysis.prototype.dispose = function () {
         var self = this;

@@ -2041,7 +2041,8 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchQueryExecutionAnalysis = function (options)  {
     var self = this;
-    var url = '/metadata/api/workload_analytics/get_impala_query/';
+    //var url = '/metadata/api/workload_analytics/get_impala_query/';
+    var url = '/impala/api/query/alanize';
     var deferred = $.Deferred();
 
     var tries = 0;

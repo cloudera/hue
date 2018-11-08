@@ -161,6 +161,9 @@ class QueryApi(Api):
     else:
       return self._query(appid)
 
+  def profile_encoded(self, appid):
+    return self.api.get_query_profile_encoded(query_id=appid)
+
   def _memory(self, appid, app_type, app_property, app_filters):
     return self.api.get_query_memory(query_id=appid);
 
