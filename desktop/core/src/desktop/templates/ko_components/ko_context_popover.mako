@@ -397,7 +397,7 @@ from metadata.conf import has_navigator
             <!-- /ko -->
 
             <!-- ko if: $parent.viewSqlVisible -->
-            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, formatted: true, dialect: getSourceType() }"></div>
+            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getSourceType() }"></div>
             <!-- /ko -->
             <!-- ko ifnot: $parent.viewSqlVisible -->
             <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry, onSampleClick: $parent.onSampleClick } } --><!-- /ko -->
