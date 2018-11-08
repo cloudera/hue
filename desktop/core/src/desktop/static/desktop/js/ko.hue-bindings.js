@@ -6906,7 +6906,14 @@
             res.push('<div class="ace_line ' + additionalClass + '">' + renderedTokens.join('') + '&nbsp;</div>');
           });
 
-          element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
+          element.innerHTML = '<div class="ace_editor ace-hue"' +
+            (options.enableOverflow ? ' style="overflow: initial !important;"' : '') +
+            '><div class="ace_layer" style="position: static;' +
+            (options.enableOverflow ? ' overflow: initial !important;' : '') +
+            '">' + res.join('') + '</div></div>';
+          if (options.enableOverflow) {
+            $(element).css({ 'overflow': 'auto' });
+          }
           $(element).find('.ace_invisible_space').remove();
         });
       }
