@@ -223,7 +223,6 @@ for app in appmanager.DESKTOP_MODULES:
       app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include(app.urls, **namespace)))
       app.urls_imported = True
 
-static_patterns = []
 static_patterns.append(
     url(r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
       serve,
