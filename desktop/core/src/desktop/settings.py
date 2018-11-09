@@ -234,6 +234,7 @@ TEMPLATES = [
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [
       get_desktop_root("core/templates/debug_toolbar"),
+      get_desktop_root("core/templates/djangosaml2"),
     ],
     'NAME': 'django',
     'APP_DIRS': True,
