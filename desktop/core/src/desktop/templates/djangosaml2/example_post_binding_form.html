@@ -1,0 +1,15 @@
+<script type="text/javascript">
+	window.onload = function(){
+		document.SSO_Login.submit();
+	};
+</script>
+<p>
+You're being redirected to a SSO login page.
+Please click the button below if you're not redirected automatically within a few seconds.
+</p>
+<form method="post" action="{{ target_url }}" name="SSO_Login">
+	{% for key, value in params.items %}
+	    <input type="hidden" name="{{ key|safe }}" value="{{ value|safe }}" />
+	{% endfor %}
+    <input type="submit" value="Log in" />
+</form>
