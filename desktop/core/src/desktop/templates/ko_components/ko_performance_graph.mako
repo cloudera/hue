@@ -69,16 +69,13 @@ from django.utils.translation import ugettext as _
         return result;
       };
 
-      var AVAILABLE_TYPES = {
-        'cpu': {
-          header: '${ _("CPU") }',
-          color: '#29A7DE'
-        },
-        'memory': {
-          header: '${ _("Memory") }',
-          color: '#5D8A8A'
-        }
-      };
+      var AVAILABLE_TYPES = [{
+        label: '${ _("CPU") }',
+        color: '#29A7DE'
+      }, {
+        label: '${ _("Memory") }',
+        color: '#5D8A8A'
+      }];
 
       function bytesToSize(bytes) {
         var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -98,13 +95,11 @@ from django.utils.translation import ugettext as _
         var self = this;
         self.id = UUID();
         self.type = params.type;
-        self.header = AVAILABLE_TYPES[self.type].header;
         self.graphHeight = 500;
         self.graphWidth = 750;
-        self.graphPadding = { top: 15, right: 50, bottom: 20, left: 40 };
 
-        self.cpuStats = ko.observable({ average: '-', min: '-', max: '-', color: AVAILABLE_TYPES.cpu.color });
-        self.memoryStats = ko.observable({ average: '-', min: '-', max: '-', color: AVAILABLE_TYPES.memory.color });
+        self.cpuStats = ko.observable({ average: '-', min: '-', max: '-', color: AVAILABLE_TYPES[0].color });
+        self.memoryStats = ko.observable({ average: '-', min: '-', max: '-', color: AVAILABLE_TYPES[1].color });
         self.chartData = ko.observable();
         self.memoryLimit = 64 * 1024 * 1024 * 1024; // 64GB should be fetched from API
 
@@ -113,8 +108,12 @@ from django.utils.translation import ugettext as _
         self.graphContainerRendered = function (domTree) {
           var graphElement = domTree[1];
 
-          var mainMargin = { top: 10, right: 10, left: 70, bottom: 140 };
-          var subMargin = { top: 400, right: 10, bottom: 40, left: 70 };
+          var maxQueryCount = 20;
+
+          var subTop = self.graphHeight - 100;
+
+          var mainMargin = { top: 10, right: 70, left: 70, bottom: self.graphHeight - subTop + 40 };
+          var subMargin = { top: subTop, right: 70, bottom: 40, left: 70 };
           var height = self.graphHeight - mainMargin.top - mainMargin.bottom;
           var subHeight = self.graphHeight - subMargin.top - subMargin.bottom;
           var width = self.graphWidth - mainMargin.left - mainMargin.right;
@@ -128,32 +127,36 @@ from django.utils.translation import ugettext as _
           var mainXScale = d3.scaleTime().range([0, width]);
 
           var mainXAxis = d3.axisBottom(mainXScale);
-          var mainYAxis = d3.axisLeft(mainYScale);
+          var mainYAxis = d3.axisLeft(mainYScale).tickFormat(function (y) {
+            return Math.round(maxQueryCount * y / 100);
+          });
+
+          var secondaryYAxis = d3.axisRight(mainYScale).tickFormat(function (y) {
+            return y + '%';
+          });
 
           var subXAxis = d3.axisBottom(subXScale);
           ##  var subYAxis = d3.axisLeft(subYScale).ticks(2);
 
-          var mainLine = d3.line()
-            .curve(d3.curveMonotoneX)
-            .x(function (d) {
-              return mainXScale(d[0])
-            })
-            .y(function (d) {
-              return mainYScale(d[1])
-            });
+          var graphCount = 2;
 
-          var subLine = d3.line()
-            .curve(d3.curveMonotoneX)
-            .x(function (d) {
-              return subXScale(d[0])
-            })
-            .y(function (d) {
-              return subYScale(d[1])
-            });
+          var mainLines = [];
+          var subLines = [];
 
-          var svg = d3.select(graphElement).append('svg')
-            .attr('width', self.graphWidth)
-            .attr('height', self.graphHeight);
+          for (var i = 0; i < graphCount; i++) {
+            mainLines.push(d3.line().curve(d3.curveMonotoneX).x(function (d) {
+              return mainXScale(d[0]);
+            }).y(function (d) {
+              return mainYScale(d[this])
+            }.bind(i + 1)));
+            subLines.push(d3.line().curve(d3.curveMonotoneX).x(function (d) {
+              return subXScale(d[0]);
+            }).y(function (d) {
+              return subYScale(d[this])
+            }.bind(i + 1)));
+          }
+
+          var svg = d3.select(graphElement).append('svg').attr('width', self.graphWidth).attr('height', self.graphHeight);
 
           svg.append('defs')
             .append('clipPath')
@@ -178,7 +181,9 @@ from django.utils.translation import ugettext as _
               }
               var s = d3.event.selection || subXScale.range();
               mainXScale.domain(s.map(subXScale.invert, subXScale));
-              main.select('.line').attr('d', mainLine);
+              for (var i = 0; i < mainLines.length; i++) {
+                main.select('.line-' + i).attr('d', mainLines[i]);
+              }
               main.select('.axis--x').call(mainXAxis);
               svg.select('.zoom').call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
             });
@@ -193,7 +198,9 @@ from django.utils.translation import ugettext as _
               }
               var t = d3.event.transform;
               mainXScale.domain(t.rescaleX(subXScale).domain());
-              main.select('.line').attr('d', mainLine);
+              for (var i = 0; i < mainLines.length; i++) {
+                main.select('.line-' + i).attr('d', mainLines[i]);
+              }
               main.select('.axis--x').call(mainXAxis);
               sub.select('.brush').call(brush.move, mainXScale.range().map(t.invertX, t));
             });
@@ -201,18 +208,10 @@ from django.utils.translation import ugettext as _
           var drawGraphs = function () {
             var data = self.chartData().slice(1);
 
-            // Handle Data
             mainXScale.domain([data[0][0], data[data.length - 1][0]]);
             mainYScale.domain([0, 100]);
             subXScale.domain(mainXScale.domain());
             subYScale.domain(mainYScale.domain());
-
-            main.append('path')
-              .datum(data)
-              .attr('stroke', function (d,i) { return 'blue' })
-              .attr('fill', 'none')
-              .classed('line', true)
-              .attr('d', mainLine);
 
             main.append('g')
               .attr('class', 'axis axis--x')
@@ -223,12 +222,10 @@ from django.utils.translation import ugettext as _
               .attr('class', 'axis axis--y')
               .call(mainYAxis);
 
-            sub.append('path')
-              .datum(data)
-              .attr('stroke', function (d,i) { return 'green' })
-              .attr('fill', 'none')
-              .classed('line', true)
-              .attr('d', subLine);
+            main.append('g')
+              .attr('class', 'axis axis--y')
+              .attr("transform", "translate(" + width + " ,0)")
+              .call(secondaryYAxis);
 
             sub.append('g')
               .attr('class', 'axis axis--x')
@@ -238,9 +235,7 @@ from django.utils.translation import ugettext as _
             sub.append('g')
               .attr('class', 'brush')
               .call(brush)
-              .call(brush.move, mainXScale.range())
-              .attr('y', -6)
-              .attr('height', subHeight + 7);
+              .call(brush.move, mainXScale.range());
 
             svg.append('rect')
               .attr('class', 'zoom')
@@ -249,6 +244,21 @@ from django.utils.translation import ugettext as _
               .attr('height', mainHeight)
               .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')')
               .call(zoom);
+
+            for (var i = 0; i < graphCount; i++) {
+              main.append('path')
+                .datum(data)
+                .attr('stroke', function (d, j) { return AVAILABLE_TYPES[i].color })
+                .attr('fill', 'none')
+                .classed('line line-' + i, true)
+                .attr('d', mainLines[i]);
+              sub.append('path')
+                .datum(data)
+                .attr('stroke', function (d, j) { return AVAILABLE_TYPES[i].color })
+                .attr('fill', 'none')
+                .classed('line-' + i, true)
+                .attr('d', subLines[i]);
+            }
           };
 
           drawGraphs();
@@ -259,8 +269,8 @@ from django.utils.translation import ugettext as _
         var self = this;
 
         var chartData = generateFakeData();
-        var cpuStats = { average: 0, min: 0, max: 0, color: AVAILABLE_TYPES.cpu.color };
-        var memoryStats = { average: 0, min: 0, max: 0, color: AVAILABLE_TYPES.memory.color };
+        var cpuStats = { average: 0, min: 0, max: 0, color: AVAILABLE_TYPES[0].color };
+        var memoryStats = { average: 0, min: 0, max: 0, color: AVAILABLE_TYPES[1].color };
         chartData.slice(1).forEach(function (val) {
           cpuStats.max = Math.max(val[1], cpuStats.max);
           cpuStats.min = Math.min(val[1], cpuStats.min);
