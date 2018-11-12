@@ -21,6 +21,15 @@ from django.utils.translation import ugettext as _
 
 <%def name="performanceGraph()">
 
+  <style>
+
+    ## TODO: proper clip in d3
+    .line {
+      clip-path: url(#clip);
+    }
+
+  </style>
+
   <script type="text/html" id="performance-graph-stats">
     <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Min") } <span style="font-weight: 300;" data-bind="text: min"></span></div>
     <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Max") } <span style="font-weight: 300;" data-bind="text: max"></span></div>
@@ -104,88 +113,145 @@ from django.utils.translation import ugettext as _
         self.graphContainerRendered = function (domTree) {
           var graphElement = domTree[1];
 
-          c3.generate({
-            bindto: graphElement,
-            size: {
-              height: self.graphHeight,
-              width: self.graphWidth
-            },
-            padding: self.graphPadding,
-            data: {
-              x: 'time',
-              rows: self.chartData(),
-              colors: {
-                'cpu': AVAILABLE_TYPES.cpu.color,
-                'memory': AVAILABLE_TYPES.memory.color
-              },
-              names: {
-                cpu: AVAILABLE_TYPES.cpu.header,
-                memory: AVAILABLE_TYPES.memory.header
-              }
-            },
-            tooltip: {
-              format: {
-                value: function (value, ratio, id, index) {
-                  if (id === 'cpu') {
-                    return value + '%';
-                  }
-                  if (id === 'memory') {
-                    return bytesToSize(self.memoryLimit * value / 100);
-                  }
-                  return value;
-                }
-              }
-            },
-            axes: {
-              'cpu': 'y',
-              'memory': 'y2'
-            },
-            grid: {
-              y: {
-                lines: [{ value: 80, text: '${ _("Auto resize") }', position: 'start' }]
-              }
-            },
-            axis: {
-              y: {
-                default: [0, 100],
-                min: 0,
-                max: 100,
-                padding: { top: 0, bottom: 0 },
-                tick: {
-                  format: function (value) { return value + '%' }
-                }
-              },
-              y2: {
-                default: [0, 100],
-                min: 0,
-                max: 100,
-                show: true,
-                padding: { top: 0, bottom: 0},
-                tick: {
-                  format: function (value) {
-                    return bytesToSize(self.memoryLimit * value / 100);
-                  }
-                }
-              },
-              x: {
-                type: 'timeseries',
-                tick: {
-                  format: '%H:%M:%S',
-                  count: 9
-                }
-              }
-            },
-            point: {
-              r: 1.5
-            },
-            zoom: {
-              enabled: true
-            },
-            subchart: {
-              show: true
-            }
-          });
+          var mainMargin = { top: 10, right: 10, left: 70, bottom: 140 };
+          var subMargin = { top: 400, right: 10, bottom: 40, left: 70 };
+          var height = self.graphHeight - mainMargin.top - mainMargin.bottom;
+          var subHeight = self.graphHeight - subMargin.top - subMargin.bottom;
+          var width = self.graphWidth - mainMargin.left - mainMargin.right;
 
+          var mainHeight = self.graphHeight - mainMargin.top - mainMargin.bottom;
+          var mainYScale = d3.scaleLinear().range([mainHeight, 0]);
+
+          var subXScale = d3.scaleTime().range([0, width]);
+          var subYScale = d3.scaleLinear().range([subHeight, 0]);
+
+          var mainXScale = d3.scaleTime().range([0, width]);
+
+          var mainXAxis = d3.axisBottom(mainXScale);
+          var mainYAxis = d3.axisLeft(mainYScale);
+
+          var subXAxis = d3.axisBottom(subXScale);
+          ##  var subYAxis = d3.axisLeft(subYScale).ticks(2);
+
+          var mainLine = d3.line()
+            .curve(d3.curveMonotoneX)
+            .x(function (d) {
+              return mainXScale(d[0])
+            })
+            .y(function (d) {
+              return mainYScale(d[1])
+            });
+
+          var subLine = d3.line()
+            .curve(d3.curveMonotoneX)
+            .x(function (d) {
+              return subXScale(d[0])
+            })
+            .y(function (d) {
+              return subYScale(d[1])
+            });
+
+          var svg = d3.select(graphElement).append('svg')
+            .attr('width', self.graphWidth)
+            .attr('height', self.graphHeight);
+
+          svg.append('defs')
+            .append('clipPath')
+            .attr('id', 'clip')
+            .append('rect')
+            .attr('width', width)
+            .attr('height', mainHeight);
+
+          var main = svg.append('g')
+            .attr('class', 'focus')
+            .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')');
+
+          var sub = svg.append('g')
+            .attr('class', 'context')
+            .attr('transform', 'translate(' + subMargin.left + ',' + subMargin.top + ')');
+
+          var brush = d3.brushX()
+            .extent([[0, 0], [width, subHeight]])
+            .on('brush end', function () {
+              if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') {
+                return;
+              }
+              var s = d3.event.selection || subXScale.range();
+              mainXScale.domain(s.map(subXScale.invert, subXScale));
+              main.select('.line').attr('d', mainLine);
+              main.select('.axis--x').call(mainXAxis);
+              svg.select('.zoom').call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
+            });
+
+          var zoom = d3.zoom()
+            .scaleExtent([1, Infinity])
+            .translateExtent([[0, 0], [width, mainHeight]])
+            .extent([[0, 0], [width, mainHeight]])
+            .on('zoom', function () {
+              if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
+                return;
+              }
+              var t = d3.event.transform;
+              mainXScale.domain(t.rescaleX(subXScale).domain());
+              main.select('.line').attr('d', mainLine);
+              main.select('.axis--x').call(mainXAxis);
+              sub.select('.brush').call(brush.move, mainXScale.range().map(t.invertX, t));
+            });
+
+          var drawGraphs = function () {
+            var data = self.chartData().slice(1);
+
+            // Handle Data
+            mainXScale.domain([data[0][0], data[data.length - 1][0]]);
+            mainYScale.domain([0, 100]);
+            subXScale.domain(mainXScale.domain());
+            subYScale.domain(mainYScale.domain());
+
+            main.append('path')
+              .datum(data)
+              .attr('stroke', function (d,i) { return 'blue' })
+              .attr('fill', 'none')
+              .classed('line', true)
+              .attr('d', mainLine);
+
+            main.append('g')
+              .attr('class', 'axis axis--x')
+              .attr('transform', 'translate(0,' + height + ')')
+              .call(mainXAxis);
+
+            main.append('g')
+              .attr('class', 'axis axis--y')
+              .call(mainYAxis);
+
+            sub.append('path')
+              .datum(data)
+              .attr('stroke', function (d,i) { return 'green' })
+              .attr('fill', 'none')
+              .classed('line', true)
+              .attr('d', subLine);
+
+            sub.append('g')
+              .attr('class', 'axis axis--x')
+              .attr('transform', 'translate(0,' + subHeight + ')')
+              .call(subXAxis);
+
+            sub.append('g')
+              .attr('class', 'brush')
+              .call(brush)
+              .call(brush.move, mainXScale.range())
+              .attr('y', -6)
+              .attr('height', subHeight + 7);
+
+            svg.append('rect')
+              .attr('class', 'zoom')
+              .attr('fill', 'none')
+              .attr('width', width)
+              .attr('height', mainHeight)
+              .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')')
+              .call(zoom);
+          };
+
+          drawGraphs();
         }
       }
 
