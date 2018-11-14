@@ -590,15 +590,23 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
                 milliseconds = 60000
             }'''
   elif file_format['inputFormat'] == 'connector':
-    # sfdc
-    properties = {
-      'streamSelection': file_format['streamSelection'],
-      'streamUsername': file_format['streamUsername'],
-      'streamPassword': file_format['streamPassword'],
-      'streamToken': file_format['streamToken'],
-      'streamEndpointUrl': file_format['streamEndpointUrl'],
-      'streamObject': file_format['streamObject'],
-    }
+    if file_format['streamSelection'] == 'flume':
+      properties = {
+        'streamSelection': file_format['streamSelection'],
+        'channelSourceHosts': file_format['channelSourceHosts'],
+        'channelSourceSelectedHosts': file_format['channelSourceSelectedHosts'],
+        'channelSourcePath': file_format['channelSourcePath'],
+      }
+    else:
+      # sfdc
+      properties = {
+        'streamSelection': file_format['streamSelection'],
+        'streamUsername': file_format['streamUsername'],
+        'streamPassword': file_format['streamPassword'],
+        'streamToken': file_format['streamToken'],
+        'streamEndpointUrl': file_format['streamEndpointUrl'],
+        'streamObject': file_format['streamObject'],
+      }
 
   if destination['outputFormat'] == 'table':
     if destination['isTargetExisting']: # Todo: check if format matches
