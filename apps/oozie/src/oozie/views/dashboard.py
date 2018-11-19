@@ -1198,7 +1198,7 @@ def has_job_edition_permission(oozie_job, user):
 	  return True
   else:
 	  user_groups = user.groups.values_list()
-	  oozie_job_group = oozie_job.group.split(",")
+	  oozie_job_group = [x.strip() for x in oozie_job.group.split(",")]
 	  for user_group in user_groups:
   	    group_name = user_group[1]
 	    if oozie_job.group and group_name in oozie_job_group:
