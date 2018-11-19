@@ -959,27 +959,29 @@ var EditorViewModel = (function() {
           self.execute(true); // Execute next, need to wait as we disabled fast click
         }, 1000);
       }
-      var match = self.statement().match(/(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i);
-      var path = [];
-      if (match) {
-        path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-      } else {
-        match = self.statement().match(/(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i);
+      if (self.lastExecutedStatement() && /CREATE|DROP/i.test(self.lastExecutedStatement().firstToken)) {
+        var match = self.statement().match(/(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i);
+        var path = [];
         if (match) {
           path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-        } else if (self.database()) {
-          path.push(self.database());
+        } else {
+          match = self.statement().match(/(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i);
+          if (match) {
+            path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+          } else if (self.database()) {
+            path.push(self.database());
+          }
         }
-      }
 
-      if (path.length) {
-        window.clearTimeout(refreshTimeouts[path.join('.')]);
-        refreshTimeouts[path.join('.')] = window.setTimeout(function () {
-          ignoreNextAssistDatabaseUpdate = true;
-          DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: path }).done(function (entry) {
-            entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
-          });
-        }, 5000);
+        if (path.length) {
+          window.clearTimeout(refreshTimeouts[path.join('.')]);
+          refreshTimeouts[path.join('.')] = window.setTimeout(function () {
+            ignoreNextAssistDatabaseUpdate = true;
+            DataCatalog.getEntry({ sourceType: self.type(), namespace: self.namespace(), compute: self.compute(), path: path }).done(function (entry) {
+              entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+            });
+          }, 5000);
+        }
       }
     };
 
@@ -1981,7 +1983,7 @@ var EditorViewModel = (function() {
     };
 
     self.checkDdlNotification = function() {
-      if (self.lastExecutedStatement() && /CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
+      if (self.lastExecutedStatement() && /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(self.lastExecutedStatement().firstToken)) {
         self.onDdlExecute();
       }
     };
