@@ -930,6 +930,56 @@ var ApiHelper = (function () {
 
   /**
    * @param {Object} options
+   * @param {Number} options.startTime -- Time in ms
+   * @param {Number} [options.endTime] -- Time in ms
+   * @param {Number} [options.points]
+   *
+   * @param {ContextCompute} [options.computes] -- Or similar. Add when API is in place
+   *
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchResourceStats = function (options) {
+    // TODO: Switch to real API
+
+    var data = [];
+    var currentMax = 100;
+    var currentMin = 50;
+
+    var addFakeMeasurement = function (data, time) {
+      var lastCpuVal = (currentMax - currentMin) / 2;
+      var lastMemVal = (currentMax - currentMin) / 2;
+      var lastIO = (currentMax - currentMin) / 2;
+      var lastQueryCount = (currentMax - currentMin) / 20;
+
+      var newQueryCount = Math.round(Math.max(Math.min(lastQueryCount + (Math.random() - 0.5) * 10, 25), 0));
+      var diff = newQueryCount - lastQueryCount;
+      if (diff > 0) {
+        lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
+        lastMemVal = Math.round(Math.max(Math.min(lastMemVal + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
+        lastIO = Math.round(Math.max(Math.min(lastIO + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
+      } else {
+        lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
+        lastMemVal = Math.round(Math.max(Math.min(lastMemVal - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
+        lastIO = Math.round(Math.max(Math.min(lastIO - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
+      }
+      data.push([time, lastCpuVal, lastMemVal, lastIO, newQueryCount]);
+    };
+
+    var generateFakeData = function (data, startTime, endTime, points) {
+      var diff = endTime - startTime;
+
+      for (var i = 1; i <= points; i++) {
+        addFakeMeasurement(data, startTime + i * diff / points )
+      }
+    };
+
+    generateFakeData(data, options.startTime, options.endTime, options.points)
+
+    return $.Deferred().resolve(data).promise();
+  };
+
+  /**
+   * @param {Object} options
    * @param {Function} [options.successCallback]
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
