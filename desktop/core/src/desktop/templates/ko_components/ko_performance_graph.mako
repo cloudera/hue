@@ -15,63 +15,36 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import _ko
-from django.utils.translation import ugettext as _
+  from desktop.views import _ko
+  from django.utils.translation import ugettext as _
 %>
 
 <%def name="performanceGraph()">
 
   <script type="text/html" id="performance-graph-stats">
-    <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Min") } <span style="font-weight: 300;" data-bind="text: min"></span></div>
-    <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Max") } <span style="font-weight: 300;" data-bind="text: max"></span></div>
-    <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Avg") } <span style="font-weight: 300; margin-right: 10px" data-bind="text: average"></span></div>
+##     <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Min") } <span style="font-weight: 300;" data-bind="text: min"></span></div>
+##     <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Max") } <span style="font-weight: 300;" data-bind="text: max"></span></div>
+##     <div style="width: 70px; display:inline-block" data-bind="style: { color: color }">${ _("Avg") } <span style="font-weight: 300; margin-right: 10px" data-bind="text: average"></span></div>
   </script>
 
   <script type="text/html" id="performance-graph-d3-template">
-    <div data-bind="attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></div>
+    <div style="position:relative;"
+         data-bind="attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></div>
   </script>
 
   <script type="text/html" id="performance-graph-template">
     <div class="performance-graph" style="position: relative">
       <h3>${ _('Resources') }</h3>
-      <div style="font-size: 12px; position: absolute; right: 0; top: 0;" data-bind="template: { name: 'performance-graph-stats', data: cpuStats }"></div>
-      <div style="font-size: 12px; position: absolute; right: 0; top: 14px;" data-bind="template: { name: 'performance-graph-stats', data: memoryStats }"></div>
+      <div style="font-size: 12px; position: absolute; right: 0; top: 0;"
+           data-bind="template: { name: 'performance-graph-stats', data: cpuStats }"></div>
+      <div style="font-size: 12px; position: absolute; right: 0; top: 14px;"
+           data-bind="template: { name: 'performance-graph-stats', data: memoryStats }"></div>
       <!-- ko template: { name: 'performance-graph-d3-template', afterRender: graphContainerRendered } --><!-- /ko -->
     </div>
   </script>
 
   <script type="text/javascript">
-
-
     (function () {
-
-      var addFakeMeasurement = function (data, time) {
-        var lastCpuVal = data.length ? data[data.length - 1][1] : 0;
-        var lastMemVal = data.length ? data[data.length - 1][2] : 0;
-        var lastQueryCount = data.length ? data[data.length - 1][3] : 0;
-        var lastIO = data.length ? data[data.length - 1][3] : 0;
-
-        var newQueryCount = Math.round(Math.max(Math.min(lastQueryCount + (Math.random() - 0.5) * 15, 25), 0));
-        var diff = newQueryCount - lastQueryCount;
-        if (diff > 0) {
-          lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal + Math.random() * 20, 100), 0));
-          lastMemVal = Math.round(Math.max(Math.min(lastMemVal + Math.random() * 20, 100), 0));
-          lastIO = Math.round(Math.max(Math.min(lastIO + Math.random() * 20, 100), 0));
-        } else {
-          lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal - Math.random() * 20, 100), 0));
-          lastMemVal = Math.round(Math.max(Math.min(lastMemVal - Math.random() * 20, 100), 0));
-          lastIO = Math.round(Math.max(Math.min(lastIO - Math.random() * 20, 100), 0));
-        }
-        data.push([time, lastCpuVal, lastMemVal, lastIO, lastQueryCount]);
-      };
-
-      var generateFakeData = function (data, timeOffset, points) {
-        var startTime = Date.now() - timeOffset;
-
-        for (var i = 0; i < points; i++) {
-          addFakeMeasurement(data, startTime + i * timeOffset/points )
-        }
-      };
 
       function bytesToSize(bytes) {
         var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -92,191 +65,327 @@ from django.utils.translation import ugettext as _
         self.id = UUID();
         self.type = params.type;
         self.graphHeight = 500;
-        self.graphWidth = 750;
+        self.graphWidth = 1000;
 
         self.data = [];
-        self.series = [{
-          label: '${ _("CPU") }',
-          color: '#29A7DE',
-          enabled: true
-        }, {
-          label: '${ _("Memory") }',
-          color: '#ACA0A4',
-          enabled: true
-        }, {
-          label: '${ _("IO") }',
-          color: '#E4689A',
-          enabled: true
-        }, {
-          label: '${ _("Queries") }',
-          color: '#EBA81A',
-          enabled: true
-        }];
 
-        self.cpuStats = ko.observable({ average: '-', min: '-', max: '-', color: self.series[0].color });
-        self.memoryStats = ko.observable({ average: '-', min: '-', max: '-', color: self.series[1].color });
+        self.cpuStats = ko.observable({average: '-', min: '-', max: '-', color: 'blue'});
+        self.memoryStats = ko.observable({average: '-', min: '-', max: '-', color: 'gray'});
         self.memoryLimit = 64 * 1024 * 1024 * 1024; // 64GB should be fetched from API
 
-        self.fetchData(300000, 100);
-
         self.graphContainerRendered = function (domTree) {
-          var graphElement = domTree[1];
+          ApiHelper.getInstance().fetchResourceStats({
+            startTime: Date.now() - 100000,
+            endTime: Date.now(),
+            points: 100
+          }).done(function (data) {
+            self.data = data;
 
-          var maxQueryCount = 20;
+            var graphElement = domTree[1];
 
-          var subTop = self.graphHeight - 150;
-          var legendTop = self.graphHeight - 50;
+            var subTop = self.graphHeight - 150;
+            var legendTop = self.graphHeight - 50;
 
-          var mainMargin = { top: 10, right: 70, left: 70, bottom: self.graphHeight - subTop + 40 };
-          var subMargin = { top: subTop, right: 70, bottom: 40, left: 70 };
-          var legendMargin = { top: legendTop, right: 70, bottom: 10, left: 70 };
+            var mainMargin = {top: 10, right: 70, left: 70, bottom: self.graphHeight - subTop + 40};
+            var subMargin = {top: subTop, right: 70, bottom: 40, left: 70};
+            var legendMargin = {top: legendTop, right: 70, bottom: 10, left: 70};
 
-          var width = self.graphWidth - mainMargin.left - mainMargin.right;
+            var width = self.graphWidth - mainMargin.left - mainMargin.right;
 
-          var mainHeight = self.graphHeight - mainMargin.top - mainMargin.bottom;
-          var mainYScale = d3.scaleLinear().range([mainHeight, 0]);
+            var mainHeight = self.graphHeight - mainMargin.top - mainMargin.bottom;
+            var queryYScale = d3.scaleLinear().range([mainHeight, 0]);
+            var percentageYScale = d3.scaleLinear().range([mainHeight, 0]);
 
-          var subHeight = self.graphHeight - subMargin.top - subMargin.bottom - 50;
+            var subHeight = self.graphHeight - subMargin.top - subMargin.bottom - 50;
 
-          var legendHeight = self.graphHeight - legendMargin.top - legendMargin.bottom;
-          var subXScale = d3.scaleTime().range([0, width]);
-          var subYScale = d3.scaleLinear().range([subHeight, 0]);
+            var legendHeight = self.graphHeight - legendMargin.top - legendMargin.bottom;
+            var subXScale = d3.scaleTime().range([0, width]);
+            var subPercentageYScale = d3.scaleLinear().range([subHeight, 0]);
+            var subQueryYScale = d3.scaleLinear().range([subHeight, 0]);
 
-          var mainXScale = d3.scaleTime().range([0, width]);
+            var mainXScale = d3.scaleTime().range([0, width]);
 
-          var mainXAxis = d3.axisBottom(mainXScale);
-          var mainYAxis = d3.axisLeft(mainYScale).tickFormat(function (y) {
-            return Math.round(maxQueryCount * y / 100);
-          });
+            var mainXAxis = d3.axisBottom(mainXScale);
 
-          var secondaryYAxis = d3.axisRight(mainYScale).tickFormat(function (y) {
-            return y + '%';
-          });
-
-          var subXAxis = d3.axisBottom(subXScale);
-
-          var dateBisector = d3.bisector(function(d) { return d[0]; }).left;
-
-          var graphCount = 2;
-
-          var mainLines = [];
-          var subLines = [];
-
-          var toggleSeries = function (i) {
-            self.series[i].enabled = !self.series[i].enabled;
-            svg.selectAll('.line-' + i).style('display', self.series[i].enabled ? null : 'none');
-            svg.selectAll('.line-circle-' + i).style('display', self.series[i].enabled ? null : 'none');
-            svg.select('.legend-circle-' + i).attr('fill-opacity', self.series[i].enabled ? 1 : 0.2);
-          };
-
-          for (var i = 0; i < graphCount; i++) {
-            mainLines.push(d3.line().curve(d3.curveMonotoneX).x(function (d) {
-              return mainXScale(d[0]);
-            }).y(function (d) {
-              return mainYScale(d[this])
-            }.bind(i + 1)));
-            subLines.push(d3.line().curve(d3.curveMonotoneX).x(function (d) {
-              return subXScale(d[0]);
-            }).y(function (d) {
-              return subYScale(d[this])
-            }.bind(i + 1)));
-          }
-
-          var svg = d3.select(graphElement).append('svg').attr('width', self.graphWidth).attr('height', self.graphHeight);
-
-          svg.append('defs')
-                  .append('clipPath')
-                  .attr('id', 'clip')
-                  .append('rect')
-                  .attr('width', width)
-                  .attr('height', mainHeight);
-
-          var main = svg.append('g')
-                  .attr('class', 'focus')
-                  .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')');
-
-          var sub = svg.append('g')
-                  .attr('class', 'context')
-                  .attr('transform', 'translate(' + subMargin.left + ',' + subMargin.top + ')');
-
-          var legend = svg.append('g')
-                  .attr('class', 'context')
-                  .attr('transform', 'translate(' + legendMargin.left + ',' + legendMargin.top + ')');
-
-          var nextSeriesX = 5;
-          for (var i = 0; i < graphCount; i++) {
-            var legendSerie = legend.append('g')
-              .on('click', function(d, j) {
-                toggleSeries(this);
-              }.bind(i))
-              .on('mouseover', function(d, j) {
-
-              })
-              .on('mouseout', function(d, j) {
-
-              });
-            legendSerie.append('circle')
-                    .attr('class', 'legend-circle-' + i)
-                    .style('fill', function(d, j) { return self.series[i].color })
-                    .style('stroke', function(d, j) { return self.series[i].color  })
-                    .attr('r', 5);
-            legendSerie.append('text')
-                    .text(self.series[i].label)
-                    .attr('text-anchor', 'start')
-                    .attr('dy', '.32em')
-                    .attr('dx', '8');
-
-            legendSerie.attr('transform', function(d, j) {
-              var length = d3.select(this).select('text').node().getComputedTextLength() + 28;
-              var xpos = nextSeriesX;
-              nextSeriesX += length;
-              return 'translate(' + xpos + ',' + 5 + ')'
+            var queryYAxis = d3.axisLeft(queryYScale);
+            var percentageYAxis = d3.axisRight(percentageYScale).tickFormat(function (y) {
+              return y + '%';
             });
-          }
 
-          var brush = d3.brushX()
-                  .extent([[0, 0], [width, subHeight]])
-                  .on('brush end', function () {
-                    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') {
-                      return;
-                    }
-                    var s = d3.event.selection || subXScale.range();
-                    mainXScale.domain(s.map(subXScale.invert, subXScale));
-                    for (var i = 0; i < mainLines.length; i++) {
-                      main.select('.line-' + i).attr('d', mainLines[i]);
-                      main.selectAll('.line-circle-' + i)
-                              .attr("cx", function(d) { return mainXScale(d[0]); })
-                              .attr("cy", function(d) { return mainYScale(d[i + 1]); });
-                    }
-                    main.select('.axis--x').call(mainXAxis);
-                    svg.select('.zoom').call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
-                  });
+            var subXAxis = d3.axisBottom(subXScale);
 
-          var zoom = d3.zoom()
-                  .scaleExtent([1, Infinity])
-                  .translateExtent([[0, 0], [width, mainHeight]])
-                  .extent([[0, 0], [width, mainHeight]])
-                  .on('zoom', function () {
-                    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
-                      return;
-                    }
-                    var t = d3.event.transform;
-                    mainXScale.domain(t.rescaleX(subXScale).domain());
-                    for (var i = 0; i < mainLines.length; i++) {
-                      main.select('.line-' + i).attr('d', mainLines[i]);
-                      main.selectAll('.line-circle-' + i)
-                              .attr("cx", function(d) { return mainXScale(d[0]); })
-                              .attr("cy", function(d) { return mainYScale(d[i + 1]); });
-                    }
-                    main.select('.axis--x').call(mainXAxis);
-                    sub.select('.brush').call(brush.move, mainXScale.range().map(t.invertX, t));
-                  });
+            ##  var tip = d3.select(graphElement).append('div').attr('class', 'graph-tip').style('opacity', 0).style('position', 'absolute');
 
-          var drawGraphs = function () {
+            var series = [{
+              label: '${ _("Queries") }',
+              color: '#BEE4F5',
+              enabled: true,
+              line: d3.area().curve(d3.curveStep).x(function (d) {
+                return mainXScale(d[0])
+              }).y0(mainHeight).y1(function (d) {
+                return queryYScale(d[4])
+              }),
+              subLine: d3.area().curve(d3.curveStep).x(function (d) {
+                return subXScale(d[0])
+              }).y0(subHeight).y1(function (d) {
+                return subQueryYScale(d[4])
+              }),
+              fill: '#BEE4F5',
+              showDot: false,
+              dataIndex: 4,
+              lineYScale: queryYScale,
+              subLineYScale: subQueryYScale
+            }, {
+              label: '${ _("CPU") }',
+              color: '#7B46AD',
+              enabled: window.cpuEnabled || false,
+              line: d3.line().curve(d3.curveMonotoneX).x(function (d) {
+                return mainXScale(d[0])
+              }).y(function (d) {
+                return percentageYScale(d[1])
+              }),
+              subLine: d3.line().curve(d3.curveMonotoneX).x(function (d) {
+                return subXScale(d[0])
+              }).y(function (d) {
+                return subPercentageYScale(d[1])
+              }),
+              fill: 'none',
+              showDot: true,
+              dataIndex: 1,
+              lineYScale: percentageYScale,
+              subLineYScale: subPercentageYScale
+            }, {
+              label: '${ _("Memory") }',
+              color: '#00B9AA',
+              enabled: window.memEnabled || false,
+              line: d3.line().curve(d3.curveMonotoneX).x(function (d) {
+                return mainXScale(d[0])
+              }).y(function (d) {
+                return percentageYScale(d[2])
+              }),
+              subLine: d3.line().curve(d3.curveMonotoneX).x(function (d) {
+                return subXScale(d[0])
+              }).y(function (d) {
+                return subPercentageYScale(d[2])
+              }),
+              fill: 'none',
+              showDot: true,
+              dataIndex: 2,
+              lineYScale: percentageYScale,
+              subLineYScale: subPercentageYScale
+            }, {
+              label: '${ _("IO") }',
+              color: '#1C749B',
+              enabled: window.ioEnabled || false,
+              line: d3.line().curve(d3.curveMonotoneX).x(function (d) {
+                return mainXScale(d[0])
+              }).y(function (d) {
+                return percentageYScale(d[3])
+              }),
+              subLine: d3.line().curve(d3.curveMonotoneX).x(function (d) {
+                return subXScale(d[0])
+              }).y(function (d) {
+                return subPercentageYScale(d[3])
+              }),
+              fill: 'none',
+              showDot: true,
+              dataIndex: 3,
+              lineYScale: percentageYScale,
+              subLineYScale: subPercentageYScale
+            }];
+
+            var dateBisector = d3.bisector(function (d) {
+              return d[0];
+            }).left;
+
+            var toggleSeries = function (serie) {
+              serie.enabled = !serie.enabled;
+              if (serie.dataIndex === 3) {
+                window.ioEnabled = serie.enabled;
+              } else if (serie.dataIndex === 2) {
+                window.memEnabled = serie.enabled;
+              } else if (serie.dataIndex === 1) {
+                window.cpuEnabled = serie.enabled;
+              }
+              svg.selectAll('.line-' + serie.dataIndex).style('display', serie.enabled ? null : 'none');
+              svg.selectAll('.line-circle-' + serie.dataIndex).style('display', serie.enabled ? null : 'none');
+              svg.select('.legend-circle-' + serie.dataIndex).attr('fill-opacity', serie.enabled ? 1 : 0.2);
+            };
+
+            var svg = d3.select(graphElement).append('svg').attr('width', self.graphWidth).attr('height', self.graphHeight);
+
+            svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip')
+                    .append('rect')
+                    .attr('width', width)
+                    .attr('height', mainHeight);
+
+            var main = svg.append('g')
+                    .attr('class', 'focus')
+                    .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')');
+
+            var sub = svg.append('g')
+                    .attr('class', 'context')
+                    .attr('transform', 'translate(' + subMargin.left + ',' + subMargin.top + ')');
+
+            var legend = svg.append('g')
+                    .attr('class', 'context')
+                    .attr('transform', 'translate(' + legendMargin.left + ',' + legendMargin.top + ')');
+
+            var nextSeriesX = 5;
+
+            series.forEach(function (serie) {
+              var legendSerie = legend.append('g')
+                      .on('click', function (d, j) {
+                        toggleSeries(serie);
+                      })
+                      .on('mouseover', function (d, j) {
+
+                      })
+                      .on('mouseout', function (d, j) {
+
+                      });
+
+              legendSerie.append('circle')
+                      .attr('class', 'legend-circle-' + serie.dataIndex)
+                      .attr('fill-opacity', serie.enabled ? 1 : 0.2)
+                      .style('fill', function (d, j) {
+                        return serie.color
+                      })
+                      .style('stroke', function (d, j) {
+                        return serie.color
+                      })
+                      .attr('r', 5);
+
+              legendSerie.append('text')
+                      .text(serie.label)
+                      .attr('text-anchor', 'start')
+                      .attr('dy', '.32em')
+                      .attr('dx', '8');
+
+              legendSerie.attr('transform', function (d, j) {
+                var length = d3.select(this).select('text').node().getComputedTextLength() + 28;
+                var xpos = nextSeriesX;
+                nextSeriesX += length;
+                return 'translate(' + xpos + ',' + 5 + ')'
+              });
+            });
+
+            var brush = d3.brushX()
+                    .extent([[0, 0], [width, subHeight]])
+                    .on('brush end', function () {
+                      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') {
+                        return;
+                      }
+                      var s = d3.event.selection || subXScale.range();
+                      mainXScale.domain(s.map(subXScale.invert, subXScale));
+                      series.forEach(function (serie) {
+                        main.select('.line-' + serie.dataIndex).attr('d', serie.line);
+                        main.selectAll('.line-circle-' + serie.dataIndex)
+                                .attr("cx", function (d) {
+                                  return mainXScale(d[0]);
+                                })
+                                .attr("cy", function (d) {
+                                  return serie.lineYScale(d[serie.dataIndex]);
+                                })
+                      });
+                      main.select('.axis--x').call(mainXAxis);
+                      svg.select('.zoom').call(zoom.transform, d3.zoomIdentity.scale(width / (s[1] - s[0])).translate(-s[0], 0));
+                    });
+
+            var zoom = d3.zoom()
+                    .scaleExtent([1, Infinity])
+                    .translateExtent([[0, 0], [width, mainHeight]])
+                    .extent([[0, 0], [width, mainHeight]])
+                    .on('zoom', function () {
+                      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
+                        return;
+                      }
+                      var t = d3.event.transform;
+                      mainXScale.domain(t.rescaleX(subXScale).domain());
+                      series.forEach(function (serie) {
+                        main.select('.line-' + serie.dataIndex).attr('d', serie.line);
+                        main.selectAll('.line-circle-' + serie.dataIndex)
+                                .attr("cx", function (d) {
+                                  return mainXScale(d[0]);
+                                })
+                                .attr("cy", function (d) {
+                                  return serie.lineYScale(d[serie.dataIndex]);
+                                })
+                      });
+                      main.select('.axis--x').call(mainXAxis);
+                      sub.select('.brush').call(brush.move, mainXScale.range().map(t.invertX, t));
+                    });
+
             mainXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
-            mainYScale.domain([0, 100]);
+            percentageYScale.domain([0, 100]);
+            var queryMax = 15;
+            self.data.forEach(function (row) {
+              if (row[4] > queryMax) {
+                queryMax = row[4];
+              }
+            });
+            queryYScale.domain([0, queryMax + 2]);
+
             subXScale.domain(mainXScale.domain());
-            subYScale.domain(mainYScale.domain());
+            subPercentageYScale.domain(percentageYScale.domain());
+            subQueryYScale.domain(queryYScale.domain());
+
+            series.forEach(function (serie) {
+
+              main.append('path')
+                      .datum(self.data)
+                      .attr('stroke', function (d, j) {
+                        return serie.color
+                      })
+                      .attr('fill', serie.fill)
+                      .style('display', serie.enabled ? null : 'none')
+                      .attr("clip-path", "url(#clip)")
+                      .classed('line line-' + serie.dataIndex, true)
+                      .attr('d', serie.line);
+
+              if (serie.showDot) {
+                main.selectAll(".line-circle-" + serie.dataIndex)
+                        .data(self.data)
+                        .enter()
+                        .append("circle")
+                        .style('display', serie.enabled ? null : 'none')
+                        .attr('fill', function (d, j) {
+                          return serie.color
+                        })
+                        .attr("clip-path", "url(#clip)")
+                        .attr("class", "line-circle-" + serie.dataIndex)
+                        .attr("r", 1.5)
+                        .attr("cx", function (d) {
+                          return mainXScale(d[0]);
+                        })
+                        .attr("cy", function (d) {
+                          return serie.lineYScale(d[serie.dataIndex]);
+                        });
+              }
+
+              sub.append('path')
+                      .datum(self.data)
+                      .style('display', serie.enabled ? null : 'none')
+                      .attr('stroke', function (d, j) {
+                        return serie.color
+                      })
+                      .attr('fill', serie.fill)
+                      .classed('line line-' + serie.dataIndex, true)
+                      .attr('d', serie.subLine);
+
+              var focus = svg.append("g")
+                      .attr("class", "point-focus point-focus-" + serie.dataIndex)
+                      .attr('fill', 'none')
+                      .attr('stroke', function (d, j) {
+                        return serie.color
+                      })
+                      .style("display", "none");
+
+              focus.append("circle")
+                      .attr("r", 5);
+            });
 
             main.append('g')
                     .attr('class', 'axis axis--x')
@@ -285,12 +394,12 @@ from django.utils.translation import ugettext as _
 
             main.append('g')
                     .attr('class', 'axis axis--y')
-                    .call(mainYAxis);
+                    .call(queryYAxis);
 
             main.append('g')
                     .attr('class', 'axis axis--y')
                     .attr("transform", "translate(" + width + " ,0)")
-                    .call(secondaryYAxis);
+                    .call(percentageYAxis);
 
             sub.append('g')
                     .attr('class', 'axis axis--x')
@@ -310,43 +419,30 @@ from django.utils.translation import ugettext as _
                     .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')')
                     .call(zoom);
 
-            for (var i = 0; i < graphCount; i++) {
-              main.append('path')
-                      .datum(self.data)
-                      .attr('stroke', function (d, j) { return self.series[i].color })
-                      .attr('fill', 'none')
-                      .attr("clip-path", "url(#clip)")
-                      .classed('line line-' + i, true)
-                      .attr('d', mainLines[i]);
+            var lastMouseCoord = [0, 0];
+            var lastFocusX = 0;
 
-              main.selectAll("line-circle-" + i)
-                      .data(self.data)
-                      .enter()
-                      .append("circle")
-                      .attr('stroke', function (d, j) { return 'white'; })
-                      .attr('fill', function (d, j) { return self.series[i].color })
-                      .attr("clip-path", "url(#clip)")
-                      .attr("class", "line-circle-" + i)
-                      .attr("r", 1.5)
-                      .attr("cx", function(d) { return mainXScale(d[0]); })
-                      .attr("cy", function(d) { return mainYScale(d[i + 1]); });
+            var pointFocus = function (mouseCoord, focusX) {
+              var x = focusX;
+              var j = dateBisector(self.data, x, 1);
+              var d0 = self.data[j - 1];
+              var d1 = self.data[j];
+              var closest = x - d0 > d1 - x ? d1 : d0;
 
-              sub.append('path')
-                      .datum(self.data)
-                      .attr('stroke', function (d, j) { return self.series[i].color })
-                      .attr('fill', 'none')
-                      .classed('line line-' + i, true)
-                      .attr('d', subLines[i]);
-
-              var focus = svg.append("g")
-                      .attr("class", "point-focus point-focus-" + i)
-                      .attr('fill', 'none')
-                      .attr('stroke', function (d, j) { return self.series[i].color })
-                      .style("display", "none");
-
-              focus.append("circle")
-                      .attr("r", 5);
-            }
+              var showTip = false;
+              series.forEach(function (serie) {
+                if (serie.enabled) {
+                  var point = svg.select('.point-focus-' + serie.dataIndex);
+                  point.attr("transform", "translate(" + (mainXScale(closest[0]) + mainMargin.left) + "," + (serie.lineYScale(closest[serie.dataIndex]) + mainMargin.top) + ")");
+                  if (point.style('display') !== 'none') {
+                    showTip = true;
+                  }
+                }
+              });
+              if (showTip) {
+                // TODO: show the tip
+              }
+            };
 
             // Hover overlay
             svg.append("rect")
@@ -356,93 +452,96 @@ from django.utils.translation import ugettext as _
                     .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')')
                     .attr("width", width)
                     .attr("height", mainHeight)
-                    .on("mouseover", function() {
-                      for (var i = 0; i < graphCount; i++) {
-                        if (self.series[i].enabled) {
-                          svg.select('.point-focus-' + i).style("display", null);
+                    .on("mouseover", function () {
+                      series.forEach(function (serie) {
+                        if (serie.enabled) {
+                          svg.select('.point-focus-' + serie.dataIndex).style("display", null);
+                          svg.select('.focus-tip').style("display", null);
                         }
-                      }
+                      });
                     })
-                    .on("mouseout", function() {
+                    .on("mouseout", function () {
                       svg.selectAll('.point-focus').style("display", "none");
+                      svg.select('.focus-tip').style("display", 'none');
                     })
                     .on("mousemove", function () {
-                              var x = mainXScale.invert(d3.mouse(this)[0]);
-                              var j = dateBisector(self.data, x, 1);
-                              var d0 = self.data[j-1];
-                              var d1 = self.data[j];
-                              var closest = x - d0 > d1 - x ? d1 : d0;
-                              for (var i = 0; i < graphCount; i++) {
-                                if (self.series[i].enabled) {
-                                  svg.select('.point-focus-' + i).attr("transform", "translate(" + (mainXScale(closest[0]) + mainMargin.left) + "," + (mainYScale(closest[i + 1]) + mainMargin.top) + ")");
-                                }
-                              }
-                            }
-                    );
-          };
+                      lastMouseCoord = d3.mouse(this);
+                      lastFocusX = mainXScale.invert(lastMouseCoord[0]);
+                      pointFocus(lastMouseCoord, lastFocusX);
+                    });
 
-          drawGraphs();
+            var appendInterval = 1000;
+            var appendPoints = 1;
 
-          var fakeAppend = function () {
-            var currentDomain = mainXScale.domain();
-            var currentSubDomain = subXScale.domain();
-            addFakeMeasurement(self.data, Date.now());
-            var mainStart = currentDomain[0].getTime() !== currentSubDomain[0].getTime() ? currentDomain[0] : self.data[0][0];
-            var mainEnd = currentDomain[1].getTime() !== currentSubDomain[1].getTime() ? currentDomain[1] : self.data[self.data.length - 1][0];
-            mainXScale.domain([mainStart, mainEnd]);
-            subXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
+            var appendData = function () {
+              var currentDomain = mainXScale.domain();
+              var currentSubDomain = subXScale.domain();
 
+              ApiHelper.getInstance().fetchResourceStats({
+                startTime: self.data[self.data.length - 1][0],
+                endTime: Date.now(),
+                points: appendPoints
+              }).done(function (data) {
+                data.forEach(function (newEntry) {
+                  self.data.push(newEntry);
+                });
 
-            for (var i = 0; i < mainLines.length; i++) {
-              main.select('.line-' + i).attr('d', mainLines[i]);
-              main.selectAll('.line-circle-' + i)
-                      .attr("cx", function(d) { return mainXScale(d[0]); })
-                      .attr("cy", function(d) { return mainYScale(d[i + 1]); });
-              sub.select('.line-' + i).attr('d', subLines[i]);
-            }
+                var mainStart = currentDomain[0].getTime() !== currentSubDomain[0].getTime() ? currentDomain[0] : self.data[0][0];
+                var mainEnd = currentDomain[1].getTime() !== currentSubDomain[1].getTime() ? currentDomain[1] : self.data[self.data.length - 1][0];
+                mainXScale.domain([mainStart, mainEnd]);
+                subXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
 
-            sub.select('.axis--x').call(subXAxis);
-            main.select('.axis--x').call(mainXAxis);
+                series.forEach(function (serie) {
+                  main.select('.line-' + serie.dataIndex).attr('d', serie.line);
+                  if (serie.showDot) {
+                    main.selectAll(".line-circle-" + serie.dataIndex).remove();
 
-             sub.select('.brush').call(brush);
+                    main.selectAll(".line-circle-" + serie.dataIndex)
+                            .data(self.data)
+                            .enter()
+                            .append("circle")
+                            .style('display', serie.enabled ? null : 'none')
+                            .attr('fill', function (d, j) {
+                              return serie.color
+                            })
+                            .attr("clip-path", "url(#clip)")
+                            .attr("class", "line-circle-" + serie.dataIndex)
+                            .attr("r", 1.5)
+                            .attr("cx", function (d) {
+                              return mainXScale(d[0]);
+                            })
+                            .attr("cy", function (d) {
+                              return serie.lineYScale(d[serie.dataIndex]);
+                            });
+                  }
+                  sub.select('.line-' + serie.dataIndex).attr('d', serie.subLine);
+                });
 
-            window.setTimeout(fakeAppend, 2000);
-          };
+                pointFocus(lastMouseCoord, lastFocusX);
 
-          window.setTimeout(fakeAppend, 2000);
+                sub.select('.axis--x').call(subXAxis);
+                main.select('.axis--x').call(mainXAxis);
+
+                sub.select('.brush').call(brush);
+
+                self.appendTimeout = window.setTimeout(appendData, appendInterval);
+              })
+            };
+            self.appendTimeout = window.setTimeout(appendData, appendInterval);
+          });
         }
       }
 
-      PerformanceGraph.prototype.fetchData = function (timeOffset, points) {
+      PerformanceGraph.prototype.dispose = function () {
         var self = this;
-
-        generateFakeData(self.data, timeOffset, points);
-        var cpuStats = { average: 0, min: 0, max: 0, color: self.series[0].color };
-        var memoryStats = { average: 0, min: 0, max: 0, color: self.series[1].color };
-        self.data.forEach(function (val) {
-          cpuStats.max = Math.max(val[1], cpuStats.max);
-          cpuStats.min = Math.min(val[1], cpuStats.min);
-          cpuStats.average += val[1];
-          memoryStats.max = Math.max(val[2], memoryStats.max);
-          memoryStats.min = Math.min(val[2], memoryStats.min);
-          memoryStats.average += val[2];
-        });
-        cpuStats.average = Math.round(cpuStats.average / self.data.length);
-        memoryStats.average = Math.round(memoryStats.average / self.data.length);
-
-        cpuStats.average += '%';
-        cpuStats.min += '%';
-        cpuStats.max += '%';
-        memoryStats.average = bytesToSize(self.memoryLimit * memoryStats.average / 100);
-        memoryStats.min = bytesToSize(self.memoryLimit * memoryStats.min / 100);
-        memoryStats.max = bytesToSize(self.memoryLimit * memoryStats.max / 100);
-        self.cpuStats(cpuStats);
-        self.memoryStats(memoryStats);
+        if (self.appendTimeout) {
+          window.clearTimeout(self.appendTimeout);
+        }
       };
 
       ko.components.register('performance-graph', {
         viewModel: PerformanceGraph,
-        template: { element: 'performance-graph-template' }
+        template: {element: 'performance-graph-template'}
       });
     })();
   </script>
