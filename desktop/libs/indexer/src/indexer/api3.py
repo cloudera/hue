@@ -616,7 +616,8 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
       if destination['tableFormat'] == 'kudu':
         properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase
       # Create table
-      SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).execute(request)
+      if not request.POST.get('show_command'):
+        SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).execute(request)
 
     if destination['tableFormat'] == 'kudu':
       manager = ManagerApi()
