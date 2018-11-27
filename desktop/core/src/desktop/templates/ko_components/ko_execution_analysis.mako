@@ -60,11 +60,11 @@ from desktop.views import _ko
           <ul class="risk-list" data-bind="foreach: healthChecks">
             <li>
               <div><span data-bind="text: contribution_factor_str"></span> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
-              <ul class="risk-list" data-bind="foreach: reason">
+              <ol data-bind="foreach: reason">
                 <li>
                   <span data-bind="text: message"></span><strong> - <span data-bind="duration: impact"></span></strong>
                 </li>
-              </ul>
+              </ol>
             </li>
           </ul>
         </div>
