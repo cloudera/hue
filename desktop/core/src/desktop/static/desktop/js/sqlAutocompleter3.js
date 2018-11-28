@@ -1252,7 +1252,7 @@ var AutocompleteResults = (function () {
               category: navOptAttribute === 'groupByColumn' ? CATEGORIES.POPULAR_GROUP_BY : CATEGORIES.POPULAR_ORDER_BY,
               weightAdjust:  Math.round(100 * entry.navOptPopularity[navOptAttribute].columnCount / totalColumnCount),
               popular: ko.observable(true),
-              hasCatalogEntry: true,
+              hasCatalogEntry: false,
               details: entry
             });
           });
