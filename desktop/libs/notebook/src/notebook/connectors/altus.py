@@ -307,6 +307,7 @@ class DataWarehouse2Api():
       'workerCpuCores': 1,
       'workerMemoryInGib': 1,
       'workerReplicas': workers_group_size,
+      'workerAutoResize': False
     }
 
     return self._root.post('createCluster', data=json.dumps(data), contenttype="application/json")
