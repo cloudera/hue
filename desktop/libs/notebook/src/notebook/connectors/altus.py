@@ -338,10 +338,5 @@ class DataWarehouse2Api():
     return data
 
 
-  def update_cluster(self, cluster_name, workers_group_size):
-    data = {
-      'clusterName': cluster_name,
-      'workerReplicas': workers_group_size,
-    }
-
-    return self._root.post('updateCluster', data=json.dumps(data), contenttype="application/json")
+  def update_cluster(self, **params):
+    return self._root.post('updateCluster', data=json.dumps(params), contenttype="application/json")

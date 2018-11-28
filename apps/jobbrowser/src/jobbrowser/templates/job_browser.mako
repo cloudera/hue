@@ -239,7 +239,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </script>
 
   <script type="text/html" id="configure-cluster-content">
-  <form>
+    <form>
       <fieldset>
         <label for="clusterConfigureWorkers">${ _('Workers') }</label>
         <span data-bind="visible: !updateClusterAutoResize()">
@@ -2697,7 +2697,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.clusterConfigModified = ko.pureComputed(function () {
         return (self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()) ||
-            (self.updateClusterAutoResize() && self.updateClusterAutoResizeMax() >= 0);
+            (self.updateClusterAutoResize() !== self.properties['properties']['workerAutoResize']() &&
+              (self.updateClusterAutoResize() && self.updateClusterAutoResizeMax() >= 0) ||
+              (!self.updateClusterAutoResize())
+            );
       });
 
       ## TODO Move to control
@@ -2706,6 +2709,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
           "cluster_name": self.id(),
           "workers_group_size": self.updateClusterWorkers(),
+          "auto_resize_changed": self.updateClusterAutoResize() !== self.properties['properties']['workerAutoResize'](),
           "auto_resize_enabled": self.updateClusterAutoResize(),
           "auto_resize_min": self.updateClusterAutoResizeMin(),
           "auto_resize_max": self.updateClusterAutoResizeMax(),
