@@ -242,10 +242,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <form>
       <fieldset>
         <label for="clusterConfigureWorkers">${ _('Workers') }</label>
-        <input id="clusterConfigureWorkers" type="number" min="1" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
-        <label class="checkbox" style="float: right;">
-          <input type="checkbox" data-bind="checked: updateClusterAutoPause"> ${ _('Auto pause') }
-        </label>
+        <span data-bind="visible: !updateClusterAutoResize()">
+          <input id="clusterConfigureWorkers" type="number" min="1" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+        </span>
+        <span data-bind="visible: updateClusterAutoResize()">
+          <input id="clusterConfigureWorkers" type="number" min="0" data-bind="value: updateClusterAutoResizeMin, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Min')}">
+          <input id="clusterConfigureWorkers" type="number" min="0" data-bind="value: updateClusterAutoResizeMax, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Max')}">
+          <input id="clusterConfigureWorkers" type="number" min="0" data-bind="value: updateClusterAutoResizeCpu, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('CPU')}">
+        </span>
+
         <label class="checkbox" style="margin-right: 10px; float: right;">
           <input type="checkbox" data-bind="checked: updateClusterAutoResize"> ${ _('Auto resize') }
         </label>
@@ -1265,10 +1270,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': Math.min(properties['properties']['workerReplicas'](), properties['properties']['workerReplicasOnline']()) / Math.max(properties['properties']['workerReplicasOnline'](), properties['properties']['workerReplicas']()) * 100 + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Auto pause') }</li>
-          <li><i class="fa fa-check fa-fw"></i></li>
           <li class="nav-header">${ _('Auto resize') }</li>
-          <li><i class="fa fa-check fa-fw"></i></li>
+          <li>
+            <i data-bind="visible: !updateClusterAutoResize()" class="fa fa-square-o fa-fw"></i>
+            <i data-bind="visible: updateClusterAutoResize()" class="fa fa-check-square-o fa-fw"></i>
+          </li>
+          <li class="nav-header">${ _('Auto pause') }</li>
+          <li><i class="fa fa-square-o fa-fw"></i></li>
           <li class="nav-header">${ _('Impalad') }</li>
           <li>
             <a href="#" data-bind="attr: { 'href': properties['properties']['coordinatorEndpoint']['publicHost']() + ':25000' }">
@@ -2674,8 +2682,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.updateClusterWorkers = ko.observable(1);
-      self.updateClusterAutoPause = ko.observable();
       self.updateClusterAutoResize = ko.observable();
+      self.updateClusterAutoResizeMin = ko.observable(1);
+      self.updateClusterAutoResizeMax = ko.observable(3);
+      self.updateClusterAutoResizeCpu = ko.observable(80);
+      self.updateClusterAutoPause = ko.observable();
 
       self.updateClusterShow = ko.observable(false);
       self.updateClusterShow.subscribe(function(newVal) {
@@ -2685,8 +2696,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.clusterConfigModified = ko.pureComputed(function () {
-        // TODO: Add auto resize/pause as condition once in properties
-        return self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()
+        return (self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()) ||
+            (self.updateClusterAutoResize() && self.updateClusterAutoResizeMax() >= 0);
       });
 
       ## TODO Move to control
@@ -2695,6 +2706,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
           "cluster_name": self.id(),
           "workers_group_size": self.updateClusterWorkers(),
+          "auto_resize_enabled": self.updateClusterAutoResize(),
+          "auto_resize_min": self.updateClusterAutoResizeMin(),
+          "auto_resize_max": self.updateClusterAutoResizeMax(),
+          "auto_resize_cpu": self.updateClusterAutoResizeCpu()
         }, function(data) {
           console.log(ko.mapping.toJSON(data));
           ## $(document).trigger("info", ko.mapping.toJSON(data));

@@ -344,7 +344,4 @@ class DataWarehouse2Api():
       'workerReplicas': workers_group_size,
     }
 
-    
     return self._root.post('updateCluster', data=json.dumps(data), contenttype="application/json")
-
-
