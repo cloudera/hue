@@ -5858,10 +5858,12 @@
             if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
               editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - (questionMarkMatch[1].length - 1));
               editor.removeTextBeforeCursor(1);
+              huePubSub.publish('editor.refresh.statement.locations', snippet);
               window.setTimeout(function () {
                 editor.execCommand("startAutocomplete");
               }, 1);
             } else if (/\.$/.test(textBeforeCursor)) {
+              huePubSub.publish('editor.refresh.statement.locations', snippet);
               window.setTimeout(function () {
                 editor.execCommand("startAutocomplete");
               }, 1);
