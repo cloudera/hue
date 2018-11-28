@@ -172,6 +172,65 @@ class SQLOperatorReason:
                 [g.value for g in group]))
         return result
 
+class SummaryReason(SQLOperatorReason):
+
+    def evaluate(self, profile, plan_node_id):
+        """
+        Evaluate the impact of this cause to the query. The return is a json string with
+        this format:
+        {
+            "impact": the amount of slow down (in ns),
+            "message" : the displayed "explanation" string
+        }
+        :return:
+        """
+        impact = -1
+        if len(self.exprs):
+            assert len(self.metric_names) == 1
+
+            # metric_names can have multiple values create a dict for all of
+            # them
+            db_result = models.query_element_by_metric(profile, 'Summary', self.metric_names[0])
+            for k, g in groupby(db_result, lambda x: x.fid):
+                grouped = list(g)
+                # A list of pairs, with aggregated value and index at value for
+                # max / min like exprs
+                converted_exprs = self.check_exprs(grouped)
+                expr_vars = {
+                    "vars": dict(zip(self.exprs, map(lambda x: x[0], converted_exprs))),
+                    "idxs": dict(zip(self.exprs, map(lambda x: x[1], converted_exprs))),
+                }
+
+                expr_val = exprs.Expr.evaluate(self.rule["expr"], expr_vars)
+                if (impact is None or impact < expr_val):
+                    impact = expr_val
+        else:
+            # For each of the metrics get the result
+            with Timer() as t:
+                # Get the metric values from the db grouped by metric name
+                db_result = [models.query_element_by_metric(profile, 'Summary', m) for m in self.metric_names]
+                # Assuming that for all metric names the same number of rows have been returned transpose the array
+                all_metrics = zip(*db_result)
+
+            for row in all_metrics:
+                # Convert to double values if unit is 6(double)
+                metric_values = map(lambda x: x.value if x.unit != 6 else to_double(x.value), row)
+
+                local_vars = {"vars": dict(zip(self.metric_names, metric_values))}
+                condition = True
+                if ("condition" in self.rule):
+                    condition = exprs.Expr.evaluate(self.rule["condition"], local_vars)
+                if (condition):
+                    expr_val = exprs.Expr.evaluate(self.rule["expr"], local_vars)
+                    if (impact is None or impact < expr_val):
+                        impact = expr_val
+
+        msg = self.rule["label"] + ": " + self.rule["message"]
+        return {
+            "impact": impact,
+            "message": msg
+        }
+
 class JoinOrderStrategyCheck(SQLOperatorReason):
     def __init__(self): pass
 
@@ -287,9 +346,13 @@ class TopDownAnalysis:
                 nodes = node_names
                 if not isinstance(node_names, types.ListType):
                     nodes = [node_names]
-                for node in nodes:
+                if type == 'SQLOperator':
+                  for node in nodes:
                     self.sqlOperatorReasons.setdefault(node,[])\
                         .append(SQLOperatorReason(**json_object))
+                else:
+                  self.sqlOperatorReasons.setdefault(type,[])\
+                    .append(SummaryReason(**json_object))
 
         # Manually append specially coded reaason
         self.sqlOperatorReasons["HASH_JOIN_NODE"].append(JoinOrderStrategyCheck())
@@ -390,7 +453,7 @@ class TopDownAnalysis:
         contributors = sorted(contributors, key=lambda x: x.wall_clock_time, reverse=True)
         return contributors
 
-    def createExecNodeReason(self, contributor, profile):
+    def createExecSqlNodeReason(self, contributor, profile):
         """
         For the given contributor, return the top reasons why it's slow. A list of models.Reason
         object will be created, persisted to the database and returned.
@@ -399,6 +462,24 @@ class TopDownAnalysis:
         reasons = []
         self.sqlOperatorReasons.setdefault(contributor.plan_node_name,[])
         for cause in self.sqlOperatorReasons[contributor.plan_node_name] + self.sqlOperatorReasons["ANY"]:
+            evaluation = cause.evaluate(profile, contributor.plan_node_id)
+            impact = evaluation["impact"]
+            if isinstance(impact, float) and (impact).is_integer():
+              evaluation["impact"] = int(impact)
+            if (evaluation["impact"] > 0):
+                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'])
+                reasons.append(reason)
+        return sorted(reasons, key=lambda x: x.impact, reverse=True)
+
+    def createExecNodeReason(self, contributor, profile):
+        """
+        For the given contributor, return the top reasons why it's slow. A list of models.Reason
+        object will be created, persisted to the database and returned.
+        The result will be in the form of
+        """
+        reasons = []
+        self.sqlOperatorReasons.setdefault(contributor.type,[])
+        for cause in self.sqlOperatorReasons[contributor.type]:
             evaluation = cause.evaluate(profile, contributor.plan_node_id)
             impact = evaluation["impact"]
             if isinstance(impact, float) and (impact).is_integer():
@@ -419,33 +500,60 @@ class TopDownAnalysis:
         contributors = self.createContributors(profile)
         for contributor in contributors:
             if (contributor.type == "SQLOperator"):
-                reasons = self.createExecNodeReason(contributor, profile)
+                reasons = self.createExecSqlNodeReason(contributor, profile)
             else:
-                reasons = []
+                reasons = self.createExecNodeReason(contributor, profile)
             contributor.reason = reasons
         return contributors
 
     def pre_process(self, profile):
         summary = profile.find_by_name("Summary")
         exec_summary_json = utils.parse_exec_summary(summary.val.info_strings['ExecSummary'])
-
+        stats_mapping = {
+          'Query Compilation': {
+            'Metadata load finished': 'MetadataLoadTime',
+            'Analysis finished': 'AnalysisTime',
+            'Single node plan created': 'SinglePlanTime',
+            'Runtime filters computed': 'RuntimeFilterTime',
+            'Distributed plan created': 'DistributedPlanTime',
+            'Lineage info computed': 'LineageTime'
+          },
+          'Query Timeline': {
+            'Planning finished': 'PlanningTime',
+            'Completed admission': 'AdmittedTime',
+            'Rows available': 'QueryTime',
+            'Unregister query': 'EndTime',
+            '((fragment instances)|(remote fragments)|(execution backends).*) started': 'RemoteFragmentsStarted'
+          }
+        }
         # Setup Event Sequence
         if summary:
           for s in summary.val.event_sequences:
-              sequence_name = s.name
-              if sequence_name == "Query Timeline":
-                duration = 0
-                for i in range(len(s.labels)):
-                    event_name = s.labels[i]
-                    event_duration = s.timestamps[i] - duration
-                    event_value = s.timestamps[i]
-                    if event_name == "Planning finished":
-                      summary.val.counters.append(models.TCounter(name='PlanningTime', value=event_duration, unit=5))
+            sequence_name = s.name
+            sequence = stats_mapping.get(sequence_name)
+            if sequence:
+              duration = 0
+              for i in range(len(s.labels)):
+                event_name = s.labels[i]
+                event_duration = s.timestamps[i] - duration
+                event_value = s.timestamps[i]
 
-                    elif re.search('remote fragments started', event_name, re.IGNORECASE) is not None or re.search('fragment instances started', event_name, re.IGNORECASE) is not None or re.search(r'execution backends.*started', event_name, re.IGNORECASE)  is not None:
-                      summary.val.counters.append(models.TCounter(name='RemoteFragmentsStarted', value=event_duration, unit=5))
+                if sequence.get(event_name):
+                  summary.val.counters.append(models.TCounter(name=sequence.get(event_name), value=event_duration, unit=5))
+                  sequence.pop(event_name)
+                else:
+                  for key, value in sequence.iteritems():
+                    if re.search(key, event_name, re.IGNORECASE):
+                      summary.val.counters.append(models.TCounter(name=value, value=event_duration, unit=5))
+                      sequence.pop(key)
+                      break
 
-                    duration = s.timestamps[i]
+                duration = s.timestamps[i]
+
+          for key, value in stats_mapping.get('Query Compilation').iteritems():
+            summary.val.counters.append(models.TCounter(name=value, value=0, unit=5))
+          for key, value in stats_mapping.get('Query Timeline').iteritems():
+            summary.val.counters.append(models.TCounter(name=value, value=0, unit=5))
 
         def add_host(node, exec_summary_json=exec_summary_json):
           is_plan_node = node.is_plan_node()
