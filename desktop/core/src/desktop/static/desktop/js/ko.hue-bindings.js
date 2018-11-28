@@ -4778,6 +4778,15 @@
           for (var i = 0; i < arguments.length; i++) {
             joined = joined.concat(arguments[i]);
           }
+          if (token.parseLocation.type === 'column') {
+            // Could be a table reference
+            token.parseLocation.tables.forEach(function (table) {
+              if (!table.alias) {
+                // Aliases are added later
+                joined.push(table.identifierChain[table.identifierChain.length - 1]);
+              }
+            });
+          }
           promise.resolve(joined);
         }).fail(promise.reject);
       } else if (token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 0) {
