@@ -1418,30 +1418,38 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <a data-bind="attr: {href: doc_url}" target="_blank" title="${ _('Open in impalad') }">
               <span data-bind="text: id"></span>
             </a>
+            <!-- ko if: $root.isMini() -->
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%; height: 4px" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {'title': progress() + '%'}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+            <!-- /ko -->
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
           <li class="nav-header">${ _('Id') }</li>
-          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span>
+          </li>
           <!-- /ko -->
+          <!-- ko if: !$root.isMini() -->
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li>
-          <span data-bind="text: progress"></span>%
+            <span data-bind="text: progress"></span>%
           </li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <!-- /ko -->
+          <!-- ko if: !$root.isMini() -->
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
           <!-- ko if: properties.plan && properties.plan().status && properties.plan().status.length > 2 -->
           <li class="nav-header">${ _('Status Text') }</li>
           <li><span data-bind="text: properties.plan().status"></span></li>
           <!-- /ko -->
-          <!-- ko if: !$root.isMini() -->
           <li class="nav-header">${ _('Open Duration') }</li>
           <li><span data-bind="text: duration() && duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
@@ -1450,8 +1458,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
 
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li>
           <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan_json) { fetchProfile('plan'); } } }">
