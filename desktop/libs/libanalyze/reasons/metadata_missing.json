@@ -1,0 +1,15 @@
+{
+  "type": "PlanningTime",
+  "node_name": "Summary",
+  "metric_names": [
+    "MetadataLoadTime",
+    "PlanningTime"
+  ],
+  "unit_id": 5,
+  "rule": {
+    "condition": "float(vars['MetadataLoadTime']) / float(vars['PlanningTime']) > 0.5 and vars['MetadataLoadTime'] > 2000000000",
+    "expr": "vars['MetadataLoadTime']",
+    "message": "The metadata was not cached and it slowed down planning time noticeably.",
+    "label": "Metadata Missing"
+  }
+}
