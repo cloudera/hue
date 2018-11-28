@@ -85,13 +85,26 @@ def update_cluster(request):
   response = {'status': -1}
 
   cluster_name = request.POST.get('cluster_name') or 'Analytic Cluster'
-  workers_group_size = int(request.POST.get('workers_group_size', '3'))
+  auto_resize_changed = bool(request.POST.get('auto_resize_changed'))
+
+  params = {
+    'clusterName': cluster_name
+  }
+
+  if auto_resize_changed:
+    updateClusterAutoResize = bool(request.POST.get('updateClusterAutoResize'))
+    params = {'updateClusterAutoResize': updateClusterAutoResize}
+    if updateClusterAutoResize:
+      params['updateClusterAutoResizeMax'] = int(request.POST.get('updateClusterAutoResizeMax'))
+      if request.POST.get('updateClusterAutoResizeMin'):
+        params['updateClusterAutoResizeMin'] = int(request.POST.get('updateClusterAutoResizeMin'))
+      if request.POST.get('updateClusterAutoResizeCpu'):
+        params['updateClusterAutoResizeCpu'] = int(request.POST.get('updateClusterAutoResizeCpu'))
+  else:
+    params['workerReplicas'] = int(request.POST.get('workers_group_size', '3'))
 
   api = DataWarehouse2Api(request.user)
-  data = api.update_cluster(
-      cluster_name=cluster_name,
-      workers_group_size=workers_group_size
-  )
+  data = api.update_cluster(**params)
 
   if data:
     response['status'] = 0
