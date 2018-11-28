@@ -246,9 +246,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <input id="clusterConfigureWorkers" type="number" min="1" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
         </span>
         <span data-bind="visible: updateClusterAutoResize()">
-          <input id="clusterConfigureWorkers" type="number" min="0" data-bind="value: updateClusterAutoResizeMin, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Min')}">
-          <input id="clusterConfigureWorkers" type="number" min="0" data-bind="value: updateClusterAutoResizeMax, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Max')}">
-          <input id="clusterConfigureWorkers" type="number" min="0" data-bind="value: updateClusterAutoResizeCpu, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('CPU')}">
+          <input type="number" min="0" data-bind="value: updateClusterAutoResizeMin, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Min')}">
+          <input type="number" min="0" data-bind="value: updateClusterAutoResizeMax, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Max')}">
+          <input type="number" min="0" data-bind="value: updateClusterAutoResizeCpu, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('CPU')}">
         </span>
 
         <label class="checkbox" style="margin-right: 10px; float: right;">
@@ -2690,7 +2690,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.updateClusterWorkers = ko.observable(1);
-      self.updateClusterAutoResize = ko.observable();
+      self.updateClusterAutoResize = ko.observable(false);
       self.updateClusterAutoResizeMin = ko.observable(1);
       self.updateClusterAutoResizeMax = ko.observable(3);
       self.updateClusterAutoResizeCpu = ko.observable(80);
@@ -2705,10 +2705,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.clusterConfigModified = ko.pureComputed(function () {
         return (self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()) ||
-            (self.updateClusterAutoResize() !== self.properties['properties']['workerAutoResize']() &&
-              (self.updateClusterAutoResize() && self.updateClusterAutoResizeMax() >= 0) ||
-              (!self.updateClusterAutoResize())
-            );
+            (self.updateClusterAutoResize() !== self.properties['properties']['workerAutoResize']());
       });
 
       ## TODO Move to control

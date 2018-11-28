@@ -16,14 +16,12 @@
 # limitations under the License.
 
 import logging
-import json
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-
 from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
 
 
@@ -85,21 +83,22 @@ def update_cluster(request):
   response = {'status': -1}
 
   cluster_name = request.POST.get('cluster_name') or 'Analytic Cluster'
-  auto_resize_changed = bool(request.POST.get('auto_resize_changed'))
+  auto_resize_changed = request.POST.get('auto_resize_changed') == 'true'
 
   params = {
-    'clusterName': cluster_name
+    'clusterName': cluster_name,
+    'updateClusterAutoResizeChanged': auto_resize_changed
   }
 
   if auto_resize_changed:
-    updateClusterAutoResize = bool(request.POST.get('updateClusterAutoResize'))
-    params = {'updateClusterAutoResize': updateClusterAutoResize}
+    updateClusterAutoResize = request.POST.get('auto_resize_enabled') == 'true'
+    params['updateClusterAutoResize'] = updateClusterAutoResize
     if updateClusterAutoResize:
-      params['updateClusterAutoResizeMax'] = int(request.POST.get('updateClusterAutoResizeMax'))
-      if request.POST.get('updateClusterAutoResizeMin'):
-        params['updateClusterAutoResizeMin'] = int(request.POST.get('updateClusterAutoResizeMin'))
-      if request.POST.get('updateClusterAutoResizeCpu'):
-        params['updateClusterAutoResizeCpu'] = int(request.POST.get('updateClusterAutoResizeCpu'))
+      params['updateClusterAutoResizeMax'] = int(request.POST.get('auto_resize_max'))
+      if request.POST.get('auto_resize_min'):
+        params['updateClusterAutoResizeMin'] = int(request.POST.get('auto_resize_min'))
+      if request.POST.get('auto_resize_cpu'):
+        params['updateClusterAutoResizeCpu'] = int(request.POST.get('auto_resize_cpu'))
   else:
     params['workerReplicas'] = int(request.POST.get('workers_group_size', '3'))
 

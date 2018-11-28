@@ -80,6 +80,8 @@ class ClusterApi(Api):
 
     cluster = handle['cluster']
 
+    cluster['workerAutoResize'] = False
+
     common = {
         'id': cluster['crn'],
         'name': cluster['clusterName'],
