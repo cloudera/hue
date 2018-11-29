@@ -771,7 +771,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- /ko -->
 
         <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
-        <li data-bind="click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
+        <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
         <!-- /ko -->
       </ul>
 
