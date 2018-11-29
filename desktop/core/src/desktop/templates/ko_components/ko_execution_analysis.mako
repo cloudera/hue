@@ -57,7 +57,7 @@ from desktop.views import _ko
         </div>
         <div>
           <h4>${_('Top down analysis')}</h4>
-          <ul class="risk-list" data-bind="foreach: healthChecks">
+          <ul class="risk-list" data-bind="foreach: $parent.healthChecks">
             <li>
               <div><span data-bind="text: contribution_factor_str"></span> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
               <ol data-bind="foreach: reason">
@@ -81,14 +81,21 @@ from desktop.views import _ko
 
         self.loading = ko.observable(false);
         self.analysis = ko.observable();
+        self.healthChecks = ko.pureComputed(function () {
+          var analysis = self.analysis()
+          if (!analysis) {
+            return [];
+          }
+          return analysis.healthChecks.filter(function (check) {
+            return check.reason.length;
+          });
+        });
         self.analysisPossible = ko.observable(true);
         self.analysisCount = ko.pureComputed(function () {
-          if (!self.analysis()) {
-            return '';
+          if (self.healthChecks().length) {
+            return '(' + self.healthChecks().length + ')'
           }
-          return '(' + self.analysis().healthChecks.reduce(function (count, check) {
-            return count + check.reason.length;
-          }, 0) + ')';
+          return '';
         });
 
         self.lastAnalysisPromise = undefined;
