@@ -372,6 +372,8 @@ var EditorViewModel = (function() {
 
     self.dbSelectionVisible = ko.observable(false);
 
+    self.showExecutionAnalysis = ko.observable(false);
+
     self.isSqlDialect = ko.pureComputed(function () {
       return vm.getSnippetViewSettings(self.type()).sqlDialect;
     });
@@ -1472,6 +1474,7 @@ var EditorViewModel = (function() {
       }
 
       if (self.type() === 'impala') {
+        self.showExecutionAnalysis(false);
         huePubSub.publish('editor.clear.execution.analysis');
       }
 
@@ -1802,6 +1805,7 @@ var EditorViewModel = (function() {
             stopLongOperationTimeout();
             data = JSON.bigdataParse(data);
             if (data.status === 0) {
+              self.showExecutionAnalysis(true);
               self.loadData(data.result, rows);
             } else {
               self._ajaxError(data, function() {self.isFetchingData = false; self.fetchResultData(rows, startOver); });
