@@ -62,7 +62,7 @@ from desktop.views import _ko
               <div><span data-bind="text: contribution_factor_str"></span> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
               <ol data-bind="foreach: reason">
                 <li>
-                  <span data-bind="text: message"></span><strong> - <span data-bind="duration: impact"></span></strong>
+                  <span data-bind="text: message"></span><strong> - <span data-bind="numberFormat: { value: impact, unit: unit }"></span></strong>
                 </li>
               </ol>
             </li>
