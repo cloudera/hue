@@ -35,6 +35,7 @@ class Reason(object):
   def __init__(self, **kwargs):
     self.message = None
     self.impact = None
+    self.unit = None
     self.__dict__.update(kwargs)
 
   def to_json(self):

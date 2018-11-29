@@ -7526,8 +7526,10 @@
         var fn;
         if (unwrapped.unit == 3) {
           fn = ko.bindingHandlers.bytesize.humanSize
-        } else { // 5
+        } else if (unwrapped.unit == 5) {
           fn = ko.bindingHandlers.duration.humanTime
+        } else {
+          fn = function(value){ return value; }
         }
         var formatted = fn(unwrapped.value);
         $(element).text(formatted);

@@ -161,7 +161,8 @@ class SQLOperatorReason:
         msg = self.rule["label"] + ": " + self.rule["message"]
         return {
             "impact": impact,
-            "message": msg
+            "message": msg,
+            "unit": self.kwargs.get('unit_id', -1)
         }
 
     def check_exprs(self, group):
@@ -228,7 +229,8 @@ class SummaryReason(SQLOperatorReason):
         msg = self.rule["label"] + ": " + self.rule["message"]
         return {
             "impact": impact,
-            "message": msg
+            "message": msg,
+            "unit": self.kwargs.get('unit_id', -1)
         }
 
 class JoinOrderStrategyCheck(SQLOperatorReason):
@@ -276,7 +278,8 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
         impact = (networkcost - min(bcost, scost) - 1) / hosts / 0.01
         return {
             "impact": impact,
-            "message": "Wrong join strategy - RHS %d; LHS %d" % (rhsRows, lhsRows)
+            "message": "Wrong join strategy - RHS %d; LHS %d" % (rhsRows, lhsRows),
+            "unit": 5
         }
 
 class ExplodingJoinCheck(SQLOperatorReason):
@@ -304,7 +307,8 @@ class ExplodingJoinCheck(SQLOperatorReason):
             impact = probeTime * (rowsReturned - probeRows) / rowsReturned
         return {
             "impact": impact,
-            "message": "Exploding join: %d input rows are exploded to %d output rows" % (probeRows, rowsReturned)
+            "message": "Exploding join: %d input rows are exploded to %d output rows" % (probeRows, rowsReturned),
+            "unit": 5
         }
 
 class NNRpcCheck(SQLOperatorReason):
@@ -327,7 +331,8 @@ class NNRpcCheck(SQLOperatorReason):
         impact = max(0, (totalStorageTime - hdfsRawReadTime) / avgReadThreads)
         return {
             "impact": impact,
-            "message": "This is the time waiting for HDFS NN RPC."
+            "message": "This is the time waiting for HDFS NN RPC.",
+            "unit": 5
         }
 
 class TopDownAnalysis:
@@ -467,7 +472,7 @@ class TopDownAnalysis:
             if isinstance(impact, float) and (impact).is_integer():
               evaluation["impact"] = int(impact)
             if (evaluation["impact"] > 0):
-                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'])
+                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=evaluation['unit'])
                 reasons.append(reason)
         return sorted(reasons, key=lambda x: x.impact, reverse=True)
 
@@ -485,7 +490,7 @@ class TopDownAnalysis:
             if isinstance(impact, float) and (impact).is_integer():
               evaluation["impact"] = int(impact)
             if (evaluation["impact"] > 0):
-                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'])
+                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=evaluation['unit'])
                 reasons.append(reason)
         return sorted(reasons, key=lambda x: x.impact, reverse=True)
 
@@ -555,17 +560,28 @@ class TopDownAnalysis:
           for key, value in stats_mapping.get('Query Timeline').iteritems():
             summary.val.counters.append(models.TCounter(name=value, value=0, unit=5))
 
+          missing_stats = {}
+          for key in ['Tables Missing Stats', 'Tables With Corrupt Table Stats']:
+            if summary.val.info_strings[key]:
+              tables = summary.val.info_strings['Tables Missing Stats'].split(',')
+              for table in tables:
+                missing_stats[table] = 1
+
         def add_host(node, exec_summary_json=exec_summary_json):
           is_plan_node = node.is_plan_node()
           node_id = node.id()
            # Setup Hosts & Broadcast
           if node_id and node.is_regular() and int(node_id) in exec_summary_json:
-
-            node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_json[int(node_id)]["hosts"], unit=0))
+            exec_summary_node = exec_summary_json[int(node_id)]
+            node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node["hosts"], unit=0))
             broadcast = 0
             if exec_summary_json[int(node_id)]["broadcast"]:
                 broadcast = 1
             node.val.counters.append(models.TCounter(name='Broadcast', value=broadcast, unit=0))
+            if node.name() == 'HDFS_SCAN_NODE':
+              details = exec_summary_node['detail'].split()
+              node.val.info_strings['Table'] = details[0]
+              node.val.counters.append(models.TCounter(name='MissingStats', value=missing_stats.get(details[0], 0), unit=0))
 
           # Setup LocalTime & ChildTime
           if node_id:
