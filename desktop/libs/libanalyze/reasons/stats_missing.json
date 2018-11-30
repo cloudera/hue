@@ -4,10 +4,17 @@
   "metric_names": [
     "MissingStats"
   ],
+  "info_names": ["Table"],
   "rule": {
     "condition": "vars['MissingStats'] == 1",
     "expr": "1",
     "message": "The statistics are missing or corrupt which prevent scan and join optimizations.",
     "label": "Statistics Missing"
+  },
+  "fix": {
+    "id": 0,
+    "fixable": true,
+    "message": "Trigger compute stats for table.",
+    "data": "vars['Table']"
   }
 }

@@ -25,7 +25,8 @@ urlpatterns = [
   url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', impala_api.refresh_table, name='refresh_table'),
   url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', impala_api.get_exec_summary, name='get_exec_summary'),
   url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', impala_api.get_runtime_profile, name='get_runtime_profile'),
-  url(r'^api/query/alanize', impala_api.alanize, name='alanize'),
+  url(r'^api/query/alanize$', impala_api.alanize, name='alanize'),
+  url(r'^api/query/alanize/fix$', impala_api.alanize_fix, name='alanize_fix'),
 ]
 
 urlpatterns += beeswax_urls

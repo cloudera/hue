@@ -12,5 +12,8 @@
     "expr": "(vars['ScannerThreadsUserTime'] + vars['ScannerThreadsSysTime'] - vars['RowsRead'] * 100) / max(1,vars['AverageScannerThreadConcurrency'])",
     "message": "Predicates might be expensive (expectes speed 10m rows per sec per core)",
     "label": "Slow HDFS Scan"
+  },
+  "fix": {
+    "fixable": false
   }
 }

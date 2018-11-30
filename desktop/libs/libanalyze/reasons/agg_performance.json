@@ -8,5 +8,8 @@
     "expr": "vars['LocalTime'] - float(vars['InputRows']) / 0.01",
     "message": "Excess time (over expected time) spent in the aggregate; might be caused by complex group by",
     "label": "Slow Aggregate"
+  },
+  "fix": {
+    "fixable": false
   }
 }

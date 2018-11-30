@@ -12,5 +12,8 @@
     "message": "Speed can be improved by that much if there's 8 scanner threads",
     "label": "Lack of scanner thread parallelism",
     "prio": 2
+  },
+  "fix": {
+    "fixable": false
   }
 }

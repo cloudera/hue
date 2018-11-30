@@ -162,6 +162,14 @@ class Node(object):
                   'unit': ctr_map[cc].unit, 'parent': parent, 'node': node})
     return counters
 
+  def find_info_by_name(self, pattern):
+    node = self
+    ctr_map = node.val.info_strings
+    counters = []
+    if ctr_map.get(pattern):
+      counters.append({'name': pattern, 'value': ctr_map.get(pattern), 'node': node})
+    return counters
+
   # Only for fragments
   def is_averaged(self):
     return re.search(r"Averaged", self.val.name) is not None
