@@ -1272,8 +1272,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </li>
           <li class="nav-header">${ _('Auto resize') }</li>
           <li>
-            <i data-bind="visible: !updateClusterAutoResize()" class="fa fa-square-o fa-fw"></i>
-            <i data-bind="visible: updateClusterAutoResize()" class="fa fa-check-square-o fa-fw"></i>
+            <i data-bind="visible: !properties['properties']['workerAutoResize']()" class="fa fa-square-o fa-fw"></i>
+            <i data-bind="visible: properties['properties']['workerAutoResize']" class="fa fa-check-square-o fa-fw"></i>
           </li>
           <li class="nav-header">${ _('Auto pause') }</li>
           <li><i class="fa fa-square-o fa-fw"></i></li>
@@ -2700,6 +2700,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.updateClusterShow.subscribe(function(newVal) {
         if (newVal) {
           self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
+          self.updateClusterAutoResize(self.properties['properties']['workerAutoResize']());
+          self.updateClusterAutoResizeMin(self.properties['properties']['workerAutoResizeMin']());
+          self.updateClusterAutoResizeMax(self.properties['properties']['workerAutoResizeMax']());
+          self.updateClusterAutoResizeCpu(self.properties['properties']['workerAutoResizeCpu']());
         }
       });
 

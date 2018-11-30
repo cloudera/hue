@@ -111,9 +111,9 @@ class DataWarehouseClusterApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STOPPED', 'STARTING']: # ONLINE ... are from K8s
+    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING']: # ONLINE ... are from K8s
       return 'RUNNING'
-    elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING']:
+    elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING', 'TERMINATED', 'STOPPED']:
       return 'SUCCEEDED'
     else:
       return 'FAILED' # KILLED and FAILED
