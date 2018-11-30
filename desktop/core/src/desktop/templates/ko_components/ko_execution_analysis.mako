@@ -109,7 +109,6 @@ from desktop.views import _ko
           }
           self.analysis(undefined);
           $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
-          $(".d3-tip");
           d3.select(".heatmap").remove();
         });
 
@@ -161,7 +160,7 @@ from desktop.views import _ko
         var d3 = window.d3v3;
         $(".d3-tip").remove();
         var tip = d3.d3tip()
-          .attr('class', 'd3-tip')
+          .attr('class', 'risk d3-tip')
           .offset([-10, 0])
           .html(function(d) {
             var host = d[0];
@@ -169,11 +168,12 @@ from desktop.views import _ko
                 host = host.substring(0, host.indexOf(":"));
             }
             var value = d[2];
-            var formattedValue = String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            var unit = d[5];
+
+            var formattedValue = ko.bindingHandlers.numberFormat.human(value, unit);
             return "<strong style='color:cyan'>" + host + "</strong><br><strong>" + counterName + ":</strong> <span style='color:red'>" + formattedValue + "</span>";
           });
         d3.select(".heatmap").call(tip);
-
         // Color gradient
         var colors = ['#f6faaa', '#9E0142'];
         var colorScale = d3.scale.linear()

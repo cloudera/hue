@@ -259,8 +259,9 @@ def heatmap_by_host(profile, counter_name):
   for r in rows:
     result.append([r[0], float(r[1]), float(r[2]),
         float(r[1]) / float(max_max) if float(max_max) != 0 else 0,
-        float(r[2]) / float(sum_sum) if float(sum_sum) != 0 else 0])
-  return { 'data': result, 'max': max_max }
+        float(r[2]) / float(sum_sum) if float(sum_sum) != 0 else 0,
+        rows.unit])
+  return { 'data': result, 'max': max_max, 'unit': rows.unit }
 
 def parse(file_name):
   """Given a file_name, open the file and decode the first line of the file
