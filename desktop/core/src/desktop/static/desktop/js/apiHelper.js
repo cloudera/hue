@@ -943,15 +943,19 @@ var ApiHelper = (function () {
 
     var data = [];
     var currentMax = 100;
-    var currentMin = 50;
+    var currentMin = 10;
 
+    var lastCpuVal = 0;
+    var lastMemVal = 0;
+    var lastIO = 0;
+    var lastQueryCount = 0;
     var addFakeMeasurement = function (data, time) {
-      var lastCpuVal = (currentMax - currentMin) / 2;
-      var lastMemVal = (currentMax - currentMin) / 2;
-      var lastIO = (currentMax - currentMin) / 2;
-      var lastQueryCount = (currentMax - currentMin) / 20;
 
       var newQueryCount = Math.round(Math.max(Math.min(lastQueryCount + (Math.random() - 0.5) * 10, 25), 0));
+
+      var queuedQueryCount = Math.round(newQueryCount * Math.random());
+      var nonQueuedQueryCount = newQueryCount - queuedQueryCount;
+
       var diff = newQueryCount - lastQueryCount;
       if (diff > 0) {
         lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
@@ -962,7 +966,7 @@ var ApiHelper = (function () {
         lastMemVal = Math.round(Math.max(Math.min(lastMemVal - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
         lastIO = Math.round(Math.max(Math.min(lastIO - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
       }
-      data.push([time, lastCpuVal, lastMemVal, lastIO, newQueryCount]);
+      data.push([time, lastCpuVal, lastMemVal, lastIO, nonQueuedQueryCount, queuedQueryCount]);
     };
 
     var generateFakeData = function (data, startTime, endTime, points) {
@@ -973,8 +977,7 @@ var ApiHelper = (function () {
       }
     };
 
-    generateFakeData(data, options.startTime, options.endTime, options.points)
-
+    generateFakeData(data, options.startTime, options.endTime, options.points);
     return $.Deferred().resolve(data).promise();
   };
 
