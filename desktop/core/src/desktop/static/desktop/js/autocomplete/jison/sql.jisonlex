@@ -719,7 +719,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <backtickedValue>\`                        { this.popState(); return 'BACKTICK'; }
 
 \'                                         { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
-<singleQuotedValue>(?:\\[']|[^'])+         {
+<singleQuotedValue>(?:\\\\|\\[']|[^'])+         {
                                              if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '\'')) {
                                                return 'PARTIAL_VALUE';
                                              }
@@ -728,7 +728,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <singleQuotedValue>\'                      { this.popState(); return 'SINGLE_QUOTE'; }
 
 \"                                         { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<doubleQuotedValue>(?:\\["]|[^"])+         {
+<doubleQuotedValue>(?:\\\\|\\["]|[^"])+         {
                                              if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '"')) {
                                                return 'PARTIAL_VALUE';
                                              }
