@@ -11,5 +11,8 @@
     "expr": "float(vars['RowsRead'] - vars['RowsReturned']) / vars['LocalTime']",
     "message": "Filters are selective. Consider a more aggresive partitioning scheme",
     "label": "Insufficient Partitioning"
+  },
+  "fix": {
+    "fixable": false
   }
 }

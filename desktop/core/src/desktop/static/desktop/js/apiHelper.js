@@ -2083,6 +2083,29 @@ var ApiHelper = (function () {
     return promise;
   };
 
+  ApiHelper.prototype.fixQueryExecutionAnalysis = function (options)  {
+    var self = this;
+    var url = '/impala/api/query/alanize/fix';
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(url, {
+      fix: JSON.stringify(options.fix),
+      start_time: options.start_time
+      }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (response) {
+        if (response.status === 0) {
+          deferred.resolve(response.details);
+        } else {
+          deferred.reject();
+        }
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
+  };
+
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]

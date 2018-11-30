@@ -11,5 +11,8 @@
     "expr": "vars['MetadataLoadTime']",
     "message": "The metadata was not cached and it slowed down planning time noticeably.",
     "label": "Metadata Missing"
+  },
+  "fix": {
+    "fixable": false
   }
 }

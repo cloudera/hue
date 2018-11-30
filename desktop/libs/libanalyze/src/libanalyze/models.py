@@ -36,6 +36,7 @@ class Reason(object):
     self.message = None
     self.impact = None
     self.unit = None
+    self.fix = None
     self.__dict__.update(kwargs)
 
   def to_json(self):
@@ -79,6 +80,16 @@ def query_element_by_metric(profile, node_name, metric_name):
   nodes = filter(lambda x: not x.fragment or x.fragment.is_averaged() == False, result)
   metric = reduce(lambda x, y: x + y.find_metric_by_name(metric_name), nodes, [])
   return map(lambda x: L(x['value'], 0, x['node'].fragment.id() if x['node'].fragment else '', x['node'].host(), 0, x['node'].id(), x['node'].name(), value=x['value'], unit=x['unit'], fragment_id=0, fid=x['node'].fragment.id() if x['node'].fragment else '', host=x['node'].host(), node_id=x['node'].id(), name=x['node'].name(), node=x['node']), metric)
+
+def query_element_by_info(profile, node_name, metric_name):
+  """Given the query_id, searches for the corresponding query profile and
+  selects the node instances given by node_name, selects the metric given by
+  metric_name and groups by fragment and fragment instance."""
+
+  result = profile.find_all_by_name(node_name)
+  nodes = filter(lambda x: not x.fragment or x.fragment.is_averaged() == False, result)
+  metric = reduce(lambda x, y: x + y.find_info_by_name(metric_name), nodes, [])
+  return map(lambda x: L(x['value'], 0, x['node'].fragment.id() if x['node'].fragment else '', x['node'].host(), 0, x['node'].id(), x['node'].name(), value=x['value'], fragment_id=0, fid=x['node'].fragment.id() if x['node'].fragment else '', host=x['node'].host(), node_id=x['node'].id(), name=x['node'].name(), node=x['node']), metric)
 
 def query_avg_fragment_metric_by_node_nid(profile, node_nid, metric_name):
   """

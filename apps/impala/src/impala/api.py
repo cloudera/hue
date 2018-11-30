@@ -41,6 +41,8 @@ from impala.server import get_api as get_impalad_api, _get_impala_server_url
 from libanalyze import analyze as analyzer
 from libanalyze import rules
 
+from notebook.models import make_notebook
+
 LOG = logging.getLogger(__name__)
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 
@@ -154,4 +156,24 @@ def alanize(request):
         heatmap[key] = metrics
     response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.iterkeys())) } }
     response['status'] = 0
+  return JsonResponse(response)
+
+@require_POST
+@error_handler
+def alanize_fix(request):
+  response = {'status': -1}
+  fix = json.loads(request.POST.get('fix'))
+  start_time = json.loads(request.POST.get('start_time'), '-1')
+  if fix['id'] == 0:
+    notebook = make_notebook(
+      name=_('compute stats %(data)s') % fix,
+      editor_type='impala',
+      statement='compute stats %(data)s' % fix,
+      status='ready',
+      last_executed=start_time,
+      is_task=True
+    )
+    response['details'] = { 'task': notebook.execute(request, batch=True) }
+    response['status'] = 0
+
   return JsonResponse(response)

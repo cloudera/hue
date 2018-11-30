@@ -17,6 +17,7 @@
 import copy
 import glob
 import json
+import logging
 import os
 import re
 import types
@@ -30,6 +31,8 @@ from libanalyze.utils import Timer
 from libanalyze import models
 from libanalyze import exprs
 from libanalyze import utils
+
+LOG = logging.getLogger(__name__)
 
 def to_double(metric_value):
     return struct.unpack('d', struct.pack('q', metric_value))[0]
@@ -115,6 +118,7 @@ class SQLOperatorReason:
         :return:
         """
         impact = -1
+        expr_data = ''
         if len(self.exprs):
             assert len(self.metric_names) == 1
 
@@ -158,11 +162,19 @@ class SQLOperatorReason:
                     if (impact is None or impact < expr_val):
                         impact = expr_val
 
+            if self.kwargs.get('info_names'):
+              db_result = [models.query_element_by_info(profile, plan_node_id, m) for m in self.kwargs['info_names']]
+              all_metrics = zip(*db_result)
+              for row in all_metrics:
+                metric_values = map(lambda x: x.value, row)
+                local_vars['vars'].update(dict(zip(self.kwargs['info_names'], metric_values)))
+                expr_data = exprs.Expr.evaluate(self.kwargs['fix']['data'], local_vars)
+
         msg = self.rule["label"] + ": " + self.rule["message"]
         return {
             "impact": impact,
             "message": msg,
-            "unit": self.kwargs.get('unit_id', -1)
+            "data": expr_data
         }
 
     def check_exprs(self, group):
@@ -229,12 +241,12 @@ class SummaryReason(SQLOperatorReason):
         msg = self.rule["label"] + ": " + self.rule["message"]
         return {
             "impact": impact,
-            "message": msg,
-            "unit": self.kwargs.get('unit_id', -1)
+            "message": msg
         }
 
 class JoinOrderStrategyCheck(SQLOperatorReason):
-    def __init__(self): pass
+    def __init__(self):
+      self.kwargs = {'fix': { 'fixable': False }, 'unit': 5}
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -278,12 +290,12 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
         impact = (networkcost - min(bcost, scost) - 1) / hosts / 0.01
         return {
             "impact": impact,
-            "message": "Wrong join strategy - RHS %d; LHS %d" % (rhsRows, lhsRows),
-            "unit": 5
+            "message": "Wrong join strategy - RHS %d; LHS %d" % (rhsRows, lhsRows)
         }
 
 class ExplodingJoinCheck(SQLOperatorReason):
-    def __init__(self): pass
+    def __init__(self):
+      self.kwargs = {'fix': { 'fixable': False }, 'unit': 5}
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -307,12 +319,12 @@ class ExplodingJoinCheck(SQLOperatorReason):
             impact = probeTime * (rowsReturned - probeRows) / rowsReturned
         return {
             "impact": impact,
-            "message": "Exploding join: %d input rows are exploded to %d output rows" % (probeRows, rowsReturned),
-            "unit": 5
+            "message": "Exploding join: %d input rows are exploded to %d output rows" % (probeRows, rowsReturned)
         }
 
 class NNRpcCheck(SQLOperatorReason):
-    def __init__(self): pass
+    def __init__(self):
+      self.kwargs = {'fix': { 'fixable': False }, 'unit': 5}
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -331,8 +343,7 @@ class NNRpcCheck(SQLOperatorReason):
         impact = max(0, (totalStorageTime - hdfsRawReadTime) / avgReadThreads)
         return {
             "impact": impact,
-            "message": "This is the time waiting for HDFS NN RPC.",
-            "unit": 5
+            "message": "This is the time waiting for HDFS NN RPC."
         }
 
 class TopDownAnalysis:
@@ -345,6 +356,7 @@ class TopDownAnalysis:
         self.sqlOperatorReasons = {}
         for r in glob.glob("{0}/*.json".format(self.base_dir)):
             with open(r, "r") as fid:
+                LOG.debug('Loading file %s' % r)
                 json_object = json.load(fid)
                 type = json_object["type"]
                 node_names = json_object["node_name"]
@@ -472,7 +484,11 @@ class TopDownAnalysis:
             if isinstance(impact, float) and (impact).is_integer():
               evaluation["impact"] = int(impact)
             if (evaluation["impact"] > 0):
-                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=evaluation['unit'])
+                fix = {}
+                fix.update(cause.kwargs['fix'])
+                if evaluation.get('data'):
+                  fix['data'] = evaluation['data']
+                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=cause.kwargs.get('unit_id', ''), fix=fix)
                 reasons.append(reason)
         return sorted(reasons, key=lambda x: x.impact, reverse=True)
 
@@ -490,7 +506,11 @@ class TopDownAnalysis:
             if isinstance(impact, float) and (impact).is_integer():
               evaluation["impact"] = int(impact)
             if (evaluation["impact"] > 0):
-                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=evaluation['unit'])
+                fix = {}
+                fix.update(cause.kwargs['fix'])
+                if evaluation.get('data'):
+                  fix['data'] = evaluation['data']
+                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=cause.kwargs.get('unit_id', ''), fix=fix)
                 reasons.append(reason)
         return sorted(reasons, key=lambda x: x.impact, reverse=True)
 
@@ -562,8 +582,8 @@ class TopDownAnalysis:
 
           missing_stats = {}
           for key in ['Tables Missing Stats', 'Tables With Corrupt Table Stats']:
-            if summary.val.info_strings[key]:
-              tables = summary.val.info_strings['Tables Missing Stats'].split(',')
+            if summary.val.info_strings.get(key):
+              tables = summary.val.info_strings.get(key).split(',')
               for table in tables:
                 missing_stats[table] = 1
 

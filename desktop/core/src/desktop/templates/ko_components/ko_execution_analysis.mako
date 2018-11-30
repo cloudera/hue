@@ -62,7 +62,7 @@ from desktop.views import _ko
               <div><span data-bind="text: contribution_factor_str"></span> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
               <ol data-bind="foreach: reason">
                 <li>
-                  <span data-bind="text: message"></span><strong> - <span data-bind="numberFormat: { value: impact, unit: unit }"></span></strong>
+                  <span data-bind="text: message, css: { striked: fix.fixed }"></span><strong> - <span data-bind="numberFormat: { value: impact, unit: unit }"></span></strong><span data-bind="visible: fix.fixable && !fix.fixed"> - <a href="javascript:void(0);" data-bind="click: $parents[2].handleFix.bind($parents[2], $data.fix)">${_('Fix')}</a></span>
                 </li>
               </ol>
             </li>
@@ -81,6 +81,16 @@ from desktop.views import _ko
 
         self.loading = ko.observable(false);
         self.analysis = ko.observable();
+        self.analysis.subscribe(function (analysis) {
+          $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
+          setTimeout(function () { // Wait for analysis to render
+            if (analysis.heatmap) {
+              self.updateHeatMap(analysis.heatmap[analysis.heatmapMetrics[0]], analysis.heatmapMetrics[0]);
+            } else {
+              d3.select(".heatmap").remove();
+            }
+          }, 0);
+        });
         self.healthChecks = ko.pureComputed(function () {
           var analysis = self.analysis()
           if (!analysis) {
@@ -97,7 +107,6 @@ from desktop.views import _ko
           }
           return '';
         });
-
         self.lastAnalysisPromise = undefined;
 
         var clearAnalysisSub = huePubSub.subscribe('editor.clear.execution.analysis', function() {
@@ -108,8 +117,6 @@ from desktop.views import _ko
             self.lastAnalysisPromise.cancel();
           }
           self.analysis(undefined);
-          $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
-          d3.select(".heatmap").remove();
         });
 
         var executionAnalysisSub = huePubSub.subscribe('editor.update.execution.analysis', function (details) {
@@ -131,7 +138,7 @@ from desktop.views import _ko
       };
       ExecutionAnalysis.prototype.heatmapMetricChanged = function (model, el) {
         var self = this;
-        self.updateHeatMap(self.analysis()['heatmap'][el.target.value], el.target.value);
+        self.updateHeatMap(self.analysis().heatmap[el.target.value], el.target.value);
       };
       ExecutionAnalysis.prototype.loadAnalysis = function (compute, queryId) {
         var self = this;
@@ -141,11 +148,8 @@ from desktop.views import _ko
           compute: compute,
           queryId: queryId
         }).done(function (response) {
-          self.analysis(response.query);
-          $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
-          setTimeout(function () { // Wait for analysis to render
-            self.updateHeatMap(response.query['heatmap'][response.query.heatmapMetrics[0]], response.query.heatmapMetrics[0]);
-          }, 0);
+          var analysis = response.query;
+          self.analysis(analysis);
         }).always(function () {
           self.loading(false);
         });
@@ -208,6 +212,17 @@ from desktop.views import _ko
             .on("mouseover", tip.show)
             .on("mouseout", tip.hide);
       }
+
+      ExecutionAnalysis.prototype.handleFix = function (fix) {
+        var self = this;
+        //TODO: Loading
+        ApiHelper.getInstance().fixQueryExecutionAnalysis({ fix: fix, start_time: ko.mapping.toJSON((new Date()).getTime()) })
+        .done(function(resp) {
+          huePubSub.publish('notebook.task.submitted', resp.task.history_uuid);
+          fix.fixed = true;
+          self.analysis.valueHasMutated();
+        });
+      };
 
       ExecutionAnalysis.prototype.dispose = function () {
         var self = this;

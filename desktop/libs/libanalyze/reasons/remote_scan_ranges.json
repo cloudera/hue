@@ -11,5 +11,8 @@
     "message": "Addition IO time cost by the remote read (assuming 30MB/sec remote)",
     "label": "Remote reads",
     "prio": 2
+  },
+  "fix": {
+    "fixable": false
   }
 }

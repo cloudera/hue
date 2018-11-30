@@ -9,5 +9,8 @@
     "expr": "vars['ProbeTime'] - float(vars['ProbeRows']) / 0.005",
     "message": "Excess time (over expected time) spent in the hash join",
     "label": "Slow Hash Join"
+  },
+  "fix": {
+    "fixable": false
   }
 }

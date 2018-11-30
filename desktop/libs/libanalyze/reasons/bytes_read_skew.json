@@ -15,5 +15,8 @@
     "message": "Addition IO time cost by the skew (assuming 5 disks)",
     "label": "Bytes Read Skew",
     "prio": 2
+  },
+  "fix": {
+    "fixable": false
   }
 }
