@@ -7523,16 +7523,18 @@
       format: function (element, valueAccessor) {
         var value = valueAccessor();
         var unwrapped = ko.unwrap(value);
+        $(element).text(that.human(unwrapped.value, unwrapped.unit));
+      },
+      human: function (value, unit) {
         var fn;
-        if (unwrapped.unit == 3) {
+        if (unit == 3) {
           fn = ko.bindingHandlers.bytesize.humanSize
-        } else if (unwrapped.unit == 5) {
+        } else if (unit == 5) {
           fn = ko.bindingHandlers.duration.humanTime
         } else {
           fn = function(value){ return value; }
         }
-        var formatted = fn(unwrapped.value);
-        $(element).text(formatted);
+        return fn(value);
       }
     }
   })();
@@ -7607,7 +7609,8 @@
         return Math.log(x) / Math.log(y);
       },
       humanSize: function(bytes) {
-        if (!bytes) {
+        var isNumber = !isNaN(parseFloat(bytes)) && isFinite(bytes);
+        if (!isNumber) {
           return '';
         }
 

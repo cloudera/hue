@@ -117,7 +117,7 @@ def host_by_metric(profile, metric_name, exprs=[max]):
   fragments = profile.find_all_fragments()
   fragments = filter(lambda x: x.is_averaged() == False, fragments)
   metrics = reduce(lambda x,y: x + y.find_metric_by_name(metric_name), fragments, [])
-  results = []
+  results = L(unit=-1)
   for k, g in groupby(metrics, lambda x: x['node'].host()):
       grouped = list(g)
       values = map(lambda x: x['value'], grouped)
@@ -126,6 +126,8 @@ def host_by_metric(profile, metric_name, exprs=[max]):
         value = expr(values)
         result.append(value)
       results.append(result)
+      if grouped:
+        results.unit = grouped[0]['unit']
 
   return results
 
