@@ -1260,6 +1260,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
             /
             <span data-bind="text: properties['properties']['workerReplicas']"></span>
+            <!-- ko if: properties['properties']['workerAutoResize'] -->
+              - ${ _('CPU') } <span data-bind="text: properties['properties']['workercurrentCPUUtilizationPercentage']"></span>%
+            <!-- /ko -->
             <!-- ko if: status() == 'SCALING_UP' || status() == 'SCALING_DOWN' -->
               <i class="fa fa-spinner fa-spin fa-fw"></i>
             <!-- /ko -->
