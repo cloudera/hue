@@ -16,12 +16,37 @@
  limitations under the License.
 */
 
-// NV D3 Adjustments
 .performance-graph {
+  position: relative;
 
   h3 {
     font-size: 34px;
     font-weight: 300;
+  }
+
+  .performance-tooltip {
+    border-radius: 3px;
+    position: absolute;
+    padding: 3px;
+    font: 10px @font-family-sans-serif;
+    background: rgba(240, 240, 240, 0.9);
+    pointer-events: none;
+  }
+
+  .performance-tooltip > div {
+    margin: 1px 0;
+  }
+
+  .performance-tooltip .performance-tooltip-label {
+    font-weight: 800;
+  }
+
+  .performance-tooltip .performance-tooltip-indicator {
+    padding-top: 3px;
+    width: 6px;
+    height: 8px;
+    margin-right: 3px;
+    display: inline-block;
   }
 
   svg {
@@ -47,6 +72,13 @@
 
     .nvd3.nv-bullet {
       font: 10px @font-family-sans-serif;
+    }
+
+    .brush .selection {
+      stroke: none;
+      fill: steelblue;
+      fill-opacity: .25;
+      shape-rendering: crispEdges;
     }
   }
 }
