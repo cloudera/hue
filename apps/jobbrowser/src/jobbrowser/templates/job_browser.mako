@@ -330,7 +330,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   </a>
                   <!-- /ko -->
 
-                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'create-cluster-content', minWidth: '320px', trigger: 'click' }">
+                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'create-cluster-content', minWidth: '320px', trigger: 'click' }, click: jobs.createClusterFormReset">
                     <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
                       ${ _('Add Warehouse') }
                     <!-- /ko -->
@@ -1273,7 +1273,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Auto resize') }</li>
           <li>
             <i data-bind="visible: !properties['properties']['workerAutoResize']()" class="fa fa-square-o fa-fw"></i>
-            <i data-bind="visible: properties['properties']['workerAutoResize']" class="fa fa-check-square-o fa-fw"></i>
+            <span data-bind="visible: properties['properties']['workerAutoResize']">
+              <i class="fa fa-check-square-o fa-fw"></i>
+              <span data-bind="text: properties['properties']['workerAutoResizeMin']"></span> -
+              <span data-bind="text: properties['properties']['workerAutoResizeMax']"></span>
+              ${ _('CPU:') } <span data-bind="text: properties['properties']['workerAutoResizeCpu']"></span>%
+            </span>
           </li>
           <li class="nav-header">${ _('Auto pause') }</li>
           <li><i class="fa fa-square-o fa-fw"></i></li>
@@ -1291,7 +1296,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position: relative;">
       <div style="position: absolute; top: 0; right: 0">
-        <button class="btn" title="Create cluster" data-bind="enable: status() == 'ONLINE', visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'configure-cluster-content', minWidth: '320px', trigger: 'click' }" style="">
+        <button class="btn" title="Create cluster" data-bind="enable: isRunning(), visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'configure-cluster-content', minWidth: '320px', trigger: 'click' }, click: updateClusterShow" style="">
             ${ _('Configure') }
           <i class="fa fa-chevron-down"></i>
         </button>
@@ -2696,16 +2701,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.updateClusterAutoResizeCpu = ko.observable(80);
       self.updateClusterAutoPause = ko.observable();
 
-      self.updateClusterShow = ko.observable(false);
-      self.updateClusterShow.subscribe(function(newVal) {
-        if (newVal) {
-          self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
-          self.updateClusterAutoResize(self.properties['properties']['workerAutoResize']());
+      self.updateClusterShow = function() {
+        self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
+        self.updateClusterAutoResize(self.properties['properties']['workerAutoResize']());
+        if (self.properties['properties']['workerAutoResize']()) {
           self.updateClusterAutoResizeMin(self.properties['properties']['workerAutoResizeMin']());
           self.updateClusterAutoResizeMax(self.properties['properties']['workerAutoResizeMax']());
           self.updateClusterAutoResizeCpu(self.properties['properties']['workerAutoResizeCpu']());
         }
-      });
+      };
 
       self.clusterConfigModified = ko.pureComputed(function () {
         return (self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()) ||
@@ -2728,7 +2732,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           ## $(document).trigger("info", ko.mapping.toJSON(data));
           self.updateJob();
         });
-        self.updateClusterShow(false);
       }
 
       self.troubleshoot = function (action) {
@@ -3040,8 +3043,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.createClusterName = ko.observable('');
       self.createClusterWorkers = ko.observable(1);
       self.createClusterShowWorkers = ko.observable(false);
+      self.createClusterAutoResize = ko.observable(false);
       self.createClusterAutoPause = ko.observable(false);
-      self.createClusterAutoResize = ko.observable(true);
+
+      self.createClusterFormReset = function() {
+        self.createClusterName('');
+        self.createClusterWorkers(1);
+        self.createClusterAutoResize(false);
+        self.createClusterAutoPause(false);
+      }
 
       self.createCluster = function() {
         if (vm.interface().indexOf('dataeng') != -1) {
@@ -3071,8 +3081,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
-            self.createClusterName('');
-            self.createClusterWorkers(1);
+            self.createClusterFormReset();
             ##$(document).trigger("info", ko.mapping.toJSON(data));
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
