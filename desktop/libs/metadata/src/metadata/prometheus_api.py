@@ -57,7 +57,7 @@ def query(request):
   query = json.loads(request.POST.get('query', '{}'))
 
   if request.POST.get('start'):
-    response['data'] = api.range_query(query, start=request.POST.get('start'), end=request.POST.get('end'), steps=request.POST.get('steps'))
+    response['data'] = api.range_query(query, start=request.POST.get('start'), end=request.POST.get('end'), step=request.POST.get('step'))
   else:
     response['data'] = api.query(query)
 
