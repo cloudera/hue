@@ -364,6 +364,45 @@
                 .attr('transform', 'translate(0,' + subHeight + ')')
                 .call(subXAxis);
 
+        mainGroup
+                .append("text")
+                .attr("class", "y-label y-label-queries")
+                .attr("transform", "rotate(-90)")
+                .attr("x", - mainHeight/2)
+                .attr("y", - 45)
+                .attr("dy", "1em")
+                .style("text-anchor", "middle");
+
+        mainGroup
+                .append("text")
+                .attr("class", "y-label y-label-resources")
+                .attr("transform", "rotate(90)")
+                .attr("x", mainHeight/2)
+                .attr("y", - width - 55)
+                .attr("dy", "1em")
+                .style("text-anchor", "middle");
+
+        var updateAxesLabels = function () {
+          var queriesLabel = '';
+          var resourcesLabel = '';
+          for (var i = 0; i < graphs.length; i++) {
+            if (i === 0 && graphs[i].enabled()) {
+              queriesLabel = graphs[i].label;
+            } else if (graphs[i].enabled()) {
+              if (resourcesLabel !== '') {
+                resourcesLabel += ' ';
+              }
+              resourcesLabel += graphs[i].label;
+            }
+          }
+          mainGroup.select('.y-label-queries').text(queriesLabel);
+          mainGroup.select('.y-label-resources').text(resourcesLabel);
+          mainGroup.select('.main-axis-query-count').attr('display', queriesLabel === '' ? 'none' : null);
+          mainGroup.select('.main-axis-percentage').attr('display', resourcesLabel === '' ? 'none' : null);
+        };
+
+        updateAxesLabels();
+
 
         // Add brush
         var brush = d3.brushX()
@@ -458,6 +497,7 @@
           var legendSerie = legend.append('g')
                   .on('click', function (d, j) {
                     graph.toggle();
+                    updateAxesLabels();
                   });
 
           legendSerie.append('circle')
