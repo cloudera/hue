@@ -63,14 +63,14 @@ class PrometheusApi(object):
     except RestException, e:
       raise PrometheusApiException(e)
 
-  def range_query(self, query, start, end, steps):
+  def range_query(self, query, start, end, step):
     # e.g. /api/v1/query_range?query=up&start=2015-07-01T20:10:30.781Z&end=2015-07-01T20:11:00.781Z&step=15s
     try:
       return self._root.get('query_range', {
         'query': query,
         'start': start,
         'end': end,
-        'steps': steps
+        'step': step
       })['data']
     except RestException, e:
       raise PrometheusApiException(e)
