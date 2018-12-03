@@ -1,6 +1,6 @@
 {
   "type": "SQLOperator",
-  "node_name": "HDFS_SCAN_NODE",
+  "node_name": ["HDFS_SCAN_NODE", "KUDU_SCAN_NODE"],
   "metric_names": [
     "MissingStats"
   ],
@@ -8,7 +8,7 @@
   "rule": {
     "condition": "vars['MissingStats'] == 1",
     "expr": "1",
-    "message": "The statistics are missing or corrupt which prevent scan and join optimizations.",
+    "message": "The statistics are missing or corrupt which prevent scan optimizations.",
     "label": "Statistics Missing"
   },
   "fix": {
