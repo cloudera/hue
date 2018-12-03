@@ -1781,7 +1781,8 @@ var EditorViewModel = (function() {
         huePubSub.publish('editor.update.execution.analysis', {
           analysisPossible: true,
           compute: self.compute(),
-          queryId: notebook.getContext().id()
+          queryId: notebook.getContext().id(),
+          name: self.jobs()[0] && self.jobs()[0].name
         });
       } else {
         huePubSub.publish('editor.update.execution.analysis', {

@@ -20,6 +20,9 @@ function impalaDagre(id) {
       var scale = _impalaDagree.scale || 1;
       var height = value || 600;
       svg.attr('height', Math.min(g.graph().height * scale + 40, height) || height);
+    },
+    moveTo: function(id) {
+      zoomToNode(id);
     }
   };
 
@@ -74,6 +77,32 @@ function impalaDagre(id) {
   }
 
   var is_first = true;
+
+  function zoomToNode(node) {
+    var nodes = g.nodes();
+    var key;
+    var nNode = parseInt(node, 10);
+    var keys = Object.keys(nodes);
+    for (var i = 0; i < keys.length; i++) {
+      if (parseInt(nodes[keys[i]].split(':')[0], 10) == nNode) {
+        key = nodes[keys[i]];
+        break;
+      }
+    }
+    if (!key) {
+      return;
+    }
+    var n = $("g.node:contains('" + key + "')")[0];
+    var t = d3.transform(d3.select(n).attr("transform")),
+        x = t.translate[0],
+        y = t.translate[1];
+
+    var scale = 1;
+
+    svg.transition().duration(1000)
+        .call(zoom.translate([((x * -scale) + (svg.property("clientWidth") / 2)), ((y * -scale) + svg.property("clientHeight") / 2)])
+            .scale(scale).event);
+  }
 
   function renderGraph(plan) {
     if (!plan || !plan.plan_nodes || !plan.plan_nodes.length) return;

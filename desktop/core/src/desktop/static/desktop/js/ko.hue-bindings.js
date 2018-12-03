@@ -7495,7 +7495,14 @@
     return {
       init: function (element, valueAccessor, allBindingsAccessor) {
         var id = $(element).attr("id");
-        this._impalaDagre = impalaDagre(id);
+        var self = this;
+        self._impalaDagre = impalaDagre(id);
+        var clickSubscription = huePubSub.subscribe('impala.node.moveto', function(value) {
+          self._impalaDagre.moveTo(value);
+        });
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+          clickSubscription.remove();
+        });
       },
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
