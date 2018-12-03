@@ -505,6 +505,7 @@
             self.data = data;
           } else {
             data.forEach(function (newRow) {
+              self.data.shift();
               self.data.push(newRow);
             })
           }
