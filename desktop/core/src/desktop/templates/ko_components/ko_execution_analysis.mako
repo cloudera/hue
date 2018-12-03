@@ -59,7 +59,7 @@ from desktop.views import _ko
           <h4>${_('Top down analysis')}</h4>
           <ul class="risk-list" data-bind="foreach: $parent.healthChecks">
             <li>
-              <div><span data-bind="text: contribution_factor_str"></span> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
+              <div><a href="javascript:void(0);" data-bind="click: $parents[1].handleNodePress.bind($parents[1], $data)"><span data-bind="text: contribution_factor_str"></span></a> - <strong><span data-bind="duration: wall_clock_time"></strong></div>
               <ol data-bind="foreach: reason">
                 <li>
                   <span data-bind="text: message, css: { striked: fix.fixed }"></span><strong> - <span data-bind="numberFormat: { value: impact, unit: unit }"></span></strong><span data-bind="visible: fix.fixable && !fix.fixed"> - <a href="javascript:void(0);" data-bind="click: $parents[2].handleFix.bind($parents[2], $data.fix)">${_('Fix')}</a></span>
@@ -81,7 +81,8 @@ from desktop.views import _ko
 
         self.loading = ko.observable(false);
         self.analysis = ko.observable();
-        self.analysis.subscribe(function (analysis) {
+        self.details = ko.observable();
+        var analysisSub = self.analysis.subscribe(function (analysis) {
           $('[href*=executionAnalysis] span:eq(1)').text(self.analysisCount());
           setTimeout(function () { // Wait for analysis to render
             if (analysis.heatmap) {
@@ -125,6 +126,7 @@ from desktop.views import _ko
           }
           if (details.analysisPossible) {
             self.analysisPossible(true);
+            self.details(details);
             self.loadAnalysis(details.compute, details.queryId);
           } else {
             self.analysisPossible(false);
@@ -132,13 +134,17 @@ from desktop.views import _ko
         });
 
         self.disposals.push(function () {
+          analysisSub.remove();
           clearAnalysisSub.remove();
           executionAnalysisSub.remove();
         });
       };
       ExecutionAnalysis.prototype.heatmapMetricChanged = function (model, el) {
         var self = this;
-        self.updateHeatMap(self.analysis().heatmap[el.target.value], el.target.value);
+        var analysis = self.analysis();
+        if (analysis.heatmap) {
+          self.updateHeatMap(analysis.heatmap[analysis.heatmapMetrics[0]], analysis.heatmapMetrics[0]);
+        }
       };
       ExecutionAnalysis.prototype.loadAnalysis = function (compute, queryId) {
         var self = this;
@@ -215,13 +221,29 @@ from desktop.views import _ko
 
       ExecutionAnalysis.prototype.handleFix = function (fix) {
         var self = this;
-        //TODO: Loading
         ApiHelper.getInstance().fixQueryExecutionAnalysis({ fix: fix, start_time: ko.mapping.toJSON((new Date()).getTime()) })
         .done(function(resp) {
           huePubSub.publish('notebook.task.submitted', resp.task.history_uuid);
           fix.fixed = true;
           self.analysis.valueHasMutated();
         });
+      };
+
+      ExecutionAnalysis.prototype.handleNodePress = function (contributor) {
+        var self = this;
+        debugger;
+        //TODO: Loading
+        if (!$('[href*="' + self.details().name + '"]')[0]) {
+          huePubSub.publish('show.jobs.panel', { id: self.details().name, interface: 'queries' });
+          setTimeout(function() {
+            huePubSub.publish('impala.node.moveto', contributor.result_id);
+          }, 500);
+        } else {
+          if (!$('#jobsPanel').is(":visible")) {
+            $('#jobsPanel').show();
+          }
+          huePubSub.publish('impala.node.moveto', contributor.result_id);
+        }
       };
 
       ExecutionAnalysis.prototype.dispose = function () {

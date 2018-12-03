@@ -653,7 +653,7 @@ class TopDownAnalysis:
         for contributor in topContributors:
             reasons = self.getTopReasons(contributor)
             topContributions += [{
-                    "result_id" : contributor.plan_node_id if contributor.plan_node_id != -1 else '-1',
+                    "result_id" : contributor.plan_node_id if contributor.plan_node_id != -1 else -1,
                     "contribution_factor_str" : contributor.type + " " +
                                                 str(contributor.plan_node_id).zfill(2) +
                                                 ":" + contributor.plan_node_name,
