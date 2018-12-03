@@ -95,13 +95,13 @@ class SQLOperatorReason:
         """
         nodeType = node.name()
 
-        if (nodeType == 'HDFS_SCAN_NODE'):
+        if re.search(r'\w*_SCAN_NODE', nodeType, re.IGNORECASE):
             return node.find_metric_by_name('RowsRead')[0]['value']
-        if (nodeType == 'EXCHANGE_NODE'):
+        if nodeType == 'EXCHANGE_NODE':
             return node.find_metric_by_name('RowsReturned')[0]['value']
-        if (nodeType == 'HASH_JOIN_NODE'):
+        if nodeType == 'HASH_JOIN_NODE':
             return node.find_metric_by_name('ProbeRows')[0]['value']
-        if (nodeType == 'HdfsTableSink'):
+        if nodeType == 'HdfsTableSink':
             return node.find_metric_by_name('RowsInserted')[0]['value']
 
         metrics = reduce(lambda x,y: x + y.find_metric_by_name('RowsReturned'), node.children, [])
@@ -598,7 +598,8 @@ class TopDownAnalysis:
             if exec_summary_json[int(node_id)]["broadcast"]:
                 broadcast = 1
             node.val.counters.append(models.TCounter(name='Broadcast', value=broadcast, unit=0))
-            if node.name() == 'HDFS_SCAN_NODE':
+
+            if re.search(r'\w*_SCAN_NODE', node.name(), re.IGNORECASE):
               details = exec_summary_node['detail'].split()
               node.val.info_strings['Table'] = details[0]
               node.val.counters.append(models.TCounter(name='MissingStats', value=missing_stats.get(details[0], 0), unit=0))
