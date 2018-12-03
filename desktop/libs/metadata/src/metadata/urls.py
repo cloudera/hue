@@ -17,7 +17,7 @@
 
 from django.conf.urls import url
 
-from metadata import catalog_api as metadata_catalog_api, analytic_db_api, dataeng_api
+from metadata import catalog_api as metadata_catalog_api, analytic_db_api, dataeng_api, prometheus_api
 from metadata import optimizer_api as metadata_optimizer_api
 from metadata import workload_analytics_api as metadata_workload_analytics_api
 from metadata import manager_api as metadata_manager_api
@@ -82,6 +82,12 @@ urlpatterns += [
   url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='manager_hello'),
   url(r'^api/manager/get_hosts/?$', metadata_manager_api.get_hosts, name='manager_hosts'),
   url(r'^api/manager/update_flume_config/?$', metadata_manager_api.update_flume_config, name='manager_update_flume_config'),
+]
+
+
+# Prometheus API
+urlpatterns += [
+  url(r'^api/prometheus/query?$', prometheus_api.query, name='prometheus_query'),
 ]
 
 

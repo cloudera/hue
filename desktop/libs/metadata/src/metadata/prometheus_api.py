@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 
 from django.utils.html import escape
@@ -53,7 +54,7 @@ def query(request):
   }
   api = PrometheusApi(request.user)
 
-  query = request.POST.get('query')
+  query = json.loads(request.POST.get('query', '{}'))
 
   if request.POST.get('start'):
     response['data'] = api.range_query(query, start=request.POST.get('start'), end=request.POST.get('end'), steps=request.POST.get('steps'))

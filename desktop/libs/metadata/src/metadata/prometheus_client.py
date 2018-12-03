@@ -16,9 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
-import urllib
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -47,16 +45,11 @@ class PrometheusApiException(Exception):
 
 class PrometheusApi(object):
 
-  def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
+  def __init__(self, user=None, ssl_cert_ca_verify=False):
     self._api_url = '%s/%s' % (PROMETHEUS.API_URL.get().strip('/'), VERSION)
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
-
-    if security_enabled:
-      self._client.set_kerberos_auth()
-    else:
-      self._client.set_basic_auth(self._username, self._password)
 
     self._client.set_verify(ssl_cert_ca_verify)
     self._root = Resource(self._client)
