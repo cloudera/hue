@@ -374,6 +374,17 @@ MANAGER = ConfigSection(
   # password comes from get_navigator_auth_password()
 )
 
+PROMETHEUS = ConfigSection(
+  key='prometheus',
+  help=_t("""Configuration options for Prometheus API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to API.'),
+      default=None),
+  )
+)
+
 
 def test_metadata_configurations(user):
   from libsentry.conf import is_enabled
