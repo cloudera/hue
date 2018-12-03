@@ -950,7 +950,6 @@ var ApiHelper = (function () {
     var lastIO = 0;
     var lastQueryCount = 0;
     var addFakeMeasurement = function (data, time) {
-
       var newQueryCount = Math.round(Math.max(Math.min(lastQueryCount + (Math.random() - 0.5) * 10, 25), 0));
 
       var queuedQueryCount = Math.round(newQueryCount * Math.random());
@@ -978,7 +977,41 @@ var ApiHelper = (function () {
     };
 
     generateFakeData(data, options.startTime, options.endTime, options.points);
-    return $.Deferred().resolve(data).promise();
+    
+//    var end = new Date();
+//    var start = new Date(end);
+//    start.setDate(start.getDate() - 1);
+
+    var metrics = []
+    var start = Math.floor(options.startTime / 1000);
+    var end = Math.floor(options.endTime / 1000);
+    var step = 60 * 60; // Same as "1h"
+    
+    $.ajax({
+      type: 'POST',
+      url: "/metadata/api/prometheus/query",
+      data: {
+        "query": ko.mapping.toJSON("node_cpu_seconds_total"), // impala_queries
+        // TODO: labels
+        "start": ko.mapping.toJSON(start),
+        "end": ko.mapping.toJSON(end),
+        "step": ko.mapping.toJSON(step),
+      },
+      success: function(data) {
+        //console.log(ko.mapping.toJSON(data));
+        if (data.data.result) {
+	        data.data.result[0].values.forEach(function(point) {
+	        	metrics.push([point[0] * 1000, 0, 0, 0, point[1], 0]);
+	        });
+        }
+      },
+      async: false
+    });
+
+    console.log(data);
+    console.log(metrics);
+    
+    return $.Deferred().resolve(metrics).promise();
   };
 
   /**
