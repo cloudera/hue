@@ -258,6 +258,7 @@
             tooltip: options.tooltip,
             toggle: function () {
               enabled = !enabled;
+              ApiHelper.getInstance().setInTotalStorage('warehouses', options.id + 'GraphEnabled', enabled);
               mainGroup.select('.highlight-point-' + options.id).style('display', enabled ? null : 'none');
               mainGroup.select('.line-' + options.id).style('display', enabled ? null : 'none');
               subGroup.select('.line-' + options.id).style('display', enabled ? null : 'none');
@@ -293,9 +294,9 @@
 
         var graphs = [
           createLineGraph({
-            id: 'query-count-sum',
+            id: 'queries',
             label: '${ _("Queries") }',
-            enabled: true,
+            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'queriesGraphEnabled', true),
             color: '#87BAD5',
             subLineColor: '#AAAAAA',
             area: true,
@@ -316,7 +317,7 @@
           }),
           createLineGraph({
             id: 'cpu',
-            enabled: false,
+            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'cpuGraphEnabled', false),
             label: '${ _("CPU") }',
             color: '#96C55A',
             subLine: true,
@@ -326,7 +327,7 @@
           }),
           createLineGraph({
             id: 'memory',
-            enabled: false,
+            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'memoryGraphEnabled', false),
             label: '${ _("Memory") }',
             color: '#E7808D',
             subLine: true,
@@ -336,7 +337,7 @@
           }),
           createLineGraph({
             id: 'io',
-            enabled: false,
+            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'ioGraphEnabled', false),
             label: '${ _("IO") }',
             color: '#7A9F9F',
             subLine: true,
