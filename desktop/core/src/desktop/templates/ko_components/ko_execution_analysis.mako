@@ -134,7 +134,7 @@ from desktop.views import _ko
         });
 
         self.disposals.push(function () {
-          analysisSub.remove();
+          analysisSub.dispose()
           clearAnalysisSub.remove();
           executionAnalysisSub.remove();
         });
