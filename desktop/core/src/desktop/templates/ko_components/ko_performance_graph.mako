@@ -436,7 +436,7 @@
           var j = dateBisector(self.data, x, 1);
           var d0 = self.data[j - 1];
           var d1 = self.data[j];
-          var closest = x - d0 > d1 - x ? d1 : d0;
+          var closest = x - d0[0] > d1[0] - x ? d1 : d0;
 
           graphs.forEach(function (graph) {
             graph.highlightPoint(closest)
