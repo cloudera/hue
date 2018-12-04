@@ -279,10 +279,12 @@
                 mainGroup.append('circle')
                         .attr('class', 'highlight-point highlight-point-' + options.id)
                         .style('display', enabled ? null : 'none')
+                        .attr('stroke', '#FFF')
+                        .attr('stroke-width', 2)
                         .attr('fill', function (d, j) {
                           return options.color
                         })
-                        .attr("r", 2.5)
+                        .attr("r", 4)
                         .attr('transform', "translate(" + mainXScale(dataPoint[0]) + "," + options.y(dataPoint) + ")")
               }
             }
@@ -443,7 +445,7 @@
           });
 
           var generateTooltipHtml = function (dataPoint) {
-            var html = '';
+            var html = '<div class="performance-tooltip-time">' + moment(dataPoint[0]).toISOString() + '</div>';
             graphs.forEach(function (graph) {
               if (graph.tooltip && graph.enabled()) {
                 html += '<div><div class="performance-tooltip-indicator"><div style="background-color: ' + graph.color + '">&nbsp;</div></div><span class="performance-tooltip-label">' + graph.label + '</span> ' + graph.tooltip(dataPoint) + '</div>';
