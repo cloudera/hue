@@ -92,9 +92,10 @@ class LastActivityMiddleware(object):
 
     # Save last activity for user except when polling
     if not (request.path.strip('/') == 'notebook/api/check_status') \
-        and not (request.path.strip('/') == 'jobbrowser/api/jobs') \
+        and not (request.path.strip('/').startswith('jobbrowser/api/job')) \
         and not (request.path.strip('/') == 'jobbrowser/jobs' and request.POST.get('format') == 'json') \
-        and not (request.path.strip('/') == 'desktop/debug/is_idle'):
+        and not (request.path.strip('/') == 'desktop/debug/is_idle') \
+        and not (request.path.strip('/').startswith('oozie/list_oozie_')):
       try:
         profile.last_activity = datetime.now()
         profile.save()
