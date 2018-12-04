@@ -1,0 +1,16 @@
+{
+  "type": "SQLOperator",
+  "node_name": "KUDU_SCAN_NODE",
+  "metric_names": [
+    "RowsRead", "RowsReturned"
+  ],
+  "rule": {
+    "condition": "vars['RowsReturned'] < vars['RowsRead']",
+    "expr": "vars['RowsRead'] - vars['RowsReturned']",
+    "message": "Kudu could not evaluate the predicate and it was evaluated by Impala",
+    "label": "Kudu predicate optimization"
+  },
+  "fix": {
+    "fixable": false
+  }
+}
