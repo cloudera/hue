@@ -107,7 +107,7 @@ class DataWarehouseClusterApi(Api):
     return {'logs': ''}
 
 
-  def profile(self, appid, app_type, app_property):
+  def profile(self, app_id, app_type, app_property, app_filters):
     return {}
 
   def _api_status(self, status):
