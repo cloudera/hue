@@ -991,8 +991,8 @@ var ApiHelper = (function () {
       type: 'POST',
       url: "/metadata/api/prometheus/query",
       data: {
-        "query": ko.mapping.toJSON("node_cpu_seconds_total"), // impala_queries
-        // TODO: labels
+        "query": ko.mapping.toJSON("impala_queries"),
+        // TODO: labels of cluster
         "start": ko.mapping.toJSON(start),
         "end": ko.mapping.toJSON(end),
         "step": ko.mapping.toJSON(step),
