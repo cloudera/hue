@@ -142,7 +142,9 @@
 
 
         // Update scale domains from data
-        mainXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
+        if (self.data[0]) {
+          mainXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
+        }
         percentageYScale.domain([0, 100]);
         var queryMax = 15;
         self.data.forEach(function (row) {
@@ -433,10 +435,12 @@
                   mainGroup.select('.main-axis-x').call(mainXAxis);
                 });
 
-        subGroup.append('g')
+        if (self.data[0]) {
+          subGroup.append('g')
                 .attr('class', 'brush')
                 .call(brush)
                 .call(brush.move, [mainXScale(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow), mainXScale(self.data[self.data.length - 1][0])]);
+        }
 
         // TODO: Custom handles
 
