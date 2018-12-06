@@ -134,11 +134,11 @@
 
 
         // Axes
-        var mainXAxis = d3.axisBottom(mainXScale);
-        var subXAxis = d3.axisBottom(subXScale);
+        var mainXAxis = d3.axisBottom(mainXScale).tickPadding(7);
+        var subXAxis = d3.axisBottom(subXScale).tickPadding(7).tickSize(0);
 
-        var queryYAxis = d3.axisLeft(queryYScale);
-        var percentageYAxis = d3.axisRight(percentageYScale).tickFormat(function (y) { return y + '%' });
+        var queryYAxis = d3.axisLeft(queryYScale).tickPadding(7);
+        var percentageYAxis = d3.axisRight(percentageYScale).tickPadding(7).tickFormat(function (y) { return y + '%' });
 
 
         // Update scale domains from data
@@ -213,7 +213,7 @@
                     return options.color;
                   })
                   .attr('stroke-width', options.area ? 0 : 2)
-                  .style('display', enabled ? null : 'none')
+                  .style('opacity', enabled ? 1 : 0)
                   .attr('fill', options.area ? options.color : 'none')
                   .attr('clip-path', 'url(#clip)')
                   .classed('line line-' + options.id, true)
@@ -239,7 +239,7 @@
                     .attr('stroke', function (d, j) {
                       return options.subLineColor || options.color;
                     })
-                    .style('display', enabled ? null : 'none')
+                    .style('opacity', enabled ? 1 : 0)
                     .attr('fill', options.area ? options.subLineColor || options.color : 'none')
                     .attr('clip-path', 'url(#clip)')
                     .classed('line line-' + options.id, true)
@@ -275,15 +275,13 @@
               enabled = !enabled;
               ApiHelper.getInstance().setInTotalStorage('warehouses', options.id + 'GraphEnabled', enabled);
               mainGroup.select('.highlight-point-' + options.id).style('display', enabled ? null : 'none');
-              mainGroup.select('.line-' + options.id).style('display', enabled ? null : 'none');
-              subGroup.select('.line-' + options.id).style('display', enabled ? null : 'none');
-              svg.select('.legend-radio-' + options.id).attr('fill-opacity', enabled ? 1 : 0.2);
+              mainGroup.select('.line-' + options.id).transition().style('opacity', enabled ? 1 : 0);
+              subGroup.select('.line-' + options.id).transition().style('opacity', enabled ? 1 : 0);
               if (stackedGraph) {
                 stackedGraph.enabled = enabled;
                 mainGroup.select('.highlight-point-' + stackedGraph.id).style('display', enabled ? null : 'none');
-                mainGroup.select('.line-' + stackedGraph.id).style('display', enabled ? null : 'none');
-                subGroup.select('.line-' + stackedGraph.id).style('display', enabled ? null : 'none');
-                svg.select('.legend-radio-' + stackedGraph.id).attr('fill-opacity', enabled ? 1 : 0.2);
+                mainGroup.select('.line-' + stackedGraph.id).transition().style('opacity', enabled ? 1 : 0);
+                subGroup.select('.line-' + stackedGraph.id).transition().style('opacity', enabled ? 1 : 0);
               }
             },
             highlightPoint: function (dataPoint) {
@@ -534,11 +532,11 @@
                 .attr('class', 'legend-serie')
                 .on('click', function (d) {
                   d.toggle();
-                  d3.select(this).select('rect').attr('fill', function (d) {
+                  d3.select(this).select('rect').transition().attr('fill', function (d) {
                     return d.enabled() ? d.color : '#FFF'
                   });
-                  d3.select(this).select('path').attr('display', function (d) {
-                    return d.enabled() ? null : 'none'
+                  d3.select(this).select('path').transition().attr('opacity', function (d) {
+                    return d.enabled() ? 1 : 0
                   });
                   updateAxesLabels();
                 });
@@ -561,8 +559,12 @@
         legendSerie.append('path')
                 .attr('d', 'M-6,-1, -2,3, 2,-4')
                 .attr('fill', 'none')
-                .attr('stroke', function (d, j) { return j === 0 || j === 2 ? '#000' : '#FFF' })
-                .attr('display', function (d) { return d.enabled() ? null : 'none' })
+                .attr('stroke', function (d, j) {
+                  return j === 0 || j === 2 ? '#000' : '#FFF'
+                })
+                .transition().attr('opacity', function (d) {
+                  return d.enabled() ? 1 : 0
+                })
                 .attr('stroke-width', 2);
 
         legendSerie.append('text', 'rect')
