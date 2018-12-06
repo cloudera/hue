@@ -212,9 +212,10 @@
                   .attr('stroke', function (d, j) {
                     return options.color;
                   })
+                  .attr('stroke-width', options.area ? 0 : 2)
                   .style('display', enabled ? null : 'none')
                   .attr('fill', options.area ? options.color : 'none')
-                  .attr("clip-path", "url(#clip)")
+                  .attr('clip-path', 'url(#clip)')
                   .classed('line line-' + options.id, true)
                   .attr('d', line);
 
@@ -240,7 +241,7 @@
                     })
                     .style('display', enabled ? null : 'none')
                     .attr('fill', options.area ? options.subLineColor || options.color : 'none')
-                    .attr("clip-path", "url(#clip)")
+                    .attr('clip-path', 'url(#clip)')
                     .classed('line line-' + options.id, true)
                     .attr('d', subLine);
             subRefresh = function () {
@@ -299,8 +300,8 @@
                         .attr('fill', function (d, j) {
                           return options.color
                         })
-                        .attr("r", 4)
-                        .attr('transform', "translate(" + mainXScale(dataPoint[0]) + "," + options.y(dataPoint) + ")")
+                        .attr('r', 4)
+                        .attr('transform', 'translate(' + mainXScale(dataPoint[0]) + ',' + options.y(dataPoint) + ')')
               }
             }
           }
@@ -311,8 +312,8 @@
             id: 'queries',
             label: '${ _("Queries") }',
             enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'queriesGraphEnabled', true),
-            color: '#87BAD5',
-            subLineColor: '#AAAAAA',
+            color: '#A9DBF1',
+            subLineColor: '#DCDCDC',
             area: true,
             subLine: true,
             tooltip: function (d) { return d[4] + d[5] + (d[4] ? ' (' + d[4] + ' ${ _("queued") })' : '') },
@@ -333,7 +334,7 @@
             id: 'cpu',
             enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'cpuGraphEnabled', false),
             label: '${ _("CPU") }',
-            color: '#96C55A',
+            color: '#654C94',
             subLine: true,
             tooltip: function (d) { return d[1] + '%' },
             y: function (d) { return percentageYScale(d[1]) },
@@ -343,7 +344,7 @@
             id: 'memory',
             enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'memoryGraphEnabled', false),
             label: '${ _("Memory") }',
-            color: '#E7808D',
+            color: '#83C1B9',
             subLine: true,
             tooltip: function (d) { return d[2] + '%' },
             y: function (d) { return percentageYScale(d[2]) },
@@ -353,7 +354,7 @@
             id: 'io',
             enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'ioGraphEnabled', false),
             label: '${ _("IO") }',
-            color: '#7A9F9F',
+            color: '#D4965E',
             subLine: true,
             tooltip: function (d) { return d[3] + '%' },
             y: function (d) { return percentageYScale(d[3]) },
@@ -382,22 +383,22 @@
                 .call(subXAxis);
 
         mainGroup
-                .append("text")
-                .attr("class", "y-label y-label-queries")
-                .attr("transform", "rotate(-90)")
-                .attr("x", - mainHeight/2)
-                .attr("y", - 45)
-                .attr("dy", "1em")
-                .style("text-anchor", "middle");
+                .append('text')
+                .attr('class', 'y-label y-label-queries')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', - mainHeight/2)
+                .attr('y', - 45)
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle');
 
         mainGroup
-                .append("text")
-                .attr("class", "y-label y-label-resources")
-                .attr("transform", "rotate(90)")
-                .attr("x", mainHeight/2)
-                .attr("y", - width - 55)
-                .attr("dy", "1em")
-                .style("text-anchor", "middle");
+                .append('text')
+                .attr('class', 'y-label y-label-resources')
+                .attr('transform', 'rotate(90)')
+                .attr('x', mainHeight/2)
+                .attr('y', - width - 55)
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle');
 
         var updateAxesLabels = function () {
           var queriesLabel = '';
@@ -422,28 +423,48 @@
 
 
         // Add brush
+        var brushed = function () {
+          var s = d3.event.selection || subXScale.range();
+          mainXScale.domain(s.map(subXScale.invert, subXScale));
+
+          graphs.forEach(function (graph) {
+            graph.refresh();
+          });
+
+          mainGroup.select('.main-axis-x').call(mainXAxis);
+
+          handle.attr('transform', function(d, i) { return 'translate(' + s[i] + ',' + subHeight / 2 + ')'; });
+        };
+
         var brush = d3.brushX()
                 .extent([[0, 0], [width, subHeight]])
-                .on('start brush end', function () {
-                  var s = d3.event.selection || subXScale.range();
-                  mainXScale.domain(s.map(subXScale.invert, subXScale));
+                .on('start brush end', brushed);
 
-                  graphs.forEach(function (graph) {
-                    graph.refresh();
-                  });
-
-                  mainGroup.select('.main-axis-x').call(mainXAxis);
-                });
-
-        if (self.data[0]) {
-          subGroup.append('g')
+        var brushG = subGroup
+                .append('g')
                 .attr('class', 'brush')
-                .call(brush)
-                .call(brush.move, [mainXScale(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow), mainXScale(self.data[self.data.length - 1][0])]);
-        }
+                .call(brush);
+
+        var handle = brushG.selectAll('.handle--custom')
+                .data([{ type: 'w' }, { type: 'e' }])
+                .enter().append('circle')
+                .classed('handle--custom', true)
+                .attr('cursor', 'ew-resize')
+                .attr('fill', '#FFF')
+                .attr('r', 8)
+                .attr('stroke', '#787878')
+                .attr('stroke-width', 7);
+
+        ##  if (self.data[0]) {
+        ##    subGroup.append('g')
+        ##          .attr('class', 'brush')
+        ##          .call(brush)
+        ##          .call(brush.move, [mainXScale(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow), mainXScale(self.data[self.data.length - 1][0])]);
+        ##  }
+
+        brushG.call(brush.move, [mainXScale(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow), mainXScale(self.data[self.data.length - 1][0])]);
 
         // TODO: Custom handles
-
 
         // Mouse hover overlay
         var dateBisector = d3.bisector(function (d) {
@@ -474,20 +495,20 @@
           d3.select(self.graphElement)
                   .select('.performance-tooltip')
                   .html(generateTooltipHtml(closest))
-                  .style("left", lastMouseCoord[0] + mainMargin.left + 15 + "px")
-                  .style("top", lastMouseCoord[1] + mainMargin.top +  "px");
+                  .style('left', lastMouseCoord[0] + mainMargin.left + 15 + 'px')
+                  .style('top', lastMouseCoord[1] + mainMargin.top +  'px');
 
         };
 
         var lastMouseCoord = [0, 0];
         var lastFocusX = 0;
-        mainGroup.append("rect")
-                .attr('class', "overlay")
-                .attr("fill-opacity", "0")
-                .attr("fill", "white")
-                .attr("width", width)
-                .attr("height", mainHeight)
-                .on("mouseout", function () {
+        mainGroup.append('rect')
+                .attr('class', 'overlay')
+                .attr('fill-opacity', '0')
+                .attr('fill', 'white')
+                .attr('width', width)
+                .attr('height', mainHeight)
+                .on('mouseout', function () {
                   mainGroup.selectAll('.highlight-point').remove();
                   d3.select(self.graphElement)
                           .selectAll('.performance-tooltip')
@@ -495,10 +516,10 @@
                 })
                 .on('mouseover', function () {
                   d3.select(self.graphElement)
-                          .append("div")
-                          .attr("class", "performance-tooltip")
+                          .append('div')
+                          .attr('class', 'performance-tooltip')
                 })
-                .on("mousemove", function () {
+                .on('mousemove', function () {
                   lastMouseCoord = d3.mouse(this);
                   lastFocusX = mainXScale.invert(lastMouseCoord[0]);
                   pointFocus(lastMouseCoord, lastFocusX);
