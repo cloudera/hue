@@ -527,42 +527,61 @@
 
 
         // Add Legend
-        var legend = svg.append('g')
-                .attr('class', 'context')
-                .attr('transform', 'translate(' + legendMargin.left + ',' + legendMargin.top + ')');
-
-        var nextSeriesX = 5;
-
-        graphs.forEach(function (graph) {
-          var legendSerie = legend.append('g')
-                  .on('click', function (d, j) {
-                    graph.toggle();
-                    updateAxesLabels();
+        var legendSerie = legendGroup.selectAll('.legend-serie')
+                .data(graphs)
+                .enter()
+                .append('g')
+                .attr('class', 'legend-serie')
+                .on('click', function (d) {
+                  d.toggle();
+                  d3.select(this).select('rect').attr('fill', function (d) {
+                    return d.enabled() ? d.color : '#FFF'
                   });
+                  d3.select(this).select('path').attr('display', function (d) {
+                    return d.enabled() ? null : 'none'
+                  });
+                  updateAxesLabels();
+                });
 
-          legendSerie.append('circle')
-                  .attr('class', 'legend-radio-' + graph.id)
-                  .attr('fill-opacity', graph.enabled() ? 1 : 0.2)
-                  .style('fill', function (d, j) {
-                    return graph.color
-                  })
-                  .style('stroke', function (d, j) {
-                    return graph.color
-                  })
-                  .attr('r', 5);
+        legendSerie.append('rect')
+                .attr('class', 'legend-radio')
+                .attr('fill', function (d) {
+                  return d.enabled() ? d.color : '#FFF'
+                })
+                .attr('stroke', function (d) {
+                  return d.color
+                })
+                .attr('stroke-width', 2)
+                .attr('rx', 2)
+                .attr('ry', 2)
+                .attr('width', 12)
+                .attr('height', 12)
+                .attr('transform', 'translate(-8, -6)');
 
-          legendSerie.append('text')
-                  .text(graph.label)
-                  .attr('text-anchor', 'start')
-                  .attr('dy', '.32em')
-                  .attr('dx', '8');
+        legendSerie.append('path')
+                .attr('d', 'M-6,-1, -2,3, 2,-4')
+                .attr('fill', 'none')
+                .attr('stroke', function (d, j) { return j === 0 || j === 2 ? '#000' : '#FFF' })
+                .attr('display', function (d) { return d.enabled() ? null : 'none' })
+                .attr('stroke-width', 2);
 
-          legendSerie.attr('transform', function (d, j) {
-            var length = d3.select(this).select('text').node().getComputedTextLength() + 28;
-            var xPos = nextSeriesX;
-            nextSeriesX += length;
-            return 'translate(' + xPos + ',' + 5 + ')'
-          });
+        legendSerie.append('text', 'rect')
+                .text(function (d) { return d.label })
+                .attr('text-anchor', 'start')
+                .attr('dy', '.32em')
+                .attr('dx', '8');
+
+        legendSerie.append('line');
+
+        var knownLengths = [];
+
+        legendSerie.attr('transform', function (d, j) {
+          knownLengths[j] = d3.select(this).select('text').node().getComputedTextLength() + 28;
+          var x = 5;
+          for (var i = 0; i < j; i++) {
+            x += knownLengths[i]
+          }
+          return 'translate(' + x + ', 5)'
         });
 
         // Fetch and append data at set interval
