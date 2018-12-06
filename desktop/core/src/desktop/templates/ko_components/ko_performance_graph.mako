@@ -291,7 +291,7 @@
                         .select('.highlight-point-' + options.id)
                         .remove();
 
-                mainGroup.append('circle')
+                mainGroup.insert('circle', '.overlay')
                         .attr('class', 'highlight-point highlight-point-' + options.id)
                         .style('display', enabled ? null : 'none')
                         .attr('stroke', '#FFF')
