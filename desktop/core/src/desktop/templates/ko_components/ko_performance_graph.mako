@@ -88,6 +88,11 @@
               return true;
             }
           });
+
+          if (!self.data || !self.data.length) {
+            self.showLoadingMessage();
+          }
+
           initialLoadPromise.done(function () {
             self.redrawGraph();
             self.selectedGranularity.subscribe(function (granularity) {
@@ -106,9 +111,41 @@
           })
         };
       }
+      PerformanceGraph.prototype.showLoadingMessage = function () {
+        var self = this;
+
+        d3.select(self.graphElement).select('svg').remove();
+
+        var svg = d3.select(self.graphElement)
+                .append('svg')
+                .attr('width', self.graphWidth)
+                .attr('height', self.graphHeight);
+
+        svg.selectAll('.loading-text')
+                .data(['${ _("Loading metrics...") }'])
+                .enter()
+                .append('text', 'rect')
+                .attr('class', 'loading-text')
+                .text(function (d) { return d })
+                .attr('text-anchor', 'middle')
+                .attr('dy', self.graphHeight / 2)
+                .attr('dx', self.graphWidth / 2);
+      };
 
       PerformanceGraph.prototype.redrawGraph = function () {
         var self = this;
+
+        // Wait for data to appear
+        if (!self.data.length) {
+          self.showLoadingMessage();
+
+          window.setTimeout(function () {
+            self.loadData().done(function () {
+              self.redrawGraph();
+            })
+          }, 3000);
+          return;
+        }
 
         // Margins and sizes
         var subTop = self.graphHeight - 150;
@@ -141,9 +178,7 @@
 
 
         // Update scale domains from data
-        if (self.data[0]) {
-          mainXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
-        }
+        mainXScale.domain([self.data[0][0], self.data[self.data.length - 1][0]]);
         percentageYScale.domain([0, 100]);
         var queryMax = 15;
         self.data.forEach(function (row) {
