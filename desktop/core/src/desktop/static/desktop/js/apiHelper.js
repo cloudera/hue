@@ -953,8 +953,8 @@ var ApiHelper = (function () {
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
-      queryMetric('process_open_fds'), // Sum of queries
-      queryMetric('round(process_open_fds * 0.5)'), // Queued queries
+      queryMetric('impala_queries'), // Sum of queries
+      queryMetric('round(process_open_fds * 0)'), // Queued queries
     ).done(function () {
       var result = [];
       for (var j = 0; j < arguments.length; j++) {
