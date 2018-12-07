@@ -930,88 +930,50 @@ var ApiHelper = (function () {
 
   /**
    * @param {Object} options
-   * @param {Number} options.startTime -- Time in ms
-   * @param {Number} [options.endTime] -- Time in ms
-   * @param {Number} [options.points]
-   *
-   * @param {ContextCompute} [options.computes] -- Or similar. Add when API is in place
+   * @param {Number} options.pastMs
+   * @param {Number} options.stepMs
    *
    * @return {Promise}
    */
   ApiHelper.prototype.fetchResourceStats = function (options) {
-    // TODO: Switch to real API
+    var self = this;
 
-    var data = [];
-    var currentMax = 100;
-    var currentMin = 10;
-
-    var lastCpuVal = 0;
-    var lastMemVal = 0;
-    var lastIO = 0;
-    var lastQueryCount = 0;
-    var addFakeMeasurement = function (data, time) {
-      var newQueryCount = Math.round(Math.max(Math.min(lastQueryCount + (Math.random() - 0.5) * 10, 25), 0));
-
-      var queuedQueryCount = Math.round(newQueryCount * Math.random());
-      var nonQueuedQueryCount = newQueryCount - queuedQueryCount;
-
-      var diff = newQueryCount - lastQueryCount;
-      if (diff > 0) {
-        lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
-        lastMemVal = Math.round(Math.max(Math.min(lastMemVal + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
-        lastIO = Math.round(Math.max(Math.min(lastIO + Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
-      } else {
-        lastCpuVal = Math.round(Math.max(Math.min(lastCpuVal - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
-        lastMemVal = Math.round(Math.max(Math.min(lastMemVal - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
-        lastIO = Math.round(Math.max(Math.min(lastIO - Math.random() * 15, Math.min(currentMax + (Math.random() - 0.5) * 10, 100)), Math.max(currentMin + (Math.random() - 0.5) * 10, 0)));
-      }
-      data.push([time, lastCpuVal, lastMemVal, lastIO, nonQueuedQueryCount, queuedQueryCount]);
+    var queryMetric = function (metricName) {
+      var now = Date.now();
+      return self.simplePost('/metadata/api/prometheus/query', {
+        query: '"' + metricName + '"',
+        start: Math.floor((now - options.pastMs) / 1000),
+        end:  Math.floor(now / 1000),
+        step: options.stepMs / 1000
+      })
     };
 
-    var generateFakeData = function (data, startTime, endTime, points) {
-      var diff = endTime - startTime;
-
-      for (var i = 1; i <= points; i++) {
-        addFakeMeasurement(data, startTime + i * diff / points )
-      }
-    };
-
-    generateFakeData(data, options.startTime, options.endTime, options.points);
-    
-//    var end = new Date();
-//    var start = new Date(end);
-//    start.setDate(start.getDate() - 1);
-
-    var metrics = []
-    var start = Math.floor(options.startTime / 1000);
-    var end = Math.floor(options.endTime / 1000);
-    var step = 60 * 60; // Same as "1h"
-    
-    $.ajax({
-      type: 'POST',
-      url: "/metadata/api/prometheus/query",
-      data: {
-        "query": ko.mapping.toJSON("impala_queries"),
-        // TODO: labels of cluster
-        "start": ko.mapping.toJSON(start),
-        "end": ko.mapping.toJSON(end),
-        "step": ko.mapping.toJSON(step),
-      },
-      success: function(data) {
-        //console.log(ko.mapping.toJSON(data));
-        if (data.data.result) {
-	        data.data.result[0].values.forEach(function(point) {
-	        	metrics.push([point[0] * 1000, 0, 0, 0, point[1], 0]);
-	        });
+    var combinedDeferred = $.Deferred();
+    $.when(
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
+      queryMetric('process_open_fds'), // Sum of queries
+      queryMetric('round(process_open_fds * 0.5)'), // Queued queries
+    ).done(function () {
+      var result = [];
+      for (var j = 0; j < arguments.length; j++) {
+        var response = arguments[j];
+        var values = response.data.result[0].values;
+        for (var i = 0; i < values.length; i++) {
+          if (!result[i]) {
+            result[i] = [];
+            result[i].push(values[i][0] * 1000); // Adjust back to milliseconds
+            result[i].push(parseFloat(values[i][1]))
+          } else {
+            result[i].push(parseFloat(values[i][1])); // Assuming timestamp is the same for each set of values;
+          }
         }
-      },
-      async: false
-    });
+      }
+      combinedDeferred.resolve(result);
+    }).fail(combinedDeferred.reject);
 
-    console.log(data);
-    console.log(metrics);
-    
-    return $.Deferred().resolve(metrics).promise();
+    return combinedDeferred.promise();
   };
 
   /**
