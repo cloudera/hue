@@ -62,24 +62,23 @@
           label: '${ _("1 hour") }',
           totalTime: 1000 * 60 * 60,
           initialWindow: 1000 * 60 * 10,
-          points: 720 // 5 seconds
+          step: 5 * 1000 // 5 seconds
         }, {
           label: '${ _("8 hours") }',
           totalTime: 1000 * 60 * 60 * 8,
           initialWindow: 1000 * 60 * 60 * 2,
-          points: 1920 // 15 seconds
+          step: 15 * 1000 // 15 seconds
         }, {
           label: '${ _("1 week") }',
           totalTime: 1000 * 60 * 60 * 24 * 7,
           initialWindow: 1000 * 60 * 60 * 24,
-          points: 2016 // Every 5 minutes
+          step: 5 * 60 * 1000 // Every 5 minutes
         }];
 
         self.selectedGranularity = ko.observable(self.availableGranularities[ApiHelper.getInstance().getFromTotalStorage('warehouses', 'performanceGraphGranularity', 0)]);
 
         // Load the initial data
-        var now = Date.now();
-        var initialLoadPromise = self.loadData(now - self.selectedGranularity().totalTime, now, self.selectedGranularity().points);
+        var initialLoadPromise = self.loadData();
         self.appendTimeout = -1;
 
         self.componentRendered = function (elements) {
@@ -100,7 +99,7 @@
               }
               window.clearTimeout(self.appendTimeout);
               self.data = undefined;
-              self.loadData(now - granularity.totalTime, now, granularity.points).done(function () {
+              self.loadData().done(function () {
                 self.redrawGraph();
               });
             });
@@ -245,6 +244,7 @@
                     .classed('line line-' + options.id, true)
                     .attr('d', subLine);
             subRefresh = function () {
+              subPath.datum(self.data);
               subPath.attr('d', subLine);
             }
           }
@@ -256,6 +256,7 @@
 
           return {
             refresh: function () {
+              path.datum(self.data)
               path.attr('d', line);
               if (subRefresh) {
                 subRefresh();
@@ -314,9 +315,9 @@
             subLineColor: '#DCDCDC',
             area: true,
             subLine: true,
-            tooltip: function (d) { return d[4] + d[5] + (d[4] ? ' (' + d[4] + ' ${ _("queued") })' : '') },
-            y: function (d) { return queryYScale(d[4] + d[5]) },
-            subY: function (d) { return subQueryYScale(d[4] + d[5]) },
+            tooltip: function (d) { return d[4] + (d[5] ? ' (' + d[5] + ' ${ _("queued") })' : '') },
+            y: function (d) { return queryYScale(d[4]) },
+            subY: function (d) { return subQueryYScale(d[4]) },
             stackedGraph: function () {
               return createLineGraph({
                 id: 'query-count-queued',
@@ -324,7 +325,7 @@
                 color: '#0B7FAD',
                 area: true,
                 disableHighlight: true,
-                y: function (d) { return queryYScale(d[4]) }
+                y: function (d) { return queryYScale(d[5]) }
               })
             }
           }),
@@ -453,16 +454,10 @@
                 .attr('stroke', '#787878')
                 .attr('stroke-width', 7);
 
-        ##  if (self.data[0]) {
-        ##    subGroup.append('g')
-        ##          .attr('class', 'brush')
-        ##          .call(brush)
-        ##          .call(brush.move, [mainXScale(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow), mainXScale(self.data[self.data.length - 1][0])]);
-        ##  }
-
-        brushG.call(brush.move, [mainXScale(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow), mainXScale(self.data[self.data.length - 1][0])]);
-
-        // TODO: Custom handles
+        brushG.call(brush.move, [
+          mainXScale(Math.max(self.data[self.data.length - 1][0] - self.selectedGranularity().initialWindow, self.data[0][0])),
+          mainXScale(self.data[self.data.length - 1][0])
+        ]);
 
         // Mouse hover overlay
         var dateBisector = d3.bisector(function (d) {
@@ -613,27 +608,19 @@
             mainGroup.select('.main-axis-x').call(mainXAxis);
             subGroup.select('.brush').call(brush);
 
-            self.appendTimeout = window.setTimeout(appendData, self.selectedGranularity().totalTime / self.selectedGranularity().points);
+            self.appendTimeout = window.setTimeout(appendData, self.selectedGranularity().step);
           });
         };
-        self.appendTimeout = window.setTimeout(appendData, self.selectedGranularity().totalTime / self.selectedGranularity().points);
+        self.appendTimeout = window.setTimeout(appendData, self.selectedGranularity().step);
       };
 
-      PerformanceGraph.prototype.loadData = function (startTime, endTime, points) {
+      PerformanceGraph.prototype.loadData = function () {
         var self = this;
         return ApiHelper.getInstance().fetchResourceStats({
-          startTime: startTime,
-          endTime: endTime,
-          points: points
+          pastMs: self.selectedGranularity().totalTime,
+          stepMs: self.selectedGranularity().step
         }).done(function (data) {
-          if (!self.data) {
-            self.data = data;
-          } else {
-            data.forEach(function (newRow) {
-              self.data.shift();
-              self.data.push(newRow);
-            })
-          }
+          self.data = data;
         });
       };
 
