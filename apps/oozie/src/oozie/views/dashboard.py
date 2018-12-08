@@ -1193,17 +1193,8 @@ def check_job_edition_permission(oozie_job, user):
 
 
 def has_job_edition_permission(oozie_job, user):
-  have_permission = user.is_superuser or oozie_job.user == user.username or (oozie_job.acl and user.username in oozie_job.acl.split(','))
-  if have_permission:
-	  return True
-  else:
-	  user_groups = user.groups.values_list()
-	  oozie_job_group = [x.strip() for x in oozie_job.group.split(",")]
-	  for user_group in user_groups:
-  	    group_name = user_group[1]
-	    if oozie_job.group and group_name in oozie_job_group:
-	      return True
-	  return False 
+  return user.is_superuser or oozie_job.user == user.username or (oozie_job.group and user.groups.filter(name__in=oozie_job.group.split(",")).exists()) or (oozie_job.acl and user.username in oozie_job.acl.split(','))
+
 
 
 def has_dashboard_jobs_access(user):
