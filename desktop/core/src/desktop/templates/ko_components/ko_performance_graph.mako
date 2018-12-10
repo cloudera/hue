@@ -29,7 +29,7 @@
 
   <script type="text/html" id="performance-graph-d3-template">
     <div style="position:relative;"
-         data-bind="attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></div>
+        data-bind="attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }"></div>
   </script>
 
   <script type="text/html" id="performance-graph-template">
@@ -76,6 +76,7 @@
         }];
 
         self.selectedGranularity = ko.observable(self.availableGranularities[ApiHelper.getInstance().getFromTotalStorage('warehouses', 'performanceGraphGranularity', 0)]);
+        self.clusterName = ko.observable(params.clusterName);
 
         // Load the initial data
         var initialLoadPromise = self.loadData();
@@ -652,6 +653,7 @@
       PerformanceGraph.prototype.loadData = function () {
         var self = this;
         return ApiHelper.getInstance().fetchResourceStats({
+          clusterName: self.clusterName(),
           pastMs: self.selectedGranularity().totalTime,
           stepMs: self.selectedGranularity().step
         }).done(function (data) {
