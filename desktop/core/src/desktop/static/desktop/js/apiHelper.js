@@ -941,7 +941,7 @@ var ApiHelper = (function () {
     var queryMetric = function (metricName) {
       var now = Date.now();
       return self.simplePost('/metadata/api/prometheus/query', {
-        query: '"' + metricName + '"',
+        query: ko.mapping.toJSON(metricName),
         start: Math.floor((now - options.pastMs) / 1000),
         end:  Math.floor(now / 1000),
         step: options.stepMs / 1000
@@ -953,20 +953,22 @@ var ApiHelper = (function () {
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
-      queryMetric('impala_queries'), // Sum of queries
-      queryMetric('round(process_open_fds * 0)'), // Queued queries
+      queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
+      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}'), // Queued queries
     ).done(function () {
       var result = [];
       for (var j = 0; j < arguments.length; j++) {
         var response = arguments[j];
-        var values = response.data.result[0].values;
-        for (var i = 0; i < values.length; i++) {
-          if (!result[i]) {
-            result[i] = [];
-            result[i].push(values[i][0] * 1000); // Adjust back to milliseconds
-            result[i].push(parseFloat(values[i][1]))
-          } else {
-            result[i].push(parseFloat(values[i][1])); // Assuming timestamp is the same for each set of values;
+        if (response.data.result[0]) {
+          var values = response.data.result[0].values;
+          for (var i = 0; i < values.length; i++) {
+            if (!result[i]) {
+              result[i] = [];
+              result[i].push(values[i][0] * 1000); // Adjust back to milliseconds
+              result[i].push(parseFloat(values[i][1]))
+            } else {
+              result[i].push(parseFloat(values[i][1])); // Assuming timestamp is the same for each set of values;
+            }
           }
         }
       }

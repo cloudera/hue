@@ -1250,7 +1250,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="dataware2-clusters-page${ SUFFIX }">
   <div class="row-fluid">
-    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Status') }</li>
@@ -1324,7 +1324,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
               <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-                <!-- ko component: { name: 'performance-graph', params: { type: 'cpu' } } --><!-- /ko -->
+                <!-- ko component: { name: 'performance-graph', params: { clusterName: name(), type: 'cpu' } } --><!-- /ko -->
               </div>
             </div>
           </div>
