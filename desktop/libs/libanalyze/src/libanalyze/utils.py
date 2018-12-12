@@ -43,7 +43,22 @@ def parse_exec_summary(summary_string):
     for c in cleaned:
         # Key 0 is id and type
         fid, ftype = c[0].split(":")
-        result[int(fid)] = {
+        if len(c) < 9:
+          index_bytes = False
+          for i in range(len(c) - 1, 0, -1):
+            if re.search('\d*.?b', c[i], re.IGNORECASE):
+              index_bytes = i
+          if index_bytes:
+            c.insert(index_bytes, '')
+            c.insert(index_bytes, '')
+          else:
+            c.append('')
+            c.append('')
+        if re.search('F\d*', fid):
+          cleaned_fid = fid
+        else:
+          cleaned_fid = int(fid)
+        result[cleaned_fid] = {
             "type": ftype,
             "hosts": int(c[1]),
             "avg": c[2],

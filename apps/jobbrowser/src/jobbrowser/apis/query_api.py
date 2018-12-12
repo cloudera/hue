@@ -171,7 +171,39 @@ class QueryApi(Api):
     query = self.api.get_query(query_id=appid)
     query['summary'] = query.get('summary').strip() if query.get('summary') else ''
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
+    if query['plan_json']:
+      def get_exchange_icon (o):
+        if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
+          return { 'svg': 'hi-broadcast' }
+        elif re.search(r'hash', o['label_detail'], re.IGNORECASE):
+          return { 'font': 'fa-random' }
+        else:
+          return { 'font': 'fa-exchange' }
+      mapping = {
+        'TOP-N': { 'type': 'SORT', 'icon': { 'font': 'fa-sort' } },
+        'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
+        'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
+        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'font': 'fa-files-o' } },
+        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'fa-table' } },
+        'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } }
+      }
+      def process(node, mapping=mapping):
+        node['id'], node['name'] = node['label'].split(':')
+        details = mapping.get(node['name'])
+        if details:
+          icon = details['icon']
+          if icon and icon.get('fn'):
+            icon = icon['fn'](node)
+          node['icon'] = icon
+
+      for node in query['plan_json']['plan_nodes']:
+        self._for_each_node(node, process)
     return query
+
+  def _for_each_node(self, node, fn):
+    fn(node)
+    for child in node['children']:
+      self._for_each_node(child, fn)
 
   def _query_profile(self, appid):
     return self.api.get_query_profile(query_id=appid)

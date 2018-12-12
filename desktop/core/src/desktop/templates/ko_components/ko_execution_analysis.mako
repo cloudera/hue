@@ -231,18 +231,19 @@ from desktop.views import _ko
 
       ExecutionAnalysis.prototype.handleNodePress = function (contributor) {
         var self = this;
-        debugger;
         //TODO: Loading
         if (!$('[href*="' + self.details().name + '"]')[0]) {
           huePubSub.publish('show.jobs.panel', { id: self.details().name, interface: 'queries' });
           setTimeout(function() {
             huePubSub.publish('impala.node.moveto', contributor.result_id);
+            huePubSub.publish('impala.node.select', contributor.result_id);
           }, 500);
         } else {
           if (!$('#jobsPanel').is(":visible")) {
             $('#jobsPanel').show();
           }
           huePubSub.publish('impala.node.moveto', contributor.result_id);
+          huePubSub.publish('impala.node.select', contributor.result_id);
         }
       };
 

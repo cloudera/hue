@@ -1508,8 +1508,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
-            <div id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 550 : 600 }">
-              <svg class="query-plan" style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 535 : 600 }">
+              <svg style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+                <defs>
+                  <filter id="dropshadow" height="130%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+                    <feOffset dx="0" dy="0" result="offsetBlur"/> <!-- how much to offset -->
+                    <feComponentTransfer>
+                      <feFuncA type="linear" slope="0.5"/> <!-- slope is the opacity of the shadow -->
+                    </feComponentTransfer>
+                    <feMerge>
+                      <feMergeNode/> <!-- this contains the offset blurred image -->
+                      <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+                    </feMerge>
+                  </filter>
+                </defs>
                 <g/>
               </svg>
             </div>

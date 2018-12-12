@@ -7500,8 +7500,12 @@
         var clickSubscription = huePubSub.subscribe('impala.node.moveto', function(value) {
           self._impalaDagre.moveTo(value);
         });
+        var selectSubscription = huePubSub.subscribe('impala.node.select', function(value) {
+          self._impalaDagre.select(value);
+        });
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
           clickSubscription.remove();
+          selectSubscription.remove();
         });
       },
       update: function (element, valueAccessor) {
