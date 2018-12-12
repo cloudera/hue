@@ -956,22 +956,24 @@ var ApiHelper = (function () {
       queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
       queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}'), // Queued queries
     ).done(function () {
-      var result = [];
+      var timestampIndex = {};
       for (var j = 0; j < arguments.length; j++) {
         var response = arguments[j];
         if (response.data.result[0]) {
           var values = response.data.result[0].values;
           for (var i = 0; i < values.length; i++) {
-            if (!result[i]) {
-              result[i] = [];
-              result[i].push(values[i][0] * 1000); // Adjust back to milliseconds
-              result[i].push(parseFloat(values[i][1]))
-            } else {
-              result[i].push(parseFloat(values[i][1])); // Assuming timestamp is the same for each set of values;
+            if (!timestampIndex[values[i][0]]) {
+              timestampIndex[values[i][0]] = [values[i][0] * 1000, 0, 0, 0, 0, 0]; // Adjust back to milliseconds
             }
+            timestampIndex[values[i][0]][j + 1] = parseFloat(values[i][1]);
           }
         }
       }
+      var result = [];
+      Object.keys(timestampIndex).forEach(function (key) {
+        result.push(timestampIndex[key]);
+      });
+      result.sort(function (a,b) { return a[0] - b[0]; });
       combinedDeferred.resolve(result);
     }).fail(combinedDeferred.reject);
 
