@@ -90,18 +90,89 @@
   }
 
   .query-plan {
-    border: 1px solid @cui-gray-300
-  }
-
-  .node rect {
-    stroke: @cui-gray-300;
-    fill: @cui-white;
-  }
-
-  .edgePath path {
-    stroke: @cui-gray-800;
-    fill: @cui-gray-800;
-    stroke-width: 1.5px;
+    border: 1px solid @cui-gray-300;
+    .label,
+    .badge {
+      color: @cui-gray-800;
+      text-shadow: none;
+    }
+    .metric {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      font-weight: normal;
+    }
+    .name {
+      padding-right: 80px;
+    }
+    .detail {
+      font-weight: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: calc(~"100% - 32px");
+      display: inline-block;
+    }
+    span.fa {
+      color: @cui-gray-600;
+      float: left;
+      font-size: 21px;
+      padding-top: 3px;
+      padding-right: 2px;
+    }
+    .hi {
+      color: @cui-gray-600 !important;
+      float: left;
+      width: 2.2em !important;
+      height: 2.2em !important;
+      padding-right: 5px;
+    }
+    .id {
+      display: none;
+    }
+    .node.active {
+      rect {
+        filter: url(#dropshadow);
+        stroke: @hue-primary-color-dark;
+        fill: @hue-primary-color-light;
+      }
+    }
+    .output {
+      path,
+      rect {
+        stroke: @cui-gray-600;
+      }
+    }
+    .button {
+      border: 1px solid @cui-gray-300;
+      color: @cui-gray-600;
+      div {
+        line-height: 32px !important;
+        display: block;
+        width: 32px;
+        height: 32px;
+      }
+    }
+    .button div:hover {
+      color: @hue-primary-color-dark
+    }
+    .node rect {
+      fill: @cui-white;
+      stroke-width: 1px
+    }
+    .edgePath > path {
+      fill: none;
+      stroke-width: 1.5px;
+    }
+    .edgePath marker path {
+      fill: @cui-gray-600;
+      stroke-width: 1.5px;
+    }
+    .edgeLabel text {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    foreignObject > div {
+      position: relative;
+    }
   }
 
   div[data-jobType="queries"] pre {
