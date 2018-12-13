@@ -38,15 +38,18 @@ API_CACHE_LOCK = threading.Lock()
 
 def get_api(user, url):
   global  API_CACHE
-  if API_CACHE is None:
+  if API_CACHE is None or API_CACHE.get(url) is None:
     API_CACHE_LOCK.acquire()
     try:
       if API_CACHE is None:
-        API_CACHE = ImpalaDaemonApi(url)
+        API_CACHE = {}
+      if API_CACHE.get(url) is None:
+        API_CACHE[url] = ImpalaDaemonApi(url)
     finally:
       API_CACHE_LOCK.release()
-  API_CACHE.set_user(user)
-  return API_CACHE
+  api = API_CACHE[url]
+  api.set_user(user)
+  return api
 
 
 def _get_impala_server_url(session):
