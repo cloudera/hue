@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+from collections import OrderedDict
 
 from django.utils.translation import ugettext_lazy as _t
 
@@ -171,6 +168,13 @@ ENABLE_PRESENTATION = Config(
   help=_t("Flag to turn on the Presentation mode of the editor."),
   type=bool,
   default=True
+)
+
+ENABLE_QUERY_ANALYSIS = Config(
+  key="enable_query_analysis",
+  help=_t("Flag to turn on the built-in hints on Impala queries in the editor."),
+  type=bool,
+  default=False
 )
 
 
