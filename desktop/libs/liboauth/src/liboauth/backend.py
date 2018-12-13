@@ -67,7 +67,7 @@ class OAuthBackend(DesktopBackendBase):
       user = find_or_create_user(username, password)
 
       profile = get_profile(user)
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
 
       user.is_superuser = is_super
