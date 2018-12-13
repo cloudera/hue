@@ -46,7 +46,7 @@ from desktop.conf import OAUTH
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import get_profile
+from useradmin.models import get_profile, UserProfile
 from useradmin.views import ensure_home_directory, require_change_password
 from notebook.connectors.base import get_api
 
@@ -139,6 +139,9 @@ def dt_login(request, from_modal=False):
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
+        # This is to fix a bug in Hue 4.3
+        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL:
+          userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
