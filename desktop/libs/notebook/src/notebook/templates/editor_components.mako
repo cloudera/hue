@@ -663,14 +663,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div class="snippet-log-container margin-bottom-10">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
-      %if not IS_EMBEDDED.get():
+      % if not IS_EMBEDDED.get():
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
-          %if is_embeddable:
-            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs'}); }, clickBubble: false"></a>
-          %else:
+          % if is_embeddable:
+            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { if ($parent.compute()) { huePubSub.publish('context.selector.set.cluster', $parent.compute().name) }; huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs'}); }, clickBubble: false"></a>
+          % else:
             <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
-          %endif
+          % endif
           <!-- ko if: typeof percentJob === 'function' && percentJob() > -1 -->
           <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
@@ -679,7 +679,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <div class="clearfix"></div>
         </li>
       </ul>
-      %endif
+      % endif
       <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
         <pre data-bind="visible: (!result.logs() || result.logs().length == 0) && jobs().length > 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
