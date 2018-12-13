@@ -50,8 +50,8 @@ def get_api(user, url):
 
 
 def _get_impala_server_url(session):
-  impala_settings = session.get_formatted_properties()
-  http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
+  properties = session.get_properties()
+  http_addr = properties.get('coordinator_host', properties.get('http_addr'))
   # Remove scheme if found
   http_addr = http_addr.replace('http://', '').replace('https://', '')
   return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
