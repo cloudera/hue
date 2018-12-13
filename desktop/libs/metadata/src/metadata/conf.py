@@ -26,6 +26,7 @@ from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
+from notebook.conf import ENABLE_QUERY_ANALYSIS
 
 
 OPTIMIZER_AUTH_PASSWORD = None
@@ -57,7 +58,7 @@ def has_optimizer():
   return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
 def has_workload_analytics():
-  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
+  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get() or ENABLE_QUERY_ANALYSIS.get()
 
 
 def get_navigator_url():
