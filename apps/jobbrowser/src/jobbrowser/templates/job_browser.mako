@@ -2931,7 +2931,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
+      %if conf.is_hue4():
       self.paginationResultPage = ko.observable(100);
+      %else:
+      self.paginationResultPage = ko.observable(50);
+      %endif
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),
