@@ -88,12 +88,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
+        sourceType: 'impala',
+        compute: compute,
+        ##namespace: namespace,
+        ##availableDatabases: availableDatabases,
+        ##database: database,
+        hideDatabases: true
+      }
+    } --><!-- /ko -->
+
+    % if not conf.IS_K8S_ONLY.get():
+    <!-- ko component: {
+      name: 'hue-context-selector',
+      params: {
         sourceType: 'jobs',
         cluster: cluster,
         onClusterSelect: onClusterSelect,
         hideLabels: true
       }
     } --><!-- /ko -->
+    % endif
   </div>
   <ul class="nav nav-pills">
     <!-- ko foreach: availableInterfaces -->
@@ -2488,6 +2502,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
 
         return $.post("/jobbrowser/api/job/" + vm.interface(), {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
@@ -2643,6 +2658,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.fetchLogs = function (name) {
         name = name || 'default';
         $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           type: ko.mapping.toJSON(self.type),
@@ -2663,6 +2679,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchProfile = function (name, callback) {
         $.post("/jobbrowser/api/job/profile", {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           app_type: ko.mapping.toJSON(self.type),
@@ -2682,6 +2699,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchStatus = function () {
         $.post("/jobbrowser/api/job", {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(self.mainType)
         }, function (data) {
@@ -2982,6 +3000,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self._fetchJobs = function (callback) {
         return $.post("/jobbrowser/api/jobs/" + vm.interface(), {
+          cluster: ko.mapping.toJSON(vm.compute),
           interface: ko.mapping.toJSON(vm.interface),
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
@@ -3184,6 +3203,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isMini = ko.observable(false);
 
       self.cluster = ko.observable();
+      self.compute = ko.observable();
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
@@ -3496,9 +3516,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }, 'jobbrowser');
 
       % if is_mini:
-        huePubSub.subscribe('mini.jb.navigate', function (interface) {
+        huePubSub.subscribe('mini.jb.navigate', function (options) {
+          if (options.compute) {
+            jobBrowserViewModel.compute(options.compute);
+          }
           $('#jobsPanel .nav-pills li').removeClass('active');
-          interface = jobBrowserViewModel.isValidInterface(interface);
+          interface = jobBrowserViewModel.isValidInterface(options.section);
           $('#jobsPanel .nav-pills li[data-interface="' + interface + '"]').addClass('active');
           jobBrowserViewModel.selectInterface(interface);
         });

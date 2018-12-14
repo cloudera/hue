@@ -51,10 +51,11 @@ def api_error_handler(func):
 def jobs(request, interface=None):
   response = {'status': -1}
 
+  cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = json.loads(request.POST.get('interface'))
   filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in _filter.items() if value])
 
-  jobs = get_api(request.user, interface).apps(filters)
+  jobs = get_api(request.user, interface, cluster=cluster).apps(filters)
 
   response['apps'] = jobs['apps']
   response['total'] = jobs.get('total')
@@ -67,10 +68,12 @@ def jobs(request, interface=None):
 def job(request, interface=None):
   response = {'status': -1}
 
+  cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
 
-  response_app = get_api(request.user, interface).app(app_id)
+  response_app = get_api(request.user, interface, cluster=cluster).app(app_id)
+
   if response_app.get('status') == -1 and response_app.get('message'):
     response.update(response_app)
   else:
@@ -84,6 +87,7 @@ def job(request, interface=None):
 def action(request, interface=None, action=None):
   response = {'status': -1, 'message': ''}
 
+  cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = json.loads(request.POST.get('interface'))
   app_ids = json.loads(request.POST.get('app_ids'))
   operation = json.loads(request.POST.get('operation'))
@@ -92,7 +96,7 @@ def action(request, interface=None, action=None):
     return serve_403_error(request)
 
   response['operation'] = operation
-  response.update(get_api(request.user, interface).action(app_ids, operation))
+  response.update(get_api(request.user, interface, cluster=cluster).action(app_ids, operation))
 
   return JsonResponse(response)
 
@@ -101,12 +105,13 @@ def action(request, interface=None, action=None):
 def logs(request):
   response = {'status': -1}
 
+  cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
   app_type = json.loads(request.POST.get('type'))
   log_name = json.loads(request.POST.get('name'))
 
-  response['logs'] = get_api(request.user, interface).logs(app_id, app_type, log_name, json.loads(request.GET.get('is_embeddable', 'false').lower()))
+  response['logs'] = get_api(request.user, interface, cluster=cluster).logs(app_id, app_type, log_name, json.loads(request.GET.get('is_embeddable', 'false').lower()))
   response['status'] = 0
 
   return JsonResponse(response)
@@ -116,13 +121,14 @@ def logs(request):
 def profile(request):
   response = {'status': -1}
 
+  cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
   app_type = json.loads(request.POST.get('app_type'))
   app_property = json.loads(request.POST.get('app_property'))
   app_filters = dict([(key, value) for _filter in json.loads(request.POST.get('app_filters', '[]')) for key, value in _filter.items() if value])
 
-  api = get_api(request.user, interface)
+  api = get_api(request.user, interface, cluster=cluster)
   api._set_request(request) # For YARN
 
   response[app_property] = api.profile(app_id, app_type, app_property, app_filters)

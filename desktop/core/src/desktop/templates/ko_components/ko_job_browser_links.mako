@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from desktop.conf import IS_EMBEDDED, IS_MULTICLUSTER_ONLY
+from desktop.conf import IS_EMBEDDED, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
@@ -28,9 +28,15 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
-      <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
-        <span>${ _('Queries') if IS_EMBEDDED.get() or IS_MULTICLUSTER_ONLY.get() else _('Jobs') }</span>
-      </a>
+      % if IS_K8S_ONLY.get():
+        <a class="btn btn-flat" style="padding-right: 4px" title="${_('Query browser')}" data-bind="hueLink: '/jobbrowser#!queries', click: function() { huePubSub.publish('show.jobs.panel', {interface: 'queries'}); huePubSub.publish('hide.jobs.panel'); }">
+          <span>${ _('Queries') }</span>
+        </a>
+      % else:
+        <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
+          <span>${ _('Queries') if IS_EMBEDDED.get() or IS_MULTICLUSTER_ONLY.get() else _('Jobs') }</span>
+        </a>
+      % endif
       <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Jobs preview')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
         <i class="fa fa-tasks"></i>
@@ -59,14 +65,18 @@ from desktop.views import _ko
           $jobsPanel.hide();
         });
 
-        huePubSub.subscribe('show.jobs.panel', function (section) {
+        huePubSub.subscribe('show.jobs.panel', function (options) {
+          if ('${ IS_K8S_ONLY.get() }' == 'True') {
+            huePubSub.publish('context.selector.set.cluster', 'impala');
+          };
+          
           huePubSub.publish('hide.history.panel');
           $(window).on('resize', reposition);
           reposition();
           $jobsPanel.show();
-          huePubSub.publish('mini.jb.navigate', section && section.interface ? section.interface : 'jobs');
-          if (section && section.id) {
-            huePubSub.publish('mini.jb.open.job', section.id);
+          huePubSub.publish('mini.jb.navigate', {section: options && options.interface ? options.interface : 'jobs', compute: options && options.compute});
+          if (options && options.id) {
+            huePubSub.publish('mini.jb.open.job', options.id);
           }
         });
 

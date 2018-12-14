@@ -175,9 +175,9 @@ from metadata.conf import has_navigator
     <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="with: data">
       <div style="padding: 8px">
         <div style="width:100%; text-align: center; margin-top: 30px; font-size: 100px; color: #787878;" data-bind="template: { name: 'app-icon-template', data: { icon: interpreter.type } }"></div>
-         <div style="width: 100%; margin-top: 20px; text-align:center">
-           <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: interpreter.displayName, hueLink: interpreter.page, click: function () { $parents[1].close(); }, attr: { 'title': interpreter.tooltip }"></a>
-         </div>
+          <div style="width: 100%; margin-top: 20px; text-align:center">
+            <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: interpreter.displayName, hueLink: interpreter.page, click: function () { $parents[1].close(); }, attr: { 'title': interpreter.tooltip }"></a>
+          </div>
       </div>
     </div>
   </script>

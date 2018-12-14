@@ -116,7 +116,7 @@ def get_context_namespaces(request, interface):
         sdx_namespaces = SdxApi(request.user).list_namespaces()
 
       # Adding "fake" namespace for cluster without one
-      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and _cluster['status'] != 'TERMINATING')])
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and 'TERMINAT' not in _cluster['status'])])
 
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
@@ -164,7 +164,7 @@ def get_context_computes(request, interface):
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
           'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
           'type': 'altus-dw'
-        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and cluster['status'] != 'TERMINATING')]
+        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and 'TERMINAT' not in cluster['status'])]
       )
 
     if interface == 'oozie' or interface == 'spark2':

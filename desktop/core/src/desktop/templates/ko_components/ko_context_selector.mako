@@ -15,10 +15,10 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 

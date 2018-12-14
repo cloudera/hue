@@ -1638,6 +1638,18 @@ def get_clusters(user):
       )
     )
 
+  if IS_K8S_ONLY.get():
+    clusters.append(
+      ('impala', {
+          'id': 'impala',
+          'name': 'impala',
+          'type': 'impala',
+          'interface': 'impala',
+          'server_host': 'impala'
+        }
+      )
+    )
+
   return OrderedDict(clusters)
 
 

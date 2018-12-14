@@ -31,13 +31,13 @@
         <!-- /ko -->
         <!-- ko foreach: children -->
         <!-- ko if: $component.collapsed -->
-        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, tooltip: { placement: 'right' }">
+        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, tooltip: { placement: 'right' }, click: function() { if (url.startsWith('/jobbrowser')) { huePubSub.publish('context.selector.set.cluster', 'AltusV2'); } }">
           <span class="sidebar-icon with-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
           <span class="sidebar-item-name" data-bind="text: displayName"></span>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: $component.collapsed -->
-        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }">
+        <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, click: function() { if (url.startsWith('/jobbrowser')) { huePubSub.publish('context.selector.set.cluster', 'AltusV2'); } }">
           <span class="sidebar-icon without-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
           <span class="sidebar-item-name" data-bind="text: displayName"></span>
         </a>
@@ -68,7 +68,7 @@
               { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
               { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
               { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
-              { displayName: 'Warehouses', url: '/hue/jobbrowser', icon: 'warehouses' }
+              { displayName: 'Warehouses', url: '/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
             ]
           } else { // DE mode
             appCategory.children = [
