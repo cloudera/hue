@@ -27,24 +27,22 @@ from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2
+from libanalyze import analyze as analyzer, rules
 
 from beeswax.api import error_handler
-from beeswax.server.dbms import get_cluster_config
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
+from beeswax.server.dbms import get_cluster_config
 from beeswax.views import authorized_get_query_history
+from notebook.models import make_notebook
 
 from impala import dbms
-from impala.dbms import _get_server_name
 from impala.server import get_api as get_impalad_api, _get_impala_server_url
 
-from libanalyze import analyze as analyzer
-from libanalyze import rules
-
-from notebook.models import make_notebook
 
 LOG = logging.getLogger(__name__)
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
+
 
 @require_POST
 @error_handler
@@ -130,10 +128,12 @@ def alanize(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
   query_id = json.loads(request.POST.get('query_id'))
 
-  application = _get_server_name(cluster)
-  query_server = dbms.get_query_server_config()
-  session = Session.objects.get_session(request.user, query_server['server_name'])
-  server_url = _get_impala_server_url(session)
+  if cluster.get('type') == 'altus-dw':
+    server_url = 'http://impala-coordinator%(name)s:25000' % cluster
+  else:
+    query_server = dbms.get_query_server_config()
+    session = Session.objects.get_session(request.user, query_server['server_name'])
+    server_url = _get_impala_server_url(session)
 
   if query_id:
     LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
