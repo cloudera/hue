@@ -22,11 +22,7 @@ import os
 import urllib
 import uuid
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
-
+from collections import OrderedDict
 from itertools import chain
 
 from django.contrib.auth import models as auth_models

@@ -28,7 +28,7 @@ from desktop.lib.exceptions_renderable import PopupException
 LOG = logging.getLogger(__name__)
 
 
-def get_api(user, interface):
+def get_api(user, interface, cluster=None):
   from jobbrowser.apis.bundle_api import BundleApi
   from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
   from jobbrowser.apis.clusters import ClusterApi
@@ -42,7 +42,7 @@ def get_api(user, interface):
   if interface == 'jobs':
     return JobApi(user)
   elif interface == 'queries':
-    return QueryApi(user)
+    return QueryApi(user, cluster=cluster)
   elif interface == 'workflows':
     return WorkflowApi(user)
   elif interface == 'schedules':

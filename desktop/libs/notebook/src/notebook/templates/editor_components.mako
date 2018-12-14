@@ -667,7 +667,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
           % if is_embeddable:
-            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { if ($parent.compute()) { huePubSub.publish('context.selector.set.cluster', $parent.compute().name) }; huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs'}); }, clickBubble: false"></a>
+            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs', compute: $parent.compute() ? $parent.compute().name : null}); }, clickBubble: false"></a>
           % else:
             <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
           % endif

@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -34,18 +35,23 @@ try:
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
-def _get_api(user):
-  session = Session.objects.get_session(user, application='impala')
-  server_url = _get_impala_server_url(session)
+
+def _get_api(user, cluster=None):
+  if cluster:
+    server_url = 'http://impala-coordinator%s:25000' % cluster
+  else:
+    session = Session.objects.get_session(user, application='impala')
+    server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
+
 
 class QueryApi(Api):
 
-  def __init__(self, user, impala_api=None):
+  def __init__(self, user, impala_api=None, cluster=None):
     if impala_api:
       self.api = impala_api
     else:
-      self.api = _get_api(user)
+      self.api = _get_api(user, cluster)
 
   def apps(self, filters):
     kwargs = {}
