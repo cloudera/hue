@@ -18,9 +18,9 @@
 import json
 import logging
 
-from django.utils.translation import ugettext as _
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
+from django.utils.translation import ugettext as _
 from desktop.views import serve_403_error
 
 from jobbrowser.apis.base_api import get_api

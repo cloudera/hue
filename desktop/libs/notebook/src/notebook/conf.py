@@ -22,8 +22,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.conf import is_oozie_enabled
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
-  coerce_json_dict, coerce_bool, coerce_csv
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 
 SHOW_NOTEBOOKS = Config(
@@ -116,7 +115,7 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
 ENABLE_DBPROXY_SERVER = Config(
   key="enable_dbproxy_server",
   help=_t("Main flag to override the automatic starting of the DBProxy server."),
-  type=bool,
+  type=coerce_bool,
   default=True
 )
 
@@ -130,7 +129,7 @@ DBPROXY_EXTRA_CLASSPATH = Config(
 ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
-  type=bool,
+  type=coerce_bool,
   default=True
 )
 
@@ -138,42 +137,42 @@ ENABLE_QUERY_BUILDER = Config(
 ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
-  type=bool,
+  type=coerce_bool,
   default=False
 )
 
 ENABLE_EXTERNAL_STATEMENT = Config(
   key="enable_external_statements",
   help=_t("Flag to enable the selection of queries from files, saved queries into the editor or as snippet."),
-  type=bool,
+  type=coerce_bool,
   default=True
 )
 
 ENABLE_BATCH_EXECUTE = Config(
   key="enable_batch_execute",
   help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),
-  type=bool,
+  type=coerce_bool,
   dynamic_default=is_oozie_enabled
 )
 
 ENABLE_SQL_INDEXER = Config(
   key="enable_sql_indexer",
   help=_t("Flag to turn on the SQL indexer."),
-  type=bool,
+  type=coerce_bool,
   default=False
 )
 
 ENABLE_PRESENTATION = Config(
   key="enable_presentation",
   help=_t("Flag to turn on the Presentation mode of the editor."),
-  type=bool,
+  type=coerce_bool,
   default=True
 )
 
 ENABLE_QUERY_ANALYSIS = Config(
   key="enable_query_analysis",
   help=_t("Flag to turn on the built-in hints on Impala queries in the editor."),
-  type=bool,
+  type=coerce_bool,
   default=False
 )
 

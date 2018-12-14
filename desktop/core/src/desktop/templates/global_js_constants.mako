@@ -24,6 +24,7 @@
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_navigator, has_optimizer, has_workload_analytics, OPTIMIZER
+  from notebook.conf import ENABLE_QUERY_ANALYSIS
 %>
 
 (function () {
@@ -50,7 +51,8 @@
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
-  window.HAS_WORKLOAD_ANALYTICS = '${ has_workload_analytics() }' === 'True';
+  ## In the past was has_workload_analytics()
+  window.HAS_WORKLOAD_ANALYTICS = '${ ENABLE_QUERY_ANALYSIS.get() }' === 'True';
 
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 

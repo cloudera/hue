@@ -58,7 +58,8 @@ def has_optimizer():
   return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
 def has_workload_analytics():
-  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get() or ENABLE_QUERY_ANALYSIS.get()
+  # Note: unused
+  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
 
 
 def get_navigator_url():
