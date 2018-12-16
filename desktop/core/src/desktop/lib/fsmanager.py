@@ -40,6 +40,7 @@ if is_s3_enabled():
 if is_adls_enabled():
   FS_GETTERS['adl'] = azure.client.get_client
 
+
 def get_filesystem(name='default'):
   """
   Return the filesystem with the given name.
