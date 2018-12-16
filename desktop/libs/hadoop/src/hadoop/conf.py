@@ -184,8 +184,6 @@ def config_validator(user):
     res.append(("hadoop.hdfs_clusters", "You should have an HDFS called 'default'."))
 
   # YARN_CLUSTERS
-  if YARN_CLUSTERS.keys():
-    res.extend(test_yarn_configurations(user))
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
@@ -194,6 +192,8 @@ def config_validator(user):
   if not submit_to:
     res.append(("hadoop", "Please designate one of the MapReduce or "
                 "Yarn clusters with `submit_to=true' in order to run jobs."))
+  else:
+    res.extend(test_yarn_configurations(user))
 
   return res
 

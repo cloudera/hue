@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.conf import Config, coerce_bool
 from django.utils.translation import ugettext_lazy as _
+
+from desktop.lib.conf import Config, coerce_bool
 
 
 SHARE_JOBS = Config(
@@ -24,13 +25,15 @@ SHARE_JOBS = Config(
   default=True,
   type=coerce_bool,
   help=_('Share submitted jobs information with all users. If set to false, '
-       'submitted jobs are visible only to the owner and administrators.'))
+       'submitted jobs are visible only to the owner and administrators.')
+)
 
 DISABLE_KILLING_JOBS = Config(
   key='disable_killing_jobs',
   default=False,
   type=coerce_bool,
-  help=_('Disable the job kill button for all users in the job browser.'))
+  help=_('Disable the job kill button for all users in the job browser.')
+)
 
 LOG_OFFSET = Config(
   key='log_offset',
@@ -40,10 +43,10 @@ LOG_OFFSET = Config(
 )
 
 ENABLE_V2 = Config(
-    key="enable_v2",
-    help=_("Show the version 2 of app which unifies all the past browsers into one."),
-    type=coerce_bool,
-    default=True
+  key="enable_v2",
+  help=_("Show the version 2 of app which unifies all the past browsers into one."),
+  type=coerce_bool,
+  default=True
 )
 
 MAX_JOB_FETCH = Config(
@@ -54,8 +57,8 @@ MAX_JOB_FETCH = Config(
 )
 
 ENABLE_QUERY_BROWSER = Config(
-    key="enable_query_browser",
-    help=_("Show the query section for listing and showing more troubleshooting information."),
-    type=coerce_bool,
-    default=True
+  key="enable_query_browser",
+  help=_("Show the query section for listing and showing more troubleshooting information."),
+  type=coerce_bool,
+  default=True
 )

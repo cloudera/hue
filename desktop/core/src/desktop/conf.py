@@ -1845,10 +1845,13 @@ def config_validator(user):
   res.extend(validate_database(user))
 
   # Validate if oozie email server is active
-  from oozie.views.editor2 import _is_oozie_mail_enabled
-
-  if not _is_oozie_mail_enabled(user):
-    res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+  try:
+    from oozie.views.editor2 import _is_oozie_mail_enabled
+  
+    if not _is_oozie_mail_enabled(user):
+      res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+  except Exception, e:
+    LOG.warn('Config check failed because Oozie app not installed %s' % e)
 
   from notebook.models import make_notebook
   from notebook.api import _save_notebook
