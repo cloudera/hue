@@ -390,7 +390,7 @@ class OozieYarnJob(Job):
   def get_task(self, task_id):
     task = YarnTask(self)
     task.taskId = None
-    task.taskAttemptIds = [appAttempt['appAttemptId'] for appAttempt in self.job_attempts['jobAttempt']]
+    task.taskAttemptIds = [appAttempt['id'] for appAttempt in self.job_attempts['jobAttempt']]
     return task
 
   def filter_tasks(self, task_types=None, task_states=None, task_text=None):
@@ -400,8 +400,6 @@ class OozieYarnJob(Job):
   def job_attempts(self):
     if not hasattr(self, '_job_attempts'):
       attempts = self.api.appattempts(self.id)['appAttempts']['appAttempt']
-      for attempt in attempts:
-        attempt['id'] = attempt['appAttemptId']
       self._job_attempts = {
         'jobAttempt': attempts
       }
@@ -626,7 +624,6 @@ class YarnOozieAttempt(Attempt):
   def _fixup(self):
     setattr(self, 'diagnostics', self.diagnosticsInfo)
     setattr(self, 'type', 'Oozie Launcher')
-    setattr(self, 'id', self.appAttemptId)
 
 class Container:
 
