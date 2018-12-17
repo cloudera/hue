@@ -329,8 +329,8 @@
     <symbol id="hi-full-screen" viewBox="0 0 24 24">
       <path d="M0 0h24v24H0z" fill="none"/><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
     </symbol>
-    <symbol id="hi-narrow" viewBox="0 0 32 32">
-      <path d="M23.021 15.007v-3.396l-4.847 4.842 4.823 4.863 0.023-3.353h6.965v-2.957h-6.964zM14 29h3v-25h-3v25zM8.040 15.007h-7.026v2.957h7.026l-0.039 3.353 4.824-4.863-4.785-4.843v3.396z"></path>
+    <symbol id="hi-vertical-align" viewBox="0 0 24 24">
+      <path d="M8 19h3v4h2v-4h3l-4-4-4 4zm8-14h-3V1h-2v4H8l4 4 4-4zM4 11v2h16v-2H4z"/>
     </symbol>
     <symbol id="hi-sort" viewBox="0 0 24 24">
       <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
@@ -349,6 +349,9 @@
     </symbol>
     <symbol id="hi-merge" viewBox="0 0 24 24">
       <path d="M17 20.41L18.41 19 15 15.59 13.59 17 17 20.41zM7.5 8H11v5.59L5.59 19 7 20.41l6-6V8h3.5L12 3.5 7.5 8z"/>
+    </symbol>
+    <symbol id="hi-crop-free" viewBox="0 0 24 24">
+      <path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/>
     </symbol>
   </svg>
 

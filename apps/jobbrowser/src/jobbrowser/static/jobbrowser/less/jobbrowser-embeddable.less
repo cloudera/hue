@@ -119,12 +119,26 @@
       padding-top: 3px;
       padding-right: 2px;
     }
-    .hi {
+    svg .hi {
       color: @cui-gray-600 !important;
       float: left;
       width: 2.2em !important;
       height: 2.2em !important;
       padding-right: 5px;
+    }
+    .buttons {
+      .hi {
+        color: @cui-gray-600 !important;
+        width: 2.2em !important;
+        height: 2.2em !important;
+        padding-left: 2px;
+      }
+      .divider {
+        background-color: @cui-gray-300;
+        width: 10px;
+        height: 1px;
+        margin-left: 5px;
+      }
     }
     .id {
       display: none;
@@ -142,7 +156,9 @@
         stroke: @cui-gray-600;
       }
     }
-    .button {
+    .buttons {
+      background-color: white;
+      box-shadow: 0px 0px 2px 0px;
       border: 1px solid @cui-gray-300;
       color: @cui-gray-600;
       div {
