@@ -315,6 +315,41 @@
     <symbol id="hi-sigma" viewBox="0 0 32 32">
       <path d="M29.425 22.96l1.387-2.96h1.188l-2 12h-30v-2.32l10.361-12.225-10.361-10.361v-7.094h30.625l1.375 8h-1.074l-0.585-1.215c-1.104-2.293-1.934-2.785-4.341-2.785h-20.688l11.033 11.033-9.294 10.967h16.949c3.625 0 4.583-1.299 5.425-3.040z"></path>
     </symbol>
+
+    <symbol id="hi-unnest" viewBox="0 0 32 32">
+      <path d="m30,8l2,0l0,16l-2,0l0,-16z"/>
+      <path d="m7,14l22,0l0,4l-22,0l0,5l-7,-7l7,-7l0,5z"/>
+    </symbol>
+    <symbol id="hi-loop" viewBox="0 0 24 24">
+      <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/><path d="M0 0h24v24H0z" fill="none"/>
+    </symbol>
+    <symbol id="hi-nested-loop" viewBox="0 0 32 32">
+       <path d="m27.8,10.1l-19.5,0l0,6l-7.8,-8l7.8,-8l0,6l23.4,0l0,12l-3.9,0l0,-8zm-23.4,12l19.5,0l0,-6l7.8,8l-7.8,8l0,-6l-23.4,0l0,-12l3.9,0l0,8z"/>
+    </symbol>
+    <symbol id="hi-full-screen" viewBox="0 0 24 24">
+      <path d="M0 0h24v24H0z" fill="none"/><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+    </symbol>
+    <symbol id="hi-narrow" viewBox="0 0 32 32">
+      <path d="M23.021 15.007v-3.396l-4.847 4.842 4.823 4.863 0.023-3.353h6.965v-2.957h-6.964zM14 29h3v-25h-3v25zM8.040 15.007h-7.026v2.957h7.026l-0.039 3.353 4.824-4.863-4.785-4.843v3.396z"></path>
+    </symbol>
+    <symbol id="hi-sort" viewBox="0 0 24 24">
+      <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
+    </symbol>
+    <symbol id="hi-map" viewBox="0 0 24 24">
+      <path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+    </symbol>
+    <symbol id="hi-filter" viewBox="0 0 24 24">
+      <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+    </symbol>
+    <symbol id="hi-timeline" viewBox="0 0 24 24">
+      <defs><path id="a" d="M0 0h24v24H0V0z"/></defs>
+      <clipPath id="b"><use xlink:href="#a" overflow="visible"/>
+      </clipPath>
+      <path clip-path="url(#b)" d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z"/>
+    </symbol>
+    <symbol id="hi-merge" viewBox="0 0 24 24">
+      <path d="M17 20.41L18.41 19 15 15.59 13.59 17 17 20.41zM7.5 8H11v5.59L5.59 19 7 20.41l6-6V8h3.5L12 3.5 7.5 8z"/>
+    </symbol>
   </svg>
 
   <script type="text/html" id="app-switcher-icon-template">

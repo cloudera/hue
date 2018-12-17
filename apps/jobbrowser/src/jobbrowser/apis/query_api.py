@@ -180,12 +180,21 @@ class QueryApi(Api):
         else:
           return { 'font': 'fa-exchange' }
       mapping = {
-        'TOP-N': { 'type': 'SORT', 'icon': { 'font': 'fa-sort' } },
+        'TOP-N': { 'type': 'TOPN', 'icon': { 'svg': 'hi-filter' } },
+        'SORT': { 'type': 'SORT', 'icon': { 'svg': 'hi-sort' } },
         'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
         'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
         'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'font': 'fa-files-o' } },
         'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'fa-table' } },
-        'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } }
+        'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
+        'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
+        'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'svg': 'hi-sigma' } },
+        'NESTED LOOP JOIN': { 'type': 'LOOP_JOIN', 'icon': { 'svg': 'hi-nested-loop' } },
+        'SUBPLAN': { 'type': 'SUBPLAN', 'icon': { 'svg': 'hi-map' } },
+        'UNNEST': { 'type': 'UNNEST', 'icon': { 'svg': 'hi-unnest' } },
+        'SINGULAR ROW SRC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-narrow' } },
+        'ANALYTIC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-timeline' } },
+        'UNION': { 'type': 'UNION', 'icon': { 'svg': 'hi-merge' } },
       }
       def process(node, mapping=mapping):
         node['id'], node['name'] = node['label'].split(':')
