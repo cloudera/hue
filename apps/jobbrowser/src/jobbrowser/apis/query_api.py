@@ -192,9 +192,9 @@ class QueryApi(Api):
         'NESTED LOOP JOIN': { 'type': 'LOOP_JOIN', 'icon': { 'svg': 'hi-nested-loop' } },
         'SUBPLAN': { 'type': 'SUBPLAN', 'icon': { 'svg': 'hi-map' } },
         'UNNEST': { 'type': 'UNNEST', 'icon': { 'svg': 'hi-unnest' } },
-        'SINGULAR ROW SRC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-narrow' } },
+        'SINGULAR ROW SRC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-vertical-align' } },
         'ANALYTIC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-timeline' } },
-        'UNION': { 'type': 'UNION', 'icon': { 'svg': 'hi-merge' } },
+        'UNION': { 'type': 'UNION', 'icon': { 'svg': 'hi-merge' } }
       }
       def process(node, mapping=mapping):
         node['id'], node['name'] = node['label'].split(':')

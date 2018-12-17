@@ -13,6 +13,12 @@ function impalaDagre(id) {
   var svg = d3.select("#"+id + " svg");
   var inner = svg.select("g");
   var _impalaDagree = {
+    init: function (initialScale) {
+      _impalaDagree.scale = initialScale;
+      zoom.translate([((svg.attr("width") || $("#"+id).width()) - g.graph().width * initialScale) / 2, 20])
+      .scale(initialScale)
+      .event(svg);
+    },
     update: function(plan) {
       renderGraph(plan);
       _impalaDagree._width = $(svg[0]).width();
@@ -25,13 +31,13 @@ function impalaDagre(id) {
     },
     action: function(type) {
       if (type == 'plus') {
-        zoom.scale(zoom.scale() + 0.25);
-        inner.attr("transform", "translate(" + zoom.translate() + ")" +
-            "scale(" + zoom.scale() + ")");
+        zoom.scale(zoom.scale() + 0.25)
+        .event(svg);
       } else if (type == 'minus') {
-        zoom.scale(zoom.scale() - 0.25);
-        inner.attr("transform", "translate(" + zoom.translate() + ")" +
-            "scale(" + zoom.scale() + ")");
+        zoom.scale(zoom.scale() - 0.25)
+        .event(svg);
+      } else if (type == 'reset') {
+        _impalaDagree.init(1);
       }
     },
     moveTo: function(id) {
@@ -50,15 +56,30 @@ function impalaDagre(id) {
       .style('position', 'absolute')
       .style('right', '5px')
       .style('bottom', '5px')
-      .classed('button', true)
-    .selectAll('button').data([{ type: 'reset', icon: 'fa-plus' }, { type: 'plus', icon: 'fa-plus' }, { type: 'minus', icon: 'fa-minus' }])
+      .classed('buttons', true)
+    .selectAll('button').data([{ type: 'reset', svg: 'hi-crop-free', divider: true }, { type: 'plus', icon: 'fa-plus', divider: true }, { type: 'minus', icon: 'fa-minus' }])
     .enter()
     .append(function (data) {
-       var button = $("<div class='fa fa-fw valign-middle " + data.icon + "'></div>")[0];
-       $(button).on('click', function () {
-         _impalaDagree.action(data.type);
-       });
-       return button;
+      var text = "";
+      if (data.svg) {
+        text += "<div><svg class='hi'><use xlink:href='#"+ data.svg +"'></use></svg>";
+        if (data.divider) {
+          text += "<div class='divider'></div>";
+        }
+        text += "</div>";
+        button = $()[0];
+      } else if (data.icon) {
+        text += "<div><div class='fa fa-fw valign-middle " + data.icon + "'></div>";
+        if (data.divider) {
+          text += "<div class='divider'></div></div>";
+        }
+        text += "</div>";
+      }
+      var button = $(text)[0];
+      $(button).on('click', function () {
+        _impalaDagree.action(data.type);
+      });
+      return button;
     });
   }
 
@@ -233,10 +254,7 @@ function impalaDagre(id) {
     // Center the graph, but only the first time through (so as to not lose user zooms).
     if (is_first) {
       var initialScale = 1;
-      _impalaDagree.scale = initialScale;
-      zoom.translate([((svg.attr("width") || $("#"+id).width()) - g.graph().width * initialScale) / 2, 20])
-        .scale(initialScale)
-        .event(svg);
+      _impalaDagree.init(initialScale);
       svg.attr('height', Math.min(g.graph().height * initialScale + 40, 600));
       is_first = false;
     }
