@@ -21,7 +21,7 @@ function impalaDagre(id) {
       var scale = _impalaDagree.scale || 1;
       var height = value || 600;
       _impalaDagree._height = height;
-      svg.attr('height', Math.min(g.graph().height * scale + 40, height) || height);
+      svg.attr('height', height);
     },
     action: function(type) {
       if (type == 'plus') {
@@ -51,7 +51,7 @@ function impalaDagre(id) {
       .style('right', '5px')
       .style('bottom', '5px')
       .classed('button', true)
-    .selectAll('button').data([{ type: 'plus', icon: 'fa-plus' }, { type: 'minus', icon: 'fa-minus' }])
+    .selectAll('button').data([{ type: 'reset', icon: 'fa-plus' }, { type: 'plus', icon: 'fa-plus' }, { type: 'minus', icon: 'fa-minus' }])
     .enter()
     .append(function (data) {
        var button = $("<div class='fa fa-fw valign-middle " + data.icon + "'></div>")[0];
@@ -87,7 +87,9 @@ function impalaDagre(id) {
 
   // Recursively build a list of edges and states that comprise the plan graph
   function build(node, parent, edges, states, colour_idx, max_node_time) {
-    if (!node["output_card"]) return;
+    if (node["output_card"] === null || node["output_card"] === undefined) {
+      return;
+    }
     states.push({ "name": node["label"],
                   "type": node["type"],
                   "label": node["name"],
