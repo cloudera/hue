@@ -542,7 +542,7 @@ class Attempt:
     log_link = attempt['logsLink']
 
     # Generate actual task log link from logsLink url
-    if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING') or self.type == 'Oozie Launcher':
+    if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING'):
       logs_path = '/node/containerlogs/'
       node_url, tracking_path = log_link.split(logs_path)
       container_id, user = tracking_path.strip('/').split('/')
@@ -559,19 +559,32 @@ class Attempt:
         'user': user
       }
     else:  # Completed jobs
-      logs_path = '/jobhistory/logs/'
-      root_url, tracking_path = log_link.split(logs_path)
-      node_url, container_id, attempt_id, user = tracking_path.strip('/').split('/')
+      if '/node/containerlogs/' in log_link:
+        # Applications that use NodeManager API instead of JobHistory API, like new "Oozie Launcher",
+        # have `logsLink` URL pointed to NodeManager even for completed jobs
+        logs_path = '/node/containerlogs/'
 
-      # Replace log path tokens with actual attempt properties if available
-      if hasattr(self, 'nodeHttpAddress') and 'nodeId' in attempt:
-        node_url = '%s:%s' % (self.nodeHttpAddress.split(':')[0], attempt['nodeId'].split(':')[1])
-      container_id = self.assignedContainerId if hasattr(self, 'assignedContainerId') else container_id
-      attempt_id = self.attemptId if hasattr(self, 'attemptId') else attempt_id
+        yarn_cluster = cluster.get_cluster_conf_for_job_submission()
+        root_url = yarn_cluster.HISTORY_SERVER_API_URL.get()
 
-      log_link = '%(root_url)s/%(logs_path)s/%(node)s/%(container)s/%(attempt)s/%(user)s' % {
+        tracking_path = log_link.split(logs_path)[1]
+        container_id, user = tracking_path.strip('/').split('/')
+
+        node_url = self.nodeId
+        attempt_id = self.id
+      else:
+        logs_path = '/jobhistory/logs/'
+        root_url, tracking_path = log_link.split(logs_path)
+        node_url, container_id, attempt_id, user = tracking_path.strip('/').split('/')
+
+        # Replace log path tokens with actual attempt properties if available
+        if hasattr(self, 'nodeHttpAddress') and 'nodeId' in attempt:
+          node_url = '%s:%s' % (self.nodeHttpAddress.split(':')[0], attempt['nodeId'].split(':')[1])
+        container_id = self.assignedContainerId if hasattr(self, 'assignedContainerId') else container_id
+        attempt_id = self.attemptId if hasattr(self, 'attemptId') else attempt_id
+
+      log_link = '%(root_url)s/jobhistory/logs/%(node)s/%(container)s/%(attempt)s/%(user)s' % {
         'root_url': root_url,
-        'logs_path': logs_path.strip('/'),
         'node': node_url,
         'container': container_id,
         'attempt': attempt_id,
