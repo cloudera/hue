@@ -622,7 +622,8 @@ class YarnOozieAttempt(Attempt):
     self._fixup()
 
   def _fixup(self):
-    setattr(self, 'diagnostics', self.diagnosticsInfo)
+    if not hasattr(self, 'diagnostics'):
+      self.diagnostics = ''
     setattr(self, 'type', 'Oozie Launcher')
 
 class Container:
