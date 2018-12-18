@@ -14,12 +14,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%
-  from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _
 
-  from desktop import conf
-  from desktop.views import commonheader, commonfooter, _ko
+from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4
+from desktop.views import commonheader, commonfooter, _ko
 
-  from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
 %>
 
 <%
@@ -39,7 +39,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
     top: 110px!important;
   }
@@ -97,7 +97,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
     } --><!-- /ko -->
 
-    % if not conf.IS_K8S_ONLY.get():
+    % if not IS_K8S_ONLY.get():
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
@@ -123,6 +123,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="nav-collapse">
           <ul class="nav">
             <li class="app-header">
+              % if IS_K8S_ONLY.get():
+                <a data-bind="click: function() { selectInterface('dataware2-clusters'); }">
+                  <i class="altus-icon altus-adb-cluster"></i>
+                  ${ _('Warehouses') }
+                </a>
+              % else:
               <!-- ko ifnot: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
               <a href="/${app_name}">
                 <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
@@ -146,6 +152,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   > gke_gcp-eng-dsdw_us-west2-b_impala-demo
                 </span>
               <!-- /ko -->
+              % endif
             </li>
             <!-- ko foreach: availableInterfaces -->
               <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
@@ -2949,11 +2956,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
-      %if conf.is_hue4():
-      self.paginationResultPage = ko.observable(100);
-      %else:
-      self.paginationResultPage = ko.observable(50);
-      %endif
+      % if is_hue4():
+        self.paginationResultPage = ko.observable(100);
+      % else:
+        self.paginationResultPage = ko.observable(50);
+      % endif
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),
@@ -3219,7 +3226,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.cluster() && self.cluster()['type'] == 'altus-dw';
         };
         var dataWarehouse2InterfaceCondition = function () {
-          return self.cluster() && self.cluster()['type'] == 'altus-dw2';
+          return false && self.cluster() && self.cluster()['type'] == 'altus-dw2';
         };
         var schedulerInterfaceCondition = function () {
           return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
@@ -3314,22 +3321,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
+
         % if not is_mini:
-        huePubSub.publish('graph.stop.refresh.view');
-        if (window.location.hash !== '#!' + interface) {
-          hueUtils.changeURL('#!' + interface);
-        }
+          huePubSub.publish('graph.stop.refresh.view');
+          if (window.location.hash !== '#!' + interface) {
+            hueUtils.changeURL('#!' + interface);
+          }
         % endif
         self.jobs.selectedJobs([]);
         self.job(null);
+
         if (interface === 'slas'){
           % if not is_mini:
-          self.loadSlaPage();
+            self.loadSlaPage();
           % endif
         }
         else if (interface === 'oozie-info') {
           % if not is_mini:
-          self.loadOozieInfoPage();
+            self.loadOozieInfoPage();
           % endif
         }
         else {
@@ -3408,9 +3417,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         loaded = true;
         var h = window.location.hash;
-        %if not is_mini:
+        % if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
-        %endif
+        % endif
 
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {

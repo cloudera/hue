@@ -22,27 +22,27 @@ import time
 import urllib2
 import urlparse
 
-from urllib import quote_plus
 from lxml import html
+from urllib import quote_plus
 
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 
-from desktop.log.access import access_log_level
-from desktop.lib.rest.http_client import RestException
-from desktop.lib.rest.resource import Resource
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse, render_json, render, copy_query_dict
-from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.json_utils import JSONEncoderForHTML
+from desktop.lib.rest.http_client import RestException
+from desktop.lib.rest.resource import Resource
+from desktop.log.access import access_log_level
 from desktop.views import register_status_bar_view
 
 from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 from hadoop.yarn import resource_manager_api as resource_manager_api
-from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
