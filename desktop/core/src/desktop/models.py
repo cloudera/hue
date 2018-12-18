@@ -1659,8 +1659,8 @@ class ClusterConfig():
 
     _interpreters = get_ordered_interpreters(self.user)
 
-    if self.cluster_type == ANALYTIC_DB:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala', 'hive', 'spark2', 'pyspark', 'mapreduce')]
+    if ANALYTIC_DB in self.cluster_type:
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala')] #, 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
       interpreters.append({
@@ -1673,7 +1673,7 @@ class ClusterConfig():
         'is_sql': interpreter['is_sql']
       })
 
-    if SHOW_NOTEBOOKS.get() and self.cluster_type != ANALYTIC_DB:
+    if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
@@ -1705,7 +1705,7 @@ class ClusterConfig():
     interpreters = get_engines(self.user)
     _interpreters = []
 
-    if interpreters and self.cluster_type != ANALYTIC_DB:
+    if interpreters and ANALYTIC_DB not in self.cluster_type:
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',
@@ -1739,7 +1739,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1757,7 +1757,7 @@ class ClusterConfig():
         'page': '/filebrowser/view=S3A://'
       })
 
-    if is_adls_enabled() and has_adls_access(self.user) and self.cluster_type != ANALYTIC_DB:
+    if is_adls_enabled() and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -1775,7 +1775,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'search' in self.apps and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1787,7 +1787,7 @@ class ClusterConfig():
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster # Circular loop
 
-      title =  _('Jobs') if self.cluster_type != ANALYTIC_DB else _('Queries')
+      title =  _('Jobs') if ANALYTIC_DB not in self.cluster_type else _('Queries')
 
       if get_default_yarncluster():
         interpreters.append({
@@ -1798,7 +1798,7 @@ class ClusterConfig():
           'page': '/jobbrowser/'
         })
 
-    if has_kafka() and self.cluster_type != ANALYTIC_DB:
+    if has_kafka() and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'kafka',
         'displayName': _('Streams'),
@@ -1807,7 +1807,7 @@ class ClusterConfig():
         'page': '/kafka/'
       })
 
-    if 'hbase' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'hbase' in self.apps and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1825,7 +1825,7 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'sqoop' in self.apps and ANALYTIC_DB not in self.cluster_type:
       from sqoop.conf import IS_ENABLED
       if IS_ENABLED.get():
         interpreters.append({
@@ -1870,7 +1870,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and self.cluster_type != ANALYTIC_DB:
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and ANALYTIC_DB not in self.cluster_type:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
