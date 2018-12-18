@@ -305,3 +305,52 @@ class ManagerApi(object):
   def _get_roles(self, cluster_name, service_name, role_type):
     roles = self._root.get('clusters/%(cluster_name)s/services/%(service_name)s/roles' % {'cluster_name': cluster_name, 'service_name': service_name})['items']
     return [role for role in roles if role['type'] == role_type]
+
+
+  def get_impalad_config(self, key=None, impalad_host=None, cluster_name=None):
+    if not key or not impalad_host:
+      return None
+
+    service_name = "IMPALA"
+    role_type = 'IMPALAD'
+
+    try:
+      cluster = self._get_cluster(cluster_name)
+      services = self._root.get('clusters/%(cluster_name)s/services' % {
+        'cluster_name': cluster['name'],
+        'service_name': service_name
+      })['items']
+
+      service_display_names = [service['displayName'] for service in services if service['type'] == service_name]
+
+      hosts = self._root.get('hosts')['items']
+      impalad_hostIds = [host['hostId'] for host in hosts if host['hostname'] == impalad_host]
+
+      if impalad_hostIds and service_display_names:
+        impalad_hostId = impalad_hostIds[0]
+        impala_service_display_name = service_display_names[0]
+
+        servers = self._root.get('clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles' % {
+          'cluster_name': cluster['name'],
+          'spark_service_display_name': impala_service_display_name
+        })['items']
+
+        impalad_server_names = [server['name'] for server in servers if server['type'] == role_type and server['hostRef']['hostId'] == impalad_hostId]
+        impalad_server_name = impalad_server_names[0] if impalad_server_names else None
+
+        if impalad_server_name:
+          server_configs = self._root.get('clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles/%(shs_server_name)s/config' % {
+            'cluster_name': cluster['name'],
+            'spark_service_display_name': impala_service_display_name,
+            'shs_server_name': impalad_server_name
+          }, params={'view': 'full'})['items']
+
+          for config in server_configs:
+            if 'relatedName' in config and 'value' in config:
+              if config['relatedName'] == key:
+                return config['value']
+
+    except Exception, e:
+      LOG.warn("Get Impala Daemon API configurations via ManangerAPI: %s" % e)
+
+    return None

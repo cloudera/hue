@@ -178,11 +178,32 @@ AUTH_PASSWORD_SCRIPT = Config(
   default=None
 )
 
+def get_daemon_config(key):
+  from metadata.conf import MANAGER
+  from metadata.manager_client import ManagerApi
+
+  if MANAGER.API_URL.get():
+    return ManagerApi().get_impalad_config(key=key, impalad_host=SERVER_HOST.get())
+
+  return None
+
+def get_daemon_api_username():
+  """
+    Try to get daemon_api_username from Cloudera Manager API
+  """
+  return get_daemon_config('webserver_htpassword_user')
+
+def get_daemon_api_password():
+  """
+    Try to get daemon_api_password from Cloudera Manager API
+  """
+  return get_daemon_config('webserver_htpassword_password')
+
 DAEMON_API_PASSWORD = Config(
   key="daemon_api_password",
   help=_t("Password for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
   private=True,
-  default=None
+  dynamic_default=get_daemon_api_password
 )
 
 DAEMON_API_PASSWORD_SCRIPT = Config(
@@ -197,7 +218,7 @@ DAEMON_API_USERNAME = Config(
   key="daemon_api_username",
   help=_t("Username for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
   private=True,
-  default=None
+  dynamic_default=get_daemon_api_username
 )
 
 
