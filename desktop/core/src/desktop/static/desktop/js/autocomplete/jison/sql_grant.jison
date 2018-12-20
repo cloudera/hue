@@ -326,7 +326,7 @@ WithGrantOption_EDIT
    {
      parser.suggestKeywords(['OPTION']);
    }
- | '<hive>WITH' '<impala>GRANT' 'CURSOR'
+ | '<impala>WITH' '<impala>GRANT' 'CURSOR'
    {
      parser.suggestKeywords(['OPTION']);
    }
