@@ -200,8 +200,8 @@
 <hive>'VIEW'                               { return '<hive>VIEW'; }
 <hive>'WAIT'                               { return '<hive>WAIT'; }
 <hive>'WEEK'                               { return '<hive>WEEK'; }
-<hive>'WITH'                               { return '<hive>WITH'; }
 <hive>'WINDOW'                             { return '<hive>WINDOW'; }
+<hive>'WITH'                               { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return '<hive>WITH'; }
 <hive>'YEAR'                               { return '<hive>YEAR'; }
 
 <hive>'.'                                  { return '<hive>.'; }
@@ -509,7 +509,7 @@
 <impala>'WHENEVER'                         { return '<impala>WHENEVER'; }
 <impala>'WIDTH_BUCKET'                     { return '<impala>WIDTH_BUCKET'; }
 <impala>'WINDOW'                           { return '<impala>WINDOW'; }
-<impala>'WITH'                             { return '<impala>WITH'; }
+<impala>'WITH'                             { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return '<impala>WITH'; }
 <impala>'WITHIN'                           { return '<impala>WITHIN'; }
 <impala>'WITHOUT'                          { return '<impala>WITHOUT'; }
 

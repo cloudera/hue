@@ -823,7 +823,6 @@ NonStartingToken
  | 'VARIANCE'
  | 'WHEN'
  | 'WHERE'
- | AnyWith
  ;
 
 DataDefinition
@@ -2520,9 +2519,7 @@ OptionalHiveGroupingSetsCubeOrRollup_EDIT
  : HiveGroupingSets_EDIT
  | '<hive>WITH' 'CURSOR'
    {
-     if (parser.isHive()) {
-       parser.suggestKeywords(['CUBE', 'ROLLUP']);
-     }
+     parser.suggestKeywords(['CUBE', 'ROLLUP']);
    }
  ;
 
