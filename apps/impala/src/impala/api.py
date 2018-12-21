@@ -158,6 +158,27 @@ def alanize(request):
     response['status'] = 0
   return JsonResponse(response)
 
+def alanize_metrics(request):
+  response = {'status': -1}
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+  query_id = json.loads(request.POST.get('query_id'))
+
+  application = _get_server_name(cluster)
+  query_server = dbms.get_query_server_config()
+  session = Session.objects.get_session(request.user, query_server['server_name'])
+  server_url = _get_impala_server_url(session)
+
+  if query_id:
+    LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
+    api = get_impalad_api(user=request.user, url=server_url)
+    query_profile = api.get_query_profile_encoded(query_id)
+    profile = analyzer.analyze(analyzer.parse_data(query_profile))
+    ANALYZER.pre_process(profile)
+    metrics = analyzer.metrics(profile)
+    response['data'] = { 'metrics': metrics }
+    response['status'] = 0
+  return JsonResponse(response)
+
 @require_POST
 @error_handler
 def alanize_fix(request):

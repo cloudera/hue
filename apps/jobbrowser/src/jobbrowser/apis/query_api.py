@@ -130,7 +130,8 @@ class QueryApi(Api):
         'profile': '',
         'plan': '',
         'backends': '',
-        'finstances': ''
+        'finstances': '',
+        'metrics': ''
       }
     })
 

@@ -193,6 +193,27 @@ class Node(object):
         #frag_node = c
         return m.group(2)
 
+  def augmented_host(self):
+    if self.fragment_instance:
+      c = self.fragment_instance
+    elif self.fragment:
+      if self.fragment.is_averaged():
+        return 'averaged'
+      c = self.fragment.children[0]
+    elif self.is_fragment():
+      if self.is_averaged():
+        return 'averaged'
+      else:
+        c = self.children[0]
+    else:
+      return None
+    m = re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', c.val.name)
+    if m:
+        #frag.instance_id = m.group(1)
+        #frag.host = m.group(2)
+        #frag_node = c
+        return m.group(2)
+
   def info_strings(self):
     return self.val.info_strings
 
@@ -207,6 +228,13 @@ class Node(object):
     if self.val.counters:
         for c in self.val.counters:
             ctr[c.name] = c
+    return ctr
+
+  def metric_map(self):
+    ctr = {}
+    if self.val.counters:
+        for c in self.val.counters:
+            ctr[c.name] = { 'name': c.name, 'value': c.value, 'unit': c.unit }
     return ctr
 
   def repr(self, indent):
@@ -251,6 +279,25 @@ def summary(profile):
   host_list = sorted(host_list, key=lambda x: x[1], reverse=True)
   peak_memory = models.TCounter(value=host_list[0][1], unit=3) if host_list else models.TCounter(value=0, unit=3) # The value is not always present
   return [{ 'key': 'PlanningTime', 'value': counter_map['PlanningTime'].value, 'unit': counter_map['PlanningTime'].unit }, {'key': 'RemoteFragmentsStarted', 'value': counter_map['RemoteFragmentsStarted'].value, 'unit': counter_map['RemoteFragmentsStarted'].unit}, {'key': 'TotalTime', 'value': counter_map_execution_profile['TotalTime'].value, 'unit': counter_map_execution_profile['TotalTime'].unit}, {'key': 'PeakMemoryUsage', 'value': peak_memory.value, 'unit': peak_memory.unit}]
+
+def metrics(profile):
+  execution_profile = profile.find_by_name('Execution Profile')
+  if not execution_profile:
+    return {}
+  counter_map = {}
+  def get_metric(node, counter_map=counter_map):
+    if not node.is_plan_node():
+      return
+    nid = node.id()
+    if counter_map.get(nid) is None:
+      counter_map[nid] = {}
+    host = node.augmented_host()
+    if host:
+      counter_map[nid][host] = node.metric_map()
+    else:
+      counter_map[nid] = node.metric_map()
+  execution_profile.foreach_lambda(get_metric)
+  return counter_map
 
 def heatmap_by_host(profile, counter_name):
   rows = models.host_by_metric(profile,

@@ -12,19 +12,24 @@ function impalaDagre(id) {
   var g = new dagreD3.graphlib.Graph().setGraph({rankDir: "BT"});
   var svg = d3.select("#"+id + " svg");
   var inner = svg.select("g");
+  var states_by_name = { };
   var _impalaDagree = {
+    _metrics: {},
     init: function (initialScale) {
-      _impalaDagree.scale = initialScale;
+      clearSelection();
       zoom.translate([((svg.attr("width") || $("#"+id).width()) - g.graph().width * initialScale) / 2, 20])
       .scale(initialScale)
       .event(svg);
+    },
+    metrics: function(metrics) {
+      _impalaDagree._metrics = metrics;
     },
     update: function(plan) {
       renderGraph(plan);
       _impalaDagree._width = $(svg[0]).width();
     },
     height: function(value) {
-      var scale = _impalaDagree.scale || 1;
+      var scale = zoom.scale() || 1;
       var height = value || 600;
       _impalaDagree._height = height;
       svg.attr('height', height);
@@ -45,51 +50,46 @@ function impalaDagre(id) {
     },
     select: function(id) {
       select(id);
-    },
+    }
   };
   createActions();
 
   function createActions () {
+    svg.on('click', function () {
+      hideDetail();
+      clearSelection();
+    });
     d3.select("#"+id)
       .style('position', 'relative')
     .append('div')
-      .style('position', 'absolute')
-      .style('right', '5px')
-      .style('bottom', '5px')
       .classed('buttons', true)
-    .selectAll('button').data([{ type: 'reset', svg: 'hi-crop-free', divider: true }, { type: 'plus', icon: 'fa-plus', divider: true }, { type: 'minus', icon: 'fa-minus' }])
+    .selectAll('button').data([{ type: 'reset', svg: 'hi-crop-free', divider: true }, { type: 'plus', font: 'fa-plus', divider: true }, { type: 'minus', font: 'fa-minus' }])
     .enter()
     .append(function (data) {
       var text = "";
-      if (data.svg) {
-        text += "<div><svg class='hi'><use xlink:href='#"+ data.svg +"'></use></svg>";
-        if (data.divider) {
-          text += "<div class='divider'></div>";
-        }
-        text += "</div>";
-        button = $()[0];
-      } else if (data.icon) {
-        text += "<div><div class='fa fa-fw valign-middle " + data.icon + "'></div>";
-        if (data.divider) {
-          text += "<div class='divider'></div></div>";
-        }
-        text += "</div>";
+      text += '<div>';
+      text += getIcon(data);
+      if (data.divider) {
+        text += '<div class="divider"></div>';
       }
+      text += '</div>';
       var button = $(text)[0];
       $(button).on('click', function () {
         _impalaDagree.action(data.type);
       });
       return button;
     });
+    d3.select("#"+id)
+    .append('div')
+      .classed('details', true);
   }
 
   // Set up zoom support
   var zoom = d3.behavior.zoom().on("zoom", function() {
     var e = d3.event,
-        scale = Math.min(Math.max(e.scale, Math.min(_impalaDagree._width / g.graph().width, _impalaDagree._height / g.graph().height)), 2),
+        scale = Math.min(Math.max(e.scale, Math.min(Math.min(_impalaDagree._width / g.graph().width, _impalaDagree._height / g.graph().height), 1)), 2),
         tx = Math.min(40, Math.max(e.translate[0], _impalaDagree._width - 40 - g.graph().width * scale)),
         ty = Math.min(40, Math.max(e.translate[1], _impalaDagree._height - 40 - g.graph().height * scale));
-    _impalaDagree.scale = scale;
     zoom.translate([tx, ty]);
     zoom.scale(scale);
     inner.attr("transform", "translate(" + [tx, ty] + ")" +
@@ -150,8 +150,13 @@ function impalaDagre(id) {
     if (!key) {
       return;
     }
-    $("g.node").attr('class', 'node') // addClass doesn't work in svg on our version of jQuery
+    clearSelection();
     $("g.node:contains('" + key + "')").attr('class', 'node active');
+    showDetail(node);
+  }
+
+  function clearSelection() {
+    $("g.node").attr('class', 'node'); // addClass doesn't work in svg on our version of jQuery
   }
 
   function getKey(node) {
@@ -185,6 +190,45 @@ function impalaDagre(id) {
             .scale(scale).event);
   }
 
+  function getIcon(icon) {
+    var html = '';
+    if (icon && icon.svg) {
+      html += '<svg class="hi"><use xlink:href="#'+ icon.svg +'"></use></svg>'
+    } else if (icon && icon.font) {
+      html += "<div class='fa fa-fw valign-middle " + icon.font + "'></div>";
+    }
+    return html;
+  }
+
+  function showDetail(id) {
+    var data;
+    if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['averaged']) {
+      data = _impalaDagree._metrics[id]['averaged'];
+    } else if (_impalaDagree._metrics[id]) {
+      data = _impalaDagree._metrics[id][Object.keys(_impalaDagree._metrics[id])[0]];
+    }
+    d3.select('.query-plan').classed('open', true);
+    var title = d3.select('.query-plan .details')
+    .selectAll('.metric-title').data([0]);
+    title.enter().append('div').classed('metric-title', true);
+    var key = getKey(id);
+    title.html(getIcon(states_by_name[key].icon) + '<span>' + states_by_name[key].label+ '</span>');
+
+    var metricTitle = d3.select('.query-plan .details')
+    .selectAll('.metrics').data([0]);
+    metricTitle.enter().append('div').classed('metrics', true);
+
+    var metrics = d3.select('.query-plan .details .metrics').selectAll('div')
+    .data(Object.keys(data).sort().map(function (key) { return data[key]; }));
+    metrics.exit().remove();
+    metrics.enter().append('div');
+    metrics.html(function (datum) { return '<div class="metric-name">' + datum.name + '</div> : <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(datum.value, datum.unit) + '</div>'; });
+  }
+
+  function hideDetail(id) {
+    d3.select('.query-plan').classed('open', false);
+  }
+
   function renderGraph(plan) {
     if (!plan || !plan.plan_nodes || !plan.plan_nodes.length) return;
     var states = [];
@@ -200,21 +244,16 @@ function impalaDagre(id) {
     });
 
     // Keep a map of names to states for use when processing edges.
-    var states_by_name = { };
     states.forEach(function(state) {
       // Build the label for the node from the name and the detail
-      var html = "";
-      if (state.icon && state.icon.svg) {
-        html += '<svg class="hi"><use xlink:href="#'+ state.icon.svg +'"></use></svg>'
-        //html += "<img src=\"" + icon.svg + "\"></img>";
-      } else if (state.icon && state.icon.font){
-        html += "<span class='fa fa-fw valign-middle " + state.icon.font + "'></span>";
-      }
+      var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + parseInt(state.name.split(':')[0], 10) + ");\">"; // TODO: Remove Hue dependency
+      html += getIcon(state.icon)
       html += "<span class='name'>" + state.label + "</span><br/>";
       html += "<span class='metric'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
       html += "<span class='metric'>" + state.max_time + "</span>"
-      html += "<span class='id'>" + state.name + "</span>";;
+      html += "<span class='id'>" + state.name + "</span>";
+      html += "</div>";
 
       var style = state.style;
 
