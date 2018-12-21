@@ -533,7 +533,7 @@ class TopDownAnalysis:
 
     def pre_process(self, profile):
         summary = profile.find_by_name("Summary")
-        exec_summary_json = utils.parse_exec_summary(summary.val.info_strings['ExecSummary'])
+        exec_summary_json = utils.parse_exec_summary(summary.val.info_strings.get('ExecSummary')) if summary.val.info_strings.get('ExecSummary') else {}
         stats_mapping = {
           'Query Compilation': {
             'Metadata load finished': 'MetadataLoadTime',
@@ -592,14 +592,14 @@ class TopDownAnalysis:
           node_id = node.id()
            # Setup Hosts & Broadcast
           if node_id and node.is_regular() and int(node_id) in exec_summary_json:
-            exec_summary_node = exec_summary_json[int(node_id)]
-            node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node["hosts"], unit=0))
+            exec_summary_node = exec_summary_json.get(int(node_id), {})
+            node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node.get('hosts', ''), unit=0))
             broadcast = 0
             if exec_summary_json[int(node_id)]["broadcast"]:
                 broadcast = 1
             node.val.counters.append(models.TCounter(name='Broadcast', value=broadcast, unit=0))
 
-            if re.search(r'\w*_SCAN_NODE', node.name(), re.IGNORECASE):
+            if exec_summary_node.get('detail') and re.search(r'\w*_SCAN_NODE', node.name(), re.IGNORECASE):
               details = exec_summary_node['detail'].split()
               node.val.info_strings['Table'] = details[0]
               node.val.counters.append(models.TCounter(name='MissingStats', value=missing_stats.get(details[0], 0), unit=0))

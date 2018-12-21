@@ -7511,6 +7511,7 @@
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
         this._impalaDagre.update(props.value);
+        this._impalaDagre.metrics(props.metrics);
         this._impalaDagre.height(props.height);
       }
     };

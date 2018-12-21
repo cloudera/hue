@@ -2105,6 +2105,29 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
+  ApiHelper.prototype.fetchQueryExecutionStatistics = function (options)  {
+    var self = this;
+    var url = '/impala/api/query/alanize/metrics';
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(url, {
+      'cluster': JSON.stringify(options.compute),
+      'query_id': '"' + options.queryId + '"'
+      }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (response) {
+        if (response.status === 0) {
+          deferred.resolve(response.data);
+        } else {
+          deferred.reject();
+        }
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
+  };
+
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
