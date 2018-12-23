@@ -208,6 +208,39 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="context-partition-details">
+    <div class="context-popover-flex-fill" style="overflow: auto;">
+      <div class="context-popover-inner-content">
+        <div style="position: absolute; right: 6px; top: 8px;">
+          <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
+        </div>
+        <!-- ko with: data -->
+        <div class="context-popover-flex-header blue"><span data-bind="text: originalName"></span></div>
+        <div class="context-popover-flex-attributes">
+          <div class="context-popover-attribute"><div>${ _('Created') }</div><div data-bind="text: created"></div></div>
+        </div>
+        <!-- ko if: description -->
+        <div class="context-popover-doc-description" data-bind="html: description"></div>
+        <!-- /ko -->
+        <div class="context-popover-flex-fill">
+          <table id="partitionsTable" class="table table-condensed table-nowrap">
+            <thead>
+            <tr>
+              <th>${ _('Values') }</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: colValues">
+              <tr>
+                <td data-bind="text: $data"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- /ko -->
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="context-popover-template">
     <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
@@ -299,7 +332,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="context-lang-ref-contents">
     <div class="context-popover-content">
-      <div class="context-popover-flex-fill" data-bind="html: body"></div>
+      <div class="context-popover-flex-fill context-popover-docs-details" data-bind="html: body"></div>
       <div class="context-popover-flex-bottom-links">
         <div class="context-popover-link-row">
           <a class="inactive-action pointer" data-bind="click: openInRightAssist">
@@ -330,8 +363,8 @@ from metadata.conf import has_navigator
       </span>
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
-        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
-        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading() && catalogEntry() && !catalogEntry().isTemporary, click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
+        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled && catalogEntry() && !catalogEntry().isTemporary, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
         <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
       </div>
     </div>
@@ -345,16 +378,16 @@ from metadata.conf import has_navigator
         <div class="alert" data-bind="text: errorText"></div>
       </div>
       <!-- /ko -->
-      <!-- ko if: !loading() && !hasErrors() && typeof catalogEntry() !== 'undefined' -->
+      <!-- ko if: !loading() && !hasErrors() && typeof catalogEntry() !== 'undefined'-->
       <div class="context-popover-flex-fill" data-bind="with: catalogEntry">
         <div class="context-popover-inner-content">
-          <!-- ko if: $parent.comment() -->
+          <!-- ko if: $parent.comment() && !isTemporary  -->
           <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis: { expanded: $parent.commentExpanded, expandable: true, expandClass: 'context-popover-comment-expanded' }, text: $parent.comment"></div>
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.commentExpanded -->
             %if has_navigator(user):
-              <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
+              <!-- ko if: !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
               <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
             %endif
@@ -364,10 +397,10 @@ from metadata.conf import has_navigator
             <!-- /ko -->
 
             <!-- ko if: $parent.viewSqlVisible -->
-            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, formatted: true, dialect: getSourceType() }"></div>
+            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getSourceType() }"></div>
             <!-- /ko -->
             <!-- ko ifnot: $parent.viewSqlVisible -->
-            <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } } --><!-- /ko -->
+            <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry, onSampleClick: $parent.onSampleClick } } --><!-- /ko -->
             <!-- /ko -->
           <!-- /ko -->
         </div>
@@ -536,6 +569,8 @@ from metadata.conf import has_navigator
         self.activePromises = [];
         self.errorText = ko.observable();
 
+        self.onSampleClick = options.popover.onSampleClick;
+
         self.analysis = ko.observable();
         self.comment = ko.observable();
         self.commentExpanded = ko.observable(false);
@@ -559,7 +594,7 @@ from metadata.conf import has_navigator
                 path: catalogEntry.path.slice(0, i + 1),
                 catalogEntry: self.catalogEntry,
                 makeActive: function () {
-                  self.catalogEntry().dataCatalog.getEntry({ namespace: self.catalogEntry().namespace, compute: self.catalogEntry().compute, path: this.path }).done(self.catalogEntry);
+                  self.catalogEntry().dataCatalog.getEntry({ namespace: self.catalogEntry().namespace, compute: self.catalogEntry().compute, path: this.path, temporaryOnly: self.catalogEntry().isTemporary }).done(self.catalogEntry);
                 }
               })
             }
@@ -880,8 +915,26 @@ from metadata.conf import has_navigator
 
       LangRefContext.prototype.openInRightAssist = function () {
         var self = this;
-        huePubSub.publish('assist.lang.ref.show.topic', self.topicId);
+        huePubSub.publish('assist.lang.ref.show.topic', { ref: self.topicId });
         huePubSub.publish('context.popover.hide');
+      };
+
+      function PartitionContext(data) {
+        var self = this;
+        self.disposals = [];
+
+        self.data = data;
+        self.loading = ko.observable(false);
+        self.hasErrors = ko.observable(false);
+        self.errorText = ko.observable();
+        self.template = 'context-partition-details';
+      }
+
+      PartitionContext.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
       };
 
       function DocumentContext(data) {
@@ -1255,6 +1308,7 @@ from metadata.conf import has_navigator
         self.compute = params.compute;
         self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
+        self.onSampleClick = params.onSampleClick;
         var orientation = params.orientation || 'bottom';
         self.contents = null;
         self.resizeHelper = new ResizeHelper(orientation, self.leftAdjust, self.topAdjust);
@@ -1491,6 +1545,7 @@ from metadata.conf import has_navigator
                 || params.data.type.toLowerCase() === 'view';
 
         self.isDocument = params.data.type.toLowerCase() === 'hue';
+        self.isPartition = params.data.type.toLowerCase() === 'partition';
 
         self.close = params.globalSearch.close.bind(params.globalSearch);
 
@@ -1515,10 +1570,13 @@ from metadata.conf import has_navigator
 
         var sourceType = params.data.sourceType && params.data.sourceType.toLowerCase();
 
-        if (!sourceType && self.isCatalogEntry) {
+        if (!sourceType || sourceType === 'hive') {
           huePubSub.publish('cluster.config.get.config', function (clusterConfig) {
-            if (clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['editor']) {
-              sourceType = clusterConfig['app_config']['editor']['default_sql_interpreter'];
+            if (clusterConfig) {
+              var defaultEditor = clusterConfig['default_sql_interpreter'];
+              if (!sourceType || (sourceType === 'hive' && defaultEditor === 'impala')) {
+                sourceType = defaultEditor;
+              }
             }
           });
         }
@@ -1535,6 +1593,8 @@ from metadata.conf import has_navigator
           });
         } else if (self.isDocument) {
           self.contents(new DocumentContext(params.data));
+        } else if (self.isPartition) {
+          self.contents(new PartitionContext(params.data));
         }
       };
 

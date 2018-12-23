@@ -16,7 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
+import urllib
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -65,6 +67,19 @@ class ManagerApi(object):
     self._root = Resource(self._client)
 
 
+  def has_service(self, service_name, cluster_name=None):
+    cluster = self._get_cluster(cluster_name)
+    try:
+      services = self._root.get('clusters/%(cluster_name)s/serviceTypes' % {
+        'cluster_name': cluster['name'],
+        'service_name': service_name
+      })['items']
+
+      return service_name in services
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
   def tools_echo(self):
     try:
       params = (
@@ -79,15 +94,10 @@ class ManagerApi(object):
 
   def get_kafka_brokers(self, cluster_name=None):
     try:
-      cluster = self._get_services(cluster_name)
-      services = self._root.get('clusters/%(name)s/services' % cluster)['items']
 
-      service = [service for service in services if service['type'] == 'KAFKA'][0]
-      broker_hosts = self._get_roles(cluster['name'], service['name'], 'KAFKA_BROKER')
-      broker_hosts_ids = [broker_host['hostRef']['hostId'] for broker_host in broker_hosts]
+      hosts = self._get_hosts('KAFKA', 'KAFKA_BROKER', cluster_name=cluster_name)
 
-      hosts = self._root.get('hosts')['items']
-      brokers_hosts = [host['hostname'] + ':9092' for host in hosts if host['hostId'] in broker_hosts_ids]
+      brokers_hosts = [host['hostname'] + ':9092' for host in hosts]
 
       return ','.join(brokers_hosts)
     except RestException, e:
@@ -96,7 +106,7 @@ class ManagerApi(object):
 
   def get_kudu_master(self, cluster_name=None):
     try:
-      cluster = self._get_services(cluster_name)
+      cluster = self._get_cluster(cluster_name)
       services = self._root.get('clusters/%(name)s/services' % cluster)['items']
 
       service = [service for service in services if service['type'] == 'KUDU'][0]
@@ -119,11 +129,102 @@ class ManagerApi(object):
       raise ManagerApiException(e)
 
 
-  def _get_services(self, cluster_name=None):
+  def update_flume_config(self, cluster_name, config_name, config_value):
+    service = 'FLUME-1'
+    cluster = self._get_cluster(cluster_name)
+    roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
+    data = {
+      u'items': [{
+        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),
+        u'body': {
+          u'items': [
+            {u'name': config_name, u'value': config_value}
+          ]
+        },
+        u'contentType': u'application/json',
+        u'method': u'PUT'
+      }]
+    }
+
+    return self.batch(
+      items=data
+    )
+
+
+  def get_flume_agents(self, cluster_name=None):
+    return [host['hostname'] for host in self._get_hosts('FLUME', 'AGENT', cluster_name=cluster_name)]
+
+
+  def _get_hosts(self, service_name, role_name, cluster_name=None):
+    try:
+      cluster = self._get_cluster(cluster_name)
+      services = self._root.get('clusters/%(name)s/services' % cluster)['items']
+
+      service = [service for service in services if service['type'] == service_name][0]
+      hosts = self._get_roles(cluster['name'], service['name'], role_name)
+      hosts_ids = [host['hostRef']['hostId'] for host in hosts]
+
+      hosts = self._root.get('hosts')['items']
+      return [host for host in hosts if host['hostId'] in hosts_ids]
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def refresh_flume(self, cluster_name, restart=False):
+    service = 'FLUME-1'
+    cluster = self._get_cluster(cluster_name)
+    roles = [role['name'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
+
+    if restart:    
+      return self.restart_services(cluster['name'], service, roles)
+    else:
+      return self.refresh_configs(cluster['name'], service, roles)
+
+
+  def refresh_configs(self, cluster_name, service=None, roles=None):
+    try:
+      if service is None:
+        return self._root.post('clusters/%(cluster_name)s/commands/refresh' % {'cluster_name': cluster_name}, contenttype="application/json")
+      elif roles is None:
+        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+      else:
+        return self._root.post(
+            'clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service},
+            data=json.dumps({"items": roles}),
+            contenttype="application/json"
+        )
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def restart_services(self, cluster_name, service=None, roles=None):
+    try:
+      if service is None:
+        return self._root.post('clusters/%(cluster_name)s/commands/restart' % {'cluster_name': cluster_name}, contenttype="application/json")
+      elif roles is None:
+        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+      else:
+        return self._root.post(
+            'clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service},
+            data=json.dumps({"items": roles}),
+            contenttype="application/json"
+        )
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def batch(self, items):
+    try:
+      return self._root.post('batch', data=json.dumps(items), contenttype='application/json')
+    except RestException, e:
+      raise ManagerApiException(e)
+
+
+  def _get_cluster(self, cluster_name=None):
     clusters = self._root.get('clusters/')['items']
 
     if cluster_name is not None:
-      cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name]
+      cluster = [cluster for cluster in clusters if cluster['name'] == cluster_name][0]
     else:
       cluster = clusters[0]
 

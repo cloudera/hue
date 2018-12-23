@@ -26,13 +26,14 @@ Checked-in third party dependencies
 |Y|Django_nose (part of basie)|1.3|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
 |Y|django-openid-auth|0.5| |http://openidenabled.com/python-openid/|
 |Y|djangosaml2|0.16.4|Apache ||
+|Y|dnspython|1.15.0|ISC|https://pypi.org/project/dnspython/1.15.0/|
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
 |Y|enum|0.4.4|Python|http://pypi.python.org/pypi/enum/|
 |Y|enum-compat|0.0.2|Python|https://pypi.python.org/pypi/enum-compat/0.0.2|
-|Y|eventlet|0.21.0|Python|https://pypi.python.org/pypi/eventlet/0.21.0|
+|Y|eventlet|0.24.1|Python|https://pypi.python.org/pypi/eventlet/0.24.1|
 |Y|future|0.16.0|MIT|https://github.com/PythonCharmers/python-future|
-|Y|greenlet|0.4.12|MIT|https://pypi.python.org/pypi/greenlet/0.4.12|
-|Y|gunicorn|19.7.1|MIT|https://pypi.python.org/pypi/gunicorn/19.7.1|
+|Y|greenlet|0.4.15|MIT|https://pypi.python.org/pypi/greenlet/0.4.15|
+|Y|gunicorn|19.9.0|MIT|https://pypi.python.org/pypi/gunicorn/19.9.0|
 |Y|guppy|0.1.10|MIT|http://guppy-pe.sourceforge.net|
 |Y|httplib2|0.8| |http://bitworking.org/projects/httplib2/|
 |Y|importlib|1.0.3|Python|http://docs.python.org/2.7/library/importlib.html|
@@ -44,6 +45,7 @@ Checked-in third party dependencies
 |Y|lxml|3.3.6|BSD|http://codespeak.net/lxml/|
 |Y|Mako|0.8.1|MIT|http://makotemplates.org/|
 |Y|Markdown|2.0.3|BSD|http://pypi.python.org/packages/source/M/Markdown/Markdown-2.0.3.tar.gz|
+|Y|monotonic|1.5|Apache|https://pypi.org/project/monotonic/1.5/|
 |Y|MarkupSafe|0.9.3|BSD|http://pypi.python.org/pypi/MarkupSafe|
 |Y|mozilla-django-oidc|1.0.0|MPL2.0|https://pypi.org/project/mozilla-django-oidc/|
 |Y|MySQL for Python|1.2.5|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|

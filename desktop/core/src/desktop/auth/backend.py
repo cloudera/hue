@@ -323,7 +323,7 @@ class PamBackend(DesktopBackendBase):
   """
 
   @metrics.pam_authentication_time
-  def authenticate(self, username, password):
+  def authenticate(self, request=None, username=None, password=None):
     username = force_username_case(username)
 
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
@@ -340,7 +340,7 @@ class PamBackend(DesktopBackendBase):
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
           profile = get_profile(user)
-          profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+          profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
           profile.save()
           user.is_superuser = is_super
 
@@ -492,7 +492,7 @@ class LdapBackend(object):
 
     if user is not None and user.is_active:
       profile = get_profile(user)
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)
@@ -577,7 +577,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
         profile = get_profile(user)
-        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         profile.save()
         user.is_superuser = is_super
 
@@ -622,7 +622,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
         profile = get_profile(user)
-        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         profile.save()
         user.is_superuser = is_super
 

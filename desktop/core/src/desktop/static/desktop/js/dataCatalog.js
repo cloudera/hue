@@ -117,6 +117,7 @@ var DataCatalog = (function () {
       var self = this;
       self.sourceType = sourceType;
       self.entries = {};
+      self.temporaryEntries = {};
       self.multiTableEntries = {};
       self.store = localforage.createInstance({
         name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
@@ -372,17 +373,233 @@ var DataCatalog = (function () {
     };
 
     /**
+     * Adds a temporary table to the data catalog. This would allow autocomplete etc. of tables that haven't
+     * been created yet.
+     *
+     * Calling this returns a handle that allows deletion of any created entries by calling delete() on the handle.
+     *
+     * @param {Object} options
+     * @param {string} options.name
+     * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
+     *
+     * @param {Object[]} options.columns
+     * @param {string} options.columns[].name
+     * @param {string} options.columns[].type
+     * @param {Object[][]} options.sample
+     *
+     * @return {Object}
+     */
+    DataCatalog.prototype.addTemporaryTable = function (options) {
+      var self = this;
+      var tableDeferred = $.Deferred();
+      var path = ['default', options.name];
+
+      var identifiersToClean = [];
+
+      var addEntryMeta = function (entry, sourceMeta) {
+        entry.sourceMeta = sourceMeta || entry.definition;
+        entry.sourceMetaPromise = $.Deferred().resolve(entry.sourceMeta).promise();
+        entry.navigatorMeta = { comment: '' };
+        entry.navigatorMetaPromise = $.Deferred().resolve(entry.navigatorMeta).promise();
+        entry.analysis = { is_view: false };
+        entry.analysisPromise = $.Deferred().resolve(entry.analysis).promise();
+      };
+
+      var removeTable = function () {}; // noop until actually added
+
+      var sourceIdentifier = generateEntryCacheId({
+        namespace: options.namespace,
+        path: []
+      });
+
+      if (!self.temporaryEntries[sourceIdentifier]) {
+        var sourceDeferred = $.Deferred();
+        self.temporaryEntries[sourceIdentifier] = sourceDeferred.promise();
+        var sourceEntry = new DataCatalogEntry({
+          isTemporary: true,
+          dataCatalog: self,
+          namespace: options.namespace,
+          compute: options.compute,
+          path: [],
+          definition: {
+            index: 0,
+            navOptLoaded: true,
+            type: 'source'
+          }
+        });
+        addEntryMeta(sourceEntry);
+        identifiersToClean.push(sourceIdentifier);
+        sourceEntry.childrenPromise = $.Deferred().resolve([]).promise();
+        sourceDeferred.resolve(sourceEntry);
+      }
+
+      self.temporaryEntries[sourceIdentifier].done(function (sourceEntry) {
+        sourceEntry.getChildren().done(function (existingTemporaryDatabases) {
+          var databaseIdentifier = generateEntryCacheId({
+            namespace: options.namespace,
+            path: ['default']
+          });
+
+          if (!self.temporaryEntries[databaseIdentifier]) {
+            var databaseDeferred = $.Deferred();
+            self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
+            var databaseEntry = new DataCatalogEntry({
+              isTemporary: true,
+              dataCatalog: self,
+              namespace: options.namespace,
+              compute: options.compute,
+              path: ['default'],
+              definition: {
+                index: 0,
+                navOptLoaded: true,
+                type: 'database'
+              }
+            });
+            addEntryMeta(databaseEntry);
+            identifiersToClean.push(databaseIdentifier);
+            databaseEntry.childrenPromise = $.Deferred().resolve([]).promise();
+            databaseDeferred.resolve(databaseEntry);
+            existingTemporaryDatabases.push(databaseEntry);
+          }
+
+          self.temporaryEntries[databaseIdentifier].done(function (databaseEntry) {
+            databaseEntry.getChildren().done(function (existingTemporaryTables) {
+              var tableIdentifier = generateEntryCacheId({
+                namespace: options.namespace,
+                path: path
+              });
+              self.temporaryEntries[tableIdentifier] = tableDeferred.promise();
+              identifiersToClean.push(tableIdentifier);
+
+              var tableEntry = new DataCatalogEntry({
+                isTemporary: true,
+                dataCatalog: self,
+                namespace: options.namespace,
+                compute: options.compute,
+                path: path,
+                definition: {
+                  comment: '',
+                  index: 0,
+                  name: options.name,
+                  navOptLoaded: true,
+                  type: 'table'
+                }
+              });
+              existingTemporaryTables.push(tableEntry);
+              var indexToDelete = existingTemporaryTables.length - 1;
+              removeTable = function () { existingTemporaryTables.splice(indexToDelete, 1); };
+
+              var childrenDeferred = $.Deferred();
+              tableEntry.childrenPromise = childrenDeferred.promise();
+
+              if (options.columns) {
+                var childEntries = [];
+
+                addEntryMeta(tableEntry, {
+                  columns: [],
+                  extended_columns: [],
+                  comment: '',
+                  notFound: false,
+                  is_view: false
+                });
+
+                tableEntry.sample = {
+                  data: options.sample || [],
+                  meta: tableEntry.sourceMeta.extended_columns
+                };
+                tableEntry.samplePromise = $.Deferred().resolve(tableEntry.sample).promise();
+
+                var index = 0;
+                options.columns.forEach(function (column) {
+                  var columnPath = path.concat(column.name);
+                  var columnIdentifier = generateEntryCacheId({
+                    namespace: options.namespace,
+                    path: columnPath
+                  });
+
+                  var columnDeferred = $.Deferred();
+                  self.temporaryEntries[columnIdentifier] = columnDeferred.promise();
+                  identifiersToClean.push(columnIdentifier);
+
+                  var columnEntry = new DataCatalogEntry({
+                    isTemporary: true,
+                    dataCatalog: self,
+                    namespace: options.namespace,
+                    compute: options.compute,
+                    path: columnPath,
+                    definition: {
+                      comment: '',
+                      index: index++,
+                      name: column.name,
+                      partitionKey: false,
+                      type: column.type
+                    }
+                  });
+
+                  columnEntry.sample = {
+                    data: [],
+                    meta: column
+                  };
+                  if (options.sample) {
+                    options.sample.forEach(function (sampleRow) {
+                      columnEntry.sample.data.push([sampleRow[index - 1]]);
+                    })
+                  }
+                  columnEntry.samplePromise = $.Deferred().resolve(columnEntry.sample).promise();
+
+                  tableEntry.sourceMeta.columns.push(column.name);
+                  tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
+                  columnDeferred.resolve(columnEntry);
+                  addEntryMeta(columnEntry, {
+                    comment: '',
+                    name: column.name,
+                    notFount: false,
+                    sample: [],
+                    type: column.type
+                  });
+
+                  childEntries.push(columnEntry)
+                });
+                childrenDeferred.resolve(childEntries);
+              } else {
+                childrenDeferred.resolve([]);
+              }
+
+              tableDeferred.resolve(tableEntry);
+            });
+          });
+        })
+
+
+      });
+
+      return {
+        delete: function () {
+          removeTable();
+          while (identifiersToClean.length) {
+            delete self.entries[identifiersToClean.pop()];
+          }
+        }
+      }
+    };
+
+    /**
      * @param {Object} options
      * @param {string|string[]} options.path
      * @param {ContextNamespace} options.namespace - The context namespace
      * @param {ContextCompute} options.compute - The context compute
      * @param {Object} [options.definition] - The initial definition if not already set on the entry
      * @param {boolean} [options.cachedOnly] - Default: false
+     * @param {boolean} [options.temporaryOnly] - Default: false
      * @return {Promise}
      */
     DataCatalog.prototype.getEntry = function (options) {
       var self = this;
       var identifier = generateEntryCacheId(options);
+      if (options.temporaryOnly) {
+        return self.temporaryEntries[identifier] || $.Deferred().reject().promise();
+      }
       if (self.entries[identifier]) {
         return self.entries[identifier];
       }
@@ -608,6 +825,7 @@ var DataCatalog = (function () {
      * @param {ContextNamespace} options.namespace - The context namespace
      * @param {ContextCompute} options.compute - The context compute
      * @param {Object} options.definition - Initial known metadata on creation (normally comes from the parent entry)
+     * @param {boolean} [options.isTemporary] - Default false
      *
      * @constructor
      */
@@ -619,6 +837,7 @@ var DataCatalog = (function () {
       self.dataCatalog = options.dataCatalog;
       self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
       self.name = self.path.length ? self.path[self.path.length - 1] : options.dataCatalog.sourceType;
+      self.isTemporary = options.isTemporary;
 
       self.definition = options.definition;
 
@@ -696,7 +915,7 @@ var DataCatalog = (function () {
      * @param {Object} options
      * @param {string} [options.invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
      * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
-     * @param {boolean [options.silenceErrors] - Default false
+     * @param {boolean} [options.silenceErrors] - Default false
      * @return {CancellablePromise}
      */
     DataCatalogEntry.prototype.clearCache = function (options) {
@@ -710,11 +929,15 @@ var DataCatalog = (function () {
       var invalidate = options.invalidate || 'cache';
 
       if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
+        if (window.IS_K8S_ONLY) {
+          invalidate = 'invalidateAndFlush';
+        }
         if (self.dataCatalog.invalidatePromise) {
           invalidatePromise = self.dataCatalog.invalidatePromise;
         } else {
           invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
             sourceType: self.getSourceType(),
+            compute: self.compute,
             invalidate: invalidate,
             path: self.path,
             silenceErrors: options.silenceErrors
@@ -1734,11 +1957,23 @@ var DataCatalog = (function () {
      * @param {boolean} [options.cachedOnly] - Default false
      * @param {boolean} [options.refreshCache] - Default false
      * @param {boolean} [options.cancellable] - Default false
+     * @oaram {string} [options.operation]
      *
      * @return {CancellablePromise}
      */
     DataCatalogEntry.prototype.getSample = function (options) {
       var self = this;
+
+      // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
+      if (options && options.operation && options.operation !== 'default') {
+        return applyCancellable(ApiHelper.getInstance().fetchSample({
+          sourceType: self.dataCatalog.sourceType,
+          compute: self.compute,
+          path: self.path,
+          silenceErrors: options && options.silenceErrors,
+          operation: options.operation
+        }), options);
+      }
 
       // Check if parent has a sample that we can reuse
       if (!self.samplePromise && self.isColumn()) {
@@ -2162,12 +2397,36 @@ var DataCatalog = (function () {
     return {
 
       /**
+       * Adds a detached (temporary) entry to the data catalog. This would allow autocomplete etc. of tables that haven't
+       * been created yet.
+       *
+       * Calling this returns a handle that allows deletion of any created entries by calling delete() on the handle.
+       *
+       * @param {Object} options
+       * @param {string} options.sourceType
+       * @param {ContextNamespace} options.namespace - The context namespace
+       * @param {ContextCompute} options.compute - The context compute
+       * @param {string} options.name
+       *
+       * @param {Object[]} options.columns
+       * @param {string} options.columns[].name
+       * @param {string} options.columns[].type
+       * @param {Object[][]} options.sample
+       *
+       * @return {Object}
+       */
+      addTemporaryTable: function (options) {
+        return getCatalog(options.sourceType).addTemporaryTable(options);
+      },
+
+      /**
        * @param {Object} options
        * @param {string} options.sourceType
        * @param {ContextNamespace} options.namespace - The context namespace
        * @param {ContextCompute} options.compute - The context compute
        * @param {string|string[]} options.path
        * @param {Object} [options.definition] - Optional initial definition
+       * @param {boolean} [options.temporaryOnly] - Default: false
        *
        * @return {Promise}
        */

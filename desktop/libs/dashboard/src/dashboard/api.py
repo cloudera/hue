@@ -23,10 +23,12 @@ import uuid
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2
+from desktop.views import serve_403_error
 
 from libsolr.api import SolrApi
 
@@ -284,6 +286,9 @@ def get_terms(request):
 
 @allow_viewer_only
 def download(request):
+  if not ENABLE_DOWNLOAD.get():
+    return serve_403_error(request)
+
   try:
     file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
     facet = json.loads(request.POST.get('facet', '{}'))

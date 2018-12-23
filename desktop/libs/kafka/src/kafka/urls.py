@@ -21,4 +21,5 @@ from kafka import kafka_api as kafka_kafka_api
 urlpatterns = [
   url(r'^api/topics/list/$', kafka_kafka_api.list_topics, name='list_topics'),
   url(r'^api/topic/list/$', kafka_kafka_api.list_topic, name='list_topic'),
+  url(r'^api/topic/create/$', kafka_kafka_api.create_topic, name='create_topic'),
 ]

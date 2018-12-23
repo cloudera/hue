@@ -18,12 +18,13 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
 
@@ -185,14 +186,16 @@ ${ hueIcons.symbols() }
         </a>
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-          % if IS_MULTICLUSTER_ONLY.get():
-            <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; margin-top: -6px">
+          % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
+            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() === 'dw'">
+            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 22px; margin-top:3px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
           % else:
             <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
           % endif
         </a>
         % endif
 
+        % if not IS_MULTICLUSTER_ONLY.get():
         <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
@@ -209,6 +212,7 @@ ${ hueIcons.symbols() }
             <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
         </div>
+        % endif
 
         <script type="text/html" id="quick-create-item-template">
           <!-- ko if: item.dividerAbove -->
@@ -216,7 +220,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
           <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
             <!-- ko if: item.url -->
-             <a href="javascript: void(0);" data-bind="hueLink: item.url">
+              <a href="javascript: void(0);" data-bind="hueLink: item.url">
                 <!-- ko if: item.icon -->
                 <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
                 <!-- /ko -->
@@ -245,7 +249,7 @@ ${ hueIcons.symbols() }
         % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
         <div class="dropdown navbar-dropdown pull-right">
           % if IS_MULTICLUSTER_ONLY.get():
-            <!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
+            ##<!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
           % endif
 
           <%
@@ -285,23 +289,12 @@ ${ hueIcons.symbols() }
   </nav>
 
   <div id="jobsPanel" class="jobs-panel" style="display: none;">
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
-    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
-    <ul class="nav nav-pills">
-      % if cluster != ANALYTIC_DB:
-      <li class="active" data-interface="jobs"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
-      % endif
-      % if 'jobbrowser' in apps:
-      <% from jobbrowser.conf import ENABLE_QUERY_BROWSER %>
-      % if ENABLE_QUERY_BROWSER.get():
-        <li data-interface="queries" class="${ 'active' if cluster == ANALYTIC_DB else '' }"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'queries')">${_('Queries')}</a></li>
-      % endif
-      % endif
-      % if cluster != ANALYTIC_DB:
-        <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
-        <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
-      % endif
-    </ul>
+    <div style="position: absolute; right: 0px; padding: 5px 10px;">
+      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
+      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
+        <i class="fa fa-fw fa-expand"></i>
+      </a>
+    </div>
     <div id="mini_jobbrowser"></div>
   </div>
 
@@ -316,19 +309,23 @@ ${ hueIcons.symbols() }
     </script>
 
     <div class="hue-sidebar hue-sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
-      <div class="hue-sidebar-content">
-        <!-- ko foreach: {data: items, as: 'item'} -->
+      % if IS_MULTICLUSTER_ONLY.get():
+        <!-- ko component: { name: 'hue-multi-cluster-sidebar' } --><!-- /ko -->
+      % else:
+        <div class="hue-sidebar-content">
+          <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
-             <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
-             <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
+            <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
+            <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: item.isCategory -->
-             <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
+            <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
           <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <div class="hue-sidebar-footer-panel">
-        <div data-bind="dropzone: {
+          <!-- /ko -->
+        </div>
+        <div class="hue-sidebar-footer-panel">
+          % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
+          <div data-bind="dropzone: {
             clickable: false,
             url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
             params: { dest: DROPZONE_HOME_DIR },
@@ -336,10 +333,16 @@ ${ hueIcons.symbols() }
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
             click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
-          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+            <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
+          </div>
+          % endif
         </div>
-      </div>
+      % endif
     </div>
+
+    % if IS_MULTICLUSTER_ONLY.get():
+    <div class="hue-dw-sidebar-container collapsed" data-bind="component: { name: 'hue-dw-sidebar', params: { items: items, pocClusterMode: pocClusterMode } }"></div>
+    % endif
 
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
       <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
@@ -934,19 +937,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (self.currentContextParams() !== null) {
               if (loadDeep && self.currentContextParams()[0]) {
                 baseURL += self.currentContextParams()[0];
-              }
-              else {
+              } else {
                 var route = new page.Route(baseURL);
                 route.keys.forEach(function (key) {
                   if (key.name === 0) {
                     if (typeof self.currentContextParams()[key.name] !== 'undefined') {
-                      baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
-                    }
-                    else {
+                      if (app === 'filebrowser') {
+                        baseURL = baseURL.replace('*', self.currentContextParams()[key.name]).replace(/#/g, '%23');
+                      } else {
+                        baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                      }
+                    } else {
                       baseURL = baseURL.replace('*', '');
                     }
-                  }
-                  else {
+                  } else {
                     baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
                   }
                 });
@@ -1481,6 +1485,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }
         });
 
+        // TODO: Drop. Just for PoC
+        self.pocClusterMode = ko.observable();
+        ApiHelper.getInstance().withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw')
+        huePubSub.subscribe('set.multi.cluster.mode', self.pocClusterMode);
+
         self.onePageViewModel.currentApp.subscribe(function () {
           self.leftNavVisible(false);
         });
@@ -1576,6 +1585,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var self = this;
 
         self.items = ko.observableArray();
+
+        self.pocClusterMode = topNavViewModel.pocClusterMode;
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           var items = [];
@@ -1686,6 +1697,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
       var sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
       ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
+    % if IS_MULTICLUSTER_ONLY.get():
+      ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+    % endif
+
     })(onePageViewModel, topNavViewModel);
 
     huePubSub.publish('cluster.config.get.config');

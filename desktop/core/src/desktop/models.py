@@ -49,7 +49,7 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1560,6 +1560,7 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
+# Aka 'Atus'
 ANALYTIC_DB = 'altus'
 
 
@@ -1663,7 +1664,7 @@ class ClusterConfig():
     _interpreters = get_ordered_interpreters(self.user)
 
     if self.cluster_type == ANALYTIC_DB:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala', 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
       interpreters.append({
@@ -1751,7 +1752,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
 
-    if is_s3_enabled() and has_s3_access(self.user) and self.cluster_type != ANALYTIC_DB:
+    if is_s3_enabled() and has_s3_access(self.user) and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1778,7 +1779,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'indexer' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'search' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1819,7 +1820,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'security' in self.apps and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1915,7 +1916,16 @@ class Cluster():
   def __init__(self, user):
     self.user = user
     self.clusters = get_clusters(user)
-    self.data = self.clusters['Altus' if IS_MULTICLUSTER_ONLY.get() else CLUSTER_ID.get()]
+
+    if len(self.clusters) == 1:
+      self.data = self.clusters.values()[0]
+    elif IS_K8S_ONLY.get():
+      self.data = self.clusters['AltusV2']
+      self.data['type'] = 'altus' # To show simplified UI
+    elif IS_MULTICLUSTER_ONLY.get():
+      self.data = self.clusters['Altus']
+    else:
+      self.data = self.clusters[CLUSTER_ID.get()]
 
   def get_type(self):
     return self.data['type']

@@ -1,0 +1,139 @@
+# Korean translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-22 18:22-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ko\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.1\n"
+
+#~ msgid "NameNode logical name."
+#~ msgstr "NameNode 논리 이름입니다."
+
+#~ msgid "JobTracker logical name."
+#~ msgstr "JobTracker 논리 이름입니다."
+
+#~ msgid "Resource Manager logical name."
+#~ msgstr "Resource Manager 논리 이름입니다."
+
+#~ msgid "%(remote_dst)s already exists. Skipping."
+#~ msgstr "%(remote_dst)s이(가) 이미 있습니다. 건너뜁니다."
+
+#~ msgid "%(remote_dst)s does not exist. Trying to copy."
+#~ msgstr "%(remote_dst)s이(가) 없습니다. 복사 시도 중입니다."
+
+#~ msgid "Copied %s -> %s."
+#~ msgstr "%s을(를) %s에 복사했습니다."
+
+#~ msgid "Copying %s -> %s failed."
+#~ msgstr "%s을(를) %s(으)로 복사할 수 없습니다."
+
+#~ msgid "Skipping %s (not a file)."
+#~ msgstr "%s(파일 아님)을(를) 건너뛰는 중입니다."
+
+#~ msgid "%(function)s has not been implemented."
+#~ msgstr "%(function)s이(가) 구현되지 않았습니다."
+
+#~ msgid "No HDFS found"
+#~ msgstr "HDFS가 없음"
+
+#~ msgid "User %s does not have permissions to write to path \"%s\"."
+#~ msgstr "사용자 %s에게 경로 \"%s\"에 쓸 권한이 없습니다."
+
+#~ msgid "File %s not found"
+#~ msgstr "파일 %s을(를) 찾을 수 없음"
+
+#~ msgid "File %s is a directory"
+#~ msgstr "파일 %s이(가) 디렉토리임"
+
+#~ msgid "File %s is already trashed"
+#~ msgstr "파일 %s이(가) 이미 휴지통으로 이동됨"
+
+#~ msgid "Delete failed: %s"
+#~ msgstr "삭제하지 못함: %s"
+
+#~ msgid "File %s is not in trash"
+#~ msgstr "파일 %s이(가) 휴지통에 없음"
+
+#~ msgid "Path %s already exists."
+#~ msgstr "경로 %s이(가) 이미 존재합니다."
+
+#~ msgid "Mkdir failed: %s"
+#~ msgstr "Mkdir 실패: %s"
+
+#~ msgid "Rename failed: %s -> %s"
+#~ msgstr "이름을 바꾸지 못함: %s -> %s"
+
+#~ msgid "'%s' is not a directory"
+#~ msgstr "'%s'이(가) 디렉토리가 아님"
+
+#~ msgid "Copy src '%s' does not exist"
+#~ msgstr "복사 소스 '%s'이(가) 존재하지 않음"
+
+#~ msgid "Copy src '%s' is a directory"
+#~ msgstr "복사 소스 '%s'이(가) 디렉토리임"
+
+#~ msgid "Copy dst '%s' is a directory"
+#~ msgstr "복사 대상 '%s'이(가) 디렉토리임"
+
+#~ msgid "File not found: %s"
+#~ msgstr "파일을 찾을 수 없음: %s"
+
+#~ msgid "Destination file %s exists and is not a directory."
+#~ msgstr "대상 파일 %s이(가) 존재하며 디렉토리가 아닙니다."
+
+#~ msgid "Failed to create '%s'. HDFS did not return a redirect"
+#~ msgstr "'%s'을(를) 생성하지 못했습니다. HDFS는 리디렉션을 리턴하지 않습니다."
+
+#~ msgid ""
+#~ "Failed to upload file. WebHdfs requires"
+#~ " a valid username to upload files."
+#~ msgstr "파일을 업로드할 수 없습니다. 파일을 업로드하려면 WebHdfs에 올바른 사용자 이름이 필요합니다."
+
+#~ msgid "Is a directory: '%s'"
+#~ msgstr "디렉토리임: '%s'"
+
+#~ msgid "Invalid argument to seek for whence"
+#~ msgstr "위치를 찾는 올바르지 않은 인수"
+
+#~ msgid "File not open for writing"
+#~ msgstr "쓰기 위해 파일을 열 수 없음"
+
+#~ msgid "Filesystem root '/' should be owned by '%s'"
+#~ msgstr "파일 시스템 루트 '/'는 '%s'에서 소유해야 함"
+
+#~ msgid "Failed to access filesystem root"
+#~ msgstr "파일 시스템 루트에 액세스하지 못함"
+
+#~ msgid "Failed to create temporary file \"%s\""
+#~ msgstr "임시 파일 \"%s\"을(를) 생성하지 못함"
+
+#~ msgid "Failed to remove temporary file \"%s\""
+#~ msgstr "임시 파일 \"%s\"을(를) 제거하지 못함"
+
+#~ msgid "YARN cluster is not available."
+#~ msgstr "YARN 클러스터를 사용할 수 없습니다."
+
+#~ msgid "No Resource Manager are available."
+#~ msgstr "사용 가능한 Resource Manager가 없습니다."
+
+#~ msgid "YARN did not return any token field."
+#~ msgstr "YARN에서 토큰 필드를 반환하지 않았습니다."
+
+#~ msgid "YARN RM returned a failed response: %s"
+#~ msgstr "YARN RM에서 실패한 응답을 리턴함: %s"
+
+#~ msgid "No Spark History Server is available."
+#~ msgstr "사용 가능한 Spark History 서버가 없습니다."
+

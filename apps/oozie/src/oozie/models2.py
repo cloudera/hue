@@ -205,8 +205,10 @@ class WorkflowConfiguration(object):
     }
   ]
 
+
 class WorkflowDepthReached(Exception):
   pass
+
 
 class Workflow(Job):
   XML_FILE_NAME = 'workflow.xml'
@@ -457,7 +459,8 @@ class Workflow(Job):
     node_mapping = dict([(node.id, node) for node in nodes])
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
     workflow_mapping = dict(
-      [(workflow.uuid, Workflow(document=workflow, user=self.user)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
+        [(workflow.uuid, Workflow(document=workflow, user=self.user)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)]
+    )
 
     xml = re.sub(re.compile('>\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
       'wf': self,
@@ -554,6 +557,7 @@ def _to_lowercase(node_list):
       if hasattr(node[key], 'lower'):
         node[key] = node[key].lower()
 
+
 def _update_adj_list(adj_list):
   uuids = {}
   id = 1
@@ -588,6 +592,7 @@ def _update_adj_list(adj_list):
     uuids[id] = adj_list[node]['uuid']
     id += 1
   return adj_list
+
 
 def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
   for node in nodes:
@@ -659,6 +664,7 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
     else:
       _dig_nodes(node, adj_list, user, wf_nodes, nodes_uuid_set)
 
+
 def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
   wf_rows = []
   for node in nodes:
@@ -666,11 +672,11 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
       node = node[0]
     if type(node) != list:
       _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
-        row={"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": _get_widget_type(adj_list[node]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        row = {"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": _get_widget_type(adj_list[node]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
     else:
       if adj_list[node[0]]['node_type'] in ('fork', 'decision'):
         _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node[0]]['uuid'],
-          row={"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": _get_widget_type(adj_list[node[0]]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+          row = {"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": _get_widget_type(adj_list[node[0]]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
 
         wf_rows.append({
           "id": str(uuid.uuid4()),
@@ -703,11 +709,13 @@ def _get_widget_type(node_type):
   widget_name = "%s-widget" % node_type
   return widget_name if widget_name in NODES.keys() else 'generic-widget'
 
+
 # Prevent duplicate nodes in graph layout
 def _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id, row):
   if row['widgets'][0]['id'] not in nodes_uuid_set:
     nodes_uuid_set.add(row['widgets'][0]['id'])
     wf_rows.append(row)
+
 
 def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
 
@@ -767,6 +775,7 @@ def _create_graph_adjaceny_list(nodes):
 
 
 class Node():
+
   def __init__(self, data, user=None):
     self.data = data
     self.user = user
@@ -784,7 +793,6 @@ class Node():
     if self.data['type'] in ('hive2', 'hive-document') and not self.data['properties']['jdbc_url']:
       self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
 
-
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
       if len(links) != len(self.data['children']):
@@ -792,7 +800,19 @@ class Node():
                  % (len(links), len(self.data['children']), links, self.data['children']))
         self.data['children'] = links
 
-    if self.data['type'] == JavaDocumentAction.TYPE:
+    if self.data['type'] == AltusAction.TYPE or \
+          (('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE or self.data['type'] == 'spark-document'))) or \
+          mapping.get('auto-cluster'):
+      shell_command_name = self.data['name'] + '.sh'
+      self.data['properties']['shell_command'] = shell_command_name
+      self.data['properties']['env_var'] = []
+      self.data['properties']['arguments'] = []
+      self.data['properties']['job_properties'] = []
+      self.data['properties']['capture_output'] = True
+      self.data['properties']['files'] = [{'value': shell_command_name}, {'value': 'altus.py'}]
+      self.data['properties']['archives'] = []
+
+    elif self.data['type'] == JavaDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
       properties = notebook.get_data()['snippets'][0]['properties']
 
@@ -855,7 +875,7 @@ class Node():
       self.data['properties']['source_path'] = action['properties']['source_path']
       self.data['properties']['destination_path'] = action['properties']['destination_path']
 
-    elif self.data['type'] == ShellDocumentAction.TYPE:
+    elif self.data['type'] == ShellAction.TYPE or self.data['type'] == ShellDocumentAction.TYPE:
       if self.data['properties'].get('uuid'):
         notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
         action = notebook.get_data()['snippets'][0]
@@ -866,8 +886,15 @@ class Node():
         self.data['properties']['capture_output'] = action['properties']['capture_output']
         self.data['properties']['arguments'] = [{'value': prop} for prop in action['properties']['arguments']]
 
-        self.data['properties']['files'] = ([{'value': action['properties']['command_path']}] if not action['properties'].get('command_path', '').startswith('/') else []) + [{'value': prop.get('path', prop)} for prop in action['properties']['files']]
+        self.data['properties']['files'] = [{'value': prop.get('path', prop)} for prop in action['properties']['files']]
         self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
+
+      # Auto ship the script if it was forgotten
+      shell_command = self.data['properties']['shell_command']
+      if '/' in shell_command and not [f for f in self.data['properties']['files'] if shell_command in f['value']]:
+        self.data['properties']['files'].append({'value': shell_command})
+        self.data['properties']['shell_command'] = Hdfs.basename(shell_command)
+
 
     elif self.data['type'] == MapReduceDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
@@ -919,6 +946,7 @@ class Node():
       self.data['properties']['archives'] = []
 
 
+
     data = {
       'node': self.data,
       'mapping': mapping,
@@ -926,7 +954,32 @@ class Node():
       'workflow_mapping': workflow_mapping
     }
 
-    if mapping.get('send_email'):
+    if mapping.get('auto-cluster'):
+      pass
+#       if self.data['type'] == StartNode.TYPE:
+#         self.data['altus_action'] = {
+#           'properties': {
+#             'credentials': {},
+#             'retry_max': {},
+#             'retry_interval': {},
+#             'prepares': {},
+#             'job_xml': {},
+#             'job_properties': {},
+#             'shell_command': '',
+#             'arguments': [],
+#             'env_var': [],
+#             'files': [],
+#             'archives': [],
+#             'capture_output': True
+#             #       <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
+# 
+#             #  Node(dict(AltusAction().get_fields()))
+#           }
+#         }
+#         self.data['properties']['auto-cluster'] = mapping['auto-cluster']
+#       if self.data['type'] == EndNode.TYPE or self.data['type'] == KillAction.TYPE:
+#         self.data['properties']['auto-cluster'] = mapping['auto-cluster']
+    elif mapping.get('send_email'):
       if self.data['type'] == KillAction.TYPE and not self.data['properties'].get('enableMail'):
         self.data['properties']['enableMail'] = True
         self.data['properties']['to'] = self.user.email
@@ -942,7 +995,7 @@ class Node():
         if self.data['type'] == EndNode.TYPE:
           self.data['properties']['body'] = 'View result file at %(send_result_browse_url)s' % mapping
 
-    return django_mako.render_to_string(self.get_template_name(), data)
+    return django_mako.render_to_string(self.get_template_name(mapping), data)
 
   @property
   def id(self):
@@ -985,13 +1038,20 @@ class Node():
     # Backward compatibility
     _upgrade_older_node(self.data)
 
-  def get_template_name(self):
+  def get_template_name(self, mapping=None):
+    if mapping is None:
+      mapping = {}
+
     node_type = self.data['type']
     if self.data['type'] == JavaDocumentAction.TYPE:
       node_type = JavaAction.TYPE
     elif self.data['type'] == ImpalaAction.TYPE or self.data['type'] == ImpalaDocumentAction.TYPE:
       node_type = ShellAction.TYPE
     elif self.data['type'] == AltusAction.TYPE:
+      node_type = ShellAction.TYPE
+    elif mapping.get('cluster') and 'document' in node_type: # Workflow
+      node_type = ShellAction.TYPE
+    elif mapping.get('auto-cluster') and 'document' in node_type: # Scheduled workflow
       node_type = ShellAction.TYPE
 
     return 'editor2/gen/workflow-%s.xml.mako' % node_type
@@ -4064,6 +4124,9 @@ class WorkflowBuilder():
 
     node['properties']['uuid'] = document.uuid
 
+    notebook = Notebook(document=document)
+    node['properties']['capture_output'] = notebook.get_data()['snippets'][0]['properties']['capture_output']
+
     return node
 
   def get_shell_snippet_node(self, snippet):
@@ -4074,6 +4137,7 @@ class WorkflowBuilder():
     node['properties']['archives'] = snippet['properties'].get('archives')
     node['properties']['files'] = snippet['properties'].get('files')
     node['properties']['env_var'] = snippet['properties'].get('env_var')
+    node['properties']['capture_output'] = snippet['properties'].get('capture_output')
 
     return node
 

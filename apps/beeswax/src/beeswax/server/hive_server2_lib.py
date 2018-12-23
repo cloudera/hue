@@ -312,7 +312,7 @@ class HiveServerDataTable(DataTable):
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
     self.operation_handle = operation_handle
-    if query_server['server_name'] == 'impala':
+    if query_server['server_name'].startswith('impala'):
       self.has_more = results.hasMoreRows
     else:
       self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
@@ -486,15 +486,15 @@ class HiveServerClient:
 
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
     LOG.info(
-        '%s: use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
-        self.query_server['server_name'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
+        '%s: server_host=%s, use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
+        self.query_server['server_name'], self.query_server['server_host'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
     )
 
     self.use_sasl = use_sasl
     self.kerberos_principal_short_name = kerberos_principal_short_name
     self.impersonation_enabled = impersonation_enabled
 
-    if self.query_server['server_name'] == 'impala':
+    if self.query_server['server_name'].startswith('impala'):
       from impala import conf as impala_conf
 
       ssl_enabled = impala_conf.SSL.ENABLED.get()
@@ -519,9 +519,11 @@ class HiveServerClient:
       password = None
 
     thrift_class = TCLIService
-    if self.query_server['server_name'] == 'impala':
+    if self.query_server['server_name'].startswith('impala'):
       from ImpalaService import ImpalaHiveServer2Service
       thrift_class = ImpalaHiveServer2Service
+
+    LOG.debug('Using %s for host_name %s' % (thrift_class, query_server['server_host']))
 
     self._client = thrift_util.get_client(
         thrift_class.Client,
@@ -556,7 +558,7 @@ class HiveServerClient:
     else:
       kerberos_principal_short_name = None
 
-    if self.query_server['server_name'] == 'impala':
+    if self.query_server['server_name'].startswith('impala'):
       if auth_password: # Force LDAP/PAM.. auth if auth_password is provided
         use_sasl = True
         mechanism = HiveServerClient.HS2_MECHANISMS['NONE']
@@ -588,7 +590,7 @@ class HiveServerClient:
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
 
-      if self.query_server['server_name'] == 'impala': # Only when Impala accepts it
+      if self.query_server['server_name'].startswith('impala'): # Only when Impala accepts it
         kwargs['configuration'].update({'impala.doas.user': user.username})
 
     if self.query_server['server_name'] == 'beeswax': # All the time
@@ -597,7 +599,7 @@ class HiveServerClient:
     if self.query_server['server_name'] == 'sparksql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
-    if self.query_server['server_name'] == 'impala' and self.query_server['SESSION_TIMEOUT_S'] > 0:
+    if self.query_server['server_name'].startswith('impala') and self.query_server['SESSION_TIMEOUT_S'] > 0:
       kwargs['configuration'].update({'idle_session_timeout': str(self.query_server['SESSION_TIMEOUT_S'])})
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
@@ -605,6 +607,8 @@ class HiveServerClient:
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
     self.coordinator_host = self._client.get_coordinator_host()
+    if self.coordinator_host:
+      res.configuration['coordinator_host'] = self.coordinator_host
 
     if res.status is not None and res.status.statusCode not in (TStatusCode.SUCCESS_STATUS,):
       if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
@@ -619,13 +623,15 @@ class HiveServerClient:
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
 
-    session = Session.objects.create(owner=user,
-                                     application=self.query_server['server_name'],
-                                     status_code=res.status.statusCode,
-                                     secret=encoded_status,
-                                     guid=encoded_guid,
-                                     server_protocol_version=res.serverProtocolVersion,
-                                     properties=properties)
+    session = Session.objects.create(
+        owner=user,
+        application=self.query_server['server_name'],
+        status_code=res.status.statusCode,
+        secret=encoded_status,
+        guid=encoded_guid,
+        server_protocol_version=res.serverProtocolVersion,
+        properties=properties
+    )
 
     # HS2 does not return properties in TOpenSessionResp
     if not session.get_properties():
@@ -741,7 +747,7 @@ class HiveServerClient:
     req = TGetSchemasReq()
     if schemaName is not None:
       req.schemaName = schemaName
-    if self.query_server['server_name'] == 'impala':
+    if self.query_server['server_name'].startswith('impala'):
       req.schemaName = None
 
     res = self.call(self._client.GetSchemas, req)
@@ -759,13 +765,28 @@ class HiveServerClient:
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
-    cols = ('db_name', 'comment', 'location','owner_name', 'owner_type', 'parameters')
+    print '-----'
+    print self.query_server['server_name']
+    print desc_results.results
+    print desc_schema.schema
+    if self.query_server['server_name'].startswith('impala'):
+      cols = ('name', 'location', 'comment') # Skip owner as on a new line
+    else:
+      cols = ('db_name', 'comment', 'location', 'owner_name', 'owner_type', 'parameters')
 
-    if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
-      raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
+#     print cols
+#     try:
+#       if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
+#         raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
+#     except Exception, e:
+#       print e
+#       raise e
 
-    return HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
-
+    
+    a = HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
+    print a
+    # {'comment': 'Default Hive database', 'name': 'default', 'location': 'hdfs://nightly6x-unsecure-1.vpc.cloudera.com:8020/user/hive/warehouse'}
+    return a
 
   def get_tables_meta(self, database, table_names, table_types=None):
     if not table_types:
@@ -873,7 +894,7 @@ class HiveServerClient:
 
     configuration = {}
 
-    if self.query_server['server_name'] == 'impala' and self.query_server['querycache_rows'] > 0:
+    if self.query_server['server_name'].startswith('impala') and self.query_server['querycache_rows'] > 0:
       configuration[IMPALA_RESULTSET_CACHE_SIZE] = str(self.query_server['querycache_rows'])
 
     # The query can override the default configuration
@@ -884,7 +905,7 @@ class HiveServerClient:
 
 
   def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_NEXT):
-    if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
+    if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
@@ -894,18 +915,20 @@ class HiveServerClient:
 
 
   def execute_async_statement(self, statement, confOverlay, with_multiple_session=False):
-    if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
+    if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
     (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, with_multiple_session=with_multiple_session)
 
-    return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
-                                 guid=res.operationHandle.operationId.guid,
-                                 operation_type=res.operationHandle.operationType,
-                                 has_result_set=res.operationHandle.hasResultSet,
-                                 modified_row_count=res.operationHandle.modifiedRowCount,
-                                 session_guid=session.guid)
+    return HiveServerQueryHandle(
+        secret=res.operationHandle.operationId.secret,
+        guid=res.operationHandle.operationId.guid,
+        operation_type=res.operationHandle.operationType,
+        has_result_set=res.operationHandle.hasResultSet,
+        modified_row_count=res.operationHandle.modifiedRowCount,
+        session_guid=session.guid
+    )
 
 
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
@@ -999,7 +1022,7 @@ class HiveServerClient:
     # Need to fetch more like this until SHOW PARTITIONS offers a LIMIT and ORDER BY
     partition_table = self.execute_query_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True)
 
-    if self.query_server['server_name'] == 'impala':
+    if self.query_server['server_name'].startswith('impala'):
       try:
         # Fetch all partition key names, which are listed before the #Rows column
         cols = [col.name for col in partition_table.cols()]
@@ -1038,7 +1061,7 @@ class HiveServerClient:
   def get_configuration(self):
     configuration = {}
 
-    if self.query_server['server_name'] == 'impala':  # Return all configuration settings
+    if self.query_server['server_name'].startswith('impala'):  # Return all configuration settings
       query = 'SET'
       results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True)
       configuration = dict((row[0], row[1]) for row in results.rows())
@@ -1197,7 +1220,7 @@ class HiveServerClientCompatible(object):
     if max_rows is None:
       max_rows = 1000
 
-    if start_over and not (self.query_server['server_name'] == 'impala' and self.query_server['querycache_rows'] == 0): # Backward compatibility for impala
+    if start_over and not (self.query_server['server_name'].startswith('impala') and self.query_server['querycache_rows'] == 0): # Backward compatibility for impala
       orientation = TFetchOrientation.FETCH_FIRST
     else:
       orientation = TFetchOrientation.FETCH_NEXT
@@ -1233,7 +1256,7 @@ class HiveServerClientCompatible(object):
   def get_log(self, handle, start_over=True):
     operationHandle = handle.get_rpc_handle()
 
-    if beeswax_conf.USE_GET_LOG_API.get() or self.query_server['server_name'] == 'impala':
+    if beeswax_conf.USE_GET_LOG_API.get() or self.query_server['server_name'].startswith('impala'):
       return self._client.get_log(operationHandle)
     else:
       if start_over:

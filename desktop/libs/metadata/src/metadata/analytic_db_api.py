@@ -16,15 +16,13 @@
 # limitations under the License.
 
 import logging
-import json
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-
-from notebook.connectors.altus import AnalyticDbApi
+from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
 
 
 LOG = logging.getLogger(__name__)
@@ -49,15 +47,16 @@ def error_handler(view_fn):
 def create_cluster(request):
   response = {'status': -1}
 
-  cluster_name = json.loads(request.POST.get('cluster_name'))
-  cdh_version = json.loads(request.POST.get('cdh_version'))
-  public_key = json.loads(request.POST.get('public_key'))
-  instance_type = json.loads(request.POST.get('instance_type', "workers_group_size"''))
-  environment_name = json.loads(request.POST.get('environment_name'))
-  workers_group_size = json.loads(request.POST.get('workers_group_size', '3'))
-  namespace_name = json.loads(request.POST.get('namespace_name', 'null'))
+  is_k8 = request.POST.get('is_k8') == 'true'
+  cluster_name = request.POST.get('cluster_name') or 'Analytic Cluster'
+  cdh_version = request.POST.get('cdh_version')
+  public_key = request.POST.get('public_key')
+  instance_type = request.POST.get('instance_type', "workers_group_size"'')
+  environment_name = request.POST.get('environment_name')
+  workers_group_size = int(request.POST.get('workers_group_size', '3'))
+  namespace_name = request.POST.get('namespace_name', 'null')
 
-  api = AnalyticDbApi(request.user)
+  api = DataWarehouse2Api(request.user) if is_k8 else AnalyticDbApi(request.user)
   data = api.create_cluster(
       cloud_provider='aws',
       cluster_name=cluster_name,
@@ -73,6 +72,43 @@ def create_cluster(request):
     response['status'] = 0
     response['data'] = data
   else:
-    response['message'] = 'Workload Analytics: %s' % data['details']
+    response['message'] = 'Data Warehouse API: %s' % data['details']
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def update_cluster(request):
+  response = {'status': -1}
+
+  cluster_name = request.POST.get('cluster_name') or 'Analytic Cluster'
+  auto_resize_changed = request.POST.get('auto_resize_changed') == 'true'
+
+  params = {
+    'clusterName': cluster_name,
+    'updateClusterAutoResizeChanged': auto_resize_changed
+  }
+
+  if auto_resize_changed:
+    updateClusterAutoResize = request.POST.get('auto_resize_enabled') == 'true'
+    params['updateClusterAutoResize'] = updateClusterAutoResize
+    if updateClusterAutoResize:
+      params['updateClusterAutoResizeMax'] = int(request.POST.get('auto_resize_max'))
+      if request.POST.get('auto_resize_min'):
+        params['updateClusterAutoResizeMin'] = int(request.POST.get('auto_resize_min'))
+      if request.POST.get('auto_resize_cpu'):
+        params['updateClusterAutoResizeCpu'] = int(request.POST.get('auto_resize_cpu'))
+  else:
+    params['workerReplicas'] = int(request.POST.get('workers_group_size', '3'))
+
+  api = DataWarehouse2Api(request.user)
+  data = api.update_cluster(**params)
+
+  if data:
+    response['status'] = 0
+    response['data'] = data
+  else:
+    response['message'] = 'Data Warehouse API: %s' % data['details']
 
   return JsonResponse(response)

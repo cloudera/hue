@@ -118,28 +118,24 @@ SSL = ConfigSection(
       type=coerce_bool,
       default=False
     ),
-
     CACERTS = Config(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
       dynamic_default=default_ssl_cacerts,
     ),
-
     KEY = Config(
       key="key",
       help=_t("Path to the private key file, e.g. /etc/hue/key.pem"),
       type=str,
       default=None
     ),
-
     CERT = Config(
       key="cert",
       help=_t("Path to the public certificate file, e.g. /etc/hue/cert.pem"),
       type=str,
       default=None
     ),
-
     VALIDATE = Config(
       key="validate",
       help=_t("Choose whether Hue should validate certificates received from the server."),
@@ -171,14 +167,38 @@ AUTH_PASSWORD = Config(
   key="auth_password",
   help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
   private=True,
-  dynamic_default=get_auth_password)
+  dynamic_default=get_auth_password
+)
 
 AUTH_PASSWORD_SCRIPT = Config(
   key="auth_password_script",
   help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
   private=True,
   type=coerce_password_from_script,
-  default=None)
+  default=None
+)
+
+DAEMON_API_PASSWORD = Config(
+  key="daemon_api_password",
+  help=_t("Password for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
+  private=True,
+  default=None
+)
+
+DAEMON_API_PASSWORD_SCRIPT = Config(
+  key="daemon_api_password_script",
+  help=_t("Execute this script to produce the Impala Daemon Password. This will be used when `daemon_api_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None
+)
+
+DAEMON_API_USERNAME = Config(
+  key="daemon_api_username",
+  help=_t("Username for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
+  private=True,
+  default=None
+)
 
 DAEMON_API_PASSWORD = Config(
   key="daemon_api_password",
@@ -226,7 +246,7 @@ def config_validator(user):
         LOG.exception(msg)
         res.append((NICE_NAME, _(msg)))
       else:
-       raise ex
+        raise ex
   except Exception, ex:
     msg = "No available Impalad to send queries to."
     LOG.exception(msg)

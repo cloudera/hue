@@ -702,9 +702,9 @@ var SqlParseSupport = (function () {
         }
       }
 
-      if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
+      if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.result.commonTableExpressions !== 'undefined') {
         var ctes = [];
-        parser.yy.latestCommonTableExpressions.forEach(function (cte) {
+        parser.yy.result.commonTableExpressions.forEach(function (cte) {
           var suggestion = {name: cte.alias};
           if (parser.yy.result.suggestTables.prependFrom) {
             suggestion.prependFrom = true
@@ -1498,6 +1498,17 @@ var SqlParseSupport = (function () {
       if (!parser.isImpala()) {
         return;
       }
+      // Don't add if already there except for SELECT
+      if (identifier !== 'SELECT' && parser.yy.allLocations) {
+        for (var i = parser.yy.allLocations.length - 1; i >= 0; i--) {
+          if (parser.yy.allLocations[i] && parser.yy.allLocations[i].type === 'statement') {
+            break;
+          }
+          if (parser.yy.allLocations[i] && parser.yy.allLocations[i].type === 'statementType') {
+            return;
+          }
+        }
+      }
       var loc = {
         type: 'statementType',
         location: adjustLocationForCursor(location),
@@ -2066,7 +2077,7 @@ var SqlParseSupport = (function () {
       'EOF': true,
       'UNSIGNED_INTEGER': true,
       'UNSIGNED_INTEGER_E': true,
-      'REGULAR_IDENTIFIER': true, // TODO: Indicate that an identifier was expected
+      'REGULAR_IDENTIFIER': true,
       'CURSOR': true,
       'PARTIAL_CURSOR': true,
       'HDFS_START_QUOTE': true,
@@ -2144,7 +2155,17 @@ var SqlParseSupport = (function () {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           // TODO: Only suggest alphanumeric?
-          if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
+          if (expected === 'REGULAR_IDENTIFIER') {
+            parser.yy.error.expectedIdentifier = true;
+            if (/^<[a-z]+>/.test(parser.yy.error.token)) {
+              var text = '`' + parser.yy.error.text + '`';
+              weightedExpected.push({
+                text: text,
+                distance: stringDistance(parser.yy.error.text, text, true)
+              });
+              parser.yy.error.possibleReserved = true;
+            }
+          } else if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
             if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
               expected = expected.substring(dialect.length + 2);
             } else if (/^<[a-z]+>/.test(expected)) {

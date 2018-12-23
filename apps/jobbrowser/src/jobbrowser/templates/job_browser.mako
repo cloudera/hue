@@ -17,8 +17,8 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.models import ANALYTIC_DB
   from desktop.views import commonheader, commonfooter, _ko
+
   from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
 %>
 
@@ -50,6 +50,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </style>
 % endif
 
+<link rel="stylesheet" href="${ static('desktop/ext/css/c3.min.css') }">
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -57,6 +58,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/ext/js/d3.v5.js') }"></script>
+<script src="${ static('desktop/ext/js/c3.min.js') }"></script>
 
 % if ENABLE_QUERY_BROWSER.get():
 <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
@@ -80,259 +83,385 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 
 
-% if not is_mini:
-<div class="navbar hue-title-bar">
+% if is_mini:
+  <div class="mini-jb-context-selector">
+    <!-- ko component: {
+      name: 'hue-context-selector',
+      params: {
+        sourceType: 'jobs',
+        cluster: cluster,
+        onClusterSelect: onClusterSelect,
+        hideLabels: true
+      }
+    } --><!-- /ko -->
+  </div>
+  <ul class="nav nav-pills">
+    <!-- ko foreach: availableInterfaces -->
+      <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
+        <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
+      </li>
+    <!-- /ko -->
+  </ul>
+% else:
+  <div class="navbar hue-title-bar">
     <div class="navbar-inner">
       <div class="container-fluid">
         <div class="nav-collapse">
           <ul class="nav">
             <li class="app-header">
+              <!-- ko ifnot: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
               <a href="/${app_name}">
                 <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
-                ${ _('Job Browser') }
+                <!-- ko if: !$root.cluster() || $root.cluster()['type'].indexOf("altus") == -1 -->
+                  ${ _('Job Browser') }
+                <!-- /ko -->
+                <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-engines") !== -1 -->
+                  ${ _('Clusters') }
+                <!-- /ko -->
+                <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-de") !== -1 -->
+                  ${ _('Data Engineering') }
+                <!-- /ko -->
               </a>
+              <!-- /ko -->
+              <!-- ko if: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
+                <span>
+                  <a data-bind="click: function() { huePubSub.publish('context.selector.set.cluster', 'engines'); }">
+                    <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
+                    ${ _('Clusters') }
+                  </a>
+                  > gke_gcp-eng-dsdw_us-west2-b_impala-demo
+                </span>
+              <!-- /ko -->
             </li>
             <!-- ko foreach: availableInterfaces -->
               <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
-                <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
+                <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label, visible: label"></a>
               </li>
             <!-- /ko -->
           </ul>
-          <span class="pull-right">
-            <!-- ko if: availableComputes().length > 1 -->
-              <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active clusters') }' } }"></div>
-            <!-- /ko -->
-          </span>
+          <div class="pull-right" style="padding-top: 15px">
+            <!-- ko component: {
+              name: 'hue-context-selector',
+              params: {
+                sourceType: 'jobs',
+                cluster: cluster,
+                onClusterSelect: onClusterSelect
+              }
+            } --><!-- /ko -->
+          </div>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right label label-warning" style="margin-top: 16px">${ _("Hive jobs are running as the 'hive' user") }</div>
           % endif
         </div>
       </div>
     </div>
-</div>
+  </div>
 % endif
 
 
-<script type="text/html" id="apps-list${ SUFFIX }">
-  <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container">
-    <thead>
-    <tr>
-      <th width="1%" class="vertical-align-middle">
-        <div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div>
-      </th>
-      <th width="20%">${_('Name')}</th>
-      <th width="6%">${_('User')}</th>
-      <th width="6%">${_('Type')}</th>
-      <th width="5%">${_('Status')}</th>
-      <th width="3%">${_('Progress')}</th>
-      <th width="5%">${_('Group')}</th>
-      <th width="10%" data-bind="text: $root.interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
-      <th width="6%">${_('Duration')}</th>
-      <th width="15%">${_('Id')}</th>
-    </tr>
-    </thead>
-    <tbody data-bind="foreach: apps">
-      <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
-        <td data-bind="click: function() {}, clickBubble: false">
-          <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
-        </td>
-        <td data-bind="text: name"></td>
-        <td data-bind="text: user"></td>
-        <td data-bind="text: type"></td>
-        <td data-bind="text: status"></td>
-        <td data-bind="text: $root.formatProgress(progress)"></td>
-        <td data-bind="text: queue"></td>
-        <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
-        <td data-bind="text: duration().toHHMMSS()"></td>
-        <td data-bind="text: id"></td>
+  <script type="text/html" id="apps-list${ SUFFIX }">
+    <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container">
+      <thead>
+      <tr>
+        <th width="1%" class="vertical-align-middle">
+          <div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div>
+        </th>
+        <th width="20%">${_('Name')}</th>
+        <th width="6%">${_('User')}</th>
+        <th width="6%">${_('Type')}</th>
+        <th width="5%">${_('Status')}</th>
+        <th width="3%">${_('Progress')}</th>
+        <th width="5%">${_('Group')}</th>
+        <th width="10%" data-bind="text: $root.interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
+        <th width="6%">${_('Duration')}</th>
+        <th width="15%">${_('Id')}</th>
       </tr>
-    </tbody>
-  </table>
-</script>
+      </thead>
+      <tbody data-bind="foreach: apps">
+        <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() == 'PAUSED', 'running': apiStatus() == 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+          <td data-bind="click: function() {}, clickBubble: false">
+            <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
+          </td>
+          <td data-bind="text: name"></td>
+          <td data-bind="text: user"></td>
+          <td data-bind="text: type"></td>
+          <td data-bind="text: status"></td>
+          <td data-bind="text: $root.formatProgress(progress)"></td>
+          <td data-bind="text: queue"></td>
+          <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
+          <td data-bind="text: duration().toHHMMSS()"></td>
+          <td data-bind="text: id"></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
 
+  <script type="text/html" id="create-cluster-content">
+    <form>
+      <fieldset>
+        <label for="clusterCreateName">${ _('Name') }</label>
+        <input id="clusterCreateName" type="text" placeholder="${ _('Name') }" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'">
 
-<div class="main-content">
-  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
-    <div class="vertical-full">
-      <div class="vertical-full row-fluid panel-container">
-        % if not is_embeddable:
-        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
-            <i class="fa fa-chevron-left"></i>
-          </a>
-          <div class="assist" data-bind="component: {
-              name: 'assist-panel',
-              params: {
-                user: '${user.username}',
-                sql: {
-                  navigationSettings: {
-                    openItem: false,
-                    showStats: true
-                  }
-                },
-                visibleAssistPanels: ['sql']
-              }
-            }"></div>
-        </div>
-        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-        % endif
+        <!-- ko if: $root.interface() == 'dataware2-clusters' -->
+        <label for="clusterCreateWorkers">${ _('Workers') }</label>
+        <input id="clusterCreateWorkers" type="number" min="1" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+        <label class="checkbox" style="float: right;">
+          <input type="checkbox" data-bind="checked: jobs.createClusterAutoPause"> ${ _('Auto pause') }
+        </label>
+        <label class="checkbox" style="margin-right: 10px; float: right;">
+          <input type="checkbox" data-bind="checked: jobs.createClusterAutoResize"> ${ _('Auto resize') }
+        </label>
+        <!-- /ko -->
+        <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
+        <label for="clusterCreateSize">${ _('Size') }</label>
+        <select id="clusterCreateSize" class="input-small" data-bind="visible: !jobs.createClusterShowWorkers()">
+          <option>${ _('X-Large') }</option>
+          <option>${ _('Large') }</option>
+          <option>${ _('Medium') }</option>
+          <option>${ _('Small') }</option>
+          <option>${ _('X-Small') }</option>
+        </select>
+        <label for="clusterCreateEnvironment">${ _('Environment') }</label>
+        <select id="clusterCreateEnvironment">
+          <option>AWS-finance-secure</option>
+          <option>GCE-east</option>
+          <option>OpenShift-prem</option>
+        </select>
+        <!-- /ko -->
+      </fieldset>
+    </form>
+    <div style="width: 100%; text-align: right;">
+      <button class="btn close-template-popover" title="${ _('Cancel') }">${ _('Cancel') }</button>
+      <button class="btn btn-primary close-template-popover" data-bind="click: jobs.createCluster, enable: jobs.createClusterName().length > 0 && jobs.createClusterWorkers() > 0" title="${ _('Start creation') }">
+        ${ _('Create') }
+      </button>
+    </div>
+  </script>
 
-        <div class="content-panel">
-          <div class="content-panel-inner">
-            <!-- ko if: $root.job() -->
-            <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
-            <!-- /ko -->
+  <script type="text/html" id="configure-cluster-content">
+    <form>
+      <fieldset>
+        <label for="clusterConfigureWorkers">${ _('Workers') }</label>
+        <span data-bind="visible: !updateClusterAutoResize()">
+          <input id="clusterConfigureWorkers" type="number" min="1" data-bind="value: updateClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+        </span>
+        <span data-bind="visible: updateClusterAutoResize()">
+          <input type="number" min="0" data-bind="value: updateClusterAutoResizeMin, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Min')}">
+          <input type="number" min="0" data-bind="value: updateClusterAutoResizeMax, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Max')}">
+          <input type="number" min="0" data-bind="value: updateClusterAutoResizeCpu, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('CPU')}">
+        </span>
 
-            <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
-            <!-- ko if: !$root.job() -->
-            <form class="form-inline">
-              <!-- ko if: !$root.isMini() && interface() == 'queries' -->
-                ${ _('Impala queries from') }
+        <label class="checkbox" style="margin-right: 10px; float: right;">
+          <input type="checkbox" data-bind="checked: updateClusterAutoResize"> ${ _('Auto resize') }
+        </label>
+      </fieldset>
+    </form>
+    <div style="width: 100%; text-align: right;">
+      <button class="btn close-template-popover" title="${ _('Cancel') }">${ _('Cancel') }</button>
+      <button class="btn btn-primary close-template-popover" data-bind="click: updateCluster, enable: clusterConfigModified" title="${ _('Update') }">
+        ${ _('Update') }
+      </button>
+    </div>
+  </script>
+
+  <div class="main-content">
+    <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+      <div class="vertical-full">
+        <div class="vertical-full row-fluid panel-container">
+          % if not is_embeddable:
+          <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+            <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+              <i class="fa fa-chevron-left"></i>
+            </a>
+            <div class="assist" data-bind="component: {
+                name: 'assist-panel',
+                params: {
+                  user: '${user.username}',
+                  sql: {
+                    navigationSettings: {
+                      openItem: false,
+                      showStats: true
+                    }
+                  },
+                  visibleAssistPanels: ['sql']
+                }
+              }"></div>
+          </div>
+          <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+          % endif
+
+          <div class="content-panel">
+            <div class="content-panel-inner">
+              <!-- ko if: $root.job() -->
+              <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
               <!-- /ko -->
-              <input type="text" class="input-large" data-bind="clearable: jobs.textFilter, valueUpdate: 'afterkeydown'" placeholder="${_('Filter by id, name, user...')}" />
-              <!-- ko if: jobs.statesValuesFilter -->
-              <span data-bind="foreach: jobs.statesValuesFilter">
-                <label class="checkbox">
-                  <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
-                  <div class="inline-block" data-bind="text: name, toggle: checked"></div>
-                </label>
-              </span>
-              <!-- /ko -->
 
-              <!-- ko ifnot: $root.isMini -->
-              <!-- ko if: $root.interface() !== 'schedules' && $root.interface() !== 'bundles' -->
-                ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
-                <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
-                  <option value="days">${_('days')}</option>
-                  <option value="hours">${_('hours')}</option>
-                  <option value="minutes">${_('minutes')}</option>
-                </select>
-
-                <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
-                  <i class="fa fa-refresh"></i>
-                </a>
-                
-                <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.compute() && $root.compute()['type'].indexOf('altus') >= 0, click: jobs.createCluster">
-                  <i class="fa fa-plus"></i>
-                </a>
-              <!-- /ko -->
-
-              <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
-              <!-- /ko -->
-            </form>
-
-            <div data-bind="visible: jobs.showJobCountBanner" class="pull-center alert alert-warning">${ _("Showing oldest %s jobs. Use days filter to get the recent ones.") % MAX_JOB_FETCH.get() }</div>
-
-            <div class="card card-small">
-              <!-- ko hueSpinner: { spin: jobs.loadingJobs(), center: true, size: 'xlarge' } --><!-- /ko -->
-              <!-- ko ifnot: jobs.loadingJobs() -->
-                <!-- ko if: $root.isMini -->
-                <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
-                  <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
-                    <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span class="muted">&nbsp;-&nbsp;</span><span class="muted" data-bind="text: status"></span></td>
-                    <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
-                    <div class="clearfix"></div>
-                    <strong class="pull-left" data-bind="text: type"></strong>
-                    <div class="inline-block pull-right"><i class="fa fa-user muted"></i> <span data-bind="text: user"></span></div>
-                    <div class="clearfix"></div>
-                    <div class="pull-left" data-bind="ellipsis: {data: name(), length: 40 }"></div>
-                    <div class="pull-right muted" data-bind="text: id"></div>
-                    <div class="clearfix"></div>
-                  </li>
-                  <div class="status-bar status-background" data-bind="css: {'running': isRunning()}, style: {'width': progress() + '%'}"></div>
-                </ul>
+              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
+              <!-- ko if: !$root.job() -->
+              <form class="form-inline">
+                <!-- ko if: !$root.isMini() && interface() == 'queries' -->
+                  ${ _('Impala queries from') }
                 <!-- /ko -->
+                <!-- ko if: interface() != 'dataware2-clusters' && interface() != 'engines' -->
+                <input type="text" class="input-large" data-bind="clearable: jobs.textFilter, valueUpdate: 'afterkeydown'" placeholder="${_('Filter by id, name, user...')}" />
+                  <!-- ko if: jobs.statesValuesFilter -->
+                  <span data-bind="foreach: jobs.statesValuesFilter">
+                    <label class="checkbox">
+                      <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                      <div class="inline-block" data-bind="text: name, toggle: checked"></div>
+                    </label>
+                  </span>
+                  <!-- /ko -->
+                <!-- /ko -->
+
                 <!-- ko ifnot: $root.isMini -->
-                  ${ _('Running') }
-                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: {apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                <!-- ko if: $root.interface() !== 'schedules' && $root.interface() !== 'bundles' -->
 
-                  ${ _('Completed') }
-                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: {apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                  <!-- ko if: $root.interface() && $root.interface().indexOf('engines') === -1 && $root.interface().indexOf('cluster') === -1 -->
+                  ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
+                  <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
+                    <option value="days">${_('days')}</option>
+                    <option value="hours">${_('hours')}</option>
+                    <option value="minutes">${_('minutes')}</option>
+                  </select>
+
+                  <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
+                    <i class="fa fa-refresh"></i>
+                  </a>
+                  <!-- /ko -->
+
+                  <a class="btn" title="${ _('Create cluster') }" data-bind="visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'create-cluster-content', minWidth: '320px', trigger: 'click' }, click: jobs.createClusterFormReset">
+                    <!-- ko if: $root.cluster() && $root.cluster()['type'] != 'altus-engines' -->
+                      ${ _('Add Warehouse') }
+                    <!-- /ko -->
+                    <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
+                      ${ _('Create / Register') }
+                    <!-- /ko -->
+                    <i class="fa fa-chevron-down"></i>
+                  </a>
+                <!-- /ko -->
+
+                <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
+                <!-- /ko -->
+              </form>
+
+              <div data-bind="visible: jobs.showJobCountBanner" class="pull-center alert alert-warning">${ _("Showing oldest %s jobs. Use days filter to get the recent ones.") % MAX_JOB_FETCH.get() }</div>
+
+              <div class="card card-small">
+                <!-- ko hueSpinner: { spin: jobs.loadingJobs(), center: true, size: 'xlarge' } --><!-- /ko -->
+                <!-- ko ifnot: jobs.loadingJobs() -->
+                  <!-- ko if: $root.isMini -->
+                  <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
+                    <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() === 'PAUSED', 'running': apiStatus() === 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+                      <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span class="muted">&nbsp;-&nbsp;</span><span class="muted" data-bind="text: status"></span></td>
+                      <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
+                      <div class="clearfix"></div>
+                      <strong class="pull-left" data-bind="text: type"></strong>
+                      <div class="inline-block pull-right"><i class="fa fa-user muted"></i> <span data-bind="text: user"></span></div>
+                      <div class="clearfix"></div>
+                      <div class="pull-left" data-bind="ellipsis: {data: name(), length: 40 }"></div>
+                      <div class="pull-right muted" data-bind="ellipsis: {data: id(), length: 32 }"></div>
+                      <div class="clearfix"></div>
+                    </li>
+                    <div class="status-bar status-background" data-bind="css: {'running': isRunning()}, style: {'width': progress() + '%'}"></div>
+                  </ul>
+                  <!-- /ko -->
+                  <!-- ko ifnot: $root.isMini -->
+                  <h4>${ _('Running') }</h4>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                  <h4>${ _('Completed') }</h4>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs } }"></div>
+                  <!-- /ko -->
+                <!-- /ko -->
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: $root.job() -->
+              <!-- ko with: $root.job() -->
+                <!-- ko if: mainType() == 'jobs' -->
+                  <div class="jb-panel" data-bind="template: { name: 'job-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'queries' -->
+                  <div class="jb-panel" data-bind="template: { name: 'queries-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'workflows' -->
+                  <!-- ko if: type() == 'workflow' -->
+                    <div class="jb-panel" data-bind="template: { name: 'workflow-page${ SUFFIX }' }"></div>
+                  <!-- /ko -->
+
+                  <!-- ko if: type() == 'workflow-action' -->
+                    <div class="jb-panel" data-bind="template: { name: 'workflow-action-page${ SUFFIX }' }"></div>
+                  <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'schedules' -->
+                  <div class="jb-panel" data-bind="template: { name: 'schedule-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'bundles' -->
+                  <div class="jb-panel" data-bind="template: { name: 'bundle-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType().startsWith('dataeng-job') -->
+                  <div data-bind="template: { name: 'dataeng-job-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'dataeng-clusters' || mainType() == 'dataware-clusters' -->
+                  <div data-bind="template: { name: 'dataware-clusters-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'dataware2-clusters' -->
+                  <div data-bind="template: { name: 'dataware2-clusters-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'livy-sessions' -->
+                  <div class="jb-panel" data-bind="template: { name: 'livy-session-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
               <!-- /ko -->
+              <!-- /ko -->
+
+              <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
+              <!-- /ko -->
+
+              % if not is_mini:
+              <!-- ko if: interface() === 'slas' -->
+                <!-- ko hueSpinner: { spin: slasLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
+              <!-- /ko -->
+              <div id="slas" data-bind="visible: interface() === 'slas'"></div>
+
+              <!-- ko if: interface() === 'oozie-info' -->
+                <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
+              <!-- /ko -->
+              <div id="oozieInfo" data-bind="visible: interface() === 'oozie-info'"></div>
+              %endif
             </div>
-            <!-- /ko -->
-
-          <!-- ko if: $root.job() -->
-          <!-- ko with: $root.job() -->
-            <!-- ko if: mainType() == 'jobs' -->
-              <div class="jb-panel" data-bind="template: { name: 'job-page${ SUFFIX }' }"></div>
-            <!-- /ko -->
-
-            <!-- ko if: mainType() == 'queries' -->
-              <div class="jb-panel" data-bind="template: { name: 'queries-page${ SUFFIX }' }"></div>
-            <!-- /ko -->
-
-            <!-- ko if: mainType() == 'workflows' -->
-              <!-- ko if: type() == 'workflow' -->
-                <div class="jb-panel" data-bind="template: { name: 'workflow-page${ SUFFIX }' }"></div>
-              <!-- /ko -->
-
-              <!-- ko if: type() == 'workflow-action' -->
-                <div class="jb-panel" data-bind="template: { name: 'workflow-action-page${ SUFFIX }' }"></div>
-              <!-- /ko -->
-            <!-- /ko -->
-
-            <!-- ko if: mainType() == 'schedules' -->
-              <div class="jb-panel" data-bind="template: { name: 'schedule-page${ SUFFIX }' }"></div>
-            <!-- /ko -->
-
-            <!-- ko if: mainType() == 'bundles' -->
-              <div class="jb-panel" data-bind="template: { name: 'bundle-page${ SUFFIX }' }"></div>
-            <!-- /ko -->
-
-            <!-- ko if: mainType().startsWith('dataeng-job') -->
-              <div data-bind="template: { name: 'dataeng-job-page${ SUFFIX }' }"></div>
-            <!-- /ko -->
-
-            <!-- ko if: mainType() == 'livy-sessions' -->
-              <div class="jb-panel" data-bind="template: { name: 'livy-session-page${ SUFFIX }' }"></div>
-            <!-- /ko -->
-
-          <!-- /ko -->
-          <!-- /ko -->
-
-          <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
-          <!-- /ko -->
-
-          % if not is_mini:
-          <!-- ko if: interface() === 'slas' -->
-            <!-- ko hueSpinner: { spin: slasLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
-          <!-- /ko -->
-          <div id="slas" data-bind="visible: interface() === 'slas'"></div>
-
-          <!-- ko if: interface() === 'oozie-info' -->
-            <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
-          <!-- /ko -->
-          <div id="oozieInfo" data-bind="visible: interface() === 'oozie-info'"></div>
-          %endif
+          </div>
         </div>
       </div>
-
     </div>
   </div>
-</div>
-</div>
 
-<!-- ko if: $root.job() -->
-  <div id="rerun-modal${ SUFFIX }" class="modal hide" data-bind="htmlUnsecure: $root.job().rerunModalContent"></div>
-<!-- /ko -->
+  <!-- ko if: $root.job() -->
+    <div id="rerun-modal${ SUFFIX }" class="modal hide" data-bind="htmlUnsecure: $root.job().rerunModalContent"></div>
+  <!-- /ko -->
 
-<!-- ko if: ($root.job() && $root.job().hasKill()) || (!$root.job() && $root.jobs.hasKill()) -->
-  <div id="killModal${ SUFFIX }" class="modal hide">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Confirm Kill')}</h2>
+  <!-- ko if: ($root.job() && $root.job().hasKill()) || (!$root.job() && $root.jobs.hasKill()) -->
+    <div id="killModal${ SUFFIX }" class="modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+        <h2 class="modal-title">${_('Confirm Kill')}</h2>
+      </div>
+      <div class="modal-body">
+        <p>${_('Are you sure you want to kill the selected job(s)?')}</p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">${_('No')}</a>
+        <a id="killJobBtn" class="btn btn-danger disable-feedback" data-dismiss="modal" data-bind="click: function(){ if (job()) { job().control('kill'); } else { jobs.control('kill'); } }">${_('Yes')}</a>
+      </div>
     </div>
-    <div class="modal-body">
-      <p>${_('Are you sure you want to kill the selected job(s)?')}</p>
-    </div>
-    <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
-      <a id="killJobBtn" class="btn btn-danger disable-feedback" data-dismiss="modal" data-bind="click: function(){ if (job()) { job().control('kill'); } else { jobs.control('kill'); } }">${_('Yes')}</a>
-    </div>
-  </div>
-<!-- /ko -->
+  <!-- /ko -->
 </div>
 
 
@@ -393,7 +522,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko ifnot: hasPagination -->
   <div class="inline">
     <span data-bind="text: totalApps()"></span>
+    <!-- ko if: $root.interface() === 'dataware2-clusters' -->
+    ${ _('warehouses') }
+    <!-- /ko -->
+    <!-- ko if: $root.interface() !== 'dataware2-clusters' -->
     ${ _('jobs') }
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 
@@ -496,7 +630,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="job-mapreduce-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini()}">
       <div class="sidebar-nav">
@@ -613,15 +746,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div data-bind="template: { name: 'render-page-counters${ SUFFIX }', data: properties['counters'] }"></div>
         </div>
       </div>
-
     </div>
   </div>
-
 </script>
 
 
 <script type="text/html" id="job-mapreduce-task-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -711,11 +841,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
   </div>
-
 </script>
 
 <script type="text/html" id="job-oozie-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -797,11 +925,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     </div>
   </div>
-
 </script>
 
 <script type="text/html" id="job-oozie-attempt-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -833,11 +959,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
     </div>
   </div>
-
 </script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -899,11 +1023,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     </div>
   </div>
-
 </script>
 
 <script type="text/html" id="job-spark-page${ SUFFIX }">
-   <div class="row-fluid">
+  <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
@@ -1012,14 +1135,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
       </div>
-
     </div>
   </div>
 </script>
 
 
 <script type="text/html" id="job-spark-executor-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1074,10 +1195,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
       </div>
-
     </div>
   </div>
-
 </script>
 
 
@@ -1089,6 +1208,192 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko if: type() == 'dataeng-job-HIVE' -->
     <div data-bind="template: { name: 'dataeng-job-hive-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="dataware-clusters-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: properties['properties']['cdhVersion']"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': '100%'}"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
+    </div>
+  </div>
+
+  <br>
+
+  <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
+    <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
+  </button>
+
+</script>
+
+
+<script type="text/html" id="dataware2-clusters-page${ SUFFIX }">
+  <div class="row-fluid">
+    <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('Workers Online') }</li>
+          <li>
+            <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
+            /
+            <span data-bind="text: properties['properties']['workerReplicas']"></span>
+            <!-- ko if: properties['properties']['workerAutoResize'] -->
+              - ${ _('CPU') } <span data-bind="text: properties['properties']['workercurrentCPUUtilizationPercentage']"></span>%
+            <!-- /ko -->
+            <!-- ko if: status() == 'SCALING_UP' || status() == 'SCALING_DOWN' -->
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            <!-- /ko -->
+          </li>
+          <li>
+            ##<div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': status() == 'SCALING_UP' || status() == 'SCALING_DOWN', 'progress-success': status() == 'ONLINE', 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': Math.min(properties['properties']['workerReplicas'](), properties['properties']['workerReplicasOnline']()) / Math.max(properties['properties']['workerReplicasOnline'](), properties['properties']['workerReplicas']()) * 100 + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Auto resize') }</li>
+          <li>
+            <i data-bind="visible: !properties['properties']['workerAutoResize']()" class="fa fa-square-o fa-fw"></i>
+            <span data-bind="visible: properties['properties']['workerAutoResize']">
+              <i class="fa fa-check-square-o fa-fw"></i>
+              <span data-bind="text: properties['properties']['workerAutoResizeMin']"></span> -
+              <span data-bind="text: properties['properties']['workerAutoResizeMax']"></span>
+              ${ _('CPU:') } <span data-bind="text: properties['properties']['workerAutoResizeCpu']"></span>%
+            </span>
+          </li>
+          <li class="nav-header">${ _('Auto pause') }</li>
+          <li><i class="fa fa-square-o fa-fw"></i></li>
+          <li class="nav-header">${ _('Impalad') }</li>
+          <li>
+            <a href="#" data-bind="attr: { 'href': properties['properties']['coordinatorEndpoint']['publicHost']() + ':25000' }">
+              <span data-bind="text: properties['properties']['coordinatorEndpoint']['publicHost']"></span>
+              <i class="fa fa-external-link fa-fw"></i>
+            </a>
+          </li>
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span class="break-word" data-bind="text: id"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }" style="position: relative;">
+      <div style="position: absolute; top: 0; right: 0">
+        <button class="btn" title="Create cluster" data-bind="enable: isRunning(), visible: $root.interface() == 'dataware2-clusters', templatePopover : { placement: 'bottom', contentTemplate: 'configure-cluster-content', minWidth: '320px', trigger: 'click' }, click: updateClusterShow" style="">
+            ${ _('Configure') }
+          <i class="fa fa-chevron-down"></i>
+        </button>
+
+        <a class="btn" title="${ _('Pause') }">
+          <i class="fa fa-pause"></i>
+        </a>
+
+        <a class="btn" title="${ _('Refresh') }" data-bind="click: function() { fetchJob(); }">
+          <i class="fa fa-refresh"></i>
+        </a>
+      </div>
+
+      <div class="acl-panel-content">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#servicesLoad" data-toggle="tab">Load</a></li>
+          <li><a href="#servicesPrivileges" data-toggle="tab">Privileges</a></li>
+          <li><a href="#servicesTroubleshooting" data-toggle="tab">Troubleshooting</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="servicesLoad">
+            <div class="wxm-poc" style="clear: both;">
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <!-- ko component: { name: 'performance-graph', params: { clusterName: name(), type: 'cpu' } } --><!-- /ko -->
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="servicesPrivileges">
+            <div class="acl-block-title">
+              <i class="fa fa-cube muted"></i> <a class="pointer"><span>admin</span></a>
+            </div>
+            <div>
+              <div class="acl-block acl-block-airy">
+                <span class="muted" title="3 months ago">CLUSTER</span>
+                <span>
+                  <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+                </span>
+                <br>
+                server=<span>server1</span>
+                <span>
+                  <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+                </span>
+                <i class="fa fa-long-arrow-right"></i> action=ALL
+              </div>
+            </div>
+            <div class="acl-block-title">
+              <i class="fa fa-cube muted"></i> <a class="pointer"><span>eng</span></a>
+            </div>
+            <div>
+              <div class="acl-block acl-block-airy">
+                <span class="muted" title="3 months ago">CLUSTER</span>
+                <span>
+                  <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+                </span>
+                <br>
+                server=server1
+                <span>
+                  <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges">gke_gcp-eng-dsdw_us-west2-b_impala-demo</a>
+                </span>
+                <i class="fa fa-long-arrow-right"></i> action=<span>ACCESS</span>
+              </div>
+            </div>
+            <div class="acl-block acl-actions">
+              <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+              <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+              <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+              <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+            </div>
+          </div>
+          <div class="tab-pane" id="servicesTroubleshooting">
+            <div class="wxm-poc" style="clear: both;">
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Outliers</h4>
+                <img src="${ static('desktop/art/wxm_fake/outliers.svg') }" style="height: 440px"/>
+              </div>
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Statement Types</h4>
+                <img src="${ static('desktop/art/wxm_fake/statement_types.svg') }" style="height: 440px"/>
+              </div>
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Duration</h4>
+                <img src="${ static('desktop/art/wxm_fake/duration.svg') }" style="height: 440px"/>
+              </div>
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                <h4>Memory Utilization</h4>
+                <img src="${ static('desktop/art/wxm_fake/memory.svg') }" style="height: 440px"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </script>
 
 
@@ -1110,7 +1415,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="queries-page${ SUFFIX }">
-
   <div class="row-fluid" data-jobType="queries">
     <!-- ko if: id() -->
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -1122,26 +1426,38 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <a data-bind="attr: {href: doc_url}" target="_blank" title="${ _('Open in impalad') }">
               <span data-bind="text: id"></span>
             </a>
+            <!-- ko if: $root.isMini() -->
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%; height: 4px" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {'title': progress() + '%'}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+            <!-- /ko -->
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
           <li class="nav-header">${ _('Id') }</li>
-          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span>
+          </li>
           <!-- /ko -->
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
+          <!-- ko if: !$root.isMini() -->
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li>
-          <span data-bind="text: progress"></span>%
+            <span data-bind="text: progress"></span>%
           </li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <!-- /ko -->
           <!-- ko if: !$root.isMini() -->
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <!-- ko if: properties.plan && properties.plan().status && properties.plan().status.length > 2 -->
+          <li class="nav-header">${ _('Status Text') }</li>
+          <li><span data-bind="text: properties.plan().status"></span></li>
+          <!-- /ko -->
           <li class="nav-header">${ _('Open Duration') }</li>
           <li><span data-bind="text: duration() && duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
@@ -1150,8 +1466,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
 
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li>
           <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan_json) { fetchProfile('plan'); } } }">
@@ -1177,6 +1493,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.memory || !properties.memory().mem_usage) { fetchProfile('memory'); } } }">
             ${ _('Memory') }</a>
         </li>
+        <li>
+          <a href="#queries-page-backends${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-backends${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.backends || !properties.backends().backend_states) { fetchProfile('backends'); } } }">
+            ${ _('Backends') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-finstances${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-finstances${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.finstances || !properties.finstances().backend_instances) { fetchProfile('finstances'); } } }">
+            ${ _('Instances') }</a>
+        </li>
       </ul>
 
       <div class="clearfix"></div>
@@ -1184,8 +1508,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
-            <div id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 250 : 600 }">
-              <svg class="query-plan" style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 535 : 600 }">
+              <svg style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+                <defs>
+                  <filter id="dropshadow" height="130%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+                    <feOffset dx="0" dy="0" result="offsetBlur"/> <!-- how much to offset -->
+                    <feComponentTransfer>
+                      <feFuncA type="linear" slope="0.5"/> <!-- slope is the opacity of the shadow -->
+                    </feComponentTransfer>
+                    <feMerge>
+                      <feMergeNode/> <!-- this contains the offset blurred image -->
+                      <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+                    </feMerge>
+                  </filter>
+                </defs>
                 <g/>
               </svg>
             </div>
@@ -1207,6 +1544,56 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane" id="queries-page-memory${ SUFFIX }" data-profile="mem_usage">
           <pre data-bind="text: (properties.memory && properties.memory().mem_usage) || _('The selected tab has no data')"/>
         </div>
+        <div class="tab-pane" id="queries-page-backends${ SUFFIX }" data-profile="backends">
+          <!-- ko if: properties.backends && properties.backends().backend_states -->
+          <div id="queries-page-memory-backends-template${ SUFFIX }" style="overflow-x: scroll;">
+            <table class="table table-condensed">
+              <thead>
+              <tr>
+                <!-- ko foreach: Object.keys(properties.backends().backend_states[0]).sort() -->
+                <th data-bind="text: $data"></th>
+                <!-- /ko -->
+              </tr>
+              </thead>
+              <tbody data-bind="foreach: { data: $data.properties.backends().backend_states, minHeight: 20, container: '#queries-page-memory-backends-template${ SUFFIX }'}">
+                <tr>
+                  <!-- ko foreach: Object.keys($data).sort() -->
+                  <td data-bind="text: $parent[$data]"></td>
+                  <!-- /ko -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /ko -->
+          <!-- ko if: !properties.backends || !properties.backends().backend_states -->
+          <pre data-bind="text: _('The selected tab has no data')"/>
+          <!-- /ko -->
+        </div>
+        <div class="tab-pane" id="queries-page-finstances${ SUFFIX }" data-profile="finstances">
+          <!-- ko if: properties.finstances && properties.finstances().backend_instances -->
+          <div id="queries-page-memory-finstances-template${ SUFFIX }" style="overflow-x: scroll;">
+            <table class="table table-condensed">
+              <thead>
+              <tr>
+                <!-- ko foreach: [_('host')].concat(Object.keys($data.properties.finstances().backend_instances[0].instance_stats[0])).sort() -->
+                <th data-bind="text: $data"></th>
+                <!-- /ko -->
+              </tr>
+              </thead>
+              <tbody data-bind="foreach: { data: $data.properties.finstances().backend_instances.reduce( function(arr, instance) { instance.instance_stats.forEach(function(stats) { stats.host = instance.host; }); return arr.concat(instance.instance_stats); }, []), minHeight: 20, container: '#queries-page-memory-finstances-template${ SUFFIX }'}">
+                <tr>
+                  <!-- ko foreach: Object.keys($data).sort() -->
+                  <td data-bind="text: $parent[$data]"></td>
+                  <!-- /ko -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /ko -->
+          <!-- ko if: !properties.finstances || !properties.finstances().backend_instances -->
+          <pre data-bind="text: _('The selected tab has no data')"/>
+          <!-- /ko -->
+        </div>
       </div>
     </div>
     <!-- /ko -->
@@ -1215,7 +1602,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="livy-session-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1241,7 +1627,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -1286,7 +1672,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   </div>
@@ -1332,7 +1717,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="workflow-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1358,7 +1742,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {title: status}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -1538,12 +1922,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
   </div>
-
 </script>
 
 
 <script type="text/html" id="schedule-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1669,7 +2051,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="bundle-page${ SUFFIX }">
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1773,7 +2154,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
   </div>
-
 </script>
 
 <script type="text/html" id="render-properties${ SUFFIX }">
@@ -1907,39 +2287,37 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   % else:
   <div id="job-mapreduce-page-metadata-template${ SUFFIX }" style="overflow-y: hidden; height: 400px;">
   %endif
-  <table id="jobbrowserJobMetadataTable" class="table table-condensed">
-    <thead>
-    <tr>
-      <th>${ _('Name') }</th>
-      <th width="50%">${ _('Value') }</th>
-    </tr>
-    </thead>
-    <tbody data-bind="foreachVisible: { data: property, minHeight: 20, container: '#job-mapreduce-page-metadata-template${ SUFFIX }'}">
+    <table id="jobbrowserJobMetadataTable" class="table table-condensed">
+      <thead>
       <tr>
-        <td data-bind="text: name"></td>
-        <td>
-          <!-- ko template: { name: 'link-or-text${ SUFFIX }', data: { name: name, value: value } } --><!-- /ko -->
-        </td>
+        <th>${ _('Name') }</th>
+        <th width="50%">${ _('Value') }</th>
       </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody data-bind="foreachVisible: { data: property, minHeight: 20, container: '#job-mapreduce-page-metadata-template${ SUFFIX }'}">
+        <tr>
+          <td data-bind="text: name"></td>
+          <td>
+            <!-- ko template: { name: 'link-or-text${ SUFFIX }', data: { name: name, value: value } } --><!-- /ko -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <!-- /ko -->
 </script>
 
 
-
-
 <script type="text/html" id="link-or-text${ SUFFIX }">
   <!-- ko if: typeof $data.value === 'string' -->
-    <!-- ko if: $data.name.indexOf('logs') > -1 -->
+    <!-- ko if: $data.name.indexOf('logs') > -1 || $data.name.indexOf('trackingUrl') > -1 -->
       <a href="javascript:void(0);" data-bind="text: $data.value, attr: { href: $data.value }" target="_blank"></a>
     <!-- /ko -->
-    <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <!-- ko if: ($data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1) && ($data.value.startsWith('/') || $data.value.startsWith('hdfs://') || $data.value.startsWith('s3a://')) -->
       <a href="javascript:void(0);" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value), text: $data.value"></a>
-      <a href="javascript: void(0);" data-bind="storageContextPopover: { path: $root.getHDFSPath($data.value), offset: { left: 5 } }"><i class="fa fa-info"></i></a>
+      <a href="javascript: void(0);" data-bind="storageContextPopover: { path: $root.getHDFSPath($data.value), orientation: 'left', offset: { top: 5 } }"><i class="fa fa-info"></i></a>
     <!-- /ko -->
-    <!-- ko ifnot: $data.name.indexOf('logs') > -1 || $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <!-- ko ifnot: $data.name.indexOf('logs') > -1 || $data.name.indexOf('trackingUrl') > -1 || (($data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1) && ($data.value.startsWith('/') || $data.value.startsWith('hdfs://') || $data.value.startsWith('s3a://'))) -->
       <span data-bind="text: $data.value"></span>
     <!-- /ko -->
   <!-- /ko -->
@@ -1947,6 +2325,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <span data-bind="text: $data.value"></span>
   <!-- /ko -->
 </script>
+
 
 <script type="text/javascript">
 
@@ -1969,7 +2348,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
       self.isRunning = ko.computed(function() {
-        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED';
+        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED' || job.isRunning;
       });
 
       self.user = ko.observableDefault(job.user);
@@ -1985,8 +2364,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return self.logsByName()[self.logActive()];
       });
 
-      self.properties = ko.mapping.fromJS(job.properties || {});
+      self.properties = ko.mapping.fromJS(job.properties || { properties: '' });
       self.mainType = ko.observable(vm.interface());
+      self.lastEvent = ko.observable(job.lastEvent || '');
 
       self.coordinatorActions = ko.pureComputed(function() {
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
@@ -2062,11 +2442,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
-        return self.hasKill() && self.canWrite() && (vm.interface() === 'queries' || (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED'));
+        return self.hasKill() && self.canWrite() && self.isRunning();
       });
 
       self.hasResume = ko.pureComputed(function() {
@@ -2102,6 +2482,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var lastUpdateJobRequest = null;
 
       self._fetchJob = function (callback) {
+        if (vm.interface() == 'engines') {
+          huePubSub.publish('context.selector.set.cluster', 'AltusV2');
+          return;
+        }
+
         return $.post("/jobbrowser/api/job/" + vm.interface(), {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
@@ -2135,8 +2520,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/oozie-\w+-B/.test(self.id())) {
           interface = 'bundles';
         }
-        else if (/[a-z0-9]{8}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{12}/.test(self.id())) {
+        else if (/altus:dataeng/.test(self.id()) && /:job:/.test(self.id())) {
           interface = 'dataeng-jobs';
+        }
+        else if (/altus:dataeng/.test(self.id()) && /:cluster:/.test(self.id())) {
+          interface = 'dataeng-clusters';
+        }
+        else if (/altus:dataware:k8/.test(self.id()) && /:cluster:/.test(self.id())) {
+          interface = 'dataware2-clusters';
+        }
+        else if (/altus:dataware/.test(self.id()) && /:cluster:/.test(self.id())) {
+          interface = 'dataware-clusters';
         }
         else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
           interface = 'queries';
@@ -2145,7 +2539,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface = 'livy-sessions';
         }
 
-        interface = vm.isValidInterface(interface);
+        interface = interface.indexOf('dataeng') || interface.indexOf('dataware') ? interface : vm.isValidInterface(interface); // TODO: support multi cluster selection in isValidInterface
         vm.interface(interface);
 
         lastFetchJobRequest = self._fetchJob(function (data) {
@@ -2192,11 +2586,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
 
             if (vm.job().type() == 'SPARK_EXECUTOR') {
-               crumbs.push({'id': vm.job().id(), 'name': vm.job().properties['executor_id'](), 'type': vm.job().type()});
+              crumbs.push({'id': vm.job().id(), 'name': vm.job().properties['executor_id'](), 'type': vm.job().type()});
             }
             else {
-               crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+              crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             }
+
             vm.resetBreadcrumbs(crumbs);
             // Show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
             setTimeout(function () {
@@ -2230,12 +2625,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         huePubSub.publish('graph.refresh.view');
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
           lastFetchJobRequest = self._fetchJob(function (data) {
-            if (vm.job().type() == 'schedule') {
-              vm.job(new Job(vm, data.app)); // Updates everything but redraw the page
+            if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
+              window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
+              vm.job = ko.mapping.fromJS(data.app, {}, vm.job);
             } else {
               vm.job().fetchStatus();
-              vm.job().fetchLogs(vm.job().logActive());
             }
+            vm.job().fetchLogs(vm.job().logActive());
             var profile = $("div[data-jobType] .tab-content .active").data("profile")
             if (profile) {
               vm.job().fetchProfile(profile);
@@ -2312,6 +2708,46 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.fetchStatus();
           });
         }
+      };
+
+      self.updateClusterWorkers = ko.observable(1);
+      self.updateClusterAutoResize = ko.observable(false);
+      self.updateClusterAutoResizeMin = ko.observable(1);
+      self.updateClusterAutoResizeMax = ko.observable(3);
+      self.updateClusterAutoResizeCpu = ko.observable(80);
+      self.updateClusterAutoPause = ko.observable();
+
+      self.updateClusterShow = function() {
+        self.updateClusterWorkers(self.properties['properties']['workerReplicas']());
+        self.updateClusterAutoResize(self.properties['properties']['workerAutoResize']());
+        if (self.properties['properties']['workerAutoResize']()) {
+          self.updateClusterAutoResizeMin(self.properties['properties']['workerAutoResizeMin']());
+          self.updateClusterAutoResizeMax(self.properties['properties']['workerAutoResizeMax']());
+          self.updateClusterAutoResizeCpu(self.properties['properties']['workerAutoResizeCpu']());
+        }
+      };
+
+      self.clusterConfigModified = ko.pureComputed(function () {
+        return (self.updateClusterWorkers() > 0 && self.updateClusterWorkers() !== self.properties['properties']['workerReplicas']()) ||
+            (self.updateClusterAutoResize() !== self.properties['properties']['workerAutoResize']());
+      });
+
+      ## TODO Move to control
+      self.updateCluster = function() {
+        $.post("/metadata/api/analytic_db/update_cluster/", {
+          "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
+          "cluster_name": self.id(),
+          "workers_group_size": self.updateClusterWorkers(),
+          "auto_resize_changed": self.updateClusterAutoResize() !== self.properties['properties']['workerAutoResize'](),
+          "auto_resize_enabled": self.updateClusterAutoResize(),
+          "auto_resize_min": self.updateClusterAutoResizeMin(),
+          "auto_resize_max": self.updateClusterAutoResizeMax(),
+          "auto_resize_cpu": self.updateClusterAutoResizeCpu()
+        }, function(data) {
+          console.log(ko.mapping.toJSON(data));
+          ## $(document).trigger("info", ko.mapping.toJSON(data));
+          self.updateJob();
+        });
       }
 
       self.troubleshoot = function (action) {
@@ -2424,7 +2860,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2433,7 +2869,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2451,7 +2887,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2495,7 +2931,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
+      %if conf.is_hue4():
       self.paginationResultPage = ko.observable(100);
+      %else:
+      self.paginationResultPage = ko.observable(50);
+      %endif
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),
@@ -2619,10 +3059,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
+      self.createClusterShow = ko.observable(false);
+      self.createClusterName = ko.observable('');
+      self.createClusterWorkers = ko.observable(1);
+      self.createClusterShowWorkers = ko.observable(false);
+      self.createClusterAutoResize = ko.observable(false);
+      self.createClusterAutoPause = ko.observable(false);
+
+      self.createClusterFormReset = function() {
+        self.createClusterName('');
+        self.createClusterWorkers(1);
+        self.createClusterAutoResize(false);
+        self.createClusterAutoPause(false);
+      }
+
       self.createCluster = function() {
-         $.post("/metadata/api/dataeng/create_cluster/", {
+        if (vm.interface().indexOf('dataeng') != -1) {
+          $.post("/metadata/api/dataeng/create_cluster/", {
             "cluster_name": "cluster_name",
-            "cdh_version": "CDH514",
+            "cdh_version": "CDH515",
             "public_key": "public_key",
             "instance_type": "m4.xlarge",
             "environment_name": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946",
@@ -2632,11 +3087,31 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             console.log(ko.mapping.toJSON(data));
             $(document).trigger("info", ko.mapping.toJSON(data));
             self.updateJobs();
+            huePubSub.publish('context.catalog.refresh');
           });
-      }
+        } else {
+          $.post("/metadata/api/analytic_db/create_cluster/", {
+            "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
+            "cluster_name": self.createClusterName(),
+            "cdh_version": "CDH515",
+            "public_key": "public_key",
+            "instance_type": "m4.xlarge",
+            "environment_name": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:jheyming-secure/b4e6d99a-261f-4ada-9b4a-576aa0af8979",
+            "workers_group_size": self.createClusterWorkers(),
+            "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
+          }, function(data) {
+            console.log(ko.mapping.toJSON(data));
+            self.createClusterFormReset();
+            ##$(document).trigger("info", ko.mapping.toJSON(data));
+            self.updateJobs();
+            huePubSub.publish('context.catalog.refresh');
+          });
+        }
+        self.createClusterShow(false);
+      };
 
       self.control = function (action) {
-        if (action == 'rerun') {
+        if (action === 'rerun') {
           $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json', function(response) {
             $('#rerun-modal${ SUFFIX }').modal('show');
             vm.job().rerunModalContent(response);
@@ -2652,7 +3127,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $('#id_actions').find('option').remove();
             $(frag).appendTo('#id_actions');
           });
-        } else if (action == 'ignore') {
+        } else if (action === 'ignore') {
           $.post('/oozie/manage_oozie_jobs/' + vm.job().id() + '/ignore', {
             actions: $.map(vm.job().coordinatorActions().selectedJobs(), function(wf) {
               return wf.properties.number();
@@ -2681,9 +3156,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface: ko.mapping.toJSON(vm.interface),
           operation: ko.mapping.toJSON({action: action})
         }, function (data) {
-          if (data.status == 0) {
+          if (data.status === 0) {
             if (callback) {
               callback(data);
+            }
+            if (vm.interface().indexOf('clusters') !== -1 && action === 'kill') {
+              huePubSub.publish('context.catalog.refresh');
+              self.selectedJobs([]);
             }
           } else {
             $(document).trigger("error", data.message);
@@ -2704,44 +3183,63 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.clusterType = ko.observable();
       self.isMini = ko.observable(false);
 
-      self.availableComputes = ko.observableArray();
-      self.compute = ko.observable();
-    
-      ContextCatalog.getComputes({ sourceType: 'jobs' }).done(self.availableComputes);
+      self.cluster = ko.observable();
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
-        }
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+        };
         var dataEngInterfaceCondition = function () {
-          // return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
-          return self.compute() && self.compute()['type'].indexOf('altus') >= 0;
-        }
+          return self.cluster() && self.cluster()['type'] == 'altus-de';
+        };
+        var enginesInterfaceCondition = function () {
+          return self.cluster() && self.cluster()['type'] == 'altus-engines';
+        };
+        var dataWarehouseInterfaceCondition = function () {
+          return self.cluster() && self.cluster()['type'] == 'altus-dw';
+        };
+        var dataWarehouse2InterfaceCondition = function () {
+          return self.cluster() && self.cluster()['type'] == 'altus-dw2';
+        };
         var schedulerInterfaceCondition = function () {
-          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }' && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
-        }
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+        };
+        var schedulerExtraInterfaceCondition = function () {
+          return '${ is_mini }' == 'False' && schedulerInterfaceCondition();
+        };
         var livyInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
-        }
+          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+        };
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.compute() || self.compute()['type'].indexOf('altus') == -1);
-        }
+          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+        };
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
           {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
+          {'interface': 'dataware-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouseInterfaceCondition},
+          {'interface': 'dataware2-clusters', 'label': '${ _ko('Warehouses') }', 'condition': dataWarehouse2InterfaceCondition},
+          {'interface': 'engines', 'label': '${ _ko('') }', 'condition': enginesInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
-          {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
-          {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
+          {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
+          {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
           return i.condition();
         });
+      });
+
+      self.availableInterfaces.subscribe(function (newInterfaces) {
+        if (self.interface() && !newInterfaces.some(function (newInterface) {
+          return newInterface.interface === self.interface();
+        })) {
+          self.selectInterface(newInterfaces[0]);
+        }
       });
 
       self.slasLoadedOnce = false;
@@ -2760,7 +3258,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
           });
         }
-      }
+      };
 
       self.oozieInfoLoadedOnce = false;
       self.oozieInfoLoading = ko.observable(true);
@@ -2779,7 +3277,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
           });
         }
-      }
+      };
 
       self.interface = ko.observable();
       self.isValidInterface = function(name) {
@@ -2819,26 +3317,39 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
 
+      self.onClusterSelect = function () {
+        var interfaceToSet = self.interface();
+        if (!self.availableInterfaces().some(function (availableInterface) {
+          return availableInterface.interface === interfaceToSet;
+        })) {
+          interfaceToSet = self.availableInterfaces()[0].interface;
+        }
+        self.selectInterface(interfaceToSet);
+      };
+
       self.jobs = new Jobs(self);
       self.job = ko.observable();
 
       var updateJobInterval = -1;
       var updateJobsInterval = -1;
       self.job.subscribe(function(val) {
+        self.monitorJob(val);
+      });
+
+      self.monitorJob = function(job) {
         window.clearInterval(updateJobInterval);
         window.clearInterval(updateJobsInterval);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
-          if (val) {
-            if (val.apiStatus() == 'RUNNING') {
-              updateJobInterval = setInterval(val.updateJob, 5000, 'jobbrowser');
+          if (job) {
+            if (job.apiStatus() === 'RUNNING') {
+              updateJobInterval = setInterval(job.updateJob, 5000, 'jobbrowser');
             }
           }
           else {
             updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
           }
         }
-      });
-
+      };
 
       self.breadcrumbs = ko.observableArray([]);
       self.resetBreadcrumbs = function(extraCrumbs) {
@@ -2847,7 +3358,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           crumbs = crumbs.concat(extraCrumbs);
         }
         self.breadcrumbs(crumbs);
-      }
+      };
 
       self.resetBreadcrumbs();
 
@@ -2858,7 +3369,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '/' + bits.join('/');
         }
         return path;
-      }
+      };
 
       self.formatProgress = function (progress) {
         if (typeof progress === 'function') {
@@ -2868,9 +3379,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return Math.round(progress*100)/100 + '%';
         }
         return progress;
-      }
+      };
 
+      var loaded = false;
       self.load = function() {
+        if (loaded) {
+          return;
+        }
+        loaded = true;
         var h = window.location.hash;
         %if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
@@ -2888,6 +3404,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'schedules':
           case 'bundles':
           case 'dataeng-clusters':
+          case 'dataware-clusters':
+          case 'dataware2-clusters':
+          case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
             self.selectInterface(h);
@@ -2900,7 +3419,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               self.selectInterface('reset');
             }
         }
-      }
+      };
     };
 
 
@@ -2958,7 +3477,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       window.onhashchange = function () {
         loadHash();
-      }
+      };
 
       huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
         jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
@@ -2971,9 +3490,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.subscribe('submit.rerun.popup.return', function (data) {
         $.jHueNotify.info('${_('Rerun submitted.')}');
         $('#rerun-modal${ SUFFIX }').modal('hide');
+
         jobBrowserViewModel.job().apiStatus('RUNNING');
-        jobBrowserViewModel.job().updateJob();
+        jobBrowserViewModel.monitorJob(jobBrowserViewModel.job());
       }, 'jobbrowser');
+
       % if is_mini:
         huePubSub.subscribe('mini.jb.navigate', function (interface) {
           $('#jobsPanel .nav-pills li').removeClass('active');

@@ -534,6 +534,7 @@
 .assist-flex-fill,
 .assist-flex-half,
 .assist-flex-quarter,
+.assist-flex-third,
 .assist-flex-40,
 .assist-flex-60 {
   position: relative;
@@ -561,6 +562,10 @@
 
 .assist-flex-quarter {
   .flex(0 1 25%);
+}
+
+.assist-flex-third {
+  .flex(0 0 33%);
 }
 
 .assist-flex-40 {
@@ -626,6 +631,15 @@
   overflow-x: auto;
 }
 
+.context-popover-docs-details {
+  padding-top: 2px;
+
+  .hue-doc-title {
+    display: none;
+  }
+}
+
+.context-popover-docs-details,
 .assist-docs-details {
   ul li {
     margin: 8px 0;
@@ -787,33 +801,6 @@
       direction: rtl;
       text-align: left;
       .nowrap-ellipsis();
-    }
-  }
-
-  .risk-list {
-    list-style: none;
-    margin: 0 0 0 10px;
-
-    .risk-list-high {
-      color: @cui-red-700;
-    }
-
-    .risk-list-normal {
-      color: @cui-orange-700;
-    }
-
-    .risk-list-title {
-      white-space: normal;
-    }
-
-    .risk-list-description {
-      margin-left:5px;
-      white-space: normal;
-      font-style: italic;
-    }
-
-    .risk-quickfix {
-      margin-left: 5px;
     }
   }
 }

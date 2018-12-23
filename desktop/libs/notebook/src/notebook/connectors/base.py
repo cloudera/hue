@@ -22,6 +22,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_multi_cluster
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
@@ -119,7 +120,7 @@ class Notebook(object):
         variable = variables[p2]
         value = variable['value']
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
-        
+
       return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
       
     return statement_raw
@@ -197,7 +198,7 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
-  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None):
+  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None, capture_output=True):
     _data = json.loads(self.data)
 
     if arguments is None:
@@ -218,7 +219,8 @@ class Notebook(object):
           u'arguments': arguments,
           u'archives': archives,
           u'env_var': env_var,
-          u'command_path': shell_command
+          u'command_path': shell_command,
+          u'capture_output': capture_output
         },
         u'lastExecuted': last_executed
     }))
@@ -238,7 +240,8 @@ class Notebook(object):
          'database': _snippet.get('database'),
          'result': {},
          'variables': [],
-         'lastExecuted': _snippet.get('lastExecuted')
+         'lastExecuted': _snippet.get('lastExecuted'),
+         'capture_output': _snippet.get('capture_output', True)
     }
 
   def _add_session(self, data, snippet_type):
@@ -297,6 +300,14 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
+    elif snippet['type'] == 'custom':
+      interpreter = [{
+        'name': snippet['name'],
+        'type': snippet['type'],
+        'interface': snippet['interface'],
+        'options': snippet.get('options', {}),
+        'is_sql': False
+      }]
     else:
       raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
 
@@ -304,17 +315,27 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog API
-  if cluster == 'undefined':
+  if has_multi_cluster():
+    cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
+    if cluster == '""' or cluster == 'undefined':
+      cluster = None
+    if not cluster and snippet.get('compute'): # Via notebook.ko.js
+      cluster = snippet['compute']
+  else:
     cluster = None
-  if not cluster and snippet.get('compute'): # Via notebook.ko.js
-    cluster = snippet.get('compute').get('id')
-  if cluster and 'crn:altus:dataware:' in cluster:
+
+  cluster_name = cluster.get('id') if cluster else None
+
+  if cluster and 'altus:dataware:k8s' in cluster_name:
+    interface = 'hiveserver2'
+  elif cluster and 'crn:altus:dataware:' in cluster_name:
     interface = 'altus-adb'
-  elif cluster and 'crn:altus:dataeng:' in cluster:
+  elif cluster and 'crn:altus:dataeng:' in cluster_name:
     interface = 'dataeng'
   if cluster:
     LOG.info('Selected cluster %s' % cluster)
+
+  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
@@ -332,16 +353,23 @@ def get_api(request, snippet):
     return TextApi(request.user)
   elif interface == 'rdbms':
     from notebook.connectors.rdbms import RdbmsApi
-    return RdbmsApi(request.user, interpreter=snippet['type'])
+    return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
   elif interface == 'altus-adb':
     from notebook.connectors.altus_adb import AltusAdbApi
-    return AltusAdbApi(user=request.user, cluster_name=cluster, request=request)
+    return AltusAdbApi(user=request.user, cluster_name=cluster_name, request=request)
   elif interface == 'dataeng':
     from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster)
-  elif interface == 'jdbc' or interface == 'teradata':
-    from notebook.connectors.jdbc import JdbcApi
-    return JdbcApi(request.user, interpreter=interpreter)
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
+  elif interface == 'jdbc':
+    if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
+      from notebook.connectors.jdbc import JdbcApi
+      return JdbcApi(request.user, interpreter=interpreter)
+    else:
+      from notebook.connectors.jdbc_teradata import JdbcApiTeradata
+      return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'teradata':
+    from notebook.connectors.jdbc import JdbcApiTeradata
+    return JdbcApiTeradata(request.user, interpreter=interpreter)
   elif interface == 'sqlalchemy':
     from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)
@@ -372,11 +400,12 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
     self.cluster = cluster
+    self.query_server = query_server
 
   def create_session(self, lang, properties=None):
     return {
@@ -409,7 +438,7 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False): raise NotImplementedError()
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None): raise NotImplementedError()
 
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
 

@@ -34,7 +34,7 @@ from notebook.connectors.spark_shell import SparkConfiguration
 
 try:
   from oozie.models2 import WorkflowConfiguration as OozieWorkflowConfiguration
-except ImportError, e:
+except (ImportError, RuntimeError), e:
   OozieWorkflowConfiguration = None
 
 

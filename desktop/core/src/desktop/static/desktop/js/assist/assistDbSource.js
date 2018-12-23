@@ -22,6 +22,7 @@ var AssistDbSource = (function () {
    * @param {ContextNamespace} [options.initialNamespace] - Optional initial namespace to use
    * @param {ContextCompute} [options.initialCompute] - Optional initial compute to use
    * @param {string} options.name
+   * @param {boolean} options.nonSqlType - Optional, default false
    * @param {Object} options.navigationSettings
    * @constructor
    */
@@ -31,9 +32,11 @@ var AssistDbSource = (function () {
     self.sourceType = options.type;
     self.name = options.name;
     self.i18n = options.i18n;
+    self.nonSqlType = options.nonSqlType;
     self.navigationSettings = options.navigationSettings;
-    self.initialNamespace = options.initialNamespace;
-    self.initialCompute = options.initialCompute
+    var apiHelper = ApiHelper.getInstance();
+    self.initialNamespace = options.initialNamespace || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
+    self.initialCompute = options.initialCompute || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();
@@ -66,10 +69,24 @@ var AssistDbSource = (function () {
       return result;
     };
 
+    var ensureDbSet = function () {
+      if (self.nonSqlType) {
+        if (!self.selectedNamespace().selectedDatabase()) {
+          self.selectedNamespace().selectedDatabase(self.selectedNamespace().databases()[0]);
+          self.selectedNamespace().selectedDatabaseChanged();
+        }
+      }
+    };
+
     self.selectedNamespace.subscribe(function (namespace) {
       if (namespace && !namespace.loaded() && !namespace.loading()) {
-        namespace.initDatabases();
+        namespace.initDatabases(ensureDbSet);
+      } else {
+        ensureDbSet();
       }
+      return self.namespaces().filter(function (namespace) {
+        return namespace.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1
+      });
     });
 
     self.hasNamespaces = ko.pureComputed(function () {
@@ -92,12 +109,14 @@ var AssistDbSource = (function () {
           if (existingNamespaceIndex[newNamespace.id]) {
             existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
             existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
+            existingNamespaceIndex[newNamespace.id].status(newNamespace.status);
             newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
           } else {
             newNamespaces.push(new AssistDbNamespace({
               sourceType: self.sourceType,
               namespace: newNamespace,
               i18n: self.i18n,
+              nonSqlType: self.nonSqlType,
               navigationSettings: self.navigationSettings
             }));
           }
@@ -118,6 +137,10 @@ var AssistDbSource = (function () {
     var self = this;
     self.loading(true);
 
+    if (refresh) {
+      ContextCatalog.getComputes({ sourceType: self.sourceType, clearCache: true });
+    }
+
     return ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: refresh }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
@@ -127,13 +150,14 @@ var AssistDbSource = (function () {
           sourceType: self.sourceType,
           namespace: namespace,
           i18n: self.i18n,
+          nonSqlType: self.nonSqlType,
           navigationSettings: self.navigationSettings
         });
 
         if (self.initialNamespace && namespace.id === self.initialNamespace.id) {
           activeNamespace = assistNamespace;
           if (self.initialCompute) {
-            activeNamespace.computes.some(function (compute) {
+            activeNamespace.namespace.computes.some(function (compute) {
               if (compute.id === self.initialCompute.id) {
                 activeCompute = compute;
               }
@@ -143,13 +167,17 @@ var AssistDbSource = (function () {
         assistNamespaces.push(assistNamespace);
       });
       self.namespaces(assistNamespaces);
-      if (!refresh && activeNamespace) {
-        self.selectedNamespace(activeNamespace);
-      } else if (!refresh && assistNamespaces.length) {
-        self.selectedNamespace(assistNamespaces[0]);
-      }
-      if (!refresh && activeCompute) {
-        self.selectedNamespace().compute(activeCompute);
+      if (!refresh) {
+        if (activeNamespace) {
+          self.selectedNamespace(activeNamespace);
+        } else if (assistNamespaces.length) {
+          self.selectedNamespace(assistNamespaces[0]);
+        }
+        if (activeCompute) {
+          self.selectedNamespace().compute(activeCompute);
+        } else if (self.selectedNamespace() && self.selectedNamespace().namespace && self.selectedNamespace().namespace.computes && self.selectedNamespace().namespace.computes.length) {
+          self.selectedNamespace().compute(self.selectedNamespace().namespace.computes[0]);
+        }
       }
     }).fail(function () {
       self.hasErrors(true);
@@ -212,6 +240,7 @@ var AssistDbNamespace = (function () {
    * @param {Object} options.i18n
    * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace
+   * @param {boolean} options.nonSqlType - Optional, default false
    * @param {Object} options.navigationSettings
    * @constructor
    */
@@ -221,8 +250,10 @@ var AssistDbNamespace = (function () {
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
     self.sourceType = options.sourceType;
+    self.nonSqlType = options.nonSqlType;
 
     self.namespace = options.namespace;
+    self.status = ko.observable(options.namespace.status);
     // TODO: Compute selection in assist?
     self.compute = ko.observable();
     if (self.namespace.computes.length) {
@@ -230,7 +261,6 @@ var AssistDbNamespace = (function () {
     }
     self.name = options.namespace.name;
 
-    self.catalogEntry;
     self.dbIndex = {};
     self.databases = ko.observableArray();
     self.selectedDatabase = ko.observable();
@@ -279,7 +309,7 @@ var AssistDbNamespace = (function () {
 
     self.selectedDatabase.subscribe(function () {
       var db = self.selectedDatabase();
-      if (HAS_OPTIMIZER && db && !db.popularityIndexSet && self.sourceType !== 'solr') {
+      if (HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
         db.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
           var applyPopularity = function () {
             db.entries().forEach(function (entry) {
@@ -314,7 +344,7 @@ var AssistDbNamespace = (function () {
           self.selectedDatabase().loadEntries()
         }
         if (!self.navigationSettings.rightAssist) {
-          ApiHelper.getInstance().setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
+          ApiHelper.getInstance().setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
           huePubSub.publish('assist.database.set', {
             sourceType: self.sourceType,
             namespace: self.namespace,
@@ -337,7 +367,7 @@ var AssistDbNamespace = (function () {
         self.selectedDatabaseChanged();
         return;
       }
-      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', 'default');
+      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
       if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
         self.selectedDatabase(self.dbIndex[lastSelectedDb]);
         self.selectedDatabaseChanged();
@@ -377,7 +407,7 @@ var AssistDbNamespace = (function () {
             dbs.push(database);
           });
 
-          if (!hasNavMeta && self.sourceType !== 'solr') {
+          if (!hasNavMeta && !self.nonSqlType) {
             self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
           }
           self.databases(dbs);
@@ -401,12 +431,16 @@ var AssistDbNamespace = (function () {
 
     if (!self.navigationSettings.rightAssist) {
       huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+        if (self.namespace.id !== details.entry.namespace.id || details.entry.getSourceType() !== self.sourceType) {
+          return;
+        }
         if (self.catalogEntry === details.entry) {
           self.initDatabases();
-        } else if (details.entry.getSourceType() === self.sourceType) {
+        } else {
           var findAndReloadInside = function (entries) {
             return entries.some(function (entry) {
-              if (entry.catalogEntry === details.entry) {
+              if (entry.catalogEntry.path.join('.') === details.entry.path.join('.')) {
+                entry.catalogEntry = details.entry;
                 entry.loadEntries();
                 return true;
               }

@@ -34,7 +34,7 @@ def has_kafka_api():
 
 KAFKA = ConfigSection(
   key='kafka',
-  help=_t("""Configuration options for Kafka management"""),
+  help=_t("""Configuration options for Kafka API integration"""),
   members=dict(
     IS_ENABLED = Config(
       key="is_enabled",

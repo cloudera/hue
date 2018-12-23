@@ -32,6 +32,7 @@ var MetastoreViewModel = (function () {
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
     self.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
+    self.appConfig = ko.observable();
 
     self.source = ko.observable();
     self.sources = ko.observableArray();
@@ -115,6 +116,7 @@ var MetastoreViewModel = (function () {
           return;
         }
       }
+    });
 
       if (self.source().namespace().id !== databaseDef.namespace.id) {
         var found = self.source().namespaces().some(function (namespace) {
@@ -272,10 +274,10 @@ var MetastoreViewModel = (function () {
 
     loadedDeferred.done(function () {
       var search = location.search;
+      var namespaceId;
+      var sourceType;
       if (search) {
         search = search.replace('?', '');
-        var namespaceId;
-        var sourceType;
         search.split('&').forEach(function (param) {
           if (param.indexOf('namespace=') === 0) {
             namespaceId = param.replace('namespace=', '');
@@ -284,39 +286,43 @@ var MetastoreViewModel = (function () {
             sourceType = param.replace('source=', '');
           }
         });
+      }
 
-        if (sourceType && sourceType !== self.source().type) {
-          var found = self.sources().some(function (source) {
-            if (source.type === sourceType) {
-              self.source(source);
+      if (sourceType && sourceType !== self.source().type) {
+        var found = self.sources().some(function (source) {
+          if (source.type === sourceType) {
+            self.source(source);
+            return true;
+          }
+        });
+        if (!found) {
+          sourceAndNamespaceDeferred.reject();
+          return;
+        }
+      }
+
+      if (!namespaceId && ApiHelper.getInstance().getFromTotalStorage('contextSelector', 'lastSelectedNamespace')) {
+        namespaceId = ApiHelper.getInstance().getFromTotalStorage('contextSelector', 'lastSelectedNamespace').id;
+      }
+
+      self.source().lastLoadNamespacesDeferred.done(function () {
+        if (namespaceId && namespaceId !== self.source().namespace().id) {
+          var found = self.source().namespaces().some(function (namespace) {
+            if (namespace.id === namespaceId) {
+              self.source().namespace(namespace);
               return true;
             }
           });
           if (!found) {
             sourceAndNamespaceDeferred.reject();
             return;
-          }
-        }
-
-        self.source().lastLoadNamespacesDeferred.done(function () {
-          if (namespaceId && namespaceId !== self.source().namespace().id) {
-            var found = self.source().namespaces().some(function (namespace) {
-              if (namespace.id === namespaceId) {
-                self.source().namespace(namespace);
-                return true;
-              }
-            });
-            if (!found) {
-              sourceAndNamespaceDeferred.reject();
-              return;
-            } else {
-              sourceAndNamespaceDeferred.resolve();
-            }
           } else {
             sourceAndNamespaceDeferred.resolve();
           }
-        });
-      }
+        } else {
+          sourceAndNamespaceDeferred.resolve();
+        }
+      });
     });
 
 

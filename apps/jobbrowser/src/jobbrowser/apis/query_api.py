@@ -66,6 +66,7 @@ class QueryApi(Api):
         'user': job['effective_user'],
         'queue': job.get('resource_pool'),
         'progress': job['progress'],
+        'isRunning': job['start_time'] > job['end_time'],
         'canWrite': job in jobs['in_flight_queries'],
         'duration': self._time_in_ms_groups(re.search(r"\s*(([\d.]*)([a-z]*))(([\d.]*)([a-z]*))?(([\d.]*)([a-z]*))?", job['duration'], re.MULTILINE).groups()),
         'submitted': job['start_time'],
@@ -114,28 +115,20 @@ class QueryApi(Api):
       }
     app = apps.get('apps')[0]
     progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
+    app.update({
+      'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100 if self._api_status(app.get('status')) in ['SUCCEEDED', 'FAILED'] else 1,
+      'type': 'queries',
+      'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid),
+      'properties': {
+        'memory': '',
+        'profile': '',
+        'plan': '',
+        'backends': '',
+        'finstances': ''
+      }
+    })
 
-    common = {
-        'id': app.get('id'),
-        'name': app.get('name'),
-        'status': app.get('status'),
-        'apiStatus': app.get('apiStatus'),
-        'user': app.get('user'),
-        'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100,
-        'duration': app.get('duration'),
-        'submitted': app.get('submitted'),
-        'type': 'queries',
-        'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid)
-    }
-
-    common['properties'] = {
-      'memory': '',
-      'profile': '',
-      'plan': ''
-    }
-
-    return common
-
+    return app
 
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
@@ -161,8 +154,15 @@ class QueryApi(Api):
       return self._memory(appid, app_type, app_property, app_filters)
     elif app_property == 'profile':
       return self._query_profile(appid)
+    elif app_property == 'backends':
+      return self._query_backends(appid)
+    elif app_property == 'finstances':
+      return self._query_finstances(appid)
     else:
       return self._query(appid)
+
+  def profile_encoded(self, appid):
+    return self.api.get_query_profile_encoded(query_id=appid)
 
   def _memory(self, appid, app_type, app_property, app_filters):
     return self.api.get_query_memory(query_id=appid);
@@ -171,26 +171,75 @@ class QueryApi(Api):
     query = self.api.get_query(query_id=appid)
     query['summary'] = query.get('summary').strip() if query.get('summary') else ''
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
+    if query['plan_json']:
+      def get_exchange_icon (o):
+        if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
+          return { 'svg': 'hi-broadcast' }
+        elif re.search(r'hash', o['label_detail'], re.IGNORECASE):
+          return { 'font': 'fa-random' }
+        else:
+          return { 'font': 'fa-exchange' }
+      mapping = {
+        'TOP-N': { 'type': 'TOPN', 'icon': { 'svg': 'hi-filter' } },
+        'SORT': { 'type': 'SORT', 'icon': { 'svg': 'hi-sort' } },
+        'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
+        'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
+        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'font': 'fa-files-o' } },
+        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'fa-table' } },
+        'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
+        'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
+        'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'svg': 'hi-sigma' } },
+        'NESTED LOOP JOIN': { 'type': 'LOOP_JOIN', 'icon': { 'svg': 'hi-nested-loop' } },
+        'SUBPLAN': { 'type': 'SUBPLAN', 'icon': { 'svg': 'hi-map' } },
+        'UNNEST': { 'type': 'UNNEST', 'icon': { 'svg': 'hi-unnest' } },
+        'SINGULAR ROW SRC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-vertical-align' } },
+        'ANALYTIC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-timeline' } },
+        'UNION': { 'type': 'UNION', 'icon': { 'svg': 'hi-merge' } }
+      }
+      def process(node, mapping=mapping):
+        node['id'], node['name'] = node['label'].split(':')
+        details = mapping.get(node['name'])
+        if details:
+          icon = details['icon']
+          if icon and icon.get('fn'):
+            icon = icon['fn'](node)
+          node['icon'] = icon
+
+      for node in query['plan_json']['plan_nodes']:
+        self._for_each_node(node, process)
     return query
+
+  def _for_each_node(self, node, fn):
+    fn(node)
+    for child in node['children']:
+      self._for_each_node(child, fn)
 
   def _query_profile(self, appid):
     return self.api.get_query_profile(query_id=appid)
 
+  def _query_backends(self, appid):
+    return self.api.get_query_backends(query_id=appid)
+
+  def _query_finstances(self, appid):
+    return self.api.get_query_finstances(query_id=appid)
+
   def _api_status_filter(self, status):
-    if status in ['RUNNING', 'CREATED']:
-      return 'RUNNING'
-    elif status in ['FINISHED']:
+    if status == 'FINISHED':
       return 'COMPLETED'
-    else:
+    elif status == 'EXCEPTION':
       return 'FAILED'
+    elif status == 'RUNNING':
+      return 'RUNNING'
 
   def _api_status(self, status):
-    if status in ['RUNNING', 'CREATED']:
-      return 'RUNNING'
-    elif status in ['FINISHED']:
+    if status == 'FINISHED':
       return 'SUCCEEDED'
-    else:
+    elif status == 'EXCEPTION':
       return 'FAILED'
+    elif status == 'RUNNING':
+      return 'RUNNING'
+    else:
+      return 'PAUSED'
 
   def _get_filter_list(self, filters):
     filter_list = []

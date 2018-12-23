@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import logging
 import uuid
@@ -63,7 +64,7 @@ class SqlAlchemyApi(Api):
       'result': result,
       'meta': [{
           'name': col[0] if type(col) is dict or type(col) is tuple else col,
-          'type': 'String', #TODO: resolve
+          'type': 'STRING_TYPE',
           'comment': ''
         } for col in result.cursor.description]
     }
@@ -98,17 +99,33 @@ class SqlAlchemyApi(Api):
     if cache:
       data = cache['result'].fetchmany(rows)
       meta = cache['meta']
+      self._assign_types(data, meta)
     else:
       data = []
       meta = []
-    has_result_set = data is not None
     return {
-      'has_more': has_result_set and len(data) >= rows,
-      'data': data if has_result_set else [],
-      'meta': meta,
+      'has_more': data and len(data) >= rows,
+      'data': data if data else [],
+      'meta': meta if meta else [],
       'type': 'table'
     }
 
+  def _assign_types(self, results, meta):
+    result = results[0]
+    if result:
+      for index, col in enumerate(result):
+        if isinstance(col, int):
+          meta[index]['type'] = 'INT_TYPE'
+        elif isinstance(col, float):
+          meta[index]['type'] = 'FLOAT_TYPE'
+        elif isinstance(col, long):
+          meta[index]['type'] = 'BIGINT_TYPE'
+        elif isinstance(col, bool):
+          meta[index]['type'] = 'BOOLEAN_TYPE'
+        elif isinstance(col, datetime.date):
+          meta[index]['type'] = 'TIMESTAMP_TYPE'
+        else:
+          meta[index]['type'] = 'STRING_TYPE'
 
   @query_error_handler
   def fetch_result_metadata(self):
@@ -204,7 +221,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)
@@ -216,11 +233,20 @@ class SqlAlchemyApi(Api):
     if sample_data:
       response['status'] = 0
       response['rows'] = escape_rows(sample_data)
+
+    if table:
+      columns = assist.get_columns(database, table)
       response['full_headers'] = [{
-          'name': col[0] if type(col) is dict or type(col) is tuple else col,
-          'type': 'String', #TODO: resolve
-          'comment': ''
-        } for col in metadata] if has_result_set else []
+        'name': col.get('name'),
+        'type': str(col.get('type')),
+        'comment': ''
+      } for col in columns]
+    elif metadata:
+      response['full_headers'] = [{
+        'name': col[0] if type(col) is dict or type(col) is tuple else col,
+        'type': 'STRING_TYPE',
+        'comment': ''
+      } for col in metadata]
 
     return response
 

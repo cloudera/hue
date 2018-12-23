@@ -16,17 +16,20 @@
 # limitations under the License.
 
 import logging
+import json
 
-from datetime import datetime,  timedelta
+from datetime import datetime, timedelta
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from metadata.conf import ALTUS
+from metadata.conf import ALTUS, K8S
 from navoptapi.api_lib import ApiLib
 
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.resource import Resource
 
 
 LOG = logging.getLogger(__name__)
@@ -38,7 +41,7 @@ def _exec(service, command, parameters=None):
   if parameters is None:
     parameters = {}
 
-  if service == 'analyticdb':
+  if service == 'dataware':
     hostname = ALTUS.HOSTNAME_ANALYTICDB.get()
   elif service == 'dataeng':
     hostname = ALTUS.HOSTNAME_DATAENG.get()
@@ -47,13 +50,16 @@ def _exec(service, command, parameters=None):
   else:
     hostname = ALTUS.HOSTNAME.get()
 
+  if not ALTUS.AUTH_KEY_ID.get() or not ALTUS.AUTH_KEY_SECRET.get():
+    raise PopupException('Altus API is not configured.')
+
   try:
     api = ApiLib(service, hostname, ALTUS.AUTH_KEY_ID.get(), ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
     LOG.debug('%s : %s' % (command, parameters))
     resp = api.call_api(command, parameters)
     LOG.info(resp)
     json_resp = resp.json()
-    LOG.debug(json_resp )
+    LOG.debug(json_resp)
     return json_resp
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
@@ -217,7 +223,7 @@ class DataEngApi():
       u'serviceType': u'SPARK',
       u'workersConfiguration': {},
       u'workersGroupSize': u'3'
-  }
+    }
 
     return _exec('dataeng', 'createAWSCluster', params)
 
@@ -232,47 +238,106 @@ class AnalyticDbApi():
 
   def __init__(self, user): pass
 
-  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None):
-    # [--cloudera-manager-username <value>]
-    # [--cloudera-manager-password <value>]
+  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
+        cloudera_manager_username='hue', cloudera_manager_password='hue'):
 
-    params = { # cloud_provider: AWS, Azure...
+    params = {
       'clusterName': cluster_name,
       'cdhVersion': cdh_version,
-      'publicKey': public_key,
+      'publicKey': u'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuTEfNIW8LEcVgprUrourbYjoW1RaTLhfzPnnBjJrg14koQrosl+s9phrpBBLTWmQuQdvy9iC2ma//gY5nz/7e+QuaeENhhoEiZn1PDBbFakD/AOjZXIu6DTEgCrOeXsQauFZKOkcFvrBGJC0qigYU3b8Eys4cun3RQ4S9WkDW6538wOSnsm6sXcL84KqbH+ay5gTk+lz3bi/6plALZMItbRz9IulXnLM4QfCwMxXTU/IjtnT+ltZVvKsWpfvDQ3Oyu/a6gK369iXcSP0e07KAzWiv2WYX46sNzZ8+de9ho1/VMaXnI4WrooV9lxByKWD+WsXkqtctT16VfxpX8CeR romain@unreal\n',
       'instanceType': instance_type,
       'environmentName': environment_name,
-      'workersGroupSize': workers_group_size
+      'workersGroupSize': workers_group_size,
+      'workersConfiguration': {},
+      'clouderaManagerUsername': cloudera_manager_username,
+      'clouderaManagerPassword': cloudera_manager_password,
+      'retypedPassword': cloudera_manager_password
     }
 
     if namespace_name:
       params['namespaceName'] = namespace_name
 
-    return _exec('analyticdb', 'createAWSCluster', params)
+    if cloud_provider == 'aws':
+      command = 'createAWSCluster'
+    else:
+      command = 'createAzureCluster'
+
+    return _exec('dataware', command, params)
 
   def list_clusters(self):
-    """
-    e.g. returns
-    [{
-            "status": "CREATED",
-            "namespaceCrn": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:spot-ns/7bdb225f-a7a1-408e-8503-1b3a422cc039",
-            "workersGroupSize": 4,
-            "clusterName": "spot",
-            "environmentType": "AWS",
-            "secured": false,
-            "environmentCrn": "crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:Spot-AWS-dev2/5a6d0ced-c8af-4fa3-9b24-8c5a3ea11cf8",
-            "securityConfiguration": {
-                "enabled": false
-            },
-            "creationDate": "2018-06-01T13:14:43.530000+00:00",
-            "crn": "crn:altus:analyticdb:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:spot/70595482-6a46-4a9d-b395-56fcabe079e4",
-            "instanceType": "r4.4xlarge",
-            "cdhVersion": "CDH514"
-        },
-      ...
-    ]
-    """
-    return _exec('analyticdb', 'listClusters')
+    return _exec('dataware', 'listClusters')
 
   def submit_hue_query(self, cluster_crn, payload):
-    return _exec('analyticdb', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
+    return _exec('dataware', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payload': payload})
+
+  def delete_cluster(self, cluster_id):
+    return _exec('dataware', 'deleteCluster', {'clusterName': cluster_id})
+
+  def describe_cluster(self, cluster_id):
+    return _exec('dataware', 'describeCluster', {'clusterName': cluster_id})
+
+
+class DataWarehouse2Api():
+
+  def __init__(self, user=None):
+    self._api_url = '%s/dw' % K8S.API_URL.get().rstrip('/')
+
+    self.user = user
+    self._client = HttpClient(self._api_url, logger=LOG)
+    self._client.set_verify(False)
+    self._root = Resource(self._client)
+
+
+  def list_k8_clusters(self):
+    clusters = self._root.post('listClusters', contenttype="application/json")
+    for cluster in clusters['clusters']:
+      cluster['clusterName'] = cluster['name']
+      cluster['workersGroupSize'] = cluster['workerReplicas']
+      cluster['instanceType'] = '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
+      cluster['creationDate'] = str(datetime.now())
+    return clusters
+
+
+  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
+        cloudera_manager_username='hue', cloudera_manager_password='hue'):
+    data = {
+      'clusterName': cluster_name,
+      'cdhVersion': cdh_version or 'CDH6.3',
+      'workerCpuCores': 1,
+      'workerMemoryInGib': 1,
+      'workerReplicas': workers_group_size,
+      'workerAutoResize': False
+    }
+
+    return self._root.post('createCluster', data=json.dumps(data), contenttype="application/json")
+
+
+  def list_clusters(self):
+    clusters = self._root.post('listClusters', contenttype="application/json")
+    for cluster in clusters['clusters']:
+      cluster['clusterName'] = cluster['name']
+      cluster['workersGroupSize'] = cluster['workerReplicas']
+      cluster['instanceType'] = 'Data Warehouse'# '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
+      cluster['creationDate'] = str(datetime.now())
+    return clusters
+
+
+  def delete_cluster(self, cluster_id):
+    data = json.dumps({'clusterName': cluster_id})
+    return {
+      'result': self._root.post('deleteCluster', data=data, contenttype="application/json")
+    }
+
+
+  def describe_cluster(self, cluster_id):
+    data = json.dumps({'clusterName': cluster_id})
+    data = self._root.post('describeCluster', data=data, contenttype="application/json")
+    data['cluster']['clusterName'] = data['cluster']['name']
+    data['cluster']['cdhVersion'] = 'Data Warehouse'
+    return data
+
+
+  def update_cluster(self, **params):
+    return self._root.post('updateCluster', data=json.dumps(params), contenttype="application/json")

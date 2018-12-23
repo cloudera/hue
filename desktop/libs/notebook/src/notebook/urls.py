@@ -45,7 +45,6 @@ urlpatterns = [
   url(r'^editor_m/?$', notebook_views.editor_m, name='editor_m'),
   url(r'^browse/(?P<database>\w+)/(?P<table>\w+)/(?P<partition_spec>.+?)?$', notebook_views.browse, name='browse'),
   url(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
-  url(r'^workers_embedded$', notebook_views.workers_embedded, name='workers_embedded'),
 ]
 
 # APIs
@@ -61,7 +60,7 @@ urlpatterns += [
   url(r'^api/cancel_statement/?$', notebook_api.cancel_statement, name='cancel_statement'),
   url(r'^api/close_statement/?$', notebook_api.close_statement, name='close_statement'),
   url(r'^api/get_logs/?$', notebook_api.get_logs, name='get_logs'),
-
+  
   url(r'^api/explain/?$', notebook_api.explain, name='explain'),
   url(r'^api/format/?$', notebook_api.format, name='format'),
   url(r'^api/get_external_statement/?$', notebook_api.get_external_statement, name='get_external_statement'),

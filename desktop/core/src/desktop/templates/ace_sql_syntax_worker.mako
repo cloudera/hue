@@ -18,17 +18,12 @@
   from desktop import conf
 %>
 
-var scriptPrefix = '';
-% if conf.IS_EMBEDDED.get():
-  scriptPrefix = location.href.substring(0, location.href.indexOf('/desktop/workers/'));
-% endif
-
 % if conf.DEV.get():
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }' + '?' + Math.random());
+importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
+importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }' + '?' + Math.random());
 % else:
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
+importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
+importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
 % endif
 
 (function () {

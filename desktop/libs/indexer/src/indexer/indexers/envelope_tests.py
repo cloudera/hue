@@ -17,168 +17,245 @@
 # limitations under the License.
 
 from django.contrib.auth.models import User
+
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
 from indexer.indexers.envelope import EnvelopeIndexer
 
 
-def test_generate_from_kafka_to_file_csv():
-  properties = {
-    'app_name': 'Ingest',
+class TestEnvelope():
 
-    'inputFormat': 'stream',
-    'streamSelection': 'kafka',
-    'brokers': 'broker:9092',
-    'topics': 'kafkaTopic',
-    'kafkaFieldType': 'delimited',
-    'kafkaFieldDelimiter': ',',
-    'kafkaFieldNames': 'id,name',
-    'kafkaFieldTypes': 'int,string',
+  def setUp(self):
+    raise SkipTest
 
-    'ouputFormat': 'file',
-    'path': '/tmp/output',
-    'format': 'csv'
-  }
 
-  config = EnvelopeIndexer(username='test').generate_config(properties)
-
-  assert_true('''steps {
-    inputdata {
-        input {
-            type = kafka
-                brokers = "broker:9092"
-                topics = kafkaTopic
-                encoding = string
-                translator {
-                    type = delimited
-                    delimiter = ","
-                    field.names = [id,name]
-                    field.types = [int,string]
-                }
-                window {
-                    enabled = true
-                    milliseconds = 60000
-                }
-        
-        }
+  def test_generate_from_kafka_to_file_csv(self):
+    properties = {
+      'app_name': 'Ingest',
+  
+      'inputFormat': 'stream',
+      'streamSelection': 'kafka',
+      'brokers': 'broker:9092',
+      'topics': 'kafkaTopic',
+      'kafkaFieldType': 'delimited',
+      'kafkaFieldDelimiter': ',',
+      'kafkaFieldNames': 'id,name',
+      'kafkaFieldTypes': 'int,string',
+  
+      'ouputFormat': 'file',
+      'input_path': '/tmp/output',
+      'format': 'csv'
     }
+  
+    config = EnvelopeIndexer(username='test').generate_config(properties)
+  
+    assert_true('''steps {
+      inputdata {
+          input {
+              type = kafka
+                  brokers = "broker:9092"
+                  topics = kafkaTopic
+                  encoding = string
+                  translator {
+                      type = delimited
+                      delimiter = ","
+                      field.names = [id,name]
+                      field.types = [int,string]
+                  }
+                  window {
+                      enabled = true
+                      milliseconds = 60000
+                  }
+  
+          }
+      }
+  
+      outputdata {
+          dependencies = [inputdata]
+  
+          deriver {
+            type = sql
+            query.literal = """SELECT * from inputdata"""
+          }
+  
+          planner = {
+            type = overwrite
+          }
+          output = {
+            type = filesystem
+            path = /tmp/output
+            format = csv
+            header = true
+          }
+      }
+  }
+  ''' in  config, config)
 
-    outputdata {
-        dependencies = [inputdata]
-        planner = {
-          type = overwrite
-        }
-        output = {
-          type = filesystem
+
+  def test_generate_from_stream_sfdc_to_hive_table(self):
+    properties = {
+      'app_name': 'Ingest',
+  
+      'inputFormat': 'stream',    
+      'streamSelection': 'sfdc',
+      'streamUsername': 'test',
+      'streamPassword': 'test',
+      'streamToken': 'token',
+      'streamEndpointUrl': 'http://sfdc/api',
+      'streamObject': 'Opportunities',
+  
+      'ouputFormat': 'table',
+      'output_table': 'sfdc',
+      'format': 'text'
+    }
+  
+    config = EnvelopeIndexer(username='test').generate_config(properties)
+  
+    assert_true('''steps {
+      inputdata {
+          input {
+              type = sfdc
+              mode = fetch-all
+              sobject = Opportunities
+              sfdc: {
+                partner: {
+                  username = "test"
+                  password = "test"
+                  token = "token"
+                  auth-endpoint = "http://sfdc/api"
+                }
+              }
+    
+          }
+      }
+  
+      outputdata {
+          dependencies = [inputdata]
+  
+          deriver {
+            type = sql
+            query.literal = """SELECT * from inputdata"""
+          }
+  
+            planner {
+                type = append
+            }
+            output {
+                type = hive
+                table.name = "sfdc"
+            }
+      }
+  }''' in  config, config)
+  
+
+  def test_generate_from_stream_kafka_to_solr_index(self):
+    properties = {
+      'app_name': 'Ingest',
+  
+      'inputFormat': 'stream',
+      'streamSelection': 'kafka',
+      'brokers': 'broker:9092',
+      'topics': 'kafkaTopic',
+      'kafkaFieldType': 'delimited',
+      'kafkaFieldDelimiter': ',',
+      'kafkaFieldNames': 'id,name',
+      'kafkaFieldTypes': 'int,string',
+  
+      'ouputFormat': 'index',
+      'connection': 'http://hue.com:8983/solr/',
+      'collectionName': 'traffic'
+    }
+  
+    config = EnvelopeIndexer(username='test').generate_config(properties)
+  
+    assert_true('''steps {
+      inputdata {
+          input {
+              type = kafka
+                  brokers = "broker:9092"
+                  topics = kafkaTopic
+                  encoding = string
+                  translator {
+                      type = delimited
+                      delimiter = ","
+                      field.names = [id,name]
+                      field.types = [int,string]
+                  }
+                  window {
+                      enabled = true
+                      milliseconds = 60000
+                  }
+  
+          }
+      }
+  
+      outputdata {
+          dependencies = [inputdata]
+  
+          deriver {
+            type = sql
+            query.literal = """SELECT * from inputdata"""
+          }
+  
+          planner {
+              type = upstert
+          }
+          output {
+              type = solr
+              connection = "http://hue.com:8983/solr/"
+              collection.name = "traffic"
+          }
+      }
+  }''' in  config, config)
+
+
+  def test_generate_from_file_to_kafka(self):
+    properties = {
+      'app_name': 'Ingest',
+  
+      'inputFormat': 'file',
+      'input_path': '/tmp/output',
+      'format': 'csv',
+  
+      'ouputFormat': 'stream',
+      'streamSelection': 'kafka',
+      'brokers': 'broker:9092',
+      'topics': 'kafkaTopic',
+      'kafkaFieldType': 'delimited',
+    }
+  
+    config = EnvelopeIndexer(username='test').generate_config(properties)
+  
+    assert_true('''steps {
+      inputdata {
+          input {
+              type = filesystem
           path = /tmp/output
           format = csv
-          header = true
-        }
-    }
-}
-''' in  config, config)
-
-
-def test_generate_from_stream_sfdc_to_hive_table():
-  properties = {
-    'app_name': 'Ingest',
-
-    'inputFormat': 'stream',    
-    'streamSelection': 'sfdc',
-    'streamUsername': 'test',
-    'streamPassword': 'test',
-    'streamToken': 'token',
-    'streamEndpointUrl': 'http://sfdc/api',
-    'streamObject': 'Opportunities',
-
-    'ouputFormat': 'table',
-    'output_table': 'sfdc',
-    'format': 'text'
-  }
-
-  config = EnvelopeIndexer(username='test').generate_config(properties)
-
-  assert_true('''steps {
-    inputdata {
-        input {
-            type = sfdc
-            mode = fetch-all
-            sobject = Opportunities
-            sfdc: {
-              partner: {
-                username = "test"
-                password = "test"
-                token = "token"
-                auth-endpoint = "http://sfdc/api"
-              }
-            }
+        
+          }
+      }
   
-        }
-    }
-
-    outputdata {
-        dependencies = [inputdata]
+      outputdata {
+          dependencies = [inputdata]
+  
+          deriver {
+            type = sql
+            query.literal = """SELECT * from inputdata"""
+          }
+  
+          
           planner {
               type = append
           }
           output {
-              type = hive
-              table.name = "sfdc"
+              type = kafka
+              brokers = "broker:9092"
+              topic = kafkaTopic
+              serializer.type = delimited
+              serializer.field.delimiter = ","
           }
-    }
-}''' in  config, config)
-  
-
-def test_generate_from_stream_kafka_to_solr_index():
-  properties = {
-    'app_name': 'Ingest',
-
-    'inputFormat': 'stream',
-    'streamSelection': 'kafka',
-    'brokers': 'broker:9092',
-    'topics': 'kafkaTopic',
-    'kafkaFieldType': 'delimited',
-    'kafkaFieldDelimiter': ',',
-    'kafkaFieldNames': 'id,name',
-    'kafkaFieldTypes': 'int,string',
-
-    'ouputFormat': 'index',
-    'connection': 'http://hue.com:8983/solr/',
-    'collectionName': 'traffic'
+      }
   }
-
-  config = EnvelopeIndexer(username='test').generate_config(properties)
-
-  assert_true('''steps {
-    inputdata {
-        input {
-            type = kafka
-                brokers = "broker:9092"
-                topics = kafkaTopic
-                encoding = string
-                translator {
-                    type = delimited
-                    delimiter = ","
-                    field.names = [id,name]
-                    field.types = [int,string]
-                }
-                window {
-                    enabled = true
-                    milliseconds = 60000
-                }
-        
-        }
-    }
-
-    outputdata {
-        dependencies = [inputdata]
-        planner {
-            type = upstert
-        }
-        output {
-            type = solr
-            connection = "http://hue.com:8983/solr/"
-            collection.name = "traffic"
-        }
-    }
-}''' in  config, config)
+  ''' in  config, config)

@@ -23,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, validate_thrift_transport, coerce_bool
+from hbase.hbase_site import get_thrift_transport
 
 
 LOG = logging.getLogger(__name__)
@@ -45,9 +46,9 @@ TRUNCATE_LIMIT = Config(
 
 THRIFT_TRANSPORT = Config(
   key="thrift_transport",
-  default="framed",
-  help=_t("'framed' is used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-       "'buffered' used to be the default of the HBase Thrift Server."),
+  default="buffered",
+  help=_t("Should come from hbase-site.xml, do not set. 'framed' is used to chunk up responses, used with the nonblocking server in Thrift but is not supported in Hue."
+       "'buffered' used to be the default of the HBase Thrift Server. Default is buffered when not set in hbase-site.xml."),
   type=str
 )
 
@@ -60,7 +61,7 @@ HBASE_CONF_DIR = Config(
 # Hidden, just for making patching of older version of Hue easier. To remove in Hue 4.
 USE_DOAS = Config(
   key='use_doas',
-  help=_t('Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties.'),
+  help=_t('Should come from hbase-site.xml, do not set. Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties.'),
   default=False,
   type=coerce_bool
 )
@@ -94,6 +95,12 @@ def config_validator(user):
       msg = 'Failed to authenticate to HBase Thrift Server, check authentication configurations.'
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))
+
+  if get_thrift_transport() == "framed":
+    msg = "Hbase config thrift_transport=framed is not supported"
+    LOG.exception(msg)
+    res.append((NICE_NAME, _(msg)))
+
 
 
   res.extend(validate_thrift_transport(THRIFT_TRANSPORT))

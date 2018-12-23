@@ -90,7 +90,7 @@
 
 .jobs-panel {
   position: fixed;
-  z-index: 2999;
+  z-index: 1038;
   top: 45px;
   padding: 10px;
   width: 600px;
@@ -99,6 +99,15 @@
   border-radius: @hue-panel-border-radius;
   background-color: @cui-white;
   .hue-box-shadow-top;
+}
+
+.mini-jb-context-selector {
+  padding: 5px 80px 0 0;
+  float: right;
+
+  .hue-drop-down-active span {
+    font-size: 13px;
+  }
 }
 
 .notification-history {
@@ -512,7 +521,6 @@ a:visited {
   font-size: 13px;
 }
 
-.hue-inner-drop-down > li,
 .hue-context-menu > li {
   min-width: 170px;
   color: @cui-gray-200;
@@ -562,6 +570,10 @@ a:visited {
   text-decoration: none;
   font-weight: 400;
   white-space: nowrap;
+}
+
+.hue-inner-drop-down > li {
+  color: @cui-gray-200;
 }
 
 .hue-inner-drop-down > li > a:hover,
@@ -709,9 +721,9 @@ a:visited {
 }
 
 #mini_jobbrowser {
-  overflow-y: auto;
-  height: 550px;
-  max-height: 550px;
+  overflow-y: hidden;
+  height: 800px;
+  max-height: 800px;
   input.search-query {
     width: 70px;
   }
@@ -728,6 +740,10 @@ a:visited {
     width: 0;
     opacity: .5;
   }
+}
+
+#mini_jobbrowser:hover {
+  overflow-y: overlay;
 }
 
 .uploadstatus {
@@ -777,12 +793,79 @@ a:visited {
   background-color: @hue-primary-color-dark !important;
 }
 
+ul.risk-list {
+  list-style: none;
+  margin: 0 0 0 10px;
+
+  .risk-list-high {
+    color: @cui-red-700;
+  }
+
+  .risk-list-normal {
+    color: @cui-orange-700;
+  }
+
+  .risk-list-title {
+    white-space: normal;
+  }
+
+  .risk-list-description {
+    margin-left: 5px;
+    white-space: normal;
+    font-style: italic;
+  }
+
+  .risk-quickfix {
+    margin-left: 5px;
+  }
+}
+
+.risk.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+.risk.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+.risk.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+
 #importerComponents {
   .step-indicator-fixed {
     position: static!important;
   }
+
   .vertical-spacer {
     height: 0 !important;
+  }
+
+  .namespace-selection {
+    margin-top: 3px;
+    vertical-align: top;
+    display: inline-block;
+    line-height: 32px;
+
+    .selectize-control {
+      max-width: 296px;
+    }
   }
 }
 
@@ -942,4 +1025,8 @@ a:visited {
 :-webkit-autofill {
   -webkit-animation-name: autofill;
   -webkit-animation-fill-mode: both;
+}
+
+.striked {
+  text-decoration: line-through;
 }

@@ -185,6 +185,9 @@ HiveObjectSpecification_EDIT
 
 ImpalaObjectSpecification
  : 'DATABASE' RegularOrBacktickedIdentifier
+   {
+     parser.addDatabaseLocation(@2, [ { name: $2 } ]);
+   }
  | '<impala>TABLE' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($2);
@@ -310,20 +313,20 @@ UserOrRoleList
 
 OptionalWithGrantOption
  :
- | 'WITH' '<hive>GRANT' 'OPTION'
- | 'WITH' '<impala>GRANT' 'OPTION'
+ | '<hive>WITH' '<hive>GRANT' 'OPTION'
+ | '<impala>WITH' '<impala>GRANT' 'OPTION'
  ;
 
 WithGrantOption_EDIT
- : 'WITH' 'CURSOR'
+ : AnyWith 'CURSOR'
    {
      parser.suggestKeywords(['GRANT OPTION']);
    }
- | 'WITH' '<hive>GRANT' 'CURSOR'
+ | '<hive>WITH' '<hive>GRANT' 'CURSOR'
    {
      parser.suggestKeywords(['OPTION']);
    }
- | 'WITH' '<impala>GRANT' 'CURSOR'
+ | '<impala>WITH' '<impala>GRANT' 'CURSOR'
    {
      parser.suggestKeywords(['OPTION']);
    }
@@ -331,15 +334,15 @@ WithGrantOption_EDIT
 
 OptionalWithAdminOption
  :
- | 'WITH' '<hive>ADMIN' 'OPTION'
+ | '<hive>WITH' '<hive>ADMIN' 'OPTION'
  ;
 
 WithAdminOption_EDIT
- : 'WITH' 'CURSOR'
+ : '<hive>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['ADMIN OPTION']);
    }
- | 'WITH' '<hive>ADMIN' 'CURSOR'
+ | '<hive>WITH' '<hive>ADMIN' 'CURSOR'
    {
      parser.suggestKeywords(['OPTION']);
    }

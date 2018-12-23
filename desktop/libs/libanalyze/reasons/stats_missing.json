@@ -1,0 +1,20 @@
+{
+  "type": "SQLOperator",
+  "node_name": ["HDFS_SCAN_NODE", "KUDU_SCAN_NODE"],
+  "metric_names": [
+    "MissingStats"
+  ],
+  "info_names": ["Table"],
+  "rule": {
+    "condition": "vars['MissingStats'] == 1",
+    "expr": "1",
+    "message": "The statistics are missing or corrupt which prevent scan optimizations.",
+    "label": "Statistics Missing"
+  },
+  "fix": {
+    "id": 0,
+    "fixable": true,
+    "message": "Trigger compute stats for table.",
+    "data": "vars['Table']"
+  }
+}

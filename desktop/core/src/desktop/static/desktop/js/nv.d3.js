@@ -1251,7 +1251,7 @@ nv.utils.optionsFunc = function(args) {
                 .attr('text-anchor', 'end')
                 .text(function(d,i) {
                   var v = fmt(d);
-                  return ('' + v).match('NaN') ? '' : v.substr(0, 8);
+                  return ('' + v).match('NaN') ? '' : v.toString().substr(0, 8);
                 });
             axisMaxMin.transition()
                 .attr('transform', function(d,i) {

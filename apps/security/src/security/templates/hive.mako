@@ -779,8 +779,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       huePubSub.subscribe('app.gained.focus', function (app) {
         if (app === 'security_hive') {
-          window.location.hash = viewModel.lastHash;
-          showMainSection(viewModel.getSectionHash());
+          window.setTimeout(function () {
+            window.location.hash = viewModel.lastHash;
+            showMainSection(viewModel.getSectionHash());
+          }, 0);
         }
       }, 'security_hive');
     });

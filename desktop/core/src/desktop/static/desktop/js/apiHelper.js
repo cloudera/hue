@@ -543,7 +543,7 @@ var ApiHelper = (function () {
     if (clonedPath.length && clonedPath[0] === '/') {
       clonedPath.shift();
     }
-    url += clonedPath.join('/') + '?compression=none&mode=text';
+    url += clonedPath.join('/').replace(/#/g, '%23') + '?compression=none&mode=text';
     url += '&offset=' + (options.offset || 0);
     url += '&length=' + (options.length || 118784);
 
@@ -930,6 +930,58 @@ var ApiHelper = (function () {
 
   /**
    * @param {Object} options
+   * @param {Number} options.pastMs
+   * @param {Number} options.stepMs
+   *
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchResourceStats = function (options) {
+    var self = this;
+
+    var queryMetric = function (metricName) {
+      var now = Date.now();
+      return self.simplePost('/metadata/api/prometheus/query', {
+        query: ko.mapping.toJSON(metricName),
+        start: Math.floor((now - options.pastMs) / 1000),
+        end:  Math.floor(now / 1000),
+        step: options.stepMs / 1000
+      })
+    };
+
+    var combinedDeferred = $.Deferred();
+    $.when(
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
+      queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
+      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}'), // Queued queries
+    ).done(function () {
+      var timestampIndex = {};
+      for (var j = 0; j < arguments.length; j++) {
+        var response = arguments[j];
+        if (response.data.result[0]) {
+          var values = response.data.result[0].values;
+          for (var i = 0; i < values.length; i++) {
+            if (!timestampIndex[values[i][0]]) {
+              timestampIndex[values[i][0]] = [values[i][0] * 1000, 0, 0, 0, 0, 0]; // Adjust back to milliseconds
+            }
+            timestampIndex[values[i][0]][j + 1] = parseFloat(values[i][1]);
+          }
+        }
+      }
+      var result = [];
+      Object.keys(timestampIndex).forEach(function (key) {
+        result.push(timestampIndex[key]);
+      });
+      result.sort(function (a,b) { return a[0] - b[0]; });
+      combinedDeferred.resolve(result);
+    }).fail(combinedDeferred.reject);
+
+    return combinedDeferred.promise();
+  };
+
+  /**
+   * @param {Object} options
    * @param {Function} [options.successCallback]
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
@@ -1265,6 +1317,7 @@ var ApiHelper = (function () {
    * @param {string} options.sourceType
    * @param {string} options.invalidate - 'invalidate' or 'invalidateAndFlush'
    * @param {string[]} [options.path]
+   * @param {ContextCompute} [options.compute]
    * @param {boolean} [options.silenceErrors]
    */
   ApiHelper.prototype.invalidateSourceMetadata = function (options) {
@@ -1273,7 +1326,8 @@ var ApiHelper = (function () {
 
     if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
       var data = {
-        flush_all: options.invalidate === 'invalidateAndFlush'
+        flush_all: options.invalidate === 'invalidateAndFlush',
+        cluster: JSON.stringify(options.compute)
       };
 
       if (options.path && options.path.length > 0) {
@@ -1319,7 +1373,7 @@ var ApiHelper = (function () {
           type: sourceType,
           source: isQuery ? 'query' : 'data',
         }),
-        cluster: '"' + (options.compute ? options.compute.id : '') + '"'
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       },
       timeout: options.timeout
     }).success(function (data) {
@@ -1393,6 +1447,8 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    * @param {ContextCompute} [options.compute]
    *
+   * @param {ContextCompute} options.compute
+   * @param {string} options.sourceType
    * @param {string[]} options.path
    *
    * @return {CancellablePromise}
@@ -1413,19 +1469,17 @@ var ApiHelper = (function () {
       }
 
       if (options.path.length > 2) {
-        url += '/stats/' + options.path.slice(2).join('/');
+        url += 'stats/' + options.path.slice(2).join('/');
       }
     }
 
-    var params = {
-      'format' : 'json'
-    }
+    var data = {
+      format: 'json',
+      cluster: JSON.stringify(options.compute),
+      source_type: options.sourceType
+    };
 
-    if (options.compute && options.compute.id) {
-      params['cluster'] = options.compute.id;
-    }
-
-    var request = self.simpleGet(url, params, {
+    var request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
       silenceErrors: options.silenceErrors,
       successCallback: function (response) {
         if (options.path.length === 1) {
@@ -1452,6 +1506,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string[]} options.path
+   * @param {ContextCompute} options.compute
    *
    * @return {CancellablePromise}
    */
@@ -1460,37 +1515,35 @@ var ApiHelper = (function () {
     var deferred = $.Deferred();
 
     // TODO: No sourceType needed?
-    var request = $.ajax({
-      url: '/metastore/table/' + options.path.join('/') + '/partitions',
-      data: { format: 'json' },
-      success: function (response) {
-        if (!self.successResponseIsError(response)) {
-          if (!response) {
-            response = {};
-          }
-          response.hueTimestamp = Date.now();
-          deferred.resolve(response);
-        } else {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(response);
+    var request = $.post('/metastore/table/' + options.path.join('/') + '/partitions', {
+      format: 'json',
+      cluster: JSON.stringify(options.compute)
+    }).done(function (response) {
+      if (!self.successResponseIsError(response)) {
+        if (!response) {
+          response = {};
         }
-      },
-      error: function (response) {
-        // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
-        if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
-          deferred.resolve({
-            hueTimestamp: Date.now(),
-            partition_keys_json: [],
-            partition_values_json: []
-          })
-        } else {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(response);
-        }
+        response.hueTimestamp = Date.now();
+        deferred.resolve(response);
+      } else {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(response);
+      }
+    }).fail(function (response) {
+      // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
+      if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
+        deferred.resolve({
+          hueTimestamp: Date.now(),
+          partition_keys_json: [],
+          partition_values_json: []
+        })
+      } else {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(response);
       }
     });
 
@@ -1504,6 +1557,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
    * @param {string[]} options.path
    *
    * @return {CancellablePromise}
@@ -1580,7 +1634,8 @@ var ApiHelper = (function () {
     var waitForAvailable = function () {
       var request = self.simplePost('/notebook/api/check_status', {
         notebook: options.notebookJson,
-        snippet: options.snippetJson
+        snippet: options.snippetJson,
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       }, {
         silenceErrors: options.silenceErrors
       }).done(function (response) {
@@ -1613,10 +1668,11 @@ var ApiHelper = (function () {
    *
    * @constructor
    */
-  var QueryResult = function (sourceType, response) {
+  var QueryResult = function (sourceType, compute, response) {
     var self = this;
     self.id = UUID();
     self.type = response.result.type || sourceType;
+    self.compute = compute;
     self.status = response.status || 'running';
     self.result = response.result || {};
     self.result.type = 'table';
@@ -1629,8 +1685,10 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.sourceType
+   * @param {ContextCompute} options.compute
    * @param {number} [options.sampleCount] - Default 100
    * @param {string[]} options.path
+   * @param {string} [options.operation] - Default 'default'
    *
    * @return {CancellablePromise}
    */
@@ -1649,7 +1707,8 @@ var ApiHelper = (function () {
       if (notebookJson) {
         self.simplePost('/notebook/api/cancel_statement', {
           notebook: notebookJson,
-          snippet: snippetJson
+          snippet: snippetJson,
+          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
         }, { silenceErrors:  options.silenceErrors });
       }
     };
@@ -1657,13 +1716,16 @@ var ApiHelper = (function () {
     self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
       notebook: {},
       snippet: JSON.stringify({
-        type: options.sourceType
+        type: options.sourceType,
+        compute: options.compute
       }),
-      async: true
+      async: true,
+      operation: '"' + (options.operation || 'default') + '"',
+      cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
     }, {
       silenceErrors: options.silenceErrors
     }).done(function (sampleResponse) {
-      var queryResult = new QueryResult(options.sourceType, sampleResponse);
+      var queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
 
       notebookJson = JSON.stringify({ type: options.sourceType });
       snippetJson = JSON.stringify(queryResult);
@@ -1674,7 +1736,7 @@ var ApiHelper = (function () {
         deferred.resolve(data);
       } else {
         cancellablePromises.push(
-          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, compute: options.compute, silenceErrors: options.silenceErrors }).done(function () {
             var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
               notebook: notebookJson,
               snippet: snippetJson,
@@ -1976,13 +2038,14 @@ var ApiHelper = (function () {
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string} options.computeId
+   * @param {ContextCompute} options.compute
    * @param {string} options.queryId
    * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchQueryExecutionAnalysis = function (options)  {
     var self = this;
-    var url = '/metadata/api/workload_analytics/get_impala_query/';
+    //var url = '/metadata/api/workload_analytics/get_impala_query/';
+    var url = '/impala/api/query/alanize';
     var deferred = $.Deferred();
 
     var tries = 0;
@@ -1999,7 +2062,7 @@ var ApiHelper = (function () {
       tries++;
       cancellablePromises.pop(); // Remove the last one
       cancellablePromises.push(deferred, self.simplePost(url, {
-        'cluster_id': '"' + options.computeId + '"',
+        'cluster': JSON.stringify(options.compute),
         'query_id': '"' + options.queryId + '"'
       }, options).done(function (response) {
         if (response && response.data) {
@@ -2018,6 +2081,29 @@ var ApiHelper = (function () {
     pollForAnalysis();
 
     return promise;
+  };
+
+  ApiHelper.prototype.fixQueryExecutionAnalysis = function (options)  {
+    var self = this;
+    var url = '/impala/api/query/alanize/fix';
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(url, {
+      fix: JSON.stringify(options.fix),
+      start_time: options.start_time
+      }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (response) {
+        if (response.status === 0) {
+          deferred.resolve(response.details);
+        } else {
+          deferred.reject();
+        }
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -2041,6 +2127,18 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchContextComputes = function (options) {
     var self = this;
     var url = '/desktop/api2/context/computes/' + options.sourceType;
+    return self.simpleGet(url, undefined, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string} options.sourceType
+   * @return {Promise}
+   */
+  ApiHelper.prototype.fetchContextClusters = function (options) {
+    var self = this;
+    var url = '/desktop/api2/context/clusters/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 

@@ -129,9 +129,9 @@ STORE upper_case INTO '$output';
     else:
       # Install old pig script fixture
       LOG.info("Using Hue 3, will install pig script fixture.")
-
-      management.call_command('loaddata', 'initial_pig_examples.json', verbosity=2)
-      Document.objects.sync()
+      with transaction.atomic():
+        management.call_command('loaddata', 'initial_pig_examples.json', verbosity=2, commit=False)
+        Document.objects.sync()
 
     if USE_NEW_EDITOR.get():
       # Get or create sample user directories

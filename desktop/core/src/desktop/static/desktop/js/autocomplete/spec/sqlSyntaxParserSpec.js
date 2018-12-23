@@ -107,6 +107,22 @@
       expect(result).toBeTruthy();
     });
 
+    it('should find errors for "select * from foo where method = 1;"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * from foo where method = 1;', '', 'impala');
+      expect(result).toBeTruthy();
+      expect(result.expected.some(function (expected) { return expected.text === '`method`' })).toBeTruthy();
+      expect(result.expectedIdentifier).toBeTruthy();
+      expect(result.possibleReserved).toBeTruthy();
+    });
+
+    it('should find errors for "select * from using where a = 1;"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * from using where a = 1;', '', 'hive');
+      expect(result).toBeTruthy();
+      expect(result.expected.some(function (expected) { return expected.text === '`using`' })).toBeTruthy();
+      expect(result.expectedIdentifier).toBeTruthy();
+      expect(result.possibleReserved).toBeTruthy();
+    });
+
     it('should suggest expected words for "SLELECT "', function() {
       var result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
       expect(result).toBeTruthy();

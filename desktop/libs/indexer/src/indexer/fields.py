@@ -44,13 +44,13 @@ class FieldType():
 
 class Field(object):
 
-  def __init__(self, name="new_field", field_type_name="string", operations=None, multi_valued=False):
+  def __init__(self, name="new_field", field_type_name="string", operations=None, multi_valued=False, unique=False):
     self.name = name
     self.field_type_name = field_type_name
     self.keep = True
     self.operations = operations if operations else []
     self.required = False
-    self.unique = False
+    self.unique = unique
     self.multi_valued = multi_valued
     self.show_properties = False
 

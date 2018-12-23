@@ -133,7 +133,7 @@ def login(request,
             logger.debug('User is already logged in')
             return render(request, authorization_error_template, {
                     'came_from': came_from,
-                    })
+                    }, using='django')
 
     selected_idp = request.GET.get('idp', None)
     conf = get_config(config_loader_path, request)
@@ -145,7 +145,7 @@ def login(request,
         return render(request, wayf_template, {
                 'available_idps': idps.items(),
                 'came_from': came_from,
-                })
+                }, using='django')
 
     # choose a binding to try first
     sign_requests = getattr(conf, '_sp_authn_requests_signed', False)
@@ -213,7 +213,7 @@ def login(request,
                         'SAMLRequest': saml_request,
                         'RelayState': came_from,
                         },
-                    })
+                    }, using='django')
             except TemplateDoesNotExist:
                 pass
 
@@ -349,7 +349,7 @@ def echo_attributes(request,
     except AttributeError:
         return HttpResponse("No active SAML identity found. Are you sure you have logged in via SAML?")
 
-    return render(request, template, {'attributes': identity[0]})
+    return render(request, template, {'attributes': identity[0]}, using='django')
 
 
 @login_required
@@ -443,7 +443,7 @@ def do_logout_service(request, data, binding, config_loader_path=None, next_page
                 'The session does not contain the subject id for user %s. Performing local logout',
                 request.user)
             auth.logout(request)
-            return render(request, logout_error_template, status=403)
+            return render(request, logout_error_template, status=403, using='django')
         else:
             http_info = client.handle_logout_request(
                 data['SAMLRequest'],
@@ -467,7 +467,7 @@ def finish_logout(request, response, next_page=None):
         return django_logout(request, next_page=next_page)
     else:
         logger.error('Unknown error during the logout')
-        return render(request, "djangosaml2/logout_error.html", {})
+        return render(request, "djangosaml2/logout_error.html", {}, using='django')
 
 
 def metadata(request, config_loader_path=None, valid_for=None):

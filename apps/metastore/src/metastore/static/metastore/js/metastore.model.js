@@ -36,16 +36,24 @@ var MetastoreSource = (function () {
     });
 
     // When manually changed through dropdown
-    self.namespaceChanged = function () {
-      huePubSub.publish('metastore.url.change')
+    self.namespaceChanged = function (newNamespace, previousNamespace) {
+      if (previousNamespace.database() && !self.namespace().database()) {
+        // Try to set the same database by name, if not there it will revert to 'default'
+        self.namespace().setDatabaseByName(previousNamespace.database().catalogEntry.name, function () {
+          huePubSub.publish('metastore.url.change');
+        });
+      } else {
+        huePubSub.publish('metastore.url.change');
+      }
     };
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       self.lastLoadNamespacesDeferred.done(function () {
+        var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
         huePubSub.publish('assist.set.database', {
           source: self.type,
           namespace: self.namespace().namespace,
-          name: null
+          name: lastSelectedDb
         });
       });
     });
@@ -151,7 +159,8 @@ var MetastoreSource = (function () {
     var self = this;
     self.loading(true);
     ContextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
-      self.namespaces($.map(context.namespaces, function (namespace) {
+      var namespacesWithComputes = context.namespaces.filter(function (namespace) { return namespace.computes.length });
+      self.namespaces($.map(namespacesWithComputes, function (namespace) {
         return new MetastoreNamespace({
           metastoreViewModel: self.metastoreViewModel,
           sourceType: self.type,
@@ -940,7 +949,8 @@ var MetastoreTable = (function () {
       $.post('/tables/drop/' + self.database.catalogEntry.name, {
         table_selection: ko.mapping.toJSON([self.name]),
         skip_trash: 'off',
-        is_embeddable: true
+        is_embeddable: true,
+        cluster: JSON.stringify(self.database.catalogEntry.compute)
       }, function(resp) {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp.history_uuid);

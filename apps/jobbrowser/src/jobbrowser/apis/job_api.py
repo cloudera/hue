@@ -148,7 +148,7 @@ class YarnApi(Api):
         'name': app['name'],
         'type': app['applicationType'],
         'status': app['status'],
-        'apiStatus': self._api_status(app['status'], app['applicationType']),
+        'apiStatus': self._api_status(app['status']),
         'user': app['user'],
         'progress': app['progress'],
         'duration': app['durationMs'],
@@ -180,9 +180,10 @@ class YarnApi(Api):
       }
     elif app['applicationType'] == 'SPARK':
       app['logs'] = job.logs_url if hasattr(job, 'logs_url') else ''
+      app['trackingUrl'] = job.trackingUrl if hasattr(job, 'trackingUrl') else ''
       common['type'] = 'SPARK'
       common['properties'] = {
-        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems()],
+        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems() if name != "url" and name != "killUrl"],
         'executors': []
       }
       if hasattr(job, 'metrics'):
@@ -258,10 +259,10 @@ class YarnApi(Api):
         }
     return {}
 
-  def _api_status(self, status, app_type=None):
+  def _api_status(self, status):
     if status in ['NEW', 'NEW_SAVING', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
       return 'RUNNING'
-    elif status == 'SUCCEEDED' or (app_type == 'Oozie Launcher' and status == 'FINISHED'):
+    elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
       return 'FAILED' # FAILED, KILLED

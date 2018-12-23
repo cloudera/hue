@@ -13,21 +13,87 @@ function impalaDagre(id) {
   var svg = d3.select("#"+id + " svg");
   var inner = svg.select("g");
   var _impalaDagree = {
+    init: function (initialScale) {
+      _impalaDagree.scale = initialScale;
+      zoom.translate([((svg.attr("width") || $("#"+id).width()) - g.graph().width * initialScale) / 2, 20])
+      .scale(initialScale)
+      .event(svg);
+    },
     update: function(plan) {
       renderGraph(plan);
+      _impalaDagree._width = $(svg[0]).width();
     },
     height: function(value) {
       var scale = _impalaDagree.scale || 1;
       var height = value || 600;
-      svg.attr('height', Math.min(g.graph().height * scale + 40, height) || height);
-    }
+      _impalaDagree._height = height;
+      svg.attr('height', height);
+    },
+    action: function(type) {
+      if (type == 'plus') {
+        zoom.scale(zoom.scale() + 0.25)
+        .event(svg);
+      } else if (type == 'minus') {
+        zoom.scale(zoom.scale() - 0.25)
+        .event(svg);
+      } else if (type == 'reset') {
+        _impalaDagree.init(1);
+      }
+    },
+    moveTo: function(id) {
+      zoomToNode(id);
+    },
+    select: function(id) {
+      select(id);
+    },
   };
+  createActions();
+
+  function createActions () {
+    d3.select("#"+id)
+      .style('position', 'relative')
+    .append('div')
+      .style('position', 'absolute')
+      .style('right', '5px')
+      .style('bottom', '5px')
+      .classed('buttons', true)
+    .selectAll('button').data([{ type: 'reset', svg: 'hi-crop-free', divider: true }, { type: 'plus', icon: 'fa-plus', divider: true }, { type: 'minus', icon: 'fa-minus' }])
+    .enter()
+    .append(function (data) {
+      var text = "";
+      if (data.svg) {
+        text += "<div><svg class='hi'><use xlink:href='#"+ data.svg +"'></use></svg>";
+        if (data.divider) {
+          text += "<div class='divider'></div>";
+        }
+        text += "</div>";
+        button = $()[0];
+      } else if (data.icon) {
+        text += "<div><div class='fa fa-fw valign-middle " + data.icon + "'></div>";
+        if (data.divider) {
+          text += "<div class='divider'></div></div>";
+        }
+        text += "</div>";
+      }
+      var button = $(text)[0];
+      $(button).on('click', function () {
+        _impalaDagree.action(data.type);
+      });
+      return button;
+    });
+  }
 
   // Set up zoom support
   var zoom = d3.behavior.zoom().on("zoom", function() {
-    _impalaDagree.scale = d3.event.scale;
-    inner.attr("transform", "translate(" + d3.event.translate + ")" +
-               "scale(" + d3.event.scale + ")");
+    var e = d3.event,
+        scale = Math.min(Math.max(e.scale, Math.min(_impalaDagree._width / g.graph().width, _impalaDagree._height / g.graph().height)), 2),
+        tx = Math.min(40, Math.max(e.translate[0], _impalaDagree._width - 40 - g.graph().width * scale)),
+        ty = Math.min(40, Math.max(e.translate[1], _impalaDagree._height - 40 - g.graph().height * scale));
+    _impalaDagree.scale = scale;
+    zoom.translate([tx, ty]);
+    zoom.scale(scale);
+    inner.attr("transform", "translate(" + [tx, ty] + ")" +
+               "scale(" + scale + ")");
   });
   svg.call(zoom);
 
@@ -42,15 +108,20 @@ function impalaDagre(id) {
 
   // Recursively build a list of edges and states that comprise the plan graph
   function build(node, parent, edges, states, colour_idx, max_node_time) {
+    if (node["output_card"] === null || node["output_card"] === undefined) {
+      return;
+    }
     states.push({ "name": node["label"],
+                  "type": node["type"],
+                  "label": node["name"],
                   "detail": node["label_detail"],
                   "num_instances": node["num_instances"],
                   "num_active": node["num_active"],
                   "max_time": node["max_time"],
                   "avg_time": node["avg_time"],
+                  "icon": node["icon"],
                   "is_broadcast": node["is_broadcast"],
-                  "max_time_val": node["max_time_val"],
-                  "style": "fill: " + colours[colour_idx]});
+                  "max_time_val": node["max_time_val"]});
     if (parent) {
       var label_val = "" + node["output_card"].toLocaleString();
       edges.push({ start: node["label"], end: parent,
@@ -62,7 +133,7 @@ function impalaDagre(id) {
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
                    "style": { label: "" + node["output_card"].toLocaleString(),
-                              style: "stroke: #f66; stroke-dasharray: 5, 5;"}});
+                              style: "stroke-dasharray: 5, 5;"}});
     }
     max_node_time = Math.max(node["max_time_val"], max_node_time)
     for (var i = 0; i < node["children"].length; ++i) {
@@ -73,6 +144,46 @@ function impalaDagre(id) {
   }
 
   var is_first = true;
+
+  function select(node) {
+    var key = getKey(node);
+    if (!key) {
+      return;
+    }
+    $("g.node").attr('class', 'node') // addClass doesn't work in svg on our version of jQuery
+    $("g.node:contains('" + key + "')").attr('class', 'node active');
+  }
+
+  function getKey(node) {
+    var nodes = g.nodes();
+    var key;
+    var nNode = parseInt(node, 10);
+    var keys = Object.keys(nodes);
+    for (var i = 0; i < keys.length; i++) {
+      if (parseInt(nodes[keys[i]].split(':')[0], 10) == nNode) {
+        key = nodes[keys[i]];
+        break;
+      }
+    }
+    return key;
+  }
+
+  function zoomToNode(node) {
+    var key = getKey(node);
+    if (!key) {
+      return;
+    }
+    var n = $("g.node:contains('" + key + "')")[0];
+    var t = d3.transform(d3.select(n).attr("transform")),
+        x = t.translate[0],
+        y = t.translate[1];
+
+    var scale = 1;
+
+    svg.transition().duration(1000)
+        .call(zoom.translate([((x * -scale) + (svg.property("clientWidth") / 2)), ((y * -scale) + svg.property("clientHeight") / 2)])
+            .scale(scale).event);
+  }
 
   function renderGraph(plan) {
     if (!plan || !plan.plan_nodes || !plan.plan_nodes.length) return;
@@ -92,14 +203,18 @@ function impalaDagre(id) {
     var states_by_name = { };
     states.forEach(function(state) {
       // Build the label for the node from the name and the detail
-      var html = "<span>" + state.name + "</span><br/>";
-      html += "<span>" + state.detail + "</span><br/>";
-      html += "<span>" + state.num_instances + " instance";
-      if (state.num_instances > 1) {
-        html += "s";
+      var html = "";
+      if (state.icon && state.icon.svg) {
+        html += '<svg class="hi"><use xlink:href="#'+ state.icon.svg +'"></use></svg>'
+        //html += "<img src=\"" + icon.svg + "\"></img>";
+      } else if (state.icon && state.icon.font){
+        html += "<span class='fa fa-fw valign-middle " + state.icon.font + "'></span>";
       }
-      html += "</span><br/>";
-      html += "<span>Max: " + state.max_time + ", avg: " + state.avg_time + "</span>";
+      html += "<span class='name'>" + state.label + "</span><br/>";
+      html += "<span class='metric'>" + state.max_time + "</span>";
+      html += "<span class='detail'>" + state.detail + "</span><br/>";
+      html += "<span class='metric'>" + state.max_time + "</span>"
+      html += "<span class='id'>" + state.name + "</span>";;
 
       var style = state.style;
 
@@ -120,7 +235,7 @@ function impalaDagre(id) {
       // Impala marks 'broadcast' as a property of the receiver, not the sender. We use
       // '(BCAST)' to denote that a node is duplicating its output to all receivers.
       if (states_by_name[edge.end].is_broadcast) {
-        edge.style.label += " \n(BCAST * " + states_by_name[edge.end].num_instances + ")";
+        edge.style.label += " * " + states_by_name[edge.end].num_instances;
       }
       g.setEdge(edge.start, edge.end, edge.style);
     });
@@ -139,10 +254,7 @@ function impalaDagre(id) {
     // Center the graph, but only the first time through (so as to not lose user zooms).
     if (is_first) {
       var initialScale = 1;
-      _impalaDagree.scale = initialScale;
-      zoom.translate([((svg.attr("width") || $("#"+id).width()) - g.graph().width * initialScale) / 2, 20])
-        .scale(initialScale)
-        .event(svg);
+      _impalaDagree.init(initialScale);
       svg.attr('height', Math.min(g.graph().height * initialScale + 40, 600));
       is_first = false;
     }

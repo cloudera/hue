@@ -67,7 +67,7 @@ class OpenIDBackend(_OpenIDBackend):
 
     if user is not None and user.is_active:
       profile = get_profile(user)
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)

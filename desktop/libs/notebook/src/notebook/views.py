@@ -93,13 +93,11 @@ def notebook(request, is_embeddable=False):
       'is_yarn_mode': is_yarn_mode,
   })
 
-@xframe_options_exempt
-def workers_embedded(request):
-  return render('workers_embedded.mako', request, {})
 
 @check_document_access_permission()
 def notebook_embeddable(request):
   return notebook(request, True)
+
 
 @check_editor_access_permission()
 @check_document_access_permission()
@@ -154,12 +152,16 @@ def browse(request, database, table, partition_spec=None):
 
   statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
   editor_type = snippet['type']
+  namespace = request.POST.get('namespace', 'default')
+  compute = json.loads(request.POST.get('cluster', '{}'))
 
   if request.method == 'POST':
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute', is_task=True)
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute',
+                             is_task=True, namespace=namespace, compute=compute)
     return JsonResponse(notebook.execute(request, batch=False))
   else:
-    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute')
+    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute',
+                           namespace=namespace, compute=compute)
 
     return render('editor.mako', request, {
         'notebooks_json': json.dumps([editor.get_data()]),

@@ -152,7 +152,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       User._default_manager.get(username=username)
     except User.DoesNotExist:
       return username
-    raise forms.ValidationError(self.GENERIC_VALIDATION_ERROR, code='duplicate_username')
+    raise forms.ValidationError(_("Username already exists."), code='duplicate_username')
 
   def clean_password(self):
     return self.cleaned_data["password"]

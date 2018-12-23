@@ -351,7 +351,10 @@ class OozieYarnJob(Job):
   def _fixup(self):
     jobid = self.id
 
-    setattr(self, 'status', self.state)
+    if self.state in ('FINISHED', 'FAILED', 'KILLED'):
+      setattr(self, 'status', self.finalStatus)
+    else:
+      setattr(self, 'status', self.state)
     setattr(self, 'jobName', self.name)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', self.jobId.replace('job_', ''))

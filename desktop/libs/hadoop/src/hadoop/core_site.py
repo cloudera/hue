@@ -82,7 +82,7 @@ def get_trash_interval():
 
   Also indicates whether trash is enabled or not.
   """
-  return get_conf().get(_CNF_TRASH_INTERVAL)
+  return get_conf().get(_CNF_TRASH_INTERVAL, 0)
 
 def get_s3a_access_key():
   """

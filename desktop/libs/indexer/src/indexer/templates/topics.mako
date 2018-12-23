@@ -54,6 +54,7 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
+
 <script type="text/html" id="indexes-breadcrumbs">
   <h1>
     <!-- ko with: index() -->
@@ -153,8 +154,11 @@ ${ assist.assistPanel() }
               </%def>
 
               <%def name="creation()">
-                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/kafka'">
+                <a data-bind="click: function() { $root.alias.name(''); $('#createAlias').modal('show'); }" class="btn">
                   <i class="fa fa-plus-circle"></i> ${ _('Create') }
+                </a>
+                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/kafka'">
+                  <i class="fa fa-cloud-download"></i> ${ _('Consume') }
                 </a>
               </%def>
             </%actionbar:render>
@@ -208,6 +212,22 @@ ${ assist.assistPanel() }
             </form>
           </div>
 
+          <div id="createAlias" class="modal hide fade">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+              <h2 class="modal-title">${ _('Create topic') }</h2>
+            </div>
+            <div class="modal-body">
+              <label class="margin-bottom-20">${ _('Name') } <input type="text" data-bind="textInput: alias.name" class="input-xlarge no-margin-bottom margin-left-10"></label>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+              <button class="btn btn-primary disable-feedback" data-bind="click: alias.create, enable: alias.name() !== ''">
+                  ${ _('Create') }
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -238,11 +258,6 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-index">
-  <!-- ko if: channelSourceType() -->
-    Used to populate <span data-bind="text: channelSinkType"></span> <span data-bind="text: channelSinkPath"></span>
-    from <span data-bind="text: channelSourceType"></span> <span data-bind="text: channelSourcePath"></span>
-    via <a href="" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }">jobs <i class="fa fa-external-link"></i></a>
-  <!-- /ko -->
   <br/>
   <br/>
 
@@ -250,7 +265,7 @@ ${ assist.assistPanel() }
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Partitions')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li>
-      <a href="#index-channel" data-toggle="tab" data-bind="click: function(){ $root.tab('index-channel'); }">${_('Channel')} (<span data-bind="text: channelSourceType() ? 1 : 0"></span>)</a>
+      <a href="#index-consumer" data-toggle="tab" data-bind="click: function(){ $root.tab('index-consumer'); }">${_('Consumers')} (0)</a>
     </li>
     <li>
       <a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Permissions')} (2)</a>
@@ -300,47 +315,15 @@ ${ assist.assistPanel() }
       </div>
     </div>
 
-    <div class="tab-pane margin-top-10" id="index-channel">
-      <h4>${ _('Source') }</h4>
+    <div class="tab-pane margin-top-10" id="index-consumer">
       <div class="row-fluid">
         <div>
-          <label class="control-label"><div>${ _('Type') }</div>
-            <select class="input-medium" data-bind="selectize: channelSourceTypes, value: channelSourceType, optionsText: 'name', optionsValue: 'value'"></select>
+          <label class="control-label"><div>${ _('Consumer 1') }</div>
+            Type
           </label>
-          <!-- ko if: ['directory', 'exec', 'syslogs'].indexOf(channelSourceType()) != -1 -->
-          <label class="control-label"><div>${ _('Hosts') }</div>
-            <select class="input-xxlarge" data-bind="selectize: channelSourceHosts, selectedOptions: channelSourceSelectedHosts" multiple="true"></select>
+          <label class="control-label"><div>${ _('Consumer 2') }</div>
+            Type
           </label>
-          <!-- /ko -->
-          <!-- ko if: channelSourceType() == 'directory' -->
-          <label class="control-label"><div>${ _('Path') }</div>
-            <input type="text" class="input-xxlarge" data-bind="value: channelSourcePath" placeholder="${ _('The path to watch and consume') }">
-          </label>
-          <!-- /ko -->
-
-          <!-- ko if: channelSourceType() -->
-          <input data-bind="click: function() { channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
-          <!-- /ko -->
-        </div>
-      </div>
-
-      <br><br>
-
-      <h4>${ _('Sink') }</h4>
-      <div class="row-fluid">
-        <div>
-          <label class="control-label"><div>${ _('Type') }</div>
-            <select class="input-medium" data-bind="selectize: channelSinkTypes, value: channelSinkType, optionsText: 'name', optionsValue: 'value'"></select>
-          </label>
-          <!-- ko if: channelSinkType() == 'solr' -->
-          <label class="control-label"><div>${ _('Collection') }</div>
-            <select class="input-xxlarge" data-bind="selectize: ['logIndex', 'apacheLogs'], value: channelSinkPath"></select>
-          </label>
-          <!-- /ko -->
-
-          <!-- ko if: channelSinkType() -->
-          <input data-bind="click: function() { channelSourceType(null); }" class="btn" value="${ _('Clear') }"/>
-          <!-- /ko -->
         </div>
       </div>
     </div>
@@ -497,14 +480,11 @@ ${ assist.assistPanel() }
       });
 
       self.create = function () {
-        $.post("${ url('indexer:create_alias') }", {
-          "name": self.name,
-          "collections": ko.mapping.toJSON($.map(self.chosenCollections(), function (collection) {
-            return collection.name();
-          }))
+        $.post("${ url('kafka:create_topic') }", {
+          "name": self.name
         }, function (data) {
           if (data.status == 0) {
-            vm.indexes.push(ko.mapping.fromJS(data.alias));
+            vm.indexes.push(ko.mapping.fromJS(data.topic));
             huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
@@ -513,13 +493,7 @@ ${ assist.assistPanel() }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
         });
-        hueAnalytics.log('indexes', 'create_alias');
-      }
-
-      self.edit = function (alias) {
-        self.name(alias.name());
-        self.chosenCollections($.grep(vm.indexes(), function(collection) { return alias.collections().indexOf(collection.name()) != -1; }));
-        $('#createAlias').modal('show');
+        hueAnalytics.log('kafka', 'create_topic');
       }
     };
 
@@ -553,24 +527,6 @@ ${ assist.assistPanel() }
       self.kafkaFieldTypes.subscribe(function(newValue) {
         $.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes', newValue)
       });
-
-      self.channelSourceTypes = ko.observableArray([
-        {'name': '${ _("Directory or File") }', 'value': 'directory'},
-        {'name': '${ _("Program") }', 'value': 'exec'},
-        {'name': '${ _("Syslogs") }', 'value': 'syslogs'},
-        {'name': '${ _("HTTP") }', 'value': 'http'}
-      ]);
-      self.channelSourceType = ko.observable();
-      self.channelSourceHosts = ko.observableArray(['host1.com', 'host2.com', 'host3.com', 'host4.com']);
-      self.channelSourceSelectedHosts = ko.observableArray([]);
-      self.channelSourcePath = ko.observable('/var/log/hue/access.log');
-
-      self.channelSinkTypes = ko.observableArray([
-        {'name': '${ _("This topic") }', 'value': 'kafka'},
-        {'name': '${ _("Solr") }', 'value': 'solr'}
-      ]);
-      self.channelSinkType = ko.observable();
-      self.channelSinkPath = ko.observable();
 
       self.sample = ko.observableArray();
       self.samplePreview = ko.pureComputed(function () {
