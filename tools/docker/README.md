@@ -44,7 +44,7 @@ or
 ```
 cd tools/docker/hue-base
 cp docker-compose.yml.sample docker-compose.yml
-cp ../../../hue/desktop/conf.dist/hue.ini
+cp ../../../desktop/conf.dist/hue.ini .
 docker-compose up -d
 docker exec -ti development_hue bash
 ```
