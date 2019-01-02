@@ -898,7 +898,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tr>
               <th>${_('Assigned Container Id')}</th>
               <th>${_('Node Id')}</th>
-              <th>${_('appAttemptId')}</th>
+              <th>${_('Application Attempt Id')}</th>
               <th>${_('Start Time')}</th>
               <th>${_('Finish Time')}</th>
               <th>${_('Node Http Address')}</th>
@@ -910,7 +910,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
                 <td data-bind="text: containerId"></td>
                 <td data-bind="text: nodeId"></td>
-                <td data-bind="text: appAttemptId"></td>
+                <td data-bind="text: id"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: finishedTime, format: 'LLL'}"></td>
                 <td data-bind="text: nodeHttpAddress"></td>
