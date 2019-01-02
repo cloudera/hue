@@ -18,6 +18,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4
 from desktop.views import commonheader, commonfooter, _ko
+from metadata.conf import PROMETHEUS
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
 %>
@@ -1336,16 +1337,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="acl-panel-content">
         <ul class="nav nav-tabs">
-          <li class="active"><a href="#servicesLoad" data-toggle="tab">Load</a></li>
-          <li><a href="#servicesPrivileges" data-toggle="tab">Privileges</a></li>
-          <li><a href="#servicesTroubleshooting" data-toggle="tab">Troubleshooting</a></li>
+          <li class="active"><a href="#servicesLoad" data-toggle="tab">${ _("Load") }</a></li>
+          <li><a href="#servicesPrivileges" data-toggle="tab">${ _("Privileges") }</a></li>
+          <li><a href="#servicesTroubleshooting" data-toggle="tab">${ _("Troubleshooting") }</a></li>
         </ul>
 
         <div class="tab-content">
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
               <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                % if PROMETHEUS.API_URL.get():
                 <!-- ko component: { name: 'performance-graph', params: { clusterName: name(), type: 'cpu' } } --><!-- /ko -->
+                % else:
+                  ${ _("Metrics are not setup") }
+                % endif
               </div>
             </div>
           </div>
@@ -3226,7 +3231,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.cluster() && self.cluster()['type'] == 'altus-dw';
         };
         var dataWarehouse2InterfaceCondition = function () {
-          return false && self.cluster() && self.cluster()['type'] == 'altus-dw2';
+          return self.cluster() && self.cluster()['type'] == 'altus-dw2';
         };
         var schedulerInterfaceCondition = function () {
           return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
