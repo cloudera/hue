@@ -33,6 +33,7 @@ var ContextCatalog = (function () {
   var CONTEXT_CATALOG_VERSION = 4;
   var NAMESPACES_CONTEXT_TYPE = 'namespaces';
   var COMPUTES_CONTEXT_TYPE = 'computes';
+  var DISABLE_CACHE = true;
 
   var ContextCatalog = (function () {
 
@@ -43,6 +44,33 @@ var ContextCatalog = (function () {
 
       self.computes = {};
       self.computePromises = {};
+
+      self.clusters = {};
+      self.clusterPromises = {};
+
+      var addPubSubs = function () {
+        if (typeof huePubSub !== 'undefined') {
+          huePubSub.subscribe('context.catalog.refresh', function () {
+            var namespacesToRefresh = Object.keys(self.namespaces);
+            self.namespaces = {};
+            self.namespacePromises = {};
+
+            self.computes = {};
+            self.computePromises = {};
+
+            self.clusters = {};
+            self.clusterPromises = {};
+            huePubSub.publish('context.catalog.refreshed');
+            namespacesToRefresh.forEach(function (sourceType) {
+              huePubSub.publish('context.catalog.namespaces.refreshed', sourceType);
+            })
+          })
+        } else {
+          window.setTimeout(addPubSubs, 100);
+        }
+      };
+
+      addPubSubs();
     }
 
     ContextCatalog.prototype.getStore = function () {
@@ -64,6 +92,11 @@ var ContextCatalog = (function () {
     ContextCatalog.prototype.getSaved = function (contextType, sourceType) {
       var self = this;
       var deferred = $.Deferred();
+
+      if (DISABLE_CACHE) {
+        return deferred.reject().promise();
+      }
+
       self.getStore().getItem(sourceType + '_' + contextType).then(function (saved) {
         if (saved && saved.version === CONTEXT_CATALOG_VERSION) {
           deferred.resolve(saved.entry);
@@ -107,15 +140,68 @@ var ContextCatalog = (function () {
 
       self.namespacePromises[options.sourceType] = deferred.promise();
 
+      var startingNamespaces = {};
+      var pollTimeout = -1;
+
+      var pollForStarted = function () {
+        window.clearTimeout(pollTimeout);
+        window.setTimeout(function () {
+          if (Object.keys(startingNamespaces).length) {
+            ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
+              if (namespaces[options.sourceType]) {
+                var namespaces = namespaces[options.sourceType];
+                if (namespaces) {
+                  var statusChanged = false;
+                  namespaces.forEach(function (namespace) {
+                    if (startingNamespaces[namespace.id] && namespace.status !== 'STARTING') {
+                      startingNamespaces[namespace.id].status = namespace.status;
+                      delete startingNamespaces[namespace.id];
+                      statusChanged = true;
+                    }
+                  });
+                  if (statusChanged) {
+                    huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
+                  }
+                  if (Object.keys(startingNamespaces).length) {
+                    pollForStarted();
+                  }
+                }
+              }
+            });
+          }
+        }, 2000);
+      };
+
+      deferred.done(function (context) {
+        context.namespaces.forEach(function (namespace) {
+          if (namespace.status === 'STARTING') {
+            startingNamespaces[namespace.id] = namespace;
+          }
+        });
+        if (Object.keys(startingNamespaces).length) {
+          pollForStarted();
+        }
+      });
+
       var fetchNamespaces = function () {
         ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
             var dynamic = namespaces.dynamicClusters;
             var namespaces = namespaces[options.sourceType];
             if (namespaces) {
+              namespaces.forEach(function (namespace) {
+                namespace.computes.forEach(function (compute) {
+                  if (!compute.id && compute.crn) {
+                    compute.id = compute.crn;
+                  }
+                  if (!compute.name && compute.clusterName) {
+                    compute.name = compute.clusterName;
+                  }
+                })
+              });
               self.namespaces[options.sourceType] = { namespaces: namespaces.filter(function (namespace) {
                 return namespace.name; // Only include namespaces with a name.
-              }), dynamic: dynamic };
+              }), dynamic: dynamic, hueTimestamp: Date.now() };
               deferred.resolve(self.namespaces[options.sourceType]);
               if (notifyForRefresh) {
                 huePubSub.publish('context.catalog.namespaces.refreshed', options.sourceType);
@@ -151,10 +237,16 @@ var ContextCatalog = (function () {
      * @param {Object} options
      * @param {string} options.sourceType
      * @param {boolean} [options.silenceErrors] - Default False
+     * @param {boolean} [options.clearCache] - Default False
      * @return {Promise}
      */
     ContextCatalog.prototype.getComputes = function (options) {
       var self = this;
+
+      if (options.clearCache) {
+        self.computePromises[options.sourceType] = undefined;
+        self.computes[options.sourceType] = undefined;
+      }
 
       if (self.computePromises[options.sourceType]) {
         return self.computePromises[options.sourceType];
@@ -186,6 +278,39 @@ var ContextCatalog = (function () {
       return self.computePromises[options.sourceType];
     };
 
+    /**
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {boolean} [options.silenceErrors] - Default False
+     * @return {Promise}
+     */
+    ContextCatalog.prototype.getClusters = function (options) {
+      var self = this;
+
+      if (self.clusterPromises[options.sourceType]) {
+        return self.clusterPromises[options.sourceType];
+      }
+
+      if (self.clusters[options.sourceType]) {
+        self.clusterPromises[options.sourceType] = $.Deferred().resolve(self.clusters[options.sourceType]).promise();
+        return self.clusterPromises[options.sourceType];
+      }
+
+      var deferred = $.Deferred();
+      self.clusterPromises[options.sourceType] = deferred.promise();
+
+      ApiHelper.getInstance().fetchContextClusters(options).done(function (clusters) {
+        if (clusters && clusters[options.sourceType]) {
+          self.clusters[options.sourceType] = clusters[options.sourceType];
+          deferred.resolve(self.clusters[options.sourceType])
+        } else {
+          deferred.reject();
+        }
+      });
+
+      return self.clusterPromises[options.sourceType];
+    };
+
     return ContextCatalog;
   })();
 
@@ -193,6 +318,7 @@ var ContextCatalog = (function () {
     var contextCatalog = new ContextCatalog();
 
     return {
+
       /**
        * @param {Object} options
        * @param {string} options.sourceType
@@ -203,6 +329,7 @@ var ContextCatalog = (function () {
       getNamespaces: function (options) {
         return contextCatalog.getNamespaces(options);
       },
+
       /**
        * @param {Object} options
        * @param {string} options.sourceType
@@ -211,6 +338,16 @@ var ContextCatalog = (function () {
        */
       getComputes: function (options) {
         return contextCatalog.getComputes(options);
+      },
+
+      /**
+       * @param {Object} options
+       * @param {string} options.sourceType // TODO: rename?
+       * @param {boolean} [options.silenceErrors] - Default False
+       * @return {Promise}
+       */
+      getClusters: function (options) {
+        return contextCatalog.getClusters(options);
       }
     }
   })();

@@ -29,7 +29,7 @@ from desktop.views import _ko
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
       <!-- ko if: !noLabel && value -->
-      <span data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
+      <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value() }" ></span>
       <!-- /ko -->
       <i class="fa fa-caret-down"></i>
     </a>
@@ -38,7 +38,7 @@ from desktop.views import _ko
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
-    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
+    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0, style: { 'overflow-y': !foreachVisible ? 'auto' : 'hidden' }">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
@@ -46,7 +46,7 @@ from desktop.views import _ko
           <li class="divider"></li>
           <!-- /ko -->
           <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { $parent.value($data); $parent.onChanged($data); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { var previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -56,7 +56,7 @@ from desktop.views import _ko
           <li class="divider"></li>
           <!-- /ko -->
           <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { $parent.value($data); $parent.onChanged($data); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: $data && typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { var previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -166,7 +166,7 @@ from desktop.views import _ko
         self.foreachVisible = params.foreachVisible || false;
         self.linkTitle = params.linkTitle || '${ _('Selected entry') }';
         self.fixedPosition = !!params.fixedPosition;
-        self.onChanged = params.onChanged || function () {};
+        self.onSelect = params.onSelect || function () {};
 
         self.inputPlaceHolder = ko.pureComputed(function () {
           return self.value() && typeof self.value() === 'object' ? self.value()[self.labelAttribute] : self.value();
@@ -184,8 +184,9 @@ from desktop.views import _ko
         };
 
         self.onEnter = function (value) {
+          var previous = self.value();
           self.value(value);
-          self.onChanged(value);
+          self.onSelect(value, previous);
           self.dropDownVisible(false);
         };
 
@@ -210,6 +211,23 @@ from desktop.views import _ko
               $(window).on('click', closeOnOutsideClick);
               $(element).find('.hue-drop-down-input').focus();
             }, 0);
+
+            // Right align the dropdown when outside the right edge
+            if (!self.fixedPosition) {
+              var $element = $(element);
+              var $dropDownMenu = $element.find('.dropdown-menu').parent();
+              var $offsetParent = $element.offsetParent();
+
+              var rightLimit = $offsetParent.offset().left + $offsetParent.width();
+
+              if ($dropDownMenu.offset().left + 160 > rightLimit) {
+                var $caret = $element.find('.fa-caret-down');
+                var caretRight = $caret.offset().left + $caret.width();
+
+                var diff = -$dropDownMenu.offset().left - 160 + caretRight;
+                $element.find('.hue-drop-down-container').css({ 'margin-left': diff + 'px' });
+              }
+            }
           } else {
             $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
             $(window).off('click', closeOnOutsideClick);

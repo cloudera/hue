@@ -26,6 +26,7 @@ from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
+from notebook.conf import ENABLE_QUERY_ANALYSIS
 
 
 OPTIMIZER_AUTH_PASSWORD = None
@@ -57,23 +58,23 @@ def has_optimizer():
   return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
 def has_workload_analytics():
-  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
+  return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get() or ENABLE_QUERY_ANALYSIS.get()
 
 
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
 def has_navigator(user):
+  from desktop.auth.backend import is_admin
   return bool(get_navigator_url() and get_navigator_auth_password()) \
-      and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
 def get_security_default():
-  '''Get default security value from Hadoop'''
-  from hadoop import cluster # Avoid dependencies conflicts
-  cluster = cluster.get_yarn()
+  '''Get if Sentry is available so that we filter the objects or not'''
+  from libsentry.conf import is_enabled
 
-  return cluster.SECURITY_ENABLED.get()
+  return is_enabled()
 
 
 def get_optimizer_password_script():
@@ -197,6 +198,24 @@ ALTUS = ConfigSection(
       private=True,
       default=None)
   )
+)
+
+K8S = ConfigSection(
+  key='k8s',
+  help=_t("""Configuration options for Kubernetes API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('API URL to Kubernetes API or compatible service.'),
+      default='http://provisioner.com/'),
+  )
+)
+
+DEFAULT_PUBLIC_KEY = Config(
+  key="default_publick_key",
+  help=_t("Public key used for cluster creation."),
+  type=str,
+  default=''
 )
 
 
@@ -354,6 +373,17 @@ MANAGER = ConfigSection(
   )
   # username comes from get_navigator_auth_username()
   # password comes from get_navigator_auth_password()
+)
+
+PROMETHEUS = ConfigSection(
+  key='prometheus',
+  help=_t("""Configuration options for Prometheus API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to API.'),
+      default=None),
+  )
 )
 
 

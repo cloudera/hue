@@ -639,7 +639,7 @@
   }
 
   .progress-starting .bar {
-    background-color: @cui-orange-500;
+    background-color: @hue-primary-color-dark;
   }
 
   @-webkit-keyframes pulsate {
@@ -1342,6 +1342,16 @@
     div.selectize-input {
       padding: 5px 23px 6px 8px;
       text-overflow: ellipsis;
+    }
+  }
+
+  .nav-tabs-editor {
+    .visible-on-hover {
+      opacity: 0;
+      .hue-ease-transition(opacity);
+    }
+    li:hover .visible-on-hover {
+       opacity: 1;
     }
   }
 }

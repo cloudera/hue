@@ -19,11 +19,6 @@
 import json
 import logging
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
-
 from django.http import Http404
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -82,6 +77,24 @@ def list_topic(request):
   return JsonResponse({
     'status': 0,
     'topic': topic
+  })
+
+
+@error_handler
+def create_topic(request):
+  name = request.POST.get('name')
+  partitions = request.POST.get('partitions', 1)
+  replication_factor = request.POST.get('replication_factor', 1)
+
+  status = KafkaApi().create_topic(name, partitions, replication_factor)
+
+  return JsonResponse({
+    'status': status,
+    'topic': {
+      'name': name,
+      'partitions': partitions,
+      'replication_factor': replication_factor
+    }
   })
 
 

@@ -1,0 +1,164 @@
+0.4.15
+===========
+- Support for RISC-V architecture
+- Workaround a gcc bug on ppc64
+
+0.4.14
+======
+- Support for C-SKY architecture
+- Fixed support for ppc64 ABI
+- Fixed support for Python 3.7
+
+0.4.13
+======
+- Support for Python 3.7
+- Support for MinGW x64
+
+0.4.12
+======
+- Stop using trashcan api
+
+0.4.11
+======
+- Fixes for aarch64 architecture
+
+0.4.10
+======
+- Added missing files to manifest
+- Added workaround for ppc32 on Linux
+- Start building binary manylinux1 wheels
+
+0.4.9
+=====
+- Fixed Windows builds
+
+0.4.8
+=====
+- Added support for iOS (arm32)
+- Added support for ppc64le
+
+0.4.7
+=====
+- Added a missing workaround for `return 0` on mips
+- Restore compatibility with Python 2.5
+- Fixed stack switching on sparc
+
+0.4.6
+=====
+- Expose `_stack_saved` property on greenlet objects, it may be used to
+  introspect the amount of memory used by a saved stack, but the API is
+  subject to change in the future
+- Added a workaround for `return 0` compiler optimizations on all
+  architectures
+- C API typo fixes
+
+0.4.5
+=====
+- Fixed several bugs in greenlet C API
+- Fixed a bug in multi-threaded applications, which manifested itself
+  with spurious "cannot switch to a different thread" exceptions
+- Fixed some crashes on arm and mips architectures
+
+0.4.4
+=====
+- Fixed PyGreenlet_SetParent signature, thanks to BoonsNaibot
+- Fixed 64-bit Windows builds depending on wrong runtime dll
+
+0.4.3
+=====
+- Better slp_switch performance on SPARC
+- Drop support for Python 2.3
+- Fix trashcan assertions on debug builds of Python
+- Remove deprecated -fno-tree-dominator-opts compiler switch
+- Enable switch code for SunStudio on 32-bit SunOS
+- Support for abc abstract methods in greenlet subclasses
+- Support custom directories for tests
+- Document switch tracing support
+
+0.4.2
+=====
+- Add .travis.yml
+- Fix 'err' may be used uninitialized in this function
+- Check _MSC_VER for msvc specific code
+- Fix slp_switch on SPARC for multi-threaded environments
+- Add support for m68k
+
+0.4.1
+=====
+* fix segfaults when using gcc 4.8 on amd64/x86 unix
+* try to disable certain gcc 4.8 optimizations that make greenlet
+  crash
+* Fix greenlet on aarch64 with gcc 4.8
+* workaround segfault on SunOS/sun4v
+* Add support for Aarch64
+* Add support for x32 psABI on x86_64
+* Changed memory constraints for assembly macro for PPC Linux
+  platforms.
+
+0.4.0
+=====
+* Greenlet has an instance dictionary now, which means it can be
+  used for implementing greenlet local storage, etc. However, this
+  might introduce incompatibility if subclasses have __dict__ in their
+  __slots__. Classes like that will fail, because greenlet already
+  has __dict__ out of the box.
+* Greenlet no longer leaks memory after thread termination, as long as
+  terminated thread has no running greenlets left at the time.
+* Add support for debian sparc and openbsd5-sparc64
+* Add support for ppc64 linux
+* Don't allow greenlets to be copied with copy.copy/deepcopy
+* Fix arm32/thumb support
+* Restore greenlet's parent after kill
+* Add experimental greenlet tracing
+
+0.3.4
+=====
+* Use plain distutils for install command, this fixes installation of
+  the greenlet.h header.
+* Enhanced arm32 support
+* Fix support for Linux/S390 zSeries
+* Workaround compiler bug on RHEL 3 / CentOS 3
+
+0.3.3
+=====
+* Use sphinx to build documentation and publish it on greenlet.rtfd.org
+* Prevent segfaults on openbsd 4/i386
+* Workaround gcc-4.0 not allowing to clobber rbx
+* Enhance test infrastructure
+* Fix possible compilation problems when including greenlet.h in C++ mode
+* Make the greenlet module work on x64 windows
+* Add a test for greenlet C++ exceptions
+* Fix compilation on Solaris with SunStudio
+
+0.3.2
+=====
+* Fix various crashes with recent gcc versions and VC90
+* Try to fix stack save/restore on arm32
+* Store and restore the threadstate on exceptions like pypy/stackless do
+* GreenletExit is now based on BaseException on Python >= 2.5
+* Switch to using PyCapsule for Python 2.7 and 3.1
+* Port for AIX on PowerPC
+* Fix the sparc/solaris header
+* Improved build dependencies patch from flub.
+* Can't pass parent=None to greenlet.greenlet() (fixes #21)
+* Rudimentary gc support (only non-live greenlets are garbage collected though)
+
+0.3.1
+=====
+* Fix reference leak when passing keyword arguments to greenlets (mbachry)
+* Updated documentation.
+
+0.3
+===
+* Python 3 support.
+* New C API to expose Greenlets to C Extensions.
+* greenlet.switch() now accept's keyword arguments.
+* Fix Python crasher caused by switching to new greenlet from another thread.
+* Fix Python 2.6 crash on Windows when built with VS2009. (arigo)
+* arm32 support from stackless (Sylvain Baro)
+* Linux mips support (Thiemo Seufer)
+* MingGW GCC 4.4 support (Giovanni Bajo)
+* Fix for a threading bug (issue 40 in py lib) (arigo and ghazel)
+* Loads more unit tests, some from py lib (3 times as many as Greenlet 0.2)
+* Add documentation from py lib.
+* General code, documentation and repository cleanup (Kyle Ambroff, Jared Kuolt)

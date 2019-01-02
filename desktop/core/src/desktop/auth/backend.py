@@ -53,9 +53,7 @@ from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username
 from mozilla_django_oidc.utils import absolutify, import_from_settings
 
 from useradmin import ldap_access
-from useradmin.forms import validate_username
 from useradmin.models import get_profile, get_default_user_group, UserProfile
-from useradmin.views import import_ldap_users, get_find_groups_filter
 
 
 LOG = logging.getLogger(__name__)
@@ -99,6 +97,19 @@ def rewrite_user(user):
     for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
       setattr(user, attr, getattr(augment, attr))
   return user
+
+def is_admin(user):
+  is_admin = False
+  if hasattr(user, 'is_superuser'):
+    is_admin = user.is_superuser
+  if not is_admin:
+    try:
+      user = rewrite_user(user)
+      is_admin = user.has_hue_permission(action="superuser", app="useradmin")
+    except Exception, e:
+      LOG.exception("Could not validate if %s is a superuser assuming False." % user)
+      is_admin = False
+  return is_admin
 
 class DefaultUserAugmentor(object):
   def __init__(self, parent):
@@ -312,7 +323,7 @@ class PamBackend(DesktopBackendBase):
   """
 
   @metrics.pam_authentication_time
-  def authenticate(self, username, password):
+  def authenticate(self, request=None, username=None, password=None):
     username = force_username_case(username)
 
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
@@ -329,7 +340,7 @@ class PamBackend(DesktopBackendBase):
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
           profile = get_profile(user)
-          profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+          profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
           profile.save()
           user.is_superuser = is_super
 
@@ -359,6 +370,8 @@ class LdapBackend(object):
         username = force_username_case(username)
 
         try:
+          #Avoid circular import from is_admin
+          from useradmin.forms import validate_username
           validate_username(username)
 
           if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
@@ -479,7 +492,7 @@ class LdapBackend(object):
 
     if user is not None and user.is_active:
       profile = get_profile(user)
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)
@@ -497,6 +510,8 @@ class LdapBackend(object):
     return user
 
   def check_ldap_access_groups(self, server, username):
+    #Avoid circular import from is_admin
+    from useradmin.views import get_find_groups_filter
     allowed_group = False
 
     if desktop.conf.LDAP.LOGIN_GROUPS.get() and desktop.conf.LDAP.LOGIN_GROUPS.get() != ['']:
@@ -504,18 +519,18 @@ class LdapBackend(object):
       connection = ldap_access.get_connection_from_server(server)
       try:
         user_info = connection.find_users(username, find_by_dn=False)
-      except LdapSearchException, e:
+      except Exception, e:
         LOG.warn("Failed to find LDAP user: %s" % e)
 
       if not user_info:
-        LOG.warn("Could not get LDAP details for users with pattern %s" % username_pattern)
-        return None
+        LOG.warn("Could not get LDAP details for users with pattern %s" % username)
+        return False
 
       ldap_info = user_info[0]
-      group_ldap_info = connection.find_groups("*", group_filter=get_find_groups_filter(ldap_info))
+      group_ldap_info = connection.find_groups("*", group_filter=get_find_groups_filter(ldap_info, server))
       for group in group_ldap_info:
         if group['name'] in login_groups:
-          allowed_group = True
+          return True
 
     else:
       #Login groups not set default to True
@@ -525,6 +540,8 @@ class LdapBackend(object):
 
   def import_groups(self, server, user):
     connection = ldap_access.get_connection_from_server(server)
+    #Avoid circular import from is_admin
+    from useradmin.views import import_ldap_users
     import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False, server=server)
 
   @classmethod
@@ -544,7 +561,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
 
   @metrics.spnego_authentication_time
-  def authenticate(self, username=None):
+  def authenticate(self, request=None, username=None):
     username = self.clean_username(username)
     username = force_username_case(username)
     is_super = False
@@ -560,7 +577,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
         profile = get_profile(user)
-        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         profile.save()
         user.is_superuser = is_super
 
@@ -605,7 +622,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
         profile = get_profile(user)
-        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         profile.save()
         user.is_superuser = is_super
 

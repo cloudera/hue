@@ -349,7 +349,7 @@ class S3FileSystem(object):
     except S3FileSystemException, e:
       raise e
     except S3ResponseError, e:
-      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e.reason))
+      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
     except Exception, e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
 

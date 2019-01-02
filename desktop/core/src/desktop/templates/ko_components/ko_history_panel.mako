@@ -55,17 +55,18 @@ from desktop.views import _ko
         <!-- ko if: progress -->
         <div class="snippet-progress-container">
           <div class="progress-snippet progress" data-bind="css: {
+                    'progress-danger': progress() == 0 && errors().length > 0 || status() == 'failed',
                     'progress-starting': progress() == 0 && status() == 'running',
-                    'progress-warning': progress() > 0 && progress() < 100,
-                    'progress-success': progress() == 100,
-                    'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
+                    'progress-warning': progress() > 0 && progress() < 100 && status() != 'failed',
+                    'progress-success': progress() == 100
+                    }" style="background-color: #FFF; width: 100%">
             <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
           </div>
         </div>
         <!-- /ko -->
         <!-- ko if: result -->
         <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated" style="height: 120px"></pre>
+        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated" style="height: 120px; overflow-y: auto;"></pre>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->

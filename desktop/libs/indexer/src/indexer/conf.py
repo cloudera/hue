@@ -67,13 +67,6 @@ def zkensemble():
     LOG.warn('Failed to get Solr url')
 
 
-ENABLE_NEW_IMPORTER = Config(
-  key="enable_new_importer",
-  help=_t("Flag to turn on the new metadata importer."),
-  type=bool,
-  default=False
-)
-
 # Deprecated as always on
 ENABLE_NEW_INDEXER = Config(
   key="enable_new_indexer",
@@ -86,26 +79,54 @@ ENABLE_SCALABLE_INDEXER = Config(
   key="enable_scalable_indexer",
   help=_t("Flag to turn on the Morphline Solr indexer."),
   type=bool,
-  default=False
+  default=True
 )
 
 CONFIG_INDEXER_LIBS_PATH = Config(
   key="config_indexer_libs_path",
-  help=_t("oozie workspace template for indexing:"),
+  help=_t("Filesystem directory containing Solr Morphline indexing libs."),
   type=str,
   default='/tmp/smart_indexer_lib'
+)
+
+CONFIG_JDBC_LIBS_PATH = Config(
+  key="config_jdbc_libs_path",
+  help=_t("Filesystem directory containing JDBC libs."),
+  type=str,
+  default='/user/oozie/libext/jdbc_drivers'
+)
+
+CONFIG_JARS_LIBS_PATH = Config(
+  key="config_jars_libs_path",
+  help=_t("Filesystem directory containing jars libs."),
+  type=str,
+  default='/user/oozie/libext/libs'
 )
 
 ENABLE_SQOOP = Config(
   key="enable_sqoop",
   help=_t("Flag to turn on Sqoop imports."),
   type=bool,
-  default=False
+  default=True
 )
 
 ENABLE_KAFKA = Config(
   key="enable_kafka",
   help=_t("Flag to turn on Kafka imports."),
+  type=bool,
+  default=False
+)
+
+ENABLE_FIELD_EDITOR = Config(
+  key="enable_field_editor",
+  help=_t("Flag to turn on the SQL/Morphline field editor."),
+  type=bool,
+  default=False
+)
+
+ENABLE_ENVELOPE = Config(
+  key="enable_envelope",
+  help=_t("Flag to turn on Envelope based jobs."),
   type=bool,
   default=False
 )
@@ -143,6 +164,12 @@ CONFIG_INDEXING_TEMPLATES_PATH = Config(
   default=os.path.join(os.path.dirname(__file__), '..', 'data', 'oozie_workspace')
   )
 
+
+def config_morphline_path():
+  return os.path.join(os.path.dirname(__file__), '..', 'data', 'morphline')
+
+
+# Unused
 SOLRCTL_PATH = Config(
   key="solrctl_path",
   help=_t("Location of the solrctl binary."),

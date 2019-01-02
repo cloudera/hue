@@ -33,16 +33,16 @@ LOG = logging.getLogger(__name__)
 
 def get_query_server_config(cluster_config=None):
   query_server = {
-        'server_name': 'impala' + ('-' + cluster_config.get('name') if cluster_config else ''),
-        'server_host': conf.SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
-        'server_port': conf.SERVER_PORT.get(),
-        'principal': conf.IMPALA_PRINCIPAL.get(),
-        'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
-        'querycache_rows': conf.QUERYCACHE_ROWS.get(),
-        'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
-        'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
-        'auth_username': conf.AUTH_USERNAME.get(),
-        'auth_password': conf.AUTH_PASSWORD.get()
+      'server_name': _get_server_name(cluster_config),
+      'server_host': conf.SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
+      'server_port': conf.SERVER_PORT.get() if not cluster_config else 21050,
+      'principal': conf.IMPALA_PRINCIPAL.get(),
+      'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
+      'querycache_rows': conf.QUERYCACHE_ROWS.get(),
+      'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
+      'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
+      'auth_username': conf.AUTH_USERNAME.get(),
+      'auth_password': conf.AUTH_PASSWORD.get()
   }
 
   debug_query_server = query_server.copy()
@@ -50,6 +50,10 @@ def get_query_server_config(cluster_config=None):
   LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
+
+
+def _get_server_name(cluster_config):
+  return 'impala' + ('-' + cluster_config.get('name') if cluster_config else '')
 
 
 class ImpalaDbms(HiveServer2Dbms):
@@ -87,24 +91,29 @@ class ImpalaDbms(HiveServer2Dbms):
     return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
 
 
-  def invalidate(self, database=None, flush_all=False):
+  def invalidate(self, database=None, table=None, flush_all=False):
     handle = None
+
     try:
       if flush_all or database is None:
         hql = "INVALIDATE METADATA"
         query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
-      else:
+      elif table is None:
         diff_tables = self._get_different_tables(database)
         for table in diff_tables:
           hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
           query = hql_query(hql, query_type=QUERY_TYPES[1])
           handle = self.execute_and_wait(query, timeout_sec=10.0)
+      else:
+        hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
+        query = hql_query(hql, query_type=QUERY_TYPES[1])
+        handle = self.execute_and_wait(query, timeout_sec=10.0)
     except QueryServerTimeoutException, e:
       # Allow timeout exceptions to propagate
       raise e
     except Exception, e:
-      msg = 'Failed to invalidate `%s`' % database
+      msg = 'Failed to invalidate `%s`: %s' % (database or 'databases', e)
       raise QueryServerException(msg)
     finally:
       if handle:

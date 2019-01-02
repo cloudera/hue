@@ -1,0 +1,142 @@
+# German translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-22 18:22-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.1\n"
+
+#~ msgid "NameNode logical name."
+#~ msgstr "Logischer NameNode-Name"
+
+#~ msgid "JobTracker logical name."
+#~ msgstr "Logischer JobTracker-Name."
+
+#~ msgid "Resource Manager logical name."
+#~ msgstr "Logischer Name von Resource Manager."
+
+#~ msgid "%(remote_dst)s already exists. Skipping."
+#~ msgstr "%(remote_dst)s bereits vorhanden. Wird übersprungen."
+
+#~ msgid "%(remote_dst)s does not exist. Trying to copy."
+#~ msgstr "%(remote_dst)s nicht vorhanden. Kopieren wird versucht."
+
+#~ msgid "Copied %s -> %s."
+#~ msgstr "%s -> %s kopiert."
+
+#~ msgid "Copying %s -> %s failed."
+#~ msgstr "Kopieren von %s -> %s fehlgeschlagen."
+
+#~ msgid "Skipping %s (not a file)."
+#~ msgstr "%s wird übersprungen (keine Datei)."
+
+#~ msgid "%(function)s has not been implemented."
+#~ msgstr "%(function)s wurde noch nicht implementiert."
+
+#~ msgid "No HDFS found"
+#~ msgstr "Kein HDFS gefunden"
+
+#~ msgid "User %s does not have permissions to write to path \"%s\"."
+#~ msgstr "Benutzer %s ist nicht berechtigt, in Pfad \"%s\" zu schreiben."
+
+#~ msgid "File %s not found"
+#~ msgstr "Datei %s nicht gefunden"
+
+#~ msgid "File %s is a directory"
+#~ msgstr "Datei %s ist ein Verzeichnis"
+
+#~ msgid "File %s is already trashed"
+#~ msgstr "Datei %s wurde bereits entfernt"
+
+#~ msgid "Delete failed: %s"
+#~ msgstr "Löschen fehlgeschlagen: %s"
+
+#~ msgid "File %s is not in trash"
+#~ msgstr "Datei %s ist nicht im Papierkorb"
+
+#~ msgid "Path %s already exists."
+#~ msgstr "Pfad %s ist bereits vorhanden."
+
+#~ msgid "Mkdir failed: %s"
+#~ msgstr "Mkdir fehlgeschlagen: %s"
+
+#~ msgid "Rename failed: %s -> %s"
+#~ msgstr "Umbenennen fehlgeschlagen: %s -> %s"
+
+#~ msgid "'%s' is not a directory"
+#~ msgstr "'%s' ist kein Verzeichnis"
+
+#~ msgid "Copy src '%s' does not exist"
+#~ msgstr "Kopie-src '%s' ist nicht vorhanden"
+
+#~ msgid "Copy src '%s' is a directory"
+#~ msgstr "Kopie-src '%s' ist ein Verzeichnis"
+
+#~ msgid "Copy dst '%s' is a directory"
+#~ msgstr "Kopie-dst '%s' ist eine Verzeichnis"
+
+#~ msgid "File not found: %s"
+#~ msgstr "Datei nicht gefunden: %s"
+
+#~ msgid "Destination file %s exists and is not a directory."
+#~ msgstr "Zieldatei %s existiert und ist kein Verzeichnis."
+
+#~ msgid "Failed to create '%s'. HDFS did not return a redirect"
+#~ msgstr "'%s' konnte nicht erstellt werden. HDFS gab keine Umleitung aus."
+
+#~ msgid ""
+#~ "Failed to upload file. WebHdfs requires"
+#~ " a valid username to upload files."
+#~ msgstr ""
+#~ "Fehler beim Hochladen der Datei. WebHdfs"
+#~ " erfordert einen gültigen Benutzernamen, um"
+#~ " Dateien hochzuladen."
+
+#~ msgid "Is a directory: '%s'"
+#~ msgstr "Ist ein Verzeichnis: '%s'"
+
+#~ msgid "Invalid argument to seek for whence"
+#~ msgstr "Ungültiges zu suchendes Argument"
+
+#~ msgid "File not open for writing"
+#~ msgstr "Datei nicht zum Schreiben geöffnet"
+
+#~ msgid "Filesystem root '/' should be owned by '%s'"
+#~ msgstr "Dateisystemstamm \"/\" darf nicht Eigentum von \"%s\" sein"
+
+#~ msgid "Failed to access filesystem root"
+#~ msgstr "Dateisystemstamm konnte nicht aufgerufen werden"
+
+#~ msgid "Failed to create temporary file \"%s\""
+#~ msgstr "Temporäre Datei \"%s\" konnte nicht erstellt werden"
+
+#~ msgid "Failed to remove temporary file \"%s\""
+#~ msgstr "Temporäre Datei \"%s\" konnte nicht entfernt werden"
+
+#~ msgid "YARN cluster is not available."
+#~ msgstr "YARN-Cluster ist nicht verfügbar."
+
+#~ msgid "No Resource Manager are available."
+#~ msgstr "Es ist kein Resource Manager verfügbar."
+
+#~ msgid "YARN did not return any token field."
+#~ msgstr "YARN gab keine Token-Felder aus."
+
+#~ msgid "YARN RM returned a failed response: %s"
+#~ msgstr "YARN RM gab eine Fehlermeldung zurück: %s"
+
+#~ msgid "No Spark History Server is available."
+#~ msgstr "Kein Spark-Verlaufsserver verfügbar."
+

@@ -23,14 +23,12 @@ from django.utils.translation import ugettext as _
 
 from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
-from notebook.connectors.altus import DataEngApi
+from notebook.connectors.altus import DataEngApi as AltusDataEngApi
 from notebook.connectors.base import Api, QueryError
+from jobbrowser.apis.data_eng_api import RUNNING_STATES
 
 
 LOG = logging.getLogger(__name__)
-
-
-RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
 
 
 class DataEngApi(Api):
@@ -41,9 +39,23 @@ class DataEngApi(Api):
 
 
   def execute(self, notebook, snippet):
-    statement = snippet['statement']
 
-    handle = DataEngApi(self.user).submit_hive_job(self.cluster_name, statement, params=None, job_xml=None)
+    if snippet['type'] == 'spark2':
+      handle = AltusDataEngApi(self.user).submit_spark_job(
+          cluster_name=self.cluster_name,
+          jars=snippet['properties']['jars'],
+          main_class=snippet['properties']['class'],
+          arguments=snippet['properties']['spark_arguments'],
+          spark_arguments=snippet['properties']['spark_opts'],
+#           properties_file
+      )
+    else:
+      statement = snippet['statement']
+      handle = AltusDataEngApi(self.user).submit_hive_job(self.cluster_name, statement, params=None, job_xml=None)
+
+    if 'jobs' not in handle:
+      raise QueryError('Submission failure: %s' % handle)
+
     job = handle['jobs'][0]
 
     if job['status'] not in RUNNING_STATES:
@@ -61,7 +73,7 @@ class DataEngApi(Api):
 
     job_id = snippet['result']['handle']['id']
 
-    handle = DataEngApi(self.user).list_jobs(job_ids=[job_id])
+    handle = AltusDataEngApi(self.user).list_jobs(job_ids=[job_id])
     job = handle['jobs'][0]
 
     if job['status'] in RUNNING_STATES:
@@ -86,21 +98,23 @@ class DataEngApi(Api):
   def cancel(self, notebook, snippet):
     if snippet['result']['handle'].get('id'):
       job_id = snippet['result']['handle']['id']
-      DataEngApi(self.user).terminate_job(job_id=job_id)
+      AltusDataEngApi(self.user).terminate_job(job_id=job_id)
       response = {'status': 0}
     else:
-      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
+      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submission.')}
 
     return response
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
-        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
-        attempt_id='attempt_1499705340501_0045_m_000000_0'
-    )
+    # Currently no way to get the logs properly easily
 
-    return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
+    # logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+    #    operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+    #    attempt_id='attempt_1499705340501_0045_m_000000_0'
+    # )
+    # return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
+    return ''
 
 
   def progress(self, snippet, logs):

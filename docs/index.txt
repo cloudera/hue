@@ -23,6 +23,7 @@ We encourage you to link:sdk/sdk.html[build or extend applications] within the H
 Release Notes
 -------------
 
+* October 17, 2018 --- link:release-notes/release-notes-4.3.0.html[Version 4.3.0]
 * April 4, 2018 --- link:release-notes/release-notes-4.2.0.html[Version 4.2.0]
 * October 4, 2017 --- link:release-notes/release-notes-4.1.0.html[Version 4.1.0]
 * June 9, 2017 --- link:release-notes/release-notes-4.0.0.html[Version 4.0.0]

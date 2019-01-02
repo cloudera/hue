@@ -39,6 +39,8 @@ from liboozie.utils import parse_timestamp, format_time, catch_unicode_time
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 
+from desktop.auth.backend import is_admin
+
 LOG = logging.getLogger(__name__)
 
 
@@ -384,7 +386,7 @@ class Job(object):
 
   def check_request_permission(self, request):
     """Raise PopupException if request user doesn't have permission to modify workflow"""
-    if not request.user.is_superuser and request.user.username != self.user:
+    if not is_admin(request.user) and request.user.username != self.user:
       access_warn(request, _('Insufficient permission.'))
       raise PopupException(_("Permission denied. User %(username)s cannot modify user %(user)s's job.") %
                            dict(username=request.user.username, user=self.user))

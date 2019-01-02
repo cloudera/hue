@@ -1,0 +1,119 @@
+# Portuguese translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-22 18:22-0800\n"
+"PO-Revision-Date: 2012-11-07 13:06-0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.1\n"
+
+#~ msgid "NameNode logical name."
+#~ msgstr "Nome lógico NameNode."
+
+#~ msgid "JobTracker logical name."
+#~ msgstr "Nome lógico JobTracker."
+
+#~ msgid "Resource Manager logical name."
+#~ msgstr "Nome lógico do Resource Manager."
+
+#~ msgid "%(remote_dst)s already exists. Skipping."
+#~ msgstr "%(remote_dst)s já existente. A ignorar."
+
+#~ msgid "%(remote_dst)s does not exist. Trying to copy."
+#~ msgstr "%(remote_dst)s inexistente. A tentar copiar."
+
+#~ msgid "Copied %s -> %s."
+#~ msgstr "Copiado %s -> %s."
+
+#~ msgid "Copying %s -> %s failed."
+#~ msgstr "Falha ao copiar %s -> %s."
+
+#~ msgid "Skipping %s (not a file)."
+#~ msgstr "A ignorar %s (não é um ficheiro)."
+
+#~ msgid "%(function)s has not been implemented."
+#~ msgstr "%(function)s não foi implementada."
+
+#~ msgid "File %s not found"
+#~ msgstr "Ficheiro %s não encontrado"
+
+#~ msgid "File %s is a directory"
+#~ msgstr "O ficheiro %s é um directório"
+
+#~ msgid "File %s is already trashed"
+#~ msgstr "O ficheiro %s já está no lixo"
+
+#~ msgid "Delete failed: %s"
+#~ msgstr "Falha ao eliminar: %s"
+
+#~ msgid "File %s is not in trash"
+#~ msgstr "O ficheiro %s não está no lixo"
+
+#~ msgid "Path %s already exists."
+#~ msgstr "O caminho %s já existe."
+
+#~ msgid "Mkdir failed: %s"
+#~ msgstr "O Mkdir falhou: %s"
+
+#~ msgid "Rename failed: %s -> %s"
+#~ msgstr "Falha ao alterar nome: %s -> %s"
+
+#~ msgid "'%s' is not a directory"
+#~ msgstr "%s não é um directório"
+
+#~ msgid "Copy src '%s' does not exist"
+#~ msgstr "A origem da cópia \"%s\" não existe"
+
+#~ msgid "Copy src '%s' is a directory"
+#~ msgstr "A origem da cópia \"%s\" é um directório"
+
+#~ msgid "Copy dst '%s' is a directory"
+#~ msgstr "O destino da cópia \"%s\" é um directório"
+
+#~ msgid "File not found: %s"
+#~ msgstr "Ficheiro não encontrado: %s"
+
+#~ msgid "Destination file %s exists and is not a directory."
+#~ msgstr "O ficheiro de destino %s já existe e não é um directório."
+
+#~ msgid "Failed to create '%s'. HDFS did not return a redirect"
+#~ msgstr "Falha ao criar \"%s\". O HDFS não devolveu um redireccionamento"
+
+#~ msgid "Is a directory: '%s'"
+#~ msgstr "É um directório: '%s'"
+
+#~ msgid "Invalid argument to seek for whence"
+#~ msgstr "Argumento inválido para procurar por origem"
+
+#~ msgid "File not open for writing"
+#~ msgstr "O ficheiro não está aberto para escrita"
+
+#~ msgid "Filesystem root '/' should be owned by 'hdfs'"
+#~ msgstr ""
+#~ "A raiz do sistema de ficheiros "
+#~ "\"/\" não deve ser propriedade de "
+#~ "\"hdsf\""
+
+#~ msgid "Failed to access filesystem root"
+#~ msgstr "Não foi possível aceder à raiz do sistema de ficheiros"
+
+#~ msgid "Failed to create temporary file \"%s\""
+#~ msgstr "Falha ao criar o ficheiro temporário \"%s\""
+
+#~ msgid "Failed to remove temporary file \"%s\""
+#~ msgstr "Falha ao remover o ficheiro temporário \"%s\""
+
+#~ msgid "No Resource Manager are available."
+#~ msgstr "Nenhum Resource Manager disponível."
+

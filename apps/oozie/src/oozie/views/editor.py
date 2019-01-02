@@ -57,6 +57,7 @@ from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
                         BundleForm, BundledCoordinatorForm, design_form_by_type,\
                         ImportWorkflowForm, ImportCoordinatorForm
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -902,7 +903,7 @@ def list_history(request):
   """
   history = History.objects
 
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     history = history.filter(submitter=request.user)
   history = history.order_by('-submission_date')
 
@@ -918,7 +919,7 @@ def list_history_record(request, record_id):
   """
   history = History.objects
 
-  if not request.user.is_superuser:
+  if not is_admin(request.user):
     history.filter(submitter=request.user)
   history = history.get(id=record_id)
 

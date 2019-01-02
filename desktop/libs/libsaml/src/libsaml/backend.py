@@ -90,7 +90,7 @@ class SAML2Backend(_Saml2Backend):
     if user is not None and user.is_active:
       user.username = force_username_case(user.username)
       profile = get_profile(user)
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)

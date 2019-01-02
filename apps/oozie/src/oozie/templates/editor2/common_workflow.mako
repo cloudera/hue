@@ -178,6 +178,10 @@
       <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon" alt="${ _('Impala icon') }">
       <!-- /ko -->
 
+      <!-- ko if: widgetType() == 'altus-widget' -->
+      <a class="widget-icon"><i class="fa fa-cloud"></i></a>
+      <!-- /ko -->
+
       <!-- ko if: widgetType() == 'pig-widget' || widgetType() == 'pig-document-widget'  -->
       <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon" alt="${ _('Pig icon') }">
       <!-- /ko -->
@@ -639,7 +643,9 @@
         <i class="fa fa-spinner fa-spin muted"></i>
       <!-- /ko -->
       <!-- ko with: associatedDocument -->
-        <a data-bind="hueLink: absoluteUrl"><span data-bind='text: name'></span></a>
+        <a data-bind="documentContextPopover: { uuid: absoluteUrl.split('=')[1], orientation: 'right', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+          <span data-bind="text: name"></span> <i class="fa fa-info"></i>
+        </a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
@@ -651,7 +657,7 @@
           <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
         </div>
         <!-- ko if: associatedDocument -->
-          <a class="pointer" data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
+          <a data-bind="documentContextPopover: { uuid: associatedDocument().absoluteUrl.split('=')[1], orientation: 'right', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
             <i class="fa fa-external-link-square"></i>
           </a>
           <div class="clearfix"></div>
@@ -842,6 +848,68 @@
 
 <script type="text/html" id="impala-widget">
   <span data-bind="template: { name: 'hive2-widget' }"></span>
+</script>
+
+
+<script type="text/html" id="altus-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: !$root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <span data-bind="text: properties.service"></span>
+      <span data-bind="text: properties.command"></span>
+      <span data-bind="text: properties.parameters"></span>
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <div class="airy">
+          <span class="widget-label" data-bind="text: $root.workflow_properties.service.label"></span>
+          <input type="text" data-bind="value: properties.service, valueUpdate:'afterkeydown', attr: { placeholder:  $root.workflow_properties.service.help_text }" validate="nonempty"/>
+        </div>
+        <div class="airy">
+          <span class="widget-label" data-bind="text: $root.workflow_properties.command.label"></span>
+          <input type="text" data-bind="value: properties.command, valueUpdate:'afterkeydown', attr: { placeholder:  $root.workflow_properties.command.help_text }" validate="nonempty"/>
+        </div>
+        <div class="row-fluid">
+          <div class="span12" data-bind="template: { name: 'common-properties-parameters' }"></div>
+        </div>
+      </div>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <div class="row-fluid">
+            <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
+            <input type="checkbox" data-bind="checked: properties.capture_output" />
+
+            <div class="span12" data-bind="template: { name: 'common-properties-parameters' }"></div>
+          </div>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        ##<div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+        ##  <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        ##</div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
 </script>
 
 
@@ -1641,7 +1709,7 @@
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <input type="text" data-bind="value: properties.shell_command" validate="nonempty"/>
+        <input type="text" data-bind="value: properties.shell_command" validate="nospace"/>
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.shell_command(), with_label: false} }'></span>
 
         <div class="row-fluid">

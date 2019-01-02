@@ -48,6 +48,8 @@ from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.hue_password_policy import reset_password_policy
 
+from desktop.auth.backend import is_admin
+
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -272,6 +274,44 @@ class TestUserAdmin(BaseUserAdminTests):
            save="Save"), follow=True)
     assert_true(len(GroupPermission.objects.all()) == 1)
 
+    # Get ourselves set up with a user and a group with superuser group priv
+    cadmin = make_logged_in_client(username="supertest", is_superuser=True)
+    Group.objects.create(name="super-test-group")
+    cadmin.post('/useradmin/groups/edit/super-test-group',
+                dict(name="super-test-group",
+                     members=[User.objects.get(username="supertest").pk],
+                     permissions=[HuePermission.objects.get(app='useradmin', action='superuser').pk],
+                     save="Save"), follow=True)
+    assert_equal(len(GroupPermission.objects.all()), 2)
+
+    supertest = User.objects.get(username="supertest")
+    supertest.groups.add(Group.objects.get(name="super-test-group"))
+    supertest.is_superuser = False
+    supertest.save()
+    # Validate user is not a checked superuser
+    assert_false(supertest.is_superuser)
+    # Validate user is superuser by group
+    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser",
+                                                                                       app="useradmin"), 1)
+
+    # Make sure that a user of supergroup can access /useradmin/users
+    # Create user to try to edit
+    notused = User.objects.get_or_create(username="notused", is_superuser=False)
+    response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
+    assert_true('Hue Users - Edit user: notused' in response.content)
+
+    # Make sure we can modify permissions
+    response = cadmin.get('/useradmin/permissions/edit/useradmin/access/?is_embeddable=true')
+    assert_true('Hue Permissions - Edit app: useradmin' in response.content)
+
+    # Revoke superuser privilege from groups
+    c.post('/useradmin/permissions/edit/useradmin/superuser',
+           dict(app='useradmin',
+           priv='superuser',
+           groups=[],
+           save="Save"), follow=True)
+    assert_equal(len(GroupPermission.objects.all()), 1)
+
     # Now test that we have limited access
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
     response = c1.get('/useradmin/users')
@@ -281,6 +321,13 @@ class TestUserAdmin(BaseUserAdminTests):
     test_user = User.objects.get(username="nonadmin")
     test_user.groups.add(Group.objects.get(name='test-group'))
     test_user.save()
+
+    # Make sure that a user of nonadmin fails where supertest succeeds
+    response = c1.get("/useradmin/users/edit/notused?is_embeddable=true")
+    assert_true('You must be a superuser to add or edit another user' in response.content)
+
+    response = c1.get("/useradmin/permissions/edit/useradmin/access/?is_embeddable=true")
+    assert_true('You must be a superuser to change permissions' in response.content)
 
     # Check that we have access now
     response = c1.get('/useradmin/users')
@@ -609,7 +656,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
-      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context[0]["form"].errors)
+      assert_equal({ 'username': ['Username already exists.']}, response.context[0]["form"].errors)
 
       # Create a new regular user (for real)
       response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
@@ -876,6 +923,19 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       assert_equal('test2', dir_stat.user)
       assert_equal('test2', dir_stat.group)
       assert_equal('40755', '%o' % dir_stat.mode)
+
+      # special character in username ctestë01
+      path_with_special_char = '/user/ctestë01'.decode("utf-8")
+      if cluster.fs.exists(path_with_special_char):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
+      response = c.post('/useradmin/users/new', dict(username='ctestë01', password1='test', password2='test', ensure_home_directory=True))
+      assert_true(cluster.fs.exists(path_with_special_char))
+      dir_stat = cluster.fs.stats(path_with_special_char)
+      assert_equal(u'ctestë01', dir_stat.user)
+      assert_equal(u'ctestë01', dir_stat.group)
+      assert_equal('40755', '%o' % dir_stat.mode)
+      if cluster.fs.exists(path_with_special_char):  # clean special characters
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
 
       # Ignore domain in username when importing LDAP users
       # eg: Ignore '@ad.sec.cloudera.com' when importing 'test@ad.sec.cloudera.com'

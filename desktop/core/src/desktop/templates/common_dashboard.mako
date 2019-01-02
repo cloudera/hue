@@ -108,15 +108,7 @@
 </%def>
 
 <%def name="layout_skeleton(suffix='')">
-  <div class="initial-hint empty-dashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
-    <div class="initial-hint-text">${ _('Click on the pencil to get started with your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" />
-  </div>
-
-  <div class="initial-hint empty-dashboard-editing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
-    <div class="initial-hint-text">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow.svg') }" alt="${ _('Hint arrow') }" class="flip-horizontal" />
-  </div>
+  <!-- ko hueSpinner: { spin: isEditing() && columns().length == 0 && previewColumns() == '', center: true, size: 'xlarge' } --><!-- /ko -->
 
   % if USE_NEW_ADD_METHOD.get():
   <!-- ko if: $root.isGridster -->
@@ -418,7 +410,7 @@
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>
-    <div class="card-body" style="padding: 5px;" data-bind="delayedOverflow">
+    <div class="card-body" style="padding: 5px;">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
       <div class="clearfix"></div>
     </div>

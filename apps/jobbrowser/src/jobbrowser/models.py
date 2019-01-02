@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.view_util import location_to_url
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS
+from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def can_kill_job(self, user):
   if self.status.lower() not in ('running', 'pending', 'accepted'):
     return False
 
-  if user.is_superuser:
+  if is_admin(user):
     return True
 
   if can_modify_job(user.username, self):
@@ -94,7 +95,7 @@ class LinkJobLogs(object):
   @classmethod
   def _replace_mr_link(self, match):
     try:
-      return '<a href="%s">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+      return '<a href="/hue%s">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
     except:
       LOG.exception('failed to replace mr links: %s' % (match.groups(),))
       return match.group(0)

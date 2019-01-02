@@ -25,12 +25,11 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_str
-from librdbms.conf import DATABASES, get_database_password, get_server_choices
+from librdbms.conf import DATABASES, get_database_password, get_server_choices, get_connector_name
 from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
-from notebook.connectors.jdbc import Assist as JdbcAssist
-from notebook.connectors.rdbms import Assist
+from notebook.connectors.base import get_api
 from notebook.models import make_notebook
 
 
@@ -39,58 +38,63 @@ LOG = logging.getLogger(__name__)
 
 def get_db_component(request):
   format_ = {'data': [], 'status': 1, 'message': ''}
-  db = None
-
   try:
     source = json.loads(request.POST.get('source', '{}'))
-    user = User.objects.get(username=request.user)
-    name = None
-    if source['rdbmsMode'] == 'configRdbms':
-      if source['rdbmsType'] != 'jdbc':
-        query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-        db = rdbms.get(user, query_server=query_server)
-      else:
-        interpreters = get_ordered_interpreters(request.user)
-        options = {}
-        key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
-        if key:
-          options = key[0]['options']
 
-          db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
-    else:
-      name = source['rdbmsType']
-      if name != 'jdbc':
-        query_server = {
-          'server_name': name,
-          'server_host': source['rdbmsHostname'],
-          'server_port': int(source['rdbmsPort']),
-          'username': source['rdbmsUsername'],
-          'password': source['rdbmsPassword'],
-          'options': {},
-          'alias': name
-        }
-        db = rdbms.get(user, query_server=query_server)
-      else:
-        db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
+    api = _get_api(request)
 
-    if source['rdbmsType'] != 'jdbc':
-      assist = Assist(db)
-    else:
-      assist = JdbcAssist(db)
-
-    if not source['rdbmsDatabaseName']:
-      data = assist.get_databases()
+    if not source['rdbmsDatabaseName'] or (source['rdbmsMode'] == "customRdbms" and not source['rdbmsDbIsValid']):
+      autocomplete = api.autocomplete(None)
+      data = autocomplete['databases']
     elif source['rdbmsDatabaseName']:
-      data = assist.get_tables(source['rdbmsDatabaseName'])
+      autocomplete = api.autocomplete(None, source['rdbmsDatabaseName'])
+      data = [table['name'] for table in autocomplete['tables_meta']]
 
     format_['data'] = [{'name': element, 'value': element} for element in data]
     format_['status'] = 0
   except Exception, e:
-    message = _('Error accessing the database %s: %s') % (name, e)
+    message = _('Error accessing the database: %s') % e
     LOG.warn(message)
-    format['message'] = message
+    format_['message'] = message
 
   return JsonResponse(format_)
+
+def _get_api(request):
+  file_format = json.loads(request.POST.get('source', request.POST.get('fileFormat', '{}')))
+  options = None
+  query_server = None
+  if file_format['rdbmsMode'] == 'customRdbms':
+    type = 'custom'
+    if file_format['rdbmsType'] == 'jdbc':
+      name = file_format['rdbmsHostname'] # We make sure it's unique as name is the cache key
+      interface = file_format['rdbmsType']
+      options = {'driver': file_format['rdbmsJdbcDriver'],
+                 'url': file_format['rdbmsHostname'],
+                 'user': file_format['rdbmsUsername'],
+                 'password': file_format['rdbmsPassword']
+                }
+    else:
+      interface = 'rdbms'
+      query_server = {
+        'server_name': file_format['rdbmsType'],
+        'server_host': file_format['rdbmsHostname'],
+        'server_port': int(file_format['rdbmsPort'] or '3306'),
+        'username': file_format['rdbmsUsername'],
+        'password': file_format['rdbmsPassword'],
+        'options': {},
+        'alias': file_format['rdbmsType']
+      }
+      name = 'rdbms:%(server_name)s://%(server_host)s:%(server_port)s' % query_server # We make sure it's unique as name is the cache key
+  else:
+    if file_format['rdbmsType'] == 'jdbc':
+      type = file_format['rdbmsJdbcDriverName'] and file_format['rdbmsJdbcDriverName'].lower()
+    else:
+      type = file_format['rdbmsType']
+      query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
+    name = type
+    interface = file_format['inputFormat']
+
+  return get_api(request, { 'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
 
 def jdbc_db_list(request):
   format_ = {'data': [], 'status': 1}
@@ -105,6 +109,7 @@ def get_drivers(request):
   servers_dict = dict(get_server_choices())
   format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in servers_dict.keys()]
   format_['data'].append({'value': 'jdbc', 'name': 'JDBC'})
+#   format_['data'].append({'value': 'sqlalchemy', 'name': 'SQL Alchemy'})
   format_['status'] = 0
 
   return JsonResponse(format_)
@@ -114,6 +119,7 @@ def run_sqoop(request, source, destination, start_time):
   rdbms_name = source['rdbmsJdbcDriverName'] if source['rdbmsType'] == 'jdbc' else source['rdbmsType']
   rdbms_database_name = source['rdbmsDatabaseName']
   rdbms_all_tables_selected = source['rdbmsAllTablesSelected']
+  rdbms_exclude = source['rdbmsTablesExclude']
   destination_type = destination['outputFormat']
   destination_name = destination['name']
   destination_table_name = destination['tableName']
@@ -126,7 +132,9 @@ def run_sqoop(request, source, destination, start_time):
   destination_splitby_column = destination['rdbmsSplitByColumn']
 
   if not rdbms_all_tables_selected:
-    rdbms_table_name = source['rdbmsTableName']
+    rdbms_table_name = source['tableName']
+  else:
+    rdbms_table_name = None
 
   if rdbms_mode == 'configRdbms' and rdbms_name == 'jdbc':
     username = ''
@@ -134,6 +142,7 @@ def run_sqoop(request, source, destination, start_time):
     url = ''
     interpreters = get_ordered_interpreters(request.user)
     key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
+
     if key:
       options = key[0]['options']
       url = options['url']
@@ -150,34 +159,43 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_port = DATABASES[rdbms_name].PORT.get()
       rdbms_user_name = DATABASES[rdbms_name].USER.get()
       rdbms_password = get_database_password(rdbms_name)
+      url = "jdbc:%(rdbmsType)s://%(rdbmsHost)s:%(rdbmsPort)s" % {
+        'rdbmsType': rdbms_name,
+        'rdbmsHost': rdbms_host,
+        'rdbmsPort': rdbms_port
+      }
     else:
       rdbms_host = source['rdbmsHostname']
       rdbms_port = source['rdbmsPort']
       rdbms_user_name = source['rdbmsUsername']
       rdbms_password = source['rdbmsPassword']
+      url = rdbms_host
 
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
     request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0700, data=smart_str(rdbms_password))
 
     lib_files = []
     if destination['sqoopJobLibPaths']:
-      lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
+      lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths'] if f['path']]
 
-    statement = '--connect jdbc:%(rdbmsName)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
-      'rdbmsName': rdbms_name,
-      'rdbmsHost': rdbms_host,
-      'rdbmsPort': rdbms_port,
+    statement = '--connect %(url)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
+      'url': url,
       'rdbmsDatabaseName': rdbms_database_name,
       'rdbmsUserName': rdbms_user_name,
       'passwordFilePath': password_file_path
     }
+  if rdbms_exclude:
+    exclude = '--exclude-tables %s' % ','.join(rdbms_exclude)
+  else:
+    exclude = ''
   if destination_type == 'file':
     success_url = '/filebrowser/view/' + destination_name
     targetDir = request.fs.fs_defaultfs + destination_name
     if rdbms_all_tables_selected:
-      statement = 'import-all-tables %(statement)s --warehouse-dir %(targetDir)s' % {
+      statement = 'import-all-tables %(statement)s --warehouse-dir %(targetDir)s %(exclude)s' % {
         'statement': statement,
-        'targetDir': targetDir
+        'targetDir': targetDir,
+        'exclude': exclude
       }
     else:
       statement = 'import %(statement)s --table %(rdbmsTableName)s --delete-target-dir --target-dir %(targetDir)s' % {
@@ -201,30 +219,35 @@ def run_sqoop(request, source, destination, start_time):
           'statement': statement
         }
       statement = _splitby_column_check(statement, destination_splitby_column)
-  elif destination_type == 'table':
+  elif destination_type == 'table' or destination_type == 'database':
     success_url = reverse('metastore:describe_table', kwargs={'database': destination_database_name, 'table': destination_table_name})
     if rdbms_all_tables_selected:
-      statement = 'import-all-tables %(statement)s --hive-import' % {
-        'statement': statement
+      statement = 'import-all-tables %(statement)s --hive-import --hive-database %(hive_database_name)s %(exclude)s' % {
+        'statement': statement,
+        'hive_database_name': destination_database_name,
+        'exclude': exclude
       }
     else:
-      statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import' % {
+      statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s --hive-table %(hive_table_name)s' % {
         'statement': statement,
-        'rdbmsTableName': rdbms_table_name
+        'rdbmsTableName': rdbms_table_name,
+        'hive_database_name': destination_database_name,
+        'hive_table_name': destination_table_name
       }
       statement = _splitby_column_check(statement, destination_splitby_column)
   elif destination_type == 'hbase':
     success_url = '/hbase/#HBase/' + destination_table_name
+
     # Todo
-  statement = '%(statement)s --num-mappers %(numMappers)s' % {
+  statement = '%(statement)s --num-mappers %(numMappers)s --verbose' % {
     'statement': statement,
     'numMappers': destination_mappers_num
   }
 
   task = make_notebook(
-    name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
+    name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsTableName)s to %(path)s') % {
       'rdbmsDatabaseName': rdbms_database_name,
-      'rdbmsDatabaseName': rdbms_database_name,
+      'rdbmsTableName': '*' if rdbms_all_tables_selected else rdbms_table_name,
       'path': destination_name
     },
     editor_type='sqoop1',
@@ -236,7 +259,11 @@ def run_sqoop(request, source, destination, start_time):
     is_task=True
   )
 
-  return task.execute(request, batch=False)
+  if request.POST.get('show_command'):
+    return {'status': 0, 'commands': task.get_str()}
+  else:
+    return task.execute(request, batch=False)
+
 
 def _splitby_column_check(statement, destination_splitby_column):
   if destination_splitby_column:
@@ -245,33 +272,3 @@ def _splitby_column_check(statement, destination_splitby_column):
       'destinationSplitbyColumn': destination_splitby_column
     }
   return statement
-
-
-class RdbmsIndexer():
-
-  def __init__(self, user, db_conf_name):
-    self.user = user
-    self.db_conf_name = db_conf_name
-
-  def guess_format(self):
-    return {"type": "csv"}
-
-  def get_sample_data(self, mode=None, database=None, table=None, column=None):
-    query_server = rdbms.get_query_server_config(server=self.db_conf_name)
-    db = rdbms.get(self.user, query_server=query_server)
-
-    if mode == 'configRdbms':
-      assist = Assist(db)
-    else:
-      assist = JdbcAssist(db)
-    response = {'status': -1}
-    sample_data = assist.get_sample_data(database, table, column)
-
-    if sample_data:
-      response['status'] = 0
-      response['headers'] = sample_data.columns
-      response['rows'] = list(sample_data.rows())
-    else:
-      response['message'] = _('Failed to get sample data.')
-
-    return response

@@ -1044,7 +1044,7 @@ LDAP = ConfigSection(
       type=coerce_bool,
       default=False),
     LOGIN_GROUPS = Config("login_groups",
-      help=_("Define a list of Ldap groups in CSV with users that can login"),
+      help=_("A comma-separated list of Ldap groups with users that can login"),
       type=coerce_csv,
       default=[]),
     DEBUG = Config("debug",
@@ -1600,37 +1600,49 @@ IS_MULTICLUSTER_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+IS_K8S_ONLY = Config(
+  key='is_k8s_only',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
+
 def get_clusters(user):
   clusters = []
+  cluster_config = CLUSTERS.get()
 
-  # Get core standalone config if there
-  apps = appmanager.get_apps_dict(user)
-  if 'beeswax' in apps: # and not IS_MULTICLUSTER_ONLY.get():
-    from beeswax.conf import HIVE_SERVER_HOST
+  for i in cluster_config:
+    # Get additional remote multi clusters
+    clusters.append(
+      (i, {
+          'id': i,
+          'name': cluster_config[i].NAME.get() or i,
+          'type': cluster_config[i].TYPE.get(),
+          'interface': cluster_config[i].INTERFACE.get() or 'hive',
+          'server_host': cluster_config[i].SERVER_HOST.get()
+        }
+      )
+    )
+
+  # Get traditional services in regular ini too
+  if not IS_MULTICLUSTER_ONLY.get():
     clusters.append(
       (CLUSTER_ID.get(), {
         'id': CLUSTER_ID.get(),
         'name': CLUSTER_ID.get(),
         'type': 'direct',
         'interface': 'all',
-        'server_host': HIVE_SERVER_HOST.get()
+        'server_host': 'all'
         }
       )
     )
 
-  # Get additional remote multi clusters
-  cluster_config = CLUSTERS.get()
-  clusters.extend([
-    (i, {
-      'id': i,
-      'name': cluster_config[i].NAME.get() or i,
-      'type': cluster_config[i].TYPE.get(),
-      'interface': cluster_config[i].INTERFACE.get() or 'hive',
-      'server_host': cluster_config[i].SERVER_HOST.get()
-    }) for i in cluster_config if cluster_config[i].NAME.get() != 'default'
-  ])
-
   return OrderedDict(clusters)
+
+
+def has_multi_cluster():
+  return bool(CLUSTERS.get())
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1766,9 +1778,23 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
+  from beeswax.models import Session
   from desktop.lib import i18n
+  from desktop.models import Document2 # Avoid cyclic loop
+  from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
 
   res = []
+
+  doc2_count = Document2.objects.filter(is_history=True).count()
+  if doc2_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('DOCUMENT2_CLEANUP_WARNING', unicode(_('Desktop Document2 has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
+
+  session_count = Session.objects.filter(status_code__gte=-10000).count()
+  if session_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('SESSION_CLEANUP_WARNING', unicode(_('Desktop Session has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
+
   if not get_secret_key():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
@@ -1820,7 +1846,7 @@ def config_validator(user):
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
   except:
-    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. </br>'
+    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
                                                     '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
   if notebook_doc:
     notebook_doc.delete()

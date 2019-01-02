@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.views import commonheader, commonfooter, commonshare, _ko
 
-from oozie.conf import ENABLE_DOCUMENT_ACTION, ENABLE_IMPALA_ACTION
+from oozie.conf import ENABLE_DOCUMENT_ACTION, ENABLE_IMPALA_ACTION, ENABLE_ALTUS_ACTION
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -141,10 +141,21 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </ul>
     % endif
   </%def>
+
   <%def name="widgets()">
     % if ENABLE_DOCUMENT_ACTION.get():
+
     <!-- ko if: $root.currentDraggableSection() === 'documents' -->
     <div class="draggable-documents">
+
+    % if ENABLE_ALTUS_ACTION.get():
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableAltusAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableAltusAction());}}}"
+         title="${_('Altus Command')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-cloud"></i></a>
+    </div>
+    % endif
 
     <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
@@ -418,7 +429,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
       <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }"></div>
     <!-- /ko -->
     </span>
-      
+
     <div class="row-fluid">
       %if is_embeddable:
       <div class="span12 margin-top-20">
@@ -819,7 +830,11 @@ ${ utils.submit_popup_event() }
   function validateFields() {
     var _hasErrors = false;
     $("[validate]").each(function () {
-      if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
+      if ($(this).attr("validate") == "nospace" && ($(this).val().indexOf(' ') >= 0 || $.trim($(this).val()) == "")) {
+        $(this).addClass("with-errors");
+        _hasErrors = true;
+      }
+      else if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
         $(this).addClass("with-errors");
         _hasErrors = true;
       }

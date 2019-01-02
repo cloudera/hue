@@ -42,25 +42,27 @@ class TestSolrClient:
 
 
   def test_get_ensemble_cdh_solr(self):
-    client = SolrClient(self.user, api=MockSolrCdhCloudHdfsApi())
+    try:
+      client = SolrClient(self.user, api=MockSolrCdhCloudHdfsApi())
 
-    client._reset_properties()
-
-    assert_true(client.is_solr_cloud_mode())
-    assert_false(client.is_solr_six_or_more())
-    assert_true(client.is_solr_with_hdfs())
-    assert_equal('hue.com:2181/solr', client.get_zookeeper_host())
+      assert_true(client.is_solr_cloud_mode())
+      assert_false(client.is_solr_six_or_more())
+      assert_true(client.is_solr_with_hdfs())
+      assert_equal('hue.com:2181/solr', client.get_zookeeper_host())
+    finally:
+      client._reset_properties()
 
 
   def test_get_ensemble_upstream_solr(self):
-    client = SolrClient(self.user, api=MockSolrUpstreamCloudApi())
+    try:
+      client = SolrClient(self.user, api=MockSolrUpstreamCloudApi())
 
-    client._reset_properties()
-
-    assert_true(client.is_solr_cloud_mode())
-    assert_true(client.is_solr_six_or_more())
-    assert_false(client.is_solr_with_hdfs())
-    assert_equal('localhost:9983', client.get_zookeeper_host())
+      assert_true(client.is_solr_cloud_mode())
+      assert_true(client.is_solr_six_or_more())
+      assert_false(client.is_solr_with_hdfs())
+      assert_equal('localhost:9983', client.get_zookeeper_host())
+    finally:
+      client._reset_properties()
 
 
 

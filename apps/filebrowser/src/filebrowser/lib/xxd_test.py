@@ -17,14 +17,17 @@
 
 import unittest
 import logging
-import StringIO
 import random
+import StringIO
+import subprocess
 
 import xxd
 
+from nose.plugins.skip import SkipTest
+
 from subprocess import Popen, PIPE
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 LENGTH = 1024*10 # 10KB
 
@@ -73,6 +76,11 @@ class XxdTest(unittest.TestCase):
     To be honest, this test was written after this was working.
     I tested using a temporary file and a side-by-side diff tool (vimdiff).
     """
+    try:
+      subprocess.check_output('type xxd', shell=True)
+    except subprocess.CalledProcessError as e:
+      LOG.warn('xxd not found')
+      raise SkipTest
     # /dev/random tends to hang on Linux, so we use python instead.
     # It's inefficient, but it's not terrible.
     random_text = "".join(chr(random.getrandbits(8)) for _ in range(LENGTH))

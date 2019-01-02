@@ -32,6 +32,7 @@ from desktop.lib import django_mako, i18n
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_forms import MultiForm
+from desktop.models import _get_apps
 from hadoop.fs import hadoopfs
 
 from beeswax.common import TERMINATORS
@@ -83,7 +84,9 @@ def create_table(request, database='default'):
   else:
     form.bind()
 
+  apps_list = _get_apps(request.user, '')
   return render("create_table_manually.mako", request, {
+    'apps': apps_list,
     'action': "#",
     'databases': databases,
     'table_form': form.table,
@@ -193,7 +196,9 @@ def import_wizard(request, database='default'):
                                                             (s2_delim_form.cleaned_data['delimiter'],))
 
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
+        apps_list = _get_apps(request.user, '')
         return render('import_wizard_choose_delimiter.mako', request, {
+          'apps': apps_list,
           'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
           'delim_readable': DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
           'initial': delim_is_auto,
@@ -222,8 +227,9 @@ def import_wizard(request, database='default'):
           fields_list_for_json = list(fields_list)
           if fields_list_for_json:
             fields_list_for_json[0] = map(lambda a: re.sub('[^\w]', '', a), fields_list_for_json[0]) # Cleaning headers
-
+          apps_list = _get_apps(request.user, '')
           return render('import_wizard_define_columns.mako', request, {
+            'apps': apps_list,
             'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
             'file_form': s1_file_form,
             'delim_form': s2_delim_form,

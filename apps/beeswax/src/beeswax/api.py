@@ -49,8 +49,9 @@ from beeswax.views import authorized_get_design, authorized_get_query_history, m
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           parse_out_jobs
 from metastore.conf import FORCE_HS2_METADATA
-from metastore.views import _get_db
+from metastore.views import _get_db, _get_servername
 
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -90,19 +91,20 @@ def error_handler(view_fn):
 
 @error_handler
 def autocomplete(request, database=None, table=None, column=None, nested=None):
+  cluster = request.POST.get('cluster')
   app_name = None if FORCE_HS2_METADATA.get() else get_app_name(request)
 
   do_as = request.user
-  if (request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
+  if (is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
     do_as = User.objects.get(username=request.GET.get('doas'))
 
-  db = _get_db(user=do_as, source_type=app_name)
+  db = _get_db(user=do_as, source_type=app_name, cluster=cluster)
 
-  response = _autocomplete(db, database, table, column, nested)
+  response = _autocomplete(db, database, table, column, nested, cluster=cluster)
   return JsonResponse(response)
 
 
-def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None):
+def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None, cluster=None):
   response = {}
 
   try:
@@ -121,12 +123,10 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
 
       cols_extended = massage_columns_for_json(table.cols)
 
-      if 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(table.properties): # When queries from Impala directly
-        table.is_impala_only = True
-
-      if table.is_impala_only: # Expand Kudu columns information
-        query_server = get_query_server_config('impala')
-        db = dbms.get(db.client.user, query_server, cluster=db.cluster)
+      if table.is_impala_only:
+        if db.client.query_server['server_name'] != 'impala': # Expand Kudu columns information
+          query_server = get_query_server_config('impala', cluster=cluster)
+          db = dbms.get(db.client.user, query_server, cluster=cluster)
 
         col_options = db.get_table_describe(database, table.name)
         extra_col_options = dict([(col[0], dict(zip(col_options.cols(), col))) for col in col_options.rows()])
@@ -148,7 +148,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
         response = parse_tree
         # If column or nested type is scalar/primitive, add sample of values
         if parser.is_scalar_type(parse_tree['type']):
-          sample = _get_sample_data(db, database, table, column)
+          sample = _get_sample_data(db, database, table, column, cluster=cluster)
           if 'rows' in sample:
             response['sample'] = sample['rows']
       else:
@@ -649,20 +649,22 @@ def clear_history(request):
 @error_handler
 def get_sample_data(request, database, table, column=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
-  response = _get_sample_data(db, database, table, column)
+  response = _get_sample_data(db, database, table, column, cluster=cluster)
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table, column, async=False):
+def _get_sample_data(db, database, table, column, async=False, cluster=None, operation=None):
   table_obj = db.get_table(database, table)
   if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
-    query_server = get_query_server_config('impala')
-    db = dbms.get(db.client.user, query_server)
+    query_server = get_query_server_config('impala', cluster=cluster)
+    db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async)
+  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async, operation=operation)
   response = {'status': -1}
 
   if sample_data:
@@ -670,13 +672,16 @@ def _get_sample_data(db, database, table, column, async=False):
     if async:
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
-          editor_type=db.server_name,
+          editor_type=_get_servername(db),
           statement=sample_data,
           status='ready-execute',
           skip_historify=True,
-          is_task=False
+          is_task=False,
+          compute=cluster if cluster else None
       )
       response['result'] = notebook.execute(request=MockedDjangoRequest(user=db.client.user), batch=False)
+      if table_obj.is_impala_only:
+        response['result']['type'] = 'impala'
     else:
       sample = escape_rows(sample_data.rows(), nulls_only=True)
       if column:
@@ -746,7 +751,9 @@ def get_functions(request):
 @error_handler
 def analyze_table(request, database, table, columns=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
   table_obj = db.get_table(database, table)
@@ -773,7 +780,9 @@ def analyze_table(request, database, table, columns=None):
 @error_handler
 def get_table_stats(request, database, table, column=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
@@ -794,7 +803,9 @@ def get_table_stats(request, database, table, column=None):
 @error_handler
 def get_top_terms(request, database, table, column, prefix=None):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+
+  query_server = get_query_server_config(app_name, cluster=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
@@ -845,7 +856,7 @@ def close_session(request, session_id):
 
   try:
     filters = {'id': session_id, 'application': query_server['server_name']}
-    if not request.user.is_superuser:
+    if not is_admin(request.user):
       filters['owner'] = request.user
     session = Session.objects.get(**filters)
   except Session.DoesNotExist:

@@ -23,6 +23,9 @@ from nose.tools import assert_equal, assert_true, assert_false
 from django.contrib.auth.models import User
 from django.urls import reverse
 from azure.conf import is_adls_enabled
+
+from desktop import appmanager
+from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
 from desktop.models import Directory, Document, Document2
@@ -69,7 +72,7 @@ class TestNotebookApi(object):
         ],
         "type": "query-hive",
         "id": 50010,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "5982a274-de78-083c-2efc-74f53dce744c",
         "isSaved": false,
         "parentUuid": null
@@ -116,7 +119,7 @@ class TestNotebookApi(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -129,7 +132,7 @@ class TestNotebookApi(object):
     assert_equal(Document2.objects.get_home_directory(self.user).uuid, doc.parent_directory.uuid)
 
     # Test that saving a notebook will save the search field to the first statement text
-    assert_equal(doc.search, "select * from web_logs")
+    assert_equal(doc.search, "select * from default.web_logs where app = 'metastore';")
 
 
   def test_historify(self):
@@ -207,7 +210,7 @@ class TestNotebookApi(object):
           ],
           "type": "query-hive",
           "id": null,
-          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default","statement":"select * from web_logs","statement_raw":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{}}],
+          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default","statement":"select * from web_logs","statement_raw":"select * from web_logs","variables":[],"properties":{"settings":[],"files":[],"functions":[]},"result":{}}],
           "uuid": "8a20da5f-b69c-4843-b17d-dea5c74c41d1"
       }
       """
@@ -253,6 +256,7 @@ class TestNotebookApi(object):
         "database": "default",
         "statement": "select * from web_logs",
         "statement_raw": "select * from web_logs",
+        "variables": [],
          "properties": {"settings": [], "files": [], "functions": []},
         "result": {}
       }]
@@ -377,7 +381,7 @@ class TestNotebookApiMocked(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -453,7 +457,10 @@ def test_get_interpreters_to_show():
     ))
 
   try:
-    resets = [INTERPRETERS.set_for_testing(default_interpreters)]
+    resets = [INTERPRETERS.set_for_testing(default_interpreters), APP_BLACKLIST.set_for_testing('')]
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
 
     interpreters_shown_on_wheel_unset = get_ordered_interpreters()
     assert_equal(default_interpreters.values(), interpreters_shown_on_wheel_unset,
@@ -468,3 +475,6 @@ def test_get_interpreters_to_show():
   finally:
     for reset in resets:
       reset()
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())

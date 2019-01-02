@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED
+  from desktop.conf import IS_EMBEDDED, IS_K8S_ONLY
   from desktop.models import hue_version
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -40,6 +40,8 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.HAS_MULTI_CLUSTER = '${ conf.has_multi_cluster() }' === 'True';
+
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
@@ -53,6 +55,7 @@
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
   window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
+  window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
 
   window.HUE_I18n = {
     autocomplete: {
@@ -159,6 +162,17 @@
     queryBuilder: {
       insertValueHere: "${ _('Insert value here') }",
       queryRequire: "${ _('Query requires a select or aggregate.') }"
+    },
+    chart: {
+      noData: "${ _('No Data Available.') }",
+      missingLegend: "${ _('Missing legend configuration.') }",
+      missingValue: "${ _('Missing value configuration.') }",
+      missingX: "${ _('Missing x axis configuration.') }",
+      missingY: "${ _('Missing y axis configuration.') }",
+      missingLatitude: "${ _('Missing latitude configuration.') }",
+      missingLongitude: "${ _('Missing longitude configuration.') }",
+      missingLabel: "${ _('Missing label configuration.') }",
+      missingRegion: "${ _('Missing region configuration.') }",
     }
   };
 

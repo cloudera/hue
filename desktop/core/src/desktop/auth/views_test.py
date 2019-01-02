@@ -72,7 +72,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     for finish in self.reset:
       finish()
 
-    if self.fs.exists("/user/%s" % self.test_username):
+    if self.cluster.fs.do_as_user(self.test_username, self.cluster.fs.exists, "/user/%s" % self.test_username):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s" % self.test_username)
 
   def test_login(self):
@@ -82,7 +82,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo"))
     assert_equal(302, response.status_code, "Expected ok redirect status.")
-    assert_true(self.fs.exists("/user/%s" % self.test_username))
+    assert_true(self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username))
 
     response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
@@ -91,15 +91,15 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
   def test_login_old(self):
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true(response.context['first_login_ever'])
+    assert_true(response.context[0]['first_login_ever'])
 
     response = self.c.post('/accounts/login/', dict(username=self.test_username, password="foo"), follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true(self.fs.exists("/user/%s" % self.test_username))
+    assert_true(self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username))
 
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_false(response.context['first_login_ever'])
+    assert_false(response.context[0]['first_login_ever'])
 
   def test_login_home_creation_failure(self):
     response = self.c.get('/hue/accounts/login/')
@@ -191,10 +191,10 @@ class TestLdapLogin(PseudoHdfsTestBase):
     for finish in self.reset:
       finish()
 
-    if self.fs.exists("/user/%s" % self.test_username):
+    if self.cluster.fs.do_as_user(self.test_username, self.cluster.fs.exists, "/user/%s" % self.test_username):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s" % self.test_username)
 
-    if self.fs.exists("/user/curly"):
+    if self.cluster.fs.do_as_user("curly", self.cluster.fs.exists, "/user/curly"):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/curly")
 
   def test_login(self):
@@ -208,7 +208,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
         'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
-    assert_true(self.fs.exists("/user/%s" % self.test_username))
+    assert_true(self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username))
 
     response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
@@ -273,7 +273,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     # Create home directory as a file in order to fail in the home creation later
     cluster = pseudo_hdfs4.shared_cluster()
     fs = cluster.fs
-    assert_false(cluster.fs.exists("/user/%s" % self.test_username))
+    assert_false(self.cluster.fs.do_as_user(self.test_username, cluster.fs.exists, "/user/%s" % self.test_username))
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
     response = self.c.post('/hue/accounts/login/', {
@@ -407,10 +407,10 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
 
     User.objects.all().delete()
 
-    if self.fs.exists("/user/%s" % self.test_username):
+    if self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s" % self.test_username)
 
-    if self.fs.exists("/user/%s_%s" % (self.test_username, '2')):
+    if self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s_%s" % (self.test_username, '2')):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s_%s" % (self.test_username, '2'))
 
   def test_normal(self):
@@ -536,7 +536,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
     for finish in self.reset:
       finish()
 
-    if self.fs.exists("/user/%s" % self.test_username):
+    if self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s" % self.test_username)
 
   def test_login_with_ldap(self):
@@ -559,7 +559,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo", server="LDAP"))
     assert_equal(302, response.status_code, "Expected ok redirect status.")
-    assert_true(self.fs.exists("/user/%s" % self.test_username))
+    assert_true(self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username))
 
 
 class TestMultipleBackendLoginNoHadoop(object):
@@ -658,7 +658,7 @@ class TestLogin(PseudoHdfsTestBase):
 
     User.objects.all().delete()
 
-    if self.fs.exists("/user/%s" % self.test_username):
+    if self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s" % self.test_username)
 
   def test_bad_first_user(self):

@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.api2 import __paginate
+from desktop.conf import IS_K8S_ONLY
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
@@ -80,6 +81,17 @@ def create_session(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   session = json.loads(request.POST.get('session', '{}'))
+
+  if IS_K8S_ONLY.get(): # TODO: create session happening asynchronously on cluster selection when opening Notebook
+    return JsonResponse({
+      "status": 0,
+      "session": {
+        "reuse_session": True, "type": session['type'],
+        "properties": [
+          {"nice_name": "Settings", "multiple": True, "key": "settings", "help_text": "Hive and Hadoop configuration properties.", "defaultValue": [], "type": "settings", "options": ["hive.map.aggr", "hive.exec.compress.output", "hive.exec.parallel", "hive.execution.engine", "mapreduce.job.queuename"], "value": []}
+        ]
+      }
+    })
 
   properties = session.get('properties', [])
 
@@ -228,8 +240,9 @@ def fetch_result_data(request):
   response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
 
   # Materialize and HTML escape results
-  if response['result'].get('data') and response['result'].get('type') == 'table':
+  if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
     response['result']['data'] = escape_rows(response['result']['data'])
+    response['result']['isEscaped'] = True
 
   response['status'] = 0
 
@@ -299,7 +312,7 @@ def get_logs(request):
   db = get_api(request, snippet)
 
   full_log = smart_str(request.POST.get('full_log', ''))
-  logs = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
+  logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
   full_log += logs
 
   jobs = db.get_jobs(notebook, snippet, full_log)
@@ -408,16 +421,9 @@ def _historify(notebook, user):
 
 
 def _get_statement(notebook):
-  statement = ''
   if notebook['snippets'] and len(notebook['snippets']) > 0:
-    try:
-      statement = notebook['snippets'][0]['result']['handle']['statement']
-      if type(statement) == dict:  # Old format
-        statement = notebook['snippets'][0]['statement_raw']
-    except KeyError:  # Old format
-      statement = notebook['snippets'][0]['statement_raw']
-  return statement
-
+    return Notebook.statement_with_variables(notebook['snippets'][0])
+  return ''
 
 @require_GET
 @api_error_handler
@@ -590,8 +596,9 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   async = json.loads(request.POST.get('async', 'false'))
+  operation = json.loads(request.POST.get('operation', '"default"'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async, operation=operation)
   response.update(sample_data)
 
   response['status'] = 0
@@ -633,8 +640,8 @@ def export_result(request):
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  data_format = json.loads(request.POST.get('format', 'hdfs-file'))
-  destination = urllib.unquote(json.loads(request.POST.get('destination', '')))
+  data_format = json.loads(request.POST.get('format', '"hdfs-file"'))
+  destination = urllib.unquote(json.loads(request.POST.get('destination', '""')))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
   start_time = json.loads(request.POST.get('start_time', '-1'))

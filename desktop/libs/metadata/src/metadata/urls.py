@@ -16,10 +16,12 @@
 # limitations under the License.
 
 from django.conf.urls import url
-from metadata import catalog_api as metadata_catalog_api
+
+from metadata import catalog_api as metadata_catalog_api, analytic_db_api, dataeng_api, prometheus_api
 from metadata import optimizer_api as metadata_optimizer_api
 from metadata import workload_analytics_api as metadata_workload_analytics_api
 from metadata import manager_api as metadata_manager_api
+
 
 # Catalog
 urlpatterns = [
@@ -77,10 +79,26 @@ urlpatterns += [
 
 # Manager API
 urlpatterns += [
-  url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='hello'),
+  url(r'^api/manager/hello/?$', metadata_manager_api.hello, name='manager_hello'),
+  url(r'^api/manager/get_hosts/?$', metadata_manager_api.get_hosts, name='manager_hosts'),
+  url(r'^api/manager/update_flume_config/?$', metadata_manager_api.update_flume_config, name='manager_update_flume_config'),
 ]
 
-# Workload Analytics API
+
+# Prometheus API
+urlpatterns += [
+  url(r'^api/prometheus/query?$', prometheus_api.query, name='prometheus_query'),
+]
+
+
+# Altus API
+urlpatterns += [
+  url(r'^api/analytic_db/create_cluster/?$', analytic_db_api.create_cluster, name='create_cluster'),
+  url(r'^api/analytic_db/update_cluster/?$', analytic_db_api.update_cluster, name='update_cluster'),
+]
+urlpatterns += [
+  url(r'^api/dataeng/create_cluster/?$', dataeng_api.create_cluster, name='create_cluster'),
+]
 urlpatterns += [
   url(r'^api/workload_analytics/get_operation_execution_details/?$', metadata_workload_analytics_api.get_operation_execution_details, name='get_operation_execution_details'),
   url(r'^api/workload_analytics/get_impala_query/?$', metadata_workload_analytics_api.get_impala_query, name='get_impala_query'),

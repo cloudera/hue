@@ -60,30 +60,26 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
       var apps = {
-        cdsw: {
-          label: 'Data Science',
-          img:'hi-as-cdsw'
-        },
-        altusAdmin: {
-          label: 'Altus Admin',
-          img:'hi-as-nav'
-        },
-        hue: {
-          label: 'Data Analytics (Hue)',
-          img: 'hi-as-hue'
-        },
-        cm: {
-          label: 'Cloudera Manager',
-          img: 'hi-as-cm'
-        },
-        navigator: {
-          label: 'Navigator',
-          img: 'hi-as-nav'
-        },
-        navopt: {
-          label: 'Data Engineering',
-          img: 'hi-as-nav'
-        }
+          hue: {
+            label: 'Data Warehouse',
+            icon: 'altus-icon altus-adb-query'
+          },
+          cdsw: {
+            label: 'Data Science',
+            icon:'altus-icon altus-ds'
+          },
+          dataFlow: {
+            label: 'Data Engineering',
+            icon:'altus-icon altus-workload'
+          },
+          navigator: {
+            label: 'Data Stewart',
+            icon: 'altus-icon altus-adb'
+          },
+          navopt: {
+            label: 'Admin',
+            icon: 'altus-icon altus-iam'
+          }
       };
 
       var AppSwitcher = function AppSwitcher(params) {
@@ -92,7 +88,23 @@ from desktop.views import _ko
         self.links = ko.observableArray([]);
 
         var altusLinks = [{
-            product: 'altusAdmin',
+            product: 'hue',
+            link: 'https://sso.staging.aem.cloudera.com'
+          },
+          {
+            product: 'cdsw',
+            link: 'https://sso.staging.aem.cloudera.com'
+          },
+          {
+            product: 'dataFlow',
+            link: 'https://sso.staging.aem.cloudera.com'
+          },
+          {
+            product: 'navigator',
+            link: 'https://sso.staging.aem.cloudera.com'
+          },
+          {
+            product: 'navopt',
             link: 'https://sso.staging.aem.cloudera.com'
           }
         ];

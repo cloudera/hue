@@ -1,0 +1,139 @@
+# Chinese (China) translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-22 18:22-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.1\n"
+
+#~ msgid "NameNode logical name."
+#~ msgstr "NameNode 逻辑名称。"
+
+#~ msgid "JobTracker logical name."
+#~ msgstr "JobTracker 逻辑名称。"
+
+#~ msgid "Resource Manager logical name."
+#~ msgstr "Resource Manager 逻辑名称。"
+
+#~ msgid "%(remote_dst)s already exists. Skipping."
+#~ msgstr "%(remote_dst)s 已存在。跳过。"
+
+#~ msgid "%(remote_dst)s does not exist. Trying to copy."
+#~ msgstr "%(remote_dst)s 不存在。尝试复制。"
+
+#~ msgid "Copied %s -> %s."
+#~ msgstr "复制的 %s -> %s。"
+
+#~ msgid "Copying %s -> %s failed."
+#~ msgstr "复制 %s -> %s 失败。"
+
+#~ msgid "Skipping %s (not a file)."
+#~ msgstr "跳过 %s （并非文件）。"
+
+#~ msgid "%(function)s has not been implemented."
+#~ msgstr "未执行 %(function)s。"
+
+#~ msgid "No HDFS found"
+#~ msgstr "未找到 HDFS"
+
+#~ msgid "User %s does not have permissions to write to path \"%s\"."
+#~ msgstr "用户 %s 没有写入路径“%s”的权限。"
+
+#~ msgid "File %s not found"
+#~ msgstr "未找到文件 %s"
+
+#~ msgid "File %s is a directory"
+#~ msgstr "文件 %s 为目录"
+
+#~ msgid "File %s is already trashed"
+#~ msgstr "文件 %s 已删除"
+
+#~ msgid "Delete failed: %s"
+#~ msgstr "删除失败：%s"
+
+#~ msgid "File %s is not in trash"
+#~ msgstr "文件 %s 不在垃圾桶中"
+
+#~ msgid "Path %s already exists."
+#~ msgstr "路径 %s 已存在。"
+
+#~ msgid "Mkdir failed: %s"
+#~ msgstr "Mkdir 失败：%s"
+
+#~ msgid "Rename failed: %s -> %s"
+#~ msgstr "重命名失败：%s -> %s"
+
+#~ msgid "'%s' is not a directory"
+#~ msgstr "“%s”不是目录"
+
+#~ msgid "Copy src '%s' does not exist"
+#~ msgstr "复制源“%s”不存在"
+
+#~ msgid "Copy src '%s' is a directory"
+#~ msgstr "复制源“%s”为目录"
+
+#~ msgid "Copy dst '%s' is a directory"
+#~ msgstr "复制目标“%s”为目录"
+
+#~ msgid "File not found: %s"
+#~ msgstr "未找到文件：%s"
+
+#~ msgid "Destination file %s exists and is not a directory."
+#~ msgstr "目标文件 %s 存在，但不是目录。"
+
+#~ msgid "Failed to create '%s'. HDFS did not return a redirect"
+#~ msgstr "无法创建“%s”。HDFS 未返回重定向"
+
+#~ msgid ""
+#~ "Failed to upload file. WebHdfs requires"
+#~ " a valid username to upload files."
+#~ msgstr "无法上传文件。WebHdfs 需要有效的用户名才可上传文件。"
+
+#~ msgid "Is a directory: '%s'"
+#~ msgstr "为目录：“%s”"
+
+#~ msgid "Invalid argument to seek for whence"
+#~ msgstr "用于寻找位置的自变量无效"
+
+#~ msgid "File not open for writing"
+#~ msgstr "未打开要写入的文件"
+
+#~ msgid "Filesystem root '/' should be owned by '%s'"
+#~ msgstr "文件系统根目录“/”应归属于 '%s'"
+
+#~ msgid "Failed to access filesystem root"
+#~ msgstr "无法访问文件系统根目录"
+
+#~ msgid "Failed to create temporary file \"%s\""
+#~ msgstr "无法创建临时文件 \"%s\""
+
+#~ msgid "Failed to remove temporary file \"%s\""
+#~ msgstr "无法删除临时文件 \"%s\""
+
+#~ msgid "YARN cluster is not available."
+#~ msgstr "无 YARN 群集可用。"
+
+#~ msgid "No Resource Manager are available."
+#~ msgstr "无可用资源管理器。"
+
+#~ msgid "YARN did not return any token field."
+#~ msgstr "YARN 未返回任何令牌字段。"
+
+#~ msgid "YARN RM returned a failed response: %s"
+#~ msgstr "YARN RM 返回失败的响应：%s"
+
+#~ msgid "No Spark History Server is available."
+#~ msgstr "无 Spark 历史记录服务器可用。"
+

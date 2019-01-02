@@ -56,7 +56,7 @@ from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
 
-
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -319,7 +319,7 @@ class LoginAndPermissionMiddleware(object):
 
       if app_accessed and \
           app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403") and \
-          not (request.user.has_hue_permission(action="access", app=app_accessed) or
+          not (is_admin(request.user) or request.user.has_hue_permission(action="access", app=app_accessed) or
                request.user.has_hue_permission(action=access_view, app=app_accessed)) and \
           not (app_accessed == '__debug__' and desktop.conf.DJANGO_DEBUG_MODE):
         access_log(request, 'permission denied', level=access_log_level)
@@ -566,9 +566,13 @@ class SpnegoMiddleware(object):
       Negotiate. This will cause the browser to re-try the request with the
       AUTHORIZATION header set.
     """
+    view_func = resolve(request.path)[0]
+    if view_func in DJANGO_VIEW_AUTH_WHITELIST:
+      return
+
     # AuthenticationMiddleware is required so that request.user exists.
     if not hasattr(request, 'user'):
-      raise ImproperlyConfigured(
+      raise exceptions.ImproperlyConfigured(
         "The Django remote user auth middleware requires the"
         " authentication middleware to be installed.  Edit your"
         " MIDDLEWARE_CLASSES setting to insert"
@@ -604,6 +608,15 @@ class SpnegoMiddleware(object):
           if user:
             request.user = user
             login(request, user)
+            msg = 'Successful login for user: %s' % request.user.username
+          else:
+            msg = 'Failed login for user: %s' % request.user.username
+          request.audit = {
+            'operation': 'USER_LOGIN',
+            'username': request.user.username,
+            'operationText': msg
+          }
+          access_warn(request, msg)
           return
         except:
           LOG.exception('Unexpected error when authenticating against KDC')

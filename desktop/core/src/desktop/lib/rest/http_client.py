@@ -27,7 +27,7 @@ from django.utils.http import urlencode
 from desktop import conf
 
 from requests import exceptions
-from requests.auth import HTTPBasicAuth
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
 
@@ -127,6 +127,10 @@ class HttpClient(object):
 
   def set_basic_auth(self, username, password):
     self._session.auth = HTTPBasicAuth(username, password)
+    return self
+
+  def set_digest_auth(self, username, password):
+    self._session.auth = HTTPDigestAuth(username, password)
     return self
 
   def set_headers(self, headers):

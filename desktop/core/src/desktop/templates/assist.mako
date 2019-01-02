@@ -17,7 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
-
+from filebrowser.conf import SHOW_UPLOAD_BUTTON
 from metadata.conf import has_navigator, OPTIMIZER
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
@@ -26,7 +26,7 @@ from dashboard.conf import HAS_SQL_ENABLED
 
 from desktop import appmanager
 from desktop import conf
-from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS, IS_MULTICLUSTER_ONLY
+from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
@@ -72,11 +72,9 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-database-actions">
     <div class="assist-actions database-actions" style="opacity: 0">
-      %if has_navigator(user):
       <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       <!-- /ko -->
-      %endif
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
   </script>
@@ -87,19 +85,15 @@ from desktop.views import _ko
 
   <script type="text/html" id="sql-context-items">
     <!-- ko if: typeof catalogEntry !== 'undefined' -->
-      <!-- ko if: sourceType === 'solr' -->
-        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+      <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+      <!-- ko switch: sourceType -->
+      <!-- ko case: 'solr' -->
         <!-- ko if: catalogEntry.isTableOrView() -->
         <li><a href="javascript:void(0);" data-bind="click: openInIndexer"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
-        <li>
-          <a href="javascript: void(0);" data-bind="click: function() { explore(true); }">
-            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
-          </a>
-        </li>
+        <li><a href="javascript: void(0);" data-bind="click: function() { explore(true); }"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
         <!-- /ko -->
       <!-- /ko -->
-      <!-- ko ifnot: sourceType === 'solr' -->
-        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+      <!-- ko case: $default -->
         <!-- ko if: !catalogEntry.isDatabase() && $currentApp() === 'editor' -->
         <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
         <!-- /ko -->
@@ -109,17 +103,9 @@ from desktop.views import _ko
         <!-- /ko -->
         % endif
         <!-- ko if: catalogEntry.isTableOrView() -->
-        <li>
-          <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
-            <i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }
-          </a>
-        </li>
+        <li><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }"><i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }</a></li>
         % if HAS_SQL_ENABLED.get():
-        <li>
-          <a href="javascript: void(0);" data-bind="click: function() { explore(false); }">
-            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
-          </a>
-        </li>
+        <li><a href="javascript: void(0);" data-bind="click: function() { explore(false); }"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
         % endif
         <!-- /ko -->
         %if ENABLE_QUERY_BUILDER.get():
@@ -128,6 +114,7 @@ from desktop.views import _ko
         <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
         <!-- /ko -->
         %endif
+      <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
   </script>
@@ -218,7 +205,7 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} }">
-        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': catalogEntry.isView() && !navigationSettings.rightAssist, 'fa-table': catalogEntry.isTable() && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
+        <i class="fa fa-fw muted valign-middle" data-bind="css: iconClass"></i>
         <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(navigationSettings.rightAssist), css: { 'highlight': highlight }"></span>
       </a>
       <div class="center assist-spinner" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin"></i></div>
@@ -306,19 +293,19 @@ from desktop.views import _ko
       <!-- ko if: selectedSource().selectedNamespace().selectedDatabase() -->
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
-        <i class="fa fa-database assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')' }"></span>
+        <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() +  (nonSqlType ? '' : ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')') }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
-      <!-- ko if: selectedSource().namespaceRefreshEnabled() || selectedSource().namespaces().length > 1-->
+      <!-- ko if: window.HAS_MULTI_CLUSTER-->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
       </a>
       <!-- /ko -->
-      <!-- ko if: !selectedSource().namespaceRefreshEnabled() && selectedSource().namespaces().length <= 1 -->
+      <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
@@ -348,19 +335,6 @@ from desktop.views import _ko
         <!-- ko with: selectedDatabase -->
           <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
         <!-- /ko -->
-      <!-- /ko -->
-    <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="assist-solr-inner-panel">
-    <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-    <!-- ko with: selectedSource -->
-      <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' }--><!-- /ko -->
-      <!-- ko with: selectedNamespace -->
-        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-        <!-- ko with: selectedDatabase -->
-          <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
-        <!-- /ko-->
       <!-- /ko -->
     <!-- /ko -->
   </script>
@@ -491,6 +465,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=' + path,
             params: { dest: path },
@@ -499,6 +474,7 @@ from desktop.views import _ko
             onComplete: function () { huePubSub.publish('assist.hdfs.refresh'); huePubSub.publish('fb.hdfs.refresh', path); } }" title="${_('Upload file')}" href="javascript:void(0)">
         <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
       </a>
+      % endif
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
@@ -506,6 +482,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-adls-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=adl:' + path,
             params: { dest: path },
@@ -514,6 +491,7 @@ from desktop.views import _ko
             onComplete: function () { huePubSub.publish('assist.adls.refresh'); } }" title="${_('Upload file')}" href="javascript:void(0)">
         <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
       </a>
+      % endif
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.adls.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
@@ -642,7 +620,7 @@ from desktop.views import _ko
       <span class="dropdown new-document-drop-down">
 
         <a class="inactive-action dropdown-toggle" data-toggle="dropdown" data-bind="dropdown" href="javascript:void(0);">
-             <i class="pointer fa fa-plus" title="${ _('New document') }"></i>
+          <i class="pointer fa fa-plus" title="${ _('New document') }"></i>
         </a>
         <ul class="dropdown-menu less-padding document-types" style="margin-top:3px; margin-left:-140px; width: 175px;position: absolute;" role="menu">
             % if 'beeswax' in apps:
@@ -861,7 +839,7 @@ from desktop.views import _ko
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredNamespaces().length"></span>)</span>
-      <!-- ko if: namespaceRefreshEnabled -->
+      <!-- ko if: window.HAS_MULTI_CLUSTER -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
       <!-- /ko -->
@@ -950,11 +928,16 @@ from desktop.views import _ko
       <!-- /ko -->
       <ul class="assist-tables" data-bind="foreach: filteredNamespaces">
         <li class="assist-table">
+          <!-- ko if: status() === 'STARTING' -->
+          <span class="assist-table-link" title="${_('Starting')}" data-bind="tooltip: { placement: 'bottom' }"><i class="fa fa-fw fa-spinner fa-spin muted valign-middle"></i> <span data-bind="text: name"></span></span>
+          <!-- /ko -->
+          <!-- ko if: status() !== 'STARTING' -->
           <!-- ko if: namespace.computes.length -->
           <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
           <!-- /ko -->
           <!-- ko ifnot: namespace.computes.length -->
           <span class="assist-table-link" title="${_('No related computes')}" data-bind="tooltip: { placement: 'bottom' }"><i class="fa fa-fw fa-warning muted valign-middle"></i> <span data-bind="text: name"></span></span>
+          <!-- /ko -->
           <!-- /ko -->
         </li>
       </ul>
@@ -989,6 +972,7 @@ from desktop.views import _ko
             params: {
               querySpec: filter.querySpec,
               facets: [],
+              placeHolder: sourceType === 'solr' || sourceType === 'kafka' ? '${_('Filter sources...')}' : '${_('Filter databases...')}',
               knownFacetValues: {},
               autocompleteFromEntries: autocompleteFromEntries
             }
@@ -1065,7 +1049,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); } }">
+    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: '${ not (hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get()) }' === 'True' }">
       <!-- ko if: availablePanels().length > 1 -->
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
@@ -1209,7 +1193,8 @@ from desktop.views import _ko
 
         self.visible = ko.observable(options.visible || true);
         options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
-        self.templateName = 'assist-' + self.type + '-inner-panel';
+
+        self.templateName = 'assist-' + (['solr', 'kafka'].indexOf(self.type) !== -1 ? 'sql' : self.type) + '-inner-panel';
 
         var loadWhenVisible = function () {
           if (! self.visible()) {
@@ -1236,6 +1221,8 @@ from desktop.views import _ko
        * @param {boolean} options.navigationSettings.openItem
        * @param {boolean} options.navigationSettings.showStats
        * @param {boolean} options.navigationSettings.pinEnabled
+       * @param {boolean} [options.isSolr] - Detfault false;
+       * @param {boolean} [options.isStreams] - Detfault false;
        * @constructor
        **/
       function AssistDbPanel(options) {
@@ -1246,15 +1233,19 @@ from desktop.views import _ko
         self.initialized = false;
         self.initalizing = false;
 
+        self.isStreams = options.isStreams;
+        self.isSolr = options.isSolr;
+        self.nonSqlType = self.isSolr || self.isStreams;
+
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
 
-          if (options.isSolr) {
+          if (self.isSolr) {
             options.sourceTypes = [{
               type: 'solr',
               name: 'solr'
             }];
-          } else if (options.isKafka) {
+          } else if (self.isStreams) {
             options.sourceTypes = [{
               type: 'kafka',
               name: 'kafka'
@@ -1300,16 +1291,24 @@ from desktop.views import _ko
             i18n: self.i18n,
             type: sourceType.type,
             name: sourceType.name,
+            nonSqlType: sourceType.type === 'solr' || sourceType.type === 'kafka',
             navigationSettings: options.navigationSettings
           });
           self.sources.push(self.sourceIndex[sourceType.type]);
         });
 
-        huePubSub.subscribe('assist.collections.refresh', function() {
-          DataCatalog.getEntry({ sourceType: 'solr', namespace: self.sourceIndex['solr'].activeNamespace(), compute: self.sourceIndex['solr'].activeCompute(), path: [] }).done(function (entry) {
-            entry.clearCache({ cascade: true });
+        if (self.sources().length === 1) {
+          self.selectedSource(self.sources()[0]);
+        }
+
+        if (self.sourceIndex['solr']) {
+          huePubSub.subscribe('assist.collections.refresh', function() {
+            var namespace = self.sourceIndex['solr'].selectedNamespace();
+            DataCatalog.getEntry({ sourceType: 'solr', namespace: namespace, compute: namespace.compute(), path: [] }).done(function (entry) {
+              entry.clearCache({ cascade: true });
+            });
           });
-        });
+        }
 
         huePubSub.subscribe('assist.db.highlight', function (catalogEntry) {
           huePubSub.publish('left.assist.show');
@@ -1336,7 +1335,7 @@ from desktop.views import _ko
           }, 0);
         });
 
-        if (!options.isSolr) {
+        if (!self.isSolr && !self.isStreams) {
           huePubSub.subscribe('assist.set.database', function (databaseDef) {
             if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
               return;
@@ -1359,10 +1358,11 @@ from desktop.views import _ko
                         name: assistDbSource.selectedNamespace().selectedDatabase().name
                       })
                     } else {
+                      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id, 'lastSelectedDb', 'default');
                       deferred.resolve({
                         sourceType: source,
                         namespace: assistDbSource.selectedNamespace().namespace,
-                        name: 'default'
+                        name: lastSelectedDb
                       })
                     }
                   });
@@ -1419,7 +1419,7 @@ from desktop.views import _ko
           });
         }
 
-        if (options.isSolr) {
+        if (self.isSolr || self.isStreams) {
           if (self.sources().length === 1) {
             self.selectedSource(self.sources()[0]);
             self.selectedSource().loadNamespaces().done(function () {
@@ -1435,12 +1435,15 @@ from desktop.views import _ko
         }
 
         self.breadcrumb = ko.computed(function () {
-          if (self.selectedSource()) {
+          if (self.isStreams && self.selectedSource()) {
+            return self.selectedSource().name;
+          }
+          if (!self.isSolr && self.selectedSource()) {
             if (self.selectedSource().selectedNamespace()) {
               if (self.selectedSource().selectedNamespace().selectedDatabase()) {
                 return self.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name
               }
-              if (self.selectedSource().namespaceRefreshEnabled() || self.selectedSource().namespaces().length > 1) {
+              if (window.HAS_MULTI_CLUSTER) {
                 return self.selectedSource().selectedNamespace().name
               }
             }
@@ -1452,11 +1455,15 @@ from desktop.views import _ko
 
       AssistDbPanel.prototype.back = function () {
         var self = this;
+        if (self.isStreams) {
+          self.selectedSource(null);
+          return;
+        }
         if (self.selectedSource()) {
           if (self.selectedSource() && self.selectedSource().selectedNamespace()) {
             if (self.selectedSource().selectedNamespace().selectedDatabase()) {
               self.selectedSource().selectedNamespace().selectedDatabase(null);
-            } else if (self.selectedSource().namespaceRefreshEnabled() || self.selectedSource().namespaces().length > 1) {
+            } else if (window.HAS_MULTI_CLUSTER) {
               self.selectedSource().selectedNamespace(null)
             } else {
               self.selectedSource(null);
@@ -1472,8 +1479,10 @@ from desktop.views import _ko
         if (self.initialized) {
           return;
         }
-        if (self.options.isSolr) {
+        if (self.isSolr) {
           self.selectedSource(self.sourceIndex['solr']);
+        } else if (self.isStreams) {
+            self.selectedSource(self.sourceIndex['kafka']);
         } else {
           var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
           if (!self.selectedSource()) {
@@ -1919,7 +1928,7 @@ from desktop.views import _ko
           window.setTimeout(function () {
             window.location.hash = hash;
           }, 0);
-        }
+        };
 
         self.lastClickeHBaseEntry = null;
         self.HBaseLoaded = false;
@@ -2112,19 +2121,19 @@ from desktop.views import _ko
               }
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('kafka') != -1) {
-                var kafkaPanel = new AssistInnerPanel({
+                var streamsPanel = new AssistInnerPanel({
                   panelData: new AssistDbPanel($.extend({
                     apiHelper: self.apiHelper,
                     i18n: i18nCollections,
-                    isKafka: true
+                    isStreams: true
                   }, params.sql)),
                   apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
-                  type: 'solr',
+                  type: 'kafka',
                   icon: 'fa-sitemap',
                   minHeight: 75
                 });
-                panels.push(kafkaPanel);
+                panels.push(streamsPanel);
               }
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
@@ -2284,7 +2293,6 @@ from desktop.views import _ko
         <!-- ko if: selectedTopic -->
         <div class="assist-flex-60 assist-docs-details" data-bind="with: selectedTopic">
           <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
-          <div class="assist-function-signature blue" data-bind="html: titleMatch() || title"></div>
           <div data-bind="html: bodyMatch() || body()"></div>
         </div>
         <!-- /ko -->
@@ -2400,7 +2408,7 @@ from desktop.views import _ko
 
         self.disposals.push(function () {
           selectedSub.dispose();
-        })
+        });
         self.query = ko.observable();
         self.filteredTopics = ko.pureComputed(function () {
           var lowerCaseQuery = self.query().toLowerCase();
@@ -2453,13 +2461,12 @@ from desktop.views import _ko
 
         huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
 
-        var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (topicId) {
-          var mainTopic = topicId.split('#')[0]; // TODO: Handle subtopics
+        var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (targetTopic) {
           var topicStack = [];
           var findTopic = function (topics) {
             topics.some(function (topic) {
               topicStack.push(topic);
-              if (topic.ref === mainTopic) {
+              if (topic.ref === targetTopic.ref) {
                 while (topicStack.length) {
                   topicStack.pop().open(true);
                 }
@@ -2482,8 +2489,11 @@ from desktop.views import _ko
         });
 
         $(element).on('click.langref', function (event) {
-          if (event.target.className === 'lang-ref-link') {
-            huePubSub.publish('assist.lang.ref.panel.show.topic', $(event.target).data('target'));
+          if (event.target.className === 'hue-doc-internal-link') {
+            huePubSub.publish('assist.lang.ref.panel.show.topic', {
+              ref: $(event.target).data('doc-ref'),
+              anchorId: $(event.target).data('doc-anchor-id')
+            });
           }
         });
 
@@ -2680,7 +2690,7 @@ from desktop.views import _ko
             } --><!-- /ko -->
           </div>
         </div>
-        <div class="assist-flex-half assist-db-scrollable" data-bind="delayedOverflow">
+        <div class="assist-flex-fill assist-db-scrollable" data-bind="delayedOverflow">
           <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
           <div class="assist-no-entries">
             <!-- ko if: isSolr -->
@@ -2719,7 +2729,7 @@ from desktop.views import _ko
 
         <!-- ko if: HAS_OPTIMIZER && !isSolr() -->
         <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Query Analysis') }</div></div>
-        <div data-bind="css: HAS_WORKLOAD_ANALYTICS ? 'assist-flex-quarter' : 'assist-flex-half'">
+        <div class="assist-flex-third">
           <!-- ko if: ! activeRisks().hints -->
           <div class="assist-no-entries">${ _('Select a query or start typing to get optimization hints.') }</div>
           <!-- /ko -->
@@ -2749,84 +2759,56 @@ from desktop.views import _ko
           <!-- /ko -->
         </div>
         <!-- /ko -->
-
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && !isSolr() -->
-          <div class="assist-flex-header" data-bind="css: { 'assist-divider': !HAS_OPTIMIZER }"><div class="assist-inner-header">${ _('Execution Analysis') }</div></div>
-          <div data-bind="css: HAS_OPTIMIZER ? 'assist-flex-quarter' : 'assist-flex-half'">
-          <!-- ko hueSpinner: { spin: loadingExecutionAnalysis, inline: true} --><!-- /ko -->
-            <!-- ko ifnot: loadingExecutionAnalysis -->
-            <!-- ko if: !executionAnalysis() -->
-            <div class="assist-no-entries">${ _('Execute a query to get query execution analysis.') }</div>
-            <!-- /ko -->
-            <!-- ko with: executionAnalysis -->
-            <ul class="risk-list" data-bind="foreach: healthChecks">
-              <li data-bind="templatePopover : { placement: 'left', contentTemplate: 'health-check-details-content', titleTemplate: 'health-check-details-title', minWidth: '320px', trigger: 'hover' }">
-                <div class="risk-list-title risk-list-normal"><span data-bind="text: name"></span></div>
-              </li>
-            </ul>
-            <!-- /ko -->
-          <!-- /ko -->
-          </div>
-        <!-- /ko -->
       </div>
     </div>
   </script>
 
-  <script type="text/html" id="health-check-details-content">
-    <div data-bind="text: description"></div>
-  </script>
-
-  <script type="text/html" id="health-check-details-title">
-    <span data-bind="text: name"></span>
-  </script>
-
   <script type="text/javascript">
     var AssistantUtils = (function () {
-          return {
-            getFilteredTablesPureComputed: function (vm) {
-              var openedByFilter = [];
-              return ko.pureComputed(function () {
-                if (vm.filter === null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
-                  while (openedByFilter.length) {
-                    openedByFilter.pop().open(false);
-                  }
-                  return vm.activeTables();
-                }
-
-                var facets = vm.filter.querySpec().facets;
-
-                var result = [];
-                $.each(vm.activeTables(), function (index, entry) {
-                  var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
-                  if (!facetMatch && facets['type']['table']) {
-                    facetMatch = entry.catalogEntry.isTable();
-                  }
-                  if (!facetMatch && facets['type']['view']) {
-                    facetMatch = entry.catalogEntry.isView();
-                  }
-
-                  var textMatch = !vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0;
-                  if (!textMatch) {
-                    var nameLower = entry.catalogEntry.name.toLowerCase();
-                    textMatch = vm.filter.querySpec().text.every(function (text) {
-                      return nameLower.indexOf(text.toLowerCase()) !== -1;
-                    });
-                  }
-                  entry.filterColumnNames(!textMatch);
-                  if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
-                    if (!entry.open()) {
-                      entry.open(true);
-                      openedByFilter.push(entry);
-                    }
-                    result.push(entry);
-                  }
-                });
-                return result;
-              });
+      return {
+        getFilteredTablesPureComputed: function (vm) {
+          var openedByFilter = [];
+          return ko.pureComputed(function () {
+            if (vm.filter === null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
+              while (openedByFilter.length) {
+                openedByFilter.pop().open(false);
+              }
+              return vm.activeTables();
             }
-          }
-        })();
 
+            var facets = vm.filter.querySpec().facets;
+
+            var result = [];
+            $.each(vm.activeTables(), function (index, entry) {
+              var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
+              if (!facetMatch && facets['type']['table']) {
+                facetMatch = entry.catalogEntry.isTable();
+              }
+              if (!facetMatch && facets['type']['view']) {
+                facetMatch = entry.catalogEntry.isView();
+              }
+
+              var textMatch = !vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0;
+              if (!textMatch) {
+                var nameLower = entry.catalogEntry.name.toLowerCase();
+                textMatch = vm.filter.querySpec().text.every(function (text) {
+                  return nameLower.indexOf(text.toLowerCase()) !== -1;
+                });
+              }
+              entry.filterColumnNames(!textMatch);
+              if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
+                if (!entry.open()) {
+                  entry.open(true);
+                  openedByFilter.push(entry);
+                }
+                result.push(entry);
+              }
+            });
+            return result;
+          });
+        }
+      }
+    })();
 
     (function () {
       function EditorAssistantPanel(params) {
@@ -2849,9 +2831,6 @@ from desktop.views import _ko
         self.activeLocations = ko.observable();
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
-
-        self.loadingExecutionAnalysis = ko.observable(false);
-        self.executionAnalysis = ko.observable();
 
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
@@ -3193,39 +3172,9 @@ from desktop.views import _ko
           }
         });
 
-        var lastExecutionAnalysisPromise = undefined;
-
-        var clearAnalysisSub = huePubSub.subscribe('assist.clear.execution.analysis', function() {
-          if (!HAS_WORKLOAD_ANALYTICS) {
-            return;
-          }
-          if (lastExecutionAnalysisPromise) {
-            lastExecutionAnalysisPromise.cancel();
-          }
-          self.executionAnalysis(undefined);
-        });
-
-        var executionAnalysisSub = huePubSub.subscribe('assist.update.execution.analysis', function (details) {
-          if (!HAS_WORKLOAD_ANALYTICS) {
-            return;
-          }
-          self.loadingExecutionAnalysis(true);
-          lastExecutionAnalysisPromise = ApiHelper.getInstance().fetchQueryExecutionAnalysis({
-            silenceErrors: true,
-            computeId: details.computeId,
-            queryId: details.queryId
-          }).done(function (response) {
-            self.executionAnalysis(response.query)
-          }).always(function () {
-            self.loadingExecutionAnalysis(false);
-          });
-        });
-
         self.disposals.push(function () {
           entryRefreshedSub.remove();
           activeTabSub.dispose();
-          clearAnalysisSub.remove();
-          executionAnalysisSub.remove();
         });
 
         var activeLocationsSub = huePubSub.subscribe('editor.active.locations', function (activeLocations) {
@@ -3252,7 +3201,6 @@ from desktop.views import _ko
           activeLocationsSub.remove();
           activeRisksSub.remove();
         });
-
       }
 
       EditorAssistantPanel.prototype.addFilter = function (riskId) {
@@ -3475,6 +3423,7 @@ from desktop.views import _ko
             initialCompute: collection.activeCompute,
             type: collection.engine(),
             name: collection.engine(),
+            nonSqlType: true,
             navigationSettings: navigationSettings
           });
 
@@ -3617,12 +3566,12 @@ from desktop.views import _ko
           }
         });
 
-        huePubSub.subscribe('assist.lang.ref.show.topic', function (topicId) {
+        huePubSub.subscribe('assist.lang.ref.show.topic', function (targetTopic) {
           huePubSub.publish('right.assist.show');
           if (self.langRefTabAvailable() && self.activeTab() !== LANG_REF_TAB) {
             self.activeTab(LANG_REF_TAB);
           }
-          huePubSub.publish('assist.lang.ref.panel.show.topic', topicId)
+          huePubSub.publish('assist.lang.ref.panel.show.topic', targetTopic)
         });
 
         var updateTabs = function () {

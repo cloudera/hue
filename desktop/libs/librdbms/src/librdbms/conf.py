@@ -107,6 +107,17 @@ def get_server_choices():
   return [(alias, DATABASES[alias].NICE_NAME.get() or alias) for alias in DATABASES]
 
 
+def get_connector_name(name):
+  engine = DATABASES[name].ENGINE.get().split('.')[-1] if name in DATABASES else None
+  return {
+    'sqlite': 'sqlite',
+    'sqlite3': 'sqlite',
+    'postgresql_psycopg2': 'postgresql',
+    'postgresql': 'postgresql',
+    'mysql': 'mysql'
+  }.get(engine, name)
+
+
 def get_database_password(name):
   """
   Return the configured database password.

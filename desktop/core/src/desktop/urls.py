@@ -157,6 +157,7 @@ dynamic_patterns += [
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   url(r'^desktop/api2/context/namespaces/(?P<interface>\w+)/?$', desktop_api2.get_context_namespaces),
   url(r'^desktop/api2/context/computes/(?P<interface>\w+)/?$', desktop_api2.get_context_computes),
+  url(r'^desktop/api2/context/clusters/(?P<interface>\w+)/?$', desktop_api2.get_context_clusters),
   url(r'^desktop/api2/user_preferences/(?P<key>\w+)?$', desktop_api2.user_preferences, name="desktop.api2.user_preferences"),
 
   url(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
@@ -222,7 +223,6 @@ for app in appmanager.DESKTOP_MODULES:
       app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include(app.urls, **namespace)))
       app.urls_imported = True
 
-static_patterns = []
 static_patterns.append(
     url(r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
       serve,

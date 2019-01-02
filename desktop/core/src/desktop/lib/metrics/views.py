@@ -40,7 +40,7 @@ def index(request):
       'timestamp': datetime.datetime.utcnow().isoformat(),
       'metric': global_registry().dump_metrics(),
   }
-  LOG.debug('Metrics: %s' % json.dumps(rep, indent=indent))
+
   if request.is_ajax():
     return JsonResponse(rep, json_dumps_params={'indent': indent})
   else:

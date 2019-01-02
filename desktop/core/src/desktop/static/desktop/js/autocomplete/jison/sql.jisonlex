@@ -201,6 +201,7 @@
 <hive>'WAIT'                               { return '<hive>WAIT'; }
 <hive>'WEEK'                               { return '<hive>WEEK'; }
 <hive>'WINDOW'                             { return '<hive>WINDOW'; }
+<hive>'WITH'                               { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return '<hive>WITH'; }
 <hive>'YEAR'                               { return '<hive>YEAR'; }
 
 <hive>'.'                                  { return '<hive>.'; }
@@ -210,68 +211,228 @@
 // Reserved Keywords
 <impala>'ADD'                              { return '<impala>ADD'; }
 <impala>'AGGREGATE'                        { return '<impala>AGGREGATE'; }
+<impala>'ALLOCATE'                         { return '<impala>ALLOCATE'; }
+<impala>'ANALYTIC'                         { return '<impala>ANALYTIC'; }
+<impala>'ANTI'                             { return '<impala>ANTI'; }
+<impala>'ANY'                              { return '<impala>ANY'; }
+<impala>'ARE'                              { return '<impala>ARE'; }
+<impala>'ARRAY_AGG'                        { return '<impala>ARRAY_AGG'; }
+<impala>'ARRAY_MAX_CARDINALITY'            { return '<impala>ARRAY_MAX_CARDINALITY'; }
+<impala>'ASENSITIVE'                       { return '<impala>ASENSITIVE'; }
+<impala>'ASYMMETRIC'                       { return '<impala>ASYMMETRIC'; }
+<impala>'AT'                               { return '<impala>AT'; }
+<impala>'ATOMIC'                           { return '<impala>ATOMIC'; }
+<impala>'AUTHORIZATION'                    { return '<impala>AUTHORIZATION'; }
 <impala>'AVRO'                             { return '<impala>AVRO'; }
+<impala>'BEGIN_FRAME'                      { return '<impala>BEGIN_FRAME'; }
+<impala>'BEGIN_PARTITION'                  { return '<impala>BEGIN_PARTITION'; }
+<impala>'BLOB'                             { return '<impala>BLOB'; }
+<impala>'BLOCK_SIZE'                       { return '<impala>BLOCK_SIZE'; }
+<impala>'BOTH'                             { return '<impala>BOTH'; }
 <impala>'CACHED'                           { return '<impala>CACHED'; }
+<impala>'CALLED'                           { return '<impala>CALLED'; }
+<impala>'CARDINALITY'                      { return '<impala>CARDINALITY'; }
 <impala>'CASCADE'                          { return '<impala>CASCADE'; }
+<impala>'CASCADED'                         { return '<impala>CASCADED'; }
 <impala>'CHANGE'                           { return '<impala>CHANGE'; }
+<impala>'CHARACTER'                        { return '<impala>CHARACTER'; }
+<impala>'CLOB'                             { return '<impala>CLOB'; }
 <impala>'CLOSE_FN'                         { return '<impala>CLOSE_FN'; }
+<impala>'COLLATE'                          { return '<impala>COLLATE'; }
+<impala>'COLLECT'                          { return '<impala>COLLECT'; }
 <impala>'COLUMN'                           { return '<impala>COLUMN'; }
 <impala>'COLUMNS'                          { return '<impala>COLUMNS'; }
 <impala>'COMMENT'                          { parser.determineCase(yytext); return '<impala>COMMENT'; }
+<impala>'COMMIT'                           { return '<impala>COMMIT'; }
+<impala>'COMPRESSION'                      { return '<impala>COMPRESSION'; }
 <impala>'COMPUTE'                          { parser.determineCase(yytext); return '<impala>COMPUTE'; }
+<impala>'CONDITION'                        { return '<impala>CONDITION'; }
+<impala>'CONNECT'                          { return '<impala>CONNECT'; }
+<impala>'CONSTRAINT'                       { return '<impala>CONSTRAINT'; }
+<impala>'CONTAINS'                         { return '<impala>CONTAINS'; }
+<impala>'CONVERT'                          { return '<impala>CONVERT'; }
+<impala>'COPY'                             { return '<impala>COPY'; }
+<impala>'CORR'                             { return '<impala>CORR'; }
+<impala>'CORRESPONDING'                    { return '<impala>CORRESPONDING'; }
+<impala>'COVAR_POP'                        { return '<impala>COVAR_POP'; }
+<impala>'COVAR_SAMP'                       { return '<impala>COVAR_SAMP'; }
 <impala>'CREATE'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('CREATE', yylloc, yy.lexer.upcomingInput()); return '<impala>CREATE'; }
+<impala>'CUBE'                             { return '<impala>CUBE'; }
+<impala>'CURRENT'                          { return '<impala>CURRENT'; }
+<impala>'CURRENT_DATE'                     { return '<impala>CURRENT_DATE'; }
+<impala>'CURRENT_DEFAULT_TRANSFORM_GROUP'  { return '<impala>CURRENT_DEFAULT_TRANSFORM_GROUP'; }
+<impala>'CURRENT_PATH'                     { return '<impala>CURRENT_PATH'; }
+<impala>'CURRENT_ROLE'                     { return '<impala>CURRENT_ROLE'; }
+<impala>'CURRENT_ROW'                      { return '<impala>CURRENT_ROW'; }
+<impala>'CURRENT_SCHEMA'                   { return '<impala>CURRENT_SCHEMA'; }
+<impala>'CURRENT_TIME'                     { return '<impala>CURRENT_TIME'; }
+<impala>'CURRENT_TRANSFORM_GROUP_FOR_TYPE' { return '<impala>CURRENT_TRANSFORM_GROUP_FOR_TYPE'; }
+<impala>'CURSOR'                           { return '<impala>CURSOR'; }
+<impala>'CYCLE'                            { return '<impala>CYCLE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
 <impala>'DATABASES'                        { return '<impala>DATABASES'; }
+<impala>'DEALLOCATE'                       { return '<impala>DEALLOCATE'; }
+<impala>'DEC'                              { return '<impala>DEC'; }
+<impala>'DECFLOAT'                         { return '<impala>DECFLOAT'; }
+<impala>'DECLARE'                          { return '<impala>DECLARE'; }
+<impala>'DEFINE'                           { return '<impala>DEFINE'; }
 <impala>'DELETE'                           { return '<impala>DELETE'; }
 <impala>'DELIMITED'                        { return '<impala>DELIMITED'; }
+<impala>'DEREF'                            { return '<impala>DEREF'; }
 <impala>'DESCRIBE'                         { parser.determineCase(yytext); parser.addStatementTypeLocation('DESCRIBE', yylloc); return '<impala>DESCRIBE'; }
+<impala>'DETERMINISTIC'                    { return '<impala>DETERMINISTIC'; }
+<impala>'DISCONNECT'                       { return '<impala>DISCONNECT'; }
+<impala>'DYNAMIC'                          { return '<impala>DYNAMIC'; }
+<impala>'EACH'                             { return '<impala>EACH'; }
+<impala>'ELEMENT'                          { return '<impala>ELEMENT'; }
+<impala>'EMPTY'                            { return '<impala>EMPTY'; }
+<impala>'ENCODING'                         { return '<impala>ENCODING'; }
+<impala>'END_FRAME'                        { return '<impala>END_FRAME'; }
+<impala>'END_PARTITION'                    { return '<impala>END_PARTITION'; }
+<impala>'EQUALS'                           { return '<impala>EQUALS'; }
+<impala>'ESCAPE'                           { return '<impala>ESCAPE'; }
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
+<impala>'EVERY'                            { return '<impala>EVERY'; }
+<impala>'EXCEPT'                           { return '<impala>EXCEPT'; }
+<impala>'EXEC'                             { return '<impala>EXEC'; }
+<impala>'EXECUTE'                          { return '<impala>EXECUTE'; }
 <impala>'EXPLAIN'                          { parser.determineCase(yytext); parser.addStatementTypeLocation('EXPLAIN', yylloc); return '<impala>EXPLAIN'; }
-<impala>'EXTERNAL'                         { return '<impala>EXTERNAL'; }
 <impala>'EXTENDED'                         { return '<impala>EXTENDED'; }
+<impala>'EXTERNAL'                         { return '<impala>EXTERNAL'; }
+<impala>'FETCH'                            { return '<impala>FETCH'; }
 <impala>'FIELDS'                           { return '<impala>FIELDS'; }
 <impala>'FILEFORMAT'                       { return '<impala>FILEFORMAT'; }
 <impala>'FILES'                            { return '<impala>FILES'; }
+<impala>'FILTER'                           { return '<impala>FILTER'; }
 <impala>'FINALIZE_FN'                      { return '<impala>FINALIZE_FN'; }
 <impala>'FIRST'                            { return '<impala>FIRST'; }
+<impala>'FOR'                              { return '<impala>FOR'; }
+<impala>'FOREIGN'                          { return '<impala>FOREIGN'; }
 <impala>'FORMAT'                           { return '<impala>FORMAT'; }
 <impala>'FORMATTED'                        { return '<impala>FORMATTED'; }
+<impala>'FRAME_ROW'                        { return '<impala>FRAME_ROW'; }
+<impala>'FREE'                             { return '<impala>FREE'; }
 <impala>'FUNCTION'                         { return '<impala>FUNCTION'; }
 <impala>'FUNCTIONS'                        { return '<impala>FUNCTIONS'; }
+<impala>'FUSION'                           { return '<impala>FUSION'; }
+<impala>'GET'                              { return '<impala>GET'; }
+<impala>'GLOBAL'                           { return '<impala>GLOBAL'; }
+<impala>'GRANT'                            { parser.determineCase(yytext); parser.addStatementTypeLocation('GRANT', yylloc); return '<impala>GRANT'; }
 <impala>'GROUP'                            { return '<impala>GROUP'; }
+<impala>'GROUPING'                         { return '<impala>GROUPING'; }
+<impala>'GROUPS'                           { return '<impala>GROUPS'; }
 <impala>'HASH'                             { return '<impala>HASH'; }
+<impala>'HOLD'                             { return '<impala>HOLD'; }
+<impala>'IGNORE'                           { return '<impala>IGNORE'; }
 <impala>'ILIKE'                            { return '<impala>ILIKE'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
-<impala>'INSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('INSERT', yylloc); return '<impala>INSERT'; }
-<impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
-<impala>'INTERMEDIATE'                     { return '<impala>INTERMEDIATE'; }
+<impala>'INDICATOR'                        { return '<impala>INDICATOR'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
-<impala>'INVALIDATE'                       { parser.determineCase(yytext); parser.addStatementTypeLocation('INVALIDATE', yylloc, yy.lexer.upcomingInput()); return '<impala>INVALIDATE'; }
+<impala>'INITIAL'                          { return '<impala>INITIAL'; }
+<impala>'INOUT'                            { return '<impala>INOUT'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
+<impala>'INSENSITIVE'                      { return '<impala>INSENSITIVE'; }
+<impala>'INSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('INSERT', yylloc); return '<impala>INSERT'; }
+<impala>'INTERMEDIATE'                     { return '<impala>INTERMEDIATE'; }
+<impala>'INTERSECT'                        { return '<impala>INTERSECT'; }
+<impala>'INTERSECTION'                     { return '<impala>INTERSECTION'; }
+<impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
+<impala>'INVALIDATE'                       { parser.determineCase(yytext); parser.addStatementTypeLocation('INVALIDATE', yylloc, yy.lexer.upcomingInput()); return '<impala>INVALIDATE'; }
 <impala>'IREGEXP'                          { return '<impala>IREGEXP'; }
+<impala>'JSON_ARRAY'                       { return '<impala>JSON_ARRAY'; }
+<impala>'JSON_ARRAYAGG'                    { return '<impala>JSON_ARRAYAGG'; }
+<impala>'JSON_EXISTS'                      { return '<impala>JSON_EXISTS'; }
+<impala>'JSON_OBJECT'                      { return '<impala>JSON_OBJECT'; }
+<impala>'JSON_OBJECTAGG'                   { return '<impala>JSON_OBJECTAGG'; }
+<impala>'JSON_QUERY'                       { return '<impala>JSON_QUERY'; }
+<impala>'JSON_TABLE'                       { return '<impala>JSON_TABLE'; }
+<impala>'JSON_TABLE_PRIMITIVE'             { return '<impala>JSON_TABLE_PRIMITIVE'; }
+<impala>'JSON_VALUE'                       { return '<impala>JSON_VALUE'; }
 <impala>'KEY'                              { return '<impala>KEY'; }
 <impala>'KUDU'                             { return '<impala>KUDU'; }
+<impala>'LARGE'                            { return '<impala>LARGE'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
+<impala>'LATERAL'                          { return '<impala>LATERAL'; }
+<impala>'LEADING'                          { return '<impala>LEADING'; }
 <impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
+<impala>'LIKE_REGEX'                       { return '<impala>LIKE_REGEX'; }
 <impala>'LIMIT'                            { return '<impala>LIMIT'; }
 <impala>'LINES'                            { return '<impala>LINES'; }
+<impala>'LISTAGG'                          { return '<impala>LISTAGG'; }
 <impala>'LOAD'                             { parser.determineCase(yytext); parser.addStatementTypeLocation('LOAD', yylloc, yy.lexer.upcomingInput()); return '<impala>LOAD'; }
+<impala>'LOCAL'                            { return '<impala>LOCAL'; }
+<impala>'LOCALTIMESTAMP'                   { return '<impala>LOCALTIMESTAMP'; }
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
+<impala>'MATCH'                            { return '<impala>MATCH'; }
+<impala>'MATCH_NUMBER'                     { return '<impala>MATCH_NUMBER'; }
+<impala>'MATCH_RECOGNIZE'                  { return '<impala>MATCH_RECOGNIZE'; }
+<impala>'MATCHES'                          { return '<impala>MATCHES'; }
+<impala>'MERGE'                            { return '<impala>MERGE'; }
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
 <impala>'METADATA'                         { return '<impala>METADATA'; }
+<impala>'METHOD'                           { return '<impala>METHOD'; }
+<impala>'MODIFIES'                         { return '<impala>MODIFIES'; }
+<impala>'MULTISET'                         { return '<impala>MULTISET'; }
+<impala>'NATIONAL'                         { return '<impala>NATIONAL'; }
+<impala>'NATURAL'                          { return '<impala>NATURAL'; }
+<impala>'NCHAR'                            { return '<impala>NCHAR'; }
+<impala>'NCLOB'                            { return '<impala>NCLOB'; }
+<impala>'NO'                               { return '<impala>NO'; }
+<impala>'NONE'                             { return '<impala>NONE'; }
+<impala>'NORMALIZE'                        { return '<impala>NORMALIZE'; }
+<impala>'NTH_VALUE'                        { return '<impala>NTH_VALUE'; }
 <impala>'NULLS'                            { return '<impala>NULLS'; }
+<impala>'NUMERIC'                          { return '<impala>NUMERIC'; }
+<impala>'OCCURRENCES_REGEX'                { return '<impala>OCCURRENCES_REGEX'; }
+<impala>'OCTET_LENGTH'                     { return '<impala>OCTET_LENGTH'; }
+<impala>'OF'                               { return '<impala>OF'; }
 <impala>'OFFSET'                           { return '<impala>OFFSET'; }
+<impala>'OMIT'                             { return '<impala>OMIT'; }
+<impala>'ONE'                              { return '<impala>ONE'; }
+<impala>'ONLY'                             { return '<impala>ONLY'; }
 <impala>'ORC'                              { return '<impala>ORC'; }
+<impala>'OUT'                              { return '<impala>OUT'; }
+<impala>'OVER'                             { return '<impala>OVER'; }
+<impala>'OVERLAPS'                         { return '<impala>OVERLAPS'; }
+<impala>'OVERLAY'                          { return '<impala>OVERLAY'; }
 <impala>'OVERWRITE'                        { return '<impala>OVERWRITE'; }
 <impala>'PARQUET'                          { return '<impala>PARQUET'; }
+<impala>PARTITION\s+VALUE\s                { return '<impala>PARTITION_VALUE'; }
 <impala>'PARTITIONED'                      { return '<impala>PARTITIONED'; }
 <impala>'PARTITIONS'                       { return '<impala>PARTITIONS'; }
+<impala>'PATTERN'                          { return '<impala>PATTERN'; }
+<impala>'PER'                              { return '<impala>PER'; }
+<impala>'PERCENT'                          { return '<impala>PERCENT'; }
+<impala>'PERCENTILE_CONT'                  { return '<impala>PERCENTILE_CONT'; }
+<impala>'PERCENTILE_DISC'                  { return '<impala>PERCENTILE_DISC'; }
+<impala>'PORTION'                          { return '<impala>PORTION'; }
+<impala>'POSITION'                         { return '<impala>POSITION'; }
+<impala>'POSITION_REGEX'                   { return '<impala>POSITION_REGEX'; }
+<impala>'PRECEDES'                         { return '<impala>PRECEDES'; }
+<impala>'PREPARE'                          { return '<impala>PREPARE'; }
 <impala>'PREPARE_FN'                       { return '<impala>PREPARE_FN'; }
 <impala>'PRIMARY'                          { return '<impala>PRIMARY'; }
-<impala>'RCFILE'                           { return '<impala>RCFILE'; }
+<impala>'PROCEDURE'                        { return '<impala>PROCEDURE'; }
+<impala>'PTF'                              { return '<impala>PTF'; }
 <impala>'RANGE'                            { return '<impala>RANGE'; }
+<impala>'RCFILE'                           { return '<impala>RCFILE'; }
+<impala>'READS'                            { return '<impala>READS'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
+<impala>'RECOVER'                          { return '<impala>RECOVER'; }
+<impala>'RECURSIVE'                        { return '<impala>RECURSIVE'; }
+<impala>'REF'                              { return '<impala>REF'; }
+<impala>'REFERENCES'                       { return '<impala>REFERENCES'; }
+<impala>'REFERENCING'                      { return '<impala>REFERENCING'; }
 <impala>'REFRESH'                          { parser.determineCase(yytext); parser.addStatementTypeLocation('REFRESH', yylloc); return '<impala>REFRESH'; }
+<impala>'REGR_AVGX'                        { return '<impala>REGR_AVGX'; }
+<impala>'REGR_AVGY'                        { return '<impala>REGR_AVGY'; }
+<impala>'REGR_COUNT'                       { return '<impala>REGR_COUNT'; }
+<impala>'REGR_INTERCEPT'                   { return '<impala>REGR_INTERCEPT'; }
+<impala>'REGR_R2REGR_SLOPE'                { return '<impala>REGR_R2REGR_SLOPE'; }
+<impala>'REGR_SXX'                         { return '<impala>REGR_SXX'; }
+<impala>'REGR_SXY'                         { return '<impala>REGR_SXY'; }
+<impala>'REGR_SYY'                         { return '<impala>REGR_SYY'; }
+<impala>'RELEASE'                          { return '<impala>RELEASE'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPEATABLE'                       { return '<impala>REPEATABLE'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
@@ -279,45 +440,85 @@
 <impala>'RESTRICT'                         { return '<impala>RESTRICT'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
 <impala>'REVOKE'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('REVOKE', yylloc); return '<impala>REVOKE'; }
+<impala>'ROLE'                             { return '<impala>ROLE'; }
+<impala>'ROLES'                            { return '<impala>ROLES'; }
+<impala>'ROLLBACK'                         { return '<impala>ROLLBACK'; }
+<impala>'ROLLUP'                           { return '<impala>ROLLUP'; }
+<impala>'RUNNING'                          { return '<impala>RUNNING'; }
+<impala>'SAVEPOINT'                        { return '<impala>SAVEPOINT'; }
+<impala>'SCHEMAS'                          { return '<impala>SCHEMAS'; }
+<impala>'SCOPE'                            { return '<impala>SCOPE'; }
+<impala>'SCROLL'                           { return '<impala>SCROLL'; }
+<impala>'SEARCH'                           { return '<impala>SEARCH'; }
+<impala>'SEEK'                             { return '<impala>SEEK'; }
+<impala>'SENSITIVE'                        { return '<impala>SENSITIVE'; }
 <impala>'SEQUENCEFILE'                     { return '<impala>SEQUENCEFILE'; }
 <impala>'SERDEPROPERTIES'                  { return '<impala>SERDEPROPERTIES'; }
-<impala>'SCHEMAS'                          { return '<impala>SCHEMAS'; }
 <impala>'SERIALIZE_FN'                     { return '<impala>SERIALIZE_FN'; }
 <impala>'SERVER'                           { return '<impala>SERVER'; }
+<impala>'SIMILAR'                          { return '<impala>SIMILAR'; }
+<impala>'SKIP'                             { return '<impala>SKIP'; }
+<impala>'SOME'                             { return '<impala>SOME'; }
 <impala>'SORT'                             { return '<impala>SORT'; }
+<impala>'SPECIFIC'                         { return '<impala>SPECIFIC'; }
+<impala>'SPECIFICTYPE'                     { return '<impala>SPECIFICTYPE'; }
+<impala>'SQLEXCEPTION'                     { return '<impala>SQLEXCEPTION'; }
+<impala>'SQLSTATE'                         { return '<impala>SQLSTATE'; }
+<impala>'SQLWARNING'                       { return '<impala>SQLWARNING'; }
+<impala>'STATIC'                           { return '<impala>STATIC'; }
 <impala>'STATS'                            { return '<impala>STATS'; }
 <impala>'STORED'                           { return '<impala>STORED'; }
 <impala>'STRAIGHT_JOIN'                    { return '<impala>STRAIGHT_JOIN'; }
+<impala>'SUBMULTISET'                      { return '<impala>SUBMULTISET'; }
+<impala>'SUBSET'                           { return '<impala>SUBSET'; }
+<impala>'SUBSTRING_REGEX'                  { return '<impala>SUBSTRING_REGEX'; }
+<impala>'SUCCEEDS'                         { return '<impala>SUCCEEDS'; }
 <impala>'SYMBOL'                           { return '<impala>SYMBOL'; }
+<impala>'SYMMETRIC'                        { return '<impala>SYMMETRIC'; }
+<impala>'SYSTEM_TIME'                      { return '<impala>SYSTEM_TIME'; }
+<impala>'SYSTEM_USER'                      { return '<impala>SYSTEM_USER'; }
 <impala>'TABLE'                            { return '<impala>TABLE'; }
 <impala>'TABLES'                           { return '<impala>TABLES'; }
 <impala>'TABLESAMPLE'                      { return '<impala>TABLESAMPLE'; }
 <impala>'TBLPROPERTIES'                    { return '<impala>TBLPROPERTIES'; }
 <impala>'TERMINATED'                       { return '<impala>TERMINATED'; }
 <impala>'TEXTFILE'                         { return '<impala>TEXTFILE'; }
+<impala>'TIMEZONE_HOUR'                    { return '<impala>TIMEZONE_HOUR'; }
+<impala>'TIMEZONE_MINUTE'                  { return '<impala>TIMEZONE_MINUTE'; }
+<impala>'TRAILING'                         { return '<impala>TRAILING'; }
+<impala>'TRANSLATE_REGEX'                  { return '<impala>TRANSLATE_REGEX'; }
+<impala>'TRANSLATION'                      { return '<impala>TRANSLATION'; }
+<impala>'TREAT'                            { return '<impala>TREAT'; }
+<impala>'TRIGGER'                          { return '<impala>TRIGGER'; }
+<impala>'TRIM_ARRAY'                       { return '<impala>TRIM_ARRAY'; }
+<impala>'UESCAPE'                          { return '<impala>UESCAPE'; }
 <impala>'UNCACHED'                         { return '<impala>UNCACHED'; }
+<impala>'UNIQUE'                           { return '<impala>UNIQUE'; }
+<impala>'UNKNOWN'                          { return '<impala>UNKNOWN'; }
+<impala>'UNNEST'                           { return '<impala>UNNEST'; }
 <impala>'UPDATE_FN'                        { return '<impala>UPDATE_FN'; }
 <impala>'UPSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('UPSERT', yylloc); return '<impala>UPSERT'; }
 <impala>'URI'                              { return '<impala>URI'; }
+<impala>'USER'                             { return '<impala>USER'; }
 <impala>'USING'                            { return '<impala>USING'; }
-<impala>PARTITION\s+VALUE\s                { return '<impala>PARTITION_VALUE'; }
+<impala>'VALUE_OF'                         { return '<impala>VALUE_OF'; }
+<impala>'VARBINARY'                        { return '<impala>VARBINARY'; }
+<impala>'VARCHAR'                          { return '<impala>VARCHAR'; }
+<impala>'VARYING'                          { return '<impala>VARYING'; }
+<impala>'VERSIONING'                       { return '<impala>VERSIONING'; }
+<impala>'WHENEVER'                         { return '<impala>WHENEVER'; }
+<impala>'WIDTH_BUCKET'                     { return '<impala>WIDTH_BUCKET'; }
+<impala>'WINDOW'                           { return '<impala>WINDOW'; }
+<impala>'WITH'                             { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return '<impala>WITH'; }
+<impala>'WITHIN'                           { return '<impala>WITHIN'; }
+<impala>'WITHOUT'                          { return '<impala>WITHOUT'; }
 
 // Non-reserved Keywords
-<impala>'ANALYTIC'                         { return '<impala>ANALYTIC'; }
-<impala>'ANTI'                             { return '<impala>ANTI'; }
 <impala>'ARRAY'                            { return 'ARRAY'; }
-<impala>'BLOCK_SIZE'                       { return '<impala>BLOCK_SIZE'; }
-<impala>'COMPRESSION'                      { return '<impala>COMPRESSION'; }
-<impala>'CURRENT'                          { return '<impala>CURRENT'; }
 <impala>'DEFAULT'                          { return '<impala>DEFAULT'; }
-<impala>'ENCODING'                         { return '<impala>ENCODING'; }
-<impala>'GRANT'                            { return '<impala>GRANT'; }
 <impala>'MAP'                              { return 'MAP'; }
-<impala>'RECOVER'                          { return '<impala>RECOVER'; }
-<impala>'ROLE'                             { return '<impala>ROLE'; }
-<impala>'ROLES'                            { return '<impala>ROLES'; }
+<impala>'OWNER'                            { return '<impala>OWNER'; }
 <impala>'STRUCT'                           { return 'STRUCT'; }
-<impala>'UNKNOWN'                          { return '<impala>UNKNOWN'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }
 <impala>\[NOSHUFFLE\]                      { return '<impala>NOSHUFFLE'; }
 <impala>\[SHUFFLE\]                        { return '<impala>SHUFFLE'; }
@@ -520,7 +721,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <backtickedValue>\`                        { this.popState(); return 'BACKTICK'; }
 
 \'                                         { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
-<singleQuotedValue>(?:\\[']|[^'])+         {
+<singleQuotedValue>(?:\\\\|\\[']|[^'])+         {
                                              if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '\'')) {
                                                return 'PARTIAL_VALUE';
                                              }
@@ -529,7 +730,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <singleQuotedValue>\'                      { this.popState(); return 'SINGLE_QUOTE'; }
 
 \"                                         { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<doubleQuotedValue>(?:\\["]|[^"])+         {
+<doubleQuotedValue>(?:\\\\|\\["]|[^"])+         {
                                              if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '"')) {
                                                return 'PARTIAL_VALUE';
                                              }

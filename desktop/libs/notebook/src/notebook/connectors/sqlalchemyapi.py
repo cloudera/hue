@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import logging
+import uuid
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -32,7 +34,7 @@ from sqlalchemy import create_engine, inspect
 
 
 LOG = logging.getLogger(__name__)
-
+CONNECTION_CACHE = {}
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
@@ -52,50 +54,78 @@ class SqlAlchemyApi(Api):
     self.options = interpreter['options']
     self.engine = create_engine(self.options['url'])
 
-  def _execute(self, notebook, snippet):
-    connection = self.engine.connect()
-    try:
-      result = connection.execute(snippet['statement'])
-      return result.cursor.description, result.fetchmany(100) # TODO: execute statement stub in Rdbms
-    finally:
-      connection.close()
-
   @query_error_handler
   def execute(self, notebook, snippet):
-    metadata, data = self._execute(notebook, snippet)
-    has_result_set = data is not None
+    guid = uuid.uuid4().hex
+    connection = self.engine.connect()
+    result = connection.execute(snippet['statement'])
+    cache = {
+      'connection': connection,
+      'result': result,
+      'meta': [{
+          'name': col[0] if type(col) is dict or type(col) is tuple else col,
+          'type': 'STRING_TYPE',
+          'comment': ''
+        } for col in result.cursor.description]
+    }
+    CONNECTION_CACHE[guid] = cache
 
     return {
-      'sync': True,
-      'has_result_set': has_result_set,
+      'sync': False,
+      'has_result_set': True,
       'modified_row_count': 0,
+      'guid': guid,
       'result': {
         'has_more': True,
-        'data': data if has_result_set else [],
-        'meta': [{
-          'name': col[0] if type(col) is dict or type(col) is tuple else col,
-          'type': col[1] if type(col) is dict or type(col) is tuple else '', #TODO: resolve
-          'comment': ''
-        } for col in metadata] if has_result_set else [],
+        'data': [],
+        'meta': cache['meta'],
         'type': 'table'
       }
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
-    return {'status': 'expired'}
-
+    guid = snippet['result']['handle']['guid']
+    connection = CONNECTION_CACHE.get(guid)
+    if connection:
+      return {'status': 'available'}
+    else:
+      return {'status': 'canceled'}
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
+    guid = snippet['result']['handle']['guid']
+    cache = CONNECTION_CACHE.get(guid)
+    if cache:
+      data = cache['result'].fetchmany(rows)
+      meta = cache['meta']
+      self._assign_types(data, meta)
+    else:
+      data = []
+      meta = []
     return {
-      'has_more': False,
-      'data': [],
-      'meta': [],
+      'has_more': data and len(data) >= rows,
+      'data': data if data else [],
+      'meta': meta if meta else [],
       'type': 'table'
     }
 
+  def _assign_types(self, results, meta):
+    result = results[0]
+    if result:
+      for index, col in enumerate(result):
+        if isinstance(col, int):
+          meta[index]['type'] = 'INT_TYPE'
+        elif isinstance(col, float):
+          meta[index]['type'] = 'FLOAT_TYPE'
+        elif isinstance(col, long):
+          meta[index]['type'] = 'BIGINT_TYPE'
+        elif isinstance(col, bool):
+          meta[index]['type'] = 'BOOLEAN_TYPE'
+        elif isinstance(col, datetime.date):
+          meta[index]['type'] = 'TIMESTAMP_TYPE'
+        else:
+          meta[index]['type'] = 'STRING_TYPE'
 
   @query_error_handler
   def fetch_result_metadata(self):
@@ -104,27 +134,54 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def cancel(self, notebook, snippet):
-    return {'status': 0}
+    result = {'status': -1}
+    try:
+      guid = snippet['result']['handle']['guid']
+      connection = CONNECTION_CACHE.get(guid)
+      if connection:
+        connection['connection'].close()
+        del CONNECTION_CACHE[guid]
+      result['status'] = 0
+    finally:
+      return result
 
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
-    return 'No logs'
+    return ''
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format):
-
+  def download(self, notebook, snippet, format, user_agent=None):
     file_name = _get_snippet_name(notebook)
-    results = self._execute(notebook, snippet)
-    db = FixedResult(results)
-
-    return data_export.download(None, format, db, id=snippet['id'], file_name=file_name)
+    guid = uuid.uuid4().hex
+    connection = self.engine.connect()
+    result = connection.execute(snippet['statement'])
+    CONNECTION_CACHE[guid] = {
+      'connection': connection,
+      'result': result
+    }
+    db = FixedResult([col[0] if type(col) is dict or type(col) is tuple else col for col in result.cursor.description])
+    def callback():
+      connection = CONNECTION_CACHE.get(guid)
+      if connection:
+        connection['connection'].close()
+        del CONNECTION_CACHE[guid]
+    return data_export.download({'guid': guid}, format, db, id=snippet['id'], file_name=file_name, callback=callback)
 
 
   @query_error_handler
   def close_statement(self, snippet):
-    return {'status': -1}
+    result = {'status': -1}
+    try:
+      guid = snippet['result']['handle']['guid']
+      connection = CONNECTION_CACHE.get('guid')
+      if connection:
+        connection['connection'].close()
+        del CONNECTION_CACHE[guid]
+      result['status'] = 0
+    finally:
+      return result
 
 
   @query_error_handler
@@ -164,22 +221,32 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)
-    response = {'status': -1}
+    response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column)
+    has_result_set = sample_data is not None
 
     if sample_data:
       response['status'] = 0
-      response['headers'] = [
-        col[0] if type(col) is dict or type(col) is tuple else col
-        for col in metadata]
       response['rows'] = escape_rows(sample_data)
-    else:
-      response['message'] = _('Failed to get sample data.')
+
+    if table:
+      columns = assist.get_columns(database, table)
+      response['full_headers'] = [{
+        'name': col.get('name'),
+        'type': str(col.get('type')),
+        'comment': ''
+      } for col in columns]
+    elif metadata:
+      response['full_headers'] = [{
+        'name': col[0] if type(col) is dict or type(col) is tuple else col,
+        'type': 'STRING_TYPE',
+        'comment': ''
+      } for col in metadata]
 
     return response
 
@@ -213,11 +280,26 @@ class Assist():
     finally:
       connection.close()
 
-class FixedResult():
+class FixedResultSet():
+  def __init__(self, metadata, data, has_more):
+    self.metadata = metadata
+    self.data = data
+    self.has_more = has_more
 
-  def __init__(self, result):
-    self.result = result
-    self.has_more = False
+  def cols(self):
+    return self.metadata
+
+  def rows(self):
+    return self.data if self.data is not None else []
+
+class FixedResult():
+  def __init__(self, metadata):
+    self.metadata = metadata
 
   def fetch(self, handle=None, start_over=None, rows=None):
-    return self.result
+    connection = CONNECTION_CACHE.get(handle['guid'])
+    if connection:
+      data = connection['result'].fetchmany(rows)
+      return FixedResultSet(self.metadata, data, data is not None and len(data) >= rows)
+    else:
+      return FixedResultSet([], [])

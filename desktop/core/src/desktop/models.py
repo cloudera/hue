@@ -49,12 +49,13 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
+from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -609,6 +610,7 @@ class DocumentManager(models.Manager):
 
 
 class Document(models.Model):
+
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -671,11 +673,11 @@ class Document(models.Model):
     DocumentPermission.objects.share_to_default(self, name=name)
 
   def can_read(self, user):
-    return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
+    return is_admin(user) or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
   def can_write(self, user):
     perm = self.list_permissions('write')
-    return user.is_superuser or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+    return is_admin(user) or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
 
   def can_read_or_exception(self, user, exception_class=PopupException):
     if self.can_read(user):
@@ -1310,7 +1312,7 @@ class Document2(models.Model):
   def can_read(self, user):
     perm = self.get_permission('read')
     has_read_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or self.can_write(user) or has_read_permissions
+    return is_admin(user) or self.owner == user or self.can_write(user) or has_read_permissions
 
   def can_read_or_exception(self, user):
     if self.can_read(user):
@@ -1321,7 +1323,7 @@ class Document2(models.Model):
   def can_write(self, user):
     perm = self.get_permission('write')
     has_write_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
+    return is_admin(user) or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1558,6 +1560,7 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
+# Aka 'Atus'
 ANALYTIC_DB = 'altus'
 
 
@@ -1661,7 +1664,7 @@ class ClusterConfig():
     _interpreters = get_ordered_interpreters(self.user)
 
     if self.cluster_type == ANALYTIC_DB:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala', 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
       interpreters.append({
@@ -1749,7 +1752,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
 
-    if is_s3_enabled() and has_s3_access(self.user) and self.cluster_type != ANALYTIC_DB:
+    if is_s3_enabled() and has_s3_access(self.user) and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1776,7 +1779,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'indexer' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'search' in self.apps and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1817,7 +1820,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and self.cluster_type != ANALYTIC_DB:
+    if 'security' in self.apps and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1871,7 +1874,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser) and self.cluster_type != ANALYTIC_DB:
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and self.cluster_type != ANALYTIC_DB:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
@@ -1913,7 +1916,16 @@ class Cluster():
   def __init__(self, user):
     self.user = user
     self.clusters = get_clusters(user)
-    self.data = self.clusters['Altus' if IS_MULTICLUSTER_ONLY.get() else CLUSTER_ID.get()]
+
+    if len(self.clusters) == 1:
+      self.data = self.clusters.values()[0]
+    elif IS_K8S_ONLY.get():
+      self.data = self.clusters['AltusV2']
+      self.data['type'] = 'altus' # To show simplified UI
+    elif IS_MULTICLUSTER_ONLY.get():
+      self.data = self.clusters['Altus']
+    else:
+      self.data = self.clusters[CLUSTER_ID.get()]
 
   def get_type(self):
     return self.data['type']

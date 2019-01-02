@@ -58,6 +58,8 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.views import serve_403_error
+
+from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -73,6 +75,8 @@ from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkD
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm, SetReplicationFactorForm
 
+
+from desktop.auth.backend import is_admin
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
@@ -214,7 +218,7 @@ def view(request, path):
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
         elif request.fs._get_scheme(path).lower() == 'hdfs':
-            if request.user.is_superuser and not _is_hdfs_superuser(request):
+            if is_admin(request.user) and not _is_hdfs_superuser(request):
                 msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                         % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
 
@@ -360,7 +364,7 @@ def listdir(request, path):
         'breadcrumbs': breadcrumbs,
         'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
-        'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
+        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'cwd_set': True,
         'is_superuser': request.user.username == request.fs.superuser,
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
@@ -428,12 +432,15 @@ def listdir_paged(request, path):
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
     do_as = None
-    if request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security"):
+    if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
       do_as = request.GET.get('doas', request.user.username)
     if hasattr(request, 'doas'):
       do_as = request.doas
 
-    home_dir_path = request.user.get_home_directory()
+    if request.fs._get_scheme(path) == 'hdfs':
+      home_dir_path = request.user.get_home_directory()
+    else:
+      home_dir_path = None
     breadcrumbs = parse_breadcrumbs(path)
 
     if do_as:
@@ -493,9 +500,7 @@ def listdir_paged(request, path):
     if page:
       page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
 
-    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
-                       (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
-                        request.fs.isdir(request.fs.trash_path(path)))
+    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
@@ -506,7 +511,7 @@ def listdir_paged(request, path):
         'files': page.object_list if page else [],
         'page': _massage_page(page, paginator) if page else {},
         'pagesize': pagesize,
-        'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
+        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'descending': descending_param,
         # The following should probably be deprecated
         'cwd_set': True,
@@ -650,8 +655,7 @@ def display(request, path):
     if mode == 'binary':
         compression = 'none'
         # Read out based on meta.
-    compression, offset, length, contents =\
-    read_contents(compression, path, request.fs, offset, length)
+    compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
     # Get contents as string for text mode, or at least try
     uni_contents = None
@@ -1060,19 +1064,13 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             except (IOError, WebHdfsException), e:
                 msg = _("Cannot perform operation.")
                 # TODO: Only apply this message for HDFS
-                if request.user.is_superuser and not _is_hdfs_superuser(request):
+                if is_admin(request.user) and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
-                if request.is_ajax():
-                    return HttpResponseForbidden(smart_str(e))
-                else:
-                    raise PopupException(msg, detail=e)
+                raise PopupException(msg, detail=e)
             except S3FileSystemException, e:
               msg = _("S3 filesystem exception.")
-              if request.is_ajax():
-                  return HttpResponseForbidden(smart_str(e))
-              else:
-                  raise PopupException(msg, detail=e)
+              raise PopupException(msg, detail=e)
             except NotImplementedError, e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)

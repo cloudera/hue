@@ -18,24 +18,22 @@
 
 import json
 import logging
-
-from metadata.manager_client import ManagerApi
-
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+import os
 
 from django.http import Http404
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
+from libzookeeper.conf import zkensemble
+from indexer.conf import config_morphline_path
 
-from metadata.conf import has_navigator
 from metadata.catalog.navigator_client import CatalogApiException
+from metadata.conf import has_navigator
+from metadata.manager_client import ManagerApi
 
 
 LOG = logging.getLogger(__name__)
@@ -67,6 +65,16 @@ def error_handler(view_fn):
   return decorator
 
 
+def admin_only_handler(view_fn):
+  def decorator(*args, **kwargs):
+    if is_admin(args[0].user):
+      return view_fn(*args, **kwargs)
+    else:
+      raise CatalogApiException('Manager API is for admins only.')
+
+  return decorator
+
+
 @error_handler
 def hello(request):
   api = ManagerApi(request.user)
@@ -74,3 +82,57 @@ def hello(request):
   response = api.tools_echo()
 
   return JsonResponse(response)
+
+
+@error_handler
+def get_hosts(request):
+  response = {
+    'status': 0
+  }
+  api = ManagerApi(request.user)
+
+  if request.POST.get('service', '').lower() == 'flume':
+    response['hosts'] = api.get_flume_agents()
+
+  return JsonResponse(response)
+
+
+@error_handler
+@admin_only_handler
+def update_flume_config(request):
+  api = ManagerApi(request.user)
+
+  flume_agent_config = '''tier1.sources = source1
+tier1.channels = channel1
+tier1.sinks = sink1
+
+tier1.sources.source1.type = exec
+tier1.sources.source1.command = tail -F /var/log/hue-httpd/access_log
+tier1.sources.source1.channels = channel1
+
+tier1.channels.channel1.type = memory
+tier1.channels.channel1.capacity = 10000
+tier1.channels.channel1.transactionCapacity = 1000
+
+# Solr Sink configuration
+tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.MorphlineSolrSink
+tier1.sinks.sink1.morphlineFile = morphlines.conf
+tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo
+tier1.sinks.sink1.channel       = channel1'''
+
+
+  morphline_config = open(os.path.join(config_morphline_path(), 'hue_accesslogs_no_geo.morphline.conf')).read()
+  morphline_config = morphline_config.replace(
+    '${SOLR_COLLECTION}', 'log_analytics_demo'
+  ).replace(
+    '${ZOOKEEPER_ENSEMBLE}', '%s/solr' % zkensemble()
+  )
+
+  responses = {}
+
+  responses['agent_config_file'] = api.update_flume_config(cluster_name=None, config_name='agent_config_file', config_value=flume_agent_config)
+  responses['agent_morphlines_conf_file'] = api.update_flume_config(cluster_name=None, config_name='agent_morphlines_conf_file', config_value=morphline_config)
+
+  responses['refresh_flume'] = api.refresh_flume(cluster_name=None, restart=True)
+
+  return JsonResponse(responses)

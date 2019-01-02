@@ -30,8 +30,8 @@ class WorkfloadAnalyticsClient():
   def __init__(self, user):
     self.user = user
 
-  def get_impala_query(self, cluster_id, query_id):
-    return WorkloadAnalytics(self.user).get_impala_query(cluster_id=cluster_id, query_id=query_id)
+  def get_impala_query(self, cluster, query_id):
+    return WorkloadAnalytics(self.user).get_impala_query(cluster=cluster, query_id=query_id)
 
   def list_uploads(self):
     return WorkloadAnalytics(self.user).list_uploads()
@@ -51,8 +51,8 @@ class WorkloadAnalytics():
 
   def __init__(self, user): pass
 
-  def get_impala_query(self, cluster_id, query_id):
-    parameters = {'clusterId': cluster_id, 'queryId': query_id}
+  def get_impala_query(self, cluster, query_id):
+    parameters = {'clusterId': cluster.get('id'), 'queryId': query_id}
 
     return _exec('wa', 'getImpalaQuery', parameters=parameters)
 

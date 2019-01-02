@@ -236,8 +236,8 @@ AlterTable_EDIT
      } else if (parser.isImpala()) {
        parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN', 'CHANGE',
          'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS', 'RENAME TO',
-         'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION', 'SET ROW FORMAT',
-         'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']);
+         'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER',
+         'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
@@ -268,7 +268,7 @@ AlterTable_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'OWNER', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+       parser.suggestKeywords(['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'OWNER ROLE', 'OWNER USER', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
@@ -382,6 +382,7 @@ ImpalaSpecificOperations
    {
      parser.addColumnLocation($4.location, [ $4.identifier ]);
    }
+ | 'SET' '<impala>OWNER' ImpalaRoleOrUser RegularOrBacktickedIdentifier
  ;
 
 ImpalaSpecificOperations_EDIT
@@ -436,6 +437,11 @@ ImpalaSpecificOperations_EDIT
    {
      parser.addColumnLocation($4.location, [ $4.identifier ]);
    }
+ | 'SET' '<impala>OWNER' 'CURSOR'
+   {
+     parser.suggestKeywords(['ROLE', 'USER']);
+   }
+ | 'SET' '<impala>OWNER' ImpalaRoleOrUser 'CURSOR'
  ;
 
 KuduStorageAttribute
@@ -601,15 +607,15 @@ AndWait_EDIT
 
 OptionalWithOverwriteTblProperties
  :
- | 'WITH' '<hive>OVERWRITE' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
+ | '<hive>WITH' '<hive>OVERWRITE' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  ;
 
 WithOverwriteTblProperties_EDIT
- : 'WITH' 'CURSOR'
+ : AnyWith 'CURSOR'
    {
      parser.suggestKeywords(['OVERWRITE TBLPROPERTIES']);
    }
- | 'WITH' '<hive>OVERWRITE' 'CURSOR'
+ | '<hive>WITH' '<hive>OVERWRITE' 'CURSOR'
    {
      parser.suggestKeywords(['TBLPROPERTIES']);
    }
@@ -635,7 +641,7 @@ AnyColumns
  ;
 
 HiveExchange
- : '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
+ : '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
  ;
 
 HiveExchange_EDIT
@@ -647,18 +653,18 @@ HiveExchange_EDIT
    {
      parser.suggestKeywords(['WITH TABLE']);
    }
- | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' 'CURSOR'
+ | '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['TABLE']);
    }
- | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' 'CURSOR'
+ | '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' '<hive>TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName_EDIT
+ | '<hive>EXCHANGE' ExchangePartitionSpec '<hive>WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName_EDIT
  | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT
- | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
+ | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT '<hive>WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName
  ;
 
 ExchangePartitionSpec
@@ -962,6 +968,7 @@ OptionalStoredAsDirectories_EDIT
 
 AlterView
  : AlterViewLeftSide 'SET' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
+ | AlterViewLeftSide 'SET' '<impala>OWNER' ImpalaRoleOrUser RegularOrBacktickedIdentifier
  | AlterViewLeftSide AnyAs QuerySpecification
  | AlterViewLeftSide '<impala>RENAME' 'TO' RegularOrBacktickedIdentifier
  | AlterViewLeftSide '<impala>RENAME' 'TO' RegularOrBacktickedIdentifier '<impala>.' RegularOrBacktickedIdentifier
@@ -974,7 +981,7 @@ AlterView_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['AS', 'SET TBLPROPERTIES']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['AS', 'RENAME TO']);
+       parser.suggestKeywords(['AS', 'RENAME TO', 'SET OWNER']);
      } else {
        parser.suggestKeywords(['AS']);
      }
@@ -983,8 +990,15 @@ AlterView_EDIT
    {
      if (parser.isHive()) {
        parser.suggestKeywords(['TBLPROPERTIES']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['OWNER ROLE', 'OWNER USER']);
      }
    }
+ | AlterViewLeftSide 'SET' '<impala>OWNER' 'CURSOR'
+   {
+     parser.suggestKeywords(['ROLE', 'USER']);
+   }
+ | AlterViewLeftSide 'SET' '<impala>OWNER' ImpalaRoleOrUser 'CURSOR'
  | AlterViewLeftSide AnyAs 'CURSOR'
    {
      parser.suggestKeywords(['SELECT']);

@@ -23,10 +23,12 @@ import uuid
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2
+from desktop.views import serve_403_error
 
 from libsolr.api import SolrApi
 
@@ -284,6 +286,9 @@ def get_terms(request):
 
 @allow_viewer_only
 def download(request):
+  if not ENABLE_DOWNLOAD.get():
+    return serve_403_error(request)
+
   try:
     file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
     facet = json.loads(request.POST.get('facet', '{}'))
@@ -425,30 +430,15 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   elif widget_type == 'document-widget':
     # SQL query, 1 solr widget
     if collection['selectedDocument'].get('uuid'):
+      properties['statementUuid'] = collection['selectedDocument'].get('uuid')
       doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
       snippets = doc.data_dict.get('snippets', [])
       properties['result'] = {'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
       if snippets:
-        table_metadata = get_api(MockRequest(user, '""'), snippets[0]).autocomplete({'source': 'query', 'type': snippets[0]['type']}, doc.id)
-        template['fieldsAttributes'] = [Collection2._make_gridlayout_header_field(field) for field in table_metadata['extended_columns']]
         properties['engine'] = snippets[0]['type']
-        if snippets[0]['result']['handle']:
-          handle = snippets[0]['result']['handle']
-          properties['result']['handle'].update({
-            'statement_id': handle['statement_id'],
-            'statements_count': handle['statements_count']
-          })
-        properties['statement'] = snippets[0]['statement_raw']
-      else:
-        properties['statement'] = ''
-
-      if collection['selectedDocument'].get('statement_id'):
-        properties['result']['handle']['statement_id'] = collection['selectedDocument'].get('statement_id')
-        properties['result']['handle']['statements_count'] = properties['result']['handle'].get('statements_count', collection['selectedDocument'].get('statement_id'))
-    else: # Demo data for now
-      properties['statement'] = 'select * from customers'
-      properties['result'] = {'handle': {}}
-
+    else:
+      properties['statementUuid'] = ''
+    properties['statement'] = ''
     properties['uuid'] = facet_field
     properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
     facet_type = 'statement'

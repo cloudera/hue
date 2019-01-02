@@ -55,10 +55,10 @@ class AltusAdbApi(Api):
     handle = snippet['result']['handle']
 
     return HueQuery(self.user, cluster_crn=self.cluster_name).do_fetch_result(handle)
-  
-  
+
+
   def close_statement(self, snippet):
-    return {'status': -1} 
+    return {'status': -1}
 
 
   def cancel(self, notebook, snippet):
@@ -163,12 +163,15 @@ class HueQuery():
     payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query.replace('\n', ' ')))
 
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
-    resp_payload = json.loads(resp['payload'])
-    
-    if 'handle' in resp_payload:
-      return resp_payload['handle']
+
+    if 'payload' in resp:
+      resp_payload = json.loads(resp['payload'])
+      if 'handle' in resp_payload:
+        return resp_payload['handle']
+      else:
+        raise QueryError(resp_payload.get('message'))
     else:
-      raise QueryError(resp_payload.get('message'))
+      raise QueryError(resp.get('message'))
 
 
   def do_check_status(self, handle):
@@ -228,7 +231,7 @@ class HueQuery():
 
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
     resp_payload = json.loads(resp['payload'])
-    
+
     if 'query_status' in resp_payload:
       return resp_payload['query_status']
     else:

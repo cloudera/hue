@@ -330,6 +330,7 @@
         assertAutoComplete({
           beforeCursor: 'set hive.exec.compress.output=true;',
           afterCursor: '',
+          dialect: 'hive',
           noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {

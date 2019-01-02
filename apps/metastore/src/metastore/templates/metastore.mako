@@ -83,10 +83,10 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-breadcrumbs">
   <div style="font-size: 14px; margin: 0 12px; line-height: 27px;">
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onChanged: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onSelect: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
     <!-- ko with: source -->
-    <!-- ko if: namespaces().length > 1 || namespaceRefreshEnabled() -->
-    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onChanged: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
+    <!-- ko if: window.HAS_MULTI_CLUSTER -->
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onSelect: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- /ko -->
   </div>
@@ -181,7 +181,7 @@ ${ components.menubar(is_embeddable) }
         </td>
         <td title="${_('Query partition data')}">
           <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function() { queryAndWatch(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
+            <a data-bind="click: function() { queryAndWatchUrl(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
           <!-- /ko -->
           <!-- ko if: ! IS_HUE_4 -->
             <a data-bind="attr: { 'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a>
@@ -356,6 +356,10 @@ ${ components.menubar(is_embeddable) }
             <input type="hidden" name="is_embeddable" value="true"/>
             <input type="hidden" name="start_time" value=""/>
             <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
+            <!-- ko with: catalogEntry -->
+            <input type="hidden" name="namespace" data-bind="value: namespace.id"/>
+            <input type="hidden" name="cluster" data-bind="value: JSON.stringify(compute)"/>
+            <!-- /ko -->
         % else:
           <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
         % endif
@@ -367,7 +371,7 @@ ${ components.menubar(is_embeddable) }
             <div class="modal-body">
               <ul data-bind="foreach: selectedDatabases">
                 <li>
-                  <span data-bind="text: catalogEntry.name"></span>
+                  <span data-bind="text: catalogEntry().name"></span>
                 </li>
               </ul>
             </div>
@@ -377,15 +381,15 @@ ${ components.menubar(is_embeddable) }
               <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
             </div>
             <!-- ko foreach: selectedDatabases -->
-            <input type="hidden" name="database_selection" data-bind="value: catalogEntry.name" />
+            <input type="hidden" name="database_selection" data-bind="value: catalogEntry().name" />
             <!-- /ko -->
           </form>
         </div>
 
         % if is_embeddable:
-          <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry.getSourceType() + '&namespace=' + catalogEntry.namespace.id + '&compute=' + catalogEntry.compute.id  }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+          <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry().getSourceType() + '&namespace=' + catalogEntry().namespace.id + '&compute=' + catalogEntry().compute.id  }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
         % elif ENABLE_NEW_CREATE_TABLE.get():
-          <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry.getSourceType() + '&namespace=' + catalogEntry.namespace.id + '&compute=' + catalogEntry.compute.id }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+          <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry().getSourceType() + '&namespace=' + catalogEntry().namespace.id + '&compute=' + catalogEntry().compute.id }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
         % else:
           <button href="${ url('beeswax:create_database') }" class="btn btn-default" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
         % endif
@@ -515,8 +519,8 @@ ${ components.menubar(is_embeddable) }
     <div class="span12 tile entries-table-container">
       <h4 class="entries-table-header">${ _('Tables') }</h4>
       <div class="actionbar-actions" data-bind="visible: tables().length > 0">
-        <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { onTableClick(selectedTables()[0].catalogEntry); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
-        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.source().type) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
+        <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { onTableClick(selectedTables()[0].catalogEntry()); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
+        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { queryAndWatch(selectedTables()[0].catalogEntry()) }, disable: selectedTables().length !== 1">
           <i class="fa fa-play fa-fw"></i> ${_('Query')}
         </button>
         % if has_write_access:
@@ -543,8 +547,10 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="start_time" value=""/>
         <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
+        <input type="hidden" name="namespace" data-bind="value: catalogEntry.namespace.id"/>
+        <input type="hidden" name="cluster" data-bind="value: JSON.stringify(catalogEntry.compute)"/>
     % else:
-      <form data-bind="attr: { 'action': '/metastore/tables/drop/' +catalogEntry. name }" method="POST">
+      <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }" method="POST">
     % endif
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
@@ -555,7 +561,7 @@ ${ components.menubar(is_embeddable) }
         <ul data-bind="foreach: selectedTables">
           <!-- ko if: $index() <= 9 -->
           <li>
-            <span data-bind="text: catalogEntry.name"></span>
+            <span data-bind="text: catalogEntry().name"></span>
           </li>
           <!-- /ko -->
         </ul>
@@ -571,7 +577,7 @@ ${ components.menubar(is_embeddable) }
         <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <!-- ko foreach: selectedTables -->
-      <input type="hidden" name="table_selection" data-bind="value: catalogEntry.name" />
+      <input type="hidden" name="table_selection" data-bind="value: catalogEntry().name" />
       <!-- /ko -->
     </form>
   </div>
@@ -696,102 +702,6 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="metastore-permissions-tab">
-  <div class="acl-panel-content" style="height: 988px;">
-    <div class="pull-right">
-      <input class="input-medium no-margin" type="text" placeholder="Search privileges..."> &nbsp;
-      <a class="btn pointer">
-        <i class="fa fa-plus-circle"></i> Add role
-      </a>
-    </div>
-    <h4 style="margin-top: 4px;">Privileges &nbsp;</h4>
-
-    <div class="acl-block-title">
-      <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerFraud</span></a>
-    </div>
-    <div>
-      <div class="acl-block acl-block-airy">
-        <span class="muted" title="3 months ago">TABLE</span>
-        <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-        </span>
-        <br>
-        server=<span>server1</span>
-        <span>
-          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
-        </span>
-        <span>
-          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
-        </span>
-        <span style="display: none;">
-          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
-        </span>
-        <i class="fa fa-long-arrow-right"></i> action=INSERT
-      </div>
-
-      <div class="acl-block acl-block-airy">
-        <span class="muted" title="3 months ago">TABLE</span>
-        <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-        </span>
-        <br>
-        server=server1
-        <span>
-          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
-        </span>
-        <span>
-          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
-        </span>
-        <span style="display: none;">
-          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
-        </span>
-
-        <i class="fa fa-long-arrow-right"></i> action=<span>SELECT</span>
-      </div>
-    </div>
-
-    <div class="acl-block acl-actions">
-      <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
-      <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
-      <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
-      <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
-    </div>
-
-    <div class="acl-block-title">
-      <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerAccess</span></a>
-    </div>
-    <div>
-      <div class="acl-block acl-block-airy">
-        <span class="muted" title="3 months ago">TABLE</span>
-
-        <span>
-          <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
-        </span>
-        <br>
-
-        server=server1
-
-          <span>
-            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().catalogEntry.name"></span></a>
-          </span>
-          <span>
-            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: catalogEntry.name"></span></a>
-          </span>
-          <span style="display: none;">
-            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
-          </span>
-
-        <i class="fa fa-long-arrow-right"></i> action=<span>ALL</span>
-      </div>
-      <div class="acl-block acl-actions">
-        <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
-        <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
-        <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
-        <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
-      </div>
-    </div>
-  </div>
-</script>
 
 <script type="text/html" id="metastore-queries-tab">
   <br/>
@@ -827,6 +737,7 @@ ${ components.menubar(is_embeddable) }
   </div>
 </script>
 
+
 <script type="text/html" id="metastore-view-sql-tab">
   <div style="padding: 5px 15px">
     <!-- ko hueSpinner: { spin: loadingViewSql, inline: true } --><!-- /ko -->
@@ -835,6 +746,7 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
   </div>
 </script>
+
 
 <script type="text/html" id="metastore-details-tab">
   <!-- ko with: tableDetails -->
@@ -874,14 +786,14 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
     <!-- ko foreach: topJoins -->
     <tr>
-      <td><a href="javscript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), namespace: parents[1].catalogEntry.namespace, compute: parents[1].catalogEntry.compute, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
+      <td><a href="javascript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), namespace: parents[1].catalogEntry.namespace, compute: parents[1].catalogEntry.compute, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
       <td>
         <table class="metastore-join-column-table">
           <tbody data-bind="foreach: joinCols">
           <tr>
-            <td><a href="javscript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javascript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
             <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
-            <td><a href="javscript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javascript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
           </tr>
           </tbody>
         </table>
@@ -905,7 +817,6 @@ ${ components.menubar(is_embeddable) }
     <!-- ko if: $root.optimizerEnabled() -->
       <li data-bind="css: { 'active': $root.currentTab() === 'relationships' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('relationships'); }">${_('Relationships')} (<span data-bind="text: topJoins().length"></span>)</a></li>
 ##       <!-- ko if: $root.database().table().optimizerDetails() -->
-##       <li data-bind="css: { 'active': $root.currentTab() === 'permissions' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('permissions'); }">${_('Permissions')}</a></li>
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'queries' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
 ##       <li data-bind="css: { 'active': $root.currentTab() === 'joins' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
 ##       <!-- /ko -->
@@ -913,14 +824,26 @@ ${ components.menubar(is_embeddable) }
 ##       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-      <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a></li>
+    <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a>
+    </li>
     <!-- /ko -->
-    <li data-bind="css: { 'active': $root.currentTab() === 'sample' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('sample'); }">${_('Sample')} (<span data-bind="text: samples.rows().length"></span>)</a></li>
+    <li data-bind="css: { 'active': $root.currentTab() === 'sample' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('sample'); }">${_('Sample')} (<span data-bind="text: samples.rows().length"></span>)</a>
+    </li>
     <!-- ko if: catalogEntry.isView() -->
-    <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('viewSql'); }">${ _('View SQL') }</a></li>
+    <li data-bind="css: { 'active' : $root.currentTab() === 'viewSql' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('viewSql'); }">${ _('View SQL') }</a>
+    </li>
     <!-- /ko -->
-    <li data-bind="css: { 'active' : $root.currentTab() === 'details' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('details'); }">${ _('Details') }</a></li>
-    <li data-bind="css: { 'active' : $root.currentTab() === 'privileges' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a></li>
+    <li data-bind="css: { 'active' : $root.currentTab() === 'details' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('details'); }">${ _('Details') }</a>
+    </li>
+    <!-- ko if: $root.appConfig() && $root.appConfig()['browser'] && $root.appConfig()['browser']['interpreter_names'].indexOf('security') !== -1 -->
+    <li data-bind="css: { 'active' : $root.currentTab() === 'privileges' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a>
+    </li>
+    <!-- /ko -->
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -939,10 +862,6 @@ ${ components.menubar(is_embeddable) }
 
       <!-- ko if: $root.currentTab() === 'sample' -->
         <!-- ko template: 'metastore-sample-tab' --><!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: $root.currentTab() === 'permissions' -->
-        <!-- ko template: 'metastore-permissions-tab' --><!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: $root.optimizerEnabled() && $root.currentTab() === 'queries' -->
@@ -1007,7 +926,7 @@ ${ components.menubar(is_embeddable) }
               <!-- ko with: table -->
               % if USE_NEW_EDITOR.get():
                 <!-- ko if: IS_HUE_4 -->
-                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch('/notebook/browse/' + catalogEntry.path.join('/') + '/', $root.source().type); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
+                <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch(catalogEntry); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
                 <!-- /ko -->
                 <!-- ko if: ! IS_HUE_4 -->
                 <a class="btn btn-default" data-bind="attr: { 'href': '/notebook/browse/' + catalogEntry.path.join('/') }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
@@ -1124,10 +1043,12 @@ ${ components.menubar(is_embeddable) }
     });
   }
 
-  function queryAndWatch(url, sourceType) {
+  function queryAndWatchUrl(url, sourceType, namespaceId, compute) {
     $.post(url, {
       format: "json",
-      sourceType: sourceType
+      sourceType: sourceType,
+      namespace: namespaceId,
+      cluster: compute
     },function(resp) {
       if (resp.history_uuid) {
         huePubSub.publish('open.editor.query', resp.history_uuid);
@@ -1137,6 +1058,15 @@ ${ components.menubar(is_embeddable) }
     }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);
     });
+  }
+
+  function queryAndWatch(catalogEntry) {
+    if (!IS_HUE_4) {
+      location.href = '/notebook/browse/' + catalogEntry.path.join('/')
+    } else {
+      queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getSourceType(),
+              catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute)
+    }
   }
 
   (function () {
@@ -1164,10 +1094,14 @@ ${ components.menubar(is_embeddable) }
       });
 
       huePubSub.subscribe('metastore.clear.selection', function () {
-        viewModel.selectedDatabases.removeAll();
-        if (viewModel.database()) {
-          viewModel.database().selectedTables.removeAll();
-        }
+        viewModel.sources().forEach(function (source) {
+          source.namespaces().forEach(function (namespace) {
+            namespace.selectedDatabases.removeAll();
+            namespace.databases().forEach(function (database) {
+              database.selectedTables.removeAll();
+            })
+          })
+        });
       }, 'metastore');
 
       viewModel.currentTab.subscribe(function(tab){
@@ -1258,6 +1192,11 @@ ${ components.menubar(is_embeddable) }
       };
 
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
+
+      huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+        viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+      });
+      huePubSub.publish('cluster.config.get.config');
 
       if (location.getParameter('refresh') === 'true') {
         DataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, compute: viewModel.source().namespace().compute, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {

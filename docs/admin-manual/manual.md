@@ -70,13 +70,15 @@ tarball, you'll need these library development packages and tools installed on y
 ### MacOS
 
 * Xcode command line tools
-* Oracle's JDK 1.7+
-* maven (Homebrew)
-* mysql (Homebrew)
-* gmp (Homebrew)
-* openssl (Homebrew)
+* [Homebrew](https://brew.sh)
 * [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
 
+#### Install Dependencies via Homebrew
+
+    brew install mysql maven gmp openssl libffi && brew cask install java8
+
+#### Install Xcode command line tools 
+    sudo xcode-select --install
 
 #### Fix openssl errors
 Required for MacOS 10.11+
@@ -485,6 +487,15 @@ using a proper SSL Certificate.  Self-signed certificates don't
 work.
 </div>
 
+Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers 
+having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.
+
+DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:
+<pre>
+  [desktop]
+  ssl_cipher_list=DEFAULT:!DES:!3DES
+</pre>
+
 ### SASL
 
 When getting a bigger result set from Hive/Impala or bigger files like images from HBase, the response requires to increase
@@ -492,12 +503,12 @@ the buffer size of SASL lib for thrift sasl communication.
 
 <pre>
   [desktop]
-  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
-  sasl_max_buffer=2 * 1024 * 1024
+  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication,
+  # default value is 2097152 (2 MB), which equals to (2 * 1024 * 1024)
+  sasl_max_buffer=2097152
 </pre>
 
 ### User Admin Configuration
-
 In the `[useradmin]` section of the configuration file, you can
 _optionally_ specify the following:
 
@@ -1169,6 +1180,14 @@ import groups from an LDAP directory.
 1.  Click **Groups**.
 2.  Check the checkbox next to the group and click **Delete**.
 3.  Click **Yes** to confirm.
+
+#### Limit users can login only if they are belong to one of listed LDAP groups
+
+<pre>
+  [desktop]
+  [[ldap]]
+  login_groups=ldap_grp1,ldap_grp2,ldap_grp3
+</pre>
 
 #### Importing Groups from an LDAP Directory
 

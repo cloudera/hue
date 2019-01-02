@@ -62,7 +62,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       </div>
     </div>
     <div class="search-bar-middle">
-      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0, submit: function() { return false }">
+      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length === 0, submit: function() { return false }">
         <!-- ko if: $root.collection.engine() == 'solr' -->
         <!-- ko if: columns().length == 0 -->
         <select data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name, disable: isSyncingCollections, selectizeOptions: { clearable: true }"></select>
@@ -91,9 +91,10 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
         <div class="search-bar-query-container">
           <div class="search-bar-collection" data-bind="visible: $root.collection.engine() != 'report'">
-            <div class="selectMask">
-              <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
-            </div>
+##             <div class="selectMask">
+##               <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
+##             </div>
+            <select data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name, disable: isSyncingCollections, selectizeOptions: { clearable: true }"></select>
           </div>
           <!-- ko if: $root.collection.engine() !== 'report' -->
           <div class="search-bar-query" data-bind="foreach: query.qs">
@@ -106,6 +107,8 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
               mode: $root.collection.engine(),
               fixedPrefix: $root.collection.engine() !== 'solr' ? function() { return 'SELECT * FROM ' +  $root.collection.name() + ' WHERE '; } : undefined,
               fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
+              namespace: $root.collection.activeNamespace,
+              compute: $root.collection.activeCompute,
               database: function () { return $root.collection.name().split('.')[0] },
               singleLine: true }
             }"></div>
@@ -241,6 +244,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
 % if not is_report:
 <%dashboard:layout_toolbar>
+  <%def name="skipLayout()"></%def>
   <%def name="results()">
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ data: draggableResultset(), stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
@@ -1486,6 +1490,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <!-- ko if: widgetType() != 'resultset-widget' -->
             <input type="hidden" name="facet" data-bind="value: ko.mapping.toJSON($data)">
           <!-- /ko -->
+          % if conf.ENABLE_DOWNLOAD.get():
           <div class="dropdown">
             <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
               <i class="fa fa-download fa-fw"></i>
@@ -1513,6 +1518,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               ##</li>
             </ul>
           </div>
+          % endif
         </form>
         <!-- /ko -->
 
@@ -1527,20 +1533,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div style="margin-bottom: 8px">
           <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(true)}, style: {'font-weight': template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: template.fields().length"></span>)</a>
         </div>
-        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
-          <a href="javascript: void(0)" class="btn btn-mini"
-            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': template.fields().length > 0 }"
-            style="margin-right: 2px;">
-            <i class="fa fa-square-o"></i>
-          </a>
-          <strong>${_('Field Name')}</strong>
+        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;margin-left:4px">
+          <div class="pull-left hue-checkbox fa" data-bind="click: toggleGridFieldsSelection, css: { 'fa-check': template.fields().length > 0 }"></div>
+          <strong>&nbsp;${_('Field Name')}</strong>
         </div>
         <div data-bind="visible: template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; color:#CCC">
           ${ _('No matches.') }
         </div>
         <div class="fields-list" data-bind="foreach: { data: template.filteredAttributeFields, afterRender: resizeFieldsListThrottled }">
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
-            <input type="checkbox" data-bind="checkedValue: name, checked: $parent.template.fieldsSelected" style="margin: 0" />
+            <div class="pull-left hue-checkbox fa" data-bind="multiCheck: '#partitionsTable', value: name, checkedValue: name, hueChecked: $parent.template.fieldsSelected"></div>
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $parent.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn, attr: {'title': name() + ' (' + type() + ')'}" style="margin-right:10px"></div>
             <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>
@@ -1750,60 +1752,58 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- ko if: widgetType() == 'document-widget' -->
           <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle}, field: template.chartSettings.chartX, fqs: $root.query.fqs,
-                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container',
-                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.data.label}, widget_id: $parent.id()}); }}" class="chart"></div>
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container'}" class="chart"></div>
           <!-- /ko -->
           <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
-          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: true, hideStacked: template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: template.chartSettings.chartSelectorType,
-                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.x}, widget_id: $parent.id()}); },
-                onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: template.chartSettings.chartX(), widget_id: $parent.id()}) }},  stacked: true, showLegend: true" class="chart"></div>
+          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: template.chartSettings.chartSelectorType},  stacked: true, showLegend: true" class="chart"></div>
           <!-- /ko -->
           <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
-          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: true,
-                transformer: multiSerieDataTransformerGrid, showControls: false,
-                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.x}, widget_id: $parent.id()}); },
-                onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: template.chartSettings.chartX(), widget_id: $parent.id()}) }}" class="chart"></div>
+          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: false,
+                transformer: multiSerieDataTransformerGrid, showControls: false}" class="chart"></div>
           <!-- /ko -->
           <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle, chartZ: template.chartSettings.chartMapLabel},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, forceRedraw: true,
-                showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }',
-                onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: $parent.id(), 'bounds': ko.toJS(bounds, null, 2), lat: template.chartSettings.chartX(), lon: template.chartSettings.chartYSingle()}); }}" class="chart"></div>
+                showMoveCheckbox: false, moveCheckboxLabel: '${ _ko('Search as I move the map') }'}" class="chart"></div>
           <!-- /ko -->
           <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
-          <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti, widget_id: $parent.id()}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: true, hideStacked: template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, showControls: false,
-                onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.x}, widget_id: $parent.id()}); },
-                onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: template.chartSettings.chartX(), widget_id: $parent.id()}) }}" class="chart"></div>
+          <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti, widget_id: $parent.id()}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
+                transformer: multiSerieDataTransformerGrid, showControls: false}" class="chart"></div>
           <!-- /ko -->
           <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
           <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $parent.results(), scope: template.chartSettings.chartScope(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle},
-              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true,
-              onClick: function(d){ searchViewModel.query.toggleFacet({facet: {cat: template.chartSettings.chartX(), value: d.fields[0]}, widget_id: $parent.id()}); }}" />
+              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}" />
           <!-- /ko -->
           <div class="clearfix"></div>
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'resultset-widget' -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
-                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
-
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
           <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: $root.collection.template.chartSettings.chartSelectorType},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
-
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: $root.collection.template.chartSettings.chartSelectorType},  stacked: true, showLegend: true" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
           <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
-
+                transformer: multiSerieDataTransformerGrid, showControls: false }" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
-
+                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, forceRedraw: true}" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
           <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
-                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
-
+                transformer: multiSerieDataTransformerGrid, showControls: false }" class="chart"></div>
+          <!-- /ko -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
           <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $root.results(), scope: $root.collection.template.chartSettings.chartScope(), snippet: $data},
-              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}, visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" />
+              transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}" />
           <div class="clearfix"></div>
+          <!-- /ko -->
         <!-- /ko -->
 
        </div>
@@ -2199,6 +2199,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
         mode: $root.collection.engine(),
         fixedPrefix: $root.collection.engine() !== 'solr' ? function() { return 'SELECT * FROM ' +  $root.collection.name() + ' WHERE '; } : undefined,
         fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
+        namespace: $root.collection.activeNamespace,
+        compute: $root.collection.activeCompute,
         database: function () { return $root.collection.name().split('.')[0] },
         singleLine: true }
       }"></div>
@@ -2787,10 +2789,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
-                <!-- We add following conditionnal so that selectize.value is not bound twice -->
-                <!-- ko if: columns().length > 0 -->
-                <select id="settingssolrindex" class="input-xlarge" data-bind="selectize: $root.initial.collections.sort(), value: $root.collection.name"></select>
-                <!-- /ko -->
+                <div data-bind="component: { name: 'hue-drop-down', params: { value: $root.collection.name, entries: $root.initial.collections.sort(), searchable: true, linkTitle: '${ _ko('Solr index') }' } }" style="display: inline-block; padding-top: 6px;"></div>
               </div>
             </div>
             <!-- /ko -->
@@ -3399,7 +3398,9 @@ function pieChartDataTransformer(data) {
       obj: item
     });
   });
-  return _data;
+  return _data.filter(function (val) {
+    return val.value >= 0;
+  });
 }
 
 function _rangePieChartDataTransformer(data, isUp) {
@@ -3415,7 +3416,9 @@ function _rangePieChartDataTransformer(data, isUp) {
       obj: item
     });
   });
-  return _data;
+  return _data.filter(function (val) {
+    return val.value >= 0;
+  });
 }
 
 
@@ -3441,6 +3444,13 @@ function pieChartDataTransformerGrid(data) {
   } else if (!data.chartY) {
     chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
   } // else we just take value as is
+  if (!chartX) {
+    _data.message = window.HUE_I18n.chart.missingLegend;
+    return _data;
+  } else if (!chartY) {
+    _data.message = window.HUE_I18n.chart.missingValue;
+    return _data;
+  }
 
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
@@ -3453,7 +3463,9 @@ function pieChartDataTransformerGrid(data) {
       });
     }
   });
-  return _data;
+  return _data.filter(function (val) {
+    return val.value >= 0;
+  });
 }
 
 function _barChartDataTransformer(rawDatum, isUp) {
@@ -3821,7 +3833,11 @@ function gradientMapChartDataTransformerGrid(data) {
     chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
   } // else we just take value as is
   var _data = [];
-  if (!chartX || !chartY) {
+  if (!chartX) {
+    _data.message = window.HUE_I18n.chart.missingRegion;
+    return _data;
+  } else if (!chartY) {
+    _data.message = window.HUE_I18n.chart.missingY;
     return _data;
   }
   $(data.counts).each(function (cnt, item) {
@@ -3898,6 +3914,17 @@ function leafletMapChartDataTransformerGrid(data) {
     chartMapLabel = data.chartZ();
   } else if (!data.chartZ) {
     chartMapLabel = searchViewModel.collection.template.chartSettings.chartMapLabel();
+  }
+
+  if (!chartX) {
+    _data.message = window.HUE_I18n.chart.missingLatitude;
+    return _data;
+  } else if (!chartY) {
+    _data.message = window.HUE_I18n.chart.missingLongitude;
+    return _data;
+  } else if (!chartMapLabel) {
+    _data.message = window.HUE_I18n.chart.missingLabel;
+    return _data;
   }
 
   $(data.counts).each(function (cnt, item) {
@@ -3979,6 +4006,14 @@ function multiSerieDataTransformerGrid(rawDatum, isTimeline) {
   } else if (!rawDatum.chartY) {
     chartY = searchViewModel.collection.template.chartSettings.chartYMulti();
   } // else we just take value as is
+
+  if (!chartX) {
+    _datum.message = window.HUE_I18n.chart.missingX;
+    return _datum;
+  } else if (!chartY || !chartY.length) {
+    _datum.message = window.HUE_I18n.chart.missingY;
+    return _datum;
+  }
 
   if (chartX != null && chartY.length > 0 && rawDatum.counts.length > 0) {
     var _plottedSerie = 0;
@@ -4117,7 +4152,12 @@ function loadSearch(collection, query, initial) {
   searchViewModel.init(function(){
     $(".chosen-select").trigger("chosen:updated");
     if (searchViewModel.collection.engine() === 'report') {
-      magicSearchLayout(searchViewModel);
+      if (!searchViewModel.collectionJson.layout.length && (!searchViewModel.collectionJson.gridItems || !searchViewModel.collectionJson.gridItems.length)) {
+        magicSearchLayout(searchViewModel);
+      }
+    }
+    else {
+      queryBuilderSearchLayout(searchViewModel);
     }
   });
 
@@ -4184,6 +4224,10 @@ function loadSearch(collection, query, initial) {
   searchViewModel.collection.autorefreshSeconds.subscribe(function (value) {
     checkAutoRefresh();
   });
+
+  huePubSub.subscribe('dashboard.switch.collection', function(){
+    queryBuilderSearchLayout(searchViewModel);
+  }, 'dashboard');
 }
 
 $(document).ready(function () {
@@ -4437,7 +4481,7 @@ $(document).ready(function () {
   var setWidgetGridWidth = function () {
     if (searchViewModel && searchViewModel.isGridster()) {
       // turns out Gridster generates CSS either with single or double quotes depending on the browser
-      widgetGridWidth = typeof hueUtils.getStyleFromCSSClass('[data-sizex="1"]') !== 'undefined' ? parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width) : parseInt(hueUtils.getStyleFromCSSClass("[data-sizex='1']").width);
+      widgetGridWidth = typeof hueUtils.getStyleFromCSSClass('[data-sizex="1"]') !== 'undefined' ? parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width) : (hueUtils.getStyleFromCSSClass("[data-sizex='1']") ? parseInt(hueUtils.getStyleFromCSSClass("[data-sizex='1']").width) : null);
     }
   }
 
@@ -4986,13 +5030,15 @@ $(document).ready(function () {
   huePubSub.subscribe('dashboard.confirm.document', function () {
     $('#addDocumentFacetDemiModal').modal('hide');
     if (selectedWidget != null) {
-      // there's no programmatic way to get the selected index from the Selectize API...
-      var $dropdown = $('.temp-document-statement')[0].selectize.$dropdown_content;
-      if ($dropdown.find('.selected').length > 1) {
-        searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected.active').index());
-      }
-      else {
-        searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected').index());
+      if (searchViewModel.tempDocument.parsedStatements().length > 1) {
+        // there's no programmatic way to get the selected index from the Selectize API...
+        var $dropdown = $('.temp-document-statement')[0].selectize.$dropdown_content;
+        if ($dropdown.find('.selected').length > 1) {
+          searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected.active').index());
+        }
+        else {
+          searchViewModel.tempDocument.selectedStatementId($dropdown.find('.selected').index());
+        }
       }
       searchViewModel.collection.selectedDocument({
         uuid: searchViewModel.tempDocument.uuid(),
@@ -5020,6 +5066,11 @@ $(document).ready(function () {
 
   huePubSub.subscribe('app.dom.unload', function (app) {
     if (app === 'dashboard') {
+      %if is_report:
+      if (ApiHelper.getInstance().getFromTotalStorage('assist', 'right_assist_panel_visible', false)) {
+        huePubSub.publish('right.assist.show');
+      }
+      %endif
       $gridster.destroy();
     }
   }, 'dashboard');

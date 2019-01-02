@@ -25,7 +25,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 from django.core import management
-
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
@@ -35,17 +35,17 @@ from django.views.decorators.http import require_POST
 
 from metadata.conf import has_navigator
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
-from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi
+from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
 from desktop.lib.django_util import JsonResponse
+from desktop.conf import get_clusters, IS_K8S_ONLY
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
-from desktop.conf import get_clusters
 
 
 LOG = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ def get_config(request):
 
 @api_error_handler
 def get_context_namespaces(request, interface):
-  response = {'dynamicClusters': False}
+  response = {}
   namespaces = []
 
   clusters = get_clusters(request.user).values()
@@ -88,35 +88,43 @@ def get_context_namespaces(request, interface):
       'name': cluster['name'],
       'status': 'CREATED',
       'computes': [cluster]
-    } for cluster in clusters if cluster.get('type') == 'direct'
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
   ])
 
   if interface == 'hive' or interface == 'impala' or interface == 'report':
     # From Altus SDX
-    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+    if [cluster for cluster in clusters if 'altus' in cluster['type']]:
       # Note: attaching computes to namespaces might be done via the frontend in the future
       if interface == 'impala':
-        adb_clusters =  AnalyticDbApi(request.user).list_clusters()['clusters']
+        if IS_K8S_ONLY.get():
+          adb_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+        else:
+          adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
         for _cluster in adb_clusters: # Add "fake" namespace if needed
           if not _cluster.get('namespaceCrn'):
             _cluster['namespaceCrn'] = _cluster['crn']
             _cluster['id'] = _cluster['crn']
             _cluster['namespaceName'] = _cluster['clusterName']
             _cluster['name'] = _cluster['clusterName']
+            _cluster['compute_end_point'] = '%(publicHost)s' % _cluster['coordinatorEndpoint'] if IS_K8S_ONLY.get() else '',
       else:
         adb_clusters = []
+
+      if IS_K8S_ONLY.get():
+        sdx_namespaces = []
+      else:
+        sdx_namespaces = SdxApi(request.user).list_namespaces()
+
+      # Adding "fake" namespace for cluster without one
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and _cluster['status'] != 'TERMINATING')])
 
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
           'name': namespace.get('namespaceName'),
           'status': namespace.get('status'),
           'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
-        } for namespace in SdxApi(request.user).list_namespaces() +
-             # Adding "fake" namespace for cluster without one
-             [_cluster for _cluster in adb_clusters if not cluster.get('namespaceCrn') and _cluster.get('status') == 'CREATED']
-        ]
-      )
-      response['dynamicClusters'] = True
+        } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED' or IS_K8S_ONLY.get()
+      ])
 
   response[interface] = namespaces
   response['status'] = 0
@@ -130,30 +138,36 @@ def get_context_computes(request, interface):
   computes = []
 
   clusters = get_clusters(request.user).values()
+  has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type']]
 
-  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'jobs' or interface == 'report':
+  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
     computes.extend([{
         'id': cluster['id'],
         'name': cluster['name'],
         'namespace': cluster['id'],
         'interface': interface,
         'type': cluster['type']
-      } for cluster in clusters if cluster.get('type') == 'direct'
+      } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
     ])
 
-  if interface == 'impala' or interface == 'jobs' or interface == 'report':
-    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+  if has_altus_clusters:
+    if interface == 'impala' or interface == 'report':
+      if IS_K8S_ONLY.get():
+        dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+      else:
+        dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
+
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
           'status': cluster.get('status'),
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-          'type': 'altus-adb'
-        } for cluster in AnalyticDbApi(request.user).list_clusters()['clusters'] if cluster.get('status') == 'CREATED']
+          'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
+          'type': 'altus-dw'
+        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and cluster['status'] != 'TERMINATING')]
       )
 
-  if interface == 'oozie' or interface == 'jobs':
-    if [cluster for cluster in clusters if cluster['type'] == 'altus']:
+    if interface == 'oozie' or interface == 'spark2':
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
@@ -164,8 +178,46 @@ def get_context_computes(request, interface):
           'type': 'altus-de'
         } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
       )
+      # TODO if interface == 'spark2' keep only SPARK type
 
   response[interface] = computes
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def get_context_clusters(request, interface):
+  response = {}
+  clusters = []
+
+  cluster_configs = get_clusters(request.user).values()
+
+  for cluster in cluster_configs:
+    cluster = {
+      'id': cluster.get('id'),
+      'name': cluster.get('name'),
+      'status': 'CREATED',
+      'environmentType': cluster.get('type'),
+      'serviceType': cluster.get('interface'),
+      'namespace': '',
+      'type': cluster.get('type')
+    }
+
+    if cluster.get('type') == 'altus':
+      cluster['name'] = 'Altus DE'
+      cluster['type'] = 'altus-de'
+      clusters.append(cluster)
+      cluster = cluster.copy()
+      cluster['name'] = 'Altus Data Warehouse'
+      cluster['type'] = 'altus-dw'
+    elif cluster.get('type') == 'altusv2':
+      cluster['name'] = 'Data Warehouse'
+      cluster['type'] = 'altus-dw2'
+
+    clusters.append(cluster)
+
+  response[interface] = clusters
   response['status'] = 0
 
   return JsonResponse(response)
@@ -708,8 +760,9 @@ def import_documents(request):
 
   stdout = StringIO.StringIO()
   try:
-    management.call_command('loaddata', f.name, verbosity=2, traceback=True, stdout=stdout)
-    Document.objects.sync()
+    with transaction.atomic(): # We wrap both commands to commit loaddata & sync
+      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout, commit=False) # We need to use commit=False because commit=True will close the connection and make Document.objects.sync fail.
+      Document.objects.sync()
 
     if request.POST.get('redirect'):
       return redirect(request.POST.get('redirect'))

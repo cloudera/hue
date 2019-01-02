@@ -32,7 +32,7 @@ class Migration(DataMigration):
             # LDAP == 1
             # HUE == 0
             if up.creation_method == '1':
-              up.creation_method = UserProfile.CreationMethod.EXTERNAL
+              up.creation_method = UserProfile.CreationMethod.EXTERNAL.name
             elif up.creation_method == '0':
               up.creation_method = UserProfile.CreationMethod.HUE
             up.save()

@@ -57,6 +57,7 @@ urlpatterns += [
   url(r'^api/index/list/$', indexer_solr_api.list_index, name='list_index'),
   url(r'^api/indexes/list/$', indexer_solr_api.list_indexes, name='list_indexes'),
   url(r'^api/indexes/create/$', indexer_solr_api.create_index, name='create_index'),
+  url(r'^api/indexes/index/$', indexer_solr_api.index, name='index'),
   url(r'^api/indexes/sample/$', indexer_solr_api.sample_index, name='sample_index'),
   url(r'^api/indexes/config/$', indexer_solr_api.config_index, name='config_index'),
   url(r'^api/indexes/delete/$', indexer_solr_api.delete_indexes, name='delete_indexes'),
@@ -67,7 +68,8 @@ urlpatterns += [
   url(r'^api/indexer/guess_format/$', indexer_api3.guess_format, name='guess_format'),
   url(r'^api/indexer/guess_field_types/$', indexer_api3.guess_field_types, name='guess_field_types'),
 
-  url(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit')
+  url(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit'),
+  url(r'^api/importer/save/?$', indexer_api3.save_pipeline, name='save_pipeline'),
 ]
 
 urlpatterns += [

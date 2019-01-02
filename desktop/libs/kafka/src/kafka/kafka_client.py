@@ -19,6 +19,8 @@
 import logging
 import json
 
+from subprocess import call
+
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
@@ -27,6 +29,7 @@ from desktop.lib.rest.resource import Resource
 from desktop.lib.i18n import smart_unicode
 
 from kafka.conf import KAFKA
+from libzookeeper.conf import zkensemble
 
 
 LOG = logging.getLogger(__name__)
@@ -49,7 +52,7 @@ class KafkaApi(object):
   """
 
   def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
-    self._api_url = KAFKA.API_URL.get().strip('/')
+    self._api_url = KAFKA.API_URL.get().strip('/') if KAFKA.API_URL.get() else ''
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
@@ -60,5 +63,20 @@ class KafkaApi(object):
     try:
       response = self._root.get('topics')
       return json.loads(response)
+    except RestException, e:
+      raise KafkaApiException(e)
+
+
+  def create_topic(self, name, partitions=1, replication_factor=1):
+    # Create/delete topics are not available in the REST API.
+    # Here only works with hack if command is available on the Hue host.
+    try:      
+      return call(
+        'kafka-topics --zookeeper %(zookeeper)s --create --if-not-exists --topic %(name)s --partitions %(partitions)s --replication-factor %(replication_factor)s' % {
+           'zookeeper': zkensemble(),
+           'name': name,
+           'partitions': partitions,
+           'replication_factor': replication_factor
+      })
     except RestException, e:
       raise KafkaApiException(e)

@@ -109,7 +109,7 @@ def index(request, is_mobile=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
-
+  engine = collection.data['collection']['engine']
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
@@ -125,6 +125,7 @@ def index(request, is_mobile=False):
     'can_edit_index': can_edit_index(request.user),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'mobile': is_mobile,
+    'is_report': collection.data['collection'].get('engine') == 'report'
   })
 
 def index_m(request):

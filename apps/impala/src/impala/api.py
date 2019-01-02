@@ -17,36 +17,50 @@
 
 ## Main views are inherited from Beeswax.
 
+import base64
 import logging
+import json
+import struct
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
+from desktop.models import Document2
 
 from beeswax.api import error_handler
+from beeswax.server.dbms import get_cluster_config
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
 from beeswax.views import authorized_get_query_history
 
 from impala import dbms
+from impala.dbms import _get_server_name
+from impala.server import get_api as get_impalad_api, _get_impala_server_url
 
+from libanalyze import analyze as analyzer
+from libanalyze import rules
+
+from notebook.models import make_notebook
 
 LOG = logging.getLogger(__name__)
-
+ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 
 @require_POST
 @error_handler
 def invalidate(request):
-  query_server = dbms.get_query_server_config()
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+  database = request.POST.get('database', None)
+  table = request.POST.get('table', None)
+  flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
+
+  cluster_config = get_cluster_config(cluster)
+  query_server = dbms.get_query_server_config(cluster_config=cluster_config)
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
-  database = request.POST.get('database', None)
-  flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
-
-  db.invalidate(database=database, flush_all=flush_all)
+  db.invalidate(database=database, table=table, flush_all=flush_all)
   response['message'] = _('Successfully invalidated metadata')
 
   return JsonResponse(response)
@@ -106,5 +120,60 @@ def get_runtime_profile(request, query_history_id):
     profile = db.get_runtime_profile(operation_handle, session_handle)
     response['status'] = 0
     response['profile'] = profile
+
+  return JsonResponse(response)
+
+@require_POST
+@error_handler
+def alanize(request):
+  response = {'status': -1}
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+  query_id = json.loads(request.POST.get('query_id'))
+
+  application = _get_server_name(cluster)
+  query_server = dbms.get_query_server_config()
+  session = Session.objects.get_session(request.user, query_server['server_name'])
+  server_url = _get_impala_server_url(session)
+
+  if query_id:
+    LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
+    doc = Document2.objects.get(id=query_id)
+    snippets = doc.data_dict.get('snippets', [])
+    secret = snippets[0]['result']['handle']['secret']
+    api = get_impalad_api(user=request.user, url=server_url)
+    impala_query_id = "%x:%x" % struct.unpack(b"QQ", base64.decodestring(secret))
+    api.kill(impala_query_id) # There are many statistics that are not present when the query is open. Close it first.
+    query_profile = api.get_query_profile_encoded(impala_query_id)
+    profile = analyzer.analyze(analyzer.parse_data(query_profile))
+    result = ANALYZER.run(profile)
+
+    heatmap = {}
+    summary = analyzer.summary(profile)
+    heatmapMetrics = ['AverageThreadTokens', 'BloomFilterBytes', 'PeakMemoryUsage', 'PerHostPeakMemUsage', 'PrepareTime', 'RowsProduced', 'TotalCpuTime', 'TotalNetworkReceiveTime', 'TotalNetworkSendTime', 'TotalStorageWaitTime', 'TotalTime']
+    for key in heatmapMetrics:
+      metrics = analyzer.heatmap_by_host(profile, key)
+      if metrics['data']:
+        heatmap[key] = metrics
+    response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.iterkeys())) } }
+    response['status'] = 0
+  return JsonResponse(response)
+
+@require_POST
+@error_handler
+def alanize_fix(request):
+  response = {'status': -1}
+  fix = json.loads(request.POST.get('fix'))
+  start_time = json.loads(request.POST.get('start_time'), '-1')
+  if fix['id'] == 0:
+    notebook = make_notebook(
+      name=_('compute stats %(data)s') % fix,
+      editor_type='impala',
+      statement='compute stats %(data)s' % fix,
+      status='ready',
+      last_executed=start_time,
+      is_task=True
+    )
+    response['details'] = { 'task': notebook.execute(request, batch=True) }
+    response['status'] = 0
 
   return JsonResponse(response)

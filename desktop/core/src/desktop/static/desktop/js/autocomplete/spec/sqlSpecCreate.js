@@ -1085,9 +1085,9 @@
         });
       });
 
-      it('should suggest keywords for "CREATE TABLE foo (id INT, some FLOAT, bar |"', function () {
+      it('should suggest keywords for "CREATE TABLE foo (id INT, `some` FLOAT, bar |"', function () {
         assertAutoComplete({
-          beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
+          beforeCursor: 'CREATE TABLE foo (id INT, `some` FLOAT, bar ',
           afterCursor: '',
           containsKeywords: ['BOOLEAN'],
           expectedResult: {
@@ -1110,14 +1110,114 @@
           });
         });
 
-        it('should handle "CREATE ... TABLE ... LIKE PARQUET ... PARTITIONED BY ... ROW FORMAT ... CACHED ...;|"', function () {
+        it('should handle "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... UNCACHED ...;|"', function () {
           assertAutoComplete({
-            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
-            'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'SORT BY (baa, boo, ble) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' ' +
-            'LINES TERMINATED BY \'q\' STORED AS PARQUET WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
-            'CACHED IN \'boo\';',
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS foo.bar ' +
+              '(foo int COMMENT \'col_comment\', bar int COMMENT \'col_comment\') ' +
+              'PARTITIONED BY (foo int COMMENT \'col_comment\', bar int COMMENT \'col_comment\') ' +
+              'SORT BY (foo, bar) ' +
+              'COMMENT \'table_comment\' ' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'c\' ESCAPED BY \'c\' ' +
+              'LINES TERMINATED BY \'c\' ' +
+              'WITH SERDEPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\') ' +
+              'STORED AS PARQUET ' +
+              'LOCATION \'/hdfs_path\' ' +
+              'UNCACHED ' +
+              'TBLPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\');',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... CACHED ...;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS foo.bar ' +
+              '(foo int COMMENT \'col_comment\', bar int COMMENT \'col_comment\') ' +
+              'PARTITIONED BY (foo int COMMENT \'col_comment\', bar int COMMENT \'col_comment\') ' +
+              'SORT BY (foo, bar) ' +
+              'COMMENT \'table_comment\' ' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'c\' ESCAPED BY \'c\' ' +
+              'LINES TERMINATED BY \'c\' ' +
+              'WITH SERDEPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\') ' +
+              'STORED AS PARQUET ' +
+              'LOCATION \'/hdfs_path\' ' +
+              'CACHED IN \'pool_name\' WITH REPLICATION = 1 ' +
+              'TBLPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\');',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... AS SELECT ...;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS foo.bar ' +
+              'PARTITIONED BY (foo int COMMENT \'col_comment\', bar int COMMENT \'col_comment\') ' +
+              'SORT BY (foo, bar) ' +
+              'COMMENT \'table_comment\' ' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'c\' ESCAPED BY \'c\' ' +
+              'LINES TERMINATED BY \'c\' ' +
+              'WITH SERDEPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\') ' +
+              'STORED AS PARQUET ' +
+              'LOCATION \'/hdfs_path\' ' +
+              'CACHED IN \'pool_name\' WITH REPLICATION = 1 ' +
+              'TBLPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\') ' +
+              'AS SELECT * FROM boo;',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE ... TABLE ... LIKE PARQUET ... PARTITIONED BY ... ROW FORMAT ...;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS foo.bar ' +
+              'LIKE PARQUET \'/hdfs_path_of_parquet_file\' ' +
+              'PARTITIONED BY (foo int COMMENT \'col_comment\', bar int COMMENT \'col_comment\') ' +
+              'SORT BY (foo, bar) ' +
+              'COMMENT \'table_comment\' ' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'c\' ESCAPED BY \'c\' ' +
+              'LINES TERMINATED BY \'c\' ' +
+              'WITH SERDEPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\') ' +
+              'STORED AS PARQUET ' +
+              'LOCATION \'/hdfs_path\' ' +
+              'CACHED IN \'pool_name\' WITH REPLICATION = 1 ' +
+              'TBLPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\');',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE ... TABLE ... PARTITIONED BY ... STORED AS KUDU ...;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS bar\n' +
+              '(foo int NOT NULL COMMENT \'col_comment\', bar int BLOCK_SIZE 1 COMMENT \'col_comment\', PRIMARY KEY (foo))\n' +
+              'PARTITION BY HASH (id) PARTITIONS 3,\n' +
+              '  RANGE (year) (PARTITION 1980 <= VALUES < 1990,\n' +
+              '    PARTITION 1990 <= VALUES < 2000,\n' +
+              '    PARTITION VALUE = 2001,\n' +
+              '    PARTITION 2001 < VALUES)\n' +
+              'COMMENT \'table_comment\'\n' +
+              'STORED AS KUDU\n' +
+              'TBLPROPERTIES (\'key1\'=\'value1\', \'key2\'=\'value2\');',
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
@@ -1282,7 +1382,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'UNCACHED', 'AS']
+              suggestKeywords: ['CACHED IN', 'UNCACHED', 'TBLPROPERTIES', 'AS']
             }
           });
         });
@@ -1400,7 +1500,7 @@
             beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED ',
             afterCursor: '',
             dialect: 'impala',
-            containsKeywords: ['AS', 'FIELDS TERMINATED BY', 'LINES TERMINATED BY' ],
+            containsKeywords: ['FIELDS TERMINATED BY', 'LINES TERMINATED BY', 'WITH SERDEPROPERTIES', 'STORED AS', 'LOCATION', 'CACHED IN', 'UNCACHED', 'TBLPROPERTIES', 'AS'],
             doestNotContainKeywords: ['ROW FORMAT'],
             expectedResult: {
               lowerCase: false
@@ -1501,7 +1601,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['WITH REPLICATION =', 'AS']
+              suggestKeywords: ['WITH REPLICATION =', 'TBLPROPERTIES', 'AS']
             }
           });
         });
@@ -1532,12 +1632,15 @@
 
         it('should suggest keywords for "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... CACHED |"', function () {
           assertAutoComplete({
-            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName (id INT, col2 STRING COMMENT \'booo\', col3 BIGINT) ' +
-            'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
-            'CACHED ',
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName\n' +
+              '  (id INT, col2 STRING COMMENT \'booo\', col3 BIGINT)\n' +
+              'PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT)\n' +
+              'COMMENT \'Table comment...\' \n' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\'\n' +
+              'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) \n' +
+              'STORED AS PARQUET\n' +
+              'LOCATION \'/baa/baa\'\n' +
+              'CACHED ',
             afterCursor: '',
             dialect: 'impala',
             expectedResult: {
@@ -1549,11 +1652,16 @@
 
         it('should suggest keywords for "CREATE ... TABLE ... LIKE PARQUET ... PARTITIONED BY ... ROW FORMAT ... CACHED |"', function () {
           assertAutoComplete({
-            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
-            'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'SORT BY (baa, boo, ble) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
-            'CACHED ',
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName \n' +
+              'LIKE PARQUET \'/boo/baa\'\n' +
+              'PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT)\n' +
+              'SORT BY (baa, boo, ble)\n' +
+              'COMMENT \'Table comment...\' \n' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\'\n' +
+              'WITH SERDEPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\')\n' +
+              'STORED AS PARQUET \n' +
+              'LOCATION \'/baa/baa\'\n' +
+              'CACHED ',
             afterCursor: '',
             dialect: 'impala',
             expectedResult: {
@@ -1593,12 +1701,15 @@
 
         it('should suggest keywords for "CREATE ... TABLE ... ROW FORMAT ... CACHED IN ... AS |"', function () {
           assertAutoComplete({
-            beforeCursor: 'CREATE TABLE dbOne.tableName ' +
-            'COMMENT \'Table comment...\' ' +
-            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
-            'CACHED IN \'boo\' AS ',
+            beforeCursor: 'CREATE TABLE dbOne.tableName\n' +
+              'COMMENT \'Table comment...\'\n' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\'\n' +
+              'WITH SERDEPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\')\n' +
+              'STORED AS PARQUET\n' +
+              'LOCATION \'/baa/baa\'\n' +
+              'CACHED IN \'boo\'\n' +
+              'TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\')\n' +
+              'AS ',
             afterCursor: '',
             dialect: 'impala',
             expectedResult: {
@@ -2470,7 +2581,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['FIELDS TERMINATED BY', 'COLLECTION ITEMS TERMINATED BY', 'MAP KEYS TERMINATED BY', 'LINES TERMINATED BY', 'NULL DEFINED AS', 'STORED AS', 'LOCATION', 'TBLPROPERTIES', 'AS']
+              suggestKeywords: ['FIELDS TERMINATED BY', 'COLLECTION ITEMS TERMINATED BY', 'MAP KEYS TERMINATED BY', 'LINES TERMINATED BY', 'NULL DEFINED AS', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'AS']
             }
           });
         });
@@ -2505,7 +2616,6 @@
             afterCursor: '',
             dialect: 'hive',
             containsKeywords: ['STORED AS'],
-            doesNotContainKeywords: ['STORED BY'],
             expectedResult: {
               lowerCase: false
             }
@@ -2519,7 +2629,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AS']
+              suggestKeywords: ['AS', 'BY']
             }
           });
         });

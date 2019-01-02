@@ -20,6 +20,9 @@
 
       var subject = new AutocompleteResults({
         snippet: {
+          autocompleteSettings: {
+            temporaryOnly: false
+          },
           type: function () {
             return 'hive';
           },
@@ -31,6 +34,9 @@
           },
           compute: function () {
             return { id: 'defaultCompute' }
+          },
+          whenContextSet: function () {
+            return $.Deferred().resolve();
           }
         },
         editor: function () {
@@ -413,6 +419,9 @@
 
         return new SqlAutocompleter3({
           snippet: {
+            autocompleteSettings: {
+              temporaryOnly: false
+            },
             type: function () {
               return dialect;
             },
@@ -424,6 +433,9 @@
             },
             compute: function () {
               return { id: 'defaultCompute' }
+            },
+            whenContextSet: function () {
+              return $.Deferred().resolve();
             },
             positionStatement: ko.observable(positionStatement)
           },

@@ -46,8 +46,9 @@ from desktop.conf import OAUTH
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import get_profile
+from useradmin.models import get_profile, UserProfile
 from useradmin.views import ensure_home_directory, require_change_password
+from notebook.connectors.base import get_api
 
 LOG = logging.getLogger(__name__)
 
@@ -138,6 +139,9 @@ def dt_login(request, from_modal=False):
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
+        # This is to fix a bug in Hue 4.3
+        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL:
+          userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
@@ -159,7 +163,7 @@ def dt_login(request, from_modal=False):
     first_user_form = None
     auth_form = AuthenticationForm()
     # SAML/OIDC user is already authenticated in djangosaml2.views.login
-    if hasattr(request,'fs') and ('OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
+    if hasattr(request,'fs') and ('SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException), e:
@@ -201,6 +205,15 @@ def dt_logout(request, next_page=None):
     'operation': 'USER_LOGOUT',
     'operationText': 'Logged out user: %s' % username
   }
+
+  # Close Impala session on logout
+  session_app = "impala"
+  if request.user.has_hue_permission(action='access', app=session_app):
+    session = {"type":session_app,"sourceMethod":"dt_logout"}
+    try:
+      get_api(request, session).close_session(session)
+    except Exception, e:
+      LOG.warn("Error closing Impala session: %s" % e)
 
   backends = get_backends()
   if backends:

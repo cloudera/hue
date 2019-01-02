@@ -510,10 +510,14 @@ from desktop.views import _ko
 
           if (parseResult.suggestFields) {
             self.fieldAccessor().forEach(function (field) {
+              var type = field.type();
+              if (type.indexOf('<') !== -1) {
+                type = type.substring(0, type.indexOf('<'));
+              }
               syncEntries.push({
                 category: CATEGORIES.FIELD,
                 value: field.name(),
-                meta: field.type(),
+                meta: type,
                 weightAdjust: 0,
                 popular: ko.observable(false),
                 details: field
@@ -771,7 +775,9 @@ from desktop.views import _ko
         'solrFormula': SolrFormulaAutocompleter,
         'solrQuery':  SolrQueryAutocompleter,
         'impalaQuery': SqlAutocompleter3,
-        'hiveQuery': SqlAutocompleter3
+        'hiveQuery': SqlAutocompleter3,
+        'impala': SqlAutocompleter3,
+        'hive': SqlAutocompleter3
       };
 
       var SimpleAceEditor = function (params, element) {
@@ -803,23 +809,56 @@ from desktop.views import _ko
             throw new Error('Could not find autocompleter for "' + params.autocomplete.type + '"');
           }
 
-          var sourceType = params.autocomplete.type.substring(0, params.autocomplete.type.indexOf('Query'));
+          var sourceType = params.autocomplete.type.indexOf('Query') !== -1 ? params.autocomplete.type.replace('Query', '') : params.autocomplete.type;
+
+          var snippet = {
+            autocompleteSettings: {
+              temporaryOnly: params.temporaryOnly
+            },
+            type: ko.observable(sourceType),
+            id: ko.observable($element.attr('id')),
+            namespace: params.namespace,
+            compute: params.compute,
+            database: ko.observable(params.database && params.database() ? params.database() : 'default'),
+            availableDatabases: ko.observableArray([params.database && params.database() ? params.database() : 'default']),
+            positionStatement: ko.observable({
+              location: { first_line: 1, last_line: 1, first_column: 0, last_column: editor.getValue().length }
+            }),
+            whenContextSet: function() {
+              var promise = $.Deferred().resolve().promise();
+              promise.dispose = function () {};
+              return promise;
+            },
+            isSqlDialect: ko.observable(true),
+            aceCursorPosition: ko.observable(),
+            inFocus: ko.observable()
+          };
+
+          if (sourceType === 'hive' || sourceType === 'impala') {
+            WorkerHandler.registerWorkers();
+            var aceLocationHandler = new AceLocationHandler({ editor: editor, editorId: $element.attr('id'), snippet: snippet });
+            self.disposeFunctions.push(function () {
+              aceLocationHandler.dispose();
+            });
+            aceLocationHandler.attachSqlSyntaxWorker();
+          }
+
+          var focusListener = editor.on('focus', function () {
+            snippet.inFocus(true);
+          });
+
+          var blurListener = editor.on('blur', function () {
+            snippet.inFocus(false);
+          });
+
+          self.disposeFunctions.push(function () {
+            editor.off('focus', focusListener);
+            editor.off('blur', blurListener);
+          });
 
           var autocompleteArgs = {
             editor: function() { return editor },
-            snippet: {
-              type: function () {
-                return sourceType;
-              },
-              database: function () {
-                return params.database && params.database() ? params.database() : 'default';
-              },
-              positionStatement: function () {
-                return {
-                  location: { first_line: 1, last_line: 1, first_column: 0, last_column: editor.getValue().length }
-                }
-              }
-            },
+            snippet: snippet,
             fixedPrefix: params.fixedPrefix,
             fixedPostfix: params.fixedPostfix,
             support: params.autocomplete.support

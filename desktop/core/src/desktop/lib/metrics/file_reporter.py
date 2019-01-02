@@ -18,13 +18,14 @@ import json
 import logging
 import os
 import tempfile
-import threading
 
 from pyformance.reporters.reporter import Reporter
 
 from desktop.lib.metrics import global_registry
 
+
 LOG = logging.getLogger(__name__)
+
 
 class FileReporter(Reporter):
   def __init__(self, location, *args, **kwargs):

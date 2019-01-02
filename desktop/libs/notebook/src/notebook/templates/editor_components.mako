@@ -24,6 +24,7 @@ from desktop.views import _ko, antixss
 from desktop.conf import IS_EMBEDDED
 from metadata.conf import has_optimizer, OPTIMIZER
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
+from desktop.auth.backend import is_admin
 %>
 
 <%def name="includes(is_embeddable=False, suffix='')">
@@ -659,7 +660,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-log${ suffix }">
-  <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
+  <div class="snippet-log-container margin-bottom-10">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
       %if not IS_EMBEDDED.get():
@@ -680,7 +681,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </ul>
       %endif
       <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
-        <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+        <pre data-bind="visible: (!result.logs() || result.logs().length == 0) && jobs().length > 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
       </span>
     </div>
@@ -712,20 +713,20 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="query-tabs${ suffix }">
   <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-tabs nav-tabs-editor">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
-            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
+            <div class="inline-block inactive-action margin-left-10 pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
             % if not IS_EMBEDDED.get():
-            <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
             %endif
           </a>
         </li>
         % if not IS_EMBEDDED.get():
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
           <a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}
-            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
+            <div class="inline-block inactive-action margin-left-10 pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           </a>
         </li>
@@ -742,14 +743,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
             <!-- ko if: showGrid -->
-            <div class="inline-block inactive-action pointer margin-left-10" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
+            <div class="inline-block inactive-action pointer margin-left-10 visible-on-hover" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
               <i class="snippet-icon fa fa-search"></i>
             </div>
             <!-- /ko -->
-            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(true); }">
+            <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(true); }">
               <i class="snippet-icon fa fa-expand"></i>
             </div>
-            <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(false); }">
+            <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(false); }">
               <i class="snippet-icon fa fa-compress"></i>
             </div>
           </a>
@@ -768,22 +769,26 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </a>
         </li>
         <!-- /ko -->
+
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
+        <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
+        <!-- /ko -->
       </ul>
+
       <div class="tab-content" style="border: none; overflow-x: hidden">
         <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
           <!-- ko if: $parent.loadingHistory -->
-          <div style="padding: 20px">
+          <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
           </div>
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.loadingHistory -->
-
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() === '' -->
-            <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
+            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
             <!-- /ko -->
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() !== '' -->
-            <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
+            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
             <!-- /ko -->
 
 
@@ -830,18 +835,18 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}" style="overflow: hidden">
           <!-- ko if: loadingQueries -->
-          <div style="padding: 20px">
+          <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
           </div>
           <!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length > 0 -->
           <table class="table table-condensed margin-top-10 history-table">
@@ -895,9 +900,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
           <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
         </div>
+
         <!-- ko if: result.explanation().length > 0 -->
         <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
           <!-- ko template: { name: 'snippet-explain${ suffix }' } --><!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
+        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" style="padding: 10px;">
+          <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
         </div>
         <!-- /ko -->
 
@@ -978,32 +990,18 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-header-database-selection">
-  <!-- ko if: loadingContext() && isSqlDialect()  -->
-  <i class="fa fa-spinner fa-spin muted"></i>
-  <!-- /ko -->
-  <!-- ko if: !loadingContext() && isSqlDialect() -->
-  <!-- ko if: availableComputes().length > 1 || namespaceRefreshEnabled() -->
-  <!-- ko if: availableComputes().length > 0-->
-  <span class="editor-header-title">${ _('Compute') }</span>
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active compute') }' } }" style="display: inline-block"></div>
-  <!-- /ko -->
-  <!-- ko if: availableComputes().length === 0-->
-  <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No computes found') }</span>
-  <!-- /ko -->
-  <!-- /ko -->
-
-  <!-- ko if: (availableNamespaces().length > 1 || namespaceRefreshEnabled()) -->
-  <span class="editor-header-title">${ _('Namespace') }</span>
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Active namespace') }' } }" style="display: inline-block"></div>
-  <!-- /ko -->
-
-  <!-- ko if: availableDatabases().length > 0 -->
-  <span class="editor-header-title">${ _('Database') }</span>
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
-  <!-- /ko -->
-  <!-- ko if: availableDatabases().length === 0-->
-  <span class="editor-header-title"><i class="fa fa-warning"></i> ${ _('No databases found') }</span>
-  <!-- /ko -->
+  <!-- ko if: isSqlDialect() || type() == 'spark2' -->
+    <!-- ko component: {
+      name: 'hue-context-selector',
+      params: {
+        sourceType: type,
+        compute: compute,
+        namespace: namespace,
+        availableDatabases: availableDatabases,
+        database: database,
+        hideDatabases: !isSqlDialect()
+      }
+    } --><!-- /ko -->
   <!-- /ko -->
 </script>
 
@@ -1078,6 +1076,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- ko template: { if: typeof properties().functions != 'undefined', name: 'property', data: { type: 'functions', label: '${ _ko('Functions') }', value: properties().functions, visibleObservable: settingsVisible, title: '${ _ko('UDFs name and class') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'settings', label: '${ _ko('Settings') }', value: properties().settings, visibleObservable: settingsVisible, title: '${ _ko('Properties') }'}} --><!-- /ko -->
 
+        <!-- ko template: { if: typeof properties().spark_opts != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Spark Arguments') }', value: properties().spark_opts, title: '${ _ko('Names and values of Spark parameters') }', placeholder: '${ _ko('e.g. --executor-memory 20G --num-executors 50') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().resources != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Resources') }', value: properties().resources, title: '${ _ko('HDFS Files or compressed files') }', placeholder: '${ _ko('e.g. /tmp/file, /tmp.file.zip') }'}} --><!-- /ko -->
@@ -1095,7 +1094,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
         <!-- ko if: parseError -->
-          <!-- ko if: $parent.compatibilityTargetPlatform() == $parent.type() && $parent.compatibilitySourcePlatform() == $parent.type() -->
+          <!-- ko if: $parent.compatibilityTargetPlatform().value === $parent.type() && $parent.compatibilitySourcePlatform().value === $parent.type() -->
             <div class="optimizer-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-exclamation"></i>
             </div>
@@ -1104,29 +1103,29 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- /ko -->
           <!-- /ko -->
           ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
-          <!-- ko if: $parent.compatibilityTargetPlatform() != $parent.type() || $parent.type() != $parent.compatibilitySourcePlatform() -->
+          <!-- ko if: $parent.compatibilityTargetPlatform().value !== $parent.type() || $parent.type() !== $parent.compatibilitySourcePlatform().value -->
             <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
-              <span class="optimizer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+              <span class="optimizer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform().name"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
             <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform() != $parent.type() || $parent.compatibilitySourcePlatform() != $parent.type()) -->
+        <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform().value !== $parent.type() || $parent.compatibilitySourcePlatform().value !== $parent.type()) -->
           <!-- ko if: queryError.encounteredString().length == 0 -->
             <div class="optimizer-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-check"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
             <span class="optimizer-explanation alert-success alert-neutral">
-              ${ _('The ') } <select data-bind="options: $parent.compatibilitySourcePlatforms, optionsText: 'name', value: $parent.compatibilitySourcePlatform, optionsValue: 'value'" class="input-medium"></select>
-              <!-- ko if: $parent.compatibilitySourcePlatform() == $parent.type() -->
-                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
-                <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform()); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span></a>.
+              ${ _('The ') } <div data-bind="component: { name: 'hue-drop-down', params: { value: $parent.compatibilitySourcePlatform, entries: $parent.compatibilitySourcePlatforms, labelAttribute: 'name' } }" style="display: inline-block"></div>
+              <!-- ko if: $parent.compatibilitySourcePlatform().value === $parent.type() -->
+                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
+                <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform().value); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span></a>.
               <!-- /ko -->
-              <!-- ko if: $parent.compatibilitySourcePlatform() != $parent.type() -->
-                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
+              <!-- ko if: $parent.compatibilitySourcePlatform().value !== $parent.type() -->
+                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
               <!-- /ko -->
             </span>
           <!-- /ko -->
@@ -1136,7 +1135,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-exclamation"></i>
           </div>
           <!-- ko if: $parent.showOptimizer -->
-            <span class="optimizer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+            <span class="optimizer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
@@ -1901,11 +1900,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- ko if: HAS_OPTIMIZER -->
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { hasSuggestion(null); compatibilitySourcePlatform(type()); compatibilityTargetPlatform(type() == 'hive' ? 'impala' : 'hive'); queryCompatibility(); }, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
+          <a href="javascript:void(0)" data-bind="click: checkCompatibility, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
-        % if conf.DJANGO_DEBUG_MODE.get() and user.is_superuser:
+        % if conf.DJANGO_DEBUG_MODE.get() and is_admin(user):
         <li>
           <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.upload.history'); }" title="${ _('Load recent queries in order to improve recommendations') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
@@ -3320,118 +3319,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      var attachEntryResolver = function (location, sourceType, namespace, compute) {
-        location.resolveCatalogEntry = function(options) {
-          if (!options) {
-            options = {};
-          }
-          if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
-            DataCatalog.applyCancellable(location.resolvePathPromise, options);
-            return location.resolvePathPromise;
-          }
-
-          if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
-            if (!location.resolvePathPromise) {
-              location.resolvePathPromise = $.Deferred().reject().promise();
-            }
-            return location.resolvePathPromise;
-          }
-
-          var promise = SqlUtils.resolveCatalogEntry({
-            sourceType: sourceType,
-            namespace: namespace,
-            compute: compute,
-            cancellable: options.cancellable,
-            cachedOnly: options.cachedOnly,
-            identifierChain: location.identifierChain || location.colRef.identifierChain,
-            tables: location.tables || (location.colRef && location.colRef.tables)
-          });
-
-          if (!options.cachedOnly) {
-            location.resolvePathPromise = promise;
-          }
-          return promise;
-        }
-      };
-
-
-      % if not IS_EMBEDDED.get():
-        if (window.Worker) {
-          // It can take a while before the worker is active
-          var whenWorkerIsReady = function (worker, message) {
-            if (!worker.isReady) {
-              window.clearTimeout(worker.pingTimeout);
-              worker.postMessage({ ping: true });
-              worker.pingTimeout = window.setTimeout(function () {
-                whenWorkerIsReady(worker, message);
-              }, 500);
-            } else {
-              worker.postMessage(message);
-            }
-          };
-
-          // For syntax checking
-          var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
-          aceSqlSyntaxWorker.onmessage = function (e) {
-            if (e.data.ping) {
-              aceSqlSyntaxWorker.isReady = true;
-            } else {
-              huePubSub.publish('ace.sql.syntax.worker.message', e);
-            }
-          };
-
-          huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
-            whenWorkerIsReady(aceSqlSyntaxWorker, message);
-          });
-
-          // For location marking
-          var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
-          aceSqlLocationWorker.onmessage = function (e) {
-            if (e.data.ping) {
-              aceSqlLocationWorker.isReady = true;
-            } else {
-              if (e.data.locations) {
-                e.data.locations.forEach(function (location) {
-                  attachEntryResolver(location, e.data.sourceType, e.data.namespace, e.data.compute);
-                })
-              }
-              huePubSub.publish('ace.sql.location.worker.message', e);
-            }
-          };
-
-          huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
-            whenWorkerIsReady(aceSqlLocationWorker, message);
-          });
-        }
-      % else:
-        var iframe = document.createElement("iframe");
-        iframe.src = (typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls('/notebook/workers_embedded?v=') : '/notebook/workers_embedded?v=') + HUE_VERSION;
-        iframe.name = "workerFrame";
-        iframe.setAttribute('style', 'display: none;');
-        document.body.appendChild(iframe);
-
-        window.addEventListener("message", function (event) {
-          if (event.data.locationWorkerResponse) {
-            if (event.data.locationWorkerResponse.locations) {
-              event.data.locationWorkerResponse.locations.forEach(function (location) {
-                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType, event.data.locationWorkerResponse.namespace, event.data.locationWorkerResponse.compute);
-              })
-            }
-            huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
-          }
-          if (event.data.syntaxWorkerResponse) {
-            huePubSub.publish('ace.sql.syntax.worker.message', { data: event.data.syntaxWorkerResponse });
-          }
-        }, false);
-
-        huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
-          iframe.contentWindow.postMessage({ locationWorkerRequest: message }, '*')
-        });
-
-        huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
-          iframe.contentWindow.postMessage({ syntaxWorkerRequest: message }, '*')
-        });
-      % endif
+      WorkerHandler.registerWorkers();
 
       if (viewModel.isOptimizerEnabled()) {
         % if OPTIMIZER.AUTO_UPLOAD_QUERIES.get():

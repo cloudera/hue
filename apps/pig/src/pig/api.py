@@ -28,6 +28,7 @@ from liboozie.oozie_api import get_oozie
 from oozie.models import Workflow, Pig
 from oozie.views.api import get_log as get_workflow_logs
 from oozie.views.editor import _submit_workflow
+from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -240,5 +241,5 @@ def format_time(st_time):
 
 
 def has_job_edition_permission(oozie_job, user):
-  return user.is_superuser or oozie_job.user == user.username
+  return is_admin(user) or oozie_job.user == user.username
 

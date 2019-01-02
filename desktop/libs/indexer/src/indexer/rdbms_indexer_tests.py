@@ -27,7 +27,7 @@ from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 
 from indexer.conf import ENABLE_SQOOP
-from indexer.indexers.rdbms import RdbmsIndexer
+from indexer.indexers.rdbms import _get_api
 from librdbms.server import dbms as rdbms
 
 
@@ -44,7 +44,10 @@ class TestRdbmsIndexer():
     cls.client = make_logged_in_client()
     cls.user = User.objects.get(username='test')
     cls.user = rewrite_user(cls.user)
-    cls.indexer = RdbmsIndexer(cls.user, db_conf_name='mysql')
+    request = Bag()
+    request.user = cls.user
+    request.POST = {'source': '{"rdbmsMode":"configRdbms", "rdbmsType": "mysql", "inputFormat": "rdbms"}'}
+    cls.indexer = _get_api(request)
 
   @classmethod
   def teardown_class(cls):
@@ -52,12 +55,10 @@ class TestRdbmsIndexer():
     cls.user.save()
 
   def test_get_sample_data(cls):
-    data = cls.indexer.get_sample_data(database='hue', table='employee', column='empname')
+    data = cls.indexer.get_sample_data({}, database='hue', table='desktop_document2', column='id')
 
     assert_equal(0, data['status'], data)
     assert_not_equal('', data['rows'], data)
 
-  def test_guess_format(cls):
-    data = cls.indexer.guess_format()
-
-    assert_equal({"type": "csv"}, data)
+class Bag(dict):
+  pass

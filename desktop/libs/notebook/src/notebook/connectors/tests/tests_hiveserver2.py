@@ -725,7 +725,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
     doc = self.create_query_document(owner=self.user, statement=statement, settings=settings)
     notebook = Notebook(document=doc)
-    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=120.0, wait=2.0)
 
     response = self.client.post(reverse('notebook:fetch_result_size'),
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})

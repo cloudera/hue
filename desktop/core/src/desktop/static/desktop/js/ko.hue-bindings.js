@@ -1508,8 +1508,16 @@
       var afterRender = function () {
         options.content = $content.html();
         options.title = $title.html();
+        var triggerTitle;
+        if ($element.attr('title')) {
+          triggerTitle = $element.attr('title');
+          $element.attr('title', null);
+        }
         $element.popover(options);
         $element.popover('show');
+        if (triggerTitle) {
+          $element.attr('title', triggerTitle);
+        }
         var $tip = $element.data('popover').$tip;
         if (HUE_CONTAINER !== 'body') {
           $tip.css({ 'position': 'fixed', 'z-index': 2000 });
@@ -1522,17 +1530,21 @@
         }
         ko.cleanNode($tip.get(0));
         ko.applyBindings(viewModel, $tip.get(0));
-        $tip.find(".close-popover").click(function (event) {
+        $tip.find(".close-popover, .close-template-popover").click(function (event) {
           hidePopover();
           event.stopPropagation();
         });
         if (options.minWidth) {
-          var heightBefore = $tip.height();
+          var heightBefore = $tip.outerHeight(true);
+          var widthBefore = $tip.outerWidth(true);
           $tip.css('min-width', options.minWidth);
-          // The width might affect the height in which case we need to reposition the popover
-          var diff = (heightBefore - $tip.height()) / 2;
-          if (diff !== 0) {
-            $tip.css('top', ($tip.position().top + diff) + 'px');
+          // The min-width might affect the height/width in which case we reposition the popover depending on placement
+          var heightDiff = (heightBefore - $tip.outerHeight(true)) / 2;
+          var widthDiff = (widthBefore - $tip.outerWidth(true)) / 2;
+          if ((!options.placement || options.placement === 'left' || options.placement === 'right') && heightDiff !== 0) {
+            $tip.css('top', ($tip.position().top + heightDiff) + 'px');
+          } else if (options.placement && (options.placement === 'bottom' || options.placement === 'top') && widthDiff !== 0) {
+            $tip.css('left', ($tip.position().left + widthDiff) + 'px');
           }
         }
         var lastWidth = $element.outerWidth(true);
@@ -4024,24 +4036,122 @@
     }
   };
 
-  var AceLocationHandler = (function () {
+  // TODO: Move worker logic and location handling out of hue-bindings
+  window.WorkerHandler = (function () {
+    var registered = false;
+
+    var attachEntryResolver = function (location, sourceType, namespace, compute) {
+      location.resolveCatalogEntry = function(options) {
+        if (!options) {
+          options = {};
+        }
+        if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
+          DataCatalog.applyCancellable(location.resolvePathPromise, options);
+          return location.resolvePathPromise;
+        }
+
+        if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
+          if (!location.resolvePathPromise) {
+            location.resolvePathPromise = $.Deferred().reject().promise();
+          }
+          return location.resolvePathPromise;
+        }
+
+        var promise = SqlUtils.resolveCatalogEntry({
+          sourceType: sourceType,
+          namespace: namespace,
+          compute: compute,
+          temporaryOnly: options.temporaryOnly,
+          cancellable: options.cancellable,
+          cachedOnly: options.cachedOnly,
+          identifierChain: location.identifierChain || location.colRef.identifierChain,
+          tables: location.tables || (location.colRef && location.colRef.tables)
+        });
+
+        if (!options.cachedOnly) {
+          location.resolvePathPromise = promise;
+        }
+        return promise;
+      }
+    };
+
+    return {
+      registerWorkers: function () {
+        if (!window.IS_EMBEDDED && !registered && window.Worker) {
+          // It can take a while before the worker is active
+          var whenWorkerIsReady = function (worker, message) {
+            if (!worker.isReady) {
+              window.clearTimeout(worker.pingTimeout);
+              worker.postMessage({ ping: true });
+              worker.pingTimeout = window.setTimeout(function () {
+                whenWorkerIsReady(worker, message);
+              }, 500);
+            } else {
+              worker.postMessage(message);
+            }
+          };
+
+          // For syntax checking
+          var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
+          aceSqlSyntaxWorker.onmessage = function (e) {
+            if (e.data.ping) {
+              aceSqlSyntaxWorker.isReady = true;
+            } else {
+              huePubSub.publish('ace.sql.syntax.worker.message', e);
+            }
+          };
+
+          huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
+            whenWorkerIsReady(aceSqlSyntaxWorker, message);
+          });
+
+          // For location marking
+          var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
+          aceSqlLocationWorker.onmessage = function (e) {
+            if (e.data.ping) {
+              aceSqlLocationWorker.isReady = true;
+            } else {
+              if (e.data.locations) {
+                e.data.locations.forEach(function (location) {
+                  attachEntryResolver(location, e.data.sourceType, e.data.namespace, e.data.compute);
+                })
+              }
+              huePubSub.publish('ace.sql.location.worker.message', e);
+            }
+          };
+
+          huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
+            whenWorkerIsReady(aceSqlLocationWorker, message);
+          });
+
+          registered = true;
+        }
+      }
+    }
+
+  })();
+
+
+  window.AceLocationHandler = (function () {
 
     var STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
-    function AceLocationHandler (editor, editorId, snippet) {
+    function AceLocationHandler (options) {
       var self = this;
-      self.editor = editor;
-      self.editorId = editorId;
-      self.snippet = snippet;
+      self.editor = options.editor;
+      self.editorId = options.editorId;
+      self.snippet = options.snippet;
+      self.expandStar = (options.i18n && options.i18n.expandStar) || 'Right-click to expand with columns';
+      self.contextTooltip = (options.i18n && options.i18n.contextTooltip) || 'Right-click for details';
+
       self.sqlSyntaxWorkerSub = null;
-
       self.disposeFunctions = [];
-
       self.databaseIndex = {};
 
       self.attachStatementLocator();
       self.attachSqlWorker();
       self.attachGutterHandler();
+      self.attachMouseListeners();
 
       var updateDatabaseIndex = function (databaseList) {
         self.databaseIndex = {};
@@ -4058,6 +4168,275 @@
 
       updateDatabaseIndex(self.snippet.availableDatabases());
     }
+
+    AceLocationHandler.prototype.attachMouseListeners = function () {
+      var self = this;
+
+      var Tooltip = ace.require("ace/tooltip").Tooltip;
+      var AceRange = ace.require('ace/range').Range;
+
+      var contextTooltip = new Tooltip(self.editor.container);
+      var tooltipTimeout = -1;
+      var disableTooltip = false;
+      var lastHoveredToken = null;
+      var activeMarkers = [];
+      var keepLastMarker = false;
+
+      var hideContextTooltip = function () {
+        clearTimeout(tooltipTimeout);
+        contextTooltip.hide();
+      };
+
+      var clearActiveMarkers = function () {
+        hideContextTooltip();
+        while (activeMarkers.length > keepLastMarker ? 1 : 0) {
+          self.editor.session.removeMarker(activeMarkers.shift());
+        }
+      };
+
+      var markLocation = function (parseLocation) {
+        var range;
+        if (parseLocation.type === 'function') {
+          // Todo: Figure out why functions need an extra char at the end
+          range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column);
+        } else {
+          range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column - 1);
+        }
+        activeMarkers.push(self.editor.session.addMarker(range, 'hue-ace-location'));
+        return range;
+      };
+
+      var popoverShownSub = huePubSub.subscribe('context.popover.shown', function () {
+        hideContextTooltip();
+        keepLastMarker = true;
+        disableTooltip = true;
+      });
+
+      self.disposeFunctions.push(function () {
+        popoverShownSub.remove();
+      });
+
+      var popoverHiddenSub = huePubSub.subscribe('context.popover.hidden', function () {
+        disableTooltip = false;
+        clearActiveMarkers();
+        keepLastMarker = false;
+      });
+
+      self.disposeFunctions.push(function () {
+        popoverHiddenSub.remove();
+      });
+
+      var mousemoveListener = self.editor.on('mousemove', function (e) {
+        clearTimeout(tooltipTimeout);
+        var selectionRange = self.editor.selection.getRange();
+        if (selectionRange.isEmpty()) {
+          var pointerPosition = self.editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
+          var endTestPosition = self.editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
+          if (endTestPosition.column !== pointerPosition.column) {
+            var token = self.editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+            if (token !== null && !token.notFound && token.parseLocation && !disableTooltip && token.parseLocation.type !== 'alias') {
+              tooltipTimeout = window.setTimeout(function () {
+                if (token.parseLocation) {
+                  var endCoordinates = self.editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+
+                  var tooltipText = token.parseLocation.type === 'asterisk' ? self.expandStar : self.contextTooltip;
+                  var colType;
+                  if (token.parseLocation.type === 'column') {
+                    var tableChain = token.parseLocation.identifierChain.concat();
+                    var lastIdentifier = tableChain.pop();
+                    if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
+                      var colName = lastIdentifier.name.toLowerCase();
+                      // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
+                      DataCatalog.getEntry({
+                        sourceType: self.snippet.type(),
+                        namespace: self.snippet.namespace(),
+                        compute: self.snippet.compute(),
+                        temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
+                        path: $.map(tableChain, function (identifier) { return identifier.name })
+                      }).done(function (entry) {
+                        entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
+                          if (sourceMeta && sourceMeta.extended_columns) {
+                            sourceMeta.extended_columns.every(function (col) {
+                              if (col.name.toLowerCase() === colName) {
+                                colType = col.type.match(/^[^<]*/g)[0];
+                                return false;
+                              }
+                              return true;
+                            })
+                          }
+                        });
+                      });
+                    }
+                  }
+                  if (token.parseLocation.identifierChain) {
+                    var sqlIdentifier = $.map(token.parseLocation.identifierChain, function (identifier) {
+                      return identifier.name
+                    }).join('.');
+                    if (colType) {
+                      sqlIdentifier += ' (' + colType + ')';
+                    }
+                    tooltipText = sqlIdentifier + ' - ' + tooltipText;
+                  } else if (token.parseLocation.function) {
+                    tooltipText = token.parseLocation.function + ' - ' + tooltipText;
+                  }
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + self.editor.renderer.lineHeight + 3);
+                }
+              }, 500);
+            } else if (token !== null && token.notFound) {
+              tooltipTimeout = window.setTimeout(function () {
+                // TODO: i18n
+                if (token.notFound && token.syntaxError) {
+                  var tooltipText;
+                  if (token.syntaxError.expected.length > 0) {
+                    tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                  } else {
+                    tooltipText = HUE_I18n.syntaxChecker.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
+                  }
+                  var endCoordinates = self.editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + self.editor.renderer.lineHeight + 3);
+                }
+              }, 500);
+            } else if (token !== null && token.syntaxError) {
+              tooltipTimeout = window.setTimeout(function () {
+                if (token.syntaxError) {
+                  var tooltipText;
+                  if (token.syntaxError.expected.length > 0) {
+                    tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                  } else if (token.syntaxError.expectedStatementEnd) {
+                    tooltipText = HUE_I18n.syntaxChecker.expectedStatementEnd;
+                  }
+                  if (tooltipText) {
+                    var endCoordinates = self.editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + self.editor.renderer.lineHeight + 3);
+                  }
+                }
+              }, 500);
+            } else {
+              hideContextTooltip();
+            }
+            if (lastHoveredToken !== token) {
+              clearActiveMarkers();
+              if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) {
+                markLocation(token.parseLocation);
+              }
+              lastHoveredToken = token;
+            }
+          } else {
+            clearActiveMarkers();
+            lastHoveredToken = null;
+          }
+        }
+      });
+
+      self.disposeFunctions.push(function () {
+        self.editor.off('mousemove', mousemoveListener);
+      });
+
+      var inputListener = self.editor.on('input', function (e) {
+        clearActiveMarkers();
+        lastHoveredToken = null;
+      });
+
+      self.disposeFunctions.push(function () {
+        self.editor.off('input', inputListener);
+      });
+
+      var mouseoutListener = function (e) {
+        clearActiveMarkers();
+        clearTimeout(tooltipTimeout);
+        contextTooltip.hide();
+        lastHoveredToken = null;
+      };
+
+      self.editor.container.addEventListener('mouseout', mouseoutListener);
+
+      self.disposeFunctions.push(function () {
+        self.editor.container.removeEventListener('mouseout', mouseoutListener);
+      });
+
+      var onContextMenu = function (e) {
+        var selectionRange = self.editor.selection.getRange();
+        huePubSub.publish('context.popover.hide');
+        huePubSub.publish('sql.syntax.dropdown.hide');
+        if (selectionRange.isEmpty()) {
+          var pointerPosition = self.editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
+          var token = self.editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+          if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
+            var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
+            var startCoordinates = self.editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
+            var endCoordinates = self.editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
+            var source = {
+              // TODO: add element likely in the event
+              left: startCoordinates.pageX - 3,
+              top: startCoordinates.pageY,
+              right: endCoordinates.pageX - 3,
+              bottom: endCoordinates.pageY + self.editor.renderer.lineHeight
+            };
+
+            if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
+              token.parseLocation.resolveCatalogEntry({
+                temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly
+              }).done(function (entry) {
+                huePubSub.publish('context.popover.show', {
+                  data: {
+                    type: 'catalogEntry',
+                    catalogEntry: entry
+                  },
+                  pinEnabled: true,
+                  source: source
+                });
+              }).fail(function () {
+                token.notFound = true;
+              });
+            } else if (token.parseLocation && !token.notFound) {
+              // Asterisk, function etc.
+              if (token.parseLocation.type === 'file') {
+                AssistStorageEntry.getEntry(token.parseLocation.path).done(function (entry) {
+                  entry.open(true);
+                  huePubSub.publish('context.popover.show', {
+                    data: {
+                      type: 'storageEntry',
+                      storageEntry: entry,
+                      editorLocation: token.parseLocation.location
+                    },
+                    pinEnabled: true,
+                    source: source
+                  });
+                });
+              } else {
+                huePubSub.publish('context.popover.show', {
+                  data: token.parseLocation,
+                  sourceType: self.snippet.type(),
+                  namespace: self.snippet.namespace(),
+                  compute: self.snippet.compute(),
+                  defaultDatabase: self.snippet.database(),
+                  pinEnabled: true,
+                  source: source
+                });
+              }
+            } else if (token.syntaxError) {
+              huePubSub.publish('sql.syntax.dropdown.show', {
+                snippet: self.snippet,
+                data: token.syntaxError,
+                editor: self.editor,
+                range: range,
+                sourceType: self.snippet.type(),
+                defaultDatabase: self.snippet.database(),
+                source: source
+              });
+            }
+            e.preventDefault();
+            return false;
+          }
+        }
+      };
+
+      var contextmenuListener = self.editor.container.addEventListener('contextmenu', onContextMenu);
+
+      self.disposeFunctions.push(function () {
+        self.editor.container.removeEventListener('contextmenu', contextmenuListener);
+      });
+    };
 
     AceLocationHandler.prototype.attachGutterHandler = function () {
       var self = this;
@@ -4374,6 +4753,7 @@
         sourceType: self.snippet.type(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
+        temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
         path: $.map(identifierChain, function (identifier) { return identifier.name }),
         silenceErrors: true,
         cachedOnly: true
@@ -4397,6 +4777,15 @@
           var joined = [];
           for (var i = 0; i < arguments.length; i++) {
             joined = joined.concat(arguments[i]);
+          }
+          if (token.parseLocation.type === 'column') {
+            // Could be a table reference
+            token.parseLocation.tables.forEach(function (table) {
+              if (!table.alias) {
+                // Aliases are added later
+                joined.push(table.identifierChain[table.identifierChain.length - 1]);
+              }
+            });
           }
           promise.resolve(joined);
         }).fail(promise.reject);
@@ -4456,6 +4845,7 @@
                 sourceType: self.snippet.type(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
+                temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
                 path: $.map(nextTable.identifierChain, function (identifier) { return identifier.name }),
                 cachedOnly: true,
                 silenceErrors: true
@@ -4622,7 +5012,7 @@
       var lastKnownLocations = {};
 
       var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function (callback, snippet) {
-        if (self.snippet === snippet || self.snippet.inFocus() || self.snippet.editorMode()) {
+        if (self.snippet === snippet && (self.snippet.inFocus() || self.snippet.editorMode())) {
           callback(lastKnownLocations);
         }
       });
@@ -4735,18 +5125,24 @@
         locationWorkerSub.remove();
       });
 
+      var lastContextRequest;
       var statementSubscription = huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
         if (statementDetails.id !== self.editorId) {
           return;
         }
         if (self.snippet.type() === 'hive' || self.snippet.type() === 'impala') {
-          huePubSub.publish('ace.sql.location.worker.post', {
-            id: self.snippet.id(),
-            statementDetails: statementDetails,
-            type: self.snippet.type(),
-            namespace: self.snippet.namespace(),
-            compute: self.snippet.compute(),
-            defaultDatabase: self.snippet.database()
+          if (lastContextRequest) {
+            lastContextRequest.dispose();
+          }
+          lastContextRequest = self.snippet.whenContextSet().done(function () {
+            huePubSub.publish('ace.sql.location.worker.post', {
+              id: self.snippet.id(),
+              statementDetails: statementDetails,
+              type: self.snippet.type(),
+              namespace: self.snippet.namespace(),
+              compute: self.snippet.compute(),
+              defaultDatabase: self.snippet.database()
+            })
           });
         }
       });
@@ -4792,7 +5188,6 @@
       $el.text(snippet.statement_raw());
 
       var editor = ace.edit($el.attr("id"));
-      var Tooltip = ace.require("ace/tooltip").Tooltip;
       var AceRange = ace.require('ace/range').Range;
 
       var resizeAce = function () {
@@ -4812,7 +5207,7 @@
         resizePubSub.remove();
       });
 
-      var aceLocationHandler = new AceLocationHandler(editor, $el.attr("id"), snippet);
+      var aceLocationHandler = new AceLocationHandler({ editor: editor, editorId: $el.attr("id"), snippet: snippet, i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }});
       disposeFunctions.push(function () {
         aceLocationHandler.dispose();
       });
@@ -4865,7 +5260,8 @@
         aceErrorsSub.dispose();
       });
 
-      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+      var darkThemeEnabled = ApiHelper.getInstance().getFromTotalStorage('ace', 'dark.theme.enabled', false);
+      editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
       var editorOptions = {
         enableSnippets: true,
@@ -4884,6 +5280,14 @@
       };
 
       editor.customMenuOptions = {
+        setEnableDarkTheme: function (enabled) {
+          darkThemeEnabled = enabled;
+          ApiHelper.getInstance().setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
+        },
+        getEnableDarkTheme: function () {
+          return darkThemeEnabled;
+        },
         setEnableAutocompleter: function (enabled) {
           editor.setOption('enableBasicAutocompletion', enabled);
           snippet.getApiHelper().setInTotalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
@@ -5082,270 +5486,6 @@
         editor.off('blur', blurListener);
       });
 
-      // TODO: Move context menu logic to separate module
-      (function () {
-        var contextTooltip = new Tooltip(editor.container);
-        var tooltipTimeout = -1;
-        var disableTooltip = false;
-        var lastHoveredToken = null;
-        var activeMarkers = [];
-        var keepLastMarker = false;
-
-        var hideContextTooltip = function () {
-          clearTimeout(tooltipTimeout);
-          contextTooltip.hide();
-        };
-
-        var clearActiveMarkers = function () {
-          hideContextTooltip();
-          while (activeMarkers.length > keepLastMarker ? 1 : 0) {
-            editor.session.removeMarker(activeMarkers.shift());
-          }
-        };
-
-        var markLocation = function (parseLocation) {
-          var range;
-          if (parseLocation.type === 'function') {
-            // Todo: Figure out why functions need an extra char at the end
-            range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column);
-          } else {
-            range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column - 1);
-          }
-          activeMarkers.push(editor.session.addMarker(range, 'hue-ace-location'));
-          return range;
-        };
-
-        var popoverShownSub = huePubSub.subscribe('context.popover.shown', function () {
-          hideContextTooltip();
-          keepLastMarker = true;
-          disableTooltip = true;
-        });
-
-        disposeFunctions.push(function () {
-          popoverShownSub.remove();
-        });
-
-        var popoverHiddenSub = huePubSub.subscribe('context.popover.hidden', function () {
-          disableTooltip = false;
-          clearActiveMarkers();
-          keepLastMarker = false;
-        });
-
-        disposeFunctions.push(function () {
-          popoverHiddenSub.remove();
-        });
-
-        var mousemoveListener = editor.on('mousemove', function (e) {
-          clearTimeout(tooltipTimeout);
-          var selectionRange = editor.selection.getRange();
-          if (selectionRange.isEmpty()) {
-            var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
-            var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
-            if (endTestPosition.column !== pointerPosition.column) {
-              var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip && token.parseLocation.type !== 'alias') {
-                tooltipTimeout = window.setTimeout(function () {
-                  if (token.parseLocation) {
-                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-
-                    var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
-                    var colType;
-                    if (token.parseLocation.type === 'column') {
-                      var tableChain = token.parseLocation.identifierChain.concat();
-                      var lastIdentifier = tableChain.pop();
-                      if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
-                        var colName = lastIdentifier.name.toLowerCase();
-                        // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
-                        DataCatalog.getEntry({
-                          sourceType: snippet.type(),
-                          namespace: snippet.namespace(),
-                          compute: snippet.compute(),
-                          path: $.map(tableChain, function (identifier) { return identifier.name })
-                        }).done(function (entry) {
-                          entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
-                            if (sourceMeta && sourceMeta.extended_columns) {
-                              sourceMeta.extended_columns.every(function (col) {
-                                if (col.name.toLowerCase() === colName) {
-                                  colType = col.type.match(/^[^<]*/g)[0];
-                                  return false;
-                                }
-                                return true;
-                              })
-                            }
-                          });
-                        });
-                      }
-                    }
-                    if (token.parseLocation.identifierChain) {
-                      var sqlIdentifier = $.map(token.parseLocation.identifierChain, function (identifier) {
-                          return identifier.name
-                        }).join('.');
-                      if (colType) {
-                        sqlIdentifier += ' (' + colType + ')';
-                      }
-                      tooltipText = sqlIdentifier + ' - ' + tooltipText;
-                    } else if (token.parseLocation.function) {
-                      tooltipText = token.parseLocation.function + ' - ' + tooltipText;
-                    }
-                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-                  }
-                }, 500);
-              } else if (token !== null && token.notFound) {
-                tooltipTimeout = window.setTimeout(function () {
-                  // TODO: i18n
-                  if (token.notFound && token.syntaxError) {
-                    var tooltipText;
-                    if (token.syntaxError.expected.length > 0) {
-                      tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
-                    } else {
-                      tooltipText = HUE_I18n.syntaxChecker.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
-                    }
-                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-                  }
-                }, 500);
-              } else if (token !== null && token.syntaxError) {
-                tooltipTimeout = window.setTimeout(function () {
-                  // TODO: i18n
-                  if (token.syntaxError) {
-                    var tooltipText;
-                    if (token.syntaxError.expected.length > 0) {
-                      tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
-                    } else if (token.syntaxError.expectedStatementEnd) {
-                      tooltipText = HUE_I18n.syntaxChecker.expectedStatementEnd;
-                    }
-                    if (tooltipText) {
-                      var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                      contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-                    }
-                  }
-                }, 500);
-              } else {
-                hideContextTooltip();
-              }
-              if (lastHoveredToken !== token) {
-                clearActiveMarkers();
-                if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) {
-                  markLocation(token.parseLocation);
-                }
-                lastHoveredToken = token;
-              }
-            } else {
-              clearActiveMarkers();
-              lastHoveredToken = null;
-            }
-          }
-        });
-
-        disposeFunctions.push(function () {
-          editor.off('mousemove', mousemoveListener);
-        });
-
-        var inputListener = editor.on('input', function (e) {
-          clearActiveMarkers();
-          lastHoveredToken = null;
-        });
-
-        disposeFunctions.push(function () {
-          editor.off('input', inputListener);
-        });
-
-        var mouseoutListener = function (e) {
-          clearActiveMarkers();
-          clearTimeout(tooltipTimeout);
-          contextTooltip.hide();
-          lastHoveredToken = null;
-        };
-
-        editor.container.addEventListener('mouseout', mouseoutListener);
-
-        disposeFunctions.push(function () {
-          editor.container.removeEventListener('mouseout', mouseoutListener);
-        });
-
-        var onContextMenu = function (e) {
-          var selectionRange = editor.selection.getRange();
-          huePubSub.publish('context.popover.hide');
-          huePubSub.publish('sql.syntax.dropdown.hide');
-          if (selectionRange.isEmpty()) {
-            var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
-            var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
-              var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
-              var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
-              var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
-              var source = {
-                 // TODO: add element likely in the event
-                left: startCoordinates.pageX - 3,
-                top: startCoordinates.pageY,
-                right: endCoordinates.pageX - 3,
-                bottom: endCoordinates.pageY + editor.renderer.lineHeight
-              };
-
-              if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
-                token.parseLocation.resolveCatalogEntry().done(function (entry) {
-                  huePubSub.publish('context.popover.show', {
-                    data: {
-                      type: 'catalogEntry',
-                      catalogEntry: entry
-                    },
-                    pinEnabled: true,
-                    source: source
-                  });
-                }).fail(function () {
-                  token.notFound = true;
-                });
-              } else if (token.parseLocation && !token.notFound) {
-                // Asterisk, function etc.
-                if (token.parseLocation.type === 'file') {
-                  AssistStorageEntry.getEntry(token.parseLocation.path).done(function (entry) {
-                    entry.open(true);
-                    huePubSub.publish('context.popover.show', {
-                      data: {
-                        type: 'storageEntry',
-                        storageEntry: entry,
-                        editorLocation: token.parseLocation.location
-                      },
-                      pinEnabled: true,
-                      source: source
-                    });
-                  });
-                } else {
-                  huePubSub.publish('context.popover.show', {
-                    data: token.parseLocation,
-                    sourceType: snippet.type(),
-                    namespace: snippet.namespace(),
-                    compute: snippet.compute(),
-                    defaultDatabase: snippet.database(),
-                    pinEnabled: true,
-                    source: source
-                  });
-                }
-              } else if (token.syntaxError) {
-                huePubSub.publish('sql.syntax.dropdown.show', {
-                  snippet: snippet,
-                  data: token.syntaxError,
-                  editor: editor,
-                  range: range,
-                  sourceType: snippet.type(),
-                  defaultDatabase: snippet.database(),
-                  source: source
-                });
-              }
-              e.preventDefault();
-              return false;
-            }
-          }
-        };
-
-        var contextmenuListener = editor.container.addEventListener('contextmenu', onContextMenu);
-
-        disposeFunctions.push(function () {
-          editor.container.removeEventListener('contextmenu', contextmenuListener);
-        });
-
-      }());
-
       editor.previousSize = 0;
 
       // TODO: Get rid of this
@@ -5432,6 +5572,16 @@
         exec: function () {
           snippet.statement_raw(removeUnicodes(editor.getValue()));
           snippet.execute();
+        }
+      });
+
+      editor.commands.addCommand({
+        name: 'switchTheme',
+        bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
+        exec: function () {
+          darkThemeEnabled = !darkThemeEnabled;
+          ApiHelper.getInstance().setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
         }
       });
 
@@ -5717,10 +5867,12 @@
             if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
               editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - (questionMarkMatch[1].length - 1));
               editor.removeTextBeforeCursor(1);
+              huePubSub.publish('editor.refresh.statement.locations', snippet);
               window.setTimeout(function () {
                 editor.execCommand("startAutocomplete");
               }, 1);
             } else if (/\.$/.test(textBeforeCursor)) {
+              huePubSub.publish('editor.refresh.statement.locations', snippet);
               window.setTimeout(function () {
                 editor.execCommand("startAutocomplete");
               }, 1);
@@ -5880,6 +6032,10 @@
     after: ['value', 'attr'],
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var selectedValues = valueAccessor();
+
+      if (allBindings().checkedValue) {
+        viewModel = ko.unwrap(allBindings().checkedValue);
+      }
 
       var updateCheckedState = function () {
         ko.utils.toggleDomNodeCssClass(element, 'fa-check', selectedValues.indexOf(viewModel) > -1);
@@ -6761,7 +6917,14 @@
             res.push('<div class="ace_line ' + additionalClass + '">' + renderedTokens.join('') + '&nbsp;</div>');
           });
 
-          element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
+          element.innerHTML = '<div class="ace_editor ace-hue"' +
+            (options.enableOverflow ? ' style="overflow: initial !important;"' : '') +
+            '><div class="ace_layer" style="position: static;' +
+            (options.enableOverflow ? ' overflow: initial !important;' : '') +
+            '">' + res.join('') + '</div></div>';
+          if (options.enableOverflow) {
+            $(element).css({ 'overflow': 'auto' });
+          }
           $(element).find('.ace_invisible_space').remove();
         });
       }
@@ -6871,12 +7034,19 @@
       var value = typeof options.data === 'function' ? options.data() : options.data;
 
       function render() {
-        if (options.format) {
-          $element.text(moment(value).format(options.format));
+        var fMoment = moment(value);
+        var text;
+        if (!fMoment.isValid()) {
+          text = value;
+        } else {
+          if (options.format) {
+            text = fMoment.format(options.format);
+          }
+          else {
+            text = fMoment.format();
+          }
         }
-        else {
-          $element.text(moment(value));
-        }
+        $element.text(text);
       }
       render();
     }
@@ -7155,7 +7325,9 @@
   ko.bindingHandlers.dropzone = {
     init: function (element, valueAccessor) {
       var value = ko.unwrap(valueAccessor());
-
+      if (value.disabled) {
+        return;
+      }
       var options = {
         autoDiscover: false,
         maxFilesize: 5000000,
@@ -7323,7 +7495,18 @@
     return {
       init: function (element, valueAccessor, allBindingsAccessor) {
         var id = $(element).attr("id");
-        this._impalaDagre = impalaDagre(id);
+        var self = this;
+        self._impalaDagre = impalaDagre(id);
+        var clickSubscription = huePubSub.subscribe('impala.node.moveto', function(value) {
+          self._impalaDagre.moveTo(value);
+        });
+        var selectSubscription = huePubSub.subscribe('impala.node.select', function(value) {
+          self._impalaDagre.select(value);
+        });
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+          clickSubscription.remove();
+          selectSubscription.remove();
+        });
       },
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
@@ -7338,5 +7521,120 @@
         $(element).dropdown();
     }
   };
+
+  ko.bindingHandlers.numberFormat = (function() {
+    var that;
+    return that = {
+      init: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      update: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      format: function (element, valueAccessor) {
+        var value = valueAccessor();
+        var unwrapped = ko.unwrap(value);
+        $(element).text(that.human(unwrapped.value, unwrapped.unit));
+      },
+      human: function (value, unit) {
+        var fn;
+        if (unit == 3) {
+          fn = ko.bindingHandlers.bytesize.humanSize
+        } else if (unit == 5) {
+          fn = ko.bindingHandlers.duration.humanTime
+        } else {
+          fn = function(value){ return value; }
+        }
+        return fn(value);
+      }
+    }
+  })();
+
+  ko.bindingHandlers.duration = (function() {
+    var that;
+    return that = {
+      init: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      update: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      format: function (element, valueAccessor) {
+        var value = valueAccessor();
+        var formatted = that.humanTime(ko.unwrap(value));
+        $(element).text(formatted);
+      },
+      humanTime: function (value) {
+        value = value * 1;
+        if (value < Math.pow(10, 3)) {
+          return value + " ns";
+        } else if (value < Math.pow(10, 6)) {
+          value = (value * 1.0) / Math.pow(10, 6);
+          return sprintf("%.4f ms", value);
+        } else if (value < Math.pow(10, 9)) {
+          value = (value * 1.0) / Math.pow(10, 9);
+          return sprintf("%.4f s", value);
+        } else {
+          // get the ms value
+          var SECOND = 1000;
+          var MINUTE = SECOND * 60;
+          var HOUR = MINUTE * 60;
+          var value = value * 1 / Math.pow(10, 6);
+          var buffer = "";
+
+          if (value > (HOUR)) {
+            buffer += sprintf("%i h ", value / HOUR);
+            value = value % HOUR;
+          }
+
+          if (value > MINUTE) {
+            buffer += sprintf("%i m ", value / MINUTE);
+            value = value % MINUTE;
+          }
+
+          if (value > SECOND) {
+            buffer += sprintf("%.3f s", value * 1.0 / SECOND);
+          }
+          return buffer;
+        }
+      }
+    };
+  })();
+
+  ko.bindingHandlers.bytesize = (function() {
+    var that;
+    return that = {
+      units: ["B", "KB", "MB", "GB", "TB", "PB"],
+      init: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      update: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      format: function (element, valueAccessor) {
+        var value = valueAccessor();
+        var formatted = that.humanSize(ko.unwrap(value));
+        $(element).text(formatted);
+      },
+      getBaseLog: function(x, y) {
+        return Math.log(x) / Math.log(y);
+      },
+      humanSize: function(bytes) {
+        var isNumber = !isNaN(parseFloat(bytes)) && isFinite(bytes);
+        if (!isNumber) {
+          return '';
+        }
+
+        // Special case small numbers (including 0), because they're exact.
+        if (bytes < 1024) {
+          return sprintf("%d B", bytes);
+        }
+
+        var index = Math.floor(that.getBaseLog(bytes, 1024));
+        index = Math.min(that.units.length - 1, index);
+        return sprintf("%.1f %s", bytes / Math.pow(1024, index), that.units[index])
+      }
+    };
+  })();
 
 })();

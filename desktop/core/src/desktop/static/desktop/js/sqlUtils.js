@@ -36,13 +36,40 @@ var SqlUtils = (function () {
   };
 
   var impalaReservedKeywords = {
-    ADD: true, AGGREGATE: true, ALL: true, ALTER: true, AND: true, API_VERSION: true, ARRAY: true, AS: true, ASC: true, AVRO: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BY: true, CACHED: true, CASE: true, CAST: true, CHANGE: true, CHAR: true, CLASS: true, CLOSE_FN: true,
-    COLUMN: true, COLUMNS: true, COMMENT: true, COMPUTE: true, CREATE: true, CROSS: true, DATA: true, DATABASE: true, DATABASES: true, DATE: true, DATETIME: true, DECIMAL: true, DELIMITED: true, DESC: true, DESCRIBE: true, DISTINCT: true, DIV: true, DOUBLE: true, DROP: true, ELSE: true, END: true,
-    ESCAPED: true, EXISTS: true, EXPLAIN: true, EXTERNAL: true, FALSE: true, FIELDS: true, FILEFORMAT: true, FILES: true, FINALIZE_FN: true, FIRST: true, FLOAT: true, FORMAT: true, FORMATTED: true, FROM: true, FULL: true, FUNCTION: true, FUNCTIONS: true, GROUP: true, HAVING: true, IF: true, ILIKE: true, IN: true, INCREMENTAL: true,
-    INIT_FN: true, INNER: true, INPATH: true, INSERT: true, INT: true, INTEGER: true, INTERMEDIATE: true, INTERVAL: true, INTO: true, INVALIDATE: true, IS: true, JOIN: true, KEY: true, KUDU: true, LAST: true, LEFT: true, LIKE: true, LIMIT: true, LINES: true, LOAD: true, LOCATION: true, MAP: true, MERGE_FN: true, METADATA: true,
-    NOT: true, NULL: true, NULLS: true, OFFSET: true, ON: true, OR: true, ORDER: true, OUTER: true, OVERWRITE: true, PARQUET: true, PARQUETFILE: true, PARTITION: true, PARTITIONED: true, PARTITIONS: true, PREPARE_FN: true, PRIMARY: true, PRODUCED: true, PURGE: true, RCFILE: true, REAL: true, REFRESH: true, REGEXP: true, RENAME: true,
-    REPEATABLE: true, REPLACE: true, RETURNS: true, RIGHT: true, RLIKE: true, ROW: true, SCHEMA: true, SCHEMAS: true, SELECT: true, SEMI: true, SEQUENCEFILE: true, SERDEPROPERTIES: true, SERIALIZE_FN: true, SET: true, SHOW: true, SMALLINT: true, SORT: true, STATS: true, STORED: true, STRAIGHT_JOIN: true, STRING: true, STRUCT: true, SYMBOL: true, TABLE: true,
-    TABLES: true, TABLESAMPLE: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true, TINYINT: true, TO: true, TRUE: true, UNCACHED: true, UNION: true, UPDATE_FN: true, UPSERT: true, USE: true, USING: true, VALUES: true, VIEW: true, WHEN: true, WHERE: true, WITH: true
+    ADD: true, AGGREGATE: true, ALL: true, ALLOCATE: true, ALTER: true, ANALYTIC: true, AND: true, ANTI: true, ANY: true, API_VERSION: true, ARE: true, ARRAY: true, ARRAY_AGG: true,
+    ARRAY_MAX_CARDINALITY: true, AS: true, ASC: true, ASENSITIVE: true, ASYMMETRIC: true, AT: true, ATOMIC: true, AUTHORIZATION: true, AVRO: true, BEGIN_FRAME: true, BEGIN_PARTITION: true,
+    BETWEEN: true, BIGINT: true, BINARY: true, BLOB: true, BLOCK_SIZE: true, BOOLEAN: true, BOTH: true, BY: true, CACHED: true, CALLED: true, CARDINALITY: true, CASCADE: true,
+    CASCADED: true, CASE: true, CAST: true, CHANGE: true, CHAR: true, CHARACTER: true, CLASS: true, CLOB: true, CLOSE_FN: true, COLLATE: true, COLLECT: true, COLUMN: true, COLUMNS: true,
+    COMMENT: true, COMMIT: true, COMPRESSION: true, COMPUTE: true, CONDITION: true, CONNECT: true, CONSTRAINT: true, CONTAINS: true, CONVERT: true, COPY: true, CORR: true,
+    CORRESPONDING: true, COVAR_POP: true, COVAR_SAMP: true, CREATE: true, CROSS: true, CUBE: true, CURRENT: true, CURRENT_DATE: true, CURRENT_DEFAULT_TRANSFORM_GROUP: true,
+    CURRENT_PATH: true, CURRENT_ROLE: true, CURRENT_ROW: true, CURRENT_SCHEMA: true, CURRENT_TIME: true, CURRENT_TRANSFORM_GROUP_FOR_TYPE: true, CURSOR: true, CYCLE: true, DATA: true,
+    DATABASE: true, DATABASES: true, DATE: true, DATETIME: true, DEALLOCATE: true, DEC: true, DECFLOAT: true, DECIMAL: true, DECLARE: true, DEFINE: true, DELETE: true, DELIMITED: true,
+    DEREF: true, DESC: true, DESCRIBE: true, DETERMINISTIC: true, DISCONNECT: true, DISTINCT: true, DIV: true, DOUBLE: true, DROP: true, DYNAMIC: true, EACH: true, ELEMENT: true,
+    ELSE: true, EMPTY: true, ENCODING: true, END: true, END_FRAME: true, END_PARTITION: true, EQUALS: true, ESCAPE: true, ESCAPED: true, EVERY: true, EXCEPT: true, EXEC: true,
+    EXECUTE: true, EXISTS: true, EXPLAIN: true, EXTENDED: true, EXTERNAL: true, FALSE: true, FETCH: true, FIELDS: true, FILEFORMAT: true, FILES: true, FILTER: true, FINALIZE_FN: true,
+    FIRST: true, FLOAT: true, FOLLOWING: true, FOR: true, FOREIGN: true, FORMAT: true, FORMATTED: true, FRAME_ROW: true, FREE: true, FROM: true, FULL: true, FUNCTION: true,
+    FUNCTIONS: true, FUSION: true, GET: true, GLOBAL: true, GRANT: true, GROUP: true, GROUPING: true, GROUPS: true, HASH: true, HAVING: true, HOLD: true, IF: true, IGNORE: true,
+    ILIKE: true, IN: true, INCREMENTAL: true, INDICATOR: true, INIT_FN: true, INITIAL: true, INNER: true, INOUT: true, INPATH: true, INSENSITIVE: true, INSERT: true, INT: true,
+    INTEGER: true, INTERMEDIATE: true, INTERSECT: true, INTERSECTION: true, INTERVAL: true, INTO: true, INVALIDATE: true, IREGEXP: true, IS: true, JOIN: true, JSON_ARRAY: true,
+    JSON_ARRAYAGG: true, JSON_EXISTS: true, JSON_OBJECT: true, JSON_OBJECTAGG: true, JSON_QUERY: true, JSON_TABLE: true, JSON_TABLE_PRIMITIVE: true, JSON_VALUE: true, KEY: true,
+    KUDU: true, LARGE: true, LAST: true, LATERAL: true, LEADING: true, LEFT: true, LIKE: true, LIKE_REGEX: true, LIMIT: true, LINES: true, LISTAGG: true, LOAD: true, LOCAL: true,
+    LOCALTIMESTAMP: true, LOCATION: true, MAP: true, MATCH: true, MATCH_NUMBER: true, MATCH_RECOGNIZE: true, MATCHES: true, MERGE: true, MERGE_FN: true, METADATA: true, METHOD: true,
+    MODIFIES: true, MULTISET: true, NATIONAL: true, NATURAL: true, NCHAR: true, NCLOB: true, NO: true, NONE: true, NORMALIZE: true, NOT: true, NTH_VALUE: true, NULL: true, NULLS: true,
+    NUMERIC: true, OCCURRENCES_REGEX: true, OCTET_LENGTH: true, OF: true, OFFSET: true, OMIT: true, ON: true, ONE: true, ONLY: true, OR: true, ORDER: true, OUT: true, OUTER: true,
+    OVER: true, OVERLAPS: true, OVERLAY: true, OVERWRITE: true, PARQUET: true, PARQUETFILE: true, PARTITION: true, PARTITIONED: true, PARTITIONS: true, PATTERN: true, PER: true,
+    PERCENT: true, PERCENTILE_CONT: true, PERCENTILE_DISC: true, PORTION: true, POSITION: true, POSITION_REGEX: true, PRECEDES: true, PRECEDING: true, PREPARE: true, PREPARE_FN: true,
+    PRIMARY: true, PROCEDURE: true, PRODUCED: true, PTF: true, PURGE: true, RANGE: true, RCFILE: true, READS: true, REAL: true, RECOVER: true, RECURSIVE: true, REF: true,
+    REFERENCES: true, REFERENCING: true, REFRESH: true, REGEXP: true, REGR_AVGX: true, REGR_AVGY: true, REGR_COUNT: true, REGR_INTERCEPT: true, REGR_R2: true,REGR_SLOPE: true,
+    REGR_SXX: true, REGR_SXY: true, REGR_SYY: true, RELEASE: true, RENAME: true, REPEATABLE: true, REPLACE: true, REPLICATION: true, RESTRICT: true, RETURNS: true, REVOKE: true,
+    RIGHT: true, RLIKE: true, ROLE: true, ROLES: true, ROLLBACK: true, ROLLUP: true, ROW: true, ROWS: true, RUNNING: true, SAVEPOINT: true, SCHEMA: true, SCHEMAS: true, SCOPE: true,
+    SCROLL: true, SEARCH: true, SEEK: true, SELECT: true, SEMI: true, SENSITIVE: true, SEQUENCEFILE: true, SERDEPROPERTIES: true, SERIALIZE_FN: true, SET: true, SHOW: true,
+    SIMILAR: true, SKIP: true, SMALLINT: true, SOME: true, SORT: true, SPECIFIC: true, SPECIFICTYPE: true, SQLEXCEPTION: true, SQLSTATE: true, SQLWARNING: true, STATIC: true,
+    STATS: true, STORED: true, STRAIGHT_JOIN: true, STRING: true, STRUCT: true, SUBMULTISET: true, SUBSET: true, SUBSTRING_REGEX: true, SUCCEEDS: true, SYMBOL: true, SYMMETRIC: true,
+    SYSTEM_TIME: true, SYSTEM_USER: true, TABLE: true, TABLES: true, TABLESAMPLE: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true,
+    TIMEZONE_HOUR: true, TIMEZONE_MINUTE: true, TINYINT: true, TO: true, TRAILING: true, TRANSLATE_REGEX: true, TRANSLATION: true, TREAT: true, TRIGGER: true, TRIM_ARRAY: true,
+    TRUE: true, TRUNCATE: true, UESCAPE: true, UNBOUNDED: true, UNCACHED: true, UNION: true, UNIQUE: true, UNKNOWN: true, UNNEST: true, UPDATE: true, UPDATE_FN: true, UPSERT: true,
+    USE: true, USER: true, USING: true, VALUE_OF: true, VALUES: true, VARBINARY: true, VARCHAR: true, VARYING: true, VERSIONING: true, VIEW: true, WHEN: true, WHENEVER: true,
+    WHERE: true, WIDTH_BUCKET: true, WINDOW: true, WITH: true, WITHIN: true, WITHOUT: true
   };
 
   var autocompleteFilter = function (filter, entries) {
@@ -122,6 +149,7 @@ var SqlUtils = (function () {
    * @param {String} options.sourceType
    * @param {ContextNamespace} options.namespace
    * @param {ContextCompute} options.compute
+   * @param {boolean} [options.temporaryOnly] - Default: false
    * @param {Object[]} [options.identifierChain]
    * @param {Object[]} [options.tables]
    * @param {Object} [options.cancellable]
@@ -196,6 +224,7 @@ var SqlUtils = (function () {
         path: SqlUtils.identifierChainToPath(nextTable.identifierChain),
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
+        temporaryOnly: options && options.temporaryOnly,
         silenceErrors: true
       }).done(function (childEntries) {
         var foundEntry = undefined;
@@ -226,6 +255,7 @@ var SqlUtils = (function () {
         path: [],
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
+        temporaryOnly: options && options.temporaryOnly,
         silenceErrors: true
       }).done(function (entry) {
         findInTree(entry, SqlUtils.identifierChainToPath(options.identifierChain))
