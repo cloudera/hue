@@ -1194,7 +1194,7 @@ def check_job_edition_permission(oozie_job, user):
 
 
 def has_job_edition_permission(oozie_job, user):
-  return is_admin(user) or oozie_job.user == user.username or (oozie_job.group and user.groups.filter(name=oozie_job.group).exists()) or (oozie_job.acl and user.username in oozie_job.acl.split(','))
+  return is_admin(user) or oozie_job.user == user.username or (oozie_job.group and user.groups.filter(name__in=oozie_job.group.split(",")).exists()) or (oozie_job.acl and user.username in oozie_job.acl.split(','))
 
 
 def has_dashboard_jobs_access(user):
