@@ -142,6 +142,11 @@ var SqlSetOptions = (function () {
   var SET_OPTIONS = {
     hive: {},
     impala: {
+      'ALLOW_ERASURE_CODED_FILES' : {
+        description: 'Use the ALLOW_ERASURE_CODED_FILES query option to enable or disable the support of erasure coded files in Impala. Until Impala is fully tested and certified with erasure coded files, this query option is set to FALSE by default.',
+        type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+        default: 'false (shown as 0 in output of SET statement)'
+      },
       'APPX_COUNT_DISTINCT': {
         description: 'Allows multiple COUNT(DISTINCT) operations within a single query, by internally rewriting each COUNT(DISTINCT) to use the NDV() function. The resulting count is approximate rather than precise.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
@@ -226,6 +231,11 @@ var SqlSetOptions = (function () {
         description: 'Maximum number of non-fatal errors for any particular query that are recorded in the Impala log file. For example, if a billion-row table had a non-fatal data error in every row, you could diagnose the problem without all billion errors being logged. Unspecified or 0 indicates the built-in default value of 1000.\n\nThis option only controls how many errors are reported. To specify whether Impala continues or halts when it encounters such errors, use the ABORT_ON_ERROR option.',
         type: 'Numeric',
         default: '0 (meaning 1000 errors)'
+      },
+      'MAX_MEM_ESTIMATE_FOR_ADMISSION': {
+        description: 'Use the MAX_MEM_ESTIMATE_FOR_ADMISSION query option to set an upper limit on the memory estimates of a query as a workaround for over-estimates precluding a query from being admitted.',
+        type: 'Numeric',
+        default: ''
       },
       'MAX_NUM_RUNTIME_FILTERS': {
         description: 'The MAX_NUM_RUNTIME_FILTERS query option sets an upper limit on the number of runtime filters that can be produced for each query.',
@@ -356,6 +366,11 @@ var SqlSetOptions = (function () {
         description: 'When enabled, causes any DDL operation such as CREATE TABLE or ALTER TABLE to return only when the changes have been propagated to all other Impala nodes in the cluster by the Impala catalog service. That way, if you issue a subsequent CONNECT statement in impala-shell to connect to a different node in the cluster, you can be sure that other node will already recognize any added or changed tables. (The catalog service automatically broadcasts the DDL changes to all nodes automatically, but without this option there could be a period of inconsistency if you quickly switched to another node, such as by issuing a subsequent query through a load-balancing proxy.)',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
         default: 'false (shown as 0 in output of SET statement)'
+      },
+      'TOPN_BYTES_LIMIT': {
+        description: 'The TOPN_BYTES_LIMIT query option places a limit on the amount of estimated memory that Impala can process for top-N queries.',
+        type: 'Numeric',
+        default: '536870912 (512 MB)'
       }
     }
   };
@@ -2854,6 +2869,13 @@ var SqlFunctions = (function () {
 				draggable: 'length()',
         description: 'Returns the length in characters of the argument string.'
       },
+      levenshtein: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
+        signature: 'levenshtein(STRING a, STRING b)',
+        draggable: 'levenshtein()',
+        description: 'Returns the Levenshtein distance between two strings. For example, levenshtein(\'kitten\', \'sitting\') results in 3.'
+      },
       locate: {
         returnTypes: ['INT'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'INT', optional: true}]],
@@ -3320,6 +3342,13 @@ var SqlFunctions = (function () {
         signature: 'effective_user()',
         draggable: 'effective_user()',
         description: 'Typically returns the same value as user(), except if delegation is enabled, in which case it returns the ID of the delegated user.'
+      },
+      logged_in_user: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'logged_in_user()',
+        draggable: 'logged_in_user()',
+        description: 'Purpose: Typically returns the same value as USER(). If delegation is enabled, it returns the ID of the delegated user. LOGGED_IN_USER() is an alias of EFFECTIVE_USER().'
       },
       pid: {
         returnTypes: ['INT'],
