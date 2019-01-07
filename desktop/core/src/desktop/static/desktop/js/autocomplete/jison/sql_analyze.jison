@@ -146,6 +146,7 @@ RefreshStatement
    {
      parser.addDatabaseLocation(@3, [{ name: $3 }]);
    }
+ | '<impala>REFRESH' '<impala>AUTHORIZATION'
  ;
 
 RefreshStatement_EDIT
@@ -153,7 +154,7 @@ RefreshStatement_EDIT
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
-     parser.suggestKeywords(['FUNCTIONS']);
+     parser.suggestKeywords(['AUTHORIZATION', 'FUNCTIONS']);
    }
  | '<impala>REFRESH' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
  | '<impala>REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'

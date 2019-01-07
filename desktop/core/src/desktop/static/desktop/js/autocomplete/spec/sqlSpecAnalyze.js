@@ -708,7 +708,7 @@
             lowerCase: false,
             suggestTables: {},
             suggestDatabases: { appendDot: true },
-            suggestKeywords: ['FUNCTIONS']
+            suggestKeywords: ['AUTHORIZATION', 'FUNCTIONS']
           }
         });
       });
