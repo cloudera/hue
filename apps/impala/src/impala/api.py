@@ -25,20 +25,22 @@ import struct
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
-from desktop.lib.django_util import JsonResponse
-from desktop.models import Document2
-from libanalyze import analyze as analyzer, rules
-
 from beeswax.api import error_handler
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
 from beeswax.server.dbms import get_cluster_config
 from beeswax.views import authorized_get_query_history
-from notebook.models import make_notebook
 
+from desktop.lib.django_util import JsonResponse
+from desktop.models import Document2
+
+from jobbrowser.apis.query_api import _get_api
 from impala import dbms
 from impala.server import get_api as get_impalad_api, _get_impala_server_url
 
+from libanalyze import analyze as analyzer, rules
+
+from notebook.models import make_notebook
 
 LOG = logging.getLogger(__name__)
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
@@ -128,19 +130,13 @@ def alanize(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
   query_id = json.loads(request.POST.get('query_id'))
 
-  if cluster.get('type') == 'altus-dw':
-    server_url = 'http://impala-coordinator%(name)s:25000' % cluster
-  else:
-    query_server = dbms.get_query_server_config()
-    session = Session.objects.get_session(request.user, query_server['server_name'])
-    server_url = _get_impala_server_url(session)
+  api = _get_api(request.user, cluster)
 
   if query_id:
-    LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
+    LOG.debug("Attempting to get Impala query profile for query ID: %s" % (query_id))
     doc = Document2.objects.get(id=query_id)
     snippets = doc.data_dict.get('snippets', [])
     secret = snippets[0]['result']['handle']['secret']
-    api = get_impalad_api(user=request.user, url=server_url)
     impala_query_id = "%x:%x" % struct.unpack(b"QQ", base64.decodestring(secret))
     api.kill(impala_query_id) # There are many statistics that are not present when the query is open. Close it first.
     query_profile = api.get_query_profile_encoded(impala_query_id)
@@ -163,14 +159,10 @@ def alanize_metrics(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
   query_id = json.loads(request.POST.get('query_id'))
 
-  application = _get_server_name(cluster)
-  query_server = dbms.get_query_server_config()
-  session = Session.objects.get_session(request.user, query_server['server_name'])
-  server_url = _get_impala_server_url(session)
+  api = _get_api(request.user, cluster)
 
   if query_id:
-    LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
-    api = get_impalad_api(user=request.user, url=server_url)
+    LOG.debug("Attempting to get Impala query profile for query ID: %s" % (query_id))
     query_profile = api.get_query_profile_encoded(query_id)
     profile = analyzer.analyze(analyzer.parse_data(query_profile))
     ANALYZER.pre_process(profile)

@@ -37,8 +37,8 @@ except Exception, e:
 
 
 def _get_api(user, cluster=None):
-  if cluster:
-    server_url = 'http://impala-coordinator-%s:25000' % cluster
+  if cluster and cluster.get('type') == 'altus-dw':
+    server_url = 'http://impala-coordinator%(name)s:25000' % cluster
   else:
     session = Session.objects.get_session(user, application='impala')
     server_url = _get_impala_server_url(session)
