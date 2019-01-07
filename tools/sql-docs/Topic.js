@@ -40,7 +40,7 @@ class Topic {
   toJson() {
     return JSON.stringify({
       body: this.domXml.toString(),
-      title: this.fragment.title.text()
+      title: this.fragment.title.text().replace(/[\n\r]/g, ' ').trim()
     });
   }
 }
