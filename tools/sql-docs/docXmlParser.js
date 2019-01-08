@@ -78,8 +78,19 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
       break;
     case 'tgroup':
     case 'colspec':
-    case 'dlentry': // TODO: Possibly keep track of ID if re-used elsewhere, for now ignore.
-      // skip
+    case 'dlentry':
+      if (extractorUtils.hasAttributes(docElement, 'id')) {
+        let id = docElement.attr('id') && docElement.attr('id').value();
+        // Move id attribute to first child element
+        for (let node of docElement.childNodes()) {
+          if (node.type() === 'element') {
+            node.attr({'id': id});
+            break;
+          }
+        }
+        docElement.attr('id').remove();
+      }
+      // skip creating corresponding DOM element
       break;
     case 'alt':
     case 'area':
@@ -243,6 +254,9 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
   if (extractorUtils.hasAttributes(docElement, 'id')) {
     let fragmentId = docElement.attr('id') && docElement.attr('id').value();
     let newFragment = new DocFragment(fragmentId, domElement);
+    if (!extractorUtils.hasAttributes(domElement, 'id') && domElement.type() === 'element') {
+      domElement.attr({'id': fragmentId});
+    }
     if (!topic.fragment) {
       topic.fragment = newFragment;
     } else {
