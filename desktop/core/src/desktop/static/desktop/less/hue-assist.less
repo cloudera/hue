@@ -667,7 +667,8 @@
   }
   .hue-doc-codeblock {
     display: block;
-    white-space: pre-wrap;
+    white-space: pre;
+    overflow-x: auto;
     margin-bottom: 10px;
     padding: 6px 8px;
     .hue-doc-varname {
@@ -706,6 +707,7 @@
     font-family: @font-family-monospace;
   }
   .hue-doc-uicontrol {
+    display: inline-block;
     font-weight: 500;
   }
   .hue-doc-example {

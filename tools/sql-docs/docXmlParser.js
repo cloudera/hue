@@ -202,8 +202,9 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
       break;
     case 'text':
       if (docElement.text().trim()) {
+        let firstInDiv = domElement.name() === 'div' && domElement.childNodes().length === 0;
         domElement = domElement.node('text');
-        domElement.replace(docElement.text());
+        domElement.replace(firstInDiv ? docElement.text().replace(/^[\n\r]*/, '') : docElement.text());
       }
       break;
     case 'abstract':
@@ -224,14 +225,19 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
     case undefined:
       if (/^<\!\[cdata.*/i.test(docElement.toString())) {
         if (docElement.text().trim()) {
+          let firstInDiv = domElement.name() === 'div' && domElement.childNodes().length === 0;
           domElement = domElement.node('text');
-          domElement.replace(docElement.text());
+          domElement.replace(firstInDiv ? docElement.text().replace(/^[\n\r]*/, '') : docElement.text());
         }
         break;
       }
     default:
       console.log('%s: Can\'t handle node: %s in ref %s', LOG_NAME, docElement.name(), topic.ref);
       return;
+  }
+
+  if (isHidden(docElement)) {
+    domElement.attr({ 'style': 'display:none;' });
   }
 
   if (extractorUtils.hasAttributes(docElement, 'id')) {
@@ -304,5 +310,6 @@ const parseTopics = (parseResults, cssClassPrefix) => new Promise((resolve, reje
 });
 
 module.exports = {
-  parseTopics: parseTopics
+  parseTopics: parseTopics,
+  isHidden: isHidden
 };
