@@ -367,6 +367,11 @@ var SqlSetOptions = (function () {
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
         default: 'false (shown as 0 in output of SET statement)'
       },
+      'TIMEZONE': {
+        description: 'The TIMEZONE query option defines the timezone used for conversions between UTC and the local time. If not set, Impala uses the system time zone where the Coordinator Impalad runs. As query options are not sent to the Coordinator immediately, the timezones are validated only when the query runs.',
+        type: 'String, can be a canonical code or a time zone name defined in the IANA Time Zone Database. The value is case-sensitive.',
+        default: 'Coordinator Impalad system time zone.'
+      },
       'TOPN_BYTES_LIMIT': {
         description: 'The TOPN_BYTES_LIMIT query option places a limit on the amount of estimated memory that Impala can process for top-N queries.',
         type: 'Numeric',
@@ -848,7 +853,7 @@ var SqlFunctions = (function () {
         arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
         signature: 'dtrunc(T<DOUBLE|DECIMAL> a, [NUMBER b])',
         draggable: 'dtrunc()',
-        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate() and dtrunc() are aliases for the same function.'
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate(), trunc() and dtrunc() are aliases for the same function.'
       },
       e: {
         returnTypes: ['DOUBLE'],
@@ -883,7 +888,7 @@ var SqlFunctions = (function () {
         arguments: [[{type: 'DOUBLE'}, {type: 'DOUBLE'}], [{type: 'FLOAT'}, {type: 'FLOAT'}]],
         signature: 'fmod(DOUBLE a, DOUBLE b), fmod(FLOAT a, FLOAT b)',
         draggable: 'fmod()',
-        description: 'Returns the modulus of a number.'
+        description: 'Returns the modulus of a floating-point number'
       },
       fpow: {
         returnTypes: ['DOUBLE'],
@@ -1165,12 +1170,19 @@ var SqlFunctions = (function () {
         draggable: 'tanh()',
         description: 'Returns the tangent of the argument.'
       },
+      trunc: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
+        signature: 'trunc(T<DOUBLE|DECIMAL> a, [NUMBER b])',
+        draggable: 'trunc()',
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate(), trunc() and dtrunc() are aliases for the same function.'
+      },
       truncate: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
         signature: 'truncate(T<DOUBLE|DECIMAL> a, [NUMBER b])',
         draggable: 'truncate()',
-        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate() and dtrunc() are aliases for the same function.'
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate(), trunc() and dtrunc() are aliases for the same function.'
       },
       unhex: {
         returnTypes: ['STRING'],
@@ -1178,7 +1190,14 @@ var SqlFunctions = (function () {
         signature: 'unhex(STRING a)',
         draggable: 'unhex()',
         description: 'Returns a string of characters with ASCII values corresponding to pairs of hexadecimal digits in the argument.'
-      }
+      },
+      width_bucket: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{type: 'INT'}]],
+        signature: 'width_bucket(DECIMAL expr, DECIMAL min_value, DECIMAL max_value, INT num_buckets)',
+        draggable: 'width_bucket()',
+        description: 'Returns the bucket number in which the expr value would fall in the histogram where its range between min_value and max_value is divided into num_buckets buckets of identical sizes.'
+      },
     }
   };
 
@@ -2102,6 +2121,13 @@ var SqlFunctions = (function () {
         signature: 'nanoseconds_sub(TIMESTAMP date, BIGINT|INT nanoseconds)',
 				draggable: 'nanoseconds_sub()',
         description: 'Returns the specified date and time minus some number of nanoseconds.'
+      },
+      next_day: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'STRING'}]],
+        signature: 'next_day(TIMESTAMP date, STRING weekday)',
+        draggable: 'next_day()',
+        description: 'Returns the date of the weekday that follows the specified date. The weekday parameter is case-insensitive. The following values are accepted for weekday: "Sunday"/"Sun", "Monday"/"Mon", "Tuesday"/"Tue", "Wednesday"/"Wed", "Thursday"/"Thu", "Friday"/"Fri", "Saturday"/"Sat".'
       },
       now: {
         returnTypes: ['TIMESTAMP'],
@@ -3329,6 +3355,13 @@ var SqlFunctions = (function () {
       }
     },
     impala: {
+      coordinator: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'coordinator()',
+        draggable: 'coordinator()',
+        description: 'Returns the name of the host which is running the impalad daemon that is acting as the coordinator for the current query.'
+      },
       current_database: {
         returnTypes: ['STRING'],
         arguments: [],
@@ -3356,6 +3389,13 @@ var SqlFunctions = (function () {
         signature: 'pid()',
 				draggable: 'pid()',
         description: 'Returns the process ID of the impalad daemon that the session is connected to.You can use it during low - level debugging, to issue Linux commands that trace, show the arguments, and so on the impalad process.'
+      },
+      sleep: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'INT'}]],
+        signature: 'sleep(INT ms)',
+        draggable: 'sleep()',
+        description: 'Pauses the query for a specified number of milliseconds. For slowing down queries with small result sets enough to monitor runtime execution, memory usage, or other factors that otherwise would be difficult to capture during the brief interval of query execution.'
       },
       user: {
         returnTypes: ['STRING'],
