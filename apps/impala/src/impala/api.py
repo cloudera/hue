@@ -167,7 +167,7 @@ def alanize_metrics(request):
     profile = analyzer.analyze(analyzer.parse_data(query_profile))
     ANALYZER.pre_process(profile)
     metrics = analyzer.metrics(profile)
-    response['data'] = { 'metrics': metrics }
+    response['data'] = metrics
     response['status'] = 0
   return JsonResponse(response)
 

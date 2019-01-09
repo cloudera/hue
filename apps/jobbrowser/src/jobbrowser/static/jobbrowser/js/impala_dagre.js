@@ -13,6 +13,7 @@ function impalaDagre(id) {
   var svg = d3.select("#"+id + " svg");
   var inner = svg.select("g");
   var states_by_name = { };
+  var colors = HueColors.cuiD3Scale();
   var _impalaDagree = {
     _metrics: {},
     init: function (initialScale) {
@@ -21,11 +22,13 @@ function impalaDagre(id) {
       .scale(initialScale)
       .event(svg);
     },
-    metrics: function(metrics) {
-      _impalaDagree._metrics = metrics;
+    metrics: function(data) {
+      _impalaDagree._metrics = data;
+      renderGraph()
     },
     update: function(plan) {
-      renderGraph(plan);
+      _impalaDagree._plan = plan;
+      renderGraph();
       _impalaDagree._width = $(svg[0]).width();
     },
     height: function(value) {
@@ -123,7 +126,7 @@ function impalaDagre(id) {
                   "is_broadcast": node["is_broadcast"],
                   "max_time_val": node["max_time_val"]});
     if (parent) {
-      var label_val = "" + node["output_card"].toLocaleString();
+      var label_val = "" + ko.bindingHandlers.simplesize.humanSize(parseInt(node["output_card"], 10));
       edges.push({ start: node["label"], end: parent,
                    style: { label: label_val }});
     }
@@ -132,7 +135,7 @@ function impalaDagre(id) {
     if (node["data_stream_target"]) {
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
-                   "style": { label: "" + node["output_card"].toLocaleString(),
+                   "style": { label: ko.bindingHandlers.simplesize.humanSize(parseInt(node["output_card"], 10)),
                               style: "stroke-dasharray: 5, 5;"}});
     }
     max_node_time = Math.max(node["max_time_val"], max_node_time)
@@ -200,36 +203,102 @@ function impalaDagre(id) {
     return html;
   }
 
+  function getTimelineData(key) {
+    if (!_impalaDagree._metrics) {
+      return [];
+    }
+    var id = parseInt(key.split(':')[0], 10);
+    if (!_impalaDagree._metrics[id]) {
+      return [];
+    }
+    var times = _impalaDagree._metrics[id];
+    var timesKeys = Object.keys(times);
+    var timesKey;
+    for (var i = 0; i < timesKeys.length; i++) {
+      if (times[timesKeys[i]]['timeline'] && times[timesKeys[i]]['timeline']['Node Lifecycle Event Timeline']) {
+        timesKey = timesKeys[i];
+        break;
+      }
+    }
+    if (!timesKey) {
+      return [];
+    }
+    var time = times[timesKey]['timeline']['Node Lifecycle Event Timeline'];
+    return time.map(function (time, index, array) {
+      var startTime = index > 0 && array[index - 1].value || 0;
+      return { starting_time: startTime, ending_time : time.value, duration: time.value - startTime, color: colors[index % colors.length], name: time.name, unit: time.unit };
+    });
+  }
+
+  function renderTimeline(key) {
+    var datum = getTimelineData(key);
+    var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
+    var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
+    var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
+    html += datum.map(function(time, index) {
+      return '<rect x="' + (time.starting_time / divider) + '" width="' + (time.duration / divider)  + '" height="10" style="fill:' + time.color  +'"></rect>';
+    }).join('');
+    html += '</svg>';
+    return html;
+  }
+
+  function renderTimelineLegend(key) {
+    var datum = getTimelineData(key);
+    var html = '';
+    if (datum) {
+      html += datum.map(function(time, index) {
+        return '<li><div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name">' + time.name + '</div> <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(time.duration, time.unit) + '</div></li>';
+      }).join('');
+    }
+    html += '';
+    return html;
+  }
+
   function showDetail(id) {
     var data;
-    if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['averaged']) {
-      data = _impalaDagree._metrics[id]['averaged'];
-    } else if (_impalaDagree._metrics[id]) {
-      data = _impalaDagree._metrics[id][Object.keys(_impalaDagree._metrics[id])[0]];
+    if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['averaged']['metrics']) {
+      data = _impalaDagree._metrics[id]['averaged']['metrics'];
+    } else if (_impalaDagree._metrics[id]['metrics']) {
+      data = _impalaDagree._metrics[id]['metrics'][Object.keys(_impalaDagree._metrics[id]['metrics'])[0]];
     }
     d3.select('.query-plan').classed('open', true);
-    var title = d3.select('.query-plan .details')
-    .selectAll('.metric-title').data([0]);
-    title.enter().append('div').classed('metric-title', true);
+    var details = d3.select('.query-plan .details');
     var key = getKey(id);
-    title.html(getIcon(states_by_name[key].icon) + '<span>' + states_by_name[key].label+ '</span>');
+    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h3>' + states_by_name[key].label+ '</h3></div>')
+    var detailsContent = details.append('div').classed('details-content', true);
+    var timelineSection = detailsContent.append('div').classed('details-section', true);
 
-    var metricTitle = d3.select('.query-plan .details')
-    .selectAll('.metrics').data([0]);
-    metricTitle.enter().append('div').classed('metrics', true);
+    var timelineTitle = timelineSection.append('header');
+    timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
+    timelineTitle.append('h4').text(window.HUE_I18n.profile.timeline);
 
-    var metrics = d3.select('.query-plan .details .metrics').selectAll('div')
+    timelineSection.node().appendChild($.parseXML(renderTimeline(key, '')).children[0]);
+
+    timelineSection.append('ol').classed('', true).html(renderTimelineLegend(key));
+
+    detailsContent.append('div').classed('divider', true);
+
+    var metricsSection = detailsContent.append('div').classed('details-section', true);
+
+    var metricsTitle = metricsSection.append('header');
+    metricsTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-bar-chart');
+    metricsTitle.append('h4').text(window.HUE_I18n.profile.metrics);
+
+    var metricsContent = metricsSection.append('ul').classed('metrics', true);
+
+    var metrics = metricsContent.selectAll('li')
     .data(Object.keys(data).sort().map(function (key) { return data[key]; }));
     metrics.exit().remove();
-    metrics.enter().append('div');
-    metrics.html(function (datum) { return '<div class="metric-name">' + datum.name + '</div> : <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(datum.value, datum.unit) + '</div>'; });
+    metrics.enter().append('li');
+    metrics.html(function (datum) { return '<div class="metric-name">' + datum.name + '</div> <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(datum.value, datum.unit) + '</div>'; });
   }
 
   function hideDetail(id) {
     d3.select('.query-plan').classed('open', false);
   }
 
-  function renderGraph(plan) {
+  function renderGraph() {
+    var plan = _impalaDagree._plan;
     if (!plan || !plan.plan_nodes || !plan.plan_nodes.length) return;
     var states = [];
     var edges = [];
@@ -251,8 +320,8 @@ function impalaDagre(id) {
       html += "<span class='name'>" + state.label + "</span><br/>";
       html += "<span class='metric'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
-      html += "<span class='metric'>" + state.max_time + "</span>"
       html += "<span class='id'>" + state.name + "</span>";
+      html += renderTimeline(state.name);
       html += "</div>";
 
       var style = state.style;

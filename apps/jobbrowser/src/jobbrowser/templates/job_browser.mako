@@ -1534,7 +1534,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
-            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, metrics: properties.metrics && properties.metrics().metrics, height:$root.isMini() ? 535 : 600 }">
+            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, metrics: properties.metrics && properties.metrics(), height:$root.isMini() ? 535 : 600 }">
               <svg style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
                 <defs>
                   <filter id="dropshadow" height="130%">

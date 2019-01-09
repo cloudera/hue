@@ -28,6 +28,7 @@ from thrift.transport import TTransport
 from libanalyze import dot
 from libanalyze import gjson as jj
 from libanalyze import models
+from libanalyze.rules import to_double
 
 
 class Node(object):
@@ -234,8 +235,19 @@ class Node(object):
     ctr = {}
     if self.val.counters:
         for c in self.val.counters:
-            ctr[c.name] = { 'name': c.name, 'value': c.value, 'unit': c.unit }
+            ctr[c.name] = { 'name': c.name, 'value': to_double(c.value) if c.unit == 6 else c.value, 'unit': c.unit }
     return ctr
+
+  def event_list(self):
+    event_list = {}
+    if self.val.event_sequences:
+      for s in self.val.event_sequences:
+        sequence_name = s.name
+        event_list[sequence_name] = []
+        for i in range(len(s.labels)):
+          event_name = s.labels[i]
+          event_list[sequence_name].append({'name': event_name, 'value': s.timestamps[i], 'unit': 5})
+    return event_list
 
   def repr(self, indent):
     buffer = indent + self.val.name + "\n"
@@ -284,7 +296,7 @@ def metrics(profile):
   execution_profile = profile.find_by_name('Execution Profile')
   if not execution_profile:
     return {}
-  counter_map = {}
+  counter_map = {'max': 0}
   def get_metric(node, counter_map=counter_map):
     if not node.is_plan_node():
       return
@@ -292,11 +304,16 @@ def metrics(profile):
     if counter_map.get(nid) is None:
       counter_map[nid] = {}
     host = node.augmented_host()
+    event_list = node.event_list();
+    if event_list and event_list.get('Node Lifecycle Event Timeline'):
+      last_value = event_list['Node Lifecycle Event Timeline'][len(event_list['Node Lifecycle Event Timeline']) - 1]['value']
+      counter_map['max'] = max(last_value, counter_map['max'])
     if host:
-      counter_map[nid][host] = node.metric_map()
+      counter_map[nid][host] = {'metrics': node.metric_map(), 'timeline': event_list}
     else:
-      counter_map[nid] = node.metric_map()
+      counter_map[nid] = {'metrics': node.metric_map(), 'timeline': event_list}
   execution_profile.foreach_lambda(get_metric)
+  counter_map['ImpalaServer'] = profile.find_by_name('ImpalaServer').metric_map()
   return counter_map
 
 def heatmap_by_host(profile, counter_name):

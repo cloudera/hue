@@ -111,7 +111,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       width: calc(~"100% - 32px");
+      max-width: 185px;
       display: inline-block;
+      height: 14px;
     }
     foreignObject {
       .fa {
@@ -198,6 +200,12 @@
     foreignObject > div {
       position: relative;
     }
+    .timeline {
+      width: 175px;
+      height: 10px;
+      border: 1px solid @cui-gray-300;
+      border-radius: 4px;
+    }
     .details {
       background-color: white;
       box-shadow: 0px 0px 10px 0px;
@@ -208,12 +216,38 @@
       right: 0px;
       width: 200px;
       height: 100%;
+      flex-direction: column;
+      .divider {
+        background-color: @cui-gray-300;
+        width: calc(~"100% - 10px");
+        margin-left: 5px;
+        padding: 0px;
+        height: 1px;
+      }
+      h3 {
+        display: inline-block;
+        margin: 0px;
+      }
+      h4 {
+        margin: 0px;
+        display: inline-block;
+      }
+      ol {
+        list-style-type: none;
+        margin: 0px;
+      }
+      ul {
+        margin: 0px;
+      }
+      .details-content {
+        overflow: scroll;
+      }
+      .details-section {
+        padding: 4px;
+      }
       .metric-title {
         background-color: @hue-primary-color-light;
-        font-weight: bold;
-        font-size: 16px;
-        color: @cui-gray-800;
-        line-height: 40px;
+        padding: 4px;
         .fa {
           padding-top: 0px;
           line-height: 40px;
@@ -226,11 +260,11 @@
       }
       .metrics {
         overflow-y: scroll;
-        height: calc(~"100% - 40px");
+        max-height: calc(~"100% - 40px");
       }
       .metric-name {
         color: @cui-gray-800;
-        width: 120px;
+        width: 107px;
         overflow: hidden;
         text-align: right;
         display: inline-block;
@@ -242,15 +276,22 @@
       .metric-value {
         color: @cui-gray-800;
         overflow: hidden;
-        width: 50px;
+        width: 60px;
         vertical-align: middle;
         display: inline-block;
         white-space: nowrap;
       }
+      .legend-icon {
+        width: 8px;
+        height: 8px;
+        border-radius: 5px;
+        border: 1px solid @cui-gray-300;
+        display: inline-block;
+      }
     }
   }
   .query-plan.open .details {
-    display: inherit;
+    display: flex;
   }
   .query-plan.open .buttons {
     right: 208px;
