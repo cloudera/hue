@@ -175,6 +175,10 @@
       missingLongitude: "${ _('Missing longitude configuration.') }",
       missingLabel: "${ _('Missing label configuration.') }",
       missingRegion: "${ _('Missing region configuration.') }",
+    },
+    profile: {
+      timeline: "${ _('Timeline') }",
+      metrics: "${ _('Metrics') }",
     }
   };
 

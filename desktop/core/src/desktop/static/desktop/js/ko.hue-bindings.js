@@ -7539,12 +7539,20 @@
       },
       human: function (value, unit) {
         var fn;
-        if (unit == 3) {
+        if (unit === 1) {
+          fn = function(value) { return ko.bindingHandlers.simplesize.humanSize(value) + '/s'; }
+        } else if (unit === 3) {
           fn = ko.bindingHandlers.bytesize.humanSize
-        } else if (unit == 5) {
+        } else if (unit === 4) {
+          fn = function(value) { return ko.bindingHandlers.bytesize.humanSize(value) + '/s'; }
+        } else if (unit === 5) {
           fn = ko.bindingHandlers.duration.humanTime
+        } else if (unit === 8) {
+          fn = function (value) { return ko.bindingHandlers.duration.humanTime(value * 1000000); }
+        } else if (unit === 9) {
+          fn = function (value) { return ko.bindingHandlers.duration.humanTime(value * 1000000000); }
         } else {
-          fn = function(value){ return value; }
+          fn = ko.bindingHandlers.simplesize.humanSize
         }
         return fn(value);
       }
@@ -7570,17 +7578,17 @@
         if (value < Math.pow(10, 3)) {
           return value + " ns";
         } else if (value < Math.pow(10, 6)) {
-          value = (value * 1.0) / Math.pow(10, 6);
-          return sprintf("%.4f ms", value);
+          value = (value * 1.0) / Math.pow(10, 3);
+          return sprintf("%.2f us", value);
         } else if (value < Math.pow(10, 9)) {
-          value = (value * 1.0) / Math.pow(10, 9);
-          return sprintf("%.4f s", value);
+          value = (value * 1.0) / Math.pow(10, 6);
+          return sprintf("%.2f ms", value);
         } else {
           // get the ms value
-          var SECOND = 1000;
+          var SECOND = 1;
           var MINUTE = SECOND * 60;
           var HOUR = MINUTE * 60;
-          var value = value * 1 / Math.pow(10, 6);
+          value = value * 1 / Math.pow(10, 9);
           var buffer = "";
 
           if (value > (HOUR)) {
@@ -7594,7 +7602,7 @@
           }
 
           if (value > SECOND) {
-            buffer += sprintf("%.3f s", value * 1.0 / SECOND);
+            buffer += sprintf("%.2f s", value * 1.0 / SECOND);
           }
           return buffer;
         }
@@ -7634,6 +7642,42 @@
         var index = Math.floor(that.getBaseLog(bytes, 1024));
         index = Math.min(that.units.length - 1, index);
         return sprintf("%.1f %s", bytes / Math.pow(1024, index), that.units[index])
+      }
+    };
+  })();
+
+  ko.bindingHandlers.simplesize = (function() {
+    var that;
+    return that = {
+      units: ["", "K", "M", "G", "T", "P"],
+      init: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      update: function (element, valueAccessor) {
+        that.format(element, valueAccessor);
+      },
+      format: function (element, valueAccessor) {
+        var value = valueAccessor();
+        var formatted = that.humanSize(ko.unwrap(value));
+        $(element).text(formatted);
+      },
+      getBaseLog: function(x, y) {
+        return Math.log(x) / Math.log(y);
+      },
+      humanSize: function(bytes) {
+        var isNumber = !isNaN(parseFloat(bytes)) && isFinite(bytes);
+        if (!isNumber) {
+          return '';
+        }
+
+        // Special case small numbers (including 0), because they're exact.
+        if (bytes < 1000) {
+          return sprintf("%d", bytes);
+        }
+
+        var index = Math.floor(that.getBaseLog(bytes, 1000));
+        index = Math.min(that.units.length - 1, index);
+        return sprintf("%.1f %s", bytes / Math.pow(1000, index), that.units[index])
       }
     };
   })();
