@@ -53,7 +53,7 @@ Checked-in third party dependencies
 |Y|ndg_httpsclient|0.4.0|BSD|https://github.com/cedadev/ndg_httpsclient/|
 |Y|openpyxl|2.3.0-b2|MIT|https://pypi.python.org/packages/source/o/openpyxl/openpyxl-2.3.0-b2.tar.gz|
 |Y|ordereddict|1.1|MIT|https://pypi.python.org/pypi/ordereddict|
-|Y|pam||||
+|Y|python-pam|1.8.4|MIT|https://pypi.org/project/python-pam/1.8.4/|
 |Y|parquet-python|1.1|ASL2|https://github.com/jcrobak/parquet-python|
 |Y|Paste|2.0.1| |https://bitbucket.org/ianb/paste|
 |Y|ply|3.9| |https://github.com/dabeaz/ply|
