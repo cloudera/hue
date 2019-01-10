@@ -141,7 +141,7 @@ class JdbcApi(Api):
 
     file_name = _get_snippet_name(notebook)
 
-    results, meta = query_and_fetch(self.db, snippet['statement'], 1000)
+    results, meta = query_and_fetch(self.db, snippet['statement'])
 
     db = FixedResult(results,meta)
 
