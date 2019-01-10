@@ -14,17 +14,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import logging
-import sys
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib import export_csvxls
+from beeswax import data_export
 from desktop.lib.i18n import force_unicode, smart_str
 from librdbms.jdbc import Jdbc, query_and_fetch
 
-from notebook.connectors.base import Api, QueryError, AuthenticationRequired
+from notebook.connectors.base import Api, QueryError, AuthenticationRequired, _get_snippet_name
 
 
 LOG = logging.getLogger(__name__)
@@ -43,11 +44,11 @@ def query_error_handler(func):
     except Exception, e:
       message = force_unicode(smart_str(e))
       if 'error occurred while trying to connect to the Java server' in message:
-        raise QueryError, _('%s: is the DB Proxy server running?') % message, sys.exc_info()[2]
+        raise QueryError(_('%s: is the DB Proxy server running?') % message)
       elif 'Access denied' in message:
-        raise AuthenticationRequired, '', sys.exc_info()[2]
+        raise AuthenticationRequired()
       else:
-        raise QueryError, message, sys.exc_info()[2]
+        raise QueryError(message)
   return decorator
 
 
@@ -64,8 +65,7 @@ class JdbcApi(Api):
       self.db = API_CACHE[self.cache_key]
     elif 'password' in self.options:
       username = self.options.get('user') or user.username
-      impersonation_property = self.options.get('impersonation_property')
-      self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], username, self.options['password'], impersonation_property=impersonation_property, impersonation_user=user.username)
+      self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], username, self.options['password'])
 
   def create_session(self, lang=None, properties=None):
     global API_CACHE
@@ -79,12 +79,24 @@ class JdbcApi(Api):
         user = properties.get('user') or self.options.get('user')
         props['properties'] = {'user': user}
         self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], user, properties.pop('password'))
-        self.db.test_connection(throw_exception=True)
+        try:
+          self.db.test_connection(throw_exception=True)
+        except:
+          self._clear_login_cache()
+          raise;
 
     if self.db is None:
       raise AuthenticationRequired()
 
     return props
+
+  def close_session(self, session):
+    self._clear_login_cache()
+
+  def _clear_login_cache(self):
+    global API_CACHE
+    self.db = None
+    API_CACHE.pop(self.cache_key, None)
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -124,8 +136,16 @@ class JdbcApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  def download(self, notebook, snippet, format, user_agent=None):
-    raise PopupException('Downloading is not supported yet')
+  @query_error_handler
+  def download(self, notebook, snippet, format):
+
+    file_name = _get_snippet_name(notebook)
+
+    results, meta = query_and_fetch(self.db, snippet['statement'], 1000)
+
+    db = FixedResult(results,meta)
+
+    return data_export.download(None, format, db, id=snippet['id'], file_name=file_name)
 
   def progress(self, snippet, logs):
     return 50
@@ -139,42 +159,40 @@ class JdbcApi(Api):
     if self.db is None:
       raise AuthenticationRequired()
 
-    assist = self._createAssist(self.db)
+    assist = self._get_assist()
     response = {'status': -1}
 
     if database is None:
       response['databases'] = assist.get_databases()
     elif table is None:
-      tables = assist.get_tables_full(database)
-      response['tables'] = [table['name'] for table in tables]
-      response['tables_meta'] = tables
+      response['tables'] = assist.get_tables(database)
+      response['tables_meta'] = response['tables']
     else:
-      columns = assist.get_columns_full(database, table)
-      response['columns'] = [col['name'] for col in columns]
-      response['extended_columns'] = columns
+      columns = assist.get_columns(database, table)
+      response['columns'] = [col[0] for col in columns]
+      response['extended_columns'] = [{
+        'name': col[0],
+        'type': col[1],
+        'comment': col[5]
+      } for col in columns]
 
     response['status'] = 0
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
     if self.db is None:
       raise AuthenticationRequired()
 
-    assist = self._createAssist(self.db)
-    response = {'status': -1, 'result': {}}
+    assist = self._get_assist()
+    response = {'status': -1}
 
     sample_data, description = assist.get_sample_data(database, table, column)
 
-    if sample_data or description:
+    if sample_data:
       response['status'] = 0
       response['headers'] = [col[0] for col in description] if description else []
-      response['full_headers'] = [{
-        'name': col[0],
-        'type': col[1],
-        'comment': ''
-      } for col in description]
-      response['rows'] = sample_data if sample_data else []
+      response['rows'] = sample_data
     else:
       response['message'] = _('Failed to get sample data.')
 
@@ -184,9 +202,11 @@ class JdbcApi(Api):
   def cache_key(self):
     return '%s-%s' % (self.interpreter['name'], self.user.username)
 
-  def _createAssist(self, db):
-    return Assist(db)
-
+  def _get_assist(self):
+    if "Presto" in self.options['driver']:
+      return PrestoAssist(self.db)
+    else:
+      return Assist(self.db)
 
 class Assist():
 
@@ -194,28 +214,58 @@ class Assist():
     self.db = db
 
   def get_databases(self):
-    dbs, description = query_and_fetch(self.db, 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA')
+    dbs, description = query_and_fetch(self.db, 'SELECT DatabaseName FROM DBC.Databases')
     return [db[0] and db[0].strip() for db in dbs]
 
   def get_tables(self, database, table_names=[]):
-    tables = self.get_tables_full(database, table_names)
-    return [table['name'] for table in tables]
-
-  def get_tables_full(self, database, table_names=[]):
-    tables, description = query_and_fetch(self.db, "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'" % database)
-    return [{"comment": table[1] and table[1].strip(), "type": "Table", "name": table[0] and table[0].strip()} for table in tables]
+    tables, description = query_and_fetch(self.db, "SELECT * FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
+    return [{"comment": table[7] and table[7].strip(), "type": "Table", "name": table[1] and table[1].strip()} for table in tables]
 
   def get_columns(self, database, table):
-    columns = self.get_columns_full(database, table)
-    return [col['name'] for col in columns]
-
-  def get_columns_full(self, database, table):
-    columns, description = query_and_fetch(self.db, "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s'" % (database, table))
-    return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
+    columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s'" % (database, table))
+    return [[col[0] and col[0].strip(), self._type_converter(col[1]), '', '', col[2], ''] for col in columns]
 
   def get_sample_data(self, database, table, column=None):
     column = column or '*'
-    #data, description =  query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
-    #response['rows'] = data
-    #response['columns'] = []
-    return query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
+    return query_and_fetch(self.db, 'SELECT %s FROM %s.%s' % (column, database, table))
+
+  def _type_converter(self, name):
+    return {
+        "I": "INT_TYPE",
+        "I2": "SMALLINT_TYPE",
+        "CF": "STRING_TYPE",
+        "CV": "CHAR_TYPE",
+        "DA": "DATE_TYPE",
+      }.get(name, 'STRING_TYPE')
+
+class PrestoAssist(Assist):
+
+  def get_databases(self):
+    dbs, description = query_and_fetch(self.db, 'SHOW SCHEMAS')
+    return [db[0] and db[0].strip() for db in dbs]
+
+  def get_tables(self, database, table_names=[]):
+    tables, description = query_and_fetch(self.db, 'SHOW TABLES FROM %s' % database)
+    return [{"type": "Table", "name": table[0] and table[0].strip()} for table in tables]
+
+  def get_columns(self, database, table):
+    columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
+    return [[col[0] and col[0].strip(), col[1], '', '', '', col[3]] for col in columns]
+
+class FixedResult():
+
+  def __init__(self, result, meta):
+    self.result = result
+    self.has_more = False
+    self.meta = meta
+
+  def fetch(self, handle=None, start_over=None, rows=None):
+    return self
+
+  def cols(self):
+    return [
+        self.meta[i][0]
+        for i in xrange(0, len(self.meta)) ]
+
+  def rows(self):
+    return self.result
