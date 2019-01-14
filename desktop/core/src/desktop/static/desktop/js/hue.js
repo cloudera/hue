@@ -27,3 +27,5 @@ window.$ = $;
 window.ko = ko;
 window.ko.mapping = komapping;
 window.page = page;
+
+console.log('boo');
