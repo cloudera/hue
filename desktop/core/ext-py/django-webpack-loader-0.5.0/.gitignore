@@ -1,0 +1,86 @@
+venv/
+
+# auto generated
+README.rst
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Editors and IDEs
+.ropeproject/
+
+.python-version
+
+examples/**/ve/
+examples/**/venv/
+examples/**/node_modules/
+examples/**/assets/bundles/
+examples/**/assets/webpack-stats.json
+
+tests/ve/
+tests/ve3/
+tests/venv/
+tests/venv3/
+tests/node_modules/
+tests/assets/bundles/
+tests/webpack-stats.json
+tests/webpack-stats-app2.json
+
+# PyCharm IDE
+.idea
+.vscode

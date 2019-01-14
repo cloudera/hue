@@ -49,7 +49,8 @@
     "grunt-contrib-uglify": "^3.0.1",
     "grunt-contrib-watch": "0.6.1",
     "load-grunt-tasks": "3.1.0",
-    "webpack": "1.13.1"
+    "webpack": "1.13.1",
+    "webpack-bundle-tracker": "^0.3.0"
   },
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",

@@ -29,6 +29,7 @@
   from metadata.conf import has_optimizer, OPTIMIZER
 
   from desktop.auth.backend import is_admin
+  from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
@@ -451,7 +452,8 @@ ${ hueIcons.symbols() }
 
 ${ commonshare() | n,unicode }
 
-<script src="${ static('desktop/js/hue-bundle.js') }"></script>
+
+${ render_bundle('hue') | n,unicode }
 % if IS_EMBEDDED.get():
 <script src="${ static('desktop/ext/js/page.js') }"></script>
 % endif
