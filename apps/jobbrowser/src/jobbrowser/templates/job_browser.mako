@@ -3131,6 +3131,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $.post("/metadata/api/analytic_db/create_cluster/", {
             "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
             "cluster_name": self.createClusterName(),
+            "cluster_hdfs_host": "hdfs-namenode",
+            "cluster_hdfs_port": 9820,
             "cdh_version": "CDH515",
             "public_key": "public_key",
             "instance_type": "m4.xlarge",
