@@ -2710,8 +2710,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.fetchMetrics = function (name, callback) {
-        ApiHelper.getInstance().fetchQueryExecutionStatistics({ queryId: self.id(), compute: '' })
-        .done(function(data) {
+        ApiHelper.getInstance().fetchQueryExecutionStatistics({
+          queryId: self.id(),
+          cluster: vm.compute()
+        }).done(function(data) {
           self.properties['metrics'](data);
         });
       };
@@ -3225,6 +3227,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.cluster = ko.observable();
       self.compute = ko.observable();
+      self.compute.subscribe(function () {
+        self.jobs.fetchJobs();
+      });
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {

@@ -232,6 +232,9 @@ function impalaDagre(id) {
 
   function renderTimeline(key) {
     var datum = getTimelineData(key);
+    if (!datum.length) {
+      return '';
+    }
     var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
     var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
@@ -244,21 +247,19 @@ function impalaDagre(id) {
 
   function renderTimelineLegend(key) {
     var datum = getTimelineData(key);
-    var html = '';
-    if (datum) {
-      html += datum.map(function(time, index) {
-        return '<li><div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name">' + time.name + '</div> <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(time.duration, time.unit) + '</div></li>';
-      }).join('');
+    if (!datum.length) {
+      return '';
     }
-    html += '';
-    return html;
+    return datum.map(function(time, index) {
+      return '<li><div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name">' + time.name + '</div> <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(time.duration, time.unit) + '</div></li>';
+    }).join('');
   }
 
   function showDetail(id) {
     var data;
     if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['averaged']['metrics']) {
       data = _impalaDagree._metrics[id]['averaged']['metrics'];
-    } else if (_impalaDagree._metrics[id]['metrics']) {
+    } else if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['metrics']) {
       data = _impalaDagree._metrics[id]['metrics'][Object.keys(_impalaDagree._metrics[id]['metrics'])[0]];
     }
     d3.select('.query-plan').classed('open', true);
@@ -266,17 +267,18 @@ function impalaDagre(id) {
     var key = getKey(id);
     details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h3>' + states_by_name[key].label+ '</h3></div>')
     var detailsContent = details.append('div').classed('details-content', true);
-    var timelineSection = detailsContent.append('div').classed('details-section', true);
 
-    var timelineTitle = timelineSection.append('header');
-    timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
-    timelineTitle.append('h4').text(window.HUE_I18n.profile.timeline);
+    var timeline = renderTimeline(key, '');
+    if (timeline) {
+      var timelineSection = detailsContent.append('div').classed('details-section', true);
+      var timelineTitle = timelineSection.append('header');
+      timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
+      timelineTitle.append('h4').text(window.HUE_I18n.profile.timeline);
+      timelineSection.node().appendChild($.parseXML(renderTimeline(key, '')).children[0]);
 
-    timelineSection.node().appendChild($.parseXML(renderTimeline(key, '')).children[0]);
-
-    timelineSection.append('ol').classed('', true).html(renderTimelineLegend(key));
-
-    detailsContent.append('div').classed('divider', true);
+      timelineSection.append('ol').classed('', true).html(renderTimelineLegend(key));
+      detailsContent.append('div').classed('divider', true);
+    }
 
     var metricsSection = detailsContent.append('div').classed('details-section', true);
 

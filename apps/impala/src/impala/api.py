@@ -130,7 +130,7 @@ def alanize(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
   query_id = json.loads(request.POST.get('query_id'))
 
-  api = _get_api(request.user, cluster)
+  api = _get_api(request.user, cluster=cluster)
 
   if query_id:
     LOG.debug("Attempting to get Impala query profile for query ID: %s" % (query_id))
@@ -159,7 +159,7 @@ def alanize_metrics(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
   query_id = json.loads(request.POST.get('query_id'))
 
-  api = _get_api(request.user, cluster)
+  api = _get_api(request.user, cluster=cluster)
 
   if query_id:
     LOG.debug("Attempting to get Impala query profile for query ID: %s" % (query_id))
@@ -175,6 +175,7 @@ def alanize_metrics(request):
 @error_handler
 def alanize_fix(request):
   response = {'status': -1}
+  cluster = json.loads(request.POST.get('cluster', '{}'))
   fix = json.loads(request.POST.get('fix'))
   start_time = json.loads(request.POST.get('start_time'), '-1')
   if fix['id'] == 0:
@@ -184,7 +185,8 @@ def alanize_fix(request):
       statement='compute stats %(data)s' % fix,
       status='ready',
       last_executed=start_time,
-      is_task=True
+      is_task=True,
+      compute=cluster
     )
     response['details'] = { 'task': notebook.execute(request, batch=True) }
     response['status'] = 0

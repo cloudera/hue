@@ -25,6 +25,7 @@ from beeswax.server import dbms
 from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
   get_query_server_config as beeswax_query_server_config
 
+from desktop.conf import CLUSTER_ID
 from impala import conf
 
 
@@ -53,7 +54,7 @@ def get_query_server_config(cluster_config=None):
 
 
 def _get_server_name(cluster_config):
-  return 'impala' + ('-' + cluster_config.get('name') if cluster_config else '')
+  return 'impala' + ('-' + cluster_config.get('name') if cluster_config and cluster_config.get('name') != CLUSTER_ID.get() else '')
 
 
 class ImpalaDbms(HiveServer2Dbms):

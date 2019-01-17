@@ -2086,8 +2086,8 @@ var ApiHelper = (function () {
     var self = this;
     var url = '/impala/api/query/alanize/fix';
     var deferred = $.Deferred();
-
     var request = self.simplePost(url, {
+      cluster: JSON.stringify(options.compute),
       fix: JSON.stringify(options.fix),
       start_time: options.start_time
       }, {
@@ -2111,7 +2111,7 @@ var ApiHelper = (function () {
     var deferred = $.Deferred();
 
     var request = self.simplePost(url, {
-      'cluster': JSON.stringify(options.compute),
+      'cluster': JSON.stringify(options.cluster),
       'query_id': '"' + options.queryId + '"'
       }, {
       silenceErrors: options.silenceErrors,
