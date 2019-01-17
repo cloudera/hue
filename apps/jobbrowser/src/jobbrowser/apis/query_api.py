@@ -25,13 +25,13 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
 
-
 LOG = logging.getLogger(__name__)
 
 
 try:
   from beeswax.models import Session
   from impala.server import get_api as get_impalad_api, _get_impala_server_url
+  from impala.dbms import _get_server_name
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -40,7 +40,7 @@ def _get_api(user, cluster=None):
   if cluster and cluster.get('type') == 'altus-dw':
     server_url = 'http://impala-coordinator-%(name)s:25000' % cluster
   else:
-    session = Session.objects.get_session(user, application='impala')
+    session = Session.objects.get_session(user, application=_get_server_name(cluster))
     server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
 
