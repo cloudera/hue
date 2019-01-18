@@ -96,24 +96,26 @@
     .badge {
       color: @cui-gray-800;
       text-shadow: none;
+      font-weight: normal;
     }
     .metric {
       position: absolute;
       top: 0px;
       right: 0px;
-      font-weight: normal;
     }
     .name {
       padding-right: 80px;
+      text-transform: capitalize;
+      font-size: 13px;
     }
     .detail {
-      font-weight: normal;
       overflow: hidden;
       text-overflow: ellipsis;
       width: calc(~"100% - 32px");
       max-width: 185px;
       display: inline-block;
       height: 14px;
+      text-transform: lowercase;
     }
     foreignObject {
       .fa {
@@ -153,7 +155,7 @@
       display: none;
     }
     .node.active {
-      rect {
+      > rect {
         filter: url(#dropshadow);
         stroke: @hue-primary-color-dark;
         fill: @hue-primary-color-light;
@@ -196,9 +198,14 @@
     }
     .edgeLabel text {
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      fill: @cui-gray-800;
+      font-size: inherit;
     }
     foreignObject > div {
       position: relative;
+    }
+    .above-average {
+      font-weight: bold;
     }
     .timeline {
       width: 175px;
@@ -207,7 +214,7 @@
       border-radius: 4px;
     }
     .details {
-      background-color: white;
+      background-color: @cui-white;
       box-shadow: 0px 0px 10px 0px;
       color: @cui-gray-600;
       position: absolute;
@@ -232,6 +239,10 @@
         margin: 0px;
         display: inline-block;
       }
+      h5 {
+        margin: 0px;
+        display: inline-block;
+      }
       ol {
         list-style-type: none;
         margin: 0px;
@@ -244,6 +255,9 @@
       }
       .details-section {
         padding: 4px;
+        header {
+          margin-top: 10px;
+        }
       }
       .metric-title {
         background-color: @hue-primary-color-light;
@@ -262,31 +276,48 @@
         overflow-y: scroll;
         max-height: calc(~"100% - 40px");
       }
-      .metric-name {
-        color: @cui-gray-800;
-        width: 107px;
-        overflow: hidden;
-        text-align: right;
-        display: inline-block;
-        white-space: nowrap;
-        vertical-align: middle;
-        font-weight: bold;
-        padding-left: 2px;
-      }
-      .metric-value {
-        color: @cui-gray-800;
-        overflow: hidden;
-        width: 60px;
-        vertical-align: middle;
-        display: inline-block;
-        white-space: nowrap;
-      }
       .legend-icon {
         width: 8px;
         height: 8px;
         border-radius: 5px;
         border: 1px solid @cui-gray-300;
         display: inline-block;
+      }
+      .metric-name {
+        display: inline-block;
+        padding-left: 2px;
+      }
+      .details-section .timeline {
+        margin-bottom: 10px;
+      }
+      table {
+        display: table;
+      }
+      table tr {
+        display: table-cell;
+      }
+      table tr td {
+        color: @cui-gray-800;
+        max-width: 107px;
+        overflow: hidden;
+        display: block;
+        white-space: nowrap;
+        padding-right: 5px;
+        text-overflow: ellipsis;
+      }
+      table thead tr td {
+        background-color: #FFFFFF;
+        border-bottom: 1px solid @cui-gray-300;
+        text-transform: capitalize;
+      }
+      table tr:nth-child(1) td {
+        border-right: 1px solid @cui-gray-300;
+      }
+      table thead tr td:nth-child(odd) {
+        background-color:@cui-white;
+      }
+      table tr td:nth-child(odd) {
+        background-color: @cui-gray-050;
       }
     }
   }

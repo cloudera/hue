@@ -618,9 +618,11 @@ class TopDownAnalysis:
             # Make sure to substract the wait time for the exchange node
             if is_plan_node and re.search(r'EXCHANGE_NODE', node.val.name) is not None:
                 async_time = counter_map.get('AsyncTotalTime', models.TCounter(value=0)).value
-                dequeue = node.find_by_name('Dequeue')
-                data_wait_time = dequeue.counter_map().get('DataWaitTime', models.TCounter(value=0)).value if dequeue else 0
-                local_time = counter_map['TotalTime'].value - counter_map['InactiveTotalTime'].value - async_time - data_wait_time
+                inactive_time = counter_map['InactiveTotalTime'].value
+                if inactive_time == 0:
+                  dequeue = node.find_by_name('Dequeue')
+                  inactive_time = dequeue.counter_map().get('DataWaitTime', models.TCounter(value=0)).value if dequeue else 0
+                local_time = counter_map['TotalTime'].value - inactive_time - async_time
 
             # For Hash Join, if the "LocalTime" metrics
             if is_plan_node and re.search(r'HASH_JOIN_NODE', node.val.name) is not None:

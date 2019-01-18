@@ -24,7 +24,6 @@ function impalaDagre(id) {
     },
     metrics: function(data) {
       _impalaDagree._metrics = data;
-      renderGraph()
     },
     update: function(plan) {
       _impalaDagree._plan = plan;
@@ -110,7 +109,7 @@ function impalaDagre(id) {
                       "#991F00", "#B22400", "#CC2900", "#E62E00", "#FF3300", "#FF4719"];
 
   // Recursively build a list of edges and states that comprise the plan graph
-  function build(node, parent, edges, states, colour_idx, max_node_time) {
+  function build(node, parent, edges, states, colour_idx, max_node_time, index) {
     if (node["output_card"] === null || node["output_card"] === undefined) {
       return;
     }
@@ -125,23 +124,27 @@ function impalaDagre(id) {
                   "icon": node["icon"],
                   "is_broadcast": node["is_broadcast"],
                   "max_time_val": node["max_time_val"]});
+    var edgeCount;
     if (parent) {
-      var label_val = "" + ko.bindingHandlers.simplesize.humanSize(parseInt(node["output_card"], 10));
-      edges.push({ start: node["label"], end: parent,
-                   style: { label: label_val }});
+      edgeCount = parseInt(node["output_card"], 10);
+      var label_val = "" + ko.bindingHandlers.simplesize.humanSize(edgeCount);
+      edges.push({ start: node["label"], end: parent, style: { label: label_val, labelpos: index === 0 ? 'l' : 'r' }, val: edgeCount });
     }
     // Add an inter-fragment edge. We use a red dashed line to show that rows are crossing
     // the fragment boundary.
     if (node["data_stream_target"]) {
+      edgeCount = parseInt(node["output_card"], 10);
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
-                   "style": { label: ko.bindingHandlers.simplesize.humanSize(parseInt(node["output_card"], 10)),
-                              style: "stroke-dasharray: 5, 5;"}});
+                   "val": edgeCount,
+                   "style": { label: ko.bindingHandlers.simplesize.humanSize(edgeCount),
+                              style: "stroke-dasharray: 5, 5;",
+                              labelpos: index === 0 ? 'l' : 'r' }});
     }
     max_node_time = Math.max(node["max_time_val"], max_node_time)
     for (var i = 0; i < node["children"].length; ++i) {
       max_node_time = build(
-        node["children"][i], node["label"], edges, states, colour_idx, max_node_time);
+        node["children"][i], node["label"], edges, states, colour_idx, max_node_time, i);
     }
     return max_node_time;
   }
@@ -205,67 +208,52 @@ function impalaDagre(id) {
 
   function getTimelineData(key) {
     if (!_impalaDagree._metrics) {
-      return [];
+      return;
     }
     var id = parseInt(key.split(':')[0], 10);
-    if (!_impalaDagree._metrics[id]) {
-      return [];
+    if (!_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[id].timeline) {
+      return;
     }
-    var times = _impalaDagree._metrics[id];
-    var timesKeys = Object.keys(times);
-    var timesKey;
-    for (var i = 0; i < timesKeys.length; i++) {
-      if (times[timesKeys[i]]['timeline'] && times[timesKeys[i]]['timeline']['Node Lifecycle Event Timeline']) {
-        timesKey = timesKeys[i];
-        break;
+    var timeline = _impalaDagree._metrics.nodes[id].timeline;
+    var times = Object.keys(timeline.hosts);
+    for (var i = 0; i < times.length; i++) {
+      if (!timeline.hosts[times[i]]['Node Lifecycle Event Timeline']) {
+        continue;
       }
+      timeline.hosts[times[i]]['Node Lifecycle Event Timeline'].forEach(function (time, index, array) {
+        time.color = colors[index % colors.length];
+        return time;
+      });
     }
-    if (!timesKey) {
-      return [];
-    }
-    var time = times[timesKey]['timeline']['Node Lifecycle Event Timeline'];
-    return time.map(function (time, index, array) {
-      var startTime = index > 0 && array[index - 1].value || 0;
-      return { starting_time: startTime, ending_time : time.value, duration: time.value - startTime, color: colors[index % colors.length], name: time.name, unit: time.unit };
-    });
+    return timeline;
   }
 
   function renderTimeline(key) {
     var datum = getTimelineData(key);
-    if (!datum.length) {
+    if (!datum || !datum.hosts[datum.min] || !datum.hosts[datum.min]['Node Lifecycle Event Timeline']) {
       return '';
     }
     var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
     var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
-    html += datum.map(function(time, index) {
-      return '<rect x="' + (time.starting_time / divider) + '" width="' + (time.duration / divider)  + '" height="10" style="fill:' + time.color  +'"></rect>';
+    html += datum.hosts[datum.min]['Node Lifecycle Event Timeline'].map(function(time, index) {
+      return '<rect x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10" style="fill:' + time.color  +'"></rect>';
     }).join('');
     html += '</svg>';
     return html;
   }
 
-  function renderTimelineLegend(key) {
-    var datum = getTimelineData(key);
-    if (!datum.length) {
-      return '';
-    }
-    return datum.map(function(time, index) {
-      return '<li><div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name">' + time.name + '</div> <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(time.duration, time.unit) + '</div></li>';
-    }).join('');
-  }
-
   function showDetail(id) {
     var data;
-    if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['averaged']['metrics']) {
-      data = _impalaDagree._metrics[id]['averaged']['metrics'];
-    } else if (_impalaDagree._metrics[id] && _impalaDagree._metrics[id]['metrics']) {
-      data = _impalaDagree._metrics[id]['metrics'][Object.keys(_impalaDagree._metrics[id]['metrics'])[0]];
+    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id]) {
+      return;
     }
+    var data = _impalaDagree._metrics.nodes[id];
+
     d3.select('.query-plan').classed('open', true);
     var details = d3.select('.query-plan .details');
     var key = getKey(id);
-    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h3>' + states_by_name[key].label+ '</h3></div>')
+    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
 
     var timeline = renderTimeline(key, '');
@@ -273,30 +261,55 @@ function impalaDagre(id) {
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
       timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
-      timelineTitle.append('h4').text(window.HUE_I18n.profile.timeline);
+      timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline);
       timelineSection.node().appendChild($.parseXML(renderTimeline(key, '')).children[0]);
 
-      timelineSection.append('ol').classed('', true).html(renderTimelineLegend(key));
-      detailsContent.append('div').classed('divider', true);
+      var timelineSectionTable = timelineSection.append('table');
+      timelineSectionTable.append('thead').selectAll('tr').data(['\u00A0'].concat(Object.keys(_impalaDagree._metrics.nodes[id].timeline.hosts).sort())).enter().append('tr').append('td').text(function (host, i) { return i > 0 ? 'Host ' + i : host; }).attr('title', function (host) { return host; });
+      var timelineSectionTableBody = timelineSectionTable.append('tbody');
+      var timelineHosts = Object.keys(_impalaDagree._metrics.nodes[id].timeline.hosts).sort().map(function (host) { return _impalaDagree._metrics.nodes[id].timeline.hosts[host]; });
+      var timelineSectionTableCols = timelineSectionTableBody.selectAll('tr').data(timelineHosts);
+      var timelineSectionTableCol0 = timelineSectionTableBody.selectAll('tr').data(timelineHosts.slice(0,1));
+      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time) { return '<div class="legend-icon" title="' + time.name + '" style="background-color:' + time.color +' "></div><div class="metric-name">' + time.name + '</div>'; });
+      timelineSectionTableCols.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
     var metricsSection = detailsContent.append('div').classed('details-section', true);
+    var metricsChildSections = metricsSection.selectAll('div').data(Object.keys(data.children));
 
     var metricsTitle = metricsSection.append('header');
     metricsTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-bar-chart');
-    metricsTitle.append('h4').text(window.HUE_I18n.profile.metrics);
+    metricsTitle.append('h5').text(window.HUE_I18n.profile.metrics);
 
-    var metricsContent = metricsSection.append('ul').classed('metrics', true);
+    var metricsContent = metricsSection.append('table').classed('metrics', true);
+    var metricsHosts = Object.keys(data.properties.hosts).sort().map(function (key) { return data.properties.hosts[key]; });
+    var metricsCols = metricsContent.selectAll('tr').data(metricsHosts);
+    var metricsCols0 = metricsContent.selectAll('tr').data(metricsHosts.slice(0,1));
+    metricsCols0.enter().append('tr').selectAll('td').data(function (host) { return Object.keys(host).sort(); }).enter().append('td').text(function (x) { return x; }).attr('title', function (x) { return x; });
+    metricsCols.enter().append('tr').selectAll('td').data(function (x) { return Object.keys(x).sort().map(function (key) {return x[key]; }) }).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.value, datum.unit); });
+    metricsContent.append('thead').selectAll('tr').data(['\u00A0'].concat(Object.keys(data.properties.hosts).sort())).enter().append('tr').append('td').text(function (x, i) { return i > 0 ? x === 'averaged' ? x : 'Host ' + (i - 1) : x; }).attr('title', function (x) {return x;});
 
-    var metrics = metricsContent.selectAll('li')
-    .data(Object.keys(data).sort().map(function (key) { return data[key]; }));
-    metrics.exit().remove();
-    metrics.enter().append('li');
-    metrics.html(function (datum) { return '<div class="metric-name">' + datum.name + '</div> <div class="metric-value">' + ko.bindingHandlers.numberFormat.human(datum.value, datum.unit) + '</div>'; });
+    var metricsChildSectionsContent = metricsChildSections.enter().append('div');
+    metricsChildSectionsContent.append('header').append('h5').text(function (key) { return key; });
+    var metricsChildSectionsContentTable = metricsChildSectionsContent.append('table').classed('metrics', true);
+    var fChildrenHosts = function (key) { return Object.keys(data.children[key].hosts).sort().map(function (host) { return data.children[key].hosts[host]; }); };
+    var metricsChildSectionsContentCols = metricsChildSectionsContentTable.selectAll('tr').data(function (key) { return fChildrenHosts(key); });
+    var metricsChildSectionsContentCols0 = metricsChildSectionsContentTable.selectAll('tr').data(function (key) { return fChildrenHosts(key).slice(0,1); });
+    metricsChildSectionsContentCols0.enter().append('tr').selectAll('td').data(function (host) { return Object.keys(host).sort(); }).enter().append('td').text(function (x) { return x; }).attr('title', function (x) { return x; });
+    metricsChildSectionsContentCols.enter().append('tr').selectAll('td').data(function (x) { return Object.keys(x).sort().map(function (key) {return x[key]; }) }).enter().append('td').text(function(datum) { return ko.bindingHandlers.numberFormat.human(datum.value, datum.unit);});
+    metricsChildSectionsContentTable.append('thead').selectAll('tr').data(function (key) { return ['\u00A0'].concat(Object.keys(data.children[key].hosts).sort()); }).enter().append('tr').append('td').text(function (x, i) { return i > 0 ? x === 'averaged' ? x : 'Host ' + (i - 1) : x; }).attr('title', function (x) {return x;});
   }
 
   function hideDetail(id) {
     d3.select('.query-plan').classed('open', false);
+  }
+
+  function average(states, metric) {
+    var sum = 0;
+    for (var i = 0; i < states.length; i++) {
+      sum += states[i][metric];
+    }
+    return sum / states.length;
   }
 
   function renderGraph() {
@@ -313,14 +326,16 @@ function impalaDagre(id) {
       // Pick a new colour for each plan fragment
       colour_idx = (colour_idx + 1) % colours.length;
     });
-
+    var avg = average(states, 'max_time_val');
     // Keep a map of names to states for use when processing edges.
     states.forEach(function(state) {
       // Build the label for the node from the name and the detail
       var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + parseInt(state.name.split(':')[0], 10) + ");\">"; // TODO: Remove Hue dependency
       html += getIcon(state.icon)
       html += "<span class='name'>" + state.label + "</span><br/>";
-      html += "<span class='metric'>" + state.max_time + "</span>";
+      console.log(state.max_time_val + '-' + avg);
+      var aboveAverageClass = state.max_time_val > avg ? 'above-average' : '';
+      html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
       html += "<span class='id'>" + state.name + "</span>";
       html += renderTimeline(state.name);
@@ -341,11 +356,18 @@ function impalaDagre(id) {
       states_by_name[state.name] = state;
     });
 
+    var avgEdges = average(edges, 'val');
+
     edges.forEach(function(edge) {
       // Impala marks 'broadcast' as a property of the receiver, not the sender. We use
       // '(BCAST)' to denote that a node is duplicating its output to all receivers.
       if (states_by_name[edge.end].is_broadcast) {
-        edge.style.label += " * " + states_by_name[edge.end].num_instances;
+        if (states_by_name[edge.end].num_instances > 1) {
+          edge.style.label += " * " + states_by_name[edge.end].num_instances;
+        }
+      }
+      if (edge.val > avgEdges) {
+        edge.style.labelStyle = "font-weight: bold";
       }
       g.setEdge(edge.start, edge.end, edge.style);
     });

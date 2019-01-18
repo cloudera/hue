@@ -7510,9 +7510,9 @@
       },
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
-        this._impalaDagre.update(props.value);
         this._impalaDagre.metrics(props.metrics);
         this._impalaDagre.height(props.height);
+        this._impalaDagre.update(props.value);
       }
     };
   })();
@@ -7579,10 +7579,10 @@
           return value + " ns";
         } else if (value < Math.pow(10, 6)) {
           value = (value * 1.0) / Math.pow(10, 3);
-          return sprintf("%.2f us", value);
+          return sprintf("%.1f us", value);
         } else if (value < Math.pow(10, 9)) {
           value = (value * 1.0) / Math.pow(10, 6);
-          return sprintf("%.2f ms", value);
+          return sprintf("%.1f ms", value);
         } else {
           // get the ms value
           var SECOND = 1;
@@ -7602,7 +7602,7 @@
           }
 
           if (value > SECOND) {
-            buffer += sprintf("%.2f s", value * 1.0 / SECOND);
+            buffer += sprintf("%.1f s", value * 1.0 / SECOND);
           }
           return buffer;
         }
