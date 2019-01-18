@@ -343,13 +343,6 @@ function impalaDagre(id) {
 
       var style = state.style;
 
-      // If colouring nodes by total time taken, choose a shade in the cols_by_time list
-      // with idx proportional to the max time of the node divided by the max time over all
-      // nodes.
-      /*if (document.getElementById("colour_scheme").checked) {
-        var idx = (cols_by_time.length - 1) * (state.max_time_val / (1.0 * max_node_time));
-        style = "fill: " + cols_by_time[Math.floor(idx)];
-      }*/
       g.setNode(state.name, { "label": html,
                               "labelType": "html",
                               "style": style });
