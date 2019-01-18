@@ -90,7 +90,7 @@ LANGUAGES = [
   ('ko', _('Korean')),
   ('pt', _('Portuguese')),
   ('pt_BR', _('Brazilian Portuguese')),
-  ('zh_CN', _('Simplified Chinese')),
+  ('zh-CN', _('Simplified Chinese')),
 ]
 
 SITE_ID = 1
