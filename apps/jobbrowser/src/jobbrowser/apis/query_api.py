@@ -178,7 +178,7 @@ class QueryApi(Api):
     query = self.api.get_query(query_id=appid)
     query['summary'] = query.get('summary').strip() if query.get('summary') else ''
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
-    if query['plan_json']:
+    if query.get('plan_json'):
       def get_exchange_icon (o):
         if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
           return { 'svg': 'hi-broadcast' }
