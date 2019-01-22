@@ -52,7 +52,7 @@ var EditorViewModel = (function() {
   var Result = function (snippet, result) {
     var self = this;
 
-    snippet = $.extend(snippet, snippet.chartType == 'lines' && { // Retire line chart
+    $.extend(snippet, snippet.chartType == 'lines' && { // Retire line chart
         chartType: 'bars',
         chartTimelineType: 'line'
     });
@@ -97,7 +97,9 @@ var EditorViewModel = (function() {
         column: 0
       }
     });
-    self.statements_count = ko.observable(typeof result.statements_count != "undefined" && result.statements_count != null ? result.statements_count : 1);
+    // We don't keep track of any previous selection so prevent entering into batch execution mode after load by setting
+    // statements_count to 1. For the case when a selection is not starting at row 0.
+    self.statements_count = ko.observable(1);
     self.previous_statement_hash = ko.observable(typeof result.previous_statement_hash != "undefined" && result.previous_statement_hash != null ? result.previous_statement_hash : null);
     self.cleanedMeta = ko.computed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item) {
@@ -214,6 +216,16 @@ var EditorViewModel = (function() {
     self.clear = function () {
       self.fetchedOnce(false);
       self.hasMore(false);
+      self.statement_range({
+        start: {
+          row: 0,
+          column: 0
+        },
+        end: {
+          row: 0,
+          column: 0
+        }
+      });
       self.meta.removeAll();
       self.data.removeAll();
       self.images.removeAll();
@@ -230,6 +242,33 @@ var EditorViewModel = (function() {
       self.logLines = 0;
       self.rows(null);
     };
+  };
+
+  Result.prototype.cancelBatchExecution = function () {
+    var self = this;
+    self.statements_count(1);
+    self.hasMore(false);
+    self.statement_range({
+      start: {
+        row: 0,
+        column: 0
+      },
+      end: {
+        row: 0,
+        column: 0
+      }
+    });
+    self.handle()['statement_id'] = 0;
+    self.handle()['start'] = {
+      row: 0,
+      column: 0
+    };
+    self.handle()['end'] = {
+      row: 0,
+      column: 0
+    };
+    self.handle()['has_more_statements'] = false;
+    self.handle()['previous_statement_hash'] = '';
   };
 
   var getDefaultSnippetProperties = function (snippetType) {
@@ -958,7 +997,12 @@ var EditorViewModel = (function() {
       if (self.result.handle() && self.result.handle().has_more_statements) {
         window.clearTimeout(executeNextTimeout);
         executeNextTimeout = setTimeout(function () {
-          self.execute(true); // Execute next, need to wait as we disabled fast click
+          // Prevent execution when statement selection has changed
+          if (self.lastExecutedStatements === self.statement()) {
+            self.execute(true); // Execute next, need to wait as we disabled fast click
+          } else {
+            self.result.cancelBatchExecution();
+          }
         }, 1000);
       }
       if (self.lastExecutedStatement() && /CREATE|DROP/i.test(self.lastExecutedStatement().firstToken)) {
@@ -1465,11 +1509,34 @@ var EditorViewModel = (function() {
       self.showLongOperationWarning(false);
     }
 
+    self.lastExecutedStatements = undefined;
+
     self.execute = function (automaticallyTriggered) {
-      var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (!automaticallyTriggered && (self.status() === 'running' || self.status() === 'loading')) { // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
-        self.cancel();
-      } else if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
+      var now = (new Date()).getTime();
+      if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
+        return; // Prevent fast clicks
+      }
+
+      if (!automaticallyTriggered) {
+        // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
+        if (self.status() === 'running' || self.status() === 'loading') {
+          self.cancel(); // TODO: Wait for cancel to finish
+        } else {
+          self.result.clear()
+        }
+      }
+
+      if (self.editorMode() && self.result.statements_count() > 1 && self.lastExecutedStatements !== self.statement()) {
+        self.lastExecutedStatements = self.statement();
+        if (automaticallyTriggered) {
+          if (self.executingBlockingOperation) {
+            self.executingBlockingOperation.abort();
+            self.executingBlockingOperation = null;
+          }
+          self.result.cancelBatchExecution();
+        } else {
+          self.reexecute();
+        }
         return;
       }
 
@@ -1484,6 +1551,8 @@ var EditorViewModel = (function() {
       if (self.isSqlDialect()) {
         huePubSub.publish('editor.refresh.statement.locations', self);
       }
+
+      self.lastExecutedStatements = self.statement();
 
       if (self.ace()) {
         huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: self });
@@ -1628,18 +1697,7 @@ var EditorViewModel = (function() {
     };
 
     self.reexecute = function () {
-      self.result.handle()['statement_id'] = 0;
-      self.result.handle()['start'] = {
-        row: 0,
-        column: 0
-      };
-      self.result.handle()['end'] = {
-        row: 0,
-        column: 0
-      };
-      self.result.handle()['has_more_statements'] = false;
-      self.result.handle()['previous_statement_hash'] = '';
-
+      self.result.cancelBatchExecution();
       self.execute();
     };
 
