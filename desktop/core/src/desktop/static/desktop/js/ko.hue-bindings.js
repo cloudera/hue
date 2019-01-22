@@ -5936,6 +5936,12 @@
         editor.commands.off('afterExec', afterExecListener);
       });
       editor.$blockScrolling = Infinity;
+
+      var range = options.highlightedRange ? options.highlightedRange() : null;
+      if (range && snippet.lastAceSelectionRowOffset()) {
+        var offset = snippet.lastAceSelectionRowOffset();
+        editor.selection.moveTo(range.start.row + offset, range.start.column);
+      }
       snippet.ace(editor);
     },
 
@@ -5948,6 +5954,13 @@
           editor.setReadOnly(options.readOnly);
         }
         var range = options.highlightedRange ? options.highlightedRange() : null;
+        if (editor.session.$backMarkers) {
+          for (var marker in editor.session.$backMarkers) {
+            if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+              editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+            }
+          }
+        }
         editor.session.setMode(snippet.getAceMode());
         if (range && JSON.stringify(range.start) !== JSON.stringify(range.end)) {
           var conflictingWithErrorMarkers = false;
@@ -5958,9 +5971,6 @@
                 if (range.start.row <= errorRange.end.row && range.end.row >= errorRange.start.row) {
                   conflictingWithErrorMarkers = true;
                 }
-              }
-              if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
-                editor.session.removeMarker(editor.session.$backMarkers[marker].id);
               }
             }
           }

@@ -1823,7 +1823,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <!-- /ko -->
-    <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }" title="${ _('Restart from the first statement') }">
+    <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.statements_count() > 1, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }" title="${ _('Restart from the first statement') }">
       <i class="fa fa-fw fa-repeat snippet-side-single"></i>
     </a>
     <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
