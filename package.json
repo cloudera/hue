@@ -24,7 +24,7 @@
     "knockout.mapping": "2.4.3",
     "less": "3.9.0",
     "minimist": "^1.2.0",
-    "page": "1.11.3"
+    "page": "1.8.6"
   },
   "devDependencies": {
     "@babel/core": "7.2.2",
