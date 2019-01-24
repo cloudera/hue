@@ -1204,10 +1204,6 @@ var autocompleter = new Autocompleter({
 
 var totalStorageUserPrefix = apiHelper.getTotalStorageUserPrefix(snippetType);
 
-var escapeOutput = function (str) {
-  return $('<span>').text(str).html().trim();
-};
-
 var truncateOutput = function (obj) {
   //default to 20 characters (column output displays first 21 chars so we need to consider the length of both column name and type
   var chars = obj.chars || 20,
@@ -1221,7 +1217,7 @@ var truncateOutput = function (obj) {
     type = type.slice(0, Math.abs(type.length - trim));
     suffix = '&hellip;';
   }
-  return escapeOutput(type) + suffix;
+  return hueUtils.escapeOutput(type) + suffix;
 };
 
 var reinitTimeout = -1;
@@ -2480,7 +2476,7 @@ function updateSidebarTooltips(selector) {
     $(this).tooltip({
       placement: "right",
       title: $(this).val()
-    }).attr('data-original-title', escapeOutput($(this).val())).tooltip('fixTitle');
+    }).attr('data-original-title', hueUtils.escapeOutput($(this).val())).tooltip('fixTitle');
   });
 }
 

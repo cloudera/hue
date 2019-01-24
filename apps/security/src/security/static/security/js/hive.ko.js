@@ -1096,7 +1096,7 @@ var HiveViewModel = (function () {
         'timestamp': privilege.timestamp,
         'roleName': privilege.roleName,
         'grantOption': privilege.grantOption,
-        'id': UUID()
+        'id': hueUtils.UUID()
       });
       return _privilege;
     }

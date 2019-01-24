@@ -1109,7 +1109,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
              <th class="grid-th" data-bind="text: key"></th>
              <td width="100%">
                <!-- ko if: typeof value() == 'string' && value().match(/^https?:\/\//i) -->
-               <a data-bind="attr: { href: escapeOutput(value()) }" target="_blank">
+               <a data-bind="attr: { href: hueUtils.escapeOutput(value()) }" target="_blank">
                  <span data-bind="text: value, visible: !$parent.showEdit()"></span>
                </a>
                <!-- /ko -->
@@ -4568,7 +4568,7 @@ $(document).ready(function () {
     else {
       tempDraggableGridsterWidget = null;
       var widgetClone = ko.mapping.toJS(options.widget);
-      widgetClone.id = UUID();
+      widgetClone.id = hueUtils.UUID();
       tempDraggable = new Widget(widgetClone);
     }
     addPreviewHolder();
@@ -4623,7 +4623,7 @@ $(document).ready(function () {
   huePubSub.subscribe('gridster.empty.add', function (options) {
     var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
     var widgetClone = ko.mapping.toJS(options.widget);
-    widgetClone.id = UUID();
+    widgetClone.id = hueUtils.UUID();
     selectedWidget = new Widget(widgetClone);
     fakeRow.addWidget(selectedWidget);
     selectedGridster = options.target;
@@ -5344,7 +5344,7 @@ $(document).ready(function () {
         }
         var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
         var widgetClone = ko.mapping.toJS(selectedWidget);
-        widgetClone.id = UUID();
+        widgetClone.id = hueUtils.UUID();
         selectedWidget = new Widget(widgetClone);
         fakeRow.addWidget(selectedWidget);
         addFacetDemiModalFieldPreview({

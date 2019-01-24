@@ -22,11 +22,9 @@ module.exports = {
     extensions: ['.json', '.jsx', '.js'],
     modules: [
       'node_modules',
-      'js',
-      'desktop/core/src/desktop/static/desktop/js/cui'
+      'js'
     ],
     alias: {
-      // any bootstrap modules should really resolve to node_modules/bootstrap/js
       bootstrap: 'bootstrap/js',
       'cloudera-ui': 'cui',
       _: 'lodash',
@@ -36,7 +34,7 @@ module.exports = {
     }
   },
   entry: {
-    hue: ['./desktop/core/src/desktop/static/desktop/js/hue.js']
+    hue: ['./desktop/core/src/desktop/js/hue.js']
   },
   output: {
     path:  __dirname + '/desktop/core/src/desktop/static/desktop/js',
@@ -51,12 +49,8 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015']
-        }
+        loader: 'babel-loader'
       },
-
       // expose lodash and jquery for knockout templates to access
       { test: /lodash$/, loader: 'expose-loader?_' },
       { test: /jquery/, loader: 'expose-loader?$!expose-loader?jQuery' },

@@ -20,7 +20,7 @@ var Bundle = function (vm, bundle) {
   var self = this;
 
   self.id = ko.observable(typeof bundle.id != "undefined" && bundle.id != null ? bundle.id : null);
-  self.uuid = ko.observable(typeof bundle.uuid != "undefined" && bundle.uuid != null ? bundle.uuid : UUID());
+  self.uuid = ko.observable(typeof bundle.uuid != "undefined" && bundle.uuid != null ? bundle.uuid : hueUtils.UUID());
   self.name = ko.observable(typeof bundle.name != "undefined" && bundle.name != null ? bundle.name : "");
 
   self.coordinators = ko.mapping.fromJS(typeof bundle.coordinators != "undefined" && bundle.coordinators != null ? bundle.coordinators : []);

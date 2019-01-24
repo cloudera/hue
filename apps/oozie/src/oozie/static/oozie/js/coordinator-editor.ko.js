@@ -26,7 +26,7 @@ var CoordinatorEditorViewModel = (function () {
     var self = this;
 
     self.id = ko.observable(typeof coordinator.id != "undefined" && coordinator.id != null ? coordinator.id : null);
-    self.uuid = ko.observable(typeof coordinator.uuid != "undefined" && coordinator.uuid != null ? coordinator.uuid : UUID());
+    self.uuid = ko.observable(typeof coordinator.uuid != "undefined" && coordinator.uuid != null ? coordinator.uuid : hueUtils.UUID());
     self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "").extend({ trackChange: true });
     self.isManaged = ko.observable(typeof coordinator.isManaged != "undefined" && coordinator.isManaged != null ? coordinator.isManaged : false);
 
@@ -147,7 +147,7 @@ var CoordinatorEditorViewModel = (function () {
 
         'dataset_type': 'parameter',
 
-        'uuid': UUID(), // Dataset
+        'uuid': hueUtils.UUID(), // Dataset
         'dataset_variable': '', // Aka property or URI
         'show_advanced': false,
         'use_done_flag': false,

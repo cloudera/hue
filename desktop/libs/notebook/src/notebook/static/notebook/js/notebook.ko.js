@@ -56,7 +56,7 @@ var EditorViewModel = (function() {
         chartType: 'bars',
         chartTimelineType: 'line'
     });
-    self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
+    self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : hueUtils.UUID());
     self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
     self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true)
       .extend("throttle", 100);
@@ -351,7 +351,7 @@ var EditorViewModel = (function() {
   var Snippet = function (vm, notebook, snippet) {
     var self = this;
 
-    self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
+    self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : hueUtils.UUID());
     self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
     self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
     self.type.subscribe(function(newVal) {
@@ -2353,7 +2353,7 @@ var EditorViewModel = (function() {
     var self = this;
 
     self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : null);
-    self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
+    self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : hueUtils.UUID());
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
@@ -2907,7 +2907,7 @@ var EditorViewModel = (function() {
         self.history.removeAll();
         if (self.isHistory()) {
           self.id(null);
-          self.uuid(UUID());
+          self.uuid(hueUtils.UUID());
           if (vm.isHue4()) {
             vm.changeURL(vm.URLS.hue4 + '?type=' + vm.editorType());
           }
@@ -3592,7 +3592,7 @@ var EditorViewModel = (function() {
 
     self.saveAsNotebook = function () {
       self.selectedNotebook().id(null);
-      self.selectedNotebook().uuid(UUID());
+      self.selectedNotebook().uuid(hueUtils.UUID());
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.selectedNotebook().save(function () {
         huePubSub.publish('assist.document.refresh');
