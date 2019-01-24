@@ -1031,7 +1031,7 @@ $(document).ready(function () {
     var _url = $(this).data('clone-url');
     $.post(_url, function (data) {
       window.location = data.url;
-    }).error(function(){
+    }).fail(function(){
       $(document).trigger("error", "${ _('There was a problem copying this workflow.') }");
     });
   });
@@ -1064,7 +1064,7 @@ $(document).ready(function () {
         $('#submit-wf-modal').html(response);
         $('#submit-wf-modal').modal('show');
       }
-    ).error(function(){
+    ).fail(function(){
       $(document).trigger("error", "${ _('There was a problem submitting this workflow.') }");
     });
   }

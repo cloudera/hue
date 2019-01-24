@@ -591,7 +591,7 @@
           });
         }, 0);
       }
-    }).error(function (e) {
+    }).fail(function (e) {
       if (!_parent.options.suppressErrors) {
         $(document).trigger("info", _parent.options.labels.FILE_NOT_FOUND);
         _parent.options.onError();
