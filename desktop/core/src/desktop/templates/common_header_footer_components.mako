@@ -511,7 +511,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       resetPrimaryButtonsStatus();
     });
 
-    $(window).unload(function () {
+    $(window).on('beforeunload', function () {
       window.clearInterval(pendingRequestsInterval);
       window.clearTimeout(resetTimeout);
     });

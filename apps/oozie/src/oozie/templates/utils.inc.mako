@@ -364,7 +364,7 @@
           $.getJSON(checkPath, function (data) {
             pathAddition = "${ workflow.deployment_dir }/";
             callFileChooser();
-          }).error(function () {
+          }).fail(function () {
             callFileChooser();
           });
         }

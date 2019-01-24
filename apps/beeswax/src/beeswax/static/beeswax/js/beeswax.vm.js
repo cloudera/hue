@@ -380,7 +380,7 @@ function BeeswaxViewModel(server, apiHelper) {
   var error_fn = function(jqXHR, status, errorThrown) {
     self.design.isRunning(false);
     try {
-      $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
+      $(document).trigger('server.error', JSON.parse(jqXHR.responseText));
     } catch(e) {
       $(document).trigger('server.unmanageable_error', jqXHR.responseText);
     }
@@ -657,7 +657,7 @@ function BeeswaxViewModel(server, apiHelper) {
       error: function(jqXHR, status, errorThrown) {
         self.design.isRunning(false);
         try {
-          var data = $.parseJSON(jqXHR.responseText);
+          var data = JSON.parse(jqXHR.responseText);
           self.design.watch.errors.push(data.error);
         } catch(e) {
           $(document).trigger('server.unmanageable_error', jqXHR.responseText);

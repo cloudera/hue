@@ -1376,7 +1376,7 @@ var ApiHelper = (function () {
         cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       },
       timeout: options.timeout
-    }).success(function (data) {
+    }).done(function (data) {
       data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
       data.hueTimestamp = Date.now();
 

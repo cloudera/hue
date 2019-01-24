@@ -789,9 +789,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         var loadScript = function (scriptUrl) {
           var deferred = $.Deferred();
-          $.get(scriptUrl).done(function (contents) {
+          $.ajax({
+            url: scriptUrl,
+            converters: {
+              'text script': function (text) {
+                return text;
+              }
+            }
+          }).done(function (contents) {
             loadedJs.push(scriptUrl);
-            deferred.resolve(contents);
+            deferred.resolve({ url: scriptUrl, contents: contents });
           }).fail(function () {
             deferred.resolve('');
           });
@@ -857,7 +864,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             })
           }
 
-          $rawHtml.unwrap('<span>');
+          $rawHtml.unwrap('span');
 
           var scriptPromises = loadScripts(scriptsToLoad);
 
@@ -865,9 +872,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (scriptPromises.length) {
               // Evaluate the scripts in the order they were defined in the page
               var nextScriptPromise = scriptPromises.shift();
-              nextScriptPromise.done(function (contents) {
-                if (contents) {
-                  new Function(contents)();
+              nextScriptPromise.done(function (scriptDetails) {
+                if (scriptDetails.contents) {
+                  $.globalEval(scriptDetails.contents)
                 }
                 evalScriptSync();
               });

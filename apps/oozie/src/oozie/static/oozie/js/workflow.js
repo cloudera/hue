@@ -530,7 +530,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
                 self[key].removeAll();
                 var arr;
                 try {
-                  arr = $.parseJSON(value);
+                  arr = JSON.parse(value);
                 }
                 catch (error){
                   arr = value;
@@ -554,7 +554,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               case 'data':
                 var data = {};
                 try {
-                  data = $.parseJSON(value);
+                  data = JSON.parse(value);
                 } catch (error){
                   data = value;
                 }
