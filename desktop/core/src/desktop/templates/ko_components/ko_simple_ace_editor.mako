@@ -793,7 +793,7 @@ from desktop.views import _ko
         var aceOptions = params.aceOptions || {};
 
         if (!$element.attr('id')) {
-          $element.attr('id', UUID());
+          $element.attr('id', hueUtils.UUID());
         }
 
         var editor = ace.edit($element.find('.ace-editor')[0]);

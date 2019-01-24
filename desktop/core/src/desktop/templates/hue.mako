@@ -459,7 +459,7 @@ ${ render_bundle('hue') | n,unicode }
 % endif
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
-<script src="${ static('desktop/js/hue.utils.js') }"></script>
+<script src="${ static('desktop/js/polyfills.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 <script src="${ static('desktop/ext/js/tether.js') }"></script>
 <script src="${ static('desktop/ext/js/shepherd.min.js') }"></script>

@@ -516,7 +516,7 @@ from desktop.views import _ko
           'timestamp': privilege.timestamp,
           'roleName': privilege.roleName,
           'grantOption': privilege.grantOption,
-          'id': UUID()
+          'id': hueUtils.UUID()
         });
         return _privilege;
       }

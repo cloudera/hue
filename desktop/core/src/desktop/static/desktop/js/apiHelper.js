@@ -1669,7 +1669,7 @@ var ApiHelper = (function () {
    */
   var QueryResult = function (sourceType, compute, response) {
     var self = this;
-    self.id = UUID();
+    self.id = hueUtils.UUID();
     self.type = response.result.type || sourceType;
     self.compute = compute;
     self.status = response.status || 'running';

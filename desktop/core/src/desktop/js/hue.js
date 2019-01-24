@@ -21,9 +21,20 @@ import _ from 'lodash';
 import ko from 'knockout';
 import komapping from 'komapping';
 import page from 'page';
+import hueUtils from 'utils/hueUtils';
+import hueAnalytics from 'utils/hueAnalytics';
+import hueDebug from 'utils/hueDebug';
+import huePubSub from 'utils/huePubSub';
+import hueDrop from 'utils/hueDrop';
 
+// TODO: Migrate away
 window._ = _;
 window.$ = $;
 window.ko = ko;
 window.ko.mapping = komapping;
 window.page = page;
+window.hueUtils = hueUtils;
+window.hueAnalytics = hueAnalytics;
+window.hueDebug = hueDebug;
+window.huePubSub = huePubSub;
+window.hueDrop = hueDrop;
