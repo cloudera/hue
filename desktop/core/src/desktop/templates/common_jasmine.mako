@@ -25,7 +25,6 @@
 
   <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
-  <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/ace/ace.js') }"></script>
   <script>

@@ -159,7 +159,6 @@ if USE_NEW_EDITOR.get():
     }
   </script>
 
-  <script src="${ static('desktop/js/hue.utils.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.migration.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
@@ -173,8 +172,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
   <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
   <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>

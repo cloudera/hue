@@ -46,7 +46,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 ${ assist.assistJSModels() }
 

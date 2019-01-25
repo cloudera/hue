@@ -34,7 +34,6 @@ ${layout.menubar(section='configurations')}
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 <script id="app-list" type="text/html">
   <div class="card card-small">

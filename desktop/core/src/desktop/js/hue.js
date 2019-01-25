@@ -18,18 +18,24 @@ var locale = 'en-US';
 
 import $ from 'jquery';
 import _ from 'lodash';
+import filesize from 'filesize';
 import ko from 'knockout';
-import komapping from 'komapping';
+import komapping from 'knockout.mapping';
 import page from 'page';
 import hueUtils from 'utils/hueUtils';
 import hueAnalytics from 'utils/hueAnalytics';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
 import hueDrop from 'utils/hueDrop';
+import localforage from 'localforage';
+import 'knockout-switch-case';
+import 'ext/ko.editable.custom';
 
 // TODO: Migrate away
-window._ = _;
 window.$ = $;
+window._ = _;
+window.filesize = filesize;
+window.jQuery = $;
 window.ko = ko;
 window.ko.mapping = komapping;
 window.page = page;
@@ -38,3 +44,4 @@ window.hueAnalytics = hueAnalytics;
 window.hueDebug = hueDebug;
 window.huePubSub = huePubSub;
 window.hueDrop = hueDrop;
+window.localforage = localforage;

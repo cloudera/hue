@@ -452,34 +452,25 @@ ${ hueIcons.symbols() }
 
 ${ commonshare() | n,unicode }
 
-
 ${ render_bundle('hue') | n,unicode }
-% if IS_EMBEDDED.get():
-<script src="${ static('desktop/ext/js/page.js') }"></script>
-% endif
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/polyfills.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 <script src="${ static('desktop/ext/js/tether.js') }"></script>
 <script src="${ static('desktop/ext/js/shepherd.min.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
-<script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
 <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
-
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
@@ -492,21 +483,18 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-<script src="${ static('desktop/js/hue.colors.js') }"></script>
-<script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
-<script src="${ static('desktop/js/dataCatalog.js') }"></script>
-<script src="${ static('desktop/js/apiHelper.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
-<script src="${ static('desktop/js/sqlUtils.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
+
+<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
@@ -514,11 +502,17 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script>
-  ace.config.set("basePath", "/static/desktop/js/ace");
-</script>
+<script>ace.config.set("basePath", "/static/desktop/js/ace");</script>
 
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
+
+<script src="${ static('desktop/js/hue.colors.js') }"></script>
+<script src="${ static('desktop/js/dataCatalog.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/sqlUtils.js') }"></script>
+<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
@@ -526,6 +520,7 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
@@ -534,7 +529,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
 <script>
   var shareViewModel = initSharing("#documentShareModal");
 </script>
