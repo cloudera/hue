@@ -19,22 +19,26 @@
   },
   "dependencies": {
     "bootstrap-2.3.2": "1.0.0",
+    "filesize": "4.0.0",
     "jquery": "3.3.1",
     "knockout": "3.4.2",
     "knockout.mapping": "2.4.3",
+    "knockout-switch-case": "2.1.0",
     "less": "3.9.0",
+    "localforage": "1.7.3",
+    "lodash": "4.17.11",
     "minimist": "^1.2.0",
     "page": "1.8.6"
   },
   "devDependencies": {
     "@babel/core": "7.2.2",
-    "architect-build": "0.1.1", // For building Ace "make ace"
+    "architect-build": "0.1.1",
+    "@babel/preset-env": "7.3.1",
     "babel-cli": "6.26.0",
     "babel-jscs": "3.0.0-beta1",
     "babel-loader": "8.0.5",
-    "@babel/preset-env": "7.3.1",
     "expose-loader": "0.7.5",
-    "dryice": "0.4.11", // For building Ace "make ace"
+    "dryice": "0.4.11",
     "grunt": "1.0.3",
     "grunt-contrib-less": "2.0.0",
     "grunt-contrib-uglify": "4.0.0",

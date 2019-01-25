@@ -27,7 +27,6 @@ ${ commonheader_m(_('Assist'), 'assist', user, request) | n,unicode }
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 ${ assist.assistJSModels() }
 

@@ -133,7 +133,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 
-  <script src="${ static('desktop/js/hue.utils.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.migration.js') }"></script>
   <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
@@ -164,13 +163,10 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
   <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
-  <script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
   <script src="${ static('desktop/js/popover-extra-placements.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
   <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
   <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
