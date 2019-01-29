@@ -109,7 +109,7 @@ function impalaDagre(id) {
                       "#991F00", "#B22400", "#CC2900", "#E62E00", "#FF3300", "#FF4719"];
 
   // Recursively build a list of edges and states that comprise the plan graph
-  function build(node, parent, edges, states, colour_idx, max_node_time, index) {
+  function build(node, parent, edges, states, colour_idx, max_node_time, index, count) {
     if (node["output_card"] === null || node["output_card"] === undefined) {
       return;
     }
@@ -133,23 +133,25 @@ function impalaDagre(id) {
     if (parent) {
       edgeCount = parseInt(node["output_card"], 10);
       var label_val = "" + ko.bindingHandlers.simplesize.humanSize(edgeCount);
-      edges.push({ start: node["label"], end: parent, style: { label: label_val, labelpos: index === 0 ? 'l' : 'r' }, val: edgeCount });
+      edges.push({ start: node["label"], end: parent, style: { label: label_val, labelpos: index === 0 && count > 1 ? 'l' : 'r' }, content: { value: edgeCount, unit: 0 } });
     }
     // Add an inter-fragment edge. We use a red dashed line to show that rows are crossing
     // the fragment boundary.
     if (node["data_stream_target"]) {
       edgeCount = parseInt(node["output_card"], 10);
+      var sendTime = getMaxTotalNetworkSendTime(node["label"]);
+      var text = sendTime && ko.bindingHandlers.numberFormat.human(sendTime.value, sendTime.unit) || ko.bindingHandlers.simplesize.humanSize(edgeCount);
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
-                   "val": edgeCount,
-                   "style": { label: ko.bindingHandlers.simplesize.humanSize(edgeCount),
+                   "content": sendTime ? sendTime : { value: edgeCount, unit: 0 },
+                   "style": { label: text,
                               style: "stroke-dasharray: 5, 5;",
-                              labelpos: 'l' }});
+                              labelpos: index === 0 && count > 1 ? 'l' : 'r' }});
     }
     max_node_time = Math.max(node["max_time_val"], max_node_time)
     for (var i = 0; i < node["children"].length; ++i) {
       max_node_time = build(
-        node["children"][i], node["label"], edges, states, colour_idx, max_node_time, i);
+        node["children"][i], node["label"], edges, states, colour_idx, max_node_time, i, node["children"].length);
     }
     return max_node_time;
   }
@@ -170,8 +172,8 @@ function impalaDagre(id) {
     $("g.node").attr('class', 'node'); // addClass doesn't work in svg on our version of jQuery
   }
 
-  function getId(name) {
-    return parseInt(name.split(':')[0], 10);
+  function getId(key) {
+    return parseInt(key.split(':')[0], 10);
   }
 
   function getKey(node) {
@@ -213,6 +215,21 @@ function impalaDagre(id) {
       html += "<div class='fa fa-fw valign-middle " + icon.font + "'></div>";
     }
     return html;
+  }
+
+  function getMaxTotalNetworkSendTime(node) {
+    var id = getId(node);
+    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
+      return;
+    }
+    var fragment = _impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment];
+    return Object.keys(fragment.properties.hosts).reduce(function (previous, host) {
+      if (fragment.properties.hosts[host].TotalNetworkSendTime.value > previous.value) {
+        return fragment.properties.hosts[host].TotalNetworkSendTime;
+      } else {
+        return previous;
+      }
+    }, { value: -1, unit: 5 });
   }
 
   function getTimelineData(key) {
@@ -313,12 +330,24 @@ function impalaDagre(id) {
     d3.select('.query-plan').classed('open', false);
   }
 
+  function getProperty(object, path) {
+    var keys = path.split('.');
+    for (var i = 0; i < keys.length; i++) {
+      object = object[keys[i]];
+    }
+    return object;
+  }
+
   function average(states, metric) {
     var sum = 0;
     for (var i = 0; i < states.length; i++) {
-      sum += states[i][metric];
+      sum += getProperty(states[i], metric);
     }
-    return sum / states.length;
+    return states.length > 0 ? sum / states.length : 0;
+  }
+
+  function averageCombined(avg1, avg2, count1, count2) {
+    return (avg1 * count1 + avg2 * count2) / (count1 + count2);
   }
 
   function renderGraph() {
@@ -331,18 +360,27 @@ function impalaDagre(id) {
     var max_node_time = 0;
     plan["plan_nodes"].forEach(function(parent) {
       max_node_time = Math.max(
-        build(parent, null, edges, states, colour_idx, max_node_time));
+        build(parent, null, edges, states, colour_idx, max_node_time, 1, 1));
       // Pick a new colour for each plan fragment
       colour_idx = (colour_idx + 1) % colours.length;
     });
-    var avg = average(states, 'max_time_val');
+    var avgStates = average(states, 'max_time_val');
+    var edgesIO = edges.filter(function (edge) {
+      return edge.content.unit === 5;
+    });
+    var edgesNonIO = edges.filter(function (edge) {
+      return edge.content.unit === 0;
+    });
+    var avgEdgesIO = average(edgesIO, 'content.value');
+    var avgEdgesNonIO = average(edgesNonIO, 'content.value');
+    var avgCombined = averageCombined(avgStates, avgEdgesIO, states.length, edgesIO.length);
+    var avg = { '0': avgEdgesNonIO, '5': avgCombined};
     // Keep a map of names to states for use when processing edges.
     states.forEach(function(state) {
       // Build the label for the node from the name and the detail
       var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + getId(state.name) + ");\">"; // TODO: Remove Hue dependency
       html += getIcon(state.icon);
       html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
-      console.log(state.max_time_val + '-' + avg);
       var aboveAverageClass = state.max_time_val > avg ? 'above-average' : '';
       html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
@@ -360,18 +398,15 @@ function impalaDagre(id) {
                               "style": style });
       states_by_name[state.name] = state;
     });
-
-    var avgEdges = average(edges, 'val');
-
     edges.forEach(function(edge) {
       // Impala marks 'broadcast' as a property of the receiver, not the sender. We use
       // '(BCAST)' to denote that a node is duplicating its output to all receivers.
-      if (states_by_name[edge.end].is_broadcast) {
+      /*if (states_by_name[edge.end].is_broadcast) {
         if (states_by_name[edge.end].num_instances > 1) {
           edge.style.label += " * " + states_by_name[edge.end].num_instances;
         }
-      }
-      if (edge.val > avgEdges) {
+      }*/
+      if (edge.content.value > avg[edge.content.unit]) {
         edge.style.labelStyle = "font-weight: bold";
       }
       g.setEdge(edge.start, edge.end, edge.style);
