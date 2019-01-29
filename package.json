@@ -39,8 +39,12 @@
     "architect-build": "0.1.1",
     "@babel/preset-env": "7.3.1",
     "babel-cli": "6.26.0",
+    "babel-eslint": "10.0.1",
     "babel-jscs": "3.0.0-beta1",
     "babel-loader": "8.0.5",
+    "eslint": "5.12.1",
+    "eslint-config-prettier": "4.0.0",
+    "eslint-plugin-prettier": "3.0.1",
     "expose-loader": "0.7.5",
     "dryice": "0.4.11",
     "grunt": "1.0.3",
@@ -48,6 +52,7 @@
     "grunt-contrib-uglify": "4.0.0",
     "grunt-contrib-watch": "1.1.0",
     "load-grunt-tasks": "4.0.0",
+    "prettier": "1.16.1",
     "webpack": "4.29.0",
     "webpack-bundle-tracker": "0.4.2-beta",
     "webpack-cli": "^3.2.1",
@@ -57,7 +62,10 @@
     "devinstall": "npm cache clean && npm install && npm prune",
     "less": "./node_modules/.bin/grunt less",
     "watch": "./node_modules/.bin/grunt watch",
-    "webpack": "webpack --config webpack.config.js"
+    "webpack": "webpack --config webpack.config.js",
+    "dev": "webpack --watch -d",
+    "lint": "cd desktop/core/src/desktop/static/desktop/js/; eslint assist autocomplete document",
+    "lint-fix": "npm run lint -- --fix"
   },
   "files": []
 }
