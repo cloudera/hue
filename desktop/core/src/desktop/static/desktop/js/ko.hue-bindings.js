@@ -7577,10 +7577,10 @@
         value = value * 1;
         if (value < Math.pow(10, 3)) {
           return value + " ns";
-        } else if (value < Math.pow(10, 6)) {
+        } else if (value - Math.pow(10, 6) < -Math.pow(10, 3) / 2) { // Make sure rounding doesn't cause numbers to have more than 4 significant digits.
           value = (value * 1.0) / Math.pow(10, 3);
           return sprintf("%.1f us", value);
-        } else if (value < Math.pow(10, 9)) {
+        } else if (value - Math.pow(10, 9) < -Math.pow(10, 6) / 2) {
           value = (value * 1.0) / Math.pow(10, 6);
           return sprintf("%.1f ms", value);
         } else {
