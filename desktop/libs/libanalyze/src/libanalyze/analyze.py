@@ -28,6 +28,7 @@ from thrift.transport import TTransport
 from libanalyze import dot
 from libanalyze import gjson as jj
 from libanalyze import models
+from libanalyze.rules import to_double
 
 
 class Node(object):
@@ -193,6 +194,27 @@ class Node(object):
         #frag_node = c
         return m.group(2)
 
+  def augmented_host(self):
+    if self.fragment_instance:
+      c = self.fragment_instance
+    elif self.fragment:
+      if self.fragment.is_averaged():
+        return 'averaged'
+      c = self.fragment.children[0]
+    elif self.is_fragment():
+      if self.is_averaged():
+        return 'averaged'
+      else:
+        c = self.children[0]
+    else:
+      return None
+    m = re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', c.val.name)
+    if m:
+        #frag.instance_id = m.group(1)
+        #frag.host = m.group(2)
+        #frag_node = c
+        return m.group(2)
+
   def info_strings(self):
     return self.val.info_strings
 
@@ -208,6 +230,24 @@ class Node(object):
         for c in self.val.counters:
             ctr[c.name] = c
     return ctr
+
+  def metric_map(self):
+    ctr = {}
+    if self.val.counters:
+        for c in self.val.counters:
+            ctr[c.name] = { 'name': c.name, 'value': to_double(c.value) if c.unit == 6 else c.value, 'unit': c.unit }
+    return ctr
+
+  def event_list(self):
+    event_list = {}
+    if self.val.event_sequences:
+      for s in self.val.event_sequences:
+        sequence_name = s.name
+        event_list[sequence_name] = []
+        for i in range(len(s.labels)):
+          event_name = s.labels[i]
+          event_list[sequence_name].append({'name': event_name, 'value': s.timestamps[i], 'unit': 5})
+    return event_list
 
   def repr(self, indent):
     buffer = indent + self.val.name + "\n"
@@ -251,6 +291,30 @@ def summary(profile):
   host_list = sorted(host_list, key=lambda x: x[1], reverse=True)
   peak_memory = models.TCounter(value=host_list[0][1], unit=3) if host_list else models.TCounter(value=0, unit=3) # The value is not always present
   return [{ 'key': 'PlanningTime', 'value': counter_map['PlanningTime'].value, 'unit': counter_map['PlanningTime'].unit }, {'key': 'RemoteFragmentsStarted', 'value': counter_map['RemoteFragmentsStarted'].value, 'unit': counter_map['RemoteFragmentsStarted'].unit}, {'key': 'TotalTime', 'value': counter_map_execution_profile['TotalTime'].value, 'unit': counter_map_execution_profile['TotalTime'].unit}, {'key': 'PeakMemoryUsage', 'value': peak_memory.value, 'unit': peak_memory.unit}]
+
+def metrics(profile):
+  execution_profile = profile.find_by_name('Execution Profile')
+  if not execution_profile:
+    return {}
+  counter_map = {'max': 0}
+  def get_metric(node, counter_map=counter_map):
+    if not node.is_plan_node():
+      return
+    nid = node.id()
+    if counter_map.get(nid) is None:
+      counter_map[nid] = {}
+    host = node.augmented_host()
+    event_list = node.event_list();
+    if event_list and event_list.get('Node Lifecycle Event Timeline'):
+      last_value = event_list['Node Lifecycle Event Timeline'][len(event_list['Node Lifecycle Event Timeline']) - 1]['value']
+      counter_map['max'] = max(last_value, counter_map['max'])
+    if host:
+      counter_map[nid][host] = {'metrics': node.metric_map(), 'timeline': event_list}
+    else:
+      counter_map[nid] = {'metrics': node.metric_map(), 'timeline': event_list}
+  execution_profile.foreach_lambda(get_metric)
+  counter_map['ImpalaServer'] = profile.find_by_name('ImpalaServer').metric_map()
+  return counter_map
 
 def heatmap_by_host(profile, counter_name):
   rows = models.host_by_metric(profile,

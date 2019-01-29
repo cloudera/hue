@@ -36,7 +36,7 @@ const saveTopics = (topics, outputPath, makoPath) => {
   let saveTopicsInternal = (topics, parent) => {
     topics.forEach(topic => {
       let entry = {
-        title: topic.fragment.title.text(),
+        title: topic.fragment.title.text().replace(/[\n\r]/g, '').trim(),
         ref: topic.ref,
         children: []
       };

@@ -192,7 +192,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return ('default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None) or has_iam_metadata()
+  return ('default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
 
 
 def has_iam_metadata():

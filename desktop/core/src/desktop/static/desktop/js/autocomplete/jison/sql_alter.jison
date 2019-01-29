@@ -63,6 +63,10 @@ AlterDatabase
     {
       parser.addDatabaseLocation(@3, [ { name: $3 } ]);
     }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<impala>OWNER' ImpalaRoleOrUser RegularOrBacktickedIdentifier
+    {
+      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+    }
  ;
 
 AlterDatabase_EDIT
@@ -84,6 +88,8 @@ AlterDatabase_EDIT
       parser.addDatabaseLocation(@3, [ { name: $3 } ]);
       if (parser.isHive()) {
         parser.suggestKeywords(['DBPROPERTIES', 'LOCATION', 'OWNER']);
+      } else if (parser.isImpala()) {
+        parser.suggestKeywords(['OWNER']);
       }
     }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation_EDIT
@@ -94,6 +100,11 @@ AlterDatabase_EDIT
    {
      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
      parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
+   }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<impala>OWNER' 'CURSOR'
+   {
+     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+     parser.suggestKeywords(['ROLE', 'USER']);
    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' PrincipalSpecification_EDIT
    {

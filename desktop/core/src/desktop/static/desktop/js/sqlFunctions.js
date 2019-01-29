@@ -142,6 +142,11 @@ var SqlSetOptions = (function () {
   var SET_OPTIONS = {
     hive: {},
     impala: {
+      'ALLOW_ERASURE_CODED_FILES' : {
+        description: 'Use the ALLOW_ERASURE_CODED_FILES query option to enable or disable the support of erasure coded files in Impala. Until Impala is fully tested and certified with erasure coded files, this query option is set to FALSE by default.',
+        type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+        default: 'false (shown as 0 in output of SET statement)'
+      },
       'APPX_COUNT_DISTINCT': {
         description: 'Allows multiple COUNT(DISTINCT) operations within a single query, by internally rewriting each COUNT(DISTINCT) to use the NDV() function. The resulting count is approximate rather than precise.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
@@ -226,6 +231,11 @@ var SqlSetOptions = (function () {
         description: 'Maximum number of non-fatal errors for any particular query that are recorded in the Impala log file. For example, if a billion-row table had a non-fatal data error in every row, you could diagnose the problem without all billion errors being logged. Unspecified or 0 indicates the built-in default value of 1000.\n\nThis option only controls how many errors are reported. To specify whether Impala continues or halts when it encounters such errors, use the ABORT_ON_ERROR option.',
         type: 'Numeric',
         default: '0 (meaning 1000 errors)'
+      },
+      'MAX_MEM_ESTIMATE_FOR_ADMISSION': {
+        description: 'Use the MAX_MEM_ESTIMATE_FOR_ADMISSION query option to set an upper limit on the memory estimates of a query as a workaround for over-estimates precluding a query from being admitted.',
+        type: 'Numeric',
+        default: ''
       },
       'MAX_NUM_RUNTIME_FILTERS': {
         description: 'The MAX_NUM_RUNTIME_FILTERS query option sets an upper limit on the number of runtime filters that can be produced for each query.',
@@ -356,6 +366,16 @@ var SqlSetOptions = (function () {
         description: 'When enabled, causes any DDL operation such as CREATE TABLE or ALTER TABLE to return only when the changes have been propagated to all other Impala nodes in the cluster by the Impala catalog service. That way, if you issue a subsequent CONNECT statement in impala-shell to connect to a different node in the cluster, you can be sure that other node will already recognize any added or changed tables. (The catalog service automatically broadcasts the DDL changes to all nodes automatically, but without this option there could be a period of inconsistency if you quickly switched to another node, such as by issuing a subsequent query through a load-balancing proxy.)',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
         default: 'false (shown as 0 in output of SET statement)'
+      },
+      'TIMEZONE': {
+        description: 'The TIMEZONE query option defines the timezone used for conversions between UTC and the local time. If not set, Impala uses the system time zone where the Coordinator Impalad runs. As query options are not sent to the Coordinator immediately, the timezones are validated only when the query runs.',
+        type: 'String, can be a canonical code or a time zone name defined in the IANA Time Zone Database. The value is case-sensitive.',
+        default: 'Coordinator Impalad system time zone.'
+      },
+      'TOPN_BYTES_LIMIT': {
+        description: 'The TOPN_BYTES_LIMIT query option places a limit on the amount of estimated memory that Impala can process for top-N queries.',
+        type: 'Numeric',
+        default: '536870912 (512 MB)'
       }
     }
   };
@@ -833,7 +853,7 @@ var SqlFunctions = (function () {
         arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
         signature: 'dtrunc(T<DOUBLE|DECIMAL> a, [NUMBER b])',
         draggable: 'dtrunc()',
-        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate() and dtrunc() are aliases for the same function.'
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate(), trunc() and dtrunc() are aliases for the same function.'
       },
       e: {
         returnTypes: ['DOUBLE'],
@@ -868,7 +888,7 @@ var SqlFunctions = (function () {
         arguments: [[{type: 'DOUBLE'}, {type: 'DOUBLE'}], [{type: 'FLOAT'}, {type: 'FLOAT'}]],
         signature: 'fmod(DOUBLE a, DOUBLE b), fmod(FLOAT a, FLOAT b)',
         draggable: 'fmod()',
-        description: 'Returns the modulus of a number.'
+        description: 'Returns the modulus of a floating-point number'
       },
       fpow: {
         returnTypes: ['DOUBLE'],
@@ -1150,12 +1170,19 @@ var SqlFunctions = (function () {
         draggable: 'tanh()',
         description: 'Returns the tangent of the argument.'
       },
+      trunc: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
+        signature: 'trunc(T<DOUBLE|DECIMAL> a, [NUMBER b])',
+        draggable: 'trunc()',
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate(), trunc() and dtrunc() are aliases for the same function.'
+      },
       truncate: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
         signature: 'truncate(T<DOUBLE|DECIMAL> a, [NUMBER b])',
         draggable: 'truncate()',
-        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate() and dtrunc() are aliases for the same function.'
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate(), trunc() and dtrunc() are aliases for the same function.'
       },
       unhex: {
         returnTypes: ['STRING'],
@@ -1163,7 +1190,14 @@ var SqlFunctions = (function () {
         signature: 'unhex(STRING a)',
         draggable: 'unhex()',
         description: 'Returns a string of characters with ASCII values corresponding to pairs of hexadecimal digits in the argument.'
-      }
+      },
+      width_bucket: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{type: 'INT'}]],
+        signature: 'width_bucket(DECIMAL expr, DECIMAL min_value, DECIMAL max_value, INT num_buckets)',
+        draggable: 'width_bucket()',
+        description: 'Returns the bucket number in which the expr value would fall in the histogram where its range between min_value and max_value is divided into num_buckets buckets of identical sizes.'
+      },
     }
   };
 
@@ -2088,6 +2122,13 @@ var SqlFunctions = (function () {
 				draggable: 'nanoseconds_sub()',
         description: 'Returns the specified date and time minus some number of nanoseconds.'
       },
+      next_day: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'STRING'}]],
+        signature: 'next_day(TIMESTAMP date, STRING weekday)',
+        draggable: 'next_day()',
+        description: 'Returns the date of the weekday that follows the specified date. The weekday parameter is case-insensitive. The following values are accepted for weekday: "Sunday"/"Sun", "Monday"/"Mon", "Tuesday"/"Tue", "Wednesday"/"Wed", "Thursday"/"Thu", "Friday"/"Fri", "Saturday"/"Sat".'
+      },
       now: {
         returnTypes: ['TIMESTAMP'],
         arguments: [],
@@ -2854,6 +2895,13 @@ var SqlFunctions = (function () {
 				draggable: 'length()',
         description: 'Returns the length in characters of the argument string.'
       },
+      levenshtein: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
+        signature: 'levenshtein(STRING a, STRING b)',
+        draggable: 'levenshtein()',
+        description: 'Returns the Levenshtein distance between two strings. For example, levenshtein(\'kitten\', \'sitting\') results in 3.'
+      },
       locate: {
         returnTypes: ['INT'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'INT', optional: true}]],
@@ -3307,6 +3355,13 @@ var SqlFunctions = (function () {
       }
     },
     impala: {
+      coordinator: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'coordinator()',
+        draggable: 'coordinator()',
+        description: 'Returns the name of the host which is running the impalad daemon that is acting as the coordinator for the current query.'
+      },
       current_database: {
         returnTypes: ['STRING'],
         arguments: [],
@@ -3321,12 +3376,26 @@ var SqlFunctions = (function () {
         draggable: 'effective_user()',
         description: 'Typically returns the same value as user(), except if delegation is enabled, in which case it returns the ID of the delegated user.'
       },
+      logged_in_user: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'logged_in_user()',
+        draggable: 'logged_in_user()',
+        description: 'Purpose: Typically returns the same value as USER(). If delegation is enabled, it returns the ID of the delegated user. LOGGED_IN_USER() is an alias of EFFECTIVE_USER().'
+      },
       pid: {
         returnTypes: ['INT'],
         arguments: [],
         signature: 'pid()',
 				draggable: 'pid()',
         description: 'Returns the process ID of the impalad daemon that the session is connected to.You can use it during low - level debugging, to issue Linux commands that trace, show the arguments, and so on the impalad process.'
+      },
+      sleep: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'INT'}]],
+        signature: 'sleep(INT ms)',
+        draggable: 'sleep()',
+        description: 'Pauses the query for a specified number of milliseconds. For slowing down queries with small result sets enough to monitor runtime execution, memory usage, or other factors that otherwise would be difficult to capture during the brief interval of query execution.'
       },
       user: {
         returnTypes: ['STRING'],

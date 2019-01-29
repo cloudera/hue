@@ -2369,7 +2369,7 @@ from desktop.views import _ko
         entry.children.forEach(function (child) {
           self.children.push(new LanguageReferenceTopic(child));
         });
-
+        self.loadDeferred = $.Deferred();
         self.loading = ko.observable(false);
         self.body = ko.observable();
         self.bodyMatch = ko.observable();
@@ -2380,14 +2380,16 @@ from desktop.views import _ko
       LanguageReferenceTopic.prototype.load = function () {
         var self = this;
         if (self.body() || self.loading()) {
-          return;
+          return self.loadDeferred.promise();
         }
         self.loading(true);
         ApiHelper.getInstance().simpleGet(IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
           self.body(doc.body);
         }).always(function () {
           self.loading(false);
-        })
+          self.loadDeferred.resolve(self);
+        });
+        return self.loadDeferred.promise();
       };
 
       function LanguageReferencePanel (params, element) {
@@ -2409,39 +2411,65 @@ from desktop.views import _ko
         self.disposals.push(function () {
           selectedSub.dispose();
         });
-        self.query = ko.observable();
-        self.filteredTopics = ko.pureComputed(function () {
-          var lowerCaseQuery = self.query().toLowerCase();
-          var replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
-          var flattenedTopics = [];
+        self.query = ko.observable().extend({ throttle: 200 });
+        self.filteredTopics = ko.observableArray();
 
-          var findInside = function (topic) {
-            if (topic.title.toLowerCase().indexOf(lowerCaseQuery) === 0) {
-              topic.weight = 1;
-              topic.titleMatch(topic.title.replace(replaceRegexp, '<b>$1</b>'));
-              topic.bodyMatch(undefined);
-              flattenedTopics.push(topic);
-            } else if (topic.body() && topic.body().toLowerCase().indexOf(lowerCaseQuery) !== -1) {
-              topic.weight = 0;
-              topic.titleMatch(undefined);
-              topic.bodyMatch(topic.body().replace(replaceRegexp, '<b>$1</b>'));
-              flattenedTopics.push(topic);
-            } else {
-              topic.titleMatch(undefined);
-              topic.bodyMatch(undefined);
-            }
-            topic.children.forEach(findInside);
-          };
-
-          self.topics.forEach(findInside);
-
-          flattenedTopics.sort(function (a, b) {
+        var sortFilteredTopics = function () {
+          self.filteredTopics.sort(function (a, b) {
             if (a.weight !== b.weight) {
               return b.weight - a.weight;
             }
             return a.title.localeCompare(b.title);
           });
-          return flattenedTopics;
+        };
+
+        self.query.subscribe(function (newVal) {
+          if (!newVal) {
+            return;
+          }
+          var lowerCaseQuery = self.query().toLowerCase();
+          var replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
+          self.filteredTopics([]);
+          var promises = [];
+
+          var sortTimeout = -1;
+
+          var findInside = function (topic) {
+            promises.push(topic.load().done(function (loadedTopic) {
+              var match = false;
+              var titleIndex = loadedTopic.title.toLowerCase().indexOf(lowerCaseQuery);
+              if (titleIndex !== -1) {
+                loadedTopic.weight = titleIndex === 0 ? 2 : 1;
+                loadedTopic.titleMatch(loadedTopic.title.replace(new RegExp('(' + lowerCaseQuery + ')', 'i'), '<b>$1</b>'));
+                loadedTopic.bodyMatch(undefined);
+                self.filteredTopics.push(loadedTopic);
+                match = true;
+              } else if (loadedTopic.body() && loadedTopic.body().toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+                loadedTopic.weight = 0;
+                loadedTopic.titleMatch(undefined);
+                loadedTopic.bodyMatch(loadedTopic.body().replace(replaceRegexp, '<b>$1</b>'));
+                self.filteredTopics.push(loadedTopic);
+                match = true;
+              } else {
+                loadedTopic.titleMatch(undefined);
+                loadedTopic.bodyMatch(undefined);
+              }
+              if (match) {
+                window.clearTimeout(sortTimeout);
+                sortTimeout = window.setTimeout(sortFilteredTopics, 100);
+              }
+            }));
+
+            topic.children.forEach(findInside);
+          };
+
+          self.topics.forEach(findInside);
+
+          window.setTimeout(function () {
+            // Initial sort deferred for promises to complete
+            sortFilteredTopics();
+          }, 0);
+
         });
 
         var selectedTopicSub = self.selectedTopic.subscribe(function () {
@@ -2459,6 +2487,17 @@ from desktop.views import _ko
           }
         };
 
+        var scrollToAnchor = function (anchorId) {
+          if (!anchorId) {
+            return;
+          }
+          var detailsPanel = $(element).find('.assist-docs-details');
+          var found = detailsPanel.find('#' + anchorId.split('/').join(' #'));
+          if (found.length) {
+            detailsPanel.scrollTop(found.position().top - 10);
+          }
+        };
+
         huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
 
         var showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', function (targetTopic) {
@@ -2473,6 +2512,7 @@ from desktop.views import _ko
                 self.query('');
                 self.selectedTopic(topic);
                 window.setTimeout(function () {
+                  scrollToAnchor(targetTopic.anchorId);
                   scrollToSelectedTopic();
                 }, 0);
                 return true;

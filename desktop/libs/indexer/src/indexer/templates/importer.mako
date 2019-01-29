@@ -2135,7 +2135,7 @@ ${ assist.assistPanel() }
 
     var Destination = function (vm, wizard) {
       var self = this;
-      self.sourceType = vm.sourceType;
+      self.apiHelperType = self.sourceType = vm.sourceType;
 
       self.name = ko.observable('').extend({ throttle: 500 });
       self.nameChanged = function(name) {
@@ -2147,10 +2147,10 @@ ${ assist.assistPanel() }
               sourceType: self.sourceType,
               compute: wizard.compute(),
               namespace: wizard.namespace(),
-              path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [self.databaseName()],
+              path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).done(function (catalogEntry) {
               catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
-                self.isTargetExisting(!sourceMeta.notFound);
+                self.isTargetExisting((sourceMeta.databases || []).indexOf(self.databaseName()) >= 0);
                 self.isTargetChecking(false);
               }).fail(function () {
                 self.isTargetExisting(false);

@@ -82,9 +82,14 @@ def config_validator(user):
   from hadoop.cluster import get_all_hdfs
   from hadoop.fs.hadoopfs import Hdfs
   from liboozie.oozie_api import get_oozie
-  from oozie.conf import REMOTE_SAMPLE_DIR
 
   res = []
+
+  try:
+    from oozie.conf import REMOTE_SAMPLE_DIR
+  except Exception, e:
+    LOG.warn('Config check failed because Oozie app not installed: %s' % e)
+    return res
 
   if OOZIE_URL.get():
     status = get_oozie_status(user)

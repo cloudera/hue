@@ -14,12 +14,13 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%
-  from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _
 
-  from desktop import conf
-  from desktop.views import commonheader, commonfooter, _ko
+from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4
+from desktop.views import commonheader, commonfooter, _ko
+from metadata.conf import PROMETHEUS
 
-  from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
 %>
 
 <%
@@ -39,7 +40,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
     top: 110px!important;
   }
@@ -88,12 +89,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
+        sourceType: 'impala',
+        compute: compute,
+        ##namespace: namespace,
+        ##availableDatabases: availableDatabases,
+        ##database: database,
+        hideDatabases: true
+      }
+    } --><!-- /ko -->
+
+    % if not IS_K8S_ONLY.get():
+    <!-- ko component: {
+      name: 'hue-context-selector',
+      params: {
         sourceType: 'jobs',
         cluster: cluster,
         onClusterSelect: onClusterSelect,
         hideLabels: true
       }
     } --><!-- /ko -->
+    % endif
   </div>
   <ul class="nav nav-pills">
     <!-- ko foreach: availableInterfaces -->
@@ -109,6 +124,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="nav-collapse">
           <ul class="nav">
             <li class="app-header">
+              % if IS_K8S_ONLY.get():
+                <a data-bind="click: function() { selectInterface('dataware2-clusters'); }">
+                  <i class="altus-icon altus-adb-cluster"></i>
+                  ${ _('Warehouses') }
+                </a>
+              % else:
               <!-- ko ifnot: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
               <a href="/${app_name}">
                 <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
@@ -132,6 +153,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   > gke_gcp-eng-dsdw_us-west2-b_impala-demo
                 </span>
               <!-- /ko -->
+              % endif
             </li>
             <!-- ko foreach: availableInterfaces -->
               <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
@@ -898,7 +920,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tr>
               <th>${_('Assigned Container Id')}</th>
               <th>${_('Node Id')}</th>
-              <th>${_('appAttemptId')}</th>
+              <th>${_('Application Attempt Id')}</th>
               <th>${_('Start Time')}</th>
               <th>${_('Finish Time')}</th>
               <th>${_('Node Http Address')}</th>
@@ -910,7 +932,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
                 <td data-bind="text: containerId"></td>
                 <td data-bind="text: nodeId"></td>
-                <td data-bind="text: appAttemptId"></td>
+                <td data-bind="text: id"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: finishedTime, format: 'LLL'}"></td>
                 <td data-bind="text: nodeHttpAddress"></td>
@@ -1315,16 +1337,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="acl-panel-content">
         <ul class="nav nav-tabs">
-          <li class="active"><a href="#servicesLoad" data-toggle="tab">Load</a></li>
-          <li><a href="#servicesPrivileges" data-toggle="tab">Privileges</a></li>
-          <li><a href="#servicesTroubleshooting" data-toggle="tab">Troubleshooting</a></li>
+          <li class="active"><a href="#servicesLoad" data-toggle="tab">${ _("Load") }</a></li>
+          <li><a href="#servicesPrivileges" data-toggle="tab">${ _("Privileges") }</a></li>
+          <li><a href="#servicesTroubleshooting" data-toggle="tab">${ _("Troubleshooting") }</a></li>
         </ul>
 
         <div class="tab-content">
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
               <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
+                % if PROMETHEUS.API_URL.get():
                 <!-- ko component: { name: 'performance-graph', params: { clusterName: name(), type: 'cpu' } } --><!-- /ko -->
+                % else:
+                  ${ _("Metrics are not setup") }
+                % endif
               </div>
             </div>
           </div>
@@ -1470,7 +1496,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan_json) { fetchProfile('plan'); } } }">
+          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan_json) { fetchProfile('plan'); fetchMetrics(); } } }">
             ${ _('Plan') }</a>
         </li>
         <li>
@@ -1508,7 +1534,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
-            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 535 : 600 }">
+            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, metrics: properties.metrics && properties.metrics(), height:$root.isMini() ? 535 : 600 }">
               <svg style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
                 <defs>
                   <filter id="dropshadow" height="130%">
@@ -2488,6 +2514,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
 
         return $.post("/jobbrowser/api/job/" + vm.interface(), {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
@@ -2643,6 +2670,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.fetchLogs = function (name) {
         name = name || 'default';
         $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           type: ko.mapping.toJSON(self.type),
@@ -2663,6 +2691,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchProfile = function (name, callback) {
         $.post("/jobbrowser/api/job/profile", {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           app_type: ko.mapping.toJSON(self.type),
@@ -2680,8 +2709,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
+      self.fetchMetrics = function (name, callback) {
+        ApiHelper.getInstance().fetchQueryExecutionStatistics({
+          queryId: self.id(),
+          cluster: vm.compute()
+        }).done(function(data) {
+          self.properties['metrics'](data);
+        });
+      };
+
       self.fetchStatus = function () {
         $.post("/jobbrowser/api/job", {
+          cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(self.mainType)
         }, function (data) {
@@ -2931,11 +2970,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
-      %if conf.is_hue4():
-      self.paginationResultPage = ko.observable(100);
-      %else:
-      self.paginationResultPage = ko.observable(50);
-      %endif
+      % if is_hue4():
+        self.paginationResultPage = ko.observable(100);
+      % else:
+        self.paginationResultPage = ko.observable(50);
+      % endif
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),
@@ -2982,6 +3021,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self._fetchJobs = function (callback) {
         return $.post("/jobbrowser/api/jobs/" + vm.interface(), {
+          cluster: ko.mapping.toJSON(vm.compute),
           interface: ko.mapping.toJSON(vm.interface),
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
@@ -3093,6 +3133,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $.post("/metadata/api/analytic_db/create_cluster/", {
             "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
             "cluster_name": self.createClusterName(),
+            "cluster_hdfs_host": "hdfs-namenode",
+            "cluster_hdfs_port": 9820,
             "cdh_version": "CDH515",
             "public_key": "public_key",
             "instance_type": "m4.xlarge",
@@ -3184,6 +3226,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isMini = ko.observable(false);
 
       self.cluster = ko.observable();
+      self.compute = ko.observable();
+      self.compute.subscribe(function () {
+        self.jobs.fetchJobs();
+      });
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
@@ -3294,22 +3340,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
+
         % if not is_mini:
-        huePubSub.publish('graph.stop.refresh.view');
-        if (window.location.hash !== '#!' + interface) {
-          hueUtils.changeURL('#!' + interface);
-        }
+          huePubSub.publish('graph.stop.refresh.view');
+          if (window.location.hash !== '#!' + interface) {
+            hueUtils.changeURL('#!' + interface);
+          }
         % endif
         self.jobs.selectedJobs([]);
         self.job(null);
+
         if (interface === 'slas'){
           % if not is_mini:
-          self.loadSlaPage();
+            self.loadSlaPage();
           % endif
         }
         else if (interface === 'oozie-info') {
           % if not is_mini:
-          self.loadOozieInfoPage();
+            self.loadOozieInfoPage();
           % endif
         }
         else {
@@ -3388,9 +3436,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         loaded = true;
         var h = window.location.hash;
-        %if not is_mini:
+        % if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
-        %endif
+        % endif
 
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {
@@ -3496,9 +3544,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }, 'jobbrowser');
 
       % if is_mini:
-        huePubSub.subscribe('mini.jb.navigate', function (interface) {
+        huePubSub.subscribe('mini.jb.navigate', function (options) {
+          if (options.compute) {
+            jobBrowserViewModel.compute(options.compute);
+          }
           $('#jobsPanel .nav-pills li').removeClass('active');
-          interface = jobBrowserViewModel.isValidInterface(interface);
+          interface = jobBrowserViewModel.isValidInterface(options.section);
           $('#jobsPanel .nav-pills li[data-interface="' + interface + '"]').addClass('active');
           jobBrowserViewModel.selectInterface(interface);
         });

@@ -31,21 +31,27 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax.models import Session
   from impala.server import get_api as get_impalad_api, _get_impala_server_url
+  from impala.dbms import _get_server_name
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
-def _get_api(user):
-  session = Session.objects.get_session(user, application='impala')
-  server_url = _get_impala_server_url(session)
+
+def _get_api(user, cluster=None):
+  if cluster and cluster.get('type') == 'altus-dw':
+    server_url = 'http://impala-coordinator-%(name)s:25000' % cluster
+  else:
+    session = Session.objects.get_session(user, application=_get_server_name(cluster))
+    server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
+
 
 class QueryApi(Api):
 
-  def __init__(self, user, impala_api=None):
+  def __init__(self, user, impala_api=None, cluster=None):
     if impala_api:
       self.api = impala_api
     else:
-      self.api = _get_api(user)
+      self.api = _get_api(user, cluster)
 
   def apps(self, filters):
     kwargs = {}
@@ -124,7 +130,8 @@ class QueryApi(Api):
         'profile': '',
         'plan': '',
         'backends': '',
-        'finstances': ''
+        'finstances': '',
+        'metrics': ''
       }
     })
 

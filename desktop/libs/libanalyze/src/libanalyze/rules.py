@@ -533,7 +533,7 @@ class TopDownAnalysis:
 
     def pre_process(self, profile):
         summary = profile.find_by_name("Summary")
-        exec_summary_json = utils.parse_exec_summary(summary.val.info_strings['ExecSummary'])
+        exec_summary_json = utils.parse_exec_summary(summary.val.info_strings.get('ExecSummary')) if summary.val.info_strings.get('ExecSummary') else {}
         stats_mapping = {
           'Query Compilation': {
             'Metadata load finished': 'MetadataLoadTime',
@@ -561,7 +561,6 @@ class TopDownAnalysis:
               for i in range(len(s.labels)):
                 event_name = s.labels[i]
                 event_duration = s.timestamps[i] - duration
-                event_value = s.timestamps[i]
 
                 if sequence.get(event_name):
                   summary.val.counters.append(models.TCounter(name=sequence.get(event_name), value=event_duration, unit=5))
@@ -592,14 +591,14 @@ class TopDownAnalysis:
           node_id = node.id()
            # Setup Hosts & Broadcast
           if node_id and node.is_regular() and int(node_id) in exec_summary_json:
-            exec_summary_node = exec_summary_json[int(node_id)]
-            node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node["hosts"], unit=0))
+            exec_summary_node = exec_summary_json.get(int(node_id), {})
+            node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node.get('hosts', ''), unit=0))
             broadcast = 0
             if exec_summary_json[int(node_id)]["broadcast"]:
                 broadcast = 1
             node.val.counters.append(models.TCounter(name='Broadcast', value=broadcast, unit=0))
 
-            if re.search(r'\w*_SCAN_NODE', node.name(), re.IGNORECASE):
+            if exec_summary_node.get('detail') and re.search(r'\w*_SCAN_NODE', node.name(), re.IGNORECASE):
               details = exec_summary_node['detail'].split()
               node.val.info_strings['Table'] = details[0]
               node.val.counters.append(models.TCounter(name='MissingStats', value=missing_stats.get(details[0], 0), unit=0))
@@ -619,7 +618,9 @@ class TopDownAnalysis:
             # Make sure to substract the wait time for the exchange node
             if is_plan_node and re.search(r'EXCHANGE_NODE', node.val.name) is not None:
                 async_time = counter_map.get('AsyncTotalTime', models.TCounter(value=0)).value
-                local_time = counter_map['TotalTime'].value - counter_map['InactiveTotalTime'].value - async_time
+                dequeue = node.find_by_name('Dequeue')
+                data_wait_time = dequeue.counter_map().get('DataWaitTime', models.TCounter(value=0)).value if dequeue else 0
+                local_time = counter_map['TotalTime'].value - counter_map['InactiveTotalTime'].value - async_time - data_wait_time
 
             # For Hash Join, if the "LocalTime" metrics
             if is_plan_node and re.search(r'HASH_JOIN_NODE', node.val.name) is not None:
