@@ -589,12 +589,13 @@ class TopDownAnalysis:
         def add_host(node, exec_summary_json=exec_summary_json):
           is_plan_node = node.is_plan_node()
           node_id = node.id()
+          nid = int(node_id) if node_id and node.is_regular() else -1
            # Setup Hosts & Broadcast
-          if node_id and node.is_regular() and int(node_id) in exec_summary_json:
-            exec_summary_node = exec_summary_json.get(int(node_id), {})
+          if node_id and node.is_regular() and nid in exec_summary_json:
+            exec_summary_node = exec_summary_json.get(nid, {})
             node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node.get('hosts', ''), unit=0))
             broadcast = 0
-            if exec_summary_json[int(node_id)]["broadcast"]:
+            if exec_summary_json[nid]['broadcast']:
                 broadcast = 1
             node.val.counters.append(models.TCounter(name='Broadcast', value=broadcast, unit=0))
 

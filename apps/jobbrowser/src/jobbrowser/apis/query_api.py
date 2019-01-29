@@ -186,6 +186,11 @@ class QueryApi(Api):
           return { 'font': 'fa-random' }
         else:
           return { 'font': 'fa-exchange' }
+      def get_sigma_icon (o):
+        if re.search(r'streaming', o['label_detail'], re.IGNORECASE):
+          return { 'svg': 'hi-sigma-stream' }
+        else:
+          return { 'svg': 'hi-sigma' }
       mapping = {
         'TOP-N': { 'type': 'TOPN', 'icon': { 'svg': 'hi-filter' } },
         'SORT': { 'type': 'SORT', 'icon': { 'svg': 'hi-sort' } },
@@ -195,7 +200,7 @@ class QueryApi(Api):
         'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'fa-table' } },
         'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
         'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
-        'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'svg': 'hi-sigma' } },
+        'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'fn': get_sigma_icon } },
         'NESTED LOOP JOIN': { 'type': 'LOOP_JOIN', 'icon': { 'svg': 'hi-nested-loop' } },
         'SUBPLAN': { 'type': 'SUBPLAN', 'icon': { 'svg': 'hi-map' } },
         'UNNEST': { 'type': 'UNNEST', 'icon': { 'svg': 'hi-unnest' } },

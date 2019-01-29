@@ -28,6 +28,7 @@ from thrift.transport import TTransport
 from libanalyze import dot
 from libanalyze import gjson as jj
 from libanalyze import models
+from libanalyze import utils
 from libanalyze.rules import to_double
 
 
@@ -306,6 +307,8 @@ def summary(profile):
 
 def metrics(profile):
   execution_profile = profile.find_by_name('Execution Profile')
+  summary = profile.find_by_name("Summary")
+  plan_json = utils.parse_plan_details(summary.val.info_strings.get('Plan')) if summary.val.info_strings.get('Plan') else {}
   if not execution_profile:
     return {}
   counter_map = {'nodes': {}, 'max': 0}
@@ -322,7 +325,7 @@ def metrics(profile):
     host = node.augmented_host()
     metric_map = node.metric_map()
     if counter_map['nodes'].get(nid) is None:
-      counter_map['nodes'][nid] = {'properties': { 'hosts': {} }, 'children': { }, 'timeline': {'hosts': {}}}
+      counter_map['nodes'][nid] = {'properties': { 'hosts': {} }, 'children': { }, 'timeline': {'hosts': {}}, 'other': {}}
 
     event_list = node.event_list();
 
@@ -330,6 +333,8 @@ def metrics(profile):
       counter_map['nodes'][nid]['properties']['hosts'][host] = metric_map
       if event_list:
         counter_map['nodes'][nid]['timeline']['hosts'][host] = event_list
+      if plan_json.get(nid):
+        counter_map['nodes'][nid]['other'] = plan_json[nid]
     else:
       name = node.name()
       if counter_map['nodes'][nid]['children'].get(name) is None:

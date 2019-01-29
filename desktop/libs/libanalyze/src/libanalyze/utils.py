@@ -77,9 +77,15 @@ def parse_exec_summary(summary_string):
 def parse_plan_details(plan_string):
     """Given a query plan, extracts the query details per node"""
     result = {}
+    last_id = -1
     for line in plan_string.split("\n"):
-        match = re.search(r'^(?!F)[|-]?(\d+):.*?\[(.*?)\]', line.strip())
+        match = re.search(r'(?!F)[|-]?(\d+):.*?\[(.*?)\]', line.strip())
         if match:
-            result[str(int(match.group(1)))] = match.group(2)
+          last_id = str(int(match.group(1)))
+          result[last_id] = {'detail': match.group(2)}
+        elif result.get(last_id):
+          match = re.search(r'[\|\s]*(.*?):\s?(.*)', line.strip())
+          if match:
+            result[last_id][match.group(1)] = match.group(2)
 
     return result
