@@ -99,6 +99,8 @@ def list_configurations(request):
 def list_for_autocomplete(request):
   extended_user_object = request.GET.get('extend_user') == 'true'
   autocomplete_filter = request.GET.get('filter', "")
+  count = int(request.GET.get("count", 100))
+
   if request.user.is_superuser:
     users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
     groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
@@ -114,8 +116,8 @@ def list_for_autocomplete(request):
   if not request.GET.get('include_myself'):
     users = users.exclude(pk=request.user.pk)
 
-  users = users[:100]
-  groups = groups[:100]
+  users = users[:count]
+  groups = groups[:count]
 
   response = {
     'users': massage_users_for_json(users, extended_user_object),

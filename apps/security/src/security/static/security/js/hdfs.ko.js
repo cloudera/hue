@@ -621,6 +621,7 @@ var HdfsViewModel = (function () {
 
     self.fetchUsers = function () {
       $.getJSON('/desktop/api/users/autocomplete', {
+        'count': 2000,
         'include_myself': true,
         'extend_user': true
       }, function (data) {

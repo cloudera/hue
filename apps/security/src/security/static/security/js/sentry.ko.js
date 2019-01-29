@@ -1352,6 +1352,7 @@ var SentryViewModel = (function () {
 
     self.fetchUsers = function () {
       var data = {
+        'count': 2000,
         'include_myself': true,
         'extend_user': true
       };
