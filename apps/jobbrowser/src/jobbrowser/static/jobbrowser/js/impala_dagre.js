@@ -113,17 +113,22 @@ function impalaDagre(id) {
     if (node["output_card"] === null || node["output_card"] === undefined) {
       return;
     }
+    var id = getId(node["label"]);
+    var metric_node = _impalaDagree._metrics && _impalaDagree._metrics.nodes[id]
+    var predicates = metric_node && (metric_node.other['group by'] || metric_node.other['hash predicates'] || metric_node.other['predicates']) || '';
     states.push({ "name": node["label"],
                   "type": node["type"],
                   "label": node["name"],
                   "detail": node["label_detail"],
+                  "predicates": predicates,
                   "num_instances": node["num_instances"],
                   "num_active": node["num_active"],
-                  "max_time": node["max_time"],
+                  "max_time": ko.bindingHandlers.numberFormat.human(node["max_time_val"], 5),
                   "avg_time": node["avg_time"],
                   "icon": node["icon"],
                   "is_broadcast": node["is_broadcast"],
-                  "max_time_val": node["max_time_val"]});
+                  "max_time_val": node["max_time_val"],
+                  "width": "200px"});
     var edgeCount;
     if (parent) {
       edgeCount = parseInt(node["output_card"], 10);
@@ -139,7 +144,7 @@ function impalaDagre(id) {
                    "val": edgeCount,
                    "style": { label: ko.bindingHandlers.simplesize.humanSize(edgeCount),
                               style: "stroke-dasharray: 5, 5;",
-                              labelpos: index === 0 ? 'l' : 'r' }});
+                              labelpos: 'l' }});
     }
     max_node_time = Math.max(node["max_time_val"], max_node_time)
     for (var i = 0; i < node["children"].length; ++i) {
@@ -165,13 +170,17 @@ function impalaDagre(id) {
     $("g.node").attr('class', 'node'); // addClass doesn't work in svg on our version of jQuery
   }
 
+  function getId(name) {
+    return parseInt(name.split(':')[0], 10);
+  }
+
   function getKey(node) {
     var nodes = g.nodes();
     var key;
     var nNode = parseInt(node, 10);
     var keys = Object.keys(nodes);
     for (var i = 0; i < keys.length; i++) {
-      if (parseInt(nodes[keys[i]].split(':')[0], 10) == nNode) {
+      if (getId(nodes[keys[i]]) == nNode) {
         key = nodes[keys[i]];
         break;
       }
@@ -210,7 +219,7 @@ function impalaDagre(id) {
     if (!_impalaDagree._metrics) {
       return;
     }
-    var id = parseInt(key.split(':')[0], 10);
+    var id = getId(key);
     if (!_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[id].timeline) {
       return;
     }
@@ -330,14 +339,17 @@ function impalaDagre(id) {
     // Keep a map of names to states for use when processing edges.
     states.forEach(function(state) {
       // Build the label for the node from the name and the detail
-      var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + parseInt(state.name.split(':')[0], 10) + ");\">"; // TODO: Remove Hue dependency
-      html += getIcon(state.icon)
-      html += "<span class='name'>" + state.label + "</span><br/>";
+      var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + getId(state.name) + ");\">"; // TODO: Remove Hue dependency
+      html += getIcon(state.icon);
+      html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
       console.log(state.max_time_val + '-' + avg);
       var aboveAverageClass = state.max_time_val > avg ? 'above-average' : '';
       html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
-      html += "<span class='id'>" + state.name + "</span>";
+      if (state.predicates) {
+        html += "<span class='detail'>" + state.predicates + "</span><br/>";
+      }
+      html += "<span class='id'>" + state.name + "</span></span>";
       html += renderTimeline(state.name);
       html += "</div>";
 
