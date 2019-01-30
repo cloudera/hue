@@ -9,7 +9,6 @@
   },
   "author": "Cloudera, Inc.",
   "contributors": [
-    "Andrew Yao <andyao@cloudera.com>",
     "Johan Ahlen <johan.ahlen@cloudera.com>"
   ],
   "license": "Apache",
@@ -18,17 +17,22 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "bootstrap-2.3.2": "1.0.0",
     "filesize": "4.0.0",
     "jquery": "3.3.1",
+    "jquery-ui": "1.12.1",
+    "jquery.cookie": "1.4.1",
+    "jquery-form": "4.2.2",
     "knockout": "3.4.2",
     "knockout.mapping": "2.4.3",
+    "knockout-sortable": "1.1.0",
     "knockout-switch-case": "2.1.0",
+    "knockout.validation": "2.0.3",
     "less": "3.9.0",
     "localforage": "1.7.3",
     "lodash": "4.17.11",
     "minimist": "^1.2.0",
-    "page": "1.8.6"
+    "page": "1.8.6",
+    "selectize": "0.12.6"
   },
   "devDependencies": {
     "@babel/core": "7.2.2",
@@ -53,7 +57,7 @@
     "devinstall": "npm cache clean && npm install && npm prune",
     "less": "./node_modules/.bin/grunt less",
     "watch": "./node_modules/.bin/grunt watch",
-    "webpack": "./node_modules/.bin/webpack"
+    "webpack": "webpack --config webpack.config.js"
   },
   "files": []
 }
