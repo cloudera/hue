@@ -108,7 +108,7 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     rows = self.describe
-    col_row_index = 2
+    col_row_index = 1
     try:
       end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
@@ -121,7 +121,7 @@ class HiveServerTable(Table):
   def _get_partition_column(self):
     rows = self.describe
     try:
-      col_row_index = map(itemgetter('col_name'), rows).index('# Partition Information') + 3
+      col_row_index = map(itemgetter('col_name'), rows).index('# Partition Information') + 2
       end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index]
     except:
