@@ -1380,9 +1380,9 @@ var EditorViewModel = (function() {
       self.showLongOperationWarning(false);
     }
 
-    self.execute = function (automaticallyTriggered) {
+    self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (!automaticallyTriggered && (self.status() == 'running' || self.status() == 'loading')) { // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
+      if (self.status() == 'running' || self.status() == 'loading') {
         self.cancel();
       } else if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
@@ -1848,7 +1848,7 @@ var EditorViewModel = (function() {
 
                   if (self.result.handle().has_more_statements) {
                     setTimeout(function () {
-                      self.execute(true); // Execute next, need to wait as we disabled fast click
+                      self.execute(); // Execute next, need to wait as we disabled fast click
                     }, 1000);
                   }
                 }
