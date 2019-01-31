@@ -607,7 +607,7 @@ from desktop.views import _ko
               }
 
               if (! dragToSelect) {
-                var $helper = $('.doc-browser-drag-helper').clone().show();
+                var $helper = $('.doc-browser-drag-helper').clone().appendTo($container).show();
                 var sharedCount = selectedEntries.filter(function (entry) {
                   return entry.isSharedWithMe();
                 }).length;
@@ -624,7 +624,6 @@ from desktop.views import _ko
                   $helper.find('i').removeClass().addClass($element.find('.doc-browser-primary-col i').attr('class'));
                 }
 
-                $helper.appendTo($container);
               } else {
                 $('<div>').addClass('doc-browser-drag-select').appendTo(HUE_CONTAINER);
               }

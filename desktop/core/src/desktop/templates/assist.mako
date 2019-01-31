@@ -1142,11 +1142,10 @@ from desktop.views import _ko
               dragStartX = event.clientX;
               dragStartY = event.clientY;
 
-              var $helper = $('.assist-file-entry-drag').clone().show();
+              var $helper = $('.assist-file-entry-drag').clone().appendTo($container);
               $helper.find('.drag-text').text(boundEntry.definition().name);
               $helper.find('i').removeClass().addClass($element.find('.doc-browser-primary-col i').attr('class'));
-
-              $helper.appendTo($container);
+              $helper.show();
             },
             drag: function (event) {
             },
