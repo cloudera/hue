@@ -959,7 +959,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                     }
                     $('#embeddable_' + app).html($rawHtml);
                     huePubSub.publish('app.dom.loaded', app);
-                    self.isLoadingEmbeddable(false);
+                    window.setTimeout(function () {
+                      self.isLoadingEmbeddable(false);
+                    }, 0)
                   });
                 } else {
                   window.location.href = baseURL;
