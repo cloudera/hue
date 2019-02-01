@@ -2869,7 +2869,7 @@ ${ assist.assistPanel() }
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime()),
-          "show_command": ko.mapping.toJSON(options.show || '')
+          "show_command": options.show || ''
         }, function (resp) {
           self.indexingStarted(false);
           if (resp.status === 0) {

@@ -28,6 +28,7 @@ from thrift.transport import TTransport
 from libanalyze import dot
 from libanalyze import gjson as jj
 from libanalyze import models
+from libanalyze import utils
 from libanalyze.rules import to_double
 
 
@@ -40,6 +41,7 @@ class Node(object):
     self.children = []
     self.fragment = None
     self.fragment_instance = None
+    self.plan_node = None
     self.pos = 0
 
   def add_child(self, c):
@@ -79,8 +81,8 @@ class Node(object):
 
   def is_regular(self):
     id = self.id()
-    matches = id and re.search(r'[a-zA-Z]+', id)
-    return id and matches is None
+    matches = id and re.search(r'^\d*$', id)
+    return id and matches
 
   def name(self):
     matches = re.search(r'(.*?)(\s+\(((dst_)?id)=(\d+)\))?$', self.val.name)
@@ -89,7 +91,11 @@ class Node(object):
     elif self.is_fragment():
       return re.search(r'(.*?Fragment) (F\d+)', self.val.name).group(1)
     else:
-      return self.val.name
+      matches = re.search(r'(.*?)(\s+\(.*?\))?$', self.val.name)
+      if matches.group(2):
+        return matches.group(1)
+      else:
+        return self.val.name
 
   def id(self):
     matches = re.search(r'(.*?)(\s+\(((dst_)?id)=(\d+)\))?$', self.val.name)
@@ -128,17 +134,20 @@ class Node(object):
 
     return results
 
-  def foreach_lambda(self, method, fragment=None, fragment_instance=None, pos=0):
+  def foreach_lambda(self, method, plan_node=None, fragment=None, fragment_instance=None, pos=0):
     self.fragment = fragment
     self.fragment_instance = fragment_instance
     self.pos = pos
+    self.plan_node = plan_node
     if self.is_fragment():
       fragment = self
     elif self.is_fragment_instance():
       fragment_instance = self
+    elif self.is_plan_node():
+      plan_node = self
 
     for idx, x in enumerate(self.children):
-      x.foreach_lambda(method, fragment=fragment, fragment_instance=fragment_instance, pos=idx)
+      x.foreach_lambda(method, plan_node=plan_node, fragment=fragment, fragment_instance=fragment_instance, pos=idx)
 
     method(self) # Post execution, because some results need child to have processed
 
@@ -242,11 +251,15 @@ class Node(object):
     event_list = {}
     if self.val.event_sequences:
       for s in self.val.event_sequences:
+        start_time = 0
         sequence_name = s.name
         event_list[sequence_name] = []
+        start_time = 0
         for i in range(len(s.labels)):
+          event_duration = s.timestamps[i] - start_time
           event_name = s.labels[i]
-          event_list[sequence_name].append({'name': event_name, 'value': s.timestamps[i], 'unit': 5})
+          event_list[sequence_name].append({'name': event_name, 'value': s.timestamps[i], 'unit': 5, 'start_time': start_time, 'duration': event_duration})
+          start_time = s.timestamps[i]
     return event_list
 
   def repr(self, indent):
@@ -294,25 +307,63 @@ def summary(profile):
 
 def metrics(profile):
   execution_profile = profile.find_by_name('Execution Profile')
+  summary = profile.find_by_name("Summary")
+  plan_json = utils.parse_plan_details(summary.val.info_strings.get('Plan')) if summary.val.info_strings.get('Plan') else {}
   if not execution_profile:
     return {}
-  counter_map = {'max': 0}
-  def get_metric(node, counter_map=counter_map):
-    if not node.is_plan_node():
-      return
-    nid = node.id()
-    if counter_map.get(nid) is None:
-      counter_map[nid] = {}
-    host = node.augmented_host()
-    event_list = node.event_list();
-    if event_list and event_list.get('Node Lifecycle Event Timeline'):
-      last_value = event_list['Node Lifecycle Event Timeline'][len(event_list['Node Lifecycle Event Timeline']) - 1]['value']
-      counter_map['max'] = max(last_value, counter_map['max'])
-    if host:
-      counter_map[nid][host] = {'metrics': node.metric_map(), 'timeline': event_list}
+  counter_map = {'nodes': {}, 'max': 0}
+  def flatten(node, counter_map=counter_map):
+    is_plan_node = node.is_plan_node()
+    is_parent_node = is_plan_node
+    if not is_plan_node:
+      if node.plan_node:
+        nid = node.plan_node.id()
+      elif node.is_fragment_instance():
+        is_parent_node = True
+        nid = node.fragment.id()
+      elif node.fragment:
+        nid = node.fragment.id()
+      else:
+        return
     else:
-      counter_map[nid] = {'metrics': node.metric_map(), 'timeline': event_list}
-  execution_profile.foreach_lambda(get_metric)
+      nid = node.id()
+
+    host = node.augmented_host()
+    metric_map = node.metric_map()
+    if counter_map['nodes'].get(nid) is None:
+      counter_map['nodes'][nid] = {'properties': { 'hosts': {} }, 'children': { }, 'timeline': {'hosts': {}}, 'other': {}}
+
+    event_list = node.event_list();
+
+    if is_parent_node:
+      counter_map['nodes'][nid]['properties']['hosts'][host] = metric_map
+      if event_list:
+        counter_map['nodes'][nid]['timeline']['hosts'][host] = event_list
+      if plan_json.get(nid):
+        counter_map['nodes'][nid]['other'] = plan_json[nid]
+      if is_plan_node:
+        counter_map['nodes'][nid]['fragment'] = node.fragment.id()
+    else:
+      name = node.name()
+      if counter_map['nodes'][nid]['children'].get(name) is None:
+        counter_map['nodes'][nid]['children'][name] = {'hosts': {}}
+      counter_map['nodes'][nid]['children'][name]['hosts'][host] = metric_map
+
+  execution_profile.foreach_lambda(flatten)
+
+  for nodeid, node in counter_map['nodes'].iteritems():
+    host_min = {'value': sys.maxint, 'host' : None}
+    for host_name, host_value in node['timeline']['hosts'].iteritems():
+      if host_value.get('Node Lifecycle Event Timeline'):
+        value = host_value['Node Lifecycle Event Timeline'][len(host_value['Node Lifecycle Event Timeline']) - 1]['value']
+        if value < host_min['value']:
+          host_min['value'] = value
+          host_min['host'] = host_name
+    node['timeline']['min'] = host_min.get('host', '')
+    if node['timeline']['min']:
+      node_min = node['timeline']['hosts'][node['timeline']['min']]['Node Lifecycle Event Timeline']
+      counter_map['max'] = max(node_min[len(node_min) - 1]['value'], counter_map['max'])
+
   counter_map['ImpalaServer'] = profile.find_by_name('ImpalaServer').metric_map()
   return counter_map
 

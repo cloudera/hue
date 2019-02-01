@@ -119,7 +119,7 @@ Checked-in frontend third party dependencies
 |classList.js|?|Unlicense|https://github.com/eligrey/classList.js|
 |clipboard.js|1.7.1|MIT|https://zenorocha.github.io/clipboard.js|
 |Codemirror|3.11|MIT|https://github.com/codemirror/CodeMirror|
-|D3|3.5.2+4.4.4|BSD|https://github.com/d3/d3|
+|D3|3.5.2,4.4.4,5.7.0|BSD|https://github.com/d3/d3|
 |Dropzone.js|4.3.0|MIT|https://github.com/enyo/dropzone|
 |django-debug-panel|0.8.3|BSD|https://pypi.org/project/django-debug-panel/0.8.3/|
 |django-debug-toolbar|1.3.2|BSD|https://pypi.python.org/pypi/django-debug-toolbar/1.3.2|

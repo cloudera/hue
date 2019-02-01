@@ -5936,6 +5936,12 @@
         editor.commands.off('afterExec', afterExecListener);
       });
       editor.$blockScrolling = Infinity;
+
+      var range = options.highlightedRange ? options.highlightedRange() : null;
+      if (range && snippet.lastAceSelectionRowOffset()) {
+        var offset = snippet.lastAceSelectionRowOffset();
+        editor.selection.moveTo(range.start.row + offset, range.start.column);
+      }
       snippet.ace(editor);
     },
 
@@ -5948,6 +5954,13 @@
           editor.setReadOnly(options.readOnly);
         }
         var range = options.highlightedRange ? options.highlightedRange() : null;
+        if (editor.session.$backMarkers) {
+          for (var marker in editor.session.$backMarkers) {
+            if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+              editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+            }
+          }
+        }
         editor.session.setMode(snippet.getAceMode());
         if (range && JSON.stringify(range.start) !== JSON.stringify(range.end)) {
           var conflictingWithErrorMarkers = false;
@@ -5958,9 +5971,6 @@
                 if (range.start.row <= errorRange.end.row && range.end.row >= errorRange.start.row) {
                   conflictingWithErrorMarkers = true;
                 }
-              }
-              if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
-                editor.session.removeMarker(editor.session.$backMarkers[marker].id);
               }
             }
           }
@@ -7510,9 +7520,9 @@
       },
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
-        this._impalaDagre.update(props.value);
         this._impalaDagre.metrics(props.metrics);
         this._impalaDagre.height(props.height);
+        this._impalaDagre.update(props.value);
       }
     };
   })();
@@ -7577,12 +7587,12 @@
         value = value * 1;
         if (value < Math.pow(10, 3)) {
           return value + " ns";
-        } else if (value < Math.pow(10, 6)) {
+        } else if (value - Math.pow(10, 6) < -Math.pow(10, 3) / 2) { // Make sure rounding doesn't cause numbers to have more than 4 significant digits.
           value = (value * 1.0) / Math.pow(10, 3);
-          return sprintf("%.2f us", value);
-        } else if (value < Math.pow(10, 9)) {
+          return sprintf("%.1f us", value);
+        } else if (value - Math.pow(10, 9) < -Math.pow(10, 6) / 2) {
           value = (value * 1.0) / Math.pow(10, 6);
-          return sprintf("%.2f ms", value);
+          return sprintf("%.1f ms", value);
         } else {
           // get the ms value
           var SECOND = 1;
@@ -7602,7 +7612,7 @@
           }
 
           if (value > SECOND) {
-            buffer += sprintf("%.2f s", value * 1.0 / SECOND);
+            buffer += sprintf("%.1f s", value * 1.0 / SECOND);
           }
           return buffer;
         }
