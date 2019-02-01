@@ -126,24 +126,21 @@ function impalaDagre(id) {
                   "max_time": ko.bindingHandlers.numberFormat.human(node["max_time_val"], 5),
                   "avg_time": node["avg_time"],
                   "icon": node["icon"],
+                  "parent": parent || node["data_stream_target"],
                   "is_broadcast": node["is_broadcast"],
                   "max_time_val": node["max_time_val"],
                   "width": "200px"});
-    var edgeCount;
     if (parent) {
-      edgeCount = parseInt(node["output_card"], 10);
-      var label_val = "" + ko.bindingHandlers.simplesize.humanSize(edgeCount);
-      edges.push({ start: node["label"], end: parent, style: { label: label_val, labelpos: index === 0 && count > 1 ? 'l' : 'r' }, content: { value: edgeCount, unit: 0 } });
+      edges.push({ start: node["label"], end: parent, style: { label: '', labelpos: index === 0 && count > 1 ? 'l' : 'r' }, content: { value: 0, unit: 0 } });
     }
     // Add an inter-fragment edge. We use a red dashed line to show that rows are crossing
     // the fragment boundary.
     if (node["data_stream_target"]) {
-      edgeCount = parseInt(node["output_card"], 10);
-      var sendTime = getMaxTotalNetworkSendTime(node["label"]);
-      var text = sendTime && ko.bindingHandlers.numberFormat.human(sendTime.value, sendTime.unit) || ko.bindingHandlers.simplesize.humanSize(edgeCount);
+      var networkTime = getMaxTotalNetworkTime(node["label"], node["data_stream_target"]);
+      var text = ko.bindingHandlers.numberFormat.human(networkTime.value, networkTime.unit);
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
-                   "content": sendTime ? sendTime : { value: edgeCount, unit: 0 },
+                   "content": networkTime,
                    "style": { label: text,
                               style: "stroke-dasharray: 5, 5;",
                               labelpos: index === 0 && count > 1 ? 'l' : 'r' }});
@@ -217,6 +214,12 @@ function impalaDagre(id) {
     return html;
   }
 
+  function getMaxTotalNetworkTime(sender, receiver) {
+    var sentTime = getMaxTotalNetworkSendTime(sender);
+    var receiveTime = getMaxTotalNetworkReceiveTime(receiver);
+    return receiveTime && sentTime ? { value: Math.min(receiveTime.value, sentTime.value), unit: sentTime.unit } : { value: 0, unit: 0 }; // We get the smallest between both, because sometime 1 of them is larger than the other (doesn't make sense for our purpose)
+  }
+
   function getMaxTotalNetworkSendTime(node) {
     var id = getId(node);
     if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
@@ -230,6 +233,54 @@ function impalaDagre(id) {
         return previous;
       }
     }, { value: -1, unit: 5 });
+  }
+
+  function getMaxTotalNetworkReceiveTime(node) {
+    var id = getId(node);
+    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
+      return;
+    }
+    var fragment = _impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment];
+    return Object.keys(fragment.properties.hosts).reduce(function (previous, host) {
+      if (fragment.properties.hosts[host].TotalNetworkReceiveTime.value > previous.value) {
+        return fragment.properties.hosts[host].TotalNetworkReceiveTime;
+      } else {
+        return previous;
+      }
+    }, { value: -1, unit: 5 });
+  }
+
+  // This is not exact, but shows some approximation of reality.
+  function getCPUTimelineData(key) {
+    var datum = getTimelineData(key);
+    if (!datum || !datum.hosts[datum.min] || !datum.hosts[datum.min]['Node Lifecycle Event Timeline']) {
+      return '';
+    }
+    var id = getId(key);
+    var localTime = _impalaDagree._metrics.nodes[id].properties.hosts[datum.min].LocalTime;
+    var timeline = datum.hosts[datum.min]['Node Lifecycle Event Timeline'];
+    if (!timeline.length) {
+      return '';
+    }
+    var openFinished = timeline.filter(function(time) {
+      return time.name === 'Open Finished';
+    })[0];
+    var last = timeline.filter(function(time) {
+      return time.name !== 'Closed';
+    }); // Close time is normally wait time;
+    last = last[last.length - 1];
+    var time;
+    if (!openFinished) {
+      var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
+      time = { start_time: end - localTime.value, duration: localTime.value, value: end, color: last.color, unit: last.unit };
+    } else if (key.indexOf('JOIN') >= 0) {
+      time = { start_time: openFinished.value - localTime.value, duration: localTime.value, value: openFinished.value, color: last.color, unit: last.unit };
+    } else if (key.indexOf('UNION') >= 0 || (key.indexOf('AGGREGATE') >= 0 && states_by_name[key].detail.indexOf('STREAMING') >= 0)) {
+      time = { start_time: openFinished.value, duration: localTime.value, value: localTime.value + openFinished.value, color: last.color, unit: last.unit };
+    } else {
+      time = { start_time: last.value - localTime.value, duration: localTime.value, value: last.value, color: last.color, unit: last.unit };
+    }
+    return [ time ];
   }
 
   function getTimelineData(key) {
@@ -264,6 +315,21 @@ function impalaDagre(id) {
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
     html += datum.hosts[datum.min]['Node Lifecycle Event Timeline'].map(function(time, index) {
       return '<rect x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10" style="fill:' + time.color  +'"></rect>';
+    }).join('');
+    html += '</svg>';
+    return html;
+  }
+
+  function renderCPUTimeline(key) {
+    var datum = getCPUTimelineData(key);
+    if (!datum) {
+      return '';
+    }
+    var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
+    var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
+    var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
+    html += datum.map(function(time, index) {
+      return '<rect class="active" x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10"></rect>';
     }).join('');
     html += '</svg>';
     return html;
@@ -381,14 +447,14 @@ function impalaDagre(id) {
       var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + getId(state.name) + ");\">"; // TODO: Remove Hue dependency
       html += getIcon(state.icon);
       html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
-      var aboveAverageClass = state.max_time_val > avg ? 'above-average' : '';
+      var aboveAverageClass = state.max_time_val > avgCombined ? 'above-average' : '';
       html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
       if (state.predicates) {
         html += "<span class='detail'>" + state.predicates + "</span><br/>";
       }
       html += "<span class='id'>" + state.name + "</span></span>";
-      html += renderTimeline(state.name);
+      html += renderCPUTimeline(state.name);
       html += "</div>";
 
       var style = state.style;
