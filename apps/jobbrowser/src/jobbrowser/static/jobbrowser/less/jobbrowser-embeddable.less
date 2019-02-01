@@ -159,9 +159,14 @@
         fill: @hue-primary-color-light;
       }
     }
+    .node {
+      rect.active {
+        fill: @hue-primary-color-dark;
+      }
+    }
     .output {
       path,
-      rect {
+      .node > rect {
         stroke: @cui-gray-600;
       }
     }
@@ -210,6 +215,7 @@
       height: 10px;
       border: 1px solid @cui-gray-300;
       border-radius: 4px;
+      background-color: @cui-white;
     }
     .details {
       background-color: @cui-white;
