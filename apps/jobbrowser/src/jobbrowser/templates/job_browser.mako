@@ -3226,7 +3226,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.cluster = ko.observable();
       self.compute = ko.observable();
       self.compute.subscribe(function () {
-        self.jobs.fetchJobs();
+        if (self.interface()) {
+          self.jobs.fetchJobs();
+        }
       });
 
       self.availableInterfaces = ko.pureComputed(function () {
