@@ -329,7 +329,7 @@ var AutocompleteResults = (function () {
   AutocompleteResults.prototype.loadDatabases = function () {
     var self = this;
     var databasesDeferred = $.Deferred();
-    DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], temporaryOnly: self.temporaryOnly }).done(function (entry) {
+    dataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], temporaryOnly: self.temporaryOnly }).done(function (entry) {
       self.cancellablePromises.push(entry.getChildren({ silenceErrors: true, cancellable: true }).done(function (databases) {
         databasesDeferred.resolve(databases);
       }).fail(databasesDeferred.reject));
@@ -547,7 +547,7 @@ var AutocompleteResults = (function () {
 
         var database = suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase;
 
-        DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ database ], temporaryOnly: self.temporaryOnly }).done(function (dbEntry) {
+        dataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ database ], temporaryOnly: self.temporaryOnly }).done(function (dbEntry) {
           self.cancellablePromises.push(dbEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (tableEntries) {
             var tableSuggestions = [];
 
@@ -987,7 +987,7 @@ var AutocompleteResults = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(suggestJoins.tables);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
+        dataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
         self.cancellablePromises.push(multiTableEntry.getTopJoins({ silenceErrors: true, cancellable: true  }).done(function (topJoins) {
           var joinSuggestions = [];
           var totalCount = 0;
@@ -1068,7 +1068,7 @@ var AutocompleteResults = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(suggestJoinConditions.tables);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
+        dataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
           self.cancellablePromises.push(multiTableEntry.getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
           var joinConditionSuggestions = [];
           var totalCount = 0;
@@ -1124,7 +1124,7 @@ var AutocompleteResults = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(suggestAggregateFunctions.tables);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
+        dataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
           self.cancellablePromises.push(multiTableEntry.getTopAggs({ silenceErrors: true, cancellable: true }).done(function (topAggs) {
             var aggregateFunctionsSuggestions = [];
             if (topAggs.values && topAggs.values.length > 0) {
@@ -1229,7 +1229,7 @@ var AutocompleteResults = (function () {
       }
     });
 
-    self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type())
+    self.cancellablePromises.push(dataCatalog.getCatalog(self.snippet.type())
       .loadNavOptPopularityForTables({ namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths, silenceErrors: true, cancellable: true }).done(function (entries) {
         var totalColumnCount = 0;
         var matchedEntries = [];
@@ -1306,7 +1306,7 @@ var AutocompleteResults = (function () {
 
       var paths = self.tableIdentifierChainsToPaths(suggestFilters.tables);
       if (paths.length) {
-        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
+        dataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), paths: paths }).done(function (multiTableEntry) {
           self.cancellablePromises.push(multiTableEntry.getTopFilters({ silenceErrors: true, cancellable: true }).done(function (topFilters) {
             var filterSuggestions = [];
             var totalCount = 0;
@@ -1367,7 +1367,7 @@ var AutocompleteResults = (function () {
         && self.parseResult.suggestTables.identifierChain.length === 1
         && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
 
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ db ], temporaryOnly: self.temporaryOnly }).done(function (entry) {
+      dataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [ db ], temporaryOnly: self.temporaryOnly }).done(function (entry) {
         self.cancellablePromises.push(entry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
           var totalPopularity = 0;
           var popularityIndex = {};
@@ -1426,7 +1426,7 @@ var AutocompleteResults = (function () {
         }
       });
 
-      self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({
+      self.cancellablePromises.push(dataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         paths: paths,
@@ -1590,7 +1590,7 @@ var AutocompleteResults = (function () {
         }
       }
 
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: fetchedPath, temporaryOnly: self.temporaryOnly }).done(function (catalogEntry) {
+      dataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: fetchedPath, temporaryOnly: self.temporaryOnly }).done(function (catalogEntry) {
         self.cancellablePromises.push(catalogEntry.getSourceMeta({ silenceErrors: true, cancellable: true }).done(function (sourceMeta) {
           if (self.snippet.type() === 'hive'
               && typeof sourceMeta.extended_columns !== 'undefined'
@@ -1620,7 +1620,7 @@ var AutocompleteResults = (function () {
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (path.length > 1 && (self.snippet.type() === 'impala' || self.snippet.type() === 'hive')) {
-      DataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], temporaryOnly: self.temporaryOnly }).done(function (catalogEntry) {
+      dataCatalog.getEntry({ sourceType: self.snippet.type(), namespace: self.snippet.namespace(), compute: self.snippet.compute(), path: [], temporaryOnly: self.temporaryOnly }).done(function (catalogEntry) {
         self.cancellablePromises.push(catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (databaseEntries) {
           var firstIsDb = databaseEntries.some(function (dbEntry) {
             return hueUtils.equalIgnoreCase(dbEntry.name, path[0]);

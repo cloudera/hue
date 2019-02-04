@@ -94,7 +94,7 @@ from django.utils.translation import ugettext as _
           self.hasErrors(true);
         });
 
-        var allTagsPromise = DataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(function (tagList) {
+        var allTagsPromise = dataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(function (tagList) {
           self.allTags(Object.keys(tagList));
         }).fail(function () {
           self.allTags([]);
@@ -137,7 +137,7 @@ from django.utils.translation import ugettext as _
 
         $.when(addTagsPromise, deleteTagsPromise).done(function () {
           if (tagsToAdd.length || tagsToRemove.length) {
-            DataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
+            dataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
             ko.unwrap(self.catalogEntry).save();
           }
           self.loadTags();

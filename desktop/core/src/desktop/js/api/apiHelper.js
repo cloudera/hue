@@ -15,11 +15,12 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import hueUtils from './hueUtils'
-import huePubSub from './huePubSub'
-import hueDebug from './hueDebug'
-import CancellablePromise from './cancellablePromise'
+
 import apiQueueManager from './apiQueueManager'
+import CancellablePromise from './cancellablePromise'
+import hueDebug from '../utils/hueDebug'
+import huePubSub from '../utils/huePubSub'
+import hueUtils from '../utils/hueUtils'
 
 const AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
 const SAMPLE_API_PREFIX = "/notebook/api/sample/";
@@ -1782,8 +1783,6 @@ class ApiHelper {
    * Lists all available navigator tags
    *
    * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
    * @return {CancellablePromise}

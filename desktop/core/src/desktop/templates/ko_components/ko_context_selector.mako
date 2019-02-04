@@ -354,7 +354,7 @@ from desktop.views import _ko
                 self.loadingDatabases(false);
                 return;
               }
-              DataCatalog.getEntry({
+              dataCatalog.getEntry({
                 sourceType: ko.unwrap(self.sourceType),
                 namespace: self[TYPES_INDEX.namespace.name](),
                 compute: self[TYPES_INDEX.compute.name](),

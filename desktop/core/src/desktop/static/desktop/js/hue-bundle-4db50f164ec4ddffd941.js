@@ -105,6 +105,5619 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./desktop/core/src/desktop/js/api/apiHelper.js":
+/*!******************************************************!*\
+  !*** ./desktop/core/src/desktop/js/api/apiHelper.js ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _apiQueueManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./apiQueueManager */ "./desktop/core/src/desktop/js/api/apiQueueManager.js");
+/* harmony import */ var _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/hueDebug */ "./desktop/core/src/desktop/js/utils/hueDebug.js");
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var _utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+
+var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
+var SAMPLE_API_PREFIX = "/notebook/api/sample/";
+var DOCUMENTS_API = "/desktop/api2/doc/";
+var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
+var FETCH_CONFIG = '/desktop/api2/get_config/';
+var HDFS_API_PREFIX = "/filebrowser/view=/";
+var ADLS_API_PREFIX = "/filebrowser/view=adl:/";
+var GIT_API_PREFIX = "/desktop/api/vcs/contents/";
+var S3_API_PREFIX = "/filebrowser/view=S3A://";
+var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
+var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
+var CONFIG_APPS_API = '/desktop/api/configurations';
+var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
+var SOLR_FIELDS_API = '/indexer/api/index/list/';
+var DASHBOARD_TERMS_API = '/dashboard/get_terms';
+var DASHBOARD_STATS_API = '/dashboard/get_stats';
+var FORMAT_SQL_API = '/notebook/api/format';
+var SEARCH_API = '/desktop/api/search/entities';
+var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
+var HBASE_API_PREFIX = '/hbase/api/';
+var SAVE_TO_FILE = '/filebrowser/save';
+var NAV_URLS = {
+  ADD_TAGS: '/metadata/api/navigator/add_tags',
+  DELETE_TAGS: '/metadata/api/navigator/delete_tags',
+  FIND_ENTITY: '/metadata/api/navigator/find_entity',
+  LIST_TAGS: '/metadata/api/navigator/list_tags',
+  UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties'
+};
+var NAV_OPT_URLS = {
+  TOP_AGGS: '/metadata/api/optimizer/top_aggs',
+  TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
+  TOP_FILTERS: '/metadata/api/optimizer/top_filters',
+  TOP_JOINS: '/metadata/api/optimizer/top_joins',
+  TOP_TABLES: '/metadata/api/optimizer/top_tables',
+  TABLE_DETAILS: '/metadata/api/optimizer/table_details'
+};
+/**
+ *
+ * @param {Object} options
+ * @param {string} options.sourceType
+ * @param {string} options.url
+ * @param {boolean} options.refreshCache
+ * @param {string} [options.hash] - Optional hash to use as well as the url
+ * @param {Function} options.fetchFunction
+ * @param {Function} options.successCallback
+ * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
+ * @param {Object} [options.editor] - Ace editor
+ * @param {Object} [options.promise] - Optional promise that will be resolved if cached data exists
+ */
+
+var fetchCached = function fetchCached(options) {
+  var self = this;
+  var cacheIdentifier = self.getAssistCacheIdentifier(options);
+  var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier) || {};
+  var cachedId = options.hash ? options.url + options.hash : options.url;
+
+  if (options.refreshCache || typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
+    if (typeof options.editor !== 'undefined' && options.editor !== null) {
+      options.editor.showSpinner();
+    }
+
+    return options.fetchFunction(function (data) {
+      cachedData[cachedId] = {
+        timestamp: new Date().getTime(),
+        data: data
+      };
+
+      try {
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, cachedData);
+      } catch (e) {}
+    });
+  } else {
+    if (options.promise) {
+      options.promise.resolve(cachedData[cachedId].data);
+    }
+
+    options.successCallback(cachedData[cachedId].data);
+  }
+};
+/**
+ * Fetches the popularity for various aspects of the given tables
+ *
+ * @param {ApiHelper} apiHelper
+ * @param {Object} options
+ * @param {boolean} [options.silenceErrors]
+ * @param {string[][]} options.paths
+ * @param {string} url
+ * @return {CancellablePromise}
+ */
+
+
+var genericNavOptMultiTableFetch = function genericNavOptMultiTableFetch(apiHelper, options, url) {
+  var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+  var dbTables = {};
+  options.paths.forEach(function (path) {
+    dbTables[path.join('.')] = true;
+  });
+  var data = {
+    dbTables: ko.mapping.toJSON(Object.keys(dbTables))
+  };
+  var request = apiHelper.simplePost(url, data, {
+    silenceErrors: options.silenceErrors,
+    successCallback: function successCallback(data) {
+      data.hueTimestamp = Date.now();
+      deferred.resolve(data);
+    },
+    errorCallback: deferred.reject
+  });
+  return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+};
+/**
+ * Wrapper around the response from the Query API
+ *
+ * @param {string} sourceType
+ * @param {Object} response
+ *
+ * @constructor
+ */
+
+
+var QueryResult = function QueryResult(sourceType, compute, response) {
+  _classCallCheck(this, QueryResult);
+
+  var self = this;
+  self.id = _utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].UUID();
+  self.type = response.result.type || sourceType;
+  self.compute = compute;
+  self.status = response.status || 'running';
+  self.result = response.result || {};
+  self.result.type = 'table';
+};
+
+var ApiHelper =
+/*#__PURE__*/
+function () {
+  function ApiHelper() {
+    _classCallCheck(this, ApiHelper);
+
+    var self = this;
+    self.queueManager = _apiQueueManager__WEBPACK_IMPORTED_MODULE_1__["default"];
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.hdfs.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'hdfs'
+      }), {});
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.adls.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'adls'
+      }), {});
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.git.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'git'
+      }), {});
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.s3.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 's3'
+      }), {});
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.collections.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'collections'
+      }), {});
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.hbase.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'hbase'
+      }), {});
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.document.cache', function () {
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'document'
+      }), {});
+    });
+
+    var clearAllCaches = function clearAllCaches() {
+      self.clearDbCache({
+        sourceType: 'hive',
+        clearAll: true
+      });
+      self.clearDbCache({
+        sourceType: 'impala',
+        clearAll: true
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'hdfs'
+      }), {});
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'adls'
+      }), {});
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'git'
+      }), {});
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 's3'
+      }), {});
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'collections'
+      }), {});
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'hbase'
+      }), {});
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
+        sourceType: 'document'
+      }), {});
+    };
+
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.all.caches', clearAllCaches);
+
+    if (window.performance && window.performance.navigation) {
+      if (window.performance.navigation.type === 1 && location.href.indexOf('/metastore') !== -1) {
+        // Browser refresh of the metastore page
+        clearAllCaches();
+      }
+    }
+  }
+
+  _createClass(ApiHelper, [{
+    key: "hasExpired",
+    value: function hasExpired(timestamp, cacheType) {
+      if (typeof _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"] !== 'undefined' && typeof _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout !== 'undefined') {
+        return new Date().getTime() - timestamp > _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout;
+      }
+
+      return new Date().getTime() - timestamp > CACHEABLE_TTL[cacheType];
+    }
+  }, {
+    key: "getTotalStorageUserPrefix",
+
+    /**
+     * @param {string} sourceType
+     * @returns {string}
+     */
+    value: function getTotalStorageUserPrefix(sourceType) {
+      return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
+    }
+  }, {
+    key: "getAssistCacheIdentifier",
+
+    /**
+     * @param {object} options
+     * @param {string} options.sourceType
+     * @param {string} [options.cacheType] - Default value 'default'
+     * @returns {string}
+     */
+    value: function getAssistCacheIdentifier(options) {
+      var self = this;
+      return "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
+    }
+  }, {
+    key: "setInTotalStorage",
+
+    /**
+     *
+     * @param {string} owner - 'assist', 'viewModelA' etc.
+     * @param {string} id
+     * @param {*} [value] - Optional, undefined and null will remove the value
+     */
+    value: function setInTotalStorage(owner, id, value) {
+      var self = this;
+
+      try {
+        var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+
+        if (typeof value !== 'undefined' && value !== null) {
+          cachedData[id] = value;
+          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, {
+            secure: window.location.protocol.indexOf('https') > -1
+          });
+        } else if (cachedData[id]) {
+          delete cachedData[id];
+          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, {
+            secure: window.location.protocol.indexOf('https') > -1
+          });
+        }
+      } catch (e) {}
+    }
+  }, {
+    key: "getFromTotalStorage",
+
+    /**
+     *
+     * @param {string} owner - 'assist', 'viewModelA' etc.
+     * @param {string} id
+     * @param {*} [defaultValue]
+     * @returns {*}
+     */
+    value: function getFromTotalStorage(owner, id, defaultValue) {
+      var self = this;
+      var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+      return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
+    }
+  }, {
+    key: "withTotalStorage",
+
+    /**
+     * @param {string} owner - 'assist', 'viewModelA' etc.
+     * @param {string} id
+     * @param {Observable} observable
+     * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
+     */
+    value: function withTotalStorage(owner, id, observable, defaultValue, noInit) {
+      var self = this;
+      var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
+
+      if (!noInit && cachedValue !== 'undefined') {
+        observable(cachedValue);
+      }
+
+      observable.subscribe(function (newValue) {
+        if (owner === 'assist' && id === 'assist_panel_visible') {
+          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.forceRender');
+        }
+
+        self.setInTotalStorage(owner, id, newValue);
+      });
+      return observable;
+    }
+  }, {
+    key: "successResponseIsError",
+
+    /**
+     * @param {Object} [response]
+     * @param {number} [response.status]
+     * @returns {boolean} - True if actually an error
+     */
+    value: function successResponseIsError(response) {
+      return typeof response !== 'undefined' && (typeof response.traceback !== 'undefined' || typeof response.status !== 'undefined' && response.status !== 0 || response.code === 503 || response.code === 500);
+    }
+  }, {
+    key: "assistErrorCallback",
+
+    /**
+     * @param {Object} options
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @returns {Function}
+     */
+    value: function assistErrorCallback(options) {
+      return function (errorResponse) {
+        var errorMessage = 'Unknown error occurred';
+
+        if (typeof errorResponse !== 'undefined' && errorResponse !== null) {
+          if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText === 'abort') {
+            return;
+          } else if (typeof errorResponse.responseText !== 'undefined') {
+            try {
+              var errorJs = JSON.parse(errorResponse.responseText);
+
+              if (typeof errorJs.message !== 'undefined') {
+                errorMessage = errorJs.message;
+              } else {
+                errorMessage = errorResponse.responseText;
+              }
+            } catch (err) {
+              errorMessage = errorResponse.responseText;
+            }
+          } else if (typeof errorResponse.message !== 'undefined' && errorResponse.message !== null) {
+            errorMessage = errorResponse.message;
+          } else if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText !== null) {
+            errorMessage = errorResponse.statusText;
+          } else if (errorResponse.error !== 'undefined' && Object.prototype.toString.call(errorResponse.error) === '[object String]') {
+            errorMessage = errorResponse.error;
+          } else if (Object.prototype.toString.call(errorResponse) === '[object String]') {
+            errorMessage = errorResponse;
+          }
+        }
+
+        if (!options || !options.silenceErrors) {
+          _utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].logError(errorResponse);
+
+          if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).trigger("error", errorMessage);
+          }
+        }
+
+        if (options && options.errorCallback) {
+          options.errorCallback(errorMessage);
+        }
+
+        return errorMessage;
+      };
+    }
+  }, {
+    key: "cancelActiveRequest",
+    value: function cancelActiveRequest(request) {
+      if (typeof request !== 'undefined' && request !== null) {
+        var readyState = request.getReadyState ? request.getReadyState() : request.readyState;
+
+        if (readyState < 4) {
+          request.abort();
+        }
+      }
+    }
+  }, {
+    key: "simplePost",
+
+    /**
+     * @param {string} url
+     * @param {Object} data
+     * @param {Object} options
+     * @param {function} [options.successCallback]
+     * @param {function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @return {Promise}
+     */
+    value: function simplePost(url, data, options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(url, data, function (data) {
+        if (self.successResponseIsError(data)) {
+          deferred.reject(self.assistErrorCallback(options)(data));
+          return;
+        }
+
+        if (options && options.successCallback) {
+          options.successCallback(data);
+        }
+
+        deferred.resolve(data);
+      }).fail(self.assistErrorCallback(options));
+      request.fail(function (data) {
+        deferred.reject(self.assistErrorCallback(options)(data));
+      });
+      var promise = deferred.promise();
+
+      promise.getReadyState = function () {
+        return request.readyState;
+      };
+
+      promise.abort = function () {
+        request.abort();
+      };
+
+      return promise;
+    }
+  }, {
+    key: "saveSnippetToFile",
+
+    /**
+     * @param {Object} data
+     * @param {Object} options
+     * @param {function} [options.successCallback]
+     */
+    value: function saveSnippetToFile(data, options) {
+      var self = this;
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(SAVE_TO_FILE, data, function (result) {
+        if (typeof options.successCallback !== 'undefined') {
+          options.successCallback(result);
+        }
+      }, 'json').fail(self.assistErrorCallback(options));
+    }
+  }, {
+    key: "simpleGet",
+
+    /**
+     * @param {string} url
+     * @param {Object} data
+     * @param {Object} options
+     * @param {function} [options.successCallback]
+     * @param {function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     */
+    value: function simpleGet(url, data, options) {
+      var self = this;
+
+      if (!options) {
+        options = {};
+      }
+
+      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.get(url, data, function (data) {
+        if (self.successResponseIsError(data)) {
+          self.assistErrorCallback(options)(data);
+        } else if (typeof options.successCallback !== 'undefined') {
+          options.successCallback(data);
+        }
+      }).fail(self.assistErrorCallback(options));
+    }
+  }, {
+    key: "fetchUsersAndGroups",
+    value: function fetchUsersAndGroups(options) {
+      var self = this;
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        method: "GET",
+        url: "/desktop/api/users/autocomplete",
+        data: options.data || {},
+        contentType: 'application/json'
+      }).done(function (response) {
+        options.successCallback(response);
+      }).fail(function (response) {
+        options.errorCallback(response);
+      });
+    }
+  }, {
+    key: "fetchUsersByIds",
+    value: function fetchUsersByIds(options) {
+      var self = this;
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        method: "GET",
+        url: "/desktop/api/users",
+        data: {
+          userids: options.userids
+        },
+        contentType: 'application/json'
+      }).done(function (response) {
+        options.successCallback(response);
+      }).fail(function (response) {
+        options.errorCallback(response);
+      });
+    }
+  }, {
+    key: "fetchStoragePreview",
+
+    /**
+     *
+     * @param {Object} options
+     * @param {string[]} options.path
+     * @param {string} options.type - 's3', 'adls' or 'hdfs'
+     * @param {number} [options.offset]
+     * @param {number} [options.length]
+     * @param {boolean} [options.silenceErrors]
+     */
+    value: function fetchStoragePreview(options) {
+      var self = this;
+      var url;
+
+      if (options.type === 's3') {
+        url = S3_API_PREFIX;
+      } else if (options.type === 'adls') {
+        url = ADLS_API_PREFIX;
+      } else {
+        url = HDFS_API_PREFIX;
+      }
+
+      var clonedPath = options.path.concat();
+
+      if (clonedPath.length && clonedPath[0] === '/') {
+        clonedPath.shift();
+      }
+
+      url += clonedPath.join('/').replace(/#/g, '%23') + '?compression=none&mode=text';
+      url += '&offset=' + (options.offset || 0);
+      url += '&length=' + (options.length || 118784);
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        dataType: "json",
+        url: url,
+        success: function success(data) {
+          if (self.successResponseIsError(data)) {
+            deferred.reject(self.assistErrorCallback(options)(data));
+          } else {
+            deferred.resolve(data);
+          }
+        },
+        fail: deferred.reject
+      });
+      return deferred.promise();
+    }
+  }, {
+    key: "fetchHdfsPath",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @param {Number} [options.timeout]
+     * @param {Object} [options.editor] - Ace editor
+     *
+     * @param {string[]} options.pathParts
+     * @param {number} [options.pageSize] - Default 500
+     * @param {number} [options.page] - Default 1
+     * @param {string} [options.filter]
+     */
+    value: function fetchHdfsPath(options) {
+      var self = this;
+
+      if (options.pathParts.length > 0 && (options.pathParts[0] === '/' || options.pathParts[0] === '')) {
+        options.pathParts.shift();
+      }
+
+      var url = HDFS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+
+      if (options.filter) {
+        url += '&filter=' + options.filter;
+      }
+
+      var fetchFunction = function fetchFunction(storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({
+            status: -1
+          });
+          return;
+        }
+
+        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+          dataType: "json",
+          url: url,
+          timeout: options.timeout,
+          success: function success(data) {
+            if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+              if (data.files.length > 2 && !options.filter) {
+                storeInCache(data);
+              }
+
+              options.successCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        }).fail(self.assistErrorCallback(options)).always(function () {
+          if (typeof options.editor !== 'undefined' && options.editor !== null) {
+            options.editor.hideSpinner();
+          }
+        });
+      };
+
+      return fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
+        sourceType: 'hdfs',
+        url: url,
+        fetchFunction: fetchFunction
+      }));
+    }
+  }, {
+    key: "fetchAdlsPath",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @param {Number} [options.timeout]
+     * @param {Object} [options.editor] - Ace editor
+     *
+     * @param {string[]} options.pathParts
+     * @param {number} [options.pageSize] - Default 500
+     * @param {number} [options.page] - Default 1
+     * @param {string} [options.filter]
+     */
+    value: function fetchAdlsPath(options) {
+      var self = this;
+      options.pathParts.shift();
+      var url = ADLS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+
+      if (options.filter) {
+        url += '&filter=' + options.filter;
+      }
+
+      var fetchFunction = function fetchFunction(storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({
+            status: -1
+          });
+          return;
+        }
+
+        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+          dataType: "json",
+          url: url,
+          timeout: options.timeout,
+          success: function success(data) {
+            if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+              if (data.files.length > 2 && !options.filter) {
+                storeInCache(data);
+              }
+
+              options.successCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        }).fail(self.assistErrorCallback(options)).always(function () {
+          if (typeof options.editor !== 'undefined' && options.editor !== null) {
+            options.editor.hideSpinner();
+          }
+        });
+      };
+
+      return fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
+        sourceType: 'adls',
+        url: url,
+        fetchFunction: fetchFunction
+      }));
+    }
+  }, {
+    key: "fetchGitContents",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @param {Number} [options.timeout]
+     *
+     * @param {string[]} options.pathParts
+     * @param {string} options.fileType
+     */
+    value: function fetchGitContents(options) {
+      var self = this;
+      var url = GIT_API_PREFIX + '?path=' + encodeURI(options.pathParts.join("/")) + '&fileType=' + options.fileType;
+
+      var fetchFunction = function fetchFunction(storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({
+            status: -1
+          });
+          return;
+        }
+
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+          dataType: "json",
+          url: url,
+          timeout: options.timeout,
+          success: function success(data) {
+            if (!data.error && !self.successResponseIsError(data)) {
+              if (data.fileType === 'dir' && typeof data.files !== 'undefined' && data.files !== null) {
+                if (data.files.length > 2) {
+                  storeInCache(data);
+                }
+
+                options.successCallback(data);
+              } else if (data.fileType === 'file' && typeof data.content !== 'undefined' && data.content !== null) {
+                options.successCallback(data);
+              }
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        }).fail(self.assistErrorCallback(options));
+      };
+
+      fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
+        sourceType: 'git',
+        url: url,
+        fetchFunction: fetchFunction
+      }));
+    }
+  }, {
+    key: "fetchS3Path",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @param {Number} [options.timeout]
+     * @param {Object} [options.editor] - Ace editor
+     *
+     * @param {string[]} options.pathParts
+     * @param {number} [options.pageSize] - Default 500
+     * @param {number} [options.page] - Default 1
+     * @param {string} [options.filter]
+     */
+    value: function fetchS3Path(options) {
+      var self = this;
+      options.pathParts.shift(); // remove the trailing /
+
+      var url = S3_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+
+      if (options.filter) {
+        url += '&filter=' + options.filter;
+      }
+
+      var fetchFunction = function fetchFunction(storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({
+            status: -1
+          });
+          return;
+        }
+
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+          dataType: "json",
+          url: url,
+          timeout: options.timeout,
+          success: function success(data) {
+            if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+              if (data.files.length > 2 && !options.filter) {
+                storeInCache(data);
+              }
+
+              options.successCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        }).fail(self.assistErrorCallback(options)).always(function () {
+          if (typeof options.editor !== 'undefined' && options.editor !== null) {
+            options.editor.hideSpinner();
+          }
+        });
+      };
+
+      fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
+        sourceType: 's3',
+        url: url,
+        fetchFunction: fetchFunction
+      }));
+    }
+  }, {
+    key: "fetchDashboardTerms",
+
+    /**
+     * @param {Object} options
+     * @param {String} options.collectionName
+     * @param {String} options.fieldName
+     * @param {String} options.prefix
+     * @param {String} [options.engine]
+     * @param {Function} options.successCallback
+     * @param {Function} [options.alwaysCallback]
+     * @param {Number} [options.timeout]
+     *
+     */
+    value: function fetchDashboardTerms(options) {
+      var self = this;
+
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({
+          status: -1
+        });
+        return;
+      }
+
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        dataType: 'json',
+        url: DASHBOARD_TERMS_API,
+        type: 'POST',
+        data: {
+          collection: ko.mapping.toJSON({
+            id: '',
+            name: options.collectionName,
+            engine: options.engine || 'solr'
+          }),
+          analysis: ko.mapping.toJSON({
+            name: options.fieldName,
+            terms: {
+              prefix: options.prefix || ''
+            }
+          })
+        },
+        timeout: options.timeout,
+        success: function success(data) {
+          if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      }).fail(self.assistErrorCallback(options)).always(options.alwaysCallback);
+    }
+  }, {
+    key: "fetchDashboardStats",
+
+    /**
+     * @param {Object} options
+     * @param {String} options.collectionName
+     * @param {String} options.fieldName
+     * @param {String} [options.engine]
+     * @param {Function} options.successCallback
+     * @param {Function} [options.alwaysCallback]
+     * @param {Number} [options.timeout]
+     *
+     */
+    value: function fetchDashboardStats(options) {
+      var self = this;
+
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({
+          status: -1
+        });
+        return;
+      }
+
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        dataType: 'json',
+        url: DASHBOARD_STATS_API,
+        type: 'POST',
+        data: {
+          collection: ko.mapping.toJSON({
+            id: '',
+            name: options.collectionName,
+            engine: options.engine || 'solr'
+          }),
+          analysis: ko.mapping.toJSON({
+            name: options.fieldName,
+            stats: {
+              facet: ''
+            }
+          }),
+          query: ko.mapping.toJSON({
+            qs: [{
+              q: ''
+            }],
+            fqs: []
+          })
+        },
+        timeout: options.timeout,
+        success: function success(data) {
+          if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
+            options.successCallback(data);
+          } else {
+            if (data.status === 1) {
+              options.notSupportedCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        }
+      }).fail(self.assistErrorCallback(options)).always(options.alwaysCallback);
+    }
+  }, {
+    key: "fetchHBase",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @param {Number} [options.timeout]
+     * @param {Object} [options.editor] - Ace editor
+     */
+    value: function fetchHBase(options) {
+      var self = this;
+      var suffix = 'getClusters';
+
+      if (options.parent.name !== '') {
+        suffix = 'getTableList/' + options.parent.name;
+      }
+
+      var url = HBASE_API_PREFIX + suffix;
+
+      var fetchFunction = function fetchFunction(storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({
+            status: -1
+          });
+          return;
+        }
+
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+          dataType: "json",
+          url: url,
+          timeout: options.timeout,
+          success: function success(data) {
+            if (!data.error && !self.successResponseIsError(data)) {
+              storeInCache(data);
+              options.successCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        }).fail(self.assistErrorCallback(options)).always(function () {
+          if (typeof options.editor !== 'undefined' && options.editor !== null) {
+            options.editor.hideSpinner();
+          }
+        });
+      };
+
+      fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
+        sourceType: 'hbase',
+        url: url,
+        fetchFunction: fetchFunction
+      }));
+    }
+  }, {
+    key: "fetchResourceStats",
+
+    /**
+     * @param {Object} options
+     * @param {Number} options.pastMs
+     * @param {Number} options.stepMs
+     *
+     * @return {Promise}
+     */
+    value: function fetchResourceStats(options) {
+      var self = this;
+
+      var queryMetric = function queryMetric(metricName) {
+        var now = Date.now();
+        return self.simplePost('/metadata/api/prometheus/query', {
+          query: ko.mapping.toJSON(metricName),
+          start: Math.floor((now - options.pastMs) / 1000),
+          end: Math.floor(now / 1000),
+          step: options.stepMs / 1000
+        });
+      };
+
+      var combinedDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when(queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
+      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
+      queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
+      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}') // Queued queries
+      ).done(function () {
+        var timestampIndex = {};
+
+        for (var j = 0; j < arguments.length; j++) {
+          var response = arguments[j];
+
+          if (response.data.result[0]) {
+            var values = response.data.result[0].values;
+
+            for (var i = 0; i < values.length; i++) {
+              if (!timestampIndex[values[i][0]]) {
+                timestampIndex[values[i][0]] = [values[i][0] * 1000, 0, 0, 0, 0, 0]; // Adjust back to milliseconds
+              }
+
+              timestampIndex[values[i][0]][j + 1] = parseFloat(values[i][1]);
+            }
+          }
+        }
+
+        var result = [];
+        Object.keys(timestampIndex).forEach(function (key) {
+          result.push(timestampIndex[key]);
+        });
+        result.sort(function (a, b) {
+          return a[0] - b[0];
+        });
+        combinedDeferred.resolve(result);
+      }).fail(combinedDeferred.reject);
+      return combinedDeferred.promise();
+    }
+  }, {
+    key: "fetchConfigurations",
+
+    /**
+     * @param {Object} options
+     * @param {Function} [options.successCallback]
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     */
+    value: function fetchConfigurations(options) {
+      var self = this;
+      self.simpleGet(CONFIG_APPS_API, {}, options);
+    }
+  }, {
+    key: "saveGlobalConfiguration",
+    value: function saveGlobalConfiguration(options) {
+      var self = this;
+      self.simplePost(CONFIG_APPS_API, {
+        configuration: ko.mapping.toJSON(options.configuration)
+      }, options);
+    }
+  }, {
+    key: "saveConfiguration",
+
+    /**
+     * @param {Object} options
+     * @param {Function} [options.successCallback]
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.app
+     * @param {Object} options.properties
+     * @param {boolean} [options.isDefault]
+     * @param {Number} [options.groupId]
+     * @param {Number} [options.userId]
+     */
+    value: function saveConfiguration(options) {
+      var self = this;
+      self.simplePost(CONFIG_SAVE_API, {
+        app: options.app,
+        properties: ko.mapping.toJSON(options.properties),
+        is_default: options.isDefault,
+        group_id: options.groupId,
+        user_id: options.userId
+      }, options);
+    }
+  }, {
+    key: "fetchDocuments",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} [options.uuid]
+     */
+    value: function fetchDocuments(options) {
+      var self = this;
+      var id = '';
+
+      if (options.uuid) {
+        id += options.uuid;
+      }
+
+      if (options.type && options.type !== 'all') {
+        id += options.type;
+      }
+
+      var promise = self.queueManager.getQueued(DOCUMENTS_API, id);
+      var firstInQueue = typeof promise === 'undefined';
+
+      if (firstInQueue) {
+        promise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+        self.queueManager.addToQueue(promise, DOCUMENTS_API, id);
+      }
+
+      promise.done(options.successCallback).fail(self.assistErrorCallback(options));
+
+      if (!firstInQueue) {
+        return;
+      }
+
+      var data = {
+        uuid: options.uuid
+      };
+
+      if (options.type && options.type !== 'all') {
+        data.type = ['directory', options.type];
+      }
+
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        url: DOCUMENTS_API,
+        data: data,
+        traditional: true,
+        success: function success(data) {
+          if (!self.successResponseIsError(data)) {
+            promise.resolve(data);
+          } else {
+            promise.reject(data);
+          }
+        }
+      }).fail(promise.reject);
+    }
+  }, {
+    key: "searchDocuments",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} [options.path]
+     * @param {string} [options.query]
+     * @param {string} [options.type]
+     * @param {int} [options.page]
+     * @param {int} [options.limit]
+     */
+    value: function searchDocuments(options) {
+      var self = this;
+      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        url: DOCUMENTS_SEARCH_API,
+        data: {
+          uuid: options.uuid,
+          text: options.query,
+          type: options.type,
+          page: options.page,
+          limit: options.limit,
+          include_trashed: options.include_trashed
+        },
+        success: function success(data) {
+          if (!self.successResponseIsError(data)) {
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      }).fail(self.assistErrorCallback(options));
+    }
+  }, {
+    key: "fetchDocument",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.fetchContents]
+     * @param {number} options.uuid
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchDocument(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        url: DOCUMENTS_API,
+        data: {
+          uuid: options.uuid,
+          data: !!options.fetchContents
+        },
+        success: function success(data) {
+          if (!self.successResponseIsError(data)) {
+            deferred.resolve(data);
+          } else {
+            deferred.reject(self.assistErrorCallback({
+              silenceErrors: options.silenceErrors
+            }));
+          }
+        }
+      }).fail(function (errorResponse) {
+        deferred.reject(self.assistErrorHandler(errorResponse));
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "createDocumentsFolder",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.parentUuid
+     * @param {string} options.name
+     */
+    value: function createDocumentsFolder(options) {
+      var self = this;
+      self.simplePost(DOCUMENTS_API + 'mkdir', {
+        parent_uuid: ko.mapping.toJSON(options.parentUuid),
+        name: ko.mapping.toJSON(options.name)
+      }, options);
+    }
+  }, {
+    key: "updateDocument",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.uuid
+     * @param {string} options.name
+     */
+    value: function updateDocument(options) {
+      var self = this;
+      self.simplePost(DOCUMENTS_API + 'update', {
+        uuid: ko.mapping.toJSON(options.uuid),
+        name: options.name
+      }, options);
+    }
+  }, {
+    key: "uploadDocument",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {Function} [options.progressHandler]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {FormData} options.formData
+     */
+    value: function uploadDocument(options) {
+      var self = this;
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        url: DOCUMENTS_API + 'import',
+        type: 'POST',
+        success: function success(data) {
+          if (!self.successResponseIsError(data)) {
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        },
+        xhr: function xhr() {
+          var myXhr = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajaxSettings.xhr();
+
+          if (myXhr.upload && options.progressHandler) {
+            myXhr.upload.addEventListener('progress', options.progressHandler, false);
+          }
+
+          return myXhr;
+        },
+        dataType: 'json',
+        data: options.formData,
+        cache: false,
+        contentType: false,
+        processData: false
+      }).fail(self.assistErrorCallback(options));
+    }
+  }, {
+    key: "moveDocument",
+
+    /**
+     *
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {number} options.sourceId - The ID of the source document
+     * @param {number} options.destinationId - The ID of the target document
+     */
+    value: function moveDocument(options) {
+      var self = this;
+      self.simplePost(DOCUMENTS_API + 'move', {
+        source_doc_uuid: ko.mapping.toJSON(options.sourceId),
+        destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
+      }, options);
+    }
+  }, {
+    key: "deleteDocument",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.uuid
+     * @param {string} [options.skipTrash] - Default false
+     */
+    value: function deleteDocument(options) {
+      var self = this;
+      self.simplePost(DOCUMENTS_API + 'delete', {
+        uuid: ko.mapping.toJSON(options.uuid),
+        skip_trash: ko.mapping.toJSON(options.skipTrash || false)
+      }, options);
+    }
+  }, {
+    key: "copyDocument",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.uuid
+     */
+    value: function copyDocument(options) {
+      var self = this;
+      self.simplePost(DOCUMENTS_API + 'copy', {
+        uuid: ko.mapping.toJSON(options.uuid)
+      }, options);
+    }
+  }, {
+    key: "restoreDocument",
+
+    /**
+     * @param {Object} options
+     * @param {Function} options.successCallback
+     * @param {Function} [options.errorCallback]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.uuid
+     */
+    value: function restoreDocument(options) {
+      var self = this;
+      self.simplePost(DOCUMENTS_API + 'restore', {
+        uuids: ko.mapping.toJSON(options.uuids)
+      }, options);
+    }
+  }, {
+    key: "clearDbCache",
+
+    /**
+     *
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {string} [options.databaseName]
+     * @param {string} [options.tableName]
+     * @param {string} [options.cacheType] - Possible values 'default', 'optimizer. Default value 'default'
+     * @param {string[]} [options.fields]
+     * @param {boolean} [options.clearAll]
+     */
+    value: function clearDbCache(options) {
+      var self = this;
+      var cacheIdentifier = self.getAssistCacheIdentifier(options);
+
+      if (options.clearAll) {
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, {});
+      } else {
+        var url = AUTOCOMPLETE_API_PREFIX;
+
+        if (options.databaseName) {
+          url += options.databaseName;
+        }
+
+        if (options.tableName) {
+          url += "/" + options.tableName;
+        }
+
+        if (options.fields) {
+          url += options.fields.length > 0 ? "/" + options.fields.join("/") : "";
+        }
+
+        var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier) || {};
+        delete cachedData[url];
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, cachedData);
+      }
+    }
+  }, {
+    key: "invalidateSourceMetadata",
+
+    /**
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {string} options.invalidate - 'invalidate' or 'invalidateAndFlush'
+     * @param {string[]} [options.path]
+     * @param {ContextCompute} [options.compute]
+     * @param {boolean} [options.silenceErrors]
+     */
+    value: function invalidateSourceMetadata(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+
+      if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
+        var data = {
+          flush_all: options.invalidate === 'invalidateAndFlush',
+          cluster: JSON.stringify(options.compute)
+        };
+
+        if (options.path && options.path.length > 0) {
+          data.database = options.path[0];
+        }
+
+        if (options.path && options.path.length > 1) {
+          data.table = options.path[1];
+        }
+
+        var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
+        return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      }
+
+      return deferred.resolve().promise();
+    }
+  }, {
+    key: "fetchSourceMetadata",
+
+    /**
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {ContextCompute} options.compute
+     * @param {boolean} [options.silenceErrors]
+     * @param {number} [options.timeout]
+     *
+     * @param {string[]} [options.path] - The path to fetch
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchSourceMetadata(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var isQuery = options.sourceType.indexOf('-query') !== -1;
+      var sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
+      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+        type: 'POST',
+        url: AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
+        data: {
+          notebook: {},
+          snippet: ko.mapping.toJSON({
+            type: sourceType,
+            source: isQuery ? 'query' : 'data'
+          }),
+          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+        },
+        timeout: options.timeout
+      }).done(function (data) {
+        data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
+        data.hueTimestamp = Date.now(); // TODO: Display warning in autocomplete when an entity can't be found
+        // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
+        // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
+
+        if (!data.notFound && self.successResponseIsError(data)) {
+          self.assistErrorCallback({
+            silenceErrors: options.silenceErrors,
+            errorCallback: deferred.reject
+          })(data);
+        } else {
+          deferred.resolve(data);
+        }
+      }).fail(self.assistErrorCallback({
+        silenceErrors: options.silenceErrors,
+        errorCallback: deferred.reject
+      }));
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "updateSourceMetadata",
+    value: function updateSourceMetadata(options) {
+      var self = this;
+      var url;
+      var data = {
+        source_type: options.sourceType
+      };
+
+      if (options.path.length === 1) {
+        url = '/metastore/databases/' + options.path[1] + '/alter';
+        data.properties = ko.mapping.toJSON(options.properties);
+      } else if (options.path.length === 2) {
+        url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
+
+        if (options.properties) {
+          if (options.properties.comment) {
+            data.comment = options.properties.comment;
+          }
+
+          if (options.properties.name) {
+            data.new_table_name = options.properties.name;
+          }
+        }
+      } else if (options.path > 2) {
+        url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
+        data.column = options.path.slice(2).join('.');
+
+        if (options.properties) {
+          if (options.properties.comment) {
+            data.comment = options.properties.comment;
+          }
+
+          if (options.properties.name) {
+            data.new_column_name = options.properties.name;
+          }
+
+          if (options.properties.type) {
+            data.new_column_type = options.properties.name;
+          }
+
+          if (options.properties.partitions) {
+            data.partition_spec = ko.mapping.toJSON(options.properties.partitions);
+          }
+        }
+      }
+
+      return self.simplePost(url, data, options);
+    }
+  }, {
+    key: "fetchAnalysis",
+
+    /**
+     * Fetches the analysis for the given source and path
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {ContextCompute} options.compute
+     * @param {string} options.sourceType
+     * @param {string[]} options.path
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchAnalysis(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var url;
+
+      if (options.path.length === 1) {
+        url = '/metastore/databases/' + options.path[0] + '/metadata';
+      } else {
+        url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
+
+        if (options.path.length > 1) {
+          url += '/' + options.path[1] + '/';
+        }
+
+        if (options.path.length > 2) {
+          url += 'stats/' + options.path.slice(2).join('/');
+        }
+      }
+
+      var data = {
+        format: 'json',
+        cluster: JSON.stringify(options.compute),
+        source_type: options.sourceType
+      };
+      var request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(response) {
+          if (options.path.length === 1) {
+            if (response.data) {
+              response.data.hueTimestamp = Date.now();
+              deferred.resolve(response.data);
+            } else {
+              deferred.reject();
+            }
+          } else {
+            deferred.resolve(response);
+          }
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "fetchPartitions",
+
+    /**
+     * Fetches the partitions for the given path
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string[]} options.path
+     * @param {ContextCompute} options.compute
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchPartitions(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred(); // TODO: No sourceType needed?
+
+      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post('/metastore/table/' + options.path.join('/') + '/partitions', {
+        format: 'json',
+        cluster: JSON.stringify(options.compute)
+      }).done(function (response) {
+        if (!self.successResponseIsError(response)) {
+          if (!response) {
+            response = {};
+          }
+
+          response.hueTimestamp = Date.now();
+          deferred.resolve(response);
+        } else {
+          self.assistErrorCallback({
+            silenceErrors: options.silenceErrors,
+            errorCallback: deferred.reject
+          })(response);
+        }
+      }).fail(function (response) {
+        // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
+        if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
+          deferred.resolve({
+            hueTimestamp: Date.now(),
+            partition_keys_json: [],
+            partition_values_json: []
+          });
+        } else {
+          self.assistErrorCallback({
+            silenceErrors: options.silenceErrors,
+            errorCallback: deferred.reject
+          })(response);
+        }
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "refreshAnalysis",
+
+    /**
+     * Refreshes the analysis for the given source and path
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.sourceType
+     * @param {ContextCompute} options.compute
+     * @param {string[]} options.path
+     *
+     * @return {CancellablePromise}
+     */
+    value: function refreshAnalysis(options) {
+      var self = this;
+
+      if (options.path.length === 1) {
+        return self.fetchAnalysis(options);
+      }
+
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var promises = [];
+
+      var pollForAnalysis = function pollForAnalysis(url, delay) {
+        window.setTimeout(function () {
+          promises.push(self.simplePost(url, undefined, {
+            silenceErrors: options.silenceErrors,
+            successCallback: function successCallback(data) {
+              promises.pop();
+
+              if (data.isSuccess) {
+                promises.push(self.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject));
+              } else if (data.isFailure) {
+                deferred.reject(data);
+              } else {
+                pollForAnalysis(url, 1000);
+              }
+            },
+            errorCallback: deferred.reject
+          }));
+        }, delay);
+      };
+
+      var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/analyze/' + options.path.join('/') + '/';
+      promises.push(self.simplePost(url, undefined, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(data) {
+          promises.pop();
+
+          if (data.status === 0 && data.watch_url) {
+            pollForAnalysis(data.watch_url, 500);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      }));
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, promises);
+    }
+  }, {
+    key: "whenAvailable",
+
+    /**
+     * Checks the status for the given snippet ID
+     * Note: similar to notebook and search check_status.
+     *
+     * @param {Object} options
+     * @param {Object} options.notebookJson
+     * @param {Object} options.snippetJson
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @return {CancellablePromise}
+     */
+    value: function whenAvailable(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var cancellablePromises = [];
+      var waitTimeout = -1;
+      deferred.fail(function () {
+        window.clearTimeout(waitTimeout);
+      });
+
+      var waitForAvailable = function waitForAvailable() {
+        var request = self.simplePost('/notebook/api/check_status', {
+          notebook: options.notebookJson,
+          snippet: options.snippetJson,
+          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+        }, {
+          silenceErrors: options.silenceErrors
+        }).done(function (response) {
+          if (response && response.query_status && response.query_status.status) {
+            var status = response.query_status.status;
+
+            if (status === 'available') {
+              deferred.resolve();
+            } else if (status === 'running' || status === 'starting' || status === 'waiting') {
+              waitTimeout = window.setTimeout(function () {
+                waitForAvailable();
+              }, 500);
+            } else {
+              deferred.reject();
+            }
+          }
+        }).fail(deferred.reject);
+        cancellablePromises.push(new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](request, request));
+      };
+
+      waitForAvailable();
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+    }
+  }, {
+    key: "fetchSample",
+
+    /**
+     * Fetches samples for the given source and path
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {string} options.sourceType
+     * @param {ContextCompute} options.compute
+     * @param {number} [options.sampleCount] - Default 100
+     * @param {string[]} options.path
+     * @param {string} [options.operation] - Default 'default'
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchSample(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var cancellablePromises = [];
+      var notebookJson = null;
+      var snippetJson = null;
+      var cancelled = false;
+
+      var cancelQuery = function cancelQuery() {
+        cancelled = true;
+
+        if (notebookJson) {
+          self.simplePost('/notebook/api/cancel_statement', {
+            notebook: notebookJson,
+            snippet: snippetJson,
+            cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+          }, {
+            silenceErrors: options.silenceErrors
+          });
+        }
+      };
+
+      self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
+        notebook: {},
+        snippet: JSON.stringify({
+          type: options.sourceType,
+          compute: options.compute
+        }),
+        async: true,
+        operation: '"' + (options.operation || 'default') + '"',
+        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+      }, {
+        silenceErrors: options.silenceErrors
+      }).done(function (sampleResponse) {
+        var queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
+        notebookJson = JSON.stringify({
+          type: options.sourceType
+        });
+        snippetJson = JSON.stringify(queryResult);
+
+        if (sampleResponse && sampleResponse.rows) {
+          // Sync results
+          var data = {
+            data: sampleResponse.rows,
+            meta: sampleResponse.full_headers
+          };
+          data.hueTimestamp = Date.now();
+          deferred.resolve(data);
+        } else {
+          cancellablePromises.push(self.whenAvailable({
+            notebookJson: notebookJson,
+            snippetJson: snippetJson,
+            compute: options.compute,
+            silenceErrors: options.silenceErrors
+          }).done(function () {
+            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
+              notebook: notebookJson,
+              snippet: snippetJson,
+              rows: options.sampleCount || 100,
+              startOver: 'false'
+            }, {
+              silenceErrors: options.silenceErrors
+            }).done(function (sampleResponse) {
+              var data = sampleResponse && sampleResponse.result || {
+                data: [],
+                meta: []
+              };
+              data.hueTimestamp = Date.now();
+              deferred.resolve(data);
+            }).fail(deferred.reject);
+            cancellablePromises.push(resultRequest, resultRequest);
+          }).fail(deferred.reject));
+        }
+      }).fail(deferred.reject);
+      cancellablePromises.push({
+        cancel: cancelQuery
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+    }
+  }, {
+    key: "fetchNavigatorMetadata",
+
+    /**
+     * Fetches a navigator entity for the given source and path
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @param {boolean} [options.isView] - Default false
+     * @param {string[]} options.path
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavigatorMetadata(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var url = NAV_URLS.FIND_ENTITY;
+
+      if (options.path.length === 1) {
+        url += '?type=database&name=' + options.path[0];
+      } else if (options.path.length === 2) {
+        url += (options.isView ? '?type=view' : '?type=table') + '&database=' + options.path[0] + '&name=' + options.path[1];
+      } else if (options.path.length === 3) {
+        url += '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
+      } else {
+        return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().reject());
+      }
+
+      var request = self.simplePost(url, {
+        notebook: {},
+        snippet: ko.mapping.toJSON({
+          type: 'nav'
+        })
+      }, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(data) {
+          data = data.entity || data;
+          data.hueTimestamp = Date.now();
+          deferred.resolve(data);
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "updateNavigatorProperties",
+
+    /**
+     * Updates Navigator properties and custom metadata for the given entity
+     *
+     * @param {Object} options
+     * @param {string} options.identity - The identifier for the Navigator entity to update
+     * @param {Object} [options.properties]
+     * @param {Object} [options.modifiedCustomMetadata]
+     * @param {string[]} [options.deletedCustomMetadataKeys]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @return {Promise}
+     */
+    value: function updateNavigatorProperties(options) {
+      var self = this;
+      var data = {
+        id: ko.mapping.toJSON(options.identity)
+      };
+
+      if (options.properties) {
+        data.properties = ko.mapping.toJSON(options.properties);
+      }
+
+      if (options.modifiedCustomMetadata) {
+        data.modifiedCustomMetadata = ko.mapping.toJSON(options.modifiedCustomMetadata);
+      }
+
+      if (options.deletedCustomMetadataKeys) {
+        data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
+      }
+
+      return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options);
+    }
+  }, {
+    key: "fetchAllNavigatorTags",
+
+    /**
+     * Lists all available navigator tags
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchAllNavigatorTags(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = self.simplePost(NAV_URLS.LIST_TAGS, undefined, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(data) {
+          if (data && data.tags) {
+            deferred.resolve(data.tags);
+          } else {
+            deferred.resolve({});
+          }
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "addNavTags",
+    value: function addNavTags(entityId, tags) {
+      var self = this;
+      return self.simplePost(NAV_URLS.ADD_TAGS, {
+        id: ko.mapping.toJSON(entityId),
+        tags: ko.mapping.toJSON(tags)
+      });
+    }
+  }, {
+    key: "deleteNavTags",
+    value: function deleteNavTags(entityId, tags) {
+      var self = this;
+      return self.simplePost(NAV_URLS.DELETE_TAGS, {
+        id: ko.mapping.toJSON(entityId),
+        tags: ko.mapping.toJSON(tags)
+      });
+    }
+  }, {
+    key: "fetchNavOptPopularity",
+
+    /**
+     * Fetches navOpt popularity for the children of the given path
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string[][]} options.paths
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavOptPopularity(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var url, data;
+
+      if (options.paths.length === 1 && options.paths[0].length === 1) {
+        url = NAV_OPT_URLS.TOP_TABLES;
+        data = {
+          database: options.paths[0][0]
+        };
+      } else {
+        url = NAV_OPT_URLS.TOP_COLUMNS;
+        var dbTables = [];
+        options.paths.forEach(function (path) {
+          dbTables.push(path.join('.'));
+        });
+        data = {
+          dbTables: ko.mapping.toJSON(dbTables)
+        };
+      }
+
+      var request = self.simplePost(url, data, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(data) {
+          data.hueTimestamp = Date.now();
+          deferred.resolve(data);
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "fetchNavOptTopAggs",
+
+    /**
+     * Fetches the popular aggregate functions for the given tables
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string[][]} options.paths
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavOptTopAggs(options) {
+      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
+    }
+  }, {
+    key: "fetchNavOptTopColumns",
+
+    /**
+     * Fetches the popular columns for the given tables
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string[][]} options.paths
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavOptTopColumns(options) {
+      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
+    }
+  }, {
+    key: "fetchNavOptTopFilters",
+
+    /**
+     * Fetches the popular filters for the given tables
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string[][]} options.paths
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavOptTopFilters(options) {
+      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
+    }
+  }, {
+    key: "fetchNavOptTopJoins",
+
+    /**
+     * Fetches the popular joins for the given tables
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string[][]} options.paths
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavOptTopJoins(options) {
+      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
+    }
+  }, {
+    key: "fetchNavOptMeta",
+
+    /**
+     * Fetches navOpt meta for the given path, only possible for tables atm.
+     *
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string[]} options.path
+     *
+     * @return {CancellablePromise}
+     */
+    value: function fetchNavOptMeta(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = self.simplePost(NAV_OPT_URLS.TABLE_DETAILS, {
+        databaseName: options.path[0],
+        tableName: options.path[1]
+      }, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(response) {
+          if (response.status === 0 && response.details) {
+            response.details.hueTimestamp = Date.now();
+            deferred.resolve(response.details);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "fetchQueryExecutionAnalysis",
+
+    /**
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {ContextCompute} options.compute
+     * @param {string} options.queryId
+     * @return {CancellablePromise}
+     */
+    value: function fetchQueryExecutionAnalysis(options) {
+      var self = this; //var url = '/metadata/api/workload_analytics/get_impala_query/';
+
+      var url = '/impala/api/query/alanize';
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var tries = 0;
+      var cancellablePromises = [];
+      var promise = new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+
+      var pollForAnalysis = function pollForAnalysis() {
+        if (tries === 10) {
+          deferred.reject();
+          return;
+        }
+
+        tries++;
+        cancellablePromises.pop(); // Remove the last one
+
+        cancellablePromises.push(deferred, self.simplePost(url, {
+          'cluster': JSON.stringify(options.compute),
+          'query_id': '"' + options.queryId + '"'
+        }, options).done(function (response) {
+          if (response && response.data) {
+            deferred.resolve(response.data);
+          } else {
+            var timeout = window.setTimeout(function () {
+              pollForAnalysis();
+            }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
+
+            promise.onCancel(function () {
+              window.clearTimeout(timeout);
+            });
+          }
+        }).fail(deferred.reject));
+      };
+
+      pollForAnalysis();
+      return promise;
+    }
+  }, {
+    key: "fixQueryExecutionAnalysis",
+    value: function fixQueryExecutionAnalysis(options) {
+      var self = this;
+      var url = '/impala/api/query/alanize/fix';
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = self.simplePost(url, {
+        fix: JSON.stringify(options.fix),
+        start_time: options.start_time
+      }, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(response) {
+          if (response.status === 0) {
+            deferred.resolve(response.details);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "fetchQueryExecutionStatistics",
+    value: function fetchQueryExecutionStatistics(options) {
+      var self = this;
+      var url = '/impala/api/query/alanize/metrics';
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = self.simplePost(url, {
+        'cluster': JSON.stringify(options.compute),
+        'query_id': '"' + options.queryId + '"'
+      }, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function successCallback(response) {
+          if (response.status === 0) {
+            deferred.resolve(response.data);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "fetchContextNamespaces",
+
+    /**
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string} options.sourceType
+     * @return {Promise}
+     */
+    value: function fetchContextNamespaces(options) {
+      var self = this;
+      var url = '/desktop/api2/context/namespaces/' + options.sourceType;
+      return self.simpleGet(url, undefined, options);
+    }
+  }, {
+    key: "fetchContextComputes",
+
+    /**
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string} options.sourceType
+     * @return {Promise}
+     */
+    value: function fetchContextComputes(options) {
+      var self = this;
+      var url = '/desktop/api2/context/computes/' + options.sourceType;
+      return self.simpleGet(url, undefined, options);
+    }
+  }, {
+    key: "fetchContextClusters",
+
+    /**
+     * @param {Object} options
+     * @param {boolean} [options.silenceErrors]
+     * @param {string} options.sourceType
+     * @return {Promise}
+     */
+    value: function fetchContextClusters(options) {
+      var self = this;
+      var url = '/desktop/api2/context/clusters/' + options.sourceType;
+      return self.simpleGet(url, undefined, options);
+    }
+  }, {
+    key: "getClusterConfig",
+    value: function getClusterConfig(data) {
+      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(FETCH_CONFIG, data);
+    }
+  }, {
+    key: "fetchHueDocsInteractive",
+    value: function fetchHueDocsInteractive(query) {
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(INTERACTIVE_SEARCH_API, {
+        query_s: ko.mapping.toJSON(query),
+        limit: 50,
+        sources: '["documents"]'
+      }).done(function (data) {
+        if (data.status === 0) {
+          deferred.resolve(data);
+        } else {
+          deferred.reject(data);
+        }
+      }).fail(deferred.reject);
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "fetchNavEntitiesInteractive",
+    value: function fetchNavEntitiesInteractive(options) {
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(INTERACTIVE_SEARCH_API, {
+        query_s: ko.mapping.toJSON(options.query),
+        field_facets: ko.mapping.toJSON(options.facets || []),
+        limit: 50,
+        sources: '["sql", "hdfs", "s3"]'
+      }).done(function (data) {
+        if (data.status === 0) {
+          deferred.resolve(data);
+        } else {
+          deferred.reject(data);
+        }
+      }).fail(deferred.reject);
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "searchEntities",
+    value: function searchEntities(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = self.simplePost(SEARCH_API, {
+        query_s: ko.mapping.toJSON(options.query),
+        limit: options.limit || 100,
+        raw_query: !!options.rawQuery,
+        sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
+      }, {
+        silenceErrors: options.silenceErrors,
+        successCallback: deferred.resolve,
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }, {
+    key: "formatSql",
+
+    /**
+     *
+     * @param {Object} options
+     * @param {string} options.statements
+     * @param {boolean} [options.silenceErrors]
+     */
+    value: function formatSql(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var request = self.simplePost(FORMAT_SQL_API, {
+        statements: options.statements
+      }, {
+        silenceErrors: options.silenceErrors,
+        successCallback: deferred.resolve,
+        errorCallback: deferred.reject
+      });
+      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+    }
+  }]);
+
+  return ApiHelper;
+}();
+
+var apiHelper = new ApiHelper();
+/* harmony default export */ __webpack_exports__["default"] = (apiHelper);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/api/apiQueueManager.js":
+/*!************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/api/apiQueueManager.js ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+var ApiQueueManager =
+/*#__PURE__*/
+function () {
+  function ApiQueueManager() {
+    _classCallCheck(this, ApiQueueManager);
+
+    var self = this;
+    self.callQueue = {};
+  }
+
+  _createClass(ApiQueueManager, [{
+    key: "getQueued",
+    value: function getQueued(url, hash) {
+      var self = this;
+      return self.callQueue[url + (hash || '')];
+    }
+  }, {
+    key: "addToQueue",
+    value: function addToQueue(promise, url, hash) {
+      var self = this;
+      self.callQueue[url + (hash || '')] = promise;
+      promise.always(function () {
+        delete self.callQueue[url + (hash || '')];
+      });
+    }
+  }]);
+
+  return ApiQueueManager;
+}();
+
+var apiQueueManager = new ApiQueueManager();
+/* harmony default export */ __webpack_exports__["default"] = (apiQueueManager);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/api/cancellablePromise.js":
+/*!***************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/api/cancellablePromise.js ***!
+  \***************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+var CancellablePromise =
+/*#__PURE__*/
+function () {
+  function CancellablePromise(deferred, request, otherCancellables) {
+    _classCallCheck(this, CancellablePromise);
+
+    var self = this;
+    self.cancelCallbacks = [];
+    self.deferred = deferred;
+    self.request = request;
+    self.otherCancellables = otherCancellables;
+    self.cancelled = false;
+    self.cancelPrevented = false;
+  }
+  /**
+   * A promise might be shared across multiple components in the UI, in some cases cancel is not an option and calling
+   * this will prevent that to happen.
+   *
+   * One example is autocompletion of databases while the assist is loading the database tree, closing the autocomplete
+   * results would make the assist loading fail if cancel hasn't been prevented.
+   *
+   * @returns {CancellablePromise}
+   */
+
+
+  _createClass(CancellablePromise, [{
+    key: "preventCancel",
+    value: function preventCancel() {
+      var self = this;
+      self.cancelPrevented = true;
+      return self;
+    }
+  }, {
+    key: "cancel",
+    value: function cancel() {
+      var self = this;
+
+      if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
+        return;
+      }
+
+      self.cancelled = true;
+
+      if (self.request) {
+        _apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].cancelActiveRequest(self.request);
+      }
+
+      if (self.state && self.state() === 'pending' && self.deferred.reject) {
+        self.deferred.reject();
+      }
+
+      if (self.otherCancellables) {
+        self.otherCancellables.forEach(function (cancellable) {
+          if (cancellable.cancel) {
+            cancellable.cancel();
+          }
+        });
+      }
+
+      while (self.cancelCallbacks.length) {
+        self.cancelCallbacks.pop()();
+      }
+
+      return self;
+    }
+  }, {
+    key: "onCancel",
+    value: function onCancel(callback) {
+      var self = this;
+
+      if (self.cancelled) {
+        callback();
+      } else {
+        self.cancelCallbacks.push(callback);
+      }
+
+      return self;
+    }
+  }, {
+    key: "then",
+    value: function then() {
+      var self = this;
+      self.deferred.then.apply(self.deferred, arguments);
+      return self;
+    }
+  }, {
+    key: "done",
+    value: function done(callback) {
+      var self = this;
+      self.deferred.done.apply(self.deferred, arguments);
+      return self;
+    }
+  }, {
+    key: "fail",
+    value: function fail(callback) {
+      var self = this;
+      self.deferred.fail.apply(self.deferred, arguments);
+      return self;
+    }
+  }, {
+    key: "always",
+    value: function always(callback) {
+      var self = this;
+      self.deferred.always.apply(self.deferred, arguments);
+      return self;
+    }
+  }, {
+    key: "pipe",
+    value: function pipe(callback) {
+      var self = this;
+      self.deferred.pipe.apply(self.deferred, arguments);
+      return self;
+    }
+  }, {
+    key: "progress",
+    value: function progress(callback) {
+      var self = this;
+      self.deferred.progress.apply(self.deferred, arguments);
+      return self;
+    }
+  }, {
+    key: "state",
+    value: function state() {
+      var self = this;
+      return self.deferred.state && self.deferred.state();
+    }
+  }]);
+
+  return CancellablePromise;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (CancellablePromise);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/catalog/catalogUtils.js":
+/*!*************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/catalog/catalogUtils.js ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+/**
+ * Wrapper function around ApiHelper calls, it will also save the entry on success.
+ *
+ * @param {string} apiHelperFunction - The name of the ApiHelper function to call
+ * @param {string} attributeName - The attribute to set
+ * @param {DataCatalogEntry|MultiTableEntry} entry - The catalog entry
+ * @param {Object} [apiOptions]
+ * @param {boolean} [apiOptions.silenceErrors]
+ */
+
+var fetchAndSave = function fetchAndSave(apiHelperFunction, attributeName, entry, apiOptions) {
+  return _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"][apiHelperFunction]({
+    sourceType: entry.dataCatalog.sourceType,
+    compute: entry.compute,
+    path: entry.path,
+    // Set for DataCatalogEntry
+    paths: entry.paths,
+    // Set for MultiTableEntry
+    silenceErrors: apiOptions && apiOptions.silenceErrors,
+    isView: entry.isView && entry.isView() // MultiTable entries don't have this property
+
+  }).done(function (data) {
+    entry[attributeName] = data;
+    entry.saveLater();
+  });
+};
+/**
+ * Helper function that adds sets the silence errors option to true if not specified
+ *
+ * @param {Object} [options]
+ * @return {Object}
+ */
+
+
+var setSilencedErrors = function setSilencedErrors(options) {
+  if (!options) {
+    options = {};
+  }
+
+  if (typeof options.silenceErrors === 'undefined') {
+    options.silenceErrors = true;
+  }
+
+  return options;
+};
+/**
+ * Helper function to apply the cancellable option to an existing or new promise
+ *
+ * @param {CancellablePromise} [promise]
+ * @param {Object} [options]
+ * @param {boolean} [options.cancellable] - Default false
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var applyCancellable = function applyCancellable(promise, options) {
+  if (promise && promise.preventCancel && (!options || !options.cancellable)) {
+    promise.preventCancel();
+  }
+
+  return promise;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  applyCancellable: applyCancellable,
+  fetchAndSave: fetchAndSave,
+  setSilencedErrors: setSilencedErrors
+});
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/catalog/dataCatalog.js":
+/*!************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/catalog/dataCatalog.js ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var _catalogUtils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
+/* harmony import */ var _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dataCatalogEntry */ "./desktop/core/src/desktop/js/catalog/dataCatalogEntry.js");
+/* harmony import */ var _generalDataCatalog__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./generalDataCatalog */ "./desktop/core/src/desktop/js/catalog/generalDataCatalog.js");
+/* harmony import */ var _multiTableEntry__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./multiTableEntry */ "./desktop/core/src/desktop/js/catalog/multiTableEntry.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+
+
+var STORAGE_POSTFIX = LOGGED_USERNAME;
+var DATA_CATALOG_VERSION = 5;
+var cacheEnabled = true;
+/**
+ * Creates a cache identifier given a namespace and path(s)
+ *
+ * @param {Object|DataCatalogEntry} options
+ * @param {Object} options.namespace
+ * @param {string} options.namespace.id
+ * @param {string[]} [options.path]
+ * @param {string[][]} [options.paths]
+ * @return {string}
+ */
+
+var generateEntryCacheId = function generateEntryCacheId(options) {
+  var id = options.namespace.id;
+
+  if (options.path) {
+    if (typeof options.path === 'string') {
+      id += '_' + options.path;
+    } else if (options.path.length) {
+      id += '_' + options.path.join('.');
+    }
+  } else if (options.paths && options.paths.length) {
+    var pathSet = {};
+    options.paths.forEach(function (path) {
+      pathSet[path.join('.')] = true;
+    });
+    var uniquePaths = Object.keys(pathSet);
+    uniquePaths.sort();
+    id += '_' + uniquePaths.join(',');
+  }
+
+  return id;
+};
+/**
+ * Helper function to fill a catalog entry with cached metadata.
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry - The entry to fill
+ * @param {Object} storeEntry - The cached version
+ */
+
+
+var mergeEntry = function mergeEntry(dataCatalogEntry, storeEntry) {
+  var mergeAttribute = function mergeAttribute(attributeName, ttl, promiseName) {
+    if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || Date.now() - storeEntry[attributeName].hueTimestamp < ttl)) {
+      dataCatalogEntry[attributeName] = storeEntry[attributeName];
+
+      if (promiseName) {
+        dataCatalogEntry[promiseName] = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(dataCatalogEntry[attributeName]).promise();
+      }
+    }
+  };
+
+  mergeAttribute('definition', CACHEABLE_TTL.default);
+  mergeAttribute('sourceMeta', CACHEABLE_TTL.default, 'sourceMetaPromise');
+  mergeAttribute('analysis', CACHEABLE_TTL.default, 'analysisPromise');
+  mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
+  mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
+  mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
+  mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer, 'navOptMetaPromise');
+  mergeAttribute('navOptPopularity', CACHEABLE_TTL.optimizer);
+};
+/**
+ * Helper function to fill a multi table catalog entry with cached metadata.
+ *
+ * @param {MultiTableEntry} multiTableCatalogEntry - The entry to fill
+ * @param {Object} storeEntry - The cached version
+ */
+
+
+var mergeMultiTableEntry = function mergeMultiTableEntry(multiTableCatalogEntry, storeEntry) {
+  var mergeAttribute = function mergeAttribute(attributeName, ttl, promiseName) {
+    if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || Date.now() - storeEntry[attributeName].hueTimestamp < ttl)) {
+      multiTableCatalogEntry[attributeName] = storeEntry[attributeName];
+
+      if (promiseName) {
+        multiTableCatalogEntry[promiseName] = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(multiTableCatalogEntry[attributeName]).promise();
+      }
+    }
+  };
+
+  mergeAttribute('topAggs', CACHEABLE_TTL.optimizer, 'topAggsPromise');
+  mergeAttribute('topColumns', CACHEABLE_TTL.optimizer, 'topColumnsPromise');
+  mergeAttribute('topFilters', CACHEABLE_TTL.optimizer, 'topFiltersPromise');
+  mergeAttribute('topJoins', CACHEABLE_TTL.optimizer, 'topJoinsPromise');
+};
+
+var DataCatalog =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {string} sourceType
+   *
+   * @constructor
+   */
+  function DataCatalog(sourceType) {
+    _classCallCheck(this, DataCatalog);
+
+    var self = this;
+    self.sourceType = sourceType;
+    self.entries = {};
+    self.temporaryEntries = {};
+    self.multiTableEntries = {};
+    self.store = localforage__WEBPACK_IMPORTED_MODULE_1___default.a.createInstance({
+      name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
+    });
+    self.multiTableStore = localforage__WEBPACK_IMPORTED_MODULE_1___default.a.createInstance({
+      name: 'HueDataCatalog_' + self.sourceType + '_multiTable_' + STORAGE_POSTFIX
+    });
+  }
+  /**
+   * Disables the caching for subsequent operations, mainly used for test purposes
+   */
+
+
+  _createClass(DataCatalog, [{
+    key: "canHaveNavOptMetadata",
+
+    /**
+     * Returns true if the catalog can have NavOpt metadata
+     *
+     * @return {boolean}
+     */
+    value: function canHaveNavOptMetadata() {
+      var self = this;
+      return HAS_OPTIMIZER && (self.sourceType === 'hive' || self.sourceType === 'impala');
+    }
+  }, {
+    key: "clearStorageCascade",
+
+    /**
+     * Clears the data catalog and cache for the given path and any children thereof.
+     *
+     * @param {ContextNamespace} [namespace] - The context namespace
+     * @param {ContextCompute} [compute] - The context compute
+     * @param {string[]} rootPath - The path to clear
+     */
+    value: function clearStorageCascade(namespace, compute, rootPath) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+
+      if (!namespace || !compute) {
+        if (rootPath.length === 0) {
+          self.entries = {};
+          self.store.clear().then(deferred.resolve).catch(deferred.reject);
+          return deferred.promise();
+        }
+
+        return deferred.reject().promise();
+      }
+
+      var keyPrefix = generateEntryCacheId({
+        namespace: namespace,
+        path: rootPath
+      });
+      Object.keys(self.entries).forEach(function (key) {
+        if (key.indexOf(keyPrefix) === 0) {
+          delete self.entries[key];
+        }
+      });
+      var deletePromises = [];
+      var keysDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      deletePromises.push(keysDeferred.promise());
+      self.store.keys().then(function (keys) {
+        keys.forEach(function (key) {
+          if (key.indexOf(keyPrefix) === 0) {
+            var deleteDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+            deletePromises.push(deleteDeferred.promise());
+            self.store.removeItem(key).then(deleteDeferred.resolve).catch(deleteDeferred.reject);
+          }
+        });
+        keysDeferred.resolve();
+      }).catch(keysDeferred.reject);
+      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when.apply(jquery__WEBPACK_IMPORTED_MODULE_0___default.a, deletePromises);
+    }
+  }, {
+    key: "persistCatalogEntry",
+
+    /**
+     * Updates the cache for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @return {Promise}
+     */
+    value: function persistCatalogEntry(dataCatalogEntry) {
+      var self = this;
+
+      if (!cacheEnabled || CACHEABLE_TTL.default <= 0) {
+        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve().promise();
+      }
+
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var identifier = generateEntryCacheId(dataCatalogEntry);
+      self.store.setItem(identifier, {
+        version: DATA_CATALOG_VERSION,
+        definition: dataCatalogEntry.definition,
+        sourceMeta: dataCatalogEntry.sourceMeta,
+        analysis: dataCatalogEntry.analysis,
+        partitions: dataCatalogEntry.partitions,
+        sample: dataCatalogEntry.sample,
+        navigatorMeta: dataCatalogEntry.navigatorMeta,
+        navOptMeta: dataCatalogEntry.navOptMeta,
+        navOptPopularity: dataCatalogEntry.navOptPopularity
+      }).then(deferred.resolve).catch(deferred.reject);
+      return deferred.promise();
+    }
+  }, {
+    key: "loadNavOptPopularityForTables",
+
+    /**
+     * Loads Navigator Optimizer popularity for multiple tables in one go.
+     *
+     * @param {Object} options
+     * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
+     * @param {string[][]} options.paths
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function loadNavOptPopularityForTables(options) {
+      var self = this;
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var cancellablePromises = [];
+      var popularEntries = [];
+      var pathsToLoad = [];
+      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_3__["default"].setSilencedErrors(options);
+      var existingPromises = [];
+      options.paths.forEach(function (path) {
+        var existingDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+        self.getEntry({
+          namespace: options.namespace,
+          compute: options.compute,
+          path: path
+        }).done(function (tableEntry) {
+          if (tableEntry.navOptPopularityForChildrenPromise) {
+            tableEntry.navOptPopularityForChildrenPromise.done(function (existingPopularEntries) {
+              popularEntries = popularEntries.concat(existingPopularEntries);
+              existingDeferred.resolve();
+            }).fail(existingDeferred.reject);
+          } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
+            cancellablePromises.push(tableEntry.getChildren(options).done(function (childEntries) {
+              childEntries.forEach(function (childEntry) {
+                if (childEntry.navOptPopularity) {
+                  popularEntries.push(childEntry);
+                }
+              });
+              existingDeferred.resolve();
+            }).fail(existingDeferred.reject));
+          } else {
+            pathsToLoad.push(path);
+            existingDeferred.resolve();
+          }
+        }).fail(existingDeferred.reject);
+        existingPromises.push(existingDeferred.promise());
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when.apply(jquery__WEBPACK_IMPORTED_MODULE_0___default.a, existingPromises).always(function () {
+        var loadDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+
+        if (pathsToLoad.length) {
+          cancellablePromises.push(window.apiHelper.fetchNavOptPopularity({
+            silenceErrors: options.silenceErrors,
+            paths: pathsToLoad
+          }).done(function (data) {
+            var perTable = {};
+
+            var splitNavOptValuesPerTable = function splitNavOptValuesPerTable(listName) {
+              if (data.values[listName]) {
+                data.values[listName].forEach(function (column) {
+                  var tableMeta = perTable[column.dbName + '.' + column.tableName];
+
+                  if (!tableMeta) {
+                    tableMeta = {
+                      values: []
+                    };
+                    perTable[column.dbName + '.' + column.tableName] = tableMeta;
+                  }
+
+                  if (!tableMeta.values[listName]) {
+                    tableMeta.values[listName] = [];
+                  }
+
+                  tableMeta.values[listName].push(column);
+                });
+              }
+            };
+
+            if (data.values) {
+              splitNavOptValuesPerTable('filterColumns');
+              splitNavOptValuesPerTable('groupbyColumns');
+              splitNavOptValuesPerTable('joinColumns');
+              splitNavOptValuesPerTable('orderbyColumns');
+              splitNavOptValuesPerTable('selectColumns');
+            }
+
+            var tablePromises = [];
+            Object.keys(perTable).forEach(function (path) {
+              var tableDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+              self.getEntry({
+                namespace: options.namespace,
+                compute: options.compute,
+                path: path
+              }).done(function (entry) {
+                cancellablePromises.push(entry.trackedPromise('navOptPopularityForChildrenPromise', entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
+                  popularEntries = popularEntries.concat(entries);
+                  tableDeferred.resolve();
+                }).fail(tableDeferred.resolve)));
+              }).fail(tableDeferred.reject);
+              tablePromises.push(tableDeferred.promise());
+            });
+            jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when.apply(jquery__WEBPACK_IMPORTED_MODULE_0___default.a, tablePromises).always(function () {
+              loadDeferred.resolve();
+            });
+          }).fail(loadDeferred.reject));
+        } else {
+          loadDeferred.resolve();
+        }
+
+        loadDeferred.always(function () {
+          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when.apply(jquery__WEBPACK_IMPORTED_MODULE_0___default.a, cancellablePromises).done(function () {
+            deferred.resolve(popularEntries);
+          }).fail(deferred.reject);
+        });
+      });
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_3__["default"].applyCancellable(new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, cancellablePromises), options);
+    }
+  }, {
+    key: "getKnownEntry",
+
+    /**
+     * @param {Object} options
+     * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
+     * @param {string|string[]} options.path
+     * @return {DataCatalogEntry}
+     */
+    value: function getKnownEntry(options) {
+      var self = this;
+      return self.entries[generateEntryCacheId(options)];
+    }
+  }, {
+    key: "addTemporaryTable",
+
+    /**
+     * Adds a temporary table to the data catalog. This would allow autocomplete etc. of tables that haven't
+     * been created yet.
+     *
+     * Calling this returns a handle that allows deletion of any created entries by calling delete() on the handle.
+     *
+     * @param {Object} options
+     * @param {string} options.name
+     * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
+     *
+     * @param {Object[]} options.columns
+     * @param {string} options.columns[].name
+     * @param {string} options.columns[].type
+     * @param {Object[][]} options.sample
+     *
+     * @return {Object}
+     */
+    value: function addTemporaryTable(options) {
+      var self = this;
+      var tableDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var path = ['default', options.name];
+      var identifiersToClean = [];
+
+      var addEntryMeta = function addEntryMeta(entry, sourceMeta) {
+        entry.sourceMeta = sourceMeta || entry.definition;
+        entry.sourceMetaPromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(entry.sourceMeta).promise();
+        entry.navigatorMeta = {
+          comment: ''
+        };
+        entry.navigatorMetaPromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(entry.navigatorMeta).promise();
+        entry.analysis = {
+          is_view: false
+        };
+        entry.analysisPromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(entry.analysis).promise();
+      };
+
+      var removeTable = function removeTable() {}; // noop until actually added
+
+
+      var sourceIdentifier = generateEntryCacheId({
+        namespace: options.namespace,
+        path: []
+      });
+
+      if (!self.temporaryEntries[sourceIdentifier]) {
+        var sourceDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+        self.temporaryEntries[sourceIdentifier] = sourceDeferred.promise();
+        var sourceEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+          isTemporary: true,
+          dataCatalog: self,
+          namespace: options.namespace,
+          compute: options.compute,
+          path: [],
+          definition: {
+            index: 0,
+            navOptLoaded: true,
+            type: 'source'
+          }
+        });
+        addEntryMeta(sourceEntry);
+        identifiersToClean.push(sourceIdentifier);
+        sourceEntry.childrenPromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve([]).promise();
+        sourceDeferred.resolve(sourceEntry);
+      }
+
+      self.temporaryEntries[sourceIdentifier].done(function (sourceEntry) {
+        sourceEntry.getChildren().done(function (existingTemporaryDatabases) {
+          var databaseIdentifier = generateEntryCacheId({
+            namespace: options.namespace,
+            path: ['default']
+          });
+
+          if (!self.temporaryEntries[databaseIdentifier]) {
+            var databaseDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+            self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
+            var databaseEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+              isTemporary: true,
+              dataCatalog: self,
+              namespace: options.namespace,
+              compute: options.compute,
+              path: ['default'],
+              definition: {
+                index: 0,
+                navOptLoaded: true,
+                type: 'database'
+              }
+            });
+            addEntryMeta(databaseEntry);
+            identifiersToClean.push(databaseIdentifier);
+            databaseEntry.childrenPromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve([]).promise();
+            databaseDeferred.resolve(databaseEntry);
+            existingTemporaryDatabases.push(databaseEntry);
+          }
+
+          self.temporaryEntries[databaseIdentifier].done(function (databaseEntry) {
+            databaseEntry.getChildren().done(function (existingTemporaryTables) {
+              var tableIdentifier = generateEntryCacheId({
+                namespace: options.namespace,
+                path: path
+              });
+              self.temporaryEntries[tableIdentifier] = tableDeferred.promise();
+              identifiersToClean.push(tableIdentifier);
+              var tableEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+                isTemporary: true,
+                dataCatalog: self,
+                namespace: options.namespace,
+                compute: options.compute,
+                path: path,
+                definition: {
+                  comment: '',
+                  index: 0,
+                  name: options.name,
+                  navOptLoaded: true,
+                  type: 'table'
+                }
+              });
+              existingTemporaryTables.push(tableEntry);
+              var indexToDelete = existingTemporaryTables.length - 1;
+
+              removeTable = function removeTable() {
+                existingTemporaryTables.splice(indexToDelete, 1);
+              };
+
+              var childrenDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+              tableEntry.childrenPromise = childrenDeferred.promise();
+
+              if (options.columns) {
+                var childEntries = [];
+                addEntryMeta(tableEntry, {
+                  columns: [],
+                  extended_columns: [],
+                  comment: '',
+                  notFound: false,
+                  is_view: false
+                });
+                tableEntry.sample = {
+                  data: options.sample || [],
+                  meta: tableEntry.sourceMeta.extended_columns
+                };
+                tableEntry.samplePromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(tableEntry.sample).promise();
+                var index = 0;
+                options.columns.forEach(function (column) {
+                  var columnPath = path.concat(column.name);
+                  var columnIdentifier = generateEntryCacheId({
+                    namespace: options.namespace,
+                    path: columnPath
+                  });
+                  var columnDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+                  self.temporaryEntries[columnIdentifier] = columnDeferred.promise();
+                  identifiersToClean.push(columnIdentifier);
+                  var columnEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+                    isTemporary: true,
+                    dataCatalog: self,
+                    namespace: options.namespace,
+                    compute: options.compute,
+                    path: columnPath,
+                    definition: {
+                      comment: '',
+                      index: index++,
+                      name: column.name,
+                      partitionKey: false,
+                      type: column.type
+                    }
+                  });
+                  columnEntry.sample = {
+                    data: [],
+                    meta: column
+                  };
+
+                  if (options.sample) {
+                    options.sample.forEach(function (sampleRow) {
+                      columnEntry.sample.data.push([sampleRow[index - 1]]);
+                    });
+                  }
+
+                  columnEntry.samplePromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve(columnEntry.sample).promise();
+                  tableEntry.sourceMeta.columns.push(column.name);
+                  tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
+                  columnDeferred.resolve(columnEntry);
+                  addEntryMeta(columnEntry, {
+                    comment: '',
+                    name: column.name,
+                    notFount: false,
+                    sample: [],
+                    type: column.type
+                  });
+                  childEntries.push(columnEntry);
+                });
+                childrenDeferred.resolve(childEntries);
+              } else {
+                childrenDeferred.resolve([]);
+              }
+
+              tableDeferred.resolve(tableEntry);
+            });
+          });
+        });
+      });
+      return {
+        delete: function _delete() {
+          removeTable();
+
+          while (identifiersToClean.length) {
+            delete self.entries[identifiersToClean.pop()];
+          }
+        }
+      };
+    }
+  }, {
+    key: "getEntry",
+
+    /**
+     * @param {Object} options
+     * @param {string|string[]} options.path
+     * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
+     * @param {Object} [options.definition] - The initial definition if not already set on the entry
+     * @param {boolean} [options.cachedOnly] - Default: false
+     * @param {boolean} [options.temporaryOnly] - Default: false
+     * @return {Promise}
+     */
+    value: function getEntry(options) {
+      var self = this;
+      var identifier = generateEntryCacheId(options);
+
+      if (options.temporaryOnly) {
+        return self.temporaryEntries[identifier] || jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().reject().promise();
+      }
+
+      if (self.entries[identifier]) {
+        return self.entries[identifier];
+      }
+
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      self.entries[identifier] = deferred.promise();
+
+      if (!cacheEnabled) {
+        deferred.resolve(new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+          dataCatalog: self,
+          namespace: options.namespace,
+          compute: options.compute,
+          path: options.path,
+          definition: options.definition
+        })).promise();
+      } else {
+        self.store.getItem(identifier).then(function (storeEntry) {
+          var definition = storeEntry ? storeEntry.definition : options.definition;
+          var entry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+            dataCatalog: self,
+            namespace: options.namespace,
+            compute: options.compute,
+            path: options.path,
+            definition: definition
+          });
+
+          if (storeEntry) {
+            mergeEntry(entry, storeEntry);
+          } else if (!options.cachedOnly && options.definition) {
+            entry.saveLater();
+          }
+
+          deferred.resolve(entry);
+        }).catch(function (error) {
+          console.warn(error);
+          var entry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_4__["default"]({
+            dataCatalog: self,
+            namespace: options.namespace,
+            compute: options.compute,
+            path: options.path,
+            definition: options.definition
+          });
+
+          if (!options.cachedOnly && options.definition) {
+            entry.saveLater();
+          }
+
+          deferred.resolve(entry);
+        });
+      }
+
+      return self.entries[identifier];
+    }
+  }, {
+    key: "getMultiTableEntry",
+
+    /**
+     *
+     * @param {Object} options
+     * @param {ContextNamespace} options.namespace - The context namespace
+     * @param {ContextCompute} options.compute - The context compute
+     * @param {string[][]} options.paths
+     *
+     * @return {Promise}
+     */
+    value: function getMultiTableEntry(options) {
+      var self = this;
+      var identifier = generateEntryCacheId(options);
+
+      if (self.multiTableEntries[identifier]) {
+        return self.multiTableEntries[identifier];
+      }
+
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      self.multiTableEntries[identifier] = deferred.promise();
+
+      if (!cacheEnabled) {
+        deferred.resolve(new _multiTableEntry__WEBPACK_IMPORTED_MODULE_6__["default"]({
+          identifier: identifier,
+          dataCatalog: self,
+          paths: options.paths
+        })).promise();
+      } else {
+        self.multiTableStore.getItem(identifier).then(function (storeEntry) {
+          var entry = new _multiTableEntry__WEBPACK_IMPORTED_MODULE_6__["default"]({
+            identifier: identifier,
+            dataCatalog: self,
+            paths: options.paths
+          });
+
+          if (storeEntry) {
+            mergeMultiTableEntry(entry, storeEntry);
+          }
+
+          deferred.resolve(entry);
+        }).catch(function (error) {
+          console.warn(error);
+          deferred.resolve(new _multiTableEntry__WEBPACK_IMPORTED_MODULE_6__["default"]({
+            identifier: identifier,
+            dataCatalog: self,
+            paths: options.paths
+          }));
+        });
+      }
+
+      return self.multiTableEntries[identifier];
+    }
+  }, {
+    key: "persistMultiTableEntry",
+
+    /**
+     * Updates the cache for the given multi tableentry
+     *
+     * @param {MultiTableEntry} multiTableEntry
+     * @return {Promise}
+     */
+    value: function persistMultiTableEntry(multiTableEntry) {
+      var self = this;
+
+      if (!cacheEnabled || CACHEABLE_TTL.default <= 0 || CACHEABLE_TTL.optimizer <= 0) {
+        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().resolve().promise();
+      }
+
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      self.multiTableStore.setItem(multiTableEntry.identifier, {
+        version: DATA_CATALOG_VERSION,
+        topAggs: multiTableEntry.topAggs,
+        topColumns: multiTableEntry.topColumns,
+        topFilters: multiTableEntry.topFilters,
+        topJoins: multiTableEntry.topJoins
+      }).then(deferred.resolve).catch(deferred.reject);
+      return deferred.promise();
+    }
+  }], [{
+    key: "disableCache",
+    value: function disableCache() {
+      cacheEnabled = false;
+    }
+  }, {
+    key: "enableCache",
+
+    /**
+     * Enables the cache for subsequent operations, mainly used for test purposes
+     */
+    value: function enableCache() {
+      cacheEnabled = true;
+    }
+  }]);
+
+  return DataCatalog;
+}();
+
+var generalDataCatalog = new _generalDataCatalog__WEBPACK_IMPORTED_MODULE_5__["default"]();
+var sourceBoundCatalogs = {};
+/**
+ * Helper function to get the DataCatalog instance for a given data source.
+ *
+ * @param {string} sourceType
+ * @return {DataCatalog}
+ */
+
+var getCatalog = function getCatalog(sourceType) {
+  if (!sourceType) {
+    throw new Error('getCatalog called without sourceType');
+  }
+
+  return sourceBoundCatalogs[sourceType] || (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  /**
+   * Adds a detached (temporary) entry to the data catalog. This would allow autocomplete etc. of tables that haven't
+   * been created yet.
+   *
+   * Calling this returns a handle that allows deletion of any created entries by calling delete() on the handle.
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {ContextNamespace} options.namespace - The context namespace
+   * @param {ContextCompute} options.compute - The context compute
+   * @param {string} options.name
+   *
+   * @param {Object[]} options.columns
+   * @param {string} options.columns[].name
+   * @param {string} options.columns[].type
+   * @param {Object[][]} options.sample
+   *
+   * @return {Object}
+   */
+  addTemporaryTable: function addTemporaryTable(options) {
+    return getCatalog(options.sourceType).addTemporaryTable(options);
+  },
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {ContextNamespace} options.namespace - The context namespace
+   * @param {ContextCompute} options.compute - The context compute
+   * @param {string|string[]} options.path
+   * @param {Object} [options.definition] - Optional initial definition
+   * @param {boolean} [options.temporaryOnly] - Default: false
+   *
+   * @return {Promise}
+   */
+  getEntry: function getEntry(options) {
+    return getCatalog(options.sourceType).getEntry(options);
+  },
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {ContextNamespace} options.namespace - The context namespace
+   * @param {ContextCompute} options.compute - The context compute
+   * @param {string[][]} options.paths
+   *
+   * @return {Promise}
+   */
+  getMultiTableEntry: function getMultiTableEntry(options) {
+    return getCatalog(options.sourceType).getMultiTableEntry(options);
+  },
+
+  /**
+   * This can be used as a shorthand function to get the child entries of the given path. Same as first calling
+   * getEntry then getChildren.
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {ContextNamespace} options.namespace - The context namespace
+   * @param {ContextCompute} options.compute - The context compute
+   * @param {string|string[]} options.path
+   * @param {Object} [options.definition] - Optional initial definition of the parent entry
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.cancellable] - Default false
+   *
+   * @return {CancellablePromise}
+   */
+  getChildren: function getChildren(options) {
+    var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+    var cancellablePromises = [];
+    getCatalog(options.sourceType).getEntry(options).done(function (entry) {
+      cancellablePromises.push(entry.getChildren(options).done(deferred.resolve).fail(deferred.reject));
+    }).fail(deferred.reject);
+    return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+  },
+
+  /**
+   * @param {string} sourceType
+   *
+   * @return {DataCatalog}
+   */
+  getCatalog: getCatalog,
+
+  /**
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.refreshCache]
+   *
+   * @return {Promise}
+   */
+  getAllNavigatorTags: generalDataCatalog.getAllNavigatorTags.bind(generalDataCatalog),
+
+  /**
+   * @param {string[]} tagsToAdd
+   * @param {string[]} tagsToRemove
+   */
+  updateAllNavigatorTags: generalDataCatalog.updateAllNavigatorTags.bind(generalDataCatalog),
+  enableCache: function enableCache() {
+    cacheEnabled = true;
+  },
+  disableCache: function disableCache() {
+    cacheEnabled = false;
+  },
+  applyCancellable: _catalogUtils__WEBPACK_IMPORTED_MODULE_3__["default"].applyCancellable
+});
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/catalog/dataCatalogEntry.js":
+/*!*****************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/catalog/dataCatalogEntry.js ***!
+  \*****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var _catalogUtils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+/**
+ * Helper function to reload the source meta for the given entry
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry
+ * @param {Object} [options]
+ * @param {boolean} [options.silenceErrors]
+ *
+ * @return {CancellablePromise}
+ */
+
+var reloadSourceMeta = function reloadSourceMeta(dataCatalogEntry, options) {
+  if (dataCatalogEntry.dataCatalog.invalidatePromise) {
+    var deferred = $.Deferred();
+    var cancellablePromises = [];
+    dataCatalogEntry.dataCatalog.invalidatePromise.always(function () {
+      cancellablePromises.push(_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options).done(deferred.resolve).fail(deferred.reject));
+    });
+    return dataCatalogEntry.trackedPromise('sourceMetaPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises));
+  }
+
+  return dataCatalogEntry.trackedPromise('sourceMetaPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options));
+};
+/**
+ * Helper function to reload the navigator meta for the given entry
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry
+ * @param {Object} [apiOptions]
+ * @param {boolean} [apiOptions.silenceErrors] - Default true
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var reloadNavigatorMeta = function reloadNavigatorMeta(dataCatalogEntry, apiOptions) {
+  if (dataCatalogEntry.canHaveNavigatorMetadata()) {
+    return dataCatalogEntry.trackedPromise('navigatorMetaPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions)).done(function (navigatorMeta) {
+      if (navigatorMeta && dataCatalogEntry.commentObservable) {
+        dataCatalogEntry.commentObservable(dataCatalogEntry.getResolvedComment());
+      }
+    });
+  }
+
+  dataCatalogEntry.navigatorMetaPromise = $.Deferred().reject();
+  return dataCatalogEntry.navigatorMetaPromise;
+};
+/**
+ * Helper function to reload the analysis for the given entry
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry
+ * @param {Object} [apiOptions]
+ * @param {boolean} [apiOptions.silenceErrors]
+ * @param {boolean} [apiOptions.refreshAnalysis]
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var reloadAnalysis = function reloadAnalysis(dataCatalogEntry, apiOptions) {
+  return dataCatalogEntry.trackedPromise('analysisPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions));
+};
+/**
+ * Helper function to reload the partitions for the given entry
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry
+ * @param {Object} [apiOptions]
+ * @param {boolean} [apiOptions.silenceErrors]
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var reloadPartitions = function reloadPartitions(dataCatalogEntry, apiOptions) {
+  return dataCatalogEntry.trackedPromise('partitionsPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions));
+};
+/**
+ * Helper function to reload the sample for the given entry
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry
+ * @param {Object} [apiOptions]
+ * @param {boolean} [apiOptions.silenceErrors]
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var reloadSample = function reloadSample(dataCatalogEntry, apiOptions) {
+  return dataCatalogEntry.trackedPromise('samplePromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions));
+};
+/**
+ * Helper function to reload the nav opt metadata for the given entry
+ *
+ * @param {DataCatalogEntry} dataCatalogEntry
+ * @param {Object} [apiOptions]
+ * @param {boolean} [apiOptions.silenceErrors] - Default true
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var reloadNavOptMeta = function reloadNavOptMeta(dataCatalogEntry, apiOptions) {
+  if (dataCatalogEntry.dataCatalog.canHaveNavOptMetadata()) {
+    return dataCatalogEntry.trackedPromise('navOptMetaPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions));
+  }
+
+  dataCatalogEntry.navOptMetaPromise = $.Deferred.reject().promise();
+  return dataCatalogEntry.navOptMetaPromise;
+};
+/**
+ * Helper function to get details from the multi-table catalog for just this specific table
+ *
+ * @param {DataCatalogEntry} catalogEntry
+ * @param {Object} [options]
+ * @param {boolean} [options.silenceErrors] - Default false
+ * @param {boolean} [options.cachedOnly] - Default false
+ * @param {boolean} [options.refreshCache] - Default false
+ * @param {boolean} [options.cancellable] - Default false
+ * @param {string} functionName - The function to call, i.e. 'getTopAggs' etc.
+ * @return {CancellablePromise}
+ */
+
+
+var getFromMultiTableCatalog = function getFromMultiTableCatalog(catalogEntry, options, functionName) {
+  var deferred = $.Deferred();
+
+  if (!catalogEntry.isTableOrView()) {
+    return deferred.reject();
+  }
+
+  var cancellablePromises = [];
+  catalogEntry.dataCatalog.getMultiTableEntry({
+    namespace: catalogEntry.namespace,
+    compute: catalogEntry.compute,
+    paths: [catalogEntry.path]
+  }).done(function (multiTableEntry) {
+    cancellablePromises.push(multiTableEntry[functionName](options).done(deferred.resolve).fail(deferred.reject));
+  }).fail(deferred.reject);
+  return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises);
+};
+/**
+ * @param {DataCatalog} options.dataCatalog
+ * @param {string|string[]} options.path
+ * @param {ContextNamespace} options.namespace - The context namespace
+ * @param {ContextCompute} options.compute - The context compute
+ * @param {Object} options.definition - Initial known metadata on creation (normally comes from the parent entry)
+ * @param {boolean} [options.isTemporary] - Default false
+ *
+ * @constructor
+ */
+
+
+var DataCatalogEntry =
+/*#__PURE__*/
+function () {
+  function DataCatalogEntry(options) {
+    _classCallCheck(this, DataCatalogEntry);
+
+    var self = this;
+    self.namespace = options.namespace;
+    self.compute = options.compute;
+    self.dataCatalog = options.dataCatalog;
+    self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
+    self.name = self.path.length ? self.path[self.path.length - 1] : options.dataCatalog.sourceType;
+    self.isTemporary = options.isTemporary;
+    self.definition = options.definition;
+
+    if (!self.definition) {
+      if (self.path.length === 0) {
+        self.definition = {
+          type: 'source'
+        };
+      } else if (self.path.length === 1) {
+        self.definition = {
+          type: 'database'
+        };
+      } else if (self.path.length === 2) {
+        self.definition = {
+          type: 'table'
+        };
+      }
+    }
+
+    self.reset();
+  }
+  /**
+   * Resets the entry to an empty state, it might still have some details cached
+   */
+
+
+  _createClass(DataCatalogEntry, [{
+    key: "reset",
+    value: function reset() {
+      var self = this;
+      self.saveTimeout = -1;
+      self.sourceMetaPromise = undefined;
+      self.sourceMeta = undefined;
+      self.navigatorMeta = undefined;
+      self.navigatorMetaPromise = undefined;
+      self.analysis = undefined;
+      self.analysisPromise = undefined;
+      self.partitions = undefined;
+      self.partitionsPromise = undefined;
+      self.sample = undefined;
+      self.samplePromise = undefined;
+      self.navOptPopularity = undefined;
+      self.navOptMeta = undefined;
+      self.navOptMetaPromise = undefined;
+      self.navigatorMetaForChildrenPromise = undefined;
+      self.navOptPopularityForChildrenPromise = undefined;
+      self.childrenPromise = undefined;
+
+      if (self.path.length) {
+        var parent = self.dataCatalog.getKnownEntry({
+          namespace: self.namespace,
+          compute: self.compute,
+          path: self.path.slice(0, self.path.length - 1)
+        });
+
+        if (parent) {
+          parent.navigatorMetaForChildrenPromise = undefined;
+          parent.navOptPopularityForChildrenPromise = undefined;
+        }
+      }
+    }
+  }, {
+    key: "trackedPromise",
+
+    /**
+     * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
+     *
+     * @param {string} promiseName - The attribute name to use
+     * @param {CancellablePromise} cancellablePromise
+     */
+    value: function trackedPromise(promiseName, cancellablePromise) {
+      var self = this;
+      self[promiseName] = cancellablePromise;
+      return cancellablePromise.fail(function () {
+        if (cancellablePromise.cancelled) {
+          delete self[promiseName];
+        }
+      });
+    }
+  }, {
+    key: "clearCache",
+
+    /**
+     * Resets the entry and clears the cache
+     *
+     * @param {Object} options
+     * @param {string} [options.invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
+     * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @return {CancellablePromise}
+     */
+    value: function clearCache(options) {
+      var self = this;
+
+      if (!options) {
+        options = {};
+      }
+
+      var invalidatePromise;
+      var invalidate = options.invalidate || 'cache';
+
+      if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
+        if (window.IS_K8S_ONLY) {
+          invalidate = 'invalidateAndFlush';
+        }
+
+        if (self.dataCatalog.invalidatePromise) {
+          invalidatePromise = self.dataCatalog.invalidatePromise;
+        } else {
+          invalidatePromise = _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].invalidateSourceMetadata({
+            sourceType: self.getSourceType(),
+            compute: self.compute,
+            invalidate: invalidate,
+            path: self.path,
+            silenceErrors: options.silenceErrors
+          });
+          self.dataCatalog.invalidatePromise = invalidatePromise;
+          invalidatePromise.always(function () {
+            delete self.dataCatalog.invalidatePromise;
+          });
+        }
+      } else {
+        invalidatePromise = $.Deferred().resolve().promise();
+      }
+
+      if (self.definition && self.definition.navOptLoaded) {
+        delete self.definition.navOptLoaded;
+      }
+
+      self.reset();
+      var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.namespace, self.compute, self.path) : self.save();
+      var clearPromise = $.when(invalidatePromise, saveDeferred);
+      clearPromise.always(function () {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('data.catalog.entry.refreshed', {
+          entry: self,
+          cascade: !!options.cascade
+        });
+      });
+      return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](clearPromise, undefined, [invalidatePromise]);
+    }
+  }, {
+    key: "save",
+
+    /**
+     * Save the entry to cache
+     *
+     * @return {Promise}
+     */
+    value: function save() {
+      var self = this;
+      window.clearTimeout(self.saveTimeout);
+      return self.dataCatalog.persistCatalogEntry(self);
+    }
+  }, {
+    key: "saveLater",
+
+    /**
+     * Save the entry at a later point of time
+     */
+    value: function saveLater() {
+      var self = this;
+
+      if (CACHEABLE_TTL.default > 0) {
+        window.clearTimeout(self.saveTimeout);
+        self.saveTimeout = window.setTimeout(function () {
+          self.save();
+        }, 1000);
+      }
+    }
+  }, {
+    key: "getChildren",
+
+    /**
+     * Get the children of the catalog entry, columns for a table entry etc.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getChildren(options) {
+      var self = this;
+
+      if (self.childrenPromise && (!options || !options.refreshCache)) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.childrenPromise, options);
+      }
+
+      var deferred = $.Deferred();
+
+      if (options && options.cachedOnly && !self.sourceMeta && !self.sourceMetaPromise) {
+        return deferred.reject(false).promise();
+      }
+
+      var sourceMetaPromise = self.getSourceMeta(options).done(function (sourceMeta) {
+        if (!sourceMeta || sourceMeta.notFound) {
+          deferred.reject();
+          return;
+        }
+
+        var promises = [];
+        var index = 0;
+        var partitionKeys = {};
+
+        if (sourceMeta.partition_keys) {
+          sourceMeta.partition_keys.forEach(function (partitionKey) {
+            partitionKeys[partitionKey.name] = true;
+          });
+        }
+
+        var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns;
+
+        if (entities) {
+          entities.forEach(function (entity) {
+            if (!sourceMeta.databases || (entity.name || entity) !== '_impala_builtins') {
+              promises.push(self.dataCatalog.getEntry({
+                namespace: self.namespace,
+                compute: self.compute,
+                path: self.path.concat(entity.name || entity)
+              }).done(function (catalogEntry) {
+                if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
+                  var definition = _typeof(entity) === 'object' ? entity : {};
+
+                  if (_typeof(entity) !== 'object') {
+                    if (self.path.length === 0) {
+                      definition.type = 'database';
+                    } else if (self.path.length === 1) {
+                      definition.type = 'table';
+                    } else if (self.path.length === 2) {
+                      definition.type = 'column';
+                    }
+                  }
+
+                  if (sourceMeta.partition_keys) {
+                    definition.partitionKey = !!partitionKeys[entity.name];
+                  }
+
+                  definition.index = index++;
+                  catalogEntry.definition = definition;
+                  catalogEntry.saveLater();
+                }
+              }));
+            }
+          });
+        }
+
+        if ((self.getSourceType() === 'impala' || self.getSourceType() === 'hive') && self.isComplex()) {
+          (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
+            if (sourceMeta[path]) {
+              promises.push(self.dataCatalog.getEntry({
+                namespace: self.namespace,
+                compute: self.compute,
+                path: self.path.concat(path)
+              }).done(function (catalogEntry) {
+                if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
+                  var definition = sourceMeta[path];
+                  definition.index = index++;
+                  definition.isMapValue = path === 'value';
+                  catalogEntry.definition = definition;
+                  catalogEntry.saveLater();
+                }
+              }));
+            }
+          });
+        }
+
+        $.when.apply($, promises).done(function () {
+          deferred.resolve(Array.prototype.slice.call(arguments));
+        });
+      }).fail(deferred.reject);
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('childrenPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [sourceMetaPromise])), options);
+    }
+  }, {
+    key: "loadNavigatorMetaForChildren",
+
+    /**
+     * Loads navigator metadata for children, only applicable to databases and tables
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function loadNavigatorMetaForChildren(options) {
+      var self = this;
+      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+
+      if (!self.canHaveNavigatorMetadata() || self.isField()) {
+        return $.Deferred().reject().promise();
+      }
+
+      if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaForChildrenPromise, options);
+      }
+
+      var deferred = $.Deferred();
+      var cancellablePromises = [];
+      cancellablePromises.push(self.getChildren(options).done(function (children) {
+        var someHaveNavMeta = children.some(function (childEntry) {
+          return childEntry.navigatorMeta;
+        });
+
+        if (someHaveNavMeta && (!options || !options.refreshCache)) {
+          deferred.resolve(children);
+          return;
+        }
+
+        var query; // TODO: Add sourceType to nav search query
+
+        if (self.path.length) {
+          query = 'parentPath:"/' + self.path.join('/') + '" AND type:(table view field)';
+        } else {
+          query = 'type:database';
+        }
+
+        var rejectUnknown = function rejectUnknown() {
+          children.forEach(function (childEntry) {
+            if (!childEntry.navigatorMeta) {
+              childEntry.navigatorMeta = {};
+              childEntry.navigatorMetaPromise = $.Deferred().reject().promise();
+            }
+          });
+        };
+
+        cancellablePromises.push(_api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].searchEntities({
+          query: query,
+          rawQuery: true,
+          limit: children.length,
+          silenceErrors: options && options.silenceErrors
+        }).done(function (result) {
+          if (result && result.entities) {
+            var childEntryIndex = {};
+            children.forEach(function (childEntry) {
+              childEntryIndex[childEntry.name.toLowerCase()] = childEntry;
+            });
+            result.entities.forEach(function (entity) {
+              var matchingChildEntry = childEntryIndex[(entity.original_name || entity.originalName).toLowerCase()];
+
+              if (matchingChildEntry) {
+                matchingChildEntry.navigatorMeta = entity;
+                entity.hueTimestamp = Date.now();
+                matchingChildEntry.navigatorMetaPromise = $.Deferred().resolve(matchingChildEntry.navigatorMeta).promise();
+
+                if (entity && matchingChildEntry.commentObservable) {
+                  matchingChildEntry.commentObservable(matchingChildEntry.getResolvedComment());
+                }
+
+                matchingChildEntry.saveLater();
+              }
+            });
+          }
+
+          rejectUnknown();
+          deferred.resolve(children);
+        }).fail(function () {
+          rejectUnknown();
+          deferred.reject();
+        }));
+      }).fail(deferred.reject));
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, null, cancellablePromises)), options);
+    }
+  }, {
+    key: "applyNavOptResponseToChildren",
+
+    /**
+     * Helper function used when loading navopt metdata for children
+     *
+     * @param {Object} response
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function applyNavOptResponseToChildren(response, options) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (!self.definition) {
+        self.definition = {};
+      }
+
+      self.definition.navOptLoaded = true;
+      self.saveLater();
+      var childPromise = self.getChildren(options).done(function (childEntries) {
+        var entriesByName = {};
+        childEntries.forEach(function (childEntry) {
+          entriesByName[childEntry.name.toLowerCase()] = childEntry;
+        });
+        var updatedIndex = {};
+
+        if (self.isDatabase() && response.top_tables) {
+          response.top_tables.forEach(function (topTable) {
+            var matchingChild = entriesByName[topTable.name.toLowerCase()];
+
+            if (matchingChild) {
+              matchingChild.navOptPopularity = topTable;
+              matchingChild.saveLater();
+              updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
+            }
+          });
+        } else if (self.isTableOrView() && response.values) {
+          var addNavOptPopularity = function addNavOptPopularity(columns, type) {
+            if (columns) {
+              columns.forEach(function (column) {
+                var matchingChild = entriesByName[column.columnName.toLowerCase()];
+
+                if (matchingChild) {
+                  if (!matchingChild.navOptPopularity) {
+                    matchingChild.navOptPopularity = {};
+                  }
+
+                  matchingChild.navOptPopularity[type] = column;
+                  matchingChild.saveLater();
+                  updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
+                }
+              });
+            }
+          };
+
+          addNavOptPopularity(response.values.filterColumns, 'filterColumn');
+          addNavOptPopularity(response.values.groupbyColumns, 'groupByColumn');
+          addNavOptPopularity(response.values.joinColumns, 'joinColumn');
+          addNavOptPopularity(response.values.orderbyColumns, 'orderByColumn');
+          addNavOptPopularity(response.values.selectColumns, 'selectColumn');
+        }
+
+        var popularEntries = [];
+        Object.keys(updatedIndex).forEach(function (path) {
+          popularEntries.push(updatedIndex[path]);
+        });
+        deferred.resolve(popularEntries);
+      }).fail(deferred.reject);
+      return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [childPromise]);
+    }
+  }, {
+    key: "loadNavOptPopularityForChildren",
+
+    /**
+     * Loads nav opt popularity for the children of this entry.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function loadNavOptPopularityForChildren(options) {
+      var self = this;
+      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+
+      if (!self.dataCatalog.canHaveNavOptMetadata()) {
+        return $.Deferred().reject().promise();
+      }
+
+      if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptPopularityForChildrenPromise, options);
+      }
+
+      var deferred = $.Deferred();
+      var cancellablePromises = [];
+
+      if (self.definition && self.definition.navOptLoaded && (!options || !options.refreshCache)) {
+        cancellablePromises.push(self.getChildren(options).done(function (childEntries) {
+          deferred.resolve(childEntries.filter(function (entry) {
+            return entry.navOptPopularity;
+          }));
+        }).fail(deferred.reject));
+      } else if (self.isDatabase() || self.isTableOrView()) {
+        cancellablePromises.push(_api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].fetchNavOptPopularity({
+          silenceErrors: options && options.silenceErrors,
+          refreshCache: options && options.refreshCache,
+          paths: [self.path]
+        }).done(function (data) {
+          cancellablePromises.push(self.applyNavOptResponseToChildren(data, options).done(deferred.resolve).fail(deferred.reject));
+        }).fail(deferred.reject));
+      } else {
+        deferred.resolve([]);
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
+    }
+  }, {
+    key: "canHaveNavigatorMetadata",
+
+    /**
+     * Returns true if the catalog entry can have navigator metadata
+     *
+     * @return {boolean}
+     */
+    value: function canHaveNavigatorMetadata() {
+      var self = this;
+      return window.HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala') && (self.isDatabase() || self.isTableOrView() || self.isColumn());
+    }
+  }, {
+    key: "getResolvedComment",
+
+    /**
+     * Returns the currently known comment without loading any additional metadata
+     *
+     * @return {string}
+     */
+    value: function getResolvedComment() {
+      var self = this;
+
+      if (self.navigatorMeta && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
+        return self.navigatorMeta.description || self.navigatorMeta.originalDescription || '';
+      }
+
+      return self.sourceMeta && self.sourceMeta.comment || '';
+    }
+  }, {
+    key: "getCommentObservable",
+
+    /**
+     * This can be used to get an observable for the comment which will be updated once a comment has been
+     * resolved.
+     *
+     * @return {ko.observable}
+     */
+    value: function getCommentObservable() {
+      var self = this;
+
+      if (!self.commentObservable) {
+        self.commentObservable = ko.observable(self.getResolvedComment());
+      }
+
+      return self.commentObservable;
+    }
+  }, {
+    key: "hasResolvedComment",
+
+    /**
+     * Checks whether the comment is known and has been loaded from the proper source
+     *
+     * @return {boolean}
+     */
+    value: function hasResolvedComment() {
+      var self = this;
+
+      if (self.canHaveNavigatorMetadata()) {
+        return typeof self.navigatorMeta !== 'undefined';
+      }
+
+      return typeof self.sourceMeta !== 'undefined';
+    }
+  }, {
+    key: "getComment",
+
+    /**
+     * Gets the comment for this entry, fetching it if necessary from the proper source.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getComment(options) {
+      var self = this;
+      var deferred = $.Deferred();
+      var cancellablePromises = [];
+
+      var resolveWithSourceMeta = function resolveWithSourceMeta() {
+        if (self.sourceMeta) {
+          deferred.resolve(self.sourceMeta.comment || '');
+        } else if (self.definition && typeof self.definition.comment !== 'undefined') {
+          deferred.resolve(self.definition.comment);
+        } else {
+          cancellablePromises.push(self.getSourceMeta(options).done(function (sourceMeta) {
+            deferred.resolve(sourceMeta && sourceMeta.comment || '');
+          }).fail(deferred.reject));
+        }
+      };
+
+      if (self.canHaveNavigatorMetadata()) {
+        if (self.navigatorMetaPromise) {
+          self.navigatorMetaPromise.done(function () {
+            deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
+          }).fail(resolveWithSourceMeta);
+        } else if (self.navigatorMeta) {
+          deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
+        } else {
+          cancellablePromises.push(self.getNavigatorMeta(options).done(function (navigatorMeta) {
+            if (navigatorMeta) {
+              deferred.resolve(navigatorMeta.description || navigatorMeta.originalDescription || '');
+            } else {
+              resolveWithSourceMeta();
+            }
+          }).fail(resolveWithSourceMeta));
+        }
+      } else {
+        resolveWithSourceMeta();
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises), options);
+    }
+  }, {
+    key: "updateNavigatorCustomMetadata",
+
+    /**
+     * Updates custom navigator metadata for the catalog entry
+     *
+     * @param {Object} [modifiedCustomMetadata] - The custom metadata to update, only supply what has been changed
+     * @param {string[]} [deletedCustomMetadataKeys] - The custom metadata to delete identifier by the keys
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     *
+     * @return {Promise}
+     */
+    value: function updateNavigatorCustomMetadata(modifiedCustomMetadata, deletedCustomMetadataKeys, apiOptions) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (self.canHaveNavigatorMetadata()) {
+        if (self.navigatorMeta === {} || self.navigatorMeta && typeof self.navigatorMeta.identity === 'undefined') {
+          if (!apiOptions) {
+            apiOptions = {};
+          }
+
+          apiOptions.refreshCache = true;
+        }
+
+        self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
+          if (navigatorMeta) {
+            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateNavigatorProperties({
+              identity: navigatorMeta.identity,
+              modifiedCustomMetadata: modifiedCustomMetadata,
+              deletedCustomMetadataKeys: deletedCustomMetadataKeys
+            }).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+                deferred.resolve(self.navigatorMeta);
+              } else {
+                deferred.reject();
+              }
+            }).fail(deferred.reject);
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+
+      return deferred.promise();
+    }
+  }, {
+    key: "setComment",
+
+    /**
+     * Sets the comment in the proper source
+     *
+     * @param {string} comment
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     * @param {boolean} [apiOptions.refreshCache]
+     *
+     * @return {Promise}
+     */
+    value: function setComment(comment, apiOptions) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (self.canHaveNavigatorMetadata()) {
+        if (self.navigatorMeta === {} || self.navigatorMeta && typeof self.navigatorMeta.identity === 'undefined') {
+          if (!apiOptions) {
+            apiOptions = {};
+          }
+
+          apiOptions.refreshCache = true;
+        }
+
+        self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
+          if (navigatorMeta) {
+            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateNavigatorProperties({
+              identity: navigatorMeta.identity,
+              properties: {
+                description: comment
+              }
+            }).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+              }
+
+              self.getComment(apiOptions).done(function (comment) {
+                if (self.commentObservable && self.commentObservable() !== comment) {
+                  self.commentObservable(comment);
+                }
+
+                deferred.resolve(comment);
+              });
+            }).fail(deferred.reject);
+          }
+        }).fail(deferred.reject);
+      } else {
+        _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateSourceMetadata({
+          sourceType: self.getSourceType(),
+          path: self.path,
+          properties: {
+            comment: comment
+          }
+        }).done(function () {
+          reloadSourceMeta(self, {
+            silenceErrors: apiOptions && apiOptions.silenceErrors,
+            refreshCache: true
+          }).done(function () {
+            self.getComment(apiOptions).done(deferred.resolve);
+          });
+        }).fail(deferred.reject);
+      }
+
+      return deferred.promise();
+    }
+  }, {
+    key: "addNavigatorTags",
+
+    /**
+     * Adds a list of tags and updates the navigator metadata of the entry
+     *
+     * @param {string[]} tags
+     *
+     * @return {Promise}
+     */
+    value: function addNavigatorTags(tags) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (self.canHaveNavigatorMetadata()) {
+        self.getNavigatorMeta().done(function (navMeta) {
+          if (navMeta && typeof navMeta.identity !== 'undefined') {
+            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].addNavTags(navMeta.identity, tags).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+              } else {
+                deferred.reject();
+              }
+
+              deferred.resolve(self.navigatorMeta);
+            }).fail(deferred.reject);
+          } else {
+            deferred.reject();
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+
+      return deferred.promise();
+    }
+  }, {
+    key: "deleteNavigatorTags",
+
+    /**
+     * Removes a list of tags and updates the navigator metadata of the entry
+     *
+     * @param {string[]} tags
+     *
+     * @return {Promise}
+     */
+    value: function deleteNavigatorTags(tags) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (self.canHaveNavigatorMetadata()) {
+        self.getNavigatorMeta().done(function (navMeta) {
+          if (navMeta && typeof navMeta.identity !== 'undefined') {
+            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].deleteNavTags(navMeta.identity, tags).done(function (entity) {
+              if (entity) {
+                self.navigatorMeta = entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+              } else {
+                deferred.reject();
+              }
+
+              deferred.resolve(self.navigatorMeta);
+            }).fail(deferred.reject);
+          } else {
+            deferred.reject();
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+
+      return deferred.promise();
+    }
+  }, {
+    key: "hasPossibleChildren",
+
+    /**
+     * Checks if the entry can have children or not without fetching additional metadata.
+     *
+     * @return {boolean}
+     */
+    value: function hasPossibleChildren() {
+      var self = this;
+      return self.path.length < 3 || !self.definition && !self.sourceMeta || self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type) || self.definition && /^(?:struct|array|map)/i.test(self.definition.type);
+    }
+  }, {
+    key: "getIndex",
+
+    /**
+     * Returns the index representing the order in which the backend returned this entry.
+     *
+     * @return {number}
+     */
+    value: function getIndex() {
+      var self = this;
+      return self.definition && self.definition.index ? self.definition.index : 0;
+    }
+  }, {
+    key: "getSourceType",
+
+    /**
+     * Returns the source type of this entry.
+     *
+     * @return {string} - 'impala', 'hive', 'solr', etc.
+     */
+    value: function getSourceType() {
+      var self = this;
+      return self.dataCatalog.sourceType;
+    }
+  }, {
+    key: "isSource",
+
+    /**
+     * Returns true if the entry represents a data source.
+     *
+     * @return {boolean}
+     */
+    value: function isSource() {
+      var self = this;
+      return self.path.length === 0;
+    }
+  }, {
+    key: "isDatabase",
+
+    /**
+     * Returns true if the entry is a database.
+     *
+     * @return {boolean}
+     */
+    value: function isDatabase() {
+      var self = this;
+      return self.path.length === 1;
+    }
+  }, {
+    key: "isTableOrView",
+
+    /**
+     * Returns true if the entry is a table or a view.
+     *
+     * @return {boolean}
+     */
+    value: function isTableOrView() {
+      var self = this;
+      return self.path.length === 2;
+    }
+  }, {
+    key: "getTitle",
+
+    /**
+     * Returns the default title used for the entry, the qualified path with type for fields. Optionally include
+     * the comment after, if already resolved.
+     *
+     * @param {boolean} [includeComment] - Default false
+     * @return {string}
+     */
+    value: function getTitle(includeComment) {
+      var self = this;
+      var title = self.getQualifiedPath();
+
+      if (self.isField()) {
+        var type = self.getType();
+
+        if (type) {
+          title += ' (' + type + ')';
+        }
+      }
+
+      if (includeComment && self.hasResolvedComment() && self.getResolvedComment()) {
+        title += ' - ' + self.getResolvedComment();
+      }
+
+      return title;
+    }
+  }, {
+    key: "getQualifiedPath",
+
+    /**
+     * Returns the fully qualified path for this entry.
+     *
+     * @return {string}
+     */
+    value: function getQualifiedPath() {
+      var self = this;
+      return self.path.join('.');
+    }
+  }, {
+    key: "getDisplayName",
+
+    /**
+     * Returns the display name for the entry, name or qualified path plus type for fields
+     *
+     * @param {boolean} qualified - Whether to use the qualified path or not, default false
+     * @return {string}
+     */
+    value: function getDisplayName(qualified) {
+      var self = this;
+      var displayName = qualified ? self.getQualifiedPath() : self.name;
+
+      if (self.isField()) {
+        var type = self.getType();
+
+        if (type) {
+          displayName += ' (' + type + ')';
+        }
+      }
+
+      return displayName;
+    }
+  }, {
+    key: "isPrimaryKey",
+
+    /**
+     * Returns true for columns that are a primary key. Note that the definition has to come from a parent entry, i.e.
+     * getChildren().
+     *
+     * @return {boolean}
+     */
+    value: function isPrimaryKey() {
+      var self = this;
+      return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+    }
+  }, {
+    key: "isPartitionKey",
+
+    /**
+     * Returns true if the entry is a partition key. Note that the definition has to come from a parent entry, i.e.
+     * getChildren().
+     *
+     * @return {boolean}
+     */
+    value: function isPartitionKey() {
+      var self = this;
+      return self.definition && !!self.definition.partitionKey;
+    }
+  }, {
+    key: "isTable",
+
+    /**
+     * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
+     *
+     * @return {boolean}
+     */
+    value: function isTable() {
+      var self = this;
+
+      if (self.path.length === 2) {
+        if (self.sourceMeta) {
+          return !self.sourceMeta.is_view;
+        }
+
+        if (self.definition && self.definition.type) {
+          return self.definition.type.toLowerCase() === 'table';
+        }
+
+        return true;
+      }
+
+      return false;
+    }
+  }, {
+    key: "isView",
+
+    /**
+     * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
+     *
+     * @return {boolean}
+     */
+    value: function isView() {
+      var self = this;
+      return self.path.length === 2 && (self.sourceMeta && self.sourceMeta.is_view || self.definition && self.definition.type && self.definition.type.toLowerCase() === 'view');
+    }
+  }, {
+    key: "isColumn",
+
+    /**
+     * Returns true if the entry is a column.
+     *
+     * @return {boolean}
+     */
+    value: function isColumn() {
+      var self = this;
+      return self.path.length === 3;
+    }
+  }, {
+    key: "isComplex",
+
+    /**
+     * Returns true if the entry is a column. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    value: function isComplex() {
+      var self = this;
+      return self.path.length > 2 && (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type) || self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
+    }
+  }, {
+    key: "isField",
+
+    /**
+     * Returns true if the entry is a field, i.e. column or child of a complex type.
+     *
+     * @return {boolean}
+     */
+    value: function isField() {
+      var self = this;
+      return self.path.length > 2;
+    }
+  }, {
+    key: "isArray",
+
+    /**
+     * Returns true if the entry is an array. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    value: function isArray() {
+      var self = this;
+      return self.sourceMeta && /^array/i.test(self.sourceMeta.type) || self.definition && /^array/i.test(self.definition.type);
+    }
+  }, {
+    key: "isMap",
+
+    /**
+     * Returns true if the entry is a map. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    value: function isMap() {
+      var self = this;
+      return self.sourceMeta && /^map/i.test(self.sourceMeta.type) || self.definition && /^map/i.test(self.definition.type);
+    }
+  }, {
+    key: "isMapValue",
+
+    /**
+     * Returns true if the entry is a map value. It will be accurate once the source meta has been loaded or if loaded
+     * from a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    value: function isMapValue() {
+      var self = this;
+      return self.definition && self.definition.isMapValue;
+    }
+  }, {
+    key: "getType",
+
+    /**
+     * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * The returned string is always lower case and for complex entries the type definition is stripped to
+     * either 'array', 'map' or 'struct'.
+     *
+     * @return {string}
+     */
+    value: function getType() {
+      var self = this;
+      var type = self.getRawType();
+
+      if (type.indexOf('<') !== -1) {
+        type = type.substring(0, type.indexOf('<'));
+      }
+
+      return type.toLowerCase();
+    }
+  }, {
+    key: "getRawType",
+
+    /**
+     * Returns the raw type of the entry. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * For complex entries the type definition is the full version.
+     *
+     * @return {string}
+     */
+    value: function getRawType() {
+      var self = this;
+      return self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
+    }
+  }, {
+    key: "getSourceMeta",
+
+    /**
+     * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getSourceMeta(options) {
+      var self = this;
+
+      if (options && options.cachedOnly) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise, options) || $.Deferred().reject(false).promise();
+      }
+
+      if (options && options.refreshCache) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSourceMeta(self, options));
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
+    }
+  }, {
+    key: "getAnalysis",
+
+    /**
+     * Gets the analysis for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache] - Clears the browser cache
+     * @param {boolean} [options.refreshAnalysis] - Performs a hard refresh on the source level
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getAnalysis(options) {
+      var self = this;
+
+      if (options && options.cachedOnly) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise, options) || $.Deferred().reject(false).promise();
+      }
+
+      if (options && (options.refreshCache || options.refreshAnalysis)) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadAnalysis(self, options), options);
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
+    }
+  }, {
+    key: "getPartitions",
+
+    /**
+     * Gets the partitions for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache] - Clears the browser cache
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getPartitions(options) {
+      var self = this;
+
+      if (!self.isTableOrView()) {
+        return $.Deferred().reject(false).promise();
+      }
+
+      if (options && options.cachedOnly) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise, options) || $.Deferred().reject(false).promise();
+      }
+
+      if (options && options.refreshCache) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadPartitions(self, options), options);
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
+    }
+  }, {
+    key: "getNavigatorMeta",
+
+    /**
+     * Gets the Navigator metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getNavigatorMeta(options) {
+      var self = this;
+      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+
+      if (!self.canHaveNavigatorMetadata()) {
+        return $.Deferred().reject().promise();
+      }
+
+      if (options && options.cachedOnly) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise, options) || $.Deferred().reject(false).promise();
+      }
+
+      if (options && options.refreshCache) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadNavigatorMeta(self, options), options);
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options);
+    }
+  }, {
+    key: "getNavOptMeta",
+
+    /**
+     * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getNavOptMeta(options) {
+      var self = this;
+      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+
+      if (!self.dataCatalog.canHaveNavOptMetadata() || !self.isTableOrView()) {
+        return $.Deferred().reject().promise();
+      }
+
+      if (options && options.cachedOnly) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise, options) || $.Deferred().reject(false).promise();
+      }
+
+      if (options && options.refreshCache) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadNavOptMeta(self, options), options);
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
+    }
+  }, {
+    key: "getSample",
+
+    /**
+     * Gets the sample for the entry, if unknown it will first check if any parent table already has the sample. It
+     * will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     * @oaram {string} [options.operation]
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getSample(options) {
+      var self = this; // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
+
+      if (options && options.operation && options.operation !== 'default') {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(_api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].fetchSample({
+          sourceType: self.dataCatalog.sourceType,
+          compute: self.compute,
+          path: self.path,
+          silenceErrors: options && options.silenceErrors,
+          operation: options.operation
+        }), options);
+      } // Check if parent has a sample that we can reuse
+
+
+      if (!self.samplePromise && self.isColumn()) {
+        var deferred = $.Deferred();
+        var cancellablePromises = [];
+
+        var revertToSpecific = function revertToSpecific() {
+          if (options && options.cachedOnly) {
+            deferred.reject();
+          } else {
+            cancellablePromises.push(_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSample(self, options), options).done(deferred.resolve).fail(deferred.reject));
+          }
+        };
+
+        self.dataCatalog.getEntry({
+          namespace: self.namespace,
+          compute: self.compute,
+          path: self.path.slice(0, 2),
+          definition: {
+            type: 'table'
+          }
+        }).done(function (tableEntry) {
+          if (tableEntry && tableEntry.samplePromise) {
+            cancellablePromises.push(_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(tableEntry.samplePromise, options));
+            tableEntry.samplePromise.done(function (parentSample) {
+              var colSample = {
+                hueTimestamp: parentSample.hueTimestamp,
+                has_more: parentSample.has_more,
+                type: parentSample.type,
+                data: [],
+                meta: []
+              };
+
+              if (parentSample.meta) {
+                var _loop = function _loop(i) {
+                  if (parentSample.meta[i].name.toLowerCase() === self.name.toLowerCase()) {
+                    colSample.meta[0] = parentSample.meta[i];
+                    parentSample.data.forEach(function (parentRow) {
+                      colSample.data.push([parentRow[i]]);
+                    });
+                    return "break";
+                  }
+                };
+
+                for (var i = 0; i < parentSample.meta.length; i++) {
+                  var _ret = _loop(i);
+
+                  if (_ret === "break") break;
+                }
+              }
+
+              if (colSample.meta.length) {
+                self.sample = colSample;
+                deferred.resolve(self.sample);
+              } else {
+                revertToSpecific();
+              }
+            }).fail(revertToSpecific);
+          } else {
+            revertToSpecific();
+          }
+        }).fail(revertToSpecific);
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('samplePromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
+      }
+
+      if (options && options.cachedOnly) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
+      }
+
+      if (options && options.refreshCache) {
+        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSample(self, options), options);
+      }
+
+      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise || reloadSample(self, options), options);
+    }
+  }, {
+    key: "getTopAggs",
+
+    /**
+     * Gets the top aggregate UDFs for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopAggs(options) {
+      var self = this;
+      return getFromMultiTableCatalog(self, options, 'getTopAggs');
+    }
+  }, {
+    key: "getTopFilters",
+
+    /**
+     * Gets the top filters for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopFilters(options) {
+      var self = this;
+      return getFromMultiTableCatalog(self, options, 'getTopFilters');
+    }
+  }, {
+    key: "getTopJoins",
+
+    /**
+     * Gets the top joins for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopJoins(options) {
+      var self = this;
+      return getFromMultiTableCatalog(self, options, 'getTopJoins');
+    }
+  }]);
+
+  return DataCatalogEntry;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (DataCatalogEntry);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/catalog/generalDataCatalog.js":
+/*!*******************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/catalog/generalDataCatalog.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+var STORAGE_POSTFIX = LOGGED_USERNAME;
+var DATA_CATALOG_VERSION = 5;
+
+var GeneralDataCatalog =
+/*#__PURE__*/
+function () {
+  function GeneralDataCatalog() {
+    _classCallCheck(this, GeneralDataCatalog);
+
+    var self = this;
+    self.store = localforage__WEBPACK_IMPORTED_MODULE_1___default.a.createInstance({
+      name: 'HueDataCatalog_' + STORAGE_POSTFIX
+    });
+    self.allNavigatorTagsPromise = undefined;
+  }
+  /**
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.refreshCache]
+   *
+   * @return {Promise}
+   */
+
+
+  _createClass(GeneralDataCatalog, [{
+    key: "getAllNavigatorTags",
+    value: function getAllNavigatorTags(options) {
+      var self = this;
+
+      if (self.allNavigatorTagsPromise && (!options || !options.refreshCache)) {
+        return self.allNavigatorTagsPromise;
+      }
+
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+
+      if (!window.HAS_NAVIGATOR) {
+        return deferred.reject().promise();
+      }
+
+      self.allNavigatorTagsPromise = deferred.promise();
+
+      var reloadAllTags = function reloadAllTags() {
+        _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAllNavigatorTags({
+          silenceErrors: options && options.silenceErrors
+        }).done(deferred.resolve).fail(deferred.reject);
+
+        if (window.CACHEABLE_TTL.default > 0) {
+          deferred.done(function (allTags) {
+            self.store.setItem('hue.dataCatalog.allNavTags', {
+              allTags: allTags,
+              hueTimestamp: Date.now(),
+              version: DATA_CATALOG_VERSION
+            });
+          });
+        }
+      };
+
+      if (window.CACHEABLE_TTL.default > 0 && (!options || !options.refreshCache)) {
+        self.store.getItem('hue.dataCatalog.allNavTags').then(function (storeEntry) {
+          if (storeEntry && storeEntry.version === DATA_CATALOG_VERSION && (!storeEntry.hueTimestamp || Date.now() - storeEntry.hueTimestamp < CACHEABLE_TTL.default)) {
+            deferred.resolve(storeEntry.allTags);
+          } else {
+            reloadAllTags();
+          }
+        }).catch(reloadAllTags);
+      } else {
+        reloadAllTags();
+      }
+
+      return self.allNavigatorTagsPromise;
+    }
+  }, {
+    key: "updateAllNavigatorTags",
+
+    /**
+     * @param {string[]} tagsToAdd
+     * @param {string[]} tagsToRemove
+     */
+    value: function updateAllNavigatorTags(tagsToAdd, tagsToRemove) {
+      var self = this;
+
+      if (self.allNavigatorTagsPromise) {
+        self.allNavigatorTagsPromise.done(function (allTags) {
+          tagsToAdd.forEach(function (newTag) {
+            if (!allTags[newTag]) {
+              allTags[newTag] = 0;
+            }
+
+            allTags[newTag]++;
+          });
+          tagsToRemove.forEach(function (removedTag) {
+            if (!allTags[removedTag]) {
+              allTags[removedTag]--;
+
+              if (allTags[removedTag] === 0) {
+                delete allTags[removedTag];
+              }
+            }
+          });
+          self.store.setItem('hue.dataCatalog.allNavTags', {
+            allTags: allTags,
+            hueTimestamp: Date.now(),
+            version: DATA_CATALOG_VERSION
+          });
+        });
+      }
+    }
+  }]);
+
+  return GeneralDataCatalog;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (GeneralDataCatalog);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/catalog/multiTableEntry.js":
+/*!****************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/catalog/multiTableEntry.js ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _catalogUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * Helper function to reload a NavOpt multi table attribute, like topAggs or topFilters
+ *
+ * @param {MultiTableEntry} multiTableEntry
+ * @param {Object} [options]
+ * @param {boolean} [options.silenceErrors] - Default true
+ * @param {string} promiseAttribute
+ * @param {string} dataAttribute
+ * @param {string} apiHelperFunction
+ * @return {CancellablePromise}
+ */
+
+var genericNavOptReload = function genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
+  if (multiTableEntry.dataCatalog.canHaveNavOptMetadata()) {
+    return multiTableEntry.trackedPromise(promiseAttribute, _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options));
+  }
+
+  multiTableEntry[promiseAttribute] = $.Deferred().reject();
+  return multiTableEntry[promiseAttribute];
+};
+/**
+ * Helper function to get a NavOpt multi table attribute, like topAggs or topFilters
+ *
+ * @param {MultiTableEntry} multiTableEntry
+ * @param {Object} [options]
+ * @param {boolean} [options.silenceErrors] - Default false
+ * @param {boolean} [options.refreshCache] - Default false
+ * @param {boolean} [options.cachedOnly] - Default false
+ * @param {boolean} [options.cancellable] - Default false
+ * @param {string} promiseAttribute
+ * @param {string} dataAttribute
+ * @param {string} apiHelperFunction
+ * @return {CancellablePromise}
+ */
+
+
+var genericNavOptGet = function genericNavOptGet(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
+  if (options && options.cachedOnly) {
+    return _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(multiTableEntry[promiseAttribute], options) || $.Deferred().reject(false).promise();
+  }
+
+  if (options && options.refreshCache) {
+    return _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+  }
+
+  return _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(multiTableEntry[promiseAttribute] || genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+};
+
+var MultiTableEntry =
+/*#__PURE__*/
+function () {
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.identifier
+   * @param {DataCatalog} options.dataCatalog
+   * @param {string[][]} options.paths
+   * @constructor
+   */
+  function MultiTableEntry(options) {
+    _classCallCheck(this, MultiTableEntry);
+
+    var self = this;
+    self.identifier = options.identifier;
+    self.dataCatalog = options.dataCatalog;
+    self.paths = options.paths;
+    self.topAggs = undefined;
+    self.topAggsPromise = undefined;
+    self.topColumns = undefined;
+    self.topColumnsPromise = undefined;
+    self.topFilters = undefined;
+    self.topFiltersPromise = undefined;
+    self.topJoins = undefined;
+    self.topJoinsPromise = undefined;
+  }
+
+  _createClass(MultiTableEntry, [{
+    key: "save",
+
+    /**
+     * Save the multi table entry to cache
+     *
+     * @return {Promise}
+     */
+    value: function save() {
+      var self = this;
+      window.clearTimeout(self.saveTimeout);
+      return self.dataCatalog.persistMultiTableEntry(self);
+    }
+  }, {
+    key: "saveLater",
+
+    /**
+     * Save the multi table entry at a later point of time
+     */
+    value: function saveLater() {
+      var self = this;
+
+      if (CACHEABLE_TTL.default > 0) {
+        window.clearTimeout(self.saveTimeout);
+        self.saveTimeout = window.setTimeout(function () {
+          self.save();
+        }, 1000);
+      }
+    }
+  }, {
+    key: "trackedPromise",
+
+    /**
+     * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
+     *
+     * @param {string} promiseName - The attribute name to use
+     * @param {CancellablePromise} cancellablePromise
+     */
+    value: function trackedPromise(promiseName, cancellablePromise) {
+      var self = this;
+      self[promiseName] = cancellablePromise;
+      return cancellablePromise.fail(function () {
+        if (cancellablePromise.cancelled) {
+          delete self[promiseName];
+        }
+      });
+    }
+  }, {
+    key: "getTopAggs",
+
+    /**
+     * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopAggs(options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topAggsPromise', 'topAggs', 'fetchNavOptTopAggs');
+    }
+  }, {
+    key: "getTopColumns",
+
+    /**
+     * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopColumns(options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topColumnsPromise', 'topColumns', 'fetchNavOptTopColumns');
+    }
+  }, {
+    key: "getTopFilters",
+
+    /**
+     * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopFilters(options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topFiltersPromise', 'topFilters', 'fetchNavOptTopFilters');
+    }
+  }, {
+    key: "getTopJoins",
+
+    /**
+     * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    value: function getTopJoins(options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topJoinsPromise', 'topJoins', 'fetchNavOptTopJoins');
+    }
+  }]);
+
+  return MultiTableEntry;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (MultiTableEntry);
+
+/***/ }),
+
 /***/ "./desktop/core/src/desktop/js/ext/bootstrap.2.3.2.min.js":
 /*!****************************************************************!*\
   !*** ./desktop/core/src/desktop/js/ext/bootstrap.2.3.2.min.js ***!
@@ -8533,30 +14146,31 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var filesize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! filesize */ "./node_modules/filesize/lib/filesize.js");
 /* harmony import */ var filesize__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(filesize__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ext/fileuploader.custom */ "./desktop/core/src/desktop/js/ext/fileuploader.custom.js");
-/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
-/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var knockout_mapping__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! knockout.mapping */ "./node_modules/knockout.mapping/knockout.mapping.js");
-/* harmony import */ var knockout_mapping__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(knockout_mapping__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var page__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! page */ "./node_modules/page/page.js");
-/* harmony import */ var page__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(page__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var utils_hueUtils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! utils/hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
-/* harmony import */ var utils_hueAnalytics__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/hueAnalytics */ "./desktop/core/src/desktop/js/utils/hueAnalytics.js");
-/* harmony import */ var utils_hueDebug__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! utils/hueDebug */ "./desktop/core/src/desktop/js/utils/hueDebug.js");
-/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
-/* harmony import */ var utils_hueDrop__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! utils/hueDrop */ "./desktop/core/src/desktop/js/utils/hueDrop.js");
-/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
-/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_13__);
-/* harmony import */ var ext_ko_editable_custom__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ext/ko.editable.custom */ "./desktop/core/src/desktop/js/ext/ko.editable.custom.js");
-/* harmony import */ var ext_ko_editable_custom__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(ext_ko_editable_custom__WEBPACK_IMPORTED_MODULE_14__);
-/* harmony import */ var ext_ko_selectize_custom__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ext/ko.selectize.custom */ "./desktop/core/src/desktop/js/ext/ko.selectize.custom.js");
-/* harmony import */ var knockout_switch_case__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! knockout-switch-case */ "./node_modules/knockout-switch-case/knockout-switch-case.js");
-/* harmony import */ var knockout_switch_case__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(knockout_switch_case__WEBPACK_IMPORTED_MODULE_16__);
-/* harmony import */ var knockout_sortable__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! knockout-sortable */ "./node_modules/knockout-sortable/build/knockout-sortable.js");
-/* harmony import */ var knockout_sortable__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(knockout_sortable__WEBPACK_IMPORTED_MODULE_17__);
-/* harmony import */ var knockout_validation__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! knockout.validation */ "./node_modules/knockout.validation/dist/knockout.validation.js");
-/* harmony import */ var knockout_validation__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(knockout_validation__WEBPACK_IMPORTED_MODULE_18__);
-/* harmony import */ var utils_apiHelper__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! utils/apiHelper */ "./desktop/core/src/desktop/js/utils/apiHelper.js");
-/* harmony import */ var utils_cancellablePromise__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! utils/cancellablePromise */ "./desktop/core/src/desktop/js/utils/cancellablePromise.js");
+/* harmony import */ var page__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! page */ "./node_modules/page/page.js");
+/* harmony import */ var page__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(page__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var knockout_mapping__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! knockout.mapping */ "./node_modules/knockout.mapping/knockout.mapping.js");
+/* harmony import */ var knockout_mapping__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(knockout_mapping__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var ext_ko_editable_custom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ext/ko.editable.custom */ "./desktop/core/src/desktop/js/ext/ko.editable.custom.js");
+/* harmony import */ var ext_ko_editable_custom__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(ext_ko_editable_custom__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var ext_ko_selectize_custom__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ext/ko.selectize.custom */ "./desktop/core/src/desktop/js/ext/ko.selectize.custom.js");
+/* harmony import */ var knockout_switch_case__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! knockout-switch-case */ "./node_modules/knockout-switch-case/knockout-switch-case.js");
+/* harmony import */ var knockout_switch_case__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(knockout_switch_case__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var knockout_sortable__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! knockout-sortable */ "./node_modules/knockout-sortable/build/knockout-sortable.js");
+/* harmony import */ var knockout_sortable__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(knockout_sortable__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var knockout_validation__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! knockout.validation */ "./node_modules/knockout.validation/dist/knockout.validation.js");
+/* harmony import */ var knockout_validation__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(knockout_validation__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
+/* harmony import */ var utils_hueAnalytics__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! utils/hueAnalytics */ "./desktop/core/src/desktop/js/utils/hueAnalytics.js");
+/* harmony import */ var utils_hueDebug__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! utils/hueDebug */ "./desktop/core/src/desktop/js/utils/hueDebug.js");
+/* harmony import */ var utils_hueDrop__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! utils/hueDrop */ "./desktop/core/src/desktop/js/utils/hueDrop.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var utils_hueUtils__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! utils/hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -8572,6 +14186,7 @@ __webpack_require__.r(__webpack_exports__);
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 
 
 
@@ -8595,2617 +14210,20 @@ __webpack_require__.r(__webpack_exports__);
  // TODO: Migrate away
 
 window._ = lodash__WEBPACK_IMPORTED_MODULE_2___default.a;
-window.apiHelper = utils_apiHelper__WEBPACK_IMPORTED_MODULE_19__["default"];
-window.CancellablePromise = utils_cancellablePromise__WEBPACK_IMPORTED_MODULE_20__["default"];
+window.apiHelper = api_apiHelper__WEBPACK_IMPORTED_MODULE_14__["default"];
+window.CancellablePromise = api_cancellablePromise__WEBPACK_IMPORTED_MODULE_15__["default"];
+window.dataCatalog = catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_16__["default"];
 window.filesize = filesize__WEBPACK_IMPORTED_MODULE_3___default.a;
-window.ko = knockout__WEBPACK_IMPORTED_MODULE_5___default.a;
-window.ko.mapping = knockout_mapping__WEBPACK_IMPORTED_MODULE_6___default.a;
-window.page = page__WEBPACK_IMPORTED_MODULE_7___default.a;
-window.hueUtils = utils_hueUtils__WEBPACK_IMPORTED_MODULE_8__["default"];
-window.hueAnalytics = utils_hueAnalytics__WEBPACK_IMPORTED_MODULE_9__["default"];
-window.hueDebug = utils_hueDebug__WEBPACK_IMPORTED_MODULE_10__["default"];
-window.huePubSub = utils_huePubSub__WEBPACK_IMPORTED_MODULE_11__["default"];
-window.hueDrop = utils_hueDrop__WEBPACK_IMPORTED_MODULE_12__["default"];
-window.localforage = localforage__WEBPACK_IMPORTED_MODULE_13___default.a;
+window.hueUtils = utils_hueUtils__WEBPACK_IMPORTED_MODULE_21__["default"];
+window.hueAnalytics = utils_hueAnalytics__WEBPACK_IMPORTED_MODULE_17__["default"];
+window.hueDebug = utils_hueDebug__WEBPACK_IMPORTED_MODULE_18__["default"];
+window.huePubSub = utils_huePubSub__WEBPACK_IMPORTED_MODULE_20__["default"];
+window.hueDrop = utils_hueDrop__WEBPACK_IMPORTED_MODULE_19__["default"];
+window.ko = knockout__WEBPACK_IMPORTED_MODULE_7___default.a;
+window.ko.mapping = knockout_mapping__WEBPACK_IMPORTED_MODULE_8___default.a;
+window.localforage = localforage__WEBPACK_IMPORTED_MODULE_6___default.a;
+window.page = page__WEBPACK_IMPORTED_MODULE_5___default.a;
 window.qq = _ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__["default"];
-
-/***/ }),
-
-/***/ "./desktop/core/src/desktop/js/utils/apiHelper.js":
-/*!********************************************************!*\
-  !*** ./desktop/core/src/desktop/js/utils/apiHelper.js ***!
-  \********************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _hueUtils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
-/* harmony import */ var _huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
-/* harmony import */ var _hueDebug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./hueDebug */ "./desktop/core/src/desktop/js/utils/hueDebug.js");
-/* harmony import */ var _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./cancellablePromise */ "./desktop/core/src/desktop/js/utils/cancellablePromise.js");
-/* harmony import */ var _apiQueueManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./apiQueueManager */ "./desktop/core/src/desktop/js/utils/apiQueueManager.js");
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// Licensed to Cloudera, Inc. under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  Cloudera, Inc. licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
-
-
-
-
-var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
-var SAMPLE_API_PREFIX = "/notebook/api/sample/";
-var DOCUMENTS_API = "/desktop/api2/doc/";
-var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
-var FETCH_CONFIG = '/desktop/api2/get_config/';
-var HDFS_API_PREFIX = "/filebrowser/view=/";
-var ADLS_API_PREFIX = "/filebrowser/view=adl:/";
-var GIT_API_PREFIX = "/desktop/api/vcs/contents/";
-var S3_API_PREFIX = "/filebrowser/view=S3A://";
-var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
-var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
-var CONFIG_APPS_API = '/desktop/api/configurations';
-var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
-var SOLR_FIELDS_API = '/indexer/api/index/list/';
-var DASHBOARD_TERMS_API = '/dashboard/get_terms';
-var DASHBOARD_STATS_API = '/dashboard/get_stats';
-var FORMAT_SQL_API = '/notebook/api/format';
-var SEARCH_API = '/desktop/api/search/entities';
-var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
-var HBASE_API_PREFIX = '/hbase/api/';
-var SAVE_TO_FILE = '/filebrowser/save';
-var NAV_URLS = {
-  ADD_TAGS: '/metadata/api/navigator/add_tags',
-  DELETE_TAGS: '/metadata/api/navigator/delete_tags',
-  FIND_ENTITY: '/metadata/api/navigator/find_entity',
-  LIST_TAGS: '/metadata/api/navigator/list_tags',
-  UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties'
-};
-var NAV_OPT_URLS = {
-  TOP_AGGS: '/metadata/api/optimizer/top_aggs',
-  TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
-  TOP_FILTERS: '/metadata/api/optimizer/top_filters',
-  TOP_JOINS: '/metadata/api/optimizer/top_joins',
-  TOP_TABLES: '/metadata/api/optimizer/top_tables',
-  TABLE_DETAILS: '/metadata/api/optimizer/table_details'
-};
-/**
- *
- * @param {Object} options
- * @param {string} options.sourceType
- * @param {string} options.url
- * @param {boolean} options.refreshCache
- * @param {string} [options.hash] - Optional hash to use as well as the url
- * @param {Function} options.fetchFunction
- * @param {Function} options.successCallback
- * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
- * @param {Object} [options.editor] - Ace editor
- * @param {Object} [options.promise] - Optional promise that will be resolved if cached data exists
- */
-
-var fetchCached = function fetchCached(options) {
-  var self = this;
-  var cacheIdentifier = self.getAssistCacheIdentifier(options);
-  var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier) || {};
-  var cachedId = options.hash ? options.url + options.hash : options.url;
-
-  if (options.refreshCache || typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
-    if (typeof options.editor !== 'undefined' && options.editor !== null) {
-      options.editor.showSpinner();
-    }
-
-    return options.fetchFunction(function (data) {
-      cachedData[cachedId] = {
-        timestamp: new Date().getTime(),
-        data: data
-      };
-
-      try {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, cachedData);
-      } catch (e) {}
-    });
-  } else {
-    if (options.promise) {
-      options.promise.resolve(cachedData[cachedId].data);
-    }
-
-    options.successCallback(cachedData[cachedId].data);
-  }
-};
-/**
- * Fetches the popularity for various aspects of the given tables
- *
- * @param {ApiHelper} apiHelper
- * @param {Object} options
- * @param {boolean} [options.silenceErrors]
- * @param {string[][]} options.paths
- * @param {string} url
- * @return {CancellablePromise}
- */
-
-
-var genericNavOptMultiTableFetch = function genericNavOptMultiTableFetch(apiHelper, options, url) {
-  var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-  var dbTables = {};
-  options.paths.forEach(function (path) {
-    dbTables[path.join('.')] = true;
-  });
-  var data = {
-    dbTables: ko.mapping.toJSON(Object.keys(dbTables))
-  };
-  var request = apiHelper.simplePost(url, data, {
-    silenceErrors: options.silenceErrors,
-    successCallback: function successCallback(data) {
-      data.hueTimestamp = Date.now();
-      deferred.resolve(data);
-    },
-    errorCallback: deferred.reject
-  });
-  return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-};
-/**
- * Wrapper around the response from the Query API
- *
- * @param {string} sourceType
- * @param {Object} response
- *
- * @constructor
- */
-
-
-var QueryResult = function QueryResult(sourceType, compute, response) {
-  _classCallCheck(this, QueryResult);
-
-  var self = this;
-  self.id = _hueUtils__WEBPACK_IMPORTED_MODULE_1__["default"].UUID();
-  self.type = response.result.type || sourceType;
-  self.compute = compute;
-  self.status = response.status || 'running';
-  self.result = response.result || {};
-  self.result.type = 'table';
-};
-
-var ApiHelper =
-/*#__PURE__*/
-function () {
-  function ApiHelper() {
-    _classCallCheck(this, ApiHelper);
-
-    var self = this;
-    self.queueManager = _apiQueueManager__WEBPACK_IMPORTED_MODULE_5__["default"];
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.hdfs.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'hdfs'
-      }), {});
-    });
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.adls.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'adls'
-      }), {});
-    });
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.git.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'git'
-      }), {});
-    });
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.s3.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 's3'
-      }), {});
-    });
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.collections.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'collections'
-      }), {});
-    });
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.hbase.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'hbase'
-      }), {});
-    });
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.document.cache', function () {
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'document'
-      }), {});
-    });
-
-    var clearAllCaches = function clearAllCaches() {
-      self.clearDbCache({
-        sourceType: 'hive',
-        clearAll: true
-      });
-      self.clearDbCache({
-        sourceType: 'impala',
-        clearAll: true
-      });
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'hdfs'
-      }), {});
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'adls'
-      }), {});
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'git'
-      }), {});
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 's3'
-      }), {});
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'collections'
-      }), {});
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'hbase'
-      }), {});
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
-        sourceType: 'document'
-      }), {});
-    };
-
-    _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribe('assist.clear.all.caches', clearAllCaches);
-
-    if (window.performance && window.performance.navigation) {
-      if (window.performance.navigation.type === 1 && location.href.indexOf('/metastore') !== -1) {
-        // Browser refresh of the metastore page
-        clearAllCaches();
-      }
-    }
-  }
-
-  _createClass(ApiHelper, [{
-    key: "hasExpired",
-    value: function hasExpired(timestamp, cacheType) {
-      if (typeof _hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"] !== 'undefined' && typeof _hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout !== 'undefined') {
-        return new Date().getTime() - timestamp > _hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout;
-      }
-
-      return new Date().getTime() - timestamp > CACHEABLE_TTL[cacheType];
-    }
-  }, {
-    key: "getTotalStorageUserPrefix",
-
-    /**
-     * @param {string} sourceType
-     * @returns {string}
-     */
-    value: function getTotalStorageUserPrefix(sourceType) {
-      return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
-    }
-  }, {
-    key: "getAssistCacheIdentifier",
-
-    /**
-     * @param {object} options
-     * @param {string} options.sourceType
-     * @param {string} [options.cacheType] - Default value 'default'
-     * @returns {string}
-     */
-    value: function getAssistCacheIdentifier(options) {
-      var self = this;
-      return "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
-    }
-  }, {
-    key: "setInTotalStorage",
-
-    /**
-     *
-     * @param {string} owner - 'assist', 'viewModelA' etc.
-     * @param {string} id
-     * @param {*} [value] - Optional, undefined and null will remove the value
-     */
-    value: function setInTotalStorage(owner, id, value) {
-      var self = this;
-
-      try {
-        var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
-
-        if (typeof value !== 'undefined' && value !== null) {
-          cachedData[id] = value;
-          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, {
-            secure: window.location.protocol.indexOf('https') > -1
-          });
-        } else if (cachedData[id]) {
-          delete cachedData[id];
-          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, {
-            secure: window.location.protocol.indexOf('https') > -1
-          });
-        }
-      } catch (e) {}
-    }
-  }, {
-    key: "getFromTotalStorage",
-
-    /**
-     *
-     * @param {string} owner - 'assist', 'viewModelA' etc.
-     * @param {string} id
-     * @param {*} [defaultValue]
-     * @returns {*}
-     */
-    value: function getFromTotalStorage(owner, id, defaultValue) {
-      var self = this;
-      var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
-      return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
-    }
-  }, {
-    key: "withTotalStorage",
-
-    /**
-     * @param {string} owner - 'assist', 'viewModelA' etc.
-     * @param {string} id
-     * @param {Observable} observable
-     * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
-     */
-    value: function withTotalStorage(owner, id, observable, defaultValue, noInit) {
-      var self = this;
-      var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
-
-      if (!noInit && cachedValue !== 'undefined') {
-        observable(cachedValue);
-      }
-
-      observable.subscribe(function (newValue) {
-        if (owner === 'assist' && id === 'assist_panel_visible') {
-          _huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.forceRender');
-        }
-
-        self.setInTotalStorage(owner, id, newValue);
-      });
-      return observable;
-    }
-  }, {
-    key: "successResponseIsError",
-
-    /**
-     * @param {Object} [response]
-     * @param {number} [response.status]
-     * @returns {boolean} - True if actually an error
-     */
-    value: function successResponseIsError(response) {
-      return typeof response !== 'undefined' && (typeof response.traceback !== 'undefined' || typeof response.status !== 'undefined' && response.status !== 0 || response.code === 503 || response.code === 500);
-    }
-  }, {
-    key: "assistErrorCallback",
-
-    /**
-     * @param {Object} options
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @returns {Function}
-     */
-    value: function assistErrorCallback(options) {
-      return function (errorResponse) {
-        var errorMessage = 'Unknown error occurred';
-
-        if (typeof errorResponse !== 'undefined' && errorResponse !== null) {
-          if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText === 'abort') {
-            return;
-          } else if (typeof errorResponse.responseText !== 'undefined') {
-            try {
-              var errorJs = JSON.parse(errorResponse.responseText);
-
-              if (typeof errorJs.message !== 'undefined') {
-                errorMessage = errorJs.message;
-              } else {
-                errorMessage = errorResponse.responseText;
-              }
-            } catch (err) {
-              errorMessage = errorResponse.responseText;
-            }
-          } else if (typeof errorResponse.message !== 'undefined' && errorResponse.message !== null) {
-            errorMessage = errorResponse.message;
-          } else if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText !== null) {
-            errorMessage = errorResponse.statusText;
-          } else if (errorResponse.error !== 'undefined' && Object.prototype.toString.call(errorResponse.error) === '[object String]') {
-            errorMessage = errorResponse.error;
-          } else if (Object.prototype.toString.call(errorResponse) === '[object String]') {
-            errorMessage = errorResponse;
-          }
-        }
-
-        if (!options || !options.silenceErrors) {
-          _hueUtils__WEBPACK_IMPORTED_MODULE_1__["default"].logError(errorResponse);
-
-          if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).trigger("error", errorMessage);
-          }
-        }
-
-        if (options && options.errorCallback) {
-          options.errorCallback(errorMessage);
-        }
-
-        return errorMessage;
-      };
-    }
-  }, {
-    key: "cancelActiveRequest",
-    value: function cancelActiveRequest(request) {
-      if (typeof request !== 'undefined' && request !== null) {
-        var readyState = request.getReadyState ? request.getReadyState() : request.readyState;
-
-        if (readyState < 4) {
-          request.abort();
-        }
-      }
-    }
-  }, {
-    key: "simplePost",
-
-    /**
-     * @param {string} url
-     * @param {Object} data
-     * @param {Object} options
-     * @param {function} [options.successCallback]
-     * @param {function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @return {Promise}
-     */
-    value: function simplePost(url, data, options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(url, data, function (data) {
-        if (self.successResponseIsError(data)) {
-          deferred.reject(self.assistErrorCallback(options)(data));
-          return;
-        }
-
-        if (options && options.successCallback) {
-          options.successCallback(data);
-        }
-
-        deferred.resolve(data);
-      }).fail(self.assistErrorCallback(options));
-      request.fail(function (data) {
-        deferred.reject(self.assistErrorCallback(options)(data));
-      });
-      var promise = deferred.promise();
-
-      promise.getReadyState = function () {
-        return request.readyState;
-      };
-
-      promise.abort = function () {
-        request.abort();
-      };
-
-      return promise;
-    }
-  }, {
-    key: "saveSnippetToFile",
-
-    /**
-     * @param {Object} data
-     * @param {Object} options
-     * @param {function} [options.successCallback]
-     */
-    value: function saveSnippetToFile(data, options) {
-      var self = this;
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(SAVE_TO_FILE, data, function (result) {
-        if (typeof options.successCallback !== 'undefined') {
-          options.successCallback(result);
-        }
-      }, 'json').fail(self.assistErrorCallback(options));
-    }
-  }, {
-    key: "simpleGet",
-
-    /**
-     * @param {string} url
-     * @param {Object} data
-     * @param {Object} options
-     * @param {function} [options.successCallback]
-     * @param {function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     */
-    value: function simpleGet(url, data, options) {
-      var self = this;
-
-      if (!options) {
-        options = {};
-      }
-
-      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.get(url, data, function (data) {
-        if (self.successResponseIsError(data)) {
-          self.assistErrorCallback(options)(data);
-        } else if (typeof options.successCallback !== 'undefined') {
-          options.successCallback(data);
-        }
-      }).fail(self.assistErrorCallback(options));
-    }
-  }, {
-    key: "fetchUsersAndGroups",
-    value: function fetchUsersAndGroups(options) {
-      var self = this;
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        method: "GET",
-        url: "/desktop/api/users/autocomplete",
-        data: options.data || {},
-        contentType: 'application/json'
-      }).done(function (response) {
-        options.successCallback(response);
-      }).fail(function (response) {
-        options.errorCallback(response);
-      });
-    }
-  }, {
-    key: "fetchUsersByIds",
-    value: function fetchUsersByIds(options) {
-      var self = this;
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        method: "GET",
-        url: "/desktop/api/users",
-        data: {
-          userids: options.userids
-        },
-        contentType: 'application/json'
-      }).done(function (response) {
-        options.successCallback(response);
-      }).fail(function (response) {
-        options.errorCallback(response);
-      });
-    }
-  }, {
-    key: "fetchStoragePreview",
-
-    /**
-     *
-     * @param {Object} options
-     * @param {string[]} options.path
-     * @param {string} options.type - 's3', 'adls' or 'hdfs'
-     * @param {number} [options.offset]
-     * @param {number} [options.length]
-     * @param {boolean} [options.silenceErrors]
-     */
-    value: function fetchStoragePreview(options) {
-      var self = this;
-      var url;
-
-      if (options.type === 's3') {
-        url = S3_API_PREFIX;
-      } else if (options.type === 'adls') {
-        url = ADLS_API_PREFIX;
-      } else {
-        url = HDFS_API_PREFIX;
-      }
-
-      var clonedPath = options.path.concat();
-
-      if (clonedPath.length && clonedPath[0] === '/') {
-        clonedPath.shift();
-      }
-
-      url += clonedPath.join('/').replace(/#/g, '%23') + '?compression=none&mode=text';
-      url += '&offset=' + (options.offset || 0);
-      url += '&length=' + (options.length || 118784);
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        dataType: "json",
-        url: url,
-        success: function success(data) {
-          if (self.successResponseIsError(data)) {
-            deferred.reject(self.assistErrorCallback(options)(data));
-          } else {
-            deferred.resolve(data);
-          }
-        },
-        fail: deferred.reject
-      });
-      return deferred.promise();
-    }
-  }, {
-    key: "fetchHdfsPath",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @param {Number} [options.timeout]
-     * @param {Object} [options.editor] - Ace editor
-     *
-     * @param {string[]} options.pathParts
-     * @param {number} [options.pageSize] - Default 500
-     * @param {number} [options.page] - Default 1
-     * @param {string} [options.filter]
-     */
-    value: function fetchHdfsPath(options) {
-      var self = this;
-
-      if (options.pathParts.length > 0 && (options.pathParts[0] === '/' || options.pathParts[0] === '')) {
-        options.pathParts.shift();
-      }
-
-      var url = HDFS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
-
-      if (options.filter) {
-        url += '&filter=' + options.filter;
-      }
-
-      var fetchFunction = function fetchFunction(storeInCache) {
-        if (options.timeout === 0) {
-          self.assistErrorCallback(options)({
-            status: -1
-          });
-          return;
-        }
-
-        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
-          url: url,
-          timeout: options.timeout,
-          success: function success(data) {
-            if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
-              if (data.files.length > 2 && !options.filter) {
-                storeInCache(data);
-              }
-
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        }).fail(self.assistErrorCallback(options)).always(function () {
-          if (typeof options.editor !== 'undefined' && options.editor !== null) {
-            options.editor.hideSpinner();
-          }
-        });
-      };
-
-      return fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
-        sourceType: 'hdfs',
-        url: url,
-        fetchFunction: fetchFunction
-      }));
-    }
-  }, {
-    key: "fetchAdlsPath",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @param {Number} [options.timeout]
-     * @param {Object} [options.editor] - Ace editor
-     *
-     * @param {string[]} options.pathParts
-     * @param {number} [options.pageSize] - Default 500
-     * @param {number} [options.page] - Default 1
-     * @param {string} [options.filter]
-     */
-    value: function fetchAdlsPath(options) {
-      var self = this;
-      options.pathParts.shift();
-      var url = ADLS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
-
-      if (options.filter) {
-        url += '&filter=' + options.filter;
-      }
-
-      var fetchFunction = function fetchFunction(storeInCache) {
-        if (options.timeout === 0) {
-          self.assistErrorCallback(options)({
-            status: -1
-          });
-          return;
-        }
-
-        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
-          url: url,
-          timeout: options.timeout,
-          success: function success(data) {
-            if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
-              if (data.files.length > 2 && !options.filter) {
-                storeInCache(data);
-              }
-
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        }).fail(self.assistErrorCallback(options)).always(function () {
-          if (typeof options.editor !== 'undefined' && options.editor !== null) {
-            options.editor.hideSpinner();
-          }
-        });
-      };
-
-      return fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
-        sourceType: 'adls',
-        url: url,
-        fetchFunction: fetchFunction
-      }));
-    }
-  }, {
-    key: "fetchGitContents",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @param {Number} [options.timeout]
-     *
-     * @param {string[]} options.pathParts
-     * @param {string} options.fileType
-     */
-    value: function fetchGitContents(options) {
-      var self = this;
-      var url = GIT_API_PREFIX + '?path=' + encodeURI(options.pathParts.join("/")) + '&fileType=' + options.fileType;
-
-      var fetchFunction = function fetchFunction(storeInCache) {
-        if (options.timeout === 0) {
-          self.assistErrorCallback(options)({
-            status: -1
-          });
-          return;
-        }
-
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
-          url: url,
-          timeout: options.timeout,
-          success: function success(data) {
-            if (!data.error && !self.successResponseIsError(data)) {
-              if (data.fileType === 'dir' && typeof data.files !== 'undefined' && data.files !== null) {
-                if (data.files.length > 2) {
-                  storeInCache(data);
-                }
-
-                options.successCallback(data);
-              } else if (data.fileType === 'file' && typeof data.content !== 'undefined' && data.content !== null) {
-                options.successCallback(data);
-              }
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        }).fail(self.assistErrorCallback(options));
-      };
-
-      fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
-        sourceType: 'git',
-        url: url,
-        fetchFunction: fetchFunction
-      }));
-    }
-  }, {
-    key: "fetchS3Path",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @param {Number} [options.timeout]
-     * @param {Object} [options.editor] - Ace editor
-     *
-     * @param {string[]} options.pathParts
-     * @param {number} [options.pageSize] - Default 500
-     * @param {number} [options.page] - Default 1
-     * @param {string} [options.filter]
-     */
-    value: function fetchS3Path(options) {
-      var self = this;
-      options.pathParts.shift(); // remove the trailing /
-
-      var url = S3_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
-
-      if (options.filter) {
-        url += '&filter=' + options.filter;
-      }
-
-      var fetchFunction = function fetchFunction(storeInCache) {
-        if (options.timeout === 0) {
-          self.assistErrorCallback(options)({
-            status: -1
-          });
-          return;
-        }
-
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
-          url: url,
-          timeout: options.timeout,
-          success: function success(data) {
-            if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
-              if (data.files.length > 2 && !options.filter) {
-                storeInCache(data);
-              }
-
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        }).fail(self.assistErrorCallback(options)).always(function () {
-          if (typeof options.editor !== 'undefined' && options.editor !== null) {
-            options.editor.hideSpinner();
-          }
-        });
-      };
-
-      fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
-        sourceType: 's3',
-        url: url,
-        fetchFunction: fetchFunction
-      }));
-    }
-  }, {
-    key: "fetchDashboardTerms",
-
-    /**
-     * @param {Object} options
-     * @param {String} options.collectionName
-     * @param {String} options.fieldName
-     * @param {String} options.prefix
-     * @param {String} [options.engine]
-     * @param {Function} options.successCallback
-     * @param {Function} [options.alwaysCallback]
-     * @param {Number} [options.timeout]
-     *
-     */
-    value: function fetchDashboardTerms(options) {
-      var self = this;
-
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({
-          status: -1
-        });
-        return;
-      }
-
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        dataType: 'json',
-        url: DASHBOARD_TERMS_API,
-        type: 'POST',
-        data: {
-          collection: ko.mapping.toJSON({
-            id: '',
-            name: options.collectionName,
-            engine: options.engine || 'solr'
-          }),
-          analysis: ko.mapping.toJSON({
-            name: options.fieldName,
-            terms: {
-              prefix: options.prefix || ''
-            }
-          })
-        },
-        timeout: options.timeout,
-        success: function success(data) {
-          if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        }
-      }).fail(self.assistErrorCallback(options)).always(options.alwaysCallback);
-    }
-  }, {
-    key: "fetchDashboardStats",
-
-    /**
-     * @param {Object} options
-     * @param {String} options.collectionName
-     * @param {String} options.fieldName
-     * @param {String} [options.engine]
-     * @param {Function} options.successCallback
-     * @param {Function} [options.alwaysCallback]
-     * @param {Number} [options.timeout]
-     *
-     */
-    value: function fetchDashboardStats(options) {
-      var self = this;
-
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({
-          status: -1
-        });
-        return;
-      }
-
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        dataType: 'json',
-        url: DASHBOARD_STATS_API,
-        type: 'POST',
-        data: {
-          collection: ko.mapping.toJSON({
-            id: '',
-            name: options.collectionName,
-            engine: options.engine || 'solr'
-          }),
-          analysis: ko.mapping.toJSON({
-            name: options.fieldName,
-            stats: {
-              facet: ''
-            }
-          }),
-          query: ko.mapping.toJSON({
-            qs: [{
-              q: ''
-            }],
-            fqs: []
-          })
-        },
-        timeout: options.timeout,
-        success: function success(data) {
-          if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
-            options.successCallback(data);
-          } else {
-            if (data.status === 1) {
-              options.notSupportedCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        }
-      }).fail(self.assistErrorCallback(options)).always(options.alwaysCallback);
-    }
-  }, {
-    key: "fetchHBase",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @param {Number} [options.timeout]
-     * @param {Object} [options.editor] - Ace editor
-     */
-    value: function fetchHBase(options) {
-      var self = this;
-      var suffix = 'getClusters';
-
-      if (options.parent.name !== '') {
-        suffix = 'getTableList/' + options.parent.name;
-      }
-
-      var url = HBASE_API_PREFIX + suffix;
-
-      var fetchFunction = function fetchFunction(storeInCache) {
-        if (options.timeout === 0) {
-          self.assistErrorCallback(options)({
-            status: -1
-          });
-          return;
-        }
-
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
-          url: url,
-          timeout: options.timeout,
-          success: function success(data) {
-            if (!data.error && !self.successResponseIsError(data)) {
-              storeInCache(data);
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        }).fail(self.assistErrorCallback(options)).always(function () {
-          if (typeof options.editor !== 'undefined' && options.editor !== null) {
-            options.editor.hideSpinner();
-          }
-        });
-      };
-
-      fetchCached.bind(self)(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, options, {
-        sourceType: 'hbase',
-        url: url,
-        fetchFunction: fetchFunction
-      }));
-    }
-  }, {
-    key: "fetchResourceStats",
-
-    /**
-     * @param {Object} options
-     * @param {Number} options.pastMs
-     * @param {Number} options.stepMs
-     *
-     * @return {Promise}
-     */
-    value: function fetchResourceStats(options) {
-      var self = this;
-
-      var queryMetric = function queryMetric(metricName) {
-        var now = Date.now();
-        return self.simplePost('/metadata/api/prometheus/query', {
-          query: ko.mapping.toJSON(metricName),
-          start: Math.floor((now - options.pastMs) / 1000),
-          end: Math.floor(now / 1000),
-          step: options.stepMs / 1000
-        });
-      };
-
-      var combinedDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when(queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
-      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
-      queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
-      queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
-      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}') // Queued queries
-      ).done(function () {
-        var timestampIndex = {};
-
-        for (var j = 0; j < arguments.length; j++) {
-          var response = arguments[j];
-
-          if (response.data.result[0]) {
-            var values = response.data.result[0].values;
-
-            for (var i = 0; i < values.length; i++) {
-              if (!timestampIndex[values[i][0]]) {
-                timestampIndex[values[i][0]] = [values[i][0] * 1000, 0, 0, 0, 0, 0]; // Adjust back to milliseconds
-              }
-
-              timestampIndex[values[i][0]][j + 1] = parseFloat(values[i][1]);
-            }
-          }
-        }
-
-        var result = [];
-        Object.keys(timestampIndex).forEach(function (key) {
-          result.push(timestampIndex[key]);
-        });
-        result.sort(function (a, b) {
-          return a[0] - b[0];
-        });
-        combinedDeferred.resolve(result);
-      }).fail(combinedDeferred.reject);
-      return combinedDeferred.promise();
-    }
-  }, {
-    key: "fetchConfigurations",
-
-    /**
-     * @param {Object} options
-     * @param {Function} [options.successCallback]
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     */
-    value: function fetchConfigurations(options) {
-      var self = this;
-      self.simpleGet(CONFIG_APPS_API, {}, options);
-    }
-  }, {
-    key: "saveGlobalConfiguration",
-    value: function saveGlobalConfiguration(options) {
-      var self = this;
-      self.simplePost(CONFIG_APPS_API, {
-        configuration: ko.mapping.toJSON(options.configuration)
-      }, options);
-    }
-  }, {
-    key: "saveConfiguration",
-
-    /**
-     * @param {Object} options
-     * @param {Function} [options.successCallback]
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.app
-     * @param {Object} options.properties
-     * @param {boolean} [options.isDefault]
-     * @param {Number} [options.groupId]
-     * @param {Number} [options.userId]
-     */
-    value: function saveConfiguration(options) {
-      var self = this;
-      self.simplePost(CONFIG_SAVE_API, {
-        app: options.app,
-        properties: ko.mapping.toJSON(options.properties),
-        is_default: options.isDefault,
-        group_id: options.groupId,
-        user_id: options.userId
-      }, options);
-    }
-  }, {
-    key: "fetchDocuments",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} [options.uuid]
-     */
-    value: function fetchDocuments(options) {
-      var self = this;
-      var id = '';
-
-      if (options.uuid) {
-        id += options.uuid;
-      }
-
-      if (options.type && options.type !== 'all') {
-        id += options.type;
-      }
-
-      var promise = self.queueManager.getQueued(DOCUMENTS_API, id);
-      var firstInQueue = typeof promise === 'undefined';
-
-      if (firstInQueue) {
-        promise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-        self.queueManager.addToQueue(promise, DOCUMENTS_API, id);
-      }
-
-      promise.done(options.successCallback).fail(self.assistErrorCallback(options));
-
-      if (!firstInQueue) {
-        return;
-      }
-
-      var data = {
-        uuid: options.uuid
-      };
-
-      if (options.type && options.type !== 'all') {
-        data.type = ['directory', options.type];
-      }
-
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        url: DOCUMENTS_API,
-        data: data,
-        traditional: true,
-        success: function success(data) {
-          if (!self.successResponseIsError(data)) {
-            promise.resolve(data);
-          } else {
-            promise.reject(data);
-          }
-        }
-      }).fail(promise.reject);
-    }
-  }, {
-    key: "searchDocuments",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} [options.path]
-     * @param {string} [options.query]
-     * @param {string} [options.type]
-     * @param {int} [options.page]
-     * @param {int} [options.limit]
-     */
-    value: function searchDocuments(options) {
-      var self = this;
-      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        url: DOCUMENTS_SEARCH_API,
-        data: {
-          uuid: options.uuid,
-          text: options.query,
-          type: options.type,
-          page: options.page,
-          limit: options.limit,
-          include_trashed: options.include_trashed
-        },
-        success: function success(data) {
-          if (!self.successResponseIsError(data)) {
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        }
-      }).fail(self.assistErrorCallback(options));
-    }
-  }, {
-    key: "fetchDocument",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     * @param {boolean} [options.fetchContents]
-     * @param {number} options.uuid
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchDocument(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        url: DOCUMENTS_API,
-        data: {
-          uuid: options.uuid,
-          data: !!options.fetchContents
-        },
-        success: function success(data) {
-          if (!self.successResponseIsError(data)) {
-            deferred.resolve(data);
-          } else {
-            deferred.reject(self.assistErrorCallback({
-              silenceErrors: options.silenceErrors
-            }));
-          }
-        }
-      }).fail(function (errorResponse) {
-        deferred.reject(self.assistErrorHandler(errorResponse));
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "createDocumentsFolder",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.parentUuid
-     * @param {string} options.name
-     */
-    value: function createDocumentsFolder(options) {
-      var self = this;
-      self.simplePost(DOCUMENTS_API + 'mkdir', {
-        parent_uuid: ko.mapping.toJSON(options.parentUuid),
-        name: ko.mapping.toJSON(options.name)
-      }, options);
-    }
-  }, {
-    key: "updateDocument",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.uuid
-     * @param {string} options.name
-     */
-    value: function updateDocument(options) {
-      var self = this;
-      self.simplePost(DOCUMENTS_API + 'update', {
-        uuid: ko.mapping.toJSON(options.uuid),
-        name: options.name
-      }, options);
-    }
-  }, {
-    key: "uploadDocument",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {Function} [options.progressHandler]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {FormData} options.formData
-     */
-    value: function uploadDocument(options) {
-      var self = this;
-      jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        url: DOCUMENTS_API + 'import',
-        type: 'POST',
-        success: function success(data) {
-          if (!self.successResponseIsError(data)) {
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        },
-        xhr: function xhr() {
-          var myXhr = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajaxSettings.xhr();
-
-          if (myXhr.upload && options.progressHandler) {
-            myXhr.upload.addEventListener('progress', options.progressHandler, false);
-          }
-
-          return myXhr;
-        },
-        dataType: 'json',
-        data: options.formData,
-        cache: false,
-        contentType: false,
-        processData: false
-      }).fail(self.assistErrorCallback(options));
-    }
-  }, {
-    key: "moveDocument",
-
-    /**
-     *
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {number} options.sourceId - The ID of the source document
-     * @param {number} options.destinationId - The ID of the target document
-     */
-    value: function moveDocument(options) {
-      var self = this;
-      self.simplePost(DOCUMENTS_API + 'move', {
-        source_doc_uuid: ko.mapping.toJSON(options.sourceId),
-        destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
-      }, options);
-    }
-  }, {
-    key: "deleteDocument",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.uuid
-     * @param {string} [options.skipTrash] - Default false
-     */
-    value: function deleteDocument(options) {
-      var self = this;
-      self.simplePost(DOCUMENTS_API + 'delete', {
-        uuid: ko.mapping.toJSON(options.uuid),
-        skip_trash: ko.mapping.toJSON(options.skipTrash || false)
-      }, options);
-    }
-  }, {
-    key: "copyDocument",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.uuid
-     */
-    value: function copyDocument(options) {
-      var self = this;
-      self.simplePost(DOCUMENTS_API + 'copy', {
-        uuid: ko.mapping.toJSON(options.uuid)
-      }, options);
-    }
-  }, {
-    key: "restoreDocument",
-
-    /**
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.uuid
-     */
-    value: function restoreDocument(options) {
-      var self = this;
-      self.simplePost(DOCUMENTS_API + 'restore', {
-        uuids: ko.mapping.toJSON(options.uuids)
-      }, options);
-    }
-  }, {
-    key: "clearDbCache",
-
-    /**
-     *
-     * @param {Object} options
-     * @param {string} options.sourceType
-     * @param {string} [options.databaseName]
-     * @param {string} [options.tableName]
-     * @param {string} [options.cacheType] - Possible values 'default', 'optimizer. Default value 'default'
-     * @param {string[]} [options.fields]
-     * @param {boolean} [options.clearAll]
-     */
-    value: function clearDbCache(options) {
-      var self = this;
-      var cacheIdentifier = self.getAssistCacheIdentifier(options);
-
-      if (options.clearAll) {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, {});
-      } else {
-        var url = AUTOCOMPLETE_API_PREFIX;
-
-        if (options.databaseName) {
-          url += options.databaseName;
-        }
-
-        if (options.tableName) {
-          url += "/" + options.tableName;
-        }
-
-        if (options.fields) {
-          url += options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-        }
-
-        var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier) || {};
-        delete cachedData[url];
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, cachedData);
-      }
-    }
-  }, {
-    key: "invalidateSourceMetadata",
-
-    /**
-     * @param {Object} options
-     * @param {string} options.sourceType
-     * @param {string} options.invalidate - 'invalidate' or 'invalidateAndFlush'
-     * @param {string[]} [options.path]
-     * @param {ContextCompute} [options.compute]
-     * @param {boolean} [options.silenceErrors]
-     */
-    value: function invalidateSourceMetadata(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-
-      if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
-        var data = {
-          flush_all: options.invalidate === 'invalidateAndFlush',
-          cluster: JSON.stringify(options.compute)
-        };
-
-        if (options.path && options.path.length > 0) {
-          data.database = options.path[0];
-        }
-
-        if (options.path && options.path.length > 1) {
-          data.table = options.path[1];
-        }
-
-        var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
-        return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-      }
-
-      return deferred.resolve().promise();
-    }
-  }, {
-    key: "fetchSourceMetadata",
-
-    /**
-     * @param {Object} options
-     * @param {string} options.sourceType
-     * @param {ContextCompute} options.compute
-     * @param {boolean} [options.silenceErrors]
-     * @param {number} [options.timeout]
-     *
-     * @param {string[]} [options.path] - The path to fetch
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchSourceMetadata(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var isQuery = options.sourceType.indexOf('-query') !== -1;
-      var sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
-      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        type: 'POST',
-        url: AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
-        data: {
-          notebook: {},
-          snippet: ko.mapping.toJSON({
-            type: sourceType,
-            source: isQuery ? 'query' : 'data'
-          }),
-          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-        },
-        timeout: options.timeout
-      }).done(function (data) {
-        data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
-        data.hueTimestamp = Date.now(); // TODO: Display warning in autocomplete when an entity can't be found
-        // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
-        // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
-
-        if (!data.notFound && self.successResponseIsError(data)) {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(data);
-        } else {
-          deferred.resolve(data);
-        }
-      }).fail(self.assistErrorCallback({
-        silenceErrors: options.silenceErrors,
-        errorCallback: deferred.reject
-      }));
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "updateSourceMetadata",
-    value: function updateSourceMetadata(options) {
-      var self = this;
-      var url;
-      var data = {
-        source_type: options.sourceType
-      };
-
-      if (options.path.length === 1) {
-        url = '/metastore/databases/' + options.path[1] + '/alter';
-        data.properties = ko.mapping.toJSON(options.properties);
-      } else if (options.path.length === 2) {
-        url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
-
-        if (options.properties) {
-          if (options.properties.comment) {
-            data.comment = options.properties.comment;
-          }
-
-          if (options.properties.name) {
-            data.new_table_name = options.properties.name;
-          }
-        }
-      } else if (options.path > 2) {
-        url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
-        data.column = options.path.slice(2).join('.');
-
-        if (options.properties) {
-          if (options.properties.comment) {
-            data.comment = options.properties.comment;
-          }
-
-          if (options.properties.name) {
-            data.new_column_name = options.properties.name;
-          }
-
-          if (options.properties.type) {
-            data.new_column_type = options.properties.name;
-          }
-
-          if (options.properties.partitions) {
-            data.partition_spec = ko.mapping.toJSON(options.properties.partitions);
-          }
-        }
-      }
-
-      return self.simplePost(url, data, options);
-    }
-  }, {
-    key: "fetchAnalysis",
-
-    /**
-     * Fetches the analysis for the given source and path
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {ContextCompute} options.compute
-     * @param {string} options.sourceType
-     * @param {string[]} options.path
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchAnalysis(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var url;
-
-      if (options.path.length === 1) {
-        url = '/metastore/databases/' + options.path[0] + '/metadata';
-      } else {
-        url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
-
-        if (options.path.length > 1) {
-          url += '/' + options.path[1] + '/';
-        }
-
-        if (options.path.length > 2) {
-          url += 'stats/' + options.path.slice(2).join('/');
-        }
-      }
-
-      var data = {
-        format: 'json',
-        cluster: JSON.stringify(options.compute),
-        source_type: options.sourceType
-      };
-      var request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(response) {
-          if (options.path.length === 1) {
-            if (response.data) {
-              response.data.hueTimestamp = Date.now();
-              deferred.resolve(response.data);
-            } else {
-              deferred.reject();
-            }
-          } else {
-            deferred.resolve(response);
-          }
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "fetchPartitions",
-
-    /**
-     * Fetches the partitions for the given path
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string[]} options.path
-     * @param {ContextCompute} options.compute
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchPartitions(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred(); // TODO: No sourceType needed?
-
-      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post('/metastore/table/' + options.path.join('/') + '/partitions', {
-        format: 'json',
-        cluster: JSON.stringify(options.compute)
-      }).done(function (response) {
-        if (!self.successResponseIsError(response)) {
-          if (!response) {
-            response = {};
-          }
-
-          response.hueTimestamp = Date.now();
-          deferred.resolve(response);
-        } else {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(response);
-        }
-      }).fail(function (response) {
-        // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
-        if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
-          deferred.resolve({
-            hueTimestamp: Date.now(),
-            partition_keys_json: [],
-            partition_values_json: []
-          });
-        } else {
-          self.assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(response);
-        }
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "refreshAnalysis",
-
-    /**
-     * Refreshes the analysis for the given source and path
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.sourceType
-     * @param {ContextCompute} options.compute
-     * @param {string[]} options.path
-     *
-     * @return {CancellablePromise}
-     */
-    value: function refreshAnalysis(options) {
-      var self = this;
-
-      if (options.path.length === 1) {
-        return self.fetchAnalysis(options);
-      }
-
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var promises = [];
-
-      var pollForAnalysis = function pollForAnalysis(url, delay) {
-        window.setTimeout(function () {
-          promises.push(self.simplePost(url, undefined, {
-            silenceErrors: options.silenceErrors,
-            successCallback: function successCallback(data) {
-              promises.pop();
-
-              if (data.isSuccess) {
-                promises.push(self.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject));
-              } else if (data.isFailure) {
-                deferred.reject(data);
-              } else {
-                pollForAnalysis(url, 1000);
-              }
-            },
-            errorCallback: deferred.reject
-          }));
-        }, delay);
-      };
-
-      var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/analyze/' + options.path.join('/') + '/';
-      promises.push(self.simplePost(url, undefined, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(data) {
-          promises.pop();
-
-          if (data.status === 0 && data.watch_url) {
-            pollForAnalysis(data.watch_url, 500);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      }));
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, undefined, promises);
-    }
-  }, {
-    key: "whenAvailable",
-
-    /**
-     * Checks the status for the given snippet ID
-     * Note: similar to notebook and search check_status.
-     *
-     * @param {Object} options
-     * @param {Object} options.notebookJson
-     * @param {Object} options.snippetJson
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @return {CancellablePromise}
-     */
-    value: function whenAvailable(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var cancellablePromises = [];
-      var waitTimeout = -1;
-      deferred.fail(function () {
-        window.clearTimeout(waitTimeout);
-      });
-
-      var waitForAvailable = function waitForAvailable() {
-        var request = self.simplePost('/notebook/api/check_status', {
-          notebook: options.notebookJson,
-          snippet: options.snippetJson,
-          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-        }, {
-          silenceErrors: options.silenceErrors
-        }).done(function (response) {
-          if (response && response.query_status && response.query_status.status) {
-            var status = response.query_status.status;
-
-            if (status === 'available') {
-              deferred.resolve();
-            } else if (status === 'running' || status === 'starting' || status === 'waiting') {
-              waitTimeout = window.setTimeout(function () {
-                waitForAvailable();
-              }, 500);
-            } else {
-              deferred.reject();
-            }
-          }
-        }).fail(deferred.reject);
-        cancellablePromises.push(new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](request, request));
-      };
-
-      waitForAvailable();
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, undefined, cancellablePromises);
-    }
-  }, {
-    key: "fetchSample",
-
-    /**
-     * Fetches samples for the given source and path
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {string} options.sourceType
-     * @param {ContextCompute} options.compute
-     * @param {number} [options.sampleCount] - Default 100
-     * @param {string[]} options.path
-     * @param {string} [options.operation] - Default 'default'
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchSample(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var cancellablePromises = [];
-      var notebookJson = null;
-      var snippetJson = null;
-      var cancelled = false;
-
-      var cancelQuery = function cancelQuery() {
-        cancelled = true;
-
-        if (notebookJson) {
-          self.simplePost('/notebook/api/cancel_statement', {
-            notebook: notebookJson,
-            snippet: snippetJson,
-            cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-          }, {
-            silenceErrors: options.silenceErrors
-          });
-        }
-      };
-
-      self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
-        notebook: {},
-        snippet: JSON.stringify({
-          type: options.sourceType,
-          compute: options.compute
-        }),
-        async: true,
-        operation: '"' + (options.operation || 'default') + '"',
-        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-      }, {
-        silenceErrors: options.silenceErrors
-      }).done(function (sampleResponse) {
-        var queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
-        notebookJson = JSON.stringify({
-          type: options.sourceType
-        });
-        snippetJson = JSON.stringify(queryResult);
-
-        if (sampleResponse && sampleResponse.rows) {
-          // Sync results
-          var data = {
-            data: sampleResponse.rows,
-            meta: sampleResponse.full_headers
-          };
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        } else {
-          cancellablePromises.push(self.whenAvailable({
-            notebookJson: notebookJson,
-            snippetJson: snippetJson,
-            compute: options.compute,
-            silenceErrors: options.silenceErrors
-          }).done(function () {
-            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
-              notebook: notebookJson,
-              snippet: snippetJson,
-              rows: options.sampleCount || 100,
-              startOver: 'false'
-            }, {
-              silenceErrors: options.silenceErrors
-            }).done(function (sampleResponse) {
-              var data = sampleResponse && sampleResponse.result || {
-                data: [],
-                meta: []
-              };
-              data.hueTimestamp = Date.now();
-              deferred.resolve(data);
-            }).fail(deferred.reject);
-            cancellablePromises.push(resultRequest, resultRequest);
-          }).fail(deferred.reject));
-        }
-      }).fail(deferred.reject);
-      cancellablePromises.push({
-        cancel: cancelQuery
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, undefined, cancellablePromises);
-    }
-  }, {
-    key: "fetchNavigatorMetadata",
-
-    /**
-     * Fetches a navigator entity for the given source and path
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @param {boolean} [options.isView] - Default false
-     * @param {string[]} options.path
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavigatorMetadata(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var url = NAV_URLS.FIND_ENTITY;
-
-      if (options.path.length === 1) {
-        url += '?type=database&name=' + options.path[0];
-      } else if (options.path.length === 2) {
-        url += (options.isView ? '?type=view' : '?type=table') + '&database=' + options.path[0] + '&name=' + options.path[1];
-      } else if (options.path.length === 3) {
-        url += '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
-      } else {
-        return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().reject());
-      }
-
-      var request = self.simplePost(url, {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: 'nav'
-        })
-      }, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(data) {
-          data = data.entity || data;
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "updateNavigatorProperties",
-
-    /**
-     * Updates Navigator properties and custom metadata for the given entity
-     *
-     * @param {Object} options
-     * @param {string} options.identity - The identifier for the Navigator entity to update
-     * @param {Object} [options.properties]
-     * @param {Object} [options.modifiedCustomMetadata]
-     * @param {string[]} [options.deletedCustomMetadataKeys]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @return {Promise}
-     */
-    value: function updateNavigatorProperties(options) {
-      var self = this;
-      var data = {
-        id: ko.mapping.toJSON(options.identity)
-      };
-
-      if (options.properties) {
-        data.properties = ko.mapping.toJSON(options.properties);
-      }
-
-      if (options.modifiedCustomMetadata) {
-        data.modifiedCustomMetadata = ko.mapping.toJSON(options.modifiedCustomMetadata);
-      }
-
-      if (options.deletedCustomMetadataKeys) {
-        data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
-      }
-
-      return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options);
-    }
-  }, {
-    key: "fetchAllNavigatorTags",
-
-    /**
-     * Lists all available navigator tags
-     *
-     * @param {Object} options
-     * @param {Function} options.successCallback
-     * @param {Function} [options.errorCallback]
-     * @param {boolean} [options.silenceErrors]
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchAllNavigatorTags(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = self.simplePost(NAV_URLS.LIST_TAGS, undefined, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(data) {
-          if (data && data.tags) {
-            deferred.resolve(data.tags);
-          } else {
-            deferred.resolve({});
-          }
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "addNavTags",
-    value: function addNavTags(entityId, tags) {
-      var self = this;
-      return self.simplePost(NAV_URLS.ADD_TAGS, {
-        id: ko.mapping.toJSON(entityId),
-        tags: ko.mapping.toJSON(tags)
-      });
-    }
-  }, {
-    key: "deleteNavTags",
-    value: function deleteNavTags(entityId, tags) {
-      var self = this;
-      return self.simplePost(NAV_URLS.DELETE_TAGS, {
-        id: ko.mapping.toJSON(entityId),
-        tags: ko.mapping.toJSON(tags)
-      });
-    }
-  }, {
-    key: "fetchNavOptPopularity",
-
-    /**
-     * Fetches navOpt popularity for the children of the given path
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string[][]} options.paths
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavOptPopularity(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var url, data;
-
-      if (options.paths.length === 1 && options.paths[0].length === 1) {
-        url = NAV_OPT_URLS.TOP_TABLES;
-        data = {
-          database: options.paths[0][0]
-        };
-      } else {
-        url = NAV_OPT_URLS.TOP_COLUMNS;
-        var dbTables = [];
-        options.paths.forEach(function (path) {
-          dbTables.push(path.join('.'));
-        });
-        data = {
-          dbTables: ko.mapping.toJSON(dbTables)
-        };
-      }
-
-      var request = self.simplePost(url, data, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(data) {
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "fetchNavOptTopAggs",
-
-    /**
-     * Fetches the popular aggregate functions for the given tables
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string[][]} options.paths
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavOptTopAggs(options) {
-      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
-    }
-  }, {
-    key: "fetchNavOptTopColumns",
-
-    /**
-     * Fetches the popular columns for the given tables
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string[][]} options.paths
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavOptTopColumns(options) {
-      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
-    }
-  }, {
-    key: "fetchNavOptTopFilters",
-
-    /**
-     * Fetches the popular filters for the given tables
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string[][]} options.paths
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavOptTopFilters(options) {
-      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
-    }
-  }, {
-    key: "fetchNavOptTopJoins",
-
-    /**
-     * Fetches the popular joins for the given tables
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string[][]} options.paths
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavOptTopJoins(options) {
-      return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
-    }
-  }, {
-    key: "fetchNavOptMeta",
-
-    /**
-     * Fetches navOpt meta for the given path, only possible for tables atm.
-     *
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string[]} options.path
-     *
-     * @return {CancellablePromise}
-     */
-    value: function fetchNavOptMeta(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = self.simplePost(NAV_OPT_URLS.TABLE_DETAILS, {
-        databaseName: options.path[0],
-        tableName: options.path[1]
-      }, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(response) {
-          if (response.status === 0 && response.details) {
-            response.details.hueTimestamp = Date.now();
-            deferred.resolve(response.details);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "fetchQueryExecutionAnalysis",
-
-    /**
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {ContextCompute} options.compute
-     * @param {string} options.queryId
-     * @return {CancellablePromise}
-     */
-    value: function fetchQueryExecutionAnalysis(options) {
-      var self = this; //var url = '/metadata/api/workload_analytics/get_impala_query/';
-
-      var url = '/impala/api/query/alanize';
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var tries = 0;
-      var cancellablePromises = [];
-      var promise = new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, undefined, cancellablePromises);
-
-      var pollForAnalysis = function pollForAnalysis() {
-        if (tries === 10) {
-          deferred.reject();
-          return;
-        }
-
-        tries++;
-        cancellablePromises.pop(); // Remove the last one
-
-        cancellablePromises.push(deferred, self.simplePost(url, {
-          'cluster': JSON.stringify(options.compute),
-          'query_id': '"' + options.queryId + '"'
-        }, options).done(function (response) {
-          if (response && response.data) {
-            deferred.resolve(response.data);
-          } else {
-            var timeout = window.setTimeout(function () {
-              pollForAnalysis();
-            }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
-
-            promise.onCancel(function () {
-              window.clearTimeout(timeout);
-            });
-          }
-        }).fail(deferred.reject));
-      };
-
-      pollForAnalysis();
-      return promise;
-    }
-  }, {
-    key: "fixQueryExecutionAnalysis",
-    value: function fixQueryExecutionAnalysis(options) {
-      var self = this;
-      var url = '/impala/api/query/alanize/fix';
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = self.simplePost(url, {
-        fix: JSON.stringify(options.fix),
-        start_time: options.start_time
-      }, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(response) {
-          if (response.status === 0) {
-            deferred.resolve(response.details);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "fetchQueryExecutionStatistics",
-    value: function fetchQueryExecutionStatistics(options) {
-      var self = this;
-      var url = '/impala/api/query/alanize/metrics';
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = self.simplePost(url, {
-        'cluster': JSON.stringify(options.compute),
-        'query_id': '"' + options.queryId + '"'
-      }, {
-        silenceErrors: options.silenceErrors,
-        successCallback: function successCallback(response) {
-          if (response.status === 0) {
-            deferred.resolve(response.data);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "fetchContextNamespaces",
-
-    /**
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string} options.sourceType
-     * @return {Promise}
-     */
-    value: function fetchContextNamespaces(options) {
-      var self = this;
-      var url = '/desktop/api2/context/namespaces/' + options.sourceType;
-      return self.simpleGet(url, undefined, options);
-    }
-  }, {
-    key: "fetchContextComputes",
-
-    /**
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string} options.sourceType
-     * @return {Promise}
-     */
-    value: function fetchContextComputes(options) {
-      var self = this;
-      var url = '/desktop/api2/context/computes/' + options.sourceType;
-      return self.simpleGet(url, undefined, options);
-    }
-  }, {
-    key: "fetchContextClusters",
-
-    /**
-     * @param {Object} options
-     * @param {boolean} [options.silenceErrors]
-     * @param {string} options.sourceType
-     * @return {Promise}
-     */
-    value: function fetchContextClusters(options) {
-      var self = this;
-      var url = '/desktop/api2/context/clusters/' + options.sourceType;
-      return self.simpleGet(url, undefined, options);
-    }
-  }, {
-    key: "getClusterConfig",
-    value: function getClusterConfig(data) {
-      return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(FETCH_CONFIG, data);
-    }
-  }, {
-    key: "fetchHueDocsInteractive",
-    value: function fetchHueDocsInteractive(query) {
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(INTERACTIVE_SEARCH_API, {
-        query_s: ko.mapping.toJSON(query),
-        limit: 50,
-        sources: '["documents"]'
-      }).done(function (data) {
-        if (data.status === 0) {
-          deferred.resolve(data);
-        } else {
-          deferred.reject(data);
-        }
-      }).fail(deferred.reject);
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "fetchNavEntitiesInteractive",
-    value: function fetchNavEntitiesInteractive(options) {
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(INTERACTIVE_SEARCH_API, {
-        query_s: ko.mapping.toJSON(options.query),
-        field_facets: ko.mapping.toJSON(options.facets || []),
-        limit: 50,
-        sources: '["sql", "hdfs", "s3"]'
-      }).done(function (data) {
-        if (data.status === 0) {
-          deferred.resolve(data);
-        } else {
-          deferred.reject(data);
-        }
-      }).fail(deferred.reject);
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "searchEntities",
-    value: function searchEntities(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = self.simplePost(SEARCH_API, {
-        query_s: ko.mapping.toJSON(options.query),
-        limit: options.limit || 100,
-        raw_query: !!options.rawQuery,
-        sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
-      }, {
-        silenceErrors: options.silenceErrors,
-        successCallback: deferred.resolve,
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }, {
-    key: "formatSql",
-
-    /**
-     *
-     * @param {Object} options
-     * @param {string} options.statements
-     * @param {boolean} [options.silenceErrors]
-     */
-    value: function formatSql(options) {
-      var self = this;
-      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-      var request = self.simplePost(FORMAT_SQL_API, {
-        statements: options.statements
-      }, {
-        silenceErrors: options.silenceErrors,
-        successCallback: deferred.resolve,
-        errorCallback: deferred.reject
-      });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_4__["default"](deferred, request);
-    }
-  }]);
-
-  return ApiHelper;
-}();
-
-var apiHelper = new ApiHelper();
-/* harmony default export */ __webpack_exports__["default"] = (apiHelper);
-
-/***/ }),
-
-/***/ "./desktop/core/src/desktop/js/utils/apiQueueManager.js":
-/*!**************************************************************!*\
-  !*** ./desktop/core/src/desktop/js/utils/apiQueueManager.js ***!
-  \**************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-// Licensed to Cloudera, Inc. under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  Cloudera, Inc. licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-var ApiQueueManager =
-/*#__PURE__*/
-function () {
-  function ApiQueueManager() {
-    _classCallCheck(this, ApiQueueManager);
-
-    var self = this;
-    self.callQueue = {};
-  }
-
-  _createClass(ApiQueueManager, [{
-    key: "getQueued",
-    value: function getQueued(url, hash) {
-      var self = this;
-      return self.callQueue[url + (hash || '')];
-    }
-  }, {
-    key: "addToQueue",
-    value: function addToQueue(promise, url, hash) {
-      var self = this;
-      self.callQueue[url + (hash || '')] = promise;
-      promise.always(function () {
-        delete self.callQueue[url + (hash || '')];
-      });
-    }
-  }]);
-
-  return ApiQueueManager;
-}();
-
-var apiQueueManager = new ApiQueueManager();
-/* harmony default export */ __webpack_exports__["default"] = (apiQueueManager);
-
-/***/ }),
-
-/***/ "./desktop/core/src/desktop/js/utils/cancellablePromise.js":
-/*!*****************************************************************!*\
-  !*** ./desktop/core/src/desktop/js/utils/cancellablePromise.js ***!
-  \*****************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./apiHelper */ "./desktop/core/src/desktop/js/utils/apiHelper.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-// Licensed to Cloudera, Inc. under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  Cloudera, Inc. licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
-var CancellablePromise =
-/*#__PURE__*/
-function () {
-  function CancellablePromise(deferred, request, otherCancellables) {
-    _classCallCheck(this, CancellablePromise);
-
-    var self = this;
-    self.cancelCallbacks = [];
-    self.deferred = deferred;
-    self.request = request;
-    self.otherCancellables = otherCancellables;
-    self.cancelled = false;
-    self.cancelPrevented = false;
-  }
-  /**
-   * A promise might be shared across multiple components in the UI, in some cases cancel is not an option and calling
-   * this will prevent that to happen.
-   *
-   * One example is autocompletion of databases while the assist is loading the database tree, closing the autocomplete
-   * results would make the assist loading fail if cancel hasn't been prevented.
-   *
-   * @returns {CancellablePromise}
-   */
-
-
-  _createClass(CancellablePromise, [{
-    key: "preventCancel",
-    value: function preventCancel() {
-      var self = this;
-      self.cancelPrevented = true;
-      return self;
-    }
-  }, {
-    key: "cancel",
-    value: function cancel() {
-      var self = this;
-
-      if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
-        return;
-      }
-
-      self.cancelled = true;
-
-      if (self.request) {
-        _apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].cancelActiveRequest(self.request);
-      }
-
-      if (self.state && self.state() === 'pending' && self.deferred.reject) {
-        self.deferred.reject();
-      }
-
-      if (self.otherCancellables) {
-        self.otherCancellables.forEach(function (cancellable) {
-          if (cancellable.cancel) {
-            cancellable.cancel();
-          }
-        });
-      }
-
-      while (self.cancelCallbacks.length) {
-        self.cancelCallbacks.pop()();
-      }
-
-      return self;
-    }
-  }, {
-    key: "onCancel",
-    value: function onCancel(callback) {
-      var self = this;
-
-      if (self.cancelled) {
-        callback();
-      } else {
-        self.cancelCallbacks.push(callback);
-      }
-
-      return self;
-    }
-  }, {
-    key: "then",
-    value: function then() {
-      var self = this;
-      self.deferred.then.apply(self.deferred, arguments);
-      return self;
-    }
-  }, {
-    key: "done",
-    value: function done(callback) {
-      var self = this;
-      self.deferred.done.apply(self.deferred, arguments);
-      return self;
-    }
-  }, {
-    key: "fail",
-    value: function fail(callback) {
-      var self = this;
-      self.deferred.fail.apply(self.deferred, arguments);
-      return self;
-    }
-  }, {
-    key: "always",
-    value: function always(callback) {
-      var self = this;
-      self.deferred.always.apply(self.deferred, arguments);
-      return self;
-    }
-  }, {
-    key: "pipe",
-    value: function pipe(callback) {
-      var self = this;
-      self.deferred.pipe.apply(self.deferred, arguments);
-      return self;
-    }
-  }, {
-    key: "progress",
-    value: function progress(callback) {
-      var self = this;
-      self.deferred.progress.apply(self.deferred, arguments);
-      return self;
-    }
-  }, {
-    key: "state",
-    value: function state() {
-      var self = this;
-      return self.deferred.state && self.deferred.state();
-    }
-  }]);
-
-  return CancellablePromise;
-}();
-
-/* harmony default export */ __webpack_exports__["default"] = (CancellablePromise);
 
 /***/ }),
 
@@ -64854,4 +67872,4 @@ module.exports = __webpack_require__(/*! ./desktop/core/src/desktop/js/hue.js */
 /***/ })
 
 /******/ });
-//# sourceMappingURL=hue-bundle-af87daf64bcf8bd84638.js.map
+//# sourceMappingURL=hue-bundle-4db50f164ec4ddffd941.js.map

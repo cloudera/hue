@@ -1020,7 +1020,7 @@ ${ commonshare() | n,unicode }
       var apiHelper = window.apiHelper;
       ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace and compute selection
-        DataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
+        dataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
         });
       });

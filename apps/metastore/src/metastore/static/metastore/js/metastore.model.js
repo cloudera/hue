@@ -240,7 +240,7 @@ var MetastoreNamespace = (function () {
       self.loadingDatabases(false);
     });
 
-    DataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
+    dataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
       self.catalogEntry(entry);
       entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {

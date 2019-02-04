@@ -484,7 +484,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
-<script src="${ static('desktop/js/dataCatalog.js') }"></script>
 
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/sqlUtils.js') }"></script>

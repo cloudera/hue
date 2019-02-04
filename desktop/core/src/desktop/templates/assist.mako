@@ -1303,7 +1303,7 @@ from desktop.views import _ko
         if (self.sourceIndex['solr']) {
           huePubSub.subscribe('assist.collections.refresh', function() {
             var namespace = self.sourceIndex['solr'].selectedNamespace();
-            DataCatalog.getEntry({ sourceType: 'solr', namespace: namespace, compute: namespace.compute(), path: [] }).done(function (entry) {
+            dataCatalog.getEntry({ sourceType: 'solr', namespace: namespace, compute: namespace.compute(), path: [] }).done(function (entry) {
               entry.clearCache({ cascade: true });
             });
           });
@@ -3042,7 +3042,7 @@ from desktop.views import _ko
                   if (databaseIndex[database]) {
                     dbDeferred.resolve(databaseIndex[database]);
                   } else {
-                    DataCatalog.getEntry({
+                    dataCatalog.getEntry({
                       sourceType: activeLocations.type,
                       namespace: activeLocations.namespace,
                       compute: activeLocations.compute,
@@ -3101,7 +3101,7 @@ from desktop.views import _ko
                                   self.reloading(false)
                                 })
                               });
-                              DataCatalog.getEntry({ sourceType: activeLocations.type, namespace: activeLocations.namespace, compute: activeLocations.compute, path: [] }).done(function (sourceEntry) {
+                              dataCatalog.getEntry({ sourceType: activeLocations.type, namespace: activeLocations.namespace, compute: activeLocations.compute, path: [] }).done(function (sourceEntry) {
                                 sourceEntry.getChildren().done(function (dbEntries) {
                                   var clearPromise;
                                    // Clear the database first if it exists without cascade
@@ -3470,7 +3470,7 @@ from desktop.views import _ko
 
           var sourceType = collection.source() === 'query' ? collection.engine() + '-query' : collection.engine();
 
-          DataCatalog.getEntry({
+          dataCatalog.getEntry({
             sourceType: sourceType,
             namespace: collection.activeNamespace,
             compute: collection.activeCompute,
@@ -3478,7 +3478,7 @@ from desktop.views import _ko
             definition: { type: 'database' }
           }).done(function (fakeDbCatalogEntry) {
             var assistFakeDb = new AssistDbEntry(fakeDbCatalogEntry, null, assistDbSource, self.filter, i18n, navigationSettings);
-            DataCatalog.getEntry({
+            dataCatalog.getEntry({
               sourceType: sourceType,
               namespace: collection.activeNamespace,
               compute: collection.activeCompute,

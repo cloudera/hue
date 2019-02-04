@@ -658,7 +658,7 @@ from desktop.views import _ko
           self.lastPollSourceMetaPromise.cancel();
         }
 
-        DataCatalog.getEntry({
+        dataCatalog.getEntry({
           sourceType: ko.unwrap(self.sourceType),
           namespace: ko.unwrap(self.namespace),
           compute: ko.unwrap(self.compute),

@@ -54,7 +54,7 @@
       describe('Test a whole lot of different parse results', function () {
 
         beforeEach(function() {
-          DataCatalog.disableCache();
+          dataCatalog.disableCache();
           AUTOCOMPLETE_TIMEOUT = 1;
           jasmine.Ajax.install();
 
@@ -278,7 +278,7 @@
 
         afterEach(function() {
           AUTOCOMPLETE_TIMEOUT = 0;
-          DataCatalog.enableCache();
+          dataCatalog.enableCache();
           jasmine.Ajax.uninstall();
         });
 
@@ -363,7 +363,7 @@
       var subject;
 
       beforeEach(function() {
-        DataCatalog.disableCache();
+        dataCatalog.disableCache();
         AUTOCOMPLETE_TIMEOUT = 1;
         jasmine.Ajax.install();
 
@@ -406,7 +406,7 @@
           fail('Still loading, missing ajax spec?')
         }
         AUTOCOMPLETE_TIMEOUT = 0;
-        DataCatalog.enableCache();
+        dataCatalog.enableCache();
         jasmine.Ajax.uninstall();
       });
 
