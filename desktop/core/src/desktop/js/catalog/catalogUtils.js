@@ -26,19 +26,17 @@ import CancellablePromise from '../api/cancellablePromise'
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors]
  */
-const fetchAndSave = function (apiHelperFunction, attributeName, entry, apiOptions) {
-  return apiHelper[apiHelperFunction]({
+const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => apiHelper[apiHelperFunction]({
     sourceType: entry.dataCatalog.sourceType,
     compute: entry.compute,
     path: entry.path, // Set for DataCatalogEntry
     paths: entry.paths, // Set for MultiTableEntry
     silenceErrors: apiOptions && apiOptions.silenceErrors,
     isView: entry.isView && entry.isView() // MultiTable entries don't have this property
-  }).done(function (data) {
+  }).done(data => {
     entry[attributeName] = data;
     entry.saveLater();
-  })
-};
+  });
 
 /**
  * Helper function that adds sets the silence errors option to true if not specified
@@ -46,7 +44,7 @@ const fetchAndSave = function (apiHelperFunction, attributeName, entry, apiOptio
  * @param {Object} [options]
  * @return {Object}
  */
-const setSilencedErrors = function (options) {
+const setSilencedErrors = options => {
   if (!options) {
     options = {};
   }
@@ -65,7 +63,7 @@ const setSilencedErrors = function (options) {
  *
  * @return {CancellablePromise}
  */
-const applyCancellable = function (promise, options) {
+const applyCancellable = (promise, options) => {
   if (promise && promise.preventCancel && (!options || !options.cancellable)) {
     promise.preventCancel();
   }

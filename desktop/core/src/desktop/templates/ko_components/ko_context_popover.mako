@@ -1582,7 +1582,7 @@ from metadata.conf import has_navigator
         }
 
         if (self.isCatalogEntry) {
-          ContextCatalog.getNamespaces({ sourceType: sourceType }).done(function (context) {
+          contextCatalog.getNamespaces({ sourceType: sourceType }).done(function (context) {
             // TODO: Namespace and compute selection for global search results?
             dataCatalog.getEntry({ sourceType: sourceType, namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
               catalogEntry.navigatorMeta = params.data;
