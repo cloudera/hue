@@ -147,7 +147,7 @@ var ContextCatalog = (function () {
         window.clearTimeout(pollTimeout);
         window.setTimeout(function () {
           if (Object.keys(startingNamespaces).length) {
-            ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
+            window.apiHelper.fetchContextNamespaces(options).done(function (namespaces) {
               if (namespaces[options.sourceType]) {
                 var namespaces = namespaces[options.sourceType];
                 if (namespaces) {
@@ -184,7 +184,7 @@ var ContextCatalog = (function () {
       });
 
       var fetchNamespaces = function () {
-        ApiHelper.getInstance().fetchContextNamespaces(options).done(function (namespaces) {
+        window.apiHelper.fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
             var dynamic = namespaces.dynamicClusters;
             var namespaces = namespaces[options.sourceType];
@@ -260,7 +260,7 @@ var ContextCatalog = (function () {
       var deferred = $.Deferred();
       self.computePromises[options.sourceType] = deferred.promise();
 
-      ApiHelper.getInstance().fetchContextComputes(options).done(function (computes) {
+      window.apiHelper.fetchContextComputes(options).done(function (computes) {
         if (computes[options.sourceType]) {
           var computes = computes[options.sourceType];
           if (computes) {
@@ -299,7 +299,7 @@ var ContextCatalog = (function () {
       var deferred = $.Deferred();
       self.clusterPromises[options.sourceType] = deferred.promise();
 
-      ApiHelper.getInstance().fetchContextClusters(options).done(function (clusters) {
+      window.apiHelper.fetchContextClusters(options).done(function (clusters) {
         if (clusters && clusters[options.sourceType]) {
           self.clusters[options.sourceType] = clusters[options.sourceType];
           deferred.resolve(self.clusters[options.sourceType])

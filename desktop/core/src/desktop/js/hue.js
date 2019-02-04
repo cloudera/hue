@@ -14,28 +14,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './ext/jquery/hue.jquery.lib';
-import './ext/bootstrap.2.3.2.min';
-import _ from 'lodash';
-import filesize from 'filesize';
-import qq from './ext/fileuploader.custom';
-import ko from 'knockout';
-import komapping from 'knockout.mapping';
-import page from 'page';
-import hueUtils from 'utils/hueUtils';
-import hueAnalytics from 'utils/hueAnalytics';
-import hueDebug from 'utils/hueDebug';
-import huePubSub from 'utils/huePubSub';
-import hueDrop from 'utils/hueDrop';
-import localforage from 'localforage';
-import 'ext/ko.editable.custom';
-import 'ext/ko.selectize.custom';
-import 'knockout-switch-case';
-import 'knockout-sortable';
-import 'knockout.validation';
+import './ext/jquery/hue.jquery.lib'
+import './ext/bootstrap.2.3.2.min'
+import _ from 'lodash'
+import filesize from 'filesize'
+import qq from './ext/fileuploader.custom'
+import ko from 'knockout'
+import komapping from 'knockout.mapping'
+import page from 'page'
+import hueUtils from 'utils/hueUtils'
+import hueAnalytics from 'utils/hueAnalytics'
+import hueDebug from 'utils/hueDebug'
+import huePubSub from 'utils/huePubSub'
+import hueDrop from 'utils/hueDrop'
+import localforage from 'localforage'
+import 'ext/ko.editable.custom'
+import 'ext/ko.selectize.custom'
+import 'knockout-switch-case'
+import 'knockout-sortable'
+import 'knockout.validation'
+import apiHelper from 'utils/apiHelper';
+import CancellablePromise from 'utils/cancellablePromise'
 
 // TODO: Migrate away
 window._ = _;
+window.apiHelper = apiHelper;
+window.CancellablePromise = CancellablePromise;
 window.filesize = filesize;
 window.ko = ko;
 window.ko.mapping = komapping;

@@ -122,7 +122,7 @@ from desktop.views import _ko
 
       var GlobalSearch = function () {
         var self = this;
-        self.apiHelper = ApiHelper.getInstance();
+        self.apiHelper = window.apiHelper;
         self.knownFacetValues = ko.observable({
           'type': { 'field': 1, 'table': 1, 'view': 1, 'database': 1, 'partition': 1, 'document' : 1 }
         });

@@ -96,7 +96,7 @@ var AutocompleteResults = (function () {
    */
   function AutocompleteResults (options) {
     var self = this;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
     self.snippet = options.snippet;
     self.editor = options.editor;
     self.temporaryOnly = options.snippet.autocompleteSettings && options.snippet.autocompleteSettings.temporaryOnly;

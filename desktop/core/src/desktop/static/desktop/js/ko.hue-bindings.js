@@ -2571,7 +2571,7 @@
         return function () {
           var options = valueAccessor();
 
-          ApiHelper.getInstance().fetchDocument({
+          window.apiHelper.fetchDocument({
             uuid: options.uuid,
             fetchContents: true,
             silenceErrors: true
@@ -4702,7 +4702,7 @@
           return;
         }
 
-        var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+        var suppressedRules = window.apiHelper.getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
         if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
           if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
             self.snippet.positionStatement().syntaxError = true;
@@ -5260,7 +5260,7 @@
         aceErrorsSub.dispose();
       });
 
-      var darkThemeEnabled = ApiHelper.getInstance().getFromTotalStorage('ace', 'dark.theme.enabled', false);
+      var darkThemeEnabled = window.apiHelper.getFromTotalStorage('ace', 'dark.theme.enabled', false);
       editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
       var editorOptions = {
@@ -5282,7 +5282,7 @@
       editor.customMenuOptions = {
         setEnableDarkTheme: function (enabled) {
           darkThemeEnabled = enabled;
-          ApiHelper.getInstance().setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          window.apiHelper.setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
           editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
         },
         getEnableDarkTheme: function () {
@@ -5346,7 +5346,7 @@
           return errorHighlightingEnabled;
         };
         editor.customMenuOptions.setClearIgnoredSyntaxChecks = function (flag) {
-          ApiHelper.getInstance().setInTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+          window.apiHelper.setInTotalStorage('hue.syntax.checker', 'suppressedRules', {});
           $('#setClearIgnoredSyntaxChecks').hide();
           $('#setClearIgnoredSyntaxChecks').before('<div style="margin-top:5px;float:right;">done</div>');
         };
@@ -5580,7 +5580,7 @@
         bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
         exec: function () {
           darkThemeEnabled = !darkThemeEnabled;
-          ApiHelper.getInstance().setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          window.apiHelper.setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
           editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
         }
       });
@@ -7143,7 +7143,7 @@
           if (query === '' && options.value && !firstLoad){
             firstLoad = true;
           }
-          ApiHelper.getInstance().searchDocuments({
+          window.apiHelper.searchDocuments({
             type: type,
             text: query,
             include_trashed: false,

@@ -16,13 +16,10 @@
 (function() {
 
   describe('apiHelper.js', function() {
-    var subject = ApiHelper.getInstance({
-      i18n: {},
-      user: 'testUser'
-    });
+    var subject = window.apiHelper;
 
     it('should be singleton', function() {
-      var otherHelper = ApiHelper.getInstance();
+      var otherHelper = window.apiHelper;
       expect(subject === otherHelper).toBeTruthy();
     });
 

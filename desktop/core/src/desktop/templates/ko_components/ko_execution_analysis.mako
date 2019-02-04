@@ -149,7 +149,7 @@ from desktop.views import _ko
       ExecutionAnalysis.prototype.loadAnalysis = function (compute, queryId) {
         var self = this;
         self.loading(true);
-        self.lastAnalysisPromise = ApiHelper.getInstance().fetchQueryExecutionAnalysis({
+        self.lastAnalysisPromise = window.apiHelper.fetchQueryExecutionAnalysis({
           silenceErrors: true,
           compute: compute,
           queryId: queryId
@@ -221,7 +221,7 @@ from desktop.views import _ko
 
       ExecutionAnalysis.prototype.handleFix = function (fix) {
         var self = this;
-        ApiHelper.getInstance().fixQueryExecutionAnalysis({ fix: fix, start_time: ko.mapping.toJSON((new Date()).getTime()), compute: self.details().compute })
+        window.apiHelper.fixQueryExecutionAnalysis({ fix: fix, start_time: ko.mapping.toJSON((new Date()).getTime()), compute: self.details().compute })
         .done(function(resp) {
           huePubSub.publish('notebook.task.submitted', resp.task.history_uuid);
           fix.fixed = true;

@@ -175,9 +175,7 @@ ${ configKoComponents.config() }
 
     var ConfigurationsViewModel = function () {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance({
-        user: '${ user.username }'
-      });
+      self.apiHelper = window.apiHelper;
       self.hasErrors = ko.observable(false);
       self.loading = ko.observable(false);
       self.apps = ko.observableArray();

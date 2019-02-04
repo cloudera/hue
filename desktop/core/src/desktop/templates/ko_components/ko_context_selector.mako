@@ -146,7 +146,7 @@ from desktop.views import _ko
       var HueContextSelector = function (params) {
         var self = this;
 
-        self.apiHelper = ApiHelper.getInstance();
+        self.apiHelper = window.apiHelper;
 
         self.sourceType = params.sourceType;
         self.disposals = [];
@@ -371,7 +371,7 @@ from desktop.views import _ko
                   self.availableDatabases([]);
                 }).always(function () {
                   if (!self.database() || self.availableDatabases().indexOf(self.database()) === -1) {
-                    var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + ko.unwrap(self.sourceType) + '_' + self[TYPES_INDEX.namespace.name]().id, 'lastSelectedDb', 'default');
+                    var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + ko.unwrap(self.sourceType) + '_' + self[TYPES_INDEX.namespace.name]().id, 'lastSelectedDb', 'default');
                     if (self.availableDatabases().length === 0 || self.availableDatabases().indexOf(lastSelectedDb) !== -1) {
                       self.database(lastSelectedDb);
                     } else {

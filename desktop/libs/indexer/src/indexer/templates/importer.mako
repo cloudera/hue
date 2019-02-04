@@ -2972,7 +2972,7 @@ ${ assist.assistPanel() }
     var IndexerViewModel = function () {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
       self.sourceType = window.location.getParameter('sourceType', true) || '${ source_type }';
       self.namespaceId = window.location.getParameter('namespace', true);
       self.computeId =  window.location.getParameter('compute', true);

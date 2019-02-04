@@ -485,7 +485,6 @@ ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/dataCatalog.js') }"></script>
-<script src="${ static('desktop/js/apiHelper.js') }"></script>
 
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/sqlUtils.js') }"></script>
@@ -1300,7 +1299,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     var sidePanelViewModel = (function () {
       function SidePanelViewModel () {
         var self = this;
-        self.apiHelper = ApiHelper.getInstance();
+        self.apiHelper = window.apiHelper;
         self.assistWithoutStorage = ko.observable(false);
         self.leftAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'left_assist_panel_visible', true));
         self.leftAssistVisible.subscribe(function (val) {
@@ -1469,7 +1468,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         // TODO: Drop. Just for PoC
         self.pocClusterMode = ko.observable();
-        ApiHelper.getInstance().withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw')
+        window.apiHelper.withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw')
         huePubSub.subscribe('set.multi.cluster.mode', self.pocClusterMode);
 
         self.onePageViewModel.currentApp.subscribe(function () {

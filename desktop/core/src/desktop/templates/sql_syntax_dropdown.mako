@@ -66,9 +66,9 @@ from django.utils.translation import ugettext as _
 
         var selectedSub = self.selected.subscribe(function (newValue) {
           if (typeof newValue.suppressRule !== 'undefined') {
-            var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+            var suppressedRules = window.apiHelper.getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
             suppressedRules[newValue.suppressRule] = true;
-            ApiHelper.getInstance().setInTotalStorage('hue.syntax.checker', 'suppressedRules', suppressedRules);
+            window.apiHelper.setInTotalStorage('hue.syntax.checker', 'suppressedRules', suppressedRules);
             huePubSub.publish('editor.refresh.statement.locations', params.snippet);
           } else {
             params.editor.session.replace(params.range, newValue);

@@ -75,7 +75,7 @@
           step: 5 * 60 * 1000 // Every 5 minutes
         }];
 
-        self.selectedGranularity = ko.observable(self.availableGranularities[ApiHelper.getInstance().getFromTotalStorage('warehouses', 'performanceGraphGranularity', 0)]);
+        self.selectedGranularity = ko.observable(self.availableGranularities[window.apiHelper.getFromTotalStorage('warehouses', 'performanceGraphGranularity', 0)]);
         self.clusterName = ko.observable(params.clusterName);
 
         // Load the initial data
@@ -99,7 +99,7 @@
             self.selectedGranularity.subscribe(function (granularity) {
               for (var i = 0; i < self.availableGranularities.length; i++) {
                 if (granularity === self.availableGranularities[i]) {
-                  ApiHelper.getInstance().setInTotalStorage('warehouses', 'performanceGraphGranularity', i);
+                  window.apiHelper.setInTotalStorage('warehouses', 'performanceGraphGranularity', i);
                   break;
                 }
               }
@@ -310,7 +310,7 @@
             tooltip: options.tooltip,
             toggle: function () {
               enabled = !enabled;
-              ApiHelper.getInstance().setInTotalStorage('warehouses', options.id + 'GraphEnabled', enabled);
+              window.apiHelper.setInTotalStorage('warehouses', options.id + 'GraphEnabled', enabled);
               mainGroup.select('.highlight-point-' + options.id).style('display', enabled ? null : 'none');
               mainGroup.select('.line-' + options.id).transition().style('opacity', enabled ? 1 : 0);
               subGroup.select('.line-' + options.id).transition().style('opacity', enabled ? 1 : 0);
@@ -346,7 +346,7 @@
           createLineGraph({
             id: 'queries',
             label: '${ _("Queries") }',
-            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'queriesGraphEnabled', true),
+            enabled: window.apiHelper.getFromTotalStorage('warehouses', 'queriesGraphEnabled', true),
             color: '#A9DBF1',
             subLineColor: '#DCDCDC',
             area: true,
@@ -367,7 +367,7 @@
           }),
           createLineGraph({
             id: 'cpu',
-            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'cpuGraphEnabled', false),
+            enabled: window.apiHelper.getFromTotalStorage('warehouses', 'cpuGraphEnabled', false),
             label: '${ _("CPU") }',
             color: '#654C94',
             subLine: true,
@@ -377,7 +377,7 @@
           }),
           createLineGraph({
             id: 'memory',
-            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'memoryGraphEnabled', false),
+            enabled: window.apiHelper.getFromTotalStorage('warehouses', 'memoryGraphEnabled', false),
             label: '${ _("Memory") }',
             color: '#83C1B9',
             subLine: true,
@@ -387,7 +387,7 @@
           }),
           createLineGraph({
             id: 'io',
-            enabled: ApiHelper.getInstance().getFromTotalStorage('warehouses', 'ioGraphEnabled', false),
+            enabled: window.apiHelper.getFromTotalStorage('warehouses', 'ioGraphEnabled', false),
             label: '${ _("IO") }',
             color: '#D4965E',
             subLine: true,
@@ -652,7 +652,7 @@
 
       PerformanceGraph.prototype.loadData = function () {
         var self = this;
-        return ApiHelper.getInstance().fetchResourceStats({
+        return window.apiHelper.fetchResourceStats({
           clusterName: self.clusterName(),
           pastMs: self.selectedGranularity().totalTime,
           stepMs: self.selectedGranularity().step

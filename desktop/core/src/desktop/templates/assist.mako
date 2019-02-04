@@ -1357,7 +1357,7 @@ from desktop.views import _ko
                         name: assistDbSource.selectedNamespace().selectedDatabase().name
                       })
                     } else {
-                      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id, 'lastSelectedDb', 'default');
+                      var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id, 'lastSelectedDb', 'default');
                       deferred.resolve({
                         sourceType: source,
                         namespace: assistDbSource.selectedNamespace().namespace,
@@ -1773,7 +1773,7 @@ from desktop.views import _ko
        **/
       function AssistGitPanel (options) {
         var self = this;
-        self.apiHelper = ApiHelper.getInstance();
+        self.apiHelper = window.apiHelper;
 
         self.selectedGitEntry = ko.observable();
         self.reload = function () {
@@ -2020,7 +2020,7 @@ from desktop.views import _ko
           errorLoadingTablePreview: "${ _('There was a problem loading the index preview') }"
         };
 
-        self.apiHelper = ApiHelper.getInstance();
+        self.apiHelper = window.apiHelper;
 
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
@@ -2382,7 +2382,7 @@ from desktop.views import _ko
           return self.loadDeferred.promise();
         }
         self.loading(true);
-        ApiHelper.getInstance().simpleGet(IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
+        window.apiHelper.simpleGet(IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
           self.body(doc.body);
         }).always(function () {
           self.loading(false);
@@ -2626,7 +2626,7 @@ from desktop.views import _ko
           return result;
         });
 
-        var apiHelper = ApiHelper.getInstance();
+        var apiHelper = window.apiHelper;
 
         self.activeType.subscribe(function (newType) {
           self.selectedFunction(selectedFunctionPerType[newType]);
@@ -3595,7 +3595,7 @@ from desktop.views import _ko
         self.langRefTabAvailable = ko.observable(false);
         self.schedulesTabAvailable = ko.observable(false);
 
-        var apiHelper = ApiHelper.getInstance();
+        var apiHelper = window.apiHelper;
         self.lastActiveTabEditor = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), EDITOR_ASSISTANT_TAB);
         self.lastActiveTabDashboard = apiHelper.withTotalStorage('assist', 'last.open.right.panel.dashboard', ko.observable(), DASHBOARD_ASSISTANT_TAB);
 

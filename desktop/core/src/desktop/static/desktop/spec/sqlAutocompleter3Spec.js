@@ -272,7 +272,7 @@
             }
           });
 
-          ApiHelper.getInstance();
+          window.apiHelper;
           huePubSub.publish('assist.clear.all.caches');
         });
 
