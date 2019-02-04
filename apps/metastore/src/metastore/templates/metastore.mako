@@ -1203,7 +1203,7 @@ ${ components.menubar(is_embeddable) }
       huePubSub.publish('cluster.config.get.config');
 
       if (location.getParameter('refresh') === 'true') {
-        DataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, compute: viewModel.source().namespace().compute, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {
+        dataCatalog.getEntry({ namespace: viewModel.source().namespace().namespace, compute: viewModel.source().namespace().compute, sourceType: viewModel.source().type, path: [], definition: { type: 'source' }}).done(function (entry) {
           entry.clearCache({ invalidate: viewMode.source().type === 'impala' ? 'invalidate' : 'cache', silenceErrors: true });
           hueUtils.replaceURL('?');
         });

@@ -237,7 +237,7 @@ from desktop.views import _ko
                   }
 
                   if (notebook.onSuccessUrl() === 'assist.db.refresh') {
-                    DataCatalog.getEntry({ sourceType: snippet.type(), namespace: snippet.namespace(), compute: snippet.compute(), path: [] }).done(function (entry) {
+                    dataCatalog.getEntry({ sourceType: snippet.type(), namespace: snippet.namespace(), compute: snippet.compute(), path: [] }).done(function (entry) {
                       entry.clearCache({ invalidate: 'cache', cascade: true, silenceErrors: true });
                     });
                   } else if (notebook.onSuccessUrl()) {

@@ -2518,7 +2518,7 @@
       ko.bindingHandlers.click.init(element, function () {
         return function () {
           var options = valueAccessor();
-          DataCatalog.getEntry(options).done(function (entry) {
+          dataCatalog.getEntry(options).done(function (entry) {
             var $source = $(element);
             var offset = $source.offset();
             if (options.offset) {
@@ -4046,7 +4046,7 @@
           options = {};
         }
         if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
-          DataCatalog.applyCancellable(location.resolvePathPromise, options);
+          dataCatalog.applyCancellable(location.resolvePathPromise, options);
           return location.resolvePathPromise;
         }
 
@@ -4247,7 +4247,7 @@
                     if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
                       var colName = lastIdentifier.name.toLowerCase();
                       // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
-                      DataCatalog.getEntry({
+                      dataCatalog.getEntry({
                         sourceType: self.snippet.type(),
                         namespace: self.snippet.namespace(),
                         compute: self.snippet.compute(),
@@ -4749,7 +4749,7 @@
     AceLocationHandler.prototype.fetchChildren = function (identifierChain) {
       var self = this;
       var deferred = $.Deferred();
-      DataCatalog.getChildren({
+      dataCatalog.getChildren({
         sourceType: self.snippet.type(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
@@ -4841,7 +4841,7 @@
           var findIdentifierChainInTable = function (tablesToGo) {
             var nextTable = tablesToGo.shift();
             if (typeof nextTable.subQuery === 'undefined') {
-              DataCatalog.getChildren({
+              dataCatalog.getChildren({
                 sourceType: self.snippet.type(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),

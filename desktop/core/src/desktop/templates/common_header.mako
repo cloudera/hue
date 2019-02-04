@@ -206,7 +206,6 @@ if USE_NEW_EDITOR.get():
 
 % if user.is_authenticated():
   <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
-  <script src="${ static('desktop/js/dataCatalog.js') }"></script>
   <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
   <script type="text/javascript">

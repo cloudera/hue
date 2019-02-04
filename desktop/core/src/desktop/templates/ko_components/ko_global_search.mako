@@ -277,7 +277,7 @@ from desktop.views import _ko
 
       GlobalSearch.prototype.initializeFacetValues = function () {
         var self = this;
-        DataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(function (facets) {
+        dataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(function (facets) {
           var facetValues = self.knownFacetValues();
           facetValues['tags'] = facets;
         });

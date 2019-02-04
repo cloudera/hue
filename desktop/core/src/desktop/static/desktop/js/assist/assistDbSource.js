@@ -386,7 +386,7 @@ var AssistDbNamespace = (function () {
       self.selectedDatabase(null);
       self.databases([]);
 
-      DataCatalog.getEntry({ sourceType: self.sourceType, namespace: self.namespace, compute: self.compute(), path : [], definition: { type: 'source' } }).done(function (catalogEntry) {
+      dataCatalog.getEntry({ sourceType: self.sourceType, namespace: self.namespace, compute: self.compute(), path : [], definition: { type: 'source' } }).done(function (catalogEntry) {
         self.catalogEntry = catalogEntry;
         self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (databaseEntries) {
           self.dbIndex = {};

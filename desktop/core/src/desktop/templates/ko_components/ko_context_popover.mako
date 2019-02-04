@@ -756,7 +756,7 @@ from metadata.conf import has_navigator
             if (path.length === 1) {
               path.unshift(defaultDatabase);
             }
-            DataCatalog.getEntry({
+            dataCatalog.getEntry({
               sourceType: sourceType,
               namespace: namespace,
               compute: compute,
@@ -1584,7 +1584,7 @@ from metadata.conf import has_navigator
         if (self.isCatalogEntry) {
           ContextCatalog.getNamespaces({ sourceType: sourceType }).done(function (context) {
             // TODO: Namespace and compute selection for global search results?
-            DataCatalog.getEntry({ sourceType: sourceType, namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
+            dataCatalog.getEntry({ sourceType: sourceType, namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
               catalogEntry.navigatorMeta = params.data;
               catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta);
               catalogEntry.saveLater();

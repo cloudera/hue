@@ -1668,7 +1668,7 @@ ${ assist.assistPanel() }
           lastStatement = statement;
           wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName));
 
-          var handle = DataCatalog.addTemporaryTable({
+          var handle = dataCatalog.addTemporaryTable({
             sourceType: self.sourceType,
             namespace: self.namespace(),
             compute: self.compute(),
@@ -2142,7 +2142,7 @@ ${ assist.assistPanel() }
 
         var checkDbEntryExists = function () {
           wizard.computeSetDeferred.done(function () {
-            DataCatalog.getEntry({
+            dataCatalog.getEntry({
               sourceType: self.sourceType,
               compute: wizard.compute(),
               namespace: wizard.namespace(),
@@ -2832,13 +2832,13 @@ ${ assist.assistPanel() }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
+                        dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })
                         });
                       } else {
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
+                        dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                           })

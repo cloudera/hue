@@ -19,35 +19,39 @@ import './ext/bootstrap.2.3.2.min'
 import _ from 'lodash'
 import filesize from 'filesize'
 import qq from './ext/fileuploader.custom'
+import page from 'page'
+import localforage from 'localforage'
+
 import ko from 'knockout'
 import komapping from 'knockout.mapping'
-import page from 'page'
-import hueUtils from 'utils/hueUtils'
-import hueAnalytics from 'utils/hueAnalytics'
-import hueDebug from 'utils/hueDebug'
-import huePubSub from 'utils/huePubSub'
-import hueDrop from 'utils/hueDrop'
-import localforage from 'localforage'
 import 'ext/ko.editable.custom'
 import 'ext/ko.selectize.custom'
 import 'knockout-switch-case'
 import 'knockout-sortable'
 import 'knockout.validation'
-import apiHelper from 'utils/apiHelper';
-import CancellablePromise from 'utils/cancellablePromise'
+
+import apiHelper from 'api/apiHelper';
+import CancellablePromise from 'api/cancellablePromise'
+import dataCatalog from 'catalog/dataCatalog'
+import hueAnalytics from 'utils/hueAnalytics'
+import hueDebug from 'utils/hueDebug'
+import hueDrop from 'utils/hueDrop'
+import huePubSub from 'utils/huePubSub'
+import hueUtils from 'utils/hueUtils'
 
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
 window.CancellablePromise = CancellablePromise;
+window.dataCatalog = dataCatalog;
 window.filesize = filesize;
-window.ko = ko;
-window.ko.mapping = komapping;
-window.page = page;
 window.hueUtils = hueUtils;
 window.hueAnalytics = hueAnalytics;
 window.hueDebug = hueDebug;
 window.huePubSub = huePubSub;
 window.hueDrop = hueDrop;
+window.ko = ko;
+window.ko.mapping = komapping;
 window.localforage = localforage;
+window.page = page;
 window.qq = qq;

@@ -161,7 +161,7 @@ var SqlUtils = (function () {
     var cancellablePromises = [];
     var deferred = $.Deferred();
     var promise = new CancellablePromise(deferred, undefined, cancellablePromises);
-    DataCatalog.applyCancellable(promise, options);
+    dataCatalog.applyCancellable(promise, options);
 
     if (!options.identifierChain) {
       deferred.reject();
@@ -217,7 +217,7 @@ var SqlUtils = (function () {
         return;
       }
 
-      cancellablePromises.push(DataCatalog.getChildren({
+      cancellablePromises.push(dataCatalog.getChildren({
         sourceType: options.sourceType,
         namespace: options.namespace,
         compute: options.compute,
@@ -248,7 +248,7 @@ var SqlUtils = (function () {
     if (options.tables) {
       findTable(options.tables.concat())
     } else {
-      DataCatalog.getEntry({
+      dataCatalog.getEntry({
         sourceType: options.sourceType,
         namespace: options.namespace,
         compute: options.compute,
