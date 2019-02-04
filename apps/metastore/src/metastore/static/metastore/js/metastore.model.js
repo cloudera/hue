@@ -158,7 +158,7 @@ var MetastoreSource = (function () {
   MetastoreSource.prototype.loadNamespaces = function () {
     var self = this;
     self.loading(true);
-    ContextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
+    contextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
       var namespacesWithComputes = context.namespaces.filter(function (namespace) { return namespace.computes.length });
       self.namespaces($.map(namespacesWithComputes, function (namespace) {
         return new MetastoreNamespace({

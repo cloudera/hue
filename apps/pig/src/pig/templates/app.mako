@@ -1018,7 +1018,7 @@ ${ commonshare() | n,unicode }
 
     % if autocomplete_base_url != '':
       var apiHelper = window.apiHelper;
-      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
+      contextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace and compute selection
         dataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');

@@ -32,6 +32,7 @@ import 'knockout.validation'
 
 import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise'
+import contextCatalog from 'catalog/contextCatalog'
 import dataCatalog from 'catalog/dataCatalog'
 import hueAnalytics from 'utils/hueAnalytics'
 import hueDebug from 'utils/hueDebug'
@@ -43,6 +44,7 @@ import hueUtils from 'utils/hueUtils'
 window._ = _;
 window.apiHelper = apiHelper;
 window.CancellablePromise = CancellablePromise;
+window.contextCatalog = contextCatalog;
 window.dataCatalog = dataCatalog;
 window.filesize = filesize;
 window.hueUtils = hueUtils;

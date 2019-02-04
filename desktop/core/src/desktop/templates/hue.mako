@@ -133,7 +133,6 @@
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
-  <script src="${ static('desktop/js/contextCatalog.js') }"></script>
 </head>
 
 <body>

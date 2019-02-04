@@ -278,7 +278,7 @@ from desktop.views import _ko
         var self = this;
         if (self[type.name]) {
           self[type.loading](true);
-          self[type.lastPromise] = ContextCatalog[type.contextCatalogFn]({
+          self[type.lastPromise] = contextCatalog[type.contextCatalogFn]({
             sourceType: ko.unwrap(self.sourceType)
           }).done(function (available) {
             // Namespaces response differs slightly from the others

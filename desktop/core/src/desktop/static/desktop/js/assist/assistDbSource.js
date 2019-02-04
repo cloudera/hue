@@ -96,7 +96,7 @@ var AssistDbSource = (function () {
       }
 
       self.loading(true);
-      ContextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
+      contextCatalog.getNamespaces({ sourceType: self.sourceType }).done(function (context) {
         var newNamespaces = [];
         var existingNamespaceIndex = {};
         self.namespaces().forEach(function (assistNamespace) {
@@ -135,10 +135,10 @@ var AssistDbSource = (function () {
     self.loading(true);
 
     if (refresh) {
-      ContextCatalog.getComputes({ sourceType: self.sourceType, clearCache: true });
+      contextCatalog.getComputes({ sourceType: self.sourceType, clearCache: true });
     }
 
-    return ContextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: refresh }).done(function (context) {
+    return contextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: refresh }).done(function (context) {
       var assistNamespaces = [];
       var activeNamespace;
       var activeCompute;

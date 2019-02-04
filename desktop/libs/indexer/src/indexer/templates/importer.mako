@@ -2500,7 +2500,7 @@ ${ assist.assistPanel() }
 
       self.computeSetDeferred = $.Deferred();
 
-      ContextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
+      contextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
         self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
           if (namespace.id === vm.namespaceId) {

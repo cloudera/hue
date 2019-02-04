@@ -17,6 +17,7 @@
 import $ from 'jquery'
 import localforage from 'localforage'
 
+import apiHelper from '../api/apiHelper'
 import CancellablePromise from '../api/cancellablePromise'
 import catalogUtils from './catalogUtils'
 import DataCatalogEntry from './dataCatalogEntry'
@@ -274,7 +275,7 @@ class DataCatalog {
     $.when.apply($, existingPromises).always(function () {
       let loadDeferred = $.Deferred();
       if (pathsToLoad.length) {
-        cancellablePromises.push(window.apiHelper.fetchNavOptPopularity({
+        cancellablePromises.push(apiHelper.fetchNavOptPopularity({
           silenceErrors: options.silenceErrors,
           paths: pathsToLoad
         }).done(function (data) {
