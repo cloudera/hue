@@ -596,7 +596,7 @@ from desktop.views import _ko
           self.entries = ko.observableArray();
           self.editor = editor;
           self.collection = collection;
-          self.apiHelper = ApiHelper.getInstance();
+          self.apiHelper = window.apiHelper;
           self.lastNonSampleSuggestions = [];
           self.parseResult = {};
 

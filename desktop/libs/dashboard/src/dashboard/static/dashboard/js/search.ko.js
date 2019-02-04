@@ -2000,7 +2000,7 @@ var TempDocument = function () {
   self.uuid = ko.observable();
   self.uuid.subscribe(function (val) {
     if (val) {
-      ApiHelper.getInstance().fetchDocument({ uuid: val, silenceErrors: false, fetchContents: true }).done(function (data) {
+      window.apiHelper.fetchDocument({ uuid: val, silenceErrors: false, fetchContents: true }).done(function (data) {
         if (data && data.data && data.data.snippets.length > 0) {
           self.name(data.document.name);
           var snippet = data.data.snippets[0];

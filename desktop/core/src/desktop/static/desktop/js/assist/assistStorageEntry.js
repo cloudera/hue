@@ -110,7 +110,7 @@ var AssistStorageEntry = (function () {
   AssistStorageEntry.prototype.loadPreview = function () {
     var self = this;
     self.loading(true);
-    ApiHelper.getInstance().fetchStoragePreview({
+    window.apiHelper.fetchStoragePreview({
       path: self.getHierarchy(),
       type: self.type,
       silenceErrors: true
@@ -351,7 +351,7 @@ var AssistStorageEntry = (function () {
         type: 'dir'
       },
       parent: null,
-      apiHelper: ApiHelper.getInstance()
+      apiHelper: window.apiHelper
     });
 
     var path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');

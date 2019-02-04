@@ -26,7 +26,7 @@ var MetastoreViewModel = (function () {
 
     self.partitionsLimit = options.partitionsLimit;
     self.assistAvailable = ko.observable(true);
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
     self.isHue4 = ko.observable(options.hue4);
     self.isLeftPanelVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -300,8 +300,8 @@ var MetastoreViewModel = (function () {
         }
       }
 
-      if (!namespaceId && ApiHelper.getInstance().getFromTotalStorage('contextSelector', 'lastSelectedNamespace')) {
-        namespaceId = ApiHelper.getInstance().getFromTotalStorage('contextSelector', 'lastSelectedNamespace').id;
+      if (!namespaceId && window.apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace')) {
+        namespaceId = window.apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace').id;
       }
 
       self.source().lastLoadNamespacesDeferred.done(function () {

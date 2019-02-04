@@ -49,7 +49,7 @@ var MetastoreSource = (function () {
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       self.lastLoadNamespacesDeferred.done(function () {
-        var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
+        var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
         huePubSub.publish('assist.set.database', {
           source: self.type,
           namespace: self.namespace().namespace,
@@ -203,7 +203,7 @@ var MetastoreNamespace = (function () {
 
   var MetastoreNamespace = function (options) {
     var self = this;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
     self.namespace = options.namespace;
 
     // TODO: Compute selection in the metastore?
@@ -354,7 +354,7 @@ var MetastoreDatabase = (function () {
    */
   function MetastoreDatabase(options) {
     var self = this;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
     self.catalogEntry = options.catalogEntry;
     self.metastoreViewModel = options.metastoreViewModel;
 
@@ -554,7 +554,7 @@ var MetastoreTable = (function () {
     });
 
     self.metastoreTable = options.metastoreTable;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -691,7 +691,7 @@ var MetastoreTable = (function () {
     self.navigatorEnabled = options.navigatorEnabled;
     self.catalogEntry = options.catalogEntry;
 
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
 
     // TODO: Check if enough or if we need to fetch additional details
     self.isView = ko.observable(self.catalogEntry.isView());
@@ -920,7 +920,7 @@ var MetastoreTable = (function () {
 
         var found = analysis.properties && analysis.properties.some(function (property) {
           if (property.col_name.toLowerCase() === 'view original text:') {
-            ApiHelper.getInstance().formatSql({ statements: property.data_type }).done(function (formatResponse) {
+            window.apiHelper.formatSql({ statements: property.data_type }).done(function (formatResponse) {
               self.viewSql(formatResponse.status === 0 ? formatResponse.formatted_statements : property.data_type)
             }).fail(function () {
               self.viewSql(property.data_type)

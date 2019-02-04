@@ -28,7 +28,7 @@ function ShareViewModel(updateDocF) {
   self.idToUserMap = {};
   self.groupMap = {};
   self.items = [];
-  self.apiHelper = ApiHelper.getInstance();
+  self.apiHelper = window.apiHelper;
   self.searchInput = ko.observable();
   self.selectedPerm = ko.observable('read');
   self.selectedPermLabel = ko.computed(function() {

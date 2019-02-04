@@ -34,7 +34,7 @@ var AssistDbSource = (function () {
     self.i18n = options.i18n;
     self.nonSqlType = options.nonSqlType;
     self.navigationSettings = options.navigationSettings;
-    var apiHelper = ApiHelper.getInstance();
+    var apiHelper = window.apiHelper;
     self.initialNamespace = options.initialNamespace || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
     self.initialCompute = options.initialCompute || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
 
@@ -341,7 +341,7 @@ var AssistDbNamespace = (function () {
           self.selectedDatabase().loadEntries()
         }
         if (!self.navigationSettings.rightAssist) {
-          ApiHelper.getInstance().setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
+          window.apiHelper.setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
           huePubSub.publish('assist.database.set', {
             sourceType: self.sourceType,
             namespace: self.namespace,
@@ -364,7 +364,7 @@ var AssistDbNamespace = (function () {
         self.selectedDatabaseChanged();
         return;
       }
-      var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
+      var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
       if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
         self.selectedDatabase(self.dbIndex[lastSelectedDb]);
         self.selectedDatabaseChanged();

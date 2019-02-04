@@ -632,7 +632,7 @@ from metadata.conf import has_navigator
           }).done(function (analysis) {
             var found = analysis.properties && analysis.properties.some(function (property) {
               if (property.col_name.toLowerCase() === 'view original text:') {
-                ApiHelper.getInstance().formatSql({statements: property.data_type}).done(function (formatResponse) {
+                window.apiHelper.formatSql({statements: property.data_type}).done(function (formatResponse) {
                   if (formatResponse.status === 0) {
                     viewSqlDeferred.resolve(formatResponse.formatted_statements);
                   } else {
@@ -990,7 +990,7 @@ from metadata.conf import has_navigator
         var self = this;
         self.hasErrors(false);
         self.loading(true);
-        ApiHelper.getInstance().fetchDocument({
+        window.apiHelper.fetchDocument({
           uuid: self.data.uuid,
           fetchContents: true,
           silenceErrors: true
@@ -1006,7 +1006,7 @@ from metadata.conf import has_navigator
       function CollectionContextTabs(data) {
         var self = this;
 
-        self.apiHelper = ApiHelper.getInstance();
+        self.apiHelper = window.apiHelper;
 
         self.disposals = [];
 
@@ -1130,7 +1130,7 @@ from metadata.conf import has_navigator
       function ResizeHelper (orientation, leftAdjust, topAdjust) {
         var self = this;
 
-        var apiHelper = ApiHelper.getInstance();
+        var apiHelper = window.apiHelper;
 
         var originalMidX, originalWidth, originalRightX, originalLeftX, originalMidY, originalHeight, originalTopY, originalBottomY;
         var rightX, leftX, leftDiff, rightDiff, topY, bottomY, topDiff, bottomDiff;
@@ -1287,7 +1287,7 @@ from metadata.conf import has_navigator
         var self = this;
         self.disposals = [];
 
-        var apiHelper = ApiHelper.getInstance();
+        var apiHelper = window.apiHelper;
 
         self.left = ko.observable(0);
         self.top = ko.observable(0);

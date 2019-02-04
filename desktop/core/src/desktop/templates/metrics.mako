@@ -39,7 +39,7 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
   (function () {
     var MetricsViewModel = function () {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
       self.metricsFilter = ko.observable();
       self.metrics = ko.observableArray();
       self.selectedMetric = ko.observable('All');

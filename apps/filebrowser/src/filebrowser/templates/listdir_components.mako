@@ -730,9 +730,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       }
     };
 
-    var apiHelper = ApiHelper.getInstance({
-      user: "${ user }"
-    });
+    var apiHelper = window.apiHelper;
 
     // ajax modal windows
     var openChownWindow = function (path, user, group, next) {

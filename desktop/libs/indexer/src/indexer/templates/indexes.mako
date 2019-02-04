@@ -657,7 +657,7 @@ ${ assist.assistPanel() }
       });
 
       self.assistAvailable = ko.observable(true);
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
       self.isHue4 = ko.observable(options.hue4);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);

@@ -627,7 +627,7 @@ ${ utils.submit_popup_event() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var apiHelper = ApiHelper.getInstance();
+  var apiHelper = window.apiHelper;
 
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);

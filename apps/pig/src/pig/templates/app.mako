@@ -1017,9 +1017,7 @@ ${ commonshare() | n,unicode }
     var availableTables = '';
 
     % if autocomplete_base_url != '':
-      var apiHelper = ApiHelper.getInstance({
-        user: '${ user }'
-      });
+      var apiHelper = window.apiHelper;
       ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace and compute selection
         DataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {

@@ -422,7 +422,7 @@ var EditorViewModel = (function() {
     };
 
     self.getApiHelper = function() {
-      return ApiHelper.getInstance(vm);
+      return window.apiHelper;
     };
 
     // namespace and compute might be initialized as empty object {}
@@ -2761,7 +2761,7 @@ var EditorViewModel = (function() {
     };
 
     self.saveDefaultUserProperties = function (session) {
-      var apiHelper = ApiHelper.getInstance();
+      var apiHelper = window.apiHelper;
       apiHelper.saveConfiguration({
         app: session.type(),
         properties: session.properties,
@@ -3301,18 +3301,18 @@ var EditorViewModel = (function() {
 
     self.assistWithoutStorage = ko.observable(false);
 
-    self.isLeftPanelVisible = ko.observable(ApiHelper.getInstance().getFromTotalStorage('assist', 'assist_panel_visible', true));
+    self.isLeftPanelVisible = ko.observable(window.apiHelper.getFromTotalStorage('assist', 'assist_panel_visible', true));
     self.isLeftPanelVisible.subscribe(function (val) {
       if (!self.assistWithoutStorage()){
-        ApiHelper.getInstance().setInTotalStorage('assist', 'assist_panel_visible', val);
+        window.apiHelper.setInTotalStorage('assist', 'assist_panel_visible', val);
       }
     });
 
     self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
-    self.isRightPanelVisible = ko.observable(ApiHelper.getInstance().getFromTotalStorage('assist', 'right_assist_panel_visible', true));
+    self.isRightPanelVisible = ko.observable(window.apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true));
     self.isRightPanelVisible.subscribe(function (val) {
       if (!self.assistWithoutStorage()){
-        ApiHelper.getInstance().setInTotalStorage('assist', 'right_assist_panel_visible', val);
+        window.apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
       }
     });
 
@@ -3371,7 +3371,7 @@ var EditorViewModel = (function() {
             }
           }
         };
-        ApiHelper.getInstance().saveSnippetToFile(data, options);
+        window.apiHelper.saveSnippetToFile(data, options);
       });
     }, self.huePubSubId);
 

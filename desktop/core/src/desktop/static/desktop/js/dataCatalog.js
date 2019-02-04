@@ -94,7 +94,7 @@ var DataCatalog = (function () {
    * @param {boolean} [apiOptions.silenceErrors]
    */
   var fetchAndSave = function (apiHelperFunction, attributeName, entry, apiOptions) {
-    return ApiHelper.getInstance()[apiHelperFunction]({
+    return window.apiHelper[apiHelperFunction]({
       sourceType: entry.dataCatalog.sourceType,
       compute: entry.compute,
       path: entry.path, // Set for DataCatalogEntry
@@ -274,7 +274,7 @@ var DataCatalog = (function () {
       $.when.apply($, existingPromises).always(function () {
         var loadDeferred = $.Deferred();
         if (pathsToLoad.length) {
-          cancellablePromises.push(ApiHelper.getInstance().fetchNavOptPopularity({
+          cancellablePromises.push(window.apiHelper.fetchNavOptPopularity({
             silenceErrors: options.silenceErrors,
             paths: pathsToLoad
           }).done(function (data) {
@@ -935,7 +935,7 @@ var DataCatalog = (function () {
         if (self.dataCatalog.invalidatePromise) {
           invalidatePromise = self.dataCatalog.invalidatePromise;
         } else {
-          invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
+          invalidatePromise = window.apiHelper.invalidateSourceMetadata({
             sourceType: self.getSourceType(),
             compute: self.compute,
             invalidate: invalidate,
@@ -1134,7 +1134,7 @@ var DataCatalog = (function () {
           });
         };
 
-        cancellablePromises.push(ApiHelper.getInstance().searchEntities({
+        cancellablePromises.push(window.apiHelper.searchEntities({
           query: query,
           rawQuery: true,
           limit: children.length,
@@ -1265,7 +1265,7 @@ var DataCatalog = (function () {
           deferred.resolve(childEntries.filter(function (entry) { return entry.navOptPopularity }));
         }).fail(deferred.reject));
       } else if (self.isDatabase() || self.isTableOrView()) {
-        cancellablePromises.push(ApiHelper.getInstance().fetchNavOptPopularity({
+        cancellablePromises.push(window.apiHelper.fetchNavOptPopularity({
           silenceErrors: options && options.silenceErrors,
           refreshCache: options && options.refreshCache,
           paths: [ self.path ]
@@ -1405,7 +1405,7 @@ var DataCatalog = (function () {
         }
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
-            ApiHelper.getInstance().updateNavigatorProperties({
+            window.apiHelper.updateNavigatorProperties({
               identity: navigatorMeta.identity,
               modifiedCustomMetadata: modifiedCustomMetadata,
               deletedCustomMetadataKeys: deletedCustomMetadataKeys
@@ -1451,7 +1451,7 @@ var DataCatalog = (function () {
         }
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
-            ApiHelper.getInstance().updateNavigatorProperties({
+            window.apiHelper.updateNavigatorProperties({
               identity: navigatorMeta.identity,
               properties: {
                 description: comment
@@ -1472,7 +1472,7 @@ var DataCatalog = (function () {
           }
         }).fail(deferred.reject);
       } else {
-        ApiHelper.getInstance().updateSourceMetadata({
+        window.apiHelper.updateSourceMetadata({
           sourceType: self.getSourceType(),
           path: self.path,
           properties: {
@@ -1504,7 +1504,7 @@ var DataCatalog = (function () {
       if (self.canHaveNavigatorMetadata()) {
         self.getNavigatorMeta().done(function (navMeta) {
           if (navMeta && typeof navMeta.identity !== 'undefined') {
-            ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (entity) {
+            window.apiHelper.addNavTags(navMeta.identity, tags).done(function (entity) {
               if (entity) {
                 self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
@@ -1537,7 +1537,7 @@ var DataCatalog = (function () {
       if (self.canHaveNavigatorMetadata()) {
         self.getNavigatorMeta().done(function (navMeta) {
           if (navMeta && typeof navMeta.identity !== 'undefined') {
-            ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (entity) {
+            window.apiHelper.deleteNavTags(navMeta.identity, tags).done(function (entity) {
               if (entity) {
                 self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
@@ -1966,7 +1966,7 @@ var DataCatalog = (function () {
 
       // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
       if (options && options.operation && options.operation !== 'default') {
-        return applyCancellable(ApiHelper.getInstance().fetchSample({
+        return applyCancellable(window.apiHelper.fetchSample({
           sourceType: self.dataCatalog.sourceType,
           compute: self.compute,
           path: self.path,
@@ -2321,7 +2321,7 @@ var DataCatalog = (function () {
       self.allNavigatorTagsPromise = deferred.promise();
 
       var reloadAllTags = function () {
-        ApiHelper.getInstance().fetchAllNavigatorTags({
+        window.apiHelper.fetchAllNavigatorTags({
           silenceErrors: options && options.silenceErrors,
         }).done(deferred.resolve).fail(deferred.reject);
 

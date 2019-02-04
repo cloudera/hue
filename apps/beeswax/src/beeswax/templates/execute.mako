@@ -1175,7 +1175,7 @@ editorViewModelOptions.languages.push({
   name: HIVE_AUTOCOMPLETE_APP == "impala" ? "Impala" : "Hive"
 });
 
-var apiHelper = ApiHelper.getInstance();
+var apiHelper = window.apiHelper;
 
 var editorViewModel = {
   sqlSourceTypes: [{

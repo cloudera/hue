@@ -21,10 +21,7 @@
       responseForUrls: {}
     };
 
-    var apiHelper = ApiHelper.getInstance({
-      i18n: {},
-      user: 'testUser'
-    });
+    var apiHelper = window.apiHelper;
 
     var snippet = {
       type: ko.observable(),
