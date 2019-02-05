@@ -24,9 +24,10 @@ from datetime import datetime
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
+from libanalyze import analyze as analyzer, rules
 
+ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 LOG = logging.getLogger(__name__)
-
 
 try:
   from beeswax.models import Session
@@ -174,10 +175,17 @@ class QueryApi(Api):
   def _memory(self, appid, app_type, app_property, app_filters):
     return self.api.get_query_memory(query_id=appid);
 
+  def _metrics(self, appid):
+    query_profile = self.api.get_query_profile_encoded(appid)
+    profile = analyzer.analyze(analyzer.parse_data(query_profile))
+    ANALYZER.pre_process(profile)
+    return analyzer.metrics(profile)
+
   def _query(self, appid):
     query = self.api.get_query(query_id=appid)
     query['summary'] = query.get('summary').strip() if query.get('summary') else ''
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
+    query['metrics'] = self._metrics(appid)
     if query.get('plan_json'):
       def get_exchange_icon (o):
         if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):

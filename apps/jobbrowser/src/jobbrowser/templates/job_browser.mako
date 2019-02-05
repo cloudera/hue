@@ -1494,7 +1494,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan_json) { fetchProfile('plan'); fetchMetrics(); } } }">
+          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan()) { fetchProfile('plan'); } } }">
             ${ _('Plan') }</a>
         </li>
         <li>
@@ -1532,8 +1532,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
-            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, metrics: properties.metrics && properties.metrics(), height:$root.isMini() ? 535 : 600 }">
-              <svg style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+            <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: { value: properties.plan && properties.plan(), height:$root.isMini() ? 535 : 600 }">
+              <svg style="width:100%;height:100%;position:relative;" id="queries-page-plan-svg${ SUFFIX }">
                 <defs>
                   <filter id="dropshadow" height="130%">
                     <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
@@ -2704,15 +2704,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           } else {
             $(document).trigger("error", data.message);
           }
-        });
-      };
-
-      self.fetchMetrics = function (name, callback) {
-        ApiHelper.getInstance().fetchQueryExecutionStatistics({
-          queryId: self.id(),
-          cluster: vm.compute()
-        }).done(function(data) {
-          self.properties['metrics'](data);
         });
       };
 

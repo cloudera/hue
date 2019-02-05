@@ -114,22 +114,24 @@ function impalaDagre(id) {
       return;
     }
     var id = getId(node["label"]);
-    var metric_node = _impalaDagree._metrics && _impalaDagree._metrics.nodes[id]
+    var metric_node = getNode(id)
     var predicates = metric_node && (metric_node.other['group by'] || metric_node.other['hash predicates'] || metric_node.other['predicates']) || '';
-    states.push({ "name": node["label"],
-                  "type": node["type"],
-                  "label": node["name"],
-                  "detail": node["label_detail"],
-                  "predicates": predicates,
-                  "num_instances": node["num_instances"],
-                  "num_active": node["num_active"],
-                  "max_time": ko.bindingHandlers.numberFormat.human(node["max_time_val"], 5),
-                  "avg_time": node["avg_time"],
-                  "icon": node["icon"],
-                  "parent": parent || node["data_stream_target"],
-                  "is_broadcast": node["is_broadcast"],
-                  "max_time_val": node["max_time_val"],
-                  "width": "200px"});
+    var state = { "name": node["label"],
+        "type": node["type"],
+        "label": node["name"],
+        "detail": node["label_detail"],
+        "predicates": predicates,
+        "num_instances": node["num_instances"],
+        "num_active": node["num_active"],
+        "max_time": ko.bindingHandlers.numberFormat.human(node["max_time_val"], 5),
+        "avg_time": node["avg_time"],
+        "icon": node["icon"],
+        "parent": parent || node["data_stream_target"],
+        "is_broadcast": node["is_broadcast"],
+        "max_time_val": node["max_time_val"],
+        "width": "200px" };
+    states_by_name[state.name] = state;
+    states.push(state);
     if (parent) {
       edges.push({ start: node["label"], end: parent, style: { label: '', labelpos: index === 0 && count > 1 ? 'l' : 'r' }, content: { value: 0, unit: 0 } });
     }
@@ -169,12 +171,16 @@ function impalaDagre(id) {
     $("g.node").attr('class', 'node'); // addClass doesn't work in svg on our version of jQuery
   }
 
+  function getNode(id) {
+    return _impalaDagree._plan && _impalaDagree._plan.metrics && _impalaDagree._plan.metrics.nodes[id];
+  }
+
   function getId(key) {
     return parseInt(key.split(':')[0], 10);
   }
 
   function getKey(node) {
-    var nodes = g.nodes();
+    var nodes = Object.keys(states_by_name);
     var key;
     var nNode = parseInt(node, 10);
     var keys = Object.keys(nodes);
@@ -225,10 +231,10 @@ function impalaDagre(id) {
       path = 'properties.hosts';
     }
     var id = getId(key);
-    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id]) {
+    var node = getNode(id);
+    if (!node) {
       return;
     }
-    var node = _impalaDagree._metrics.nodes[id];
     return getValue(node, metric, path, minmax, start);
   }
 
@@ -305,7 +311,7 @@ function impalaDagre(id) {
     last = last[last.length - 1];
     var time;
     if (!openFinished) {
-      var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
+      var end = getMetricsMax() || 10;
       time = { start_time: end - localTime.value, duration: localTime.value, value: end, unit: localTime.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
     } else if (key.indexOf('EXCHANGE') >= 0 && firstBatchReturned) {
       var triplet = getExchangeCPUIOTimelineData(key);
@@ -345,10 +351,12 @@ function impalaDagre(id) {
   }
 
   function getFragment(id) {
-    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
-      return;
-    }
-    return _impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment];
+    var node = getNode(id);
+    return node && _impalaDagree._plan.metrics.nodes[node.fragment];
+  }
+
+  function getMetricsMax() {
+    return _impalaDagree._plan && _impalaDagree._plan.metrics && _impalaDagree._plan.metrics['max'];
   }
 
   function getScanCPUIOTimelineData(key) {
@@ -359,10 +367,11 @@ function impalaDagre(id) {
 
   function getExchangeCPUIOTimelineData(key) {
     var id = getId(key);
-    var timeline = _impalaDagree._metrics.nodes[id].timeline;
+    var node = getNode(id);
+    var timeline = node.timeline;
     var cpuExchange = getMaxValue(key, 'LocalTime');
 
-    var sender = g.nodes().filter(function(node) {
+    var sender = Object.keys(states_by_name).filter(function(node) {
       return states_by_name[node].parent == key;
     })[0];
     if (!sender) {
@@ -370,19 +379,16 @@ function impalaDagre(id) {
     }
     var networkTime = getMaxTotalNetworkTime(sender, key);
     var krpcTime = getMaxFragmentMetric(sender, 'LocalTime', 'children.KrpcDataStreamSender.hosts');
-    console.log('test');
     return [ krpcTime, networkTime, cpuExchange];
   }
 
   function getTimelineData(key) {
-    if (!_impalaDagree._metrics) {
-      return;
-    }
     var id = getId(key);
-    if (!_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[id].timeline) {
+    var node = getNode(id);
+    if (!node || !node.timeline) {
       return;
     }
-    var timeline = _impalaDagree._metrics.nodes[id].timeline;
+    var timeline = node.timeline;
     var times = Object.keys(timeline.hosts);
     for (var i = 0; i < times.length; i++) {
       if (!timeline.hosts[times[i]]['Node Lifecycle Event Timeline']) {
@@ -401,7 +407,7 @@ function impalaDagre(id) {
     if (!datum || !datum.hosts[datum.min] || !datum.hosts[datum.min]['Node Lifecycle Event Timeline']) {
       return '';
     }
-    var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
+    var end = getMetricsMax() || 10;
     var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
     html += datum.hosts[datum.min]['Node Lifecycle Event Timeline'].map(function(time, index) {
@@ -416,7 +422,7 @@ function impalaDagre(id) {
     if (!datum) {
       return '';
     }
-    var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
+    var end = getMetricsMax() || 10;
     var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
     html += datum.map(function(time, index) {
@@ -428,10 +434,11 @@ function impalaDagre(id) {
 
   function showDetail(id) {
     var data;
-    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id]) {
+    var node = getNode(id);
+    if (!node) {
       return;
     }
-    var data = _impalaDagree._metrics.nodes[id];
+    var data = node;
 
     d3.select('.query-plan').classed('open', true);
     var details = d3.select('.query-plan .details');
@@ -463,9 +470,9 @@ function impalaDagre(id) {
       timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var timelineSectionTable = timelineSection.append('table');
-      timelineSectionTable.append('thead').selectAll('tr').data(['\u00A0'].concat(Object.keys(_impalaDagree._metrics.nodes[id].timeline.hosts).sort())).enter().append('tr').append('td').text(function (host, i) { return i > 0 ? 'Host ' + i : host; }).attr('title', function (host) { return host; });
+      timelineSectionTable.append('thead').selectAll('tr').data(['\u00A0'].concat(Object.keys(node.timeline.hosts).sort())).enter().append('tr').append('td').text(function (host, i) { return i > 0 ? 'Host ' + i : host; }).attr('title', function (host) { return host; });
       var timelineSectionTableBody = timelineSectionTable.append('tbody');
-      var timelineHosts = Object.keys(_impalaDagree._metrics.nodes[id].timeline.hosts).sort().map(function (host) { return _impalaDagree._metrics.nodes[id].timeline.hosts[host]; });
+      var timelineHosts = Object.keys(node.timeline.hosts).sort().map(function (host) { return node.timeline.hosts[host]; });
       var timelineSectionTableCols = timelineSectionTableBody.selectAll('tr').data(timelineHosts);
       var timelineSectionTableCol0 = timelineSectionTableBody.selectAll('tr').data(timelineHosts.slice(0,1));
       timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time) { return '<div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
@@ -535,13 +542,13 @@ function impalaDagre(id) {
 
   function renderGraph() {
     var plan = _impalaDagree._plan;
-    if (!plan || !plan.plan_nodes || !plan.plan_nodes.length) return;
+    if (!plan || !plan.plan_json.plan_nodes || !plan.plan_json.plan_nodes.length) return;
     var states = [];
     var edges = [];
     var colour_idx = 0;
 
     var max_node_time = 0;
-    plan["plan_nodes"].forEach(function(parent) {
+    plan.plan_json["plan_nodes"].forEach(function(parent) {
       max_node_time = Math.max(
         build(parent, null, edges, states, colour_idx, max_node_time, 1, 1));
       // Pick a new colour for each plan fragment
@@ -579,7 +586,6 @@ function impalaDagre(id) {
       g.setNode(state.name, { "label": html,
                               "labelType": "html",
                               "style": style });
-      states_by_name[state.name] = state;
     });
     edges.forEach(function(edge) {
       // Impala marks 'broadcast' as a property of the receiver, not the sender. We use
