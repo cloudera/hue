@@ -624,6 +624,21 @@ class TopDownAnalysis:
                   dequeue = node.find_by_name('Dequeue')
                   inactive_time = dequeue.counter_map().get('DataWaitTime', models.TCounter(value=0)).value if dequeue else 0
                 local_time = counter_map['TotalTime'].value - inactive_time - async_time
+                child_time = counter_map['TotalTime'].value - local_time
+            if re.search(r'KrpcDataStreamSender', node.val.name) is not None and node.fragment_instance:
+              local_time = counter_map.get('SerializeBatchTime', models.TCounter(value=0)).value
+              child_time = counter_map['TotalTime'].value - local_time
+            if re.search(r'HBASE_SCAN_NODE', node.val.name):
+              local_time = counter_map['TotalTime'].value - counter_map.get('TotalRawHBaseReadTime(*)', models.TCounter(value=0)).value
+              child_time = counter_map['TotalTime'].value - local_time
+            if re.search(r'KUDU_SCAN_NODE', node.val.name):
+              child_time = counter_map.get('KuduClientTime', models.TCounter(value=0)).value
+              local_time = counter_map['TotalTime'].value
+              counter_map['TotalTime'].value = child_time + local_time
+            if re.search(r'HDFS_SCAN_NODE', node.val.name):
+              child_time = counter_map.get('TotalRawHdfsReadTime(*)', models.TCounter(value=0)).value
+              local_time = counter_map['TotalTime'].value
+              counter_map['TotalTime'].value = local_time + child_time
 
             # For Hash Join, if the "LocalTime" metrics
             if is_plan_node and re.search(r'HASH_JOIN_NODE', node.val.name) is not None:

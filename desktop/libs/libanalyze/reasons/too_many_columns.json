@@ -1,6 +1,6 @@
 {
   "type": "SQLOperator",
-  "node_name": "HDFS_SCAN_NODE",
+  "node_name": ["HDFS_SCAN_NODE", "KUDU_SCAN_NODE", "HBASE_SCAN_NODE"],
   "collapse": true,
   "metric_names": [
     "NumColumns",

@@ -215,72 +215,163 @@ function impalaDagre(id) {
   }
 
   function getMaxTotalNetworkTime(sender, receiver) {
-    var sentTime = getMaxTotalNetworkSendTime(sender);
-    var receiveTime = getMaxTotalNetworkReceiveTime(receiver);
-    return receiveTime && sentTime ? { value: Math.min(receiveTime.value, sentTime.value), unit: sentTime.unit } : { value: 0, unit: 0 }; // We get the smallest between both, because sometime 1 of them is larger than the other (doesn't make sense for our purpose)
+    var sentTime = getMaxFragmentMetric(sender, 'TotalNetworkSendTime'); // AFAIK there can be only 1 sender per fragment.
+    var receiveTime = getMaxValue(receiver, 'ChildTime'); // We can't use TotalNetworkReceiveTime from fragment, because there can be multiple receiver per fragment and that time gets added
+    return receiveTime && sentTime ? { value: Math.min(receiveTime.value, sentTime.value), unit: sentTime.unit } : { value: 0, unit: 0 }; // We get the smallest between both, because sometime 1 of them is larger than the other (doesn't make sense for our purpose)*/
   }
 
-  function getMaxTotalNetworkSendTime(node) {
-    var id = getId(node);
-    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
+  function getValueByKey(key, metric, path, minmax, start) {
+    if (!path) {
+      path = 'properties.hosts';
+    }
+    var id = getId(key);
+    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id]) {
       return;
     }
-    var fragment = _impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment];
-    return Object.keys(fragment.properties.hosts).reduce(function (previous, host) {
-      if (fragment.properties.hosts[host].TotalNetworkSendTime.value > previous.value) {
-        return fragment.properties.hosts[host].TotalNetworkSendTime;
-      } else {
-        return previous;
-      }
-    }, { value: -1, unit: 5 });
+    var node = _impalaDagree._metrics.nodes[id];
+    return getValue(node, metric, path, minmax, start);
   }
 
-  function getMaxTotalNetworkReceiveTime(node) {
-    var id = getId(node);
-    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
+  function getValue(node, metric, path, minmax, start) {
+    if (!path) {
+      path = 'properties.hosts';
+    }
+    var timeline = node.timeline;
+    var hosts = getProperty(node, path);
+    if (timeline[minmax]) {
+      return hosts[timeline[minmax]][metric];
+    } else {
+      return Object.keys(hosts).filter(function (key) { return key !== 'averaged'; }).reduce(function (previous, host) {
+        if (Math[minmax](hosts[host][metric].value, previous.value) !== previous.value) {
+          return hosts[host][metric];
+        } else {
+          return previous;
+        }
+      }, { value: start, unit: 5 });
+    }
+  }
+
+  function getMaxValue(key, metric, path) {
+    return getValueByKey(key, metric, path, 'max', -(Number.MAX_SAFE_INTEGER - 1));
+  }
+
+  function getMinValue(key, metric, path) {
+    return getValueByKey(key, metric, path, 'min', Number.MAX_SAFE_INTEGER);
+  }
+
+  function getFragmentMetric(node, metric, path, minmax, start) {
+    var fragment = getFragment(getId(node));
+    if (!fragment) {
       return;
     }
-    var fragment = _impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment];
-    return Object.keys(fragment.properties.hosts).reduce(function (previous, host) {
-      if (fragment.properties.hosts[host].TotalNetworkReceiveTime.value > previous.value) {
-        return fragment.properties.hosts[host].TotalNetworkReceiveTime;
-      } else {
-        return previous;
-      }
-    }, { value: -1, unit: 5 });
+    return getValue(fragment, metric, path, minmax, start)
+  }
+
+  function getMinFragmentMetric(node, metric, path) {
+    if (!path) {
+      path = 'properties.hosts';
+    }
+    return getFragmentMetric(node, metric, path, 'min', Number.MAX_SAFE_INTEGER);
+  }
+
+  function getMaxFragmentMetric(node, metric, path) {
+    if (!path) {
+      path = 'properties.hosts';
+    }
+    return getFragmentMetric(node, metric, path, 'max', -(Number.MAX_SAFE_INTEGER - 1));
   }
 
   // This is not exact, but shows some approximation of reality.
   function getCPUTimelineData(key) {
     var datum = getTimelineData(key);
     if (!datum || !datum.hosts[datum.min] || !datum.hosts[datum.min]['Node Lifecycle Event Timeline']) {
-      return '';
+      return;
     }
     var id = getId(key);
-    var localTime = _impalaDagree._metrics.nodes[id].properties.hosts[datum.min].LocalTime;
+    var localTime = getMaxValue(key, 'LocalTime');
     var timeline = datum.hosts[datum.min]['Node Lifecycle Event Timeline'];
     if (!timeline.length) {
-      return '';
+      return;
     }
-    var openFinished = timeline.filter(function(time) {
-      return time.name === 'Open Finished';
-    })[0];
     var last = timeline.filter(function(time) {
       return time.name !== 'Closed';
     }); // Close time is normally wait time;
+    var openFinished = last.filter(function(time) {
+      return time.name === 'Open Finished';
+    })[0];
+    var firstBatchReturned = last.filter(function(time) {
+      return time.name === 'First Batch Returned';
+    })[0];
     last = last[last.length - 1];
     var time;
     if (!openFinished) {
       var end = _impalaDagree._metrics && _impalaDagree._metrics['max'] || 10;
-      time = { start_time: end - localTime.value, duration: localTime.value, value: end, color: last.color, unit: last.unit };
+      time = { start_time: end - localTime.value, duration: localTime.value, value: end, unit: localTime.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
+    } else if (key.indexOf('EXCHANGE') >= 0 && firstBatchReturned) {
+      var triplet = getExchangeCPUIOTimelineData(key);
+      var tripletSum = sum(triplet, 'value');
+      time = [{ start_time: firstBatchReturned.value, duration: triplet[0].value, value: firstBatchReturned.value + triplet[0].value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }, { start_time: firstBatchReturned.value + triplet[0].value, duration: triplet[1].value, value: firstBatchReturned.value + tripletSum - triplet[2].value, clazz: 'io', unit: last.unit, name: window.HUE_I18n.profile.io }, { start_time: firstBatchReturned.value + tripletSum - triplet[2].value, duration: triplet[2].value, value: firstBatchReturned.value + tripletSum, clazz: 'cpu', unit: last.unit, name: window.HUE_I18n.profile.cpu }]
     } else if (key.indexOf('JOIN') >= 0) {
-      time = { start_time: openFinished.value - localTime.value, duration: localTime.value, value: openFinished.value, color: last.color, unit: last.unit };
+      var middle = (openFinished.duration - localTime.value) / 2;
+      time = { start_time: openFinished.start_time + middle, duration: localTime.value, value: openFinished.value - middle, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
     } else if (key.indexOf('UNION') >= 0 || (key.indexOf('AGGREGATE') >= 0 && states_by_name[key].detail.indexOf('STREAMING') >= 0)) {
-      time = { start_time: openFinished.value, duration: localTime.value, value: localTime.value + openFinished.value, color: last.color, unit: last.unit };
+      time = { start_time: openFinished.value, duration: localTime.value, value: localTime.value + openFinished.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
+    } else if (key.indexOf('SCAN') >= 0 && firstBatchReturned) {
+      var doublet = getScanCPUIOTimelineData(key);
+      var doubletSum = sum(doublet, 'value');
+      time = [{ start_time: firstBatchReturned.start_time, duration: doublet[0].value, value: firstBatchReturned.start_time + doublet[0].value, unit: last.unit, clazz: 'io', name: window.HUE_I18n.profile.io }, { start_time: firstBatchReturned.start_time + doublet[0].value, duration: doublet[1].value, value: firstBatchReturned.start_time + doubletSum, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }];
     } else {
-      time = { start_time: last.value - localTime.value, duration: localTime.value, value: last.value, color: last.color, unit: last.unit };
+      time = { start_time: last.value - localTime.value, duration: localTime.value, value: last.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
     }
-    return [ time ];
+    return time.length ? time : [ time ];
+  }
+
+  function getExecutionTimelineData(key) {
+    var timeline = getCPUTimelineData(key)
+    if (!timeline) {
+      return timeline;
+    }
+    var fragment = getFragment(key);
+    if (fragment) {
+      return timeline;
+    }
+    var initTime = getMaxFragmentMetric(key, 'TotalTime', 'children.CodeGen.hosts');
+    if (!initTime) {
+      return timeline;
+    }
+    initTime.duration = initTime.value;
+    initTime.name = window.HUE_I18n.profile.codegen;
+    return [initTime].concat(timeline);
+  }
+
+  function getFragment(id) {
+    if (!_impalaDagree._metrics || !_impalaDagree._metrics.nodes[id] || !_impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment]) {
+      return;
+    }
+    return _impalaDagree._metrics.nodes[_impalaDagree._metrics.nodes[id].fragment];
+  }
+
+  function getScanCPUIOTimelineData(key) {
+    var cpuExchange = getMaxValue(key, 'LocalTime');
+    var ioTime = getMaxValue(key, 'ChildTime');
+    return [ioTime, cpuExchange];
+  }
+
+  function getExchangeCPUIOTimelineData(key) {
+    var id = getId(key);
+    var timeline = _impalaDagree._metrics.nodes[id].timeline;
+    var cpuExchange = getMaxValue(key, 'LocalTime');
+
+    var sender = g.nodes().filter(function(node) {
+      return states_by_name[node].parent == key;
+    })[0];
+    if (!sender) {
+      return [{ value: 0, unit: 0 }, { value: 0, unit: 0 }, { value: 0, unit: 0 }];
+    }
+    var networkTime = getMaxTotalNetworkTime(sender, key);
+    var krpcTime = getMaxFragmentMetric(sender, 'LocalTime', 'children.KrpcDataStreamSender.hosts');
+    console.log('test');
+    return [ krpcTime, networkTime, cpuExchange];
   }
 
   function getTimelineData(key) {
@@ -329,7 +420,7 @@ function impalaDagre(id) {
     var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
     html += datum.map(function(time, index) {
-      return '<rect class="active" x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10"></rect>';
+      return '<rect class="' + time.clazz + '" x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10"></rect>';
     }).join('');
     html += '</svg>';
     return html;
@@ -348,13 +439,28 @@ function impalaDagre(id) {
     details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
 
+    var executionTimeline = renderCPUTimeline(key);
+    var executionTimelineData = getExecutionTimelineData(key);
+    if (executionTimeline) {
+      var executionSum = sum(executionTimelineData, 'duration');
+      var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
+      var cpuTimelineTitle = cpuTimelineSection.append('header');
+      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
+      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.execution + ' (' + ko.bindingHandlers.numberFormat.human(executionSum, 5) + ')');
+      cpuTimelineSection.node().appendChild($.parseXML(executionTimeline).children[0]);
+
+      var cpuTimelineSectionTable = cpuTimelineSection.append('table');
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(executionTimelineData).enter().append('td').html(function (time) { return '<div class="legend-icon ' + time.clazz + '"></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(executionTimelineData).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
+    }
+
     var timeline = renderTimeline(key, '');
     if (timeline) {
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
       timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
       timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline);
-      timelineSection.node().appendChild($.parseXML(renderTimeline(key, '')).children[0]);
+      timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var timelineSectionTable = timelineSection.append('table');
       timelineSectionTable.append('thead').selectAll('tr').data(['\u00A0'].concat(Object.keys(_impalaDagree._metrics.nodes[id].timeline.hosts).sort())).enter().append('tr').append('td').text(function (host, i) { return i > 0 ? 'Host ' + i : host; }).attr('title', function (host) { return host; });
@@ -362,7 +468,7 @@ function impalaDagre(id) {
       var timelineHosts = Object.keys(_impalaDagree._metrics.nodes[id].timeline.hosts).sort().map(function (host) { return _impalaDagree._metrics.nodes[id].timeline.hosts[host]; });
       var timelineSectionTableCols = timelineSectionTableBody.selectAll('tr').data(timelineHosts);
       var timelineSectionTableCol0 = timelineSectionTableBody.selectAll('tr').data(timelineHosts.slice(0,1));
-      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time) { return '<div class="legend-icon" title="' + time.name + '" style="background-color:' + time.color +' "></div><div class="metric-name">' + time.name + '</div>'; });
+      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time) { return '<div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
       timelineSectionTableCols.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
@@ -399,9 +505,20 @@ function impalaDagre(id) {
   function getProperty(object, path) {
     var keys = path.split('.');
     for (var i = 0; i < keys.length; i++) {
+      if (object[keys[i]] === null || object[keys[i]] === undefined) {
+        return;
+      }
       object = object[keys[i]];
     }
     return object;
+  }
+
+  function sum(states, metric) {
+    var sum = 0;
+    for (var i = 0; i < states.length; i++) {
+      sum += getProperty(states[i], metric);
+    }
+    return sum;
   }
 
   function average(states, metric) {
