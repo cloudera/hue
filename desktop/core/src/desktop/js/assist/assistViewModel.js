@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import AssistDbEntry from 'assist/assistDbEntry'
-import AssistDbSource from 'assist/assistDbSource'
-import AssistGitEntry from 'assist/assistGitEntry'
-import AssistHBaseEntry from 'assist/assistHBaseEntry'
-import AssistStorageEntry from 'assist/assistStorageEntry'
+import AssistDbEntry from 'assist/assistDbEntry';
+import AssistDbSource from 'assist/assistDbSource';
+import AssistGitEntry from 'assist/assistGitEntry';
+import AssistHBaseEntry from 'assist/assistHBaseEntry';
+import AssistStorageEntry from 'assist/assistStorageEntry';
 
 // TODO: Get rid of
 window.AssistDbEntry = AssistDbEntry;

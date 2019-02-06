@@ -14,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import ko from 'knockout'
+import $ from 'jquery';
+import ko from 'knockout';
 
-import apiHelper from '../api/apiHelper'
-import huePubSub from '../utils/huePubSub'
+import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
 
 const PAGE_SIZE = 100;
 
 const TYPE_SPECIFICS = {
-  'adls': {
+  adls: {
     apiHelperFetchFunction: 'fetchAdlsPath',
     dblClickPubSubId: 'assist.dblClickAdlsItem',
     goHomePubSubId: 'assist.adls.go.home',
     selectEntryPubSubId: 'assist.selectAdlsEntry'
   },
-  'hdfs': {
+  hdfs: {
     apiHelperFetchFunction: 'fetchHdfsPath',
     dblClickPubSubId: 'assist.dblClickHdfsItem',
     goHomePubSubId: 'assist.hdfs.go.home',
     selectEntryPubSubId: 'assist.selectHdfsEntry'
   },
-  's3': {
+  s3: {
     apiHelperFetchFunction: 'fetchS3Path',
     dblClickPubSubId: 'assist.dblClickS3Item',
     goHomePubSubId: 'assist.s3.go.home',
@@ -44,7 +44,6 @@ const TYPE_SPECIFICS = {
 };
 
 class AssistStorageEntry {
-
   /**
    * @param {object} options
    * @param {object} options.definition
@@ -56,7 +55,7 @@ class AssistStorageEntry {
    * @constructor
    */
   constructor(options) {
-    let self = this;
+    const self = this;
     self.type = options.type;
     self.originalType = options.originalType;
     self.definition = options.definition;
@@ -65,7 +64,7 @@ class AssistStorageEntry {
     if (self.parent !== null) {
       self.path = self.parent.path;
       if (self.parent.path !== '/') {
-        self.path += '/'
+        self.path += '/';
       }
     }
     self.path += self.definition.name;
@@ -106,27 +105,31 @@ class AssistStorageEntry {
 
   dblClick() {
     huePubSub.publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, this);
-  };
+  }
 
   loadPreview() {
-    let self = this;
+    const self = this;
     self.loading(true);
-    window.apiHelper.fetchStoragePreview({
-      path: self.getHierarchy(),
-      type: self.type,
-      silenceErrors: true
-    }).done(data => {
-      self.preview(data);
-    }).fail(errorText => {
-      self.hasErrors(true);
-      self.errorText(errorText);
-    }).always(() => {
-      self.loading(false);
-    })
-  };
+    window.apiHelper
+      .fetchStoragePreview({
+        path: self.getHierarchy(),
+        type: self.type,
+        silenceErrors: true
+      })
+      .done(data => {
+        self.preview(data);
+      })
+      .fail(errorText => {
+        self.hasErrors(true);
+        self.errorText(errorText);
+      })
+      .always(() => {
+        self.loading(false);
+      });
+  }
 
   loadEntries(callback) {
-    let self = this;
+    const self = this;
     if (self.loading()) {
       return;
     }
@@ -140,15 +143,17 @@ class AssistStorageEntry {
       pathParts: self.getHierarchy(),
       successCallback: data => {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
-        let filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
-        self.entries(filteredFiles.map(file => {
-          file.url = encodeURI(file.url);
-          return new AssistStorageEntry({
-            type: self.type,
-            definition: file,
-            parent: self
+        const filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
+        self.entries(
+          filteredFiles.map(file => {
+            file.url = encodeURI(file.url);
+            return new AssistStorageEntry({
+              type: self.type,
+              definition: file,
+              parent: self
+            });
           })
-        }));
+        );
         self.loaded = true;
         self.loading(false);
         if (callback) {
@@ -163,27 +168,29 @@ class AssistStorageEntry {
           callback();
         }
       }
-    })
-  };
+    });
+  }
 
   goHome() {
     huePubSub.publish(TYPE_SPECIFICS[this.type].goHomePubSubId);
-  };
+  }
 
   loadDeep(folders, callback) {
-    let self = this;
+    const self = this;
 
     if (folders.length === 0) {
       callback(self);
       return;
     }
 
-    let nextName = folders.shift();
+    const nextName = folders.shift();
     let loadedPages = 0;
 
-    let findNextAndLoadDeep = () =>{
-      let foundEntry = self.entries().filter(entry => entry.definition.name === nextName);
-      let passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
+    const findNextAndLoadDeep = () => {
+      const foundEntry = self.entries().filter(entry => entry.definition.name === nextName);
+      const passedAlphabetically =
+        self.entries().length > 0 &&
+        self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
 
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
@@ -197,16 +204,16 @@ class AssistStorageEntry {
       }
     };
 
-    if (! self.loaded) {
+    if (!self.loaded) {
       self.loadEntries(findNextAndLoadDeep);
     } else {
       findNextAndLoadDeep();
     }
-  };
+  }
 
   getHierarchy() {
-    let self = this;
-    let parts = [];
+    const self = this;
+    const parts = [];
     let entry = self;
     while (entry != null) {
       parts.push(entry.definition.name);
@@ -214,10 +221,10 @@ class AssistStorageEntry {
     }
     parts.reverse();
     return parts;
-  };
+  }
 
   toggleOpen(data, event) {
-    let self = this;
+    const self = this;
     if (self.definition.type === 'file') {
       if (IS_HUE_4) {
         if (event.ctrlKey || event.metaKey || event.which === 2) {
@@ -238,10 +245,10 @@ class AssistStorageEntry {
     } else {
       huePubSub.publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self);
     }
-  };
+  }
 
   fetchMore(successCallback, errorCallback) {
-    let self = this;
+    const self = this;
     if (!self.hasMorePages || self.loadingMore()) {
       return;
     }
@@ -256,12 +263,19 @@ class AssistStorageEntry {
       pathParts: self.getHierarchy(),
       successCallback: data => {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
-        let filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
-        self.entries(self.entries().concat(filteredFiles.map(file => new AssistStorageEntry({
-          type: self.type,
-          definition: file,
-          parent: self
-        }))));
+        const filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
+        self.entries(
+          self.entries().concat(
+            filteredFiles.map(
+              file =>
+                new AssistStorageEntry({
+                  type: self.type,
+                  definition: file,
+                  parent: self
+                })
+            )
+          )
+        );
         self.loadingMore(false);
         if (successCallback) {
           successCallback();
@@ -274,11 +288,11 @@ class AssistStorageEntry {
         }
       }
     });
-  };
+  }
 
   showContextPopover(entry, event, positionAdjustment) {
-    let $source = $(event.target);
-    let offset = $source.offset();
+    const $source = $(event.target);
+    const offset = $source.offset();
     entry.contextPopoverVisible(true);
 
     if (positionAdjustment) {
@@ -305,11 +319,11 @@ class AssistStorageEntry {
     huePubSub.subscribeOnce('context.popover.hidden', () => {
       entry.contextPopoverVisible(false);
     });
-  };
+  }
 
   openInImporter() {
     huePubSub.publish('open.in.importer', this.definition.path);
-  };
+  }
 
   /**
    * Helper function to create an assistStorageEntry. It will load the entries starting from the root up until the
@@ -320,13 +334,13 @@ class AssistStorageEntry {
    * @return {Promise}
    */
   static getEntry(path, type) {
-    let deferred = $.Deferred();
-    let typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
-    type = typeMatch ? typeMatch[1] : (type || 'hdfs');
+    const deferred = $.Deferred();
+    const typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
+    type = typeMatch ? typeMatch[1] : type || 'hdfs';
     type = type.replace(/s3.*/i, 's3');
     type = type.replace(/adl.*/i, 'adls');
 
-    let rootEntry = new AssistStorageEntry({
+    const rootEntry = new AssistStorageEntry({
       type: type.toLowerCase(),
       originalType: typeMatch && typeMatch[1],
       definition: {
@@ -342,7 +356,7 @@ class AssistStorageEntry {
     rootEntry.loadDeep(path, deferred.resolve);
 
     return deferred.promise();
-  };
+  }
 }
 
-export default AssistStorageEntry
+export default AssistStorageEntry;

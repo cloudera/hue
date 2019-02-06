@@ -16,24 +16,24 @@
 
 class ApiQueueManager {
   constructor() {
-    var self = this;
+    const self = this;
     self.callQueue = {};
   }
 
   getQueued(url, hash) {
-    var self = this;
+    const self = this;
     return self.callQueue[url + (hash || '')];
-  };
+  }
 
   addToQueue(promise, url, hash) {
-    var self = this;
+    const self = this;
     self.callQueue[url + (hash || '')] = promise;
-    promise.always(function () {
+    promise.always(() => {
       delete self.callQueue[url + (hash || '')];
-    })
-  };
+    });
+  }
 }
 
-let apiQueueManager = new ApiQueueManager();
+const apiQueueManager = new ApiQueueManager();
 
 export default apiQueueManager;

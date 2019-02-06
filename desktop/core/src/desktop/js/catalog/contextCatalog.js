@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import localforage from 'localforage'
+import $ from 'jquery';
+import localforage from 'localforage';
 
-import apiHelper from '../api/apiHelper'
-import huePubSub from '../utils/huePubSub'
+import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
 
 /**
  * @typedef {Object} ContextCompute
@@ -39,9 +39,8 @@ const NAMESPACES_CONTEXT_TYPE = 'namespaces';
 const DISABLE_CACHE = true;
 
 class ContextCatalog {
-
   constructor() {
-    let self = this;
+    const self = this;
     self.namespaces = {};
     self.namespacePromises = {};
 
@@ -51,10 +50,10 @@ class ContextCatalog {
     self.clusters = {};
     self.clusterPromises = {};
 
-    let addPubSubs = () => {
+    const addPubSubs = () => {
       if (typeof huePubSub !== 'undefined') {
         huePubSub.subscribe('context.catalog.refresh', () => {
-          let namespacesToRefresh = Object.keys(self.namespaces);
+          const namespacesToRefresh = Object.keys(self.namespaces);
           self.namespaces = {};
           self.namespacePromises = {};
 
@@ -66,8 +65,8 @@ class ContextCatalog {
           huePubSub.publish('context.catalog.refreshed');
           namespacesToRefresh.forEach(sourceType => {
             huePubSub.publish('context.catalog.namespaces.refreshed', sourceType);
-          })
-        })
+          });
+        });
       } else {
         window.setTimeout(addPubSubs, 100);
       }
@@ -83,36 +82,43 @@ class ContextCatalog {
       });
     }
     return self.store;
-  };
+  }
 
   saveLater(contextType, sourceType, entry) {
-    let self = this;
+    const self = this;
     window.setTimeout(() => {
-      self.getStore().setItem(sourceType + '_' + contextType, { version: CONTEXT_CATALOG_VERSION, entry: entry });
+      self.getStore().setItem(sourceType + '_' + contextType, {
+        version: CONTEXT_CATALOG_VERSION,
+        entry: entry
+      });
     }, 1000);
-  };
+  }
 
   getSaved(contextType, sourceType) {
-    let self = this;
-    let deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
     if (DISABLE_CACHE) {
       return deferred.reject().promise();
     }
 
-    self.getStore().getItem(sourceType + '_' + contextType).then(saved => {
-      if (saved && saved.version === CONTEXT_CATALOG_VERSION) {
-        deferred.resolve(saved.entry);
-      } else {
+    self
+      .getStore()
+      .getItem(sourceType + '_' + contextType)
+      .then(saved => {
+        if (saved && saved.version === CONTEXT_CATALOG_VERSION) {
+          deferred.resolve(saved.entry);
+        } else {
+          deferred.reject();
+        }
+      })
+      .catch(error => {
+        console.warn(error);
         deferred.reject();
-      }
-    }).catch(error => {
-      console.warn(error);
-      deferred.reject();
-    });
+      });
 
     return deferred.promise();
-  };
+  }
 
   /**
    * @param {Object} options
@@ -122,9 +128,9 @@ class ContextCatalog {
    * @return {Promise}
    */
   getNamespaces(options) {
-    let self = this;
+    const self = this;
 
-    let notifyForRefresh = self.namespacePromises[options.sourceType] && options.clearCache;
+    const notifyForRefresh = self.namespacePromises[options.sourceType] && options.clearCache;
     if (options.clearCache) {
       self.namespacePromises[options.sourceType] = undefined;
       self.namespaces[options.sourceType] = undefined;
@@ -135,24 +141,26 @@ class ContextCatalog {
     }
 
     if (self.namespaces[options.sourceType]) {
-      self.namespacePromises[options.sourceType] = $.Deferred().resolve(self.namespaces[options.sourceType]).promise();
+      self.namespacePromises[options.sourceType] = $.Deferred()
+        .resolve(self.namespaces[options.sourceType])
+        .promise();
       return self.namespacePromises[options.sourceType];
     }
 
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
 
     self.namespacePromises[options.sourceType] = deferred.promise();
 
-    let startingNamespaces = {};
-    let pollTimeout = -1;
+    const startingNamespaces = {};
+    const pollTimeout = -1;
 
-    let pollForStarted = () => {
+    const pollForStarted = () => {
       window.clearTimeout(pollTimeout);
       window.setTimeout(() => {
         if (Object.keys(startingNamespaces).length) {
           apiHelper.fetchContextNamespaces(options).done(namespaces => {
             if (namespaces[options.sourceType]) {
-              let namespaces = namespaces[options.sourceType];
+              const namespaces = namespaces[options.sourceType];
               if (namespaces) {
                 let statusChanged = false;
                 namespaces.forEach(namespace => {
@@ -186,7 +194,7 @@ class ContextCatalog {
       }
     });
 
-    let fetchNamespaces = () => {
+    const fetchNamespaces = () => {
       apiHelper.fetchContextNamespaces(options).done(namespaces => {
         if (namespaces[options.sourceType]) {
           const dynamic = namespaces.dynamicClusters;
@@ -200,7 +208,7 @@ class ContextCatalog {
                 if (!compute.name && compute.clusterName) {
                   compute.name = compute.clusterName;
                 }
-              })
+              });
             });
             self.namespaces[options.sourceType] = {
               namespaces: namespaces.filter(namespace => namespace.name),
@@ -213,7 +221,11 @@ class ContextCatalog {
             }
 
             if (self.namespaces[options.sourceType].namespaces.length) {
-              self.saveLater(NAMESPACES_CONTEXT_TYPE, options.sourceType, self.namespaces[options.sourceType]);
+              self.saveLater(
+                NAMESPACES_CONTEXT_TYPE,
+                options.sourceType,
+                self.namespaces[options.sourceType]
+              );
             } else {
               self.getStore().removeItem(options.sourceType + '_' + NAMESPACES_CONTEXT_TYPE);
             }
@@ -227,16 +239,19 @@ class ContextCatalog {
     };
 
     if (!options.clearCache) {
-      self.getSaved(NAMESPACES_CONTEXT_TYPE, options.sourceType).done(namespaces => {
-        self.namespaces[options.sourceType] = namespaces;
-        deferred.resolve(self.namespaces[options.sourceType]);
-      }).fail(fetchNamespaces);
+      self
+        .getSaved(NAMESPACES_CONTEXT_TYPE, options.sourceType)
+        .done(namespaces => {
+          self.namespaces[options.sourceType] = namespaces;
+          deferred.resolve(self.namespaces[options.sourceType]);
+        })
+        .fail(fetchNamespaces);
     } else {
       fetchNamespaces();
     }
 
     return self.namespacePromises[options.sourceType];
-  };
+  }
 
   /**
    * @param {Object} options
@@ -246,7 +261,7 @@ class ContextCatalog {
    * @return {Promise}
    */
   getComputes(options) {
-    let self = this;
+    const self = this;
 
     if (options.clearCache) {
       self.computePromises[options.sourceType] = undefined;
@@ -258,11 +273,13 @@ class ContextCatalog {
     }
 
     if (self.computes[options.sourceType]) {
-      self.computePromises[options.sourceType] = $.Deferred().resolve(self.computes[options.sourceType]).promise();
+      self.computePromises[options.sourceType] = $.Deferred()
+        .resolve(self.computes[options.sourceType])
+        .promise();
       return self.computePromises[options.sourceType];
     }
 
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
     self.computePromises[options.sourceType] = deferred.promise();
 
     apiHelper.fetchContextComputes(options).done(computes => {
@@ -270,7 +287,7 @@ class ContextCatalog {
         computes = computes[options.sourceType];
         if (computes) {
           self.computes[options.sourceType] = computes;
-          deferred.resolve(self.computes[options.sourceType])
+          deferred.resolve(self.computes[options.sourceType]);
           // TODO: save
         } else {
           deferred.reject();
@@ -281,7 +298,7 @@ class ContextCatalog {
     });
 
     return self.computePromises[options.sourceType];
-  };
+  }
 
   /**
    * @param {Object} options
@@ -290,37 +307,38 @@ class ContextCatalog {
    * @return {Promise}
    */
   getClusters(options) {
-    let self = this;
+    const self = this;
 
     if (self.clusterPromises[options.sourceType]) {
       return self.clusterPromises[options.sourceType];
     }
 
     if (self.clusters[options.sourceType]) {
-      self.clusterPromises[options.sourceType] = $.Deferred().resolve(self.clusters[options.sourceType]).promise();
+      self.clusterPromises[options.sourceType] = $.Deferred()
+        .resolve(self.clusters[options.sourceType])
+        .promise();
       return self.clusterPromises[options.sourceType];
     }
 
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
     self.clusterPromises[options.sourceType] = deferred.promise();
 
     apiHelper.fetchContextClusters(options).done(clusters => {
       if (clusters && clusters[options.sourceType]) {
         self.clusters[options.sourceType] = clusters[options.sourceType];
-        deferred.resolve(self.clusters[options.sourceType])
+        deferred.resolve(self.clusters[options.sourceType]);
       } else {
         deferred.reject();
       }
     });
 
     return self.clusterPromises[options.sourceType];
-  };
+  }
 }
 
-let contextCatalog = new ContextCatalog();
+const contextCatalog = new ContextCatalog();
 
 export default {
-
   /**
    * @param {Object} options
    * @param {string} options.sourceType
@@ -345,4 +363,4 @@ export default {
    * @return {Promise}
    */
   getClusters: options => contextCatalog.getClusters(options)
-}
+};

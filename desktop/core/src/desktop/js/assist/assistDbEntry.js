@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import ko from 'knockout'
+import $ from 'jquery';
+import ko from 'knockout';
 
-import huePubSub from '../utils/huePubSub'
-import sqlUtils from '../sql/sqlUtils'
+import huePubSub from 'utils/huePubSub';
+import sqlUtils from 'sql/sqlUtils';
 
 const findNameInHierarchy = (entry, searchCondition) => {
-  let sourceType = entry.sourceType;
+  const sourceType = entry.sourceType;
   while (entry && !searchCondition(entry)) {
     entry = entry.parent;
   }
@@ -42,8 +42,8 @@ class AssistDbEntry {
    * @param {Object} navigationSettings
    * @constructor
    */
-  constructor (catalogEntry, parent, assistDbNamespace, filter, i18n, navigationSettings) {
-    let self = this;
+  constructor(catalogEntry, parent, assistDbNamespace, filter, i18n, navigationSettings) {
+    const self = this;
     self.catalogEntry = catalogEntry;
     self.parent = parent;
     self.assistDbNamespace = assistDbNamespace;
@@ -52,7 +52,7 @@ class AssistDbEntry {
     self.navigationSettings = navigationSettings;
 
     self.sourceType = assistDbNamespace.sourceType;
-    self.invalidateOnRefresh =  assistDbNamespace.invalidateOnRefresh;
+    self.invalidateOnRefresh = assistDbNamespace.invalidateOnRefresh;
 
     self.expandable = self.catalogEntry.hasPossibleChildren();
 
@@ -87,13 +87,15 @@ class AssistDbEntry {
       }
     });
 
-    self.hasEntries = ko.pureComputed(() => self.entries().length > 0)
+    self.hasEntries = ko.pureComputed(() => self.entries().length > 0);
 
     self.filteredEntries = ko.pureComputed(() => {
-      let facets = self.filter.querySpec().facets;
-      let facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+      const facets = self.filter.querySpec().facets;
+      const facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
       // Only text match on tables/views or columns if flag is set
-      let textMatch = (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
+      const textMatch =
+        (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) ||
+        (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
 
       if (facetMatch && textMatch) {
         return self.entries();
@@ -104,17 +106,26 @@ class AssistDbEntry {
 
         if (match && !facetMatch) {
           if (entry.catalogEntry.isField()) {
-            match = (Object.keys(facets['type']).length === 2 && facets['type']['table'] && facets['type']['view'])
-              || (Object.keys(facets['type']).length === 1 && (facets['type']['table'] || facets['type']['view']))
-              || facets['type'][entry.catalogEntry.getType()];
+            match =
+              (Object.keys(facets['type']).length === 2 &&
+                facets['type']['table'] &&
+                facets['type']['view']) ||
+              (Object.keys(facets['type']).length === 1 &&
+                (facets['type']['table'] || facets['type']['view'])) ||
+              facets['type'][entry.catalogEntry.getType()];
           } else if (entry.catalogEntry.isTableOrView()) {
-            match = (!facets['type']['table'] && !facets['type']['view']) || (facets['type']['table'] && entry.catalogEntry.isTable()) || (facets['type']['view'] && entry.catalogEntry.isView());
+            match =
+              (!facets['type']['table'] && !facets['type']['view']) ||
+              (facets['type']['table'] && entry.catalogEntry.isTable()) ||
+              (facets['type']['view'] && entry.catalogEntry.isView());
           }
         }
 
         if (match && !textMatch) {
-          let nameLower = entry.catalogEntry.name.toLowerCase();
-          match = self.filter.querySpec().text.every(text => nameLower.indexOf(text.toLowerCase()) !== -1)
+          const nameLower = entry.catalogEntry.name.toLowerCase();
+          match = self.filter
+            .querySpec()
+            .text.every(text => nameLower.indexOf(text.toLowerCase()) !== -1);
         }
 
         return match;
@@ -122,11 +133,11 @@ class AssistDbEntry {
     });
 
     self.autocompleteFromEntries = (nonPartial, partial) => {
-      let result = [];
-      let partialLower = partial.toLowerCase();
+      const result = [];
+      const partialLower = partial.toLowerCase();
       self.entries().forEach(entry => {
         if (entry.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
-          result.push(nonPartial + partial + entry.catalogEntry.name.substring(partial.length))
+          result.push(nonPartial + partial + entry.catalogEntry.name.substring(partial.length));
         }
       });
       return result;
@@ -157,15 +168,16 @@ class AssistDbEntry {
   }
 
   knownFacetValues() {
-    let self = this;
-    let types = {};
-    if (self.parent === null) { // Only find facets on the DB level
+    const self = this;
+    const types = {};
+    if (self.parent === null) {
+      // Only find facets on the DB level
       self.entries().forEach(tableEntry => {
         if (!self.assistDbNamespace.nonSqlType) {
           if (tableEntry.catalogEntry.isTable()) {
-            types.table =  types.table ? types.table + 1 : 1;
+            types.table = types.table ? types.table + 1 : 1;
           } else if (tableEntry.catalogEntry.isView()) {
-            types.view =  types.view ? types.view + 1 : 1;
+            types.view = types.view ? types.view + 1 : 1;
           }
         }
         if (tableEntry.open()) {
@@ -175,54 +187,54 @@ class AssistDbEntry {
             } else {
               types[colEntry.catalogEntry.getType()]++;
             }
-          })
+          });
         }
       });
     }
     if (Object.keys(types).length) {
-      return { type: types }
+      return { type: types };
     }
     return {};
-  };
+  }
 
   getDatabaseName() {
     return findNameInHierarchy(this, entry => entry.catalogEntry.isDatabase());
-  };
+  }
 
   getTableName() {
     return findNameInHierarchy(this, entry => entry.catalogEntry.isTableOrView());
-  };
+  }
 
   getColumnName() {
     return findNameInHierarchy(this, entry => entry.catalogEntry.isColumn());
-  };
+  }
 
   getComplexName() {
     let entry = this;
-    let sourceType = entry.sourceType;
-    let parts = [];
+    const sourceType = entry.sourceType;
+    const parts = [];
     while (entry != null) {
       if (entry.catalogEntry.isTableOrView()) {
         break;
       }
       if (entry.catalogEntry.isArray() || entry.catalogEntry.isMapValue()) {
         if (sourceType === 'hive') {
-          parts.push("[]");
+          parts.push('[]');
         }
       } else {
         parts.push(sqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name));
-        parts.push(".");
+        parts.push('.');
       }
       entry = entry.parent;
     }
     parts.reverse();
-    return parts.slice(1).join("");
-  };
+    return parts.slice(1).join('');
+  }
 
   showContextPopover(entry, event, positionAdjustment) {
-    let self = this;
-    let $source = $(event.target);
-    let offset = $source.offset();
+    const self = this;
+    const $source = $(event.target);
+    const offset = $source.offset();
     if (positionAdjustment) {
       offset.left += positionAdjustment.left;
       offset.top += positionAdjustment.top;
@@ -248,17 +260,17 @@ class AssistDbEntry {
     huePubSub.subscribeOnce('context.popover.hidden', () => {
       self.statsVisible(false);
     });
-  };
+  }
 
   triggerRefresh() {
-    let self = this;
+    const self = this;
     self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh(), cascade: true });
-  };
+  }
 
   highlightInside(path) {
-    let self = this;
+    const self = this;
 
-    let searchEntry = () => {
+    const searchEntry = () => {
       let foundEntry;
       self.entries().forEach(entry => {
         entry.highlight(false);
@@ -290,7 +302,7 @@ class AssistDbEntry {
 
     if (self.entries().length === 0) {
       if (self.loading()) {
-        let subscription = self.loading.subscribe(newVal => {
+        const subscription = self.loading.subscribe(newVal => {
           if (!newVal) {
             subscription.dispose();
             searchEntry();
@@ -302,51 +314,56 @@ class AssistDbEntry {
     } else {
       searchEntry();
     }
-  };
+  }
 
   loadEntries(callback) {
-    let self = this;
+    const self = this;
     if (!self.expandable || self.loading()) {
       return;
     }
     self.loading(true);
 
-    let loadEntriesDeferred = $.Deferred();
+    const loadEntriesDeferred = $.Deferred();
 
-    let successCallback = sourceMeta => {
+    const successCallback = sourceMeta => {
       self.entries([]);
       if (!sourceMeta.notFound) {
-        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done( catalogEntries => {
-          self.hasErrors(false);
-          self.loading(false);
-          self.loaded = true;
-          if (catalogEntries.length === 0) {
-            self.entries([]);
-            return;
-          }
-          let newEntries = [];
-          catalogEntries.forEach(catalogEntry => {
-            newEntries.push(self.createEntry(catalogEntry));
-          });
-          if (sourceMeta.type === 'array') {
-            self.entries(newEntries);
-            self.entries()[0].open(true);
-          } else {
-            self.entries(newEntries);
-          }
+        self.catalogEntry
+          .getChildren({ silenceErrors: self.navigationSettings.rightAssist })
+          .done(catalogEntries => {
+            self.hasErrors(false);
+            self.loading(false);
+            self.loaded = true;
+            if (catalogEntries.length === 0) {
+              self.entries([]);
+              return;
+            }
+            const newEntries = [];
+            catalogEntries.forEach(catalogEntry => {
+              newEntries.push(self.createEntry(catalogEntry));
+            });
+            if (sourceMeta.type === 'array') {
+              self.entries(newEntries);
+              self.entries()[0].open(true);
+            } else {
+              self.entries(newEntries);
+            }
 
-          loadEntriesDeferred.resolve(newEntries);
-          if (typeof callback === 'function') {
-            callback();
-          }
-        }).fail(() => {
-          self.loading(false);
-          self.loaded = true;
-          self.hasErrors(true);
-        });
+            loadEntriesDeferred.resolve(newEntries);
+            if (typeof callback === 'function') {
+              callback();
+            }
+          })
+          .fail(() => {
+            self.loading(false);
+            self.loaded = true;
+            self.hasErrors(true);
+          });
 
         if (!self.assistDbNamespace.nonSqlType) {
-          self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
+          self.catalogEntry.loadNavigatorMetaForChildren({
+            silenceErrors: self.navigationSettings.rightAssist
+          });
         }
       } else {
         self.hasErrors(true);
@@ -358,77 +375,124 @@ class AssistDbEntry {
       }
     };
 
-    let errorCallback = () => {
+    const errorCallback = () => {
       self.hasErrors(true);
       self.loading(false);
       self.loaded = true;
       loadEntriesDeferred.resolve([]);
     };
 
-    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && !self.assistDbNamespace.nonSqlType) {
+    if (
+      !self.navigationSettings.rightAssist &&
+      HAS_OPTIMIZER &&
+      (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) &&
+      !self.assistDbNamespace.nonSqlType
+    ) {
       self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(() => {
         loadEntriesDeferred.done(() => {
           if (!self.hasErrors()) {
             self.entries().forEach(entry => {
               if (entry.catalogEntry.navOptPopularity) {
                 if (entry.catalogEntry.navOptPopularity.popularity) {
-                  entry.popularity(entry.catalogEntry.navOptPopularity.popularity)
+                  entry.popularity(entry.catalogEntry.navOptPopularity.popularity);
                 } else if (entry.catalogEntry.navOptPopularity.column_count) {
-                  entry.popularity(entry.catalogEntry.navOptPopularity.column_count)
+                  entry.popularity(entry.catalogEntry.navOptPopularity.column_count);
                 } else if (entry.catalogEntry.navOptPopularity.selectColumn) {
                   entry.popularity(entry.catalogEntry.navOptPopularity.selectColumn.columnCount);
                 }
               }
             });
           }
-        })
+        });
       });
     }
 
-    self.catalogEntry.getSourceMeta({ silenceErrors: self.navigationSettings.rightAssist }).done(successCallback).fail(errorCallback);
-  };
+    self.catalogEntry
+      .getSourceMeta({ silenceErrors: self.navigationSettings.rightAssist })
+      .done(successCallback)
+      .fail(errorCallback);
+  }
 
   /**
    * @param {DataCatalogEntry} catalogEntry
    */
   createEntry(catalogEntry) {
-    let self = this;
-    return new AssistDbEntry(catalogEntry, self, self.assistDbNamespace, self.filter, self.i18n, self.navigationSettings)
-  };
+    const self = this;
+    return new AssistDbEntry(
+      catalogEntry,
+      self,
+      self.assistDbNamespace,
+      self.filter,
+      self.i18n,
+      self.navigationSettings
+    );
+  }
 
   getHierarchy() {
-    let self = this;
+    const self = this;
     return self.catalogEntry.path.concat();
-  };
+  }
 
   dblClick() {
-    let self = this;
+    const self = this;
     if (self.catalogEntry.isTableOrView()) {
-      huePubSub.publish('editor.insert.table.at.cursor', { name: self.getTableName(), database: self.getDatabaseName() });
+      huePubSub.publish('editor.insert.table.at.cursor', {
+        name: self.getTableName(),
+        database: self.getDatabaseName()
+      });
     } else if (self.catalogEntry.isColumn()) {
-      huePubSub.publish('editor.insert.column.at.cursor', { name: self.getColumnName(), table: self.getTableName(), database: self.getDatabaseName() });
+      huePubSub.publish('editor.insert.column.at.cursor', {
+        name: self.getColumnName(),
+        table: self.getTableName(),
+        database: self.getDatabaseName()
+      });
     } else {
-      huePubSub.publish('editor.insert.column.at.cursor', { name: self.getComplexName(), table: self.getTableName(), database: self.getDatabaseName() });
+      huePubSub.publish('editor.insert.column.at.cursor', {
+        name: self.getComplexName(),
+        table: self.getTableName(),
+        database: self.getDatabaseName()
+      });
     }
-  };
+  }
 
   explore(isSolr) {
-    let self = this;
+    const self = this;
     if (isSolr) {
       huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry.name);
+    } else {
+      huePubSub.publish(
+        'open.link',
+        '/hue/dashboard/browse/' +
+          self.getDatabaseName() +
+          '.' +
+          self.getTableName() +
+          '?engine=' +
+          self.assistDbNamespace.sourceType
+      );
     }
-    else {
-      huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbNamespace.sourceType);
-    }
-  };
+  }
 
   openInMetastore() {
-    let self = this;
+    const self = this;
     let url;
     if (self.catalogEntry.isDatabase()) {
-      url = '/metastore/tables/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
+      url =
+        '/metastore/tables/' +
+        self.catalogEntry.name +
+        '?source=' +
+        self.catalogEntry.getSourceType() +
+        '&namespace=' +
+        self.catalogEntry.namespace.id;
     } else if (self.catalogEntry.isTableOrView()) {
-      url = '/metastore/table/' + self.parent.catalogEntry.name + '/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
+      url =
+        '/metastore/table/' +
+        self.parent.catalogEntry.name +
+        '/' +
+        self.catalogEntry.name +
+        '?source=' +
+        self.catalogEntry.getSourceType() +
+        '&namespace=' +
+        self.catalogEntry.namespace.id;
     } else {
       return;
     }
@@ -438,11 +502,11 @@ class AssistDbEntry {
     } else {
       window.open(url, '_blank');
     }
-  };
+  }
 
   openInIndexer() {
-    let self = this;
-    let definitionName = self.catalogEntry.name;
+    const self = this;
+    const definitionName = self.catalogEntry.name;
     if (window.IS_NEW_INDEXER_ENABLED) {
       if (window.IS_HUE_4) {
         huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
@@ -450,16 +514,19 @@ class AssistDbEntry {
         window.open('/indexer/indexes/' + definitionName);
       }
     } else {
-      let hash = '#edit/' + definitionName;
+      const hash = '#edit/' + definitionName;
       if (window.IS_HUE_4) {
-        if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
+        if (
+          window.location.pathname.startsWith('/hue/indexer') &&
+          !window.location.pathname.startsWith('/hue/indexer/importer')
+        ) {
           window.location.hash = hash;
         } else {
           huePubSub.subscribeOnce('app.gained.focus', app => {
             if (app === 'indexes') {
               window.setTimeout(() => {
                 window.location.hash = hash;
-              }, 0)
+              }, 0);
             }
           });
           huePubSub.publish('open.link', '/indexer');
@@ -468,30 +535,30 @@ class AssistDbEntry {
         window.open('/indexer/' + hash);
       }
     }
-  };
+  }
 
   toggleOpen() {
-    let self = this;
+    const self = this;
     self.open(!self.open());
-  };
+  }
 
   openItem() {
-    let self = this;
+    const self = this;
     if (self.catalogEntry.isTableOrView()) {
       huePubSub.publish('assist.table.selected', {
         sourceType: self.assistDbNamespace.sourceType,
         namespace: self.assistDbNamespace.namespace,
         database: self.databaseName,
         name: self.catalogEntry.name
-      })
+      });
     } else if (self.catalogEntry.isDatabase()) {
       huePubSub.publish('assist.database.selected', {
         sourceType: self.assistDbNamespace.sourceType,
         namespace: self.assistDbNamespace.namespace,
         name: self.catalogEntry.name
-      })
+      });
     }
-  };
+  }
 }
 
 export default AssistDbEntry;

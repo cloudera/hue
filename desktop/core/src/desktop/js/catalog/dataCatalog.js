@@ -14,18 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import localforage from 'localforage'
+import $ from 'jquery';
+import localforage from 'localforage';
 
-import apiHelper from '../api/apiHelper'
-import CancellablePromise from '../api/cancellablePromise'
-import catalogUtils from './catalogUtils'
-import DataCatalogEntry from './dataCatalogEntry'
-import GeneralDataCatalog from './generalDataCatalog'
-import MultiTableEntry from './multiTableEntry'
+import apiHelper from 'api/apiHelper';
+import CancellablePromise from 'api/cancellablePromise';
+import catalogUtils from 'catalog/catalogUtils';
+import DataCatalogEntry from 'catalog/dataCatalogEntry';
+import GeneralDataCatalog from 'catalog/generalDataCatalog';
+import MultiTableEntry from 'catalog/multiTableEntry';
 
 const STORAGE_POSTFIX = LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
+
 let cacheEnabled = true;
 
 /**
@@ -38,20 +39,20 @@ let cacheEnabled = true;
  * @param {string[][]} [options.paths]
  * @return {string}
  */
-const generateEntryCacheId = function (options) {
+const generateEntryCacheId = function(options) {
   let id = options.namespace.id;
   if (options.path) {
     if (typeof options.path === 'string') {
       id += '_' + options.path;
     } else if (options.path.length) {
-      id +='_' + options.path.join('.');
+      id += '_' + options.path.join('.');
     }
   } else if (options.paths && options.paths.length) {
-    let pathSet = {};
-    options.paths.forEach(function (path) {
+    const pathSet = {};
+    options.paths.forEach(path => {
       pathSet[path.join('.')] = true;
     });
-    let uniquePaths = Object.keys(pathSet);
+    const uniquePaths = Object.keys(pathSet);
     uniquePaths.sort();
     id += '_' + uniquePaths.join(',');
   }
@@ -64,12 +65,19 @@ const generateEntryCacheId = function (options) {
  * @param {DataCatalogEntry} dataCatalogEntry - The entry to fill
  * @param {Object} storeEntry - The cached version
  */
-const mergeEntry = function (dataCatalogEntry, storeEntry) {
-  let mergeAttribute = function (attributeName, ttl, promiseName) {
-    if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
+const mergeEntry = function(dataCatalogEntry, storeEntry) {
+  const mergeAttribute = function(attributeName, ttl, promiseName) {
+    if (
+      storeEntry.version === DATA_CATALOG_VERSION &&
+      storeEntry[attributeName] &&
+      (!storeEntry[attributeName].hueTimestamp ||
+        Date.now() - storeEntry[attributeName].hueTimestamp < ttl)
+    ) {
       dataCatalogEntry[attributeName] = storeEntry[attributeName];
       if (promiseName) {
-        dataCatalogEntry[promiseName] = $.Deferred().resolve(dataCatalogEntry[attributeName]).promise();
+        dataCatalogEntry[promiseName] = $.Deferred()
+          .resolve(dataCatalogEntry[attributeName])
+          .promise();
       }
     }
   };
@@ -84,19 +92,25 @@ const mergeEntry = function (dataCatalogEntry, storeEntry) {
   mergeAttribute('navOptPopularity', CACHEABLE_TTL.optimizer);
 };
 
-
 /**
  * Helper function to fill a multi table catalog entry with cached metadata.
  *
  * @param {MultiTableEntry} multiTableCatalogEntry - The entry to fill
  * @param {Object} storeEntry - The cached version
  */
-const mergeMultiTableEntry = function (multiTableCatalogEntry, storeEntry) {
-  let mergeAttribute = function (attributeName, ttl, promiseName) {
-    if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
+const mergeMultiTableEntry = function(multiTableCatalogEntry, storeEntry) {
+  const mergeAttribute = function(attributeName, ttl, promiseName) {
+    if (
+      storeEntry.version === DATA_CATALOG_VERSION &&
+      storeEntry[attributeName] &&
+      (!storeEntry[attributeName].hueTimestamp ||
+        Date.now() - storeEntry[attributeName].hueTimestamp < ttl)
+    ) {
       multiTableCatalogEntry[attributeName] = storeEntry[attributeName];
       if (promiseName) {
-        multiTableCatalogEntry[promiseName] = $.Deferred().resolve(multiTableCatalogEntry[attributeName]).promise();
+        multiTableCatalogEntry[promiseName] = $.Deferred()
+          .resolve(multiTableCatalogEntry[attributeName])
+          .promise();
       }
     }
   };
@@ -108,14 +122,13 @@ const mergeMultiTableEntry = function (multiTableCatalogEntry, storeEntry) {
 };
 
 class DataCatalog {
-
   /**
    * @param {string} sourceType
    *
    * @constructor
    */
   constructor(sourceType) {
-    let self = this;
+    const self = this;
     self.sourceType = sourceType;
     self.entries = {};
     self.temporaryEntries = {};
@@ -133,14 +146,14 @@ class DataCatalog {
    */
   static disableCache() {
     cacheEnabled = false;
-  };
+  }
 
   /**
    * Enables the cache for subsequent operations, mainly used for test purposes
    */
   static enableCache() {
     cacheEnabled = true;
-  };
+  }
 
   /**
    * Returns true if the catalog can have NavOpt metadata
@@ -148,9 +161,9 @@ class DataCatalog {
    * @return {boolean}
    */
   canHaveNavOptMetadata() {
-    let self = this;
+    const self = this;
     return HAS_OPTIMIZER && (self.sourceType === 'hive' || self.sourceType === 'impala');
-  };
+  }
 
   /**
    * Clears the data catalog and cache for the given path and any children thereof.
@@ -160,40 +173,49 @@ class DataCatalog {
    * @param {string[]} rootPath - The path to clear
    */
   clearStorageCascade(namespace, compute, rootPath) {
-    let self = this;
-    let deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
     if (!namespace || !compute) {
       if (rootPath.length === 0) {
         self.entries = {};
-        self.store.clear().then(deferred.resolve).catch(deferred.reject);
+        self.store
+          .clear()
+          .then(deferred.resolve)
+          .catch(deferred.reject);
         return deferred.promise();
       }
       return deferred.reject().promise();
     }
 
-    let keyPrefix = generateEntryCacheId({ namespace: namespace, path: rootPath });
-    Object.keys(self.entries).forEach(function (key) {
+    const keyPrefix = generateEntryCacheId({ namespace: namespace, path: rootPath });
+    Object.keys(self.entries).forEach(key => {
       if (key.indexOf(keyPrefix) === 0) {
         delete self.entries[key];
       }
     });
 
-    let deletePromises = [];
-    let keysDeferred = $.Deferred();
+    const deletePromises = [];
+    const keysDeferred = $.Deferred();
     deletePromises.push(keysDeferred.promise());
-    self.store.keys().then(function (keys) {
-      keys.forEach(function (key) {
-        if (key.indexOf(keyPrefix) === 0) {
-          let deleteDeferred = $.Deferred();
-          deletePromises.push(deleteDeferred.promise());
-          self.store.removeItem(key).then(deleteDeferred.resolve).catch(deleteDeferred.reject);
-        }
-      });
-      keysDeferred.resolve();
-    }).catch(keysDeferred.reject);
+    self.store
+      .keys()
+      .then(keys => {
+        keys.forEach(key => {
+          if (key.indexOf(keyPrefix) === 0) {
+            const deleteDeferred = $.Deferred();
+            deletePromises.push(deleteDeferred.promise());
+            self.store
+              .removeItem(key)
+              .then(deleteDeferred.resolve)
+              .catch(deleteDeferred.reject);
+          }
+        });
+        keysDeferred.resolve();
+      })
+      .catch(keysDeferred.reject);
 
     return $.when.apply($, deletePromises);
-  };
+  }
 
   /**
    * Updates the cache for the given entry
@@ -202,28 +224,33 @@ class DataCatalog {
    * @return {Promise}
    */
   persistCatalogEntry(dataCatalogEntry) {
-    let self = this;
+    const self = this;
     if (!cacheEnabled || CACHEABLE_TTL.default <= 0) {
-      return $.Deferred().resolve().promise();
+      return $.Deferred()
+        .resolve()
+        .promise();
     }
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
 
-    let identifier = generateEntryCacheId(dataCatalogEntry);
+    const identifier = generateEntryCacheId(dataCatalogEntry);
 
-    self.store.setItem(identifier, {
-      version: DATA_CATALOG_VERSION,
-      definition: dataCatalogEntry.definition,
-      sourceMeta: dataCatalogEntry.sourceMeta,
-      analysis: dataCatalogEntry.analysis,
-      partitions: dataCatalogEntry.partitions,
-      sample: dataCatalogEntry.sample,
-      navigatorMeta: dataCatalogEntry.navigatorMeta,
-      navOptMeta:  dataCatalogEntry.navOptMeta,
-      navOptPopularity: dataCatalogEntry.navOptPopularity,
-    }).then(deferred.resolve).catch(deferred.reject);
+    self.store
+      .setItem(identifier, {
+        version: DATA_CATALOG_VERSION,
+        definition: dataCatalogEntry.definition,
+        sourceMeta: dataCatalogEntry.sourceMeta,
+        analysis: dataCatalogEntry.analysis,
+        partitions: dataCatalogEntry.partitions,
+        sample: dataCatalogEntry.sample,
+        navigatorMeta: dataCatalogEntry.navigatorMeta,
+        navOptMeta: dataCatalogEntry.navOptMeta,
+        navOptPopularity: dataCatalogEntry.navOptPopularity
+      })
+      .then(deferred.resolve)
+      .catch(deferred.reject);
 
     return deferred.promise();
-  };
+  }
 
   /**
    * Loads Navigator Optimizer popularity for multiple tables in one go.
@@ -238,102 +265,134 @@ class DataCatalog {
    * @return {CancellablePromise}
    */
   loadNavOptPopularityForTables(options) {
-    let self = this;
-    let deferred = $.Deferred();
-    let cancellablePromises = [];
+    const self = this;
+    const deferred = $.Deferred();
+    const cancellablePromises = [];
     let popularEntries = [];
-    let pathsToLoad = [];
+    const pathsToLoad = [];
 
     options = catalogUtils.setSilencedErrors(options);
 
-    let existingPromises = [];
-    options.paths.forEach(function (path) {
-      let existingDeferred = $.Deferred();
-      self.getEntry({ namespace: options.namespace, compute: options.compute, path: path }).done(function (tableEntry) {
-        if (tableEntry.navOptPopularityForChildrenPromise) {
-          tableEntry.navOptPopularityForChildrenPromise.done(function (existingPopularEntries) {
-            popularEntries = popularEntries.concat(existingPopularEntries);
+    const existingPromises = [];
+    options.paths.forEach(path => {
+      const existingDeferred = $.Deferred();
+      self
+        .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
+        .done(tableEntry => {
+          if (tableEntry.navOptPopularityForChildrenPromise) {
+            tableEntry.navOptPopularityForChildrenPromise
+              .done(existingPopularEntries => {
+                popularEntries = popularEntries.concat(existingPopularEntries);
+                existingDeferred.resolve();
+              })
+              .fail(existingDeferred.reject);
+          } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
+            cancellablePromises.push(
+              tableEntry
+                .getChildren(options)
+                .done(childEntries => {
+                  childEntries.forEach(childEntry => {
+                    if (childEntry.navOptPopularity) {
+                      popularEntries.push(childEntry);
+                    }
+                  });
+                  existingDeferred.resolve();
+                })
+                .fail(existingDeferred.reject)
+            );
+          } else {
+            pathsToLoad.push(path);
             existingDeferred.resolve();
-          }).fail(existingDeferred.reject);
-        } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
-          cancellablePromises.push(tableEntry.getChildren(options).done(function (childEntries) {
-            childEntries.forEach(function (childEntry) {
-              if (childEntry.navOptPopularity) {
-                popularEntries.push(childEntry);
-              }
-            });
-            existingDeferred.resolve();
-          }).fail(existingDeferred.reject));
-        } else {
-          pathsToLoad.push(path);
-          existingDeferred.resolve();
-        }
-      }).fail(existingDeferred.reject);
+          }
+        })
+        .fail(existingDeferred.reject);
       existingPromises.push(existingDeferred.promise());
     });
 
-    $.when.apply($, existingPromises).always(function () {
-      let loadDeferred = $.Deferred();
+    $.when.apply($, existingPromises).always(() => {
+      const loadDeferred = $.Deferred();
       if (pathsToLoad.length) {
-        cancellablePromises.push(apiHelper.fetchNavOptPopularity({
-          silenceErrors: options.silenceErrors,
-          paths: pathsToLoad
-        }).done(function (data) {
-          let perTable = {};
+        cancellablePromises.push(
+          apiHelper
+            .fetchNavOptPopularity({
+              silenceErrors: options.silenceErrors,
+              paths: pathsToLoad
+            })
+            .done(data => {
+              const perTable = {};
 
-          let splitNavOptValuesPerTable = function (listName) {
-            if (data.values[listName]) {
-              data.values[listName].forEach(function (column) {
-                let tableMeta = perTable[column.dbName + '.' + column.tableName];
-                if (!tableMeta) {
-                  tableMeta = { values: [] };
-                  perTable[column.dbName + '.' + column.tableName] = tableMeta;
+              const splitNavOptValuesPerTable = function(listName) {
+                if (data.values[listName]) {
+                  data.values[listName].forEach(column => {
+                    let tableMeta = perTable[column.dbName + '.' + column.tableName];
+                    if (!tableMeta) {
+                      tableMeta = { values: [] };
+                      perTable[column.dbName + '.' + column.tableName] = tableMeta;
+                    }
+                    if (!tableMeta.values[listName]) {
+                      tableMeta.values[listName] = [];
+                    }
+                    tableMeta.values[listName].push(column);
+                  });
                 }
-                if (!tableMeta.values[listName]) {
-                  tableMeta.values[listName] = [];
-                }
-                tableMeta.values[listName].push(column);
+              };
+
+              if (data.values) {
+                splitNavOptValuesPerTable('filterColumns');
+                splitNavOptValuesPerTable('groupbyColumns');
+                splitNavOptValuesPerTable('joinColumns');
+                splitNavOptValuesPerTable('orderbyColumns');
+                splitNavOptValuesPerTable('selectColumns');
+              }
+
+              const tablePromises = [];
+
+              Object.keys(perTable).forEach(path => {
+                const tableDeferred = $.Deferred();
+                self
+                  .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
+                  .done(entry => {
+                    cancellablePromises.push(
+                      entry.trackedPromise(
+                        'navOptPopularityForChildrenPromise',
+                        entry
+                          .applyNavOptResponseToChildren(perTable[path], options)
+                          .done(entries => {
+                            popularEntries = popularEntries.concat(entries);
+                            tableDeferred.resolve();
+                          })
+                          .fail(tableDeferred.resolve)
+                      )
+                    );
+                  })
+                  .fail(tableDeferred.reject);
+                tablePromises.push(tableDeferred.promise());
               });
-            }
-          };
 
-          if (data.values) {
-            splitNavOptValuesPerTable('filterColumns');
-            splitNavOptValuesPerTable('groupbyColumns');
-            splitNavOptValuesPerTable('joinColumns');
-            splitNavOptValuesPerTable('orderbyColumns');
-            splitNavOptValuesPerTable('selectColumns');
-          }
-
-          let tablePromises = [];
-
-          Object.keys(perTable).forEach(function (path) {
-            let tableDeferred = $.Deferred();
-            self.getEntry({ namespace: options.namespace, compute: options.compute, path: path }).done(function (entry) {
-              cancellablePromises.push(entry.trackedPromise('navOptPopularityForChildrenPromise', entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
-                popularEntries = popularEntries.concat(entries);
-                tableDeferred.resolve();
-              }).fail(tableDeferred.resolve)));
-            }).fail(tableDeferred.reject);
-            tablePromises.push(tableDeferred.promise());
-          });
-
-          $.when.apply($, tablePromises).always(function () {
-            loadDeferred.resolve();
-          });
-        }).fail(loadDeferred.reject));
+              $.when.apply($, tablePromises).always(() => {
+                loadDeferred.resolve();
+              });
+            })
+            .fail(loadDeferred.reject)
+        );
       } else {
         loadDeferred.resolve();
       }
-      loadDeferred.always(function () {
-        $.when.apply($, cancellablePromises).done(function () {
-          deferred.resolve(popularEntries);
-        }).fail(deferred.reject);
+      loadDeferred.always(() => {
+        $.when
+          .apply($, cancellablePromises)
+          .done(() => {
+            deferred.resolve(popularEntries);
+          })
+          .fail(deferred.reject);
       });
     });
 
-    return catalogUtils.applyCancellable(new CancellablePromise(deferred, cancellablePromises), options);
-  };
+    return catalogUtils.applyCancellable(
+      new CancellablePromise(deferred, cancellablePromises),
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -343,9 +402,9 @@ class DataCatalog {
    * @return {DataCatalogEntry}
    */
   getKnownEntry(options) {
-    let self = this;
+    const self = this;
     return self.entries[generateEntryCacheId(options)];
-  };
+  }
 
   /**
    * Adds a temporary table to the data catalog. This would allow autocomplete etc. of tables that haven't
@@ -366,32 +425,38 @@ class DataCatalog {
    * @return {Object}
    */
   addTemporaryTable(options) {
-    let self = this;
-    let tableDeferred = $.Deferred();
-    let path = ['default', options.name];
+    const self = this;
+    const tableDeferred = $.Deferred();
+    const path = ['default', options.name];
 
-    let identifiersToClean = [];
+    const identifiersToClean = [];
 
-    let addEntryMeta = function (entry, sourceMeta) {
+    const addEntryMeta = function(entry, sourceMeta) {
       entry.sourceMeta = sourceMeta || entry.definition;
-      entry.sourceMetaPromise = $.Deferred().resolve(entry.sourceMeta).promise();
+      entry.sourceMetaPromise = $.Deferred()
+        .resolve(entry.sourceMeta)
+        .promise();
       entry.navigatorMeta = { comment: '' };
-      entry.navigatorMetaPromise = $.Deferred().resolve(entry.navigatorMeta).promise();
+      entry.navigatorMetaPromise = $.Deferred()
+        .resolve(entry.navigatorMeta)
+        .promise();
       entry.analysis = { is_view: false };
-      entry.analysisPromise = $.Deferred().resolve(entry.analysis).promise();
+      entry.analysisPromise = $.Deferred()
+        .resolve(entry.analysis)
+        .promise();
     };
 
-    let removeTable = function () {}; // noop until actually added
+    let removeTable = function() {}; // noop until actually added
 
-    let sourceIdentifier = generateEntryCacheId({
+    const sourceIdentifier = generateEntryCacheId({
       namespace: options.namespace,
       path: []
     });
 
     if (!self.temporaryEntries[sourceIdentifier]) {
-      let sourceDeferred = $.Deferred();
+      const sourceDeferred = $.Deferred();
       self.temporaryEntries[sourceIdentifier] = sourceDeferred.promise();
-      let sourceEntry = new DataCatalogEntry({
+      const sourceEntry = new DataCatalogEntry({
         isTemporary: true,
         dataCatalog: self,
         namespace: options.namespace,
@@ -405,21 +470,23 @@ class DataCatalog {
       });
       addEntryMeta(sourceEntry);
       identifiersToClean.push(sourceIdentifier);
-      sourceEntry.childrenPromise = $.Deferred().resolve([]).promise();
+      sourceEntry.childrenPromise = $.Deferred()
+        .resolve([])
+        .promise();
       sourceDeferred.resolve(sourceEntry);
     }
 
-    self.temporaryEntries[sourceIdentifier].done(function (sourceEntry) {
-      sourceEntry.getChildren().done(function (existingTemporaryDatabases) {
-        let databaseIdentifier = generateEntryCacheId({
+    self.temporaryEntries[sourceIdentifier].done(sourceEntry => {
+      sourceEntry.getChildren().done(existingTemporaryDatabases => {
+        const databaseIdentifier = generateEntryCacheId({
           namespace: options.namespace,
           path: ['default']
         });
 
         if (!self.temporaryEntries[databaseIdentifier]) {
-          let databaseDeferred = $.Deferred();
+          const databaseDeferred = $.Deferred();
           self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
-          let databaseEntry = new DataCatalogEntry({
+          const databaseEntry = new DataCatalogEntry({
             isTemporary: true,
             dataCatalog: self,
             namespace: options.namespace,
@@ -433,21 +500,23 @@ class DataCatalog {
           });
           addEntryMeta(databaseEntry);
           identifiersToClean.push(databaseIdentifier);
-          databaseEntry.childrenPromise = $.Deferred().resolve([]).promise();
+          databaseEntry.childrenPromise = $.Deferred()
+            .resolve([])
+            .promise();
           databaseDeferred.resolve(databaseEntry);
           existingTemporaryDatabases.push(databaseEntry);
         }
 
-        self.temporaryEntries[databaseIdentifier].done(function (databaseEntry) {
-          databaseEntry.getChildren().done(function (existingTemporaryTables) {
-            let tableIdentifier = generateEntryCacheId({
+        self.temporaryEntries[databaseIdentifier].done(databaseEntry => {
+          databaseEntry.getChildren().done(existingTemporaryTables => {
+            const tableIdentifier = generateEntryCacheId({
               namespace: options.namespace,
               path: path
             });
             self.temporaryEntries[tableIdentifier] = tableDeferred.promise();
             identifiersToClean.push(tableIdentifier);
 
-            let tableEntry = new DataCatalogEntry({
+            const tableEntry = new DataCatalogEntry({
               isTemporary: true,
               dataCatalog: self,
               namespace: options.namespace,
@@ -462,14 +531,16 @@ class DataCatalog {
               }
             });
             existingTemporaryTables.push(tableEntry);
-            let indexToDelete = existingTemporaryTables.length - 1;
-            removeTable = function () { existingTemporaryTables.splice(indexToDelete, 1); };
+            const indexToDelete = existingTemporaryTables.length - 1;
+            removeTable = function() {
+              existingTemporaryTables.splice(indexToDelete, 1);
+            };
 
-            let childrenDeferred = $.Deferred();
+            const childrenDeferred = $.Deferred();
             tableEntry.childrenPromise = childrenDeferred.promise();
 
             if (options.columns) {
-              let childEntries = [];
+              const childEntries = [];
 
               addEntryMeta(tableEntry, {
                 columns: [],
@@ -483,21 +554,23 @@ class DataCatalog {
                 data: options.sample || [],
                 meta: tableEntry.sourceMeta.extended_columns
               };
-              tableEntry.samplePromise = $.Deferred().resolve(tableEntry.sample).promise();
+              tableEntry.samplePromise = $.Deferred()
+                .resolve(tableEntry.sample)
+                .promise();
 
               let index = 0;
-              options.columns.forEach(function (column) {
-                let columnPath = path.concat(column.name);
-                let columnIdentifier = generateEntryCacheId({
+              options.columns.forEach(column => {
+                const columnPath = path.concat(column.name);
+                const columnIdentifier = generateEntryCacheId({
                   namespace: options.namespace,
                   path: columnPath
                 });
 
-                let columnDeferred = $.Deferred();
+                const columnDeferred = $.Deferred();
                 self.temporaryEntries[columnIdentifier] = columnDeferred.promise();
                 identifiersToClean.push(columnIdentifier);
 
-                let columnEntry = new DataCatalogEntry({
+                const columnEntry = new DataCatalogEntry({
                   isTemporary: true,
                   dataCatalog: self,
                   namespace: options.namespace,
@@ -517,11 +590,13 @@ class DataCatalog {
                   meta: column
                 };
                 if (options.sample) {
-                  options.sample.forEach(function (sampleRow) {
+                  options.sample.forEach(sampleRow => {
                     columnEntry.sample.data.push([sampleRow[index - 1]]);
-                  })
+                  });
                 }
-                columnEntry.samplePromise = $.Deferred().resolve(columnEntry.sample).promise();
+                columnEntry.samplePromise = $.Deferred()
+                  .resolve(columnEntry.sample)
+                  .promise();
 
                 tableEntry.sourceMeta.columns.push(column.name);
                 tableEntry.sourceMeta.extended_columns.push(columnEntry.definition);
@@ -534,7 +609,7 @@ class DataCatalog {
                   type: column.type
                 });
 
-                childEntries.push(columnEntry)
+                childEntries.push(columnEntry);
               });
               childrenDeferred.resolve(childEntries);
             } else {
@@ -544,20 +619,18 @@ class DataCatalog {
             tableDeferred.resolve(tableEntry);
           });
         });
-      })
-
-
+      });
     });
 
     return {
-      delete: function () {
+      delete: function() {
         removeTable();
         while (identifiersToClean.length) {
           delete self.entries[identifiersToClean.pop()];
         }
       }
-    }
-  };
+    };
+  }
 
   /**
    * @param {Object} options
@@ -570,42 +643,72 @@ class DataCatalog {
    * @return {Promise}
    */
   getEntry(options) {
-    let self = this;
-    let identifier = generateEntryCacheId(options);
+    const self = this;
+    const identifier = generateEntryCacheId(options);
     if (options.temporaryOnly) {
-      return self.temporaryEntries[identifier] || $.Deferred().reject().promise();
+      return (
+        self.temporaryEntries[identifier] ||
+        $.Deferred()
+          .reject()
+          .promise()
+      );
     }
     if (self.entries[identifier]) {
       return self.entries[identifier];
     }
 
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
     self.entries[identifier] = deferred.promise();
 
     if (!cacheEnabled) {
-      deferred.resolve(new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, compute: options.compute, path: options.path, definition: options.definition })).promise();
+      deferred
+        .resolve(
+          new DataCatalogEntry({
+            dataCatalog: self,
+            namespace: options.namespace,
+            compute: options.compute,
+            path: options.path,
+            definition: options.definition
+          })
+        )
+        .promise();
     } else {
-      self.store.getItem(identifier).then(function (storeEntry) {
-        let definition = storeEntry ? storeEntry.definition : options.definition;
-        let entry = new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, compute: options.compute, path: options.path, definition: definition });
-        if (storeEntry) {
-          mergeEntry(entry, storeEntry);
-        } else if (!options.cachedOnly && options.definition) {
-          entry.saveLater();
-        }
-        deferred.resolve(entry);
-      }).catch(function (error) {
-        console.warn(error);
-        let entry = new DataCatalogEntry({ dataCatalog: self, namespace: options.namespace, compute: options.compute, path: options.path, definition: options.definition });
-        if (!options.cachedOnly && options.definition) {
-          entry.saveLater();
-        }
-        deferred.resolve(entry);
-      })
+      self.store
+        .getItem(identifier)
+        .then(storeEntry => {
+          const definition = storeEntry ? storeEntry.definition : options.definition;
+          const entry = new DataCatalogEntry({
+            dataCatalog: self,
+            namespace: options.namespace,
+            compute: options.compute,
+            path: options.path,
+            definition: definition
+          });
+          if (storeEntry) {
+            mergeEntry(entry, storeEntry);
+          } else if (!options.cachedOnly && options.definition) {
+            entry.saveLater();
+          }
+          deferred.resolve(entry);
+        })
+        .catch(error => {
+          console.warn(error);
+          const entry = new DataCatalogEntry({
+            dataCatalog: self,
+            namespace: options.namespace,
+            compute: options.compute,
+            path: options.path,
+            definition: options.definition
+          });
+          if (!options.cachedOnly && options.definition) {
+            entry.saveLater();
+          }
+          deferred.resolve(entry);
+        });
     }
 
     return self.entries[identifier];
-  };
+  }
 
   /**
    *
@@ -617,32 +720,45 @@ class DataCatalog {
    * @return {Promise}
    */
   getMultiTableEntry(options) {
-    let self = this;
-    let identifier = generateEntryCacheId(options);
+    const self = this;
+    const identifier = generateEntryCacheId(options);
     if (self.multiTableEntries[identifier]) {
       return self.multiTableEntries[identifier];
     }
 
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
     self.multiTableEntries[identifier] = deferred.promise();
 
     if (!cacheEnabled) {
-      deferred.resolve(new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths })).promise();
+      deferred
+        .resolve(
+          new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths })
+        )
+        .promise();
     } else {
-      self.multiTableStore.getItem(identifier).then(function (storeEntry) {
-        let entry = new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths });
-        if (storeEntry) {
-          mergeMultiTableEntry(entry, storeEntry);
-        }
-        deferred.resolve(entry);
-      }).catch(function (error) {
-        console.warn(error);
-        deferred.resolve(new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths }));
-      })
+      self.multiTableStore
+        .getItem(identifier)
+        .then(storeEntry => {
+          const entry = new MultiTableEntry({
+            identifier: identifier,
+            dataCatalog: self,
+            paths: options.paths
+          });
+          if (storeEntry) {
+            mergeMultiTableEntry(entry, storeEntry);
+          }
+          deferred.resolve(entry);
+        })
+        .catch(error => {
+          console.warn(error);
+          deferred.resolve(
+            new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths })
+          );
+        });
     }
 
     return self.multiTableEntries[identifier];
-  };
+  }
 
   /**
    * Updates the cache for the given multi tableentry
@@ -651,24 +767,29 @@ class DataCatalog {
    * @return {Promise}
    */
   persistMultiTableEntry(multiTableEntry) {
-    let self = this;
+    const self = this;
     if (!cacheEnabled || CACHEABLE_TTL.default <= 0 || CACHEABLE_TTL.optimizer <= 0) {
-      return $.Deferred().resolve().promise();
+      return $.Deferred()
+        .resolve()
+        .promise();
     }
-    let deferred = $.Deferred();
-    self.multiTableStore.setItem(multiTableEntry.identifier, {
-      version: DATA_CATALOG_VERSION,
-      topAggs: multiTableEntry.topAggs,
-      topColumns: multiTableEntry.topColumns,
-      topFilters: multiTableEntry.topFilters,
-      topJoins: multiTableEntry.topJoins,
-    }).then(deferred.resolve).catch(deferred.reject);
+    const deferred = $.Deferred();
+    self.multiTableStore
+      .setItem(multiTableEntry.identifier, {
+        version: DATA_CATALOG_VERSION,
+        topAggs: multiTableEntry.topAggs,
+        topColumns: multiTableEntry.topColumns,
+        topFilters: multiTableEntry.topFilters,
+        topJoins: multiTableEntry.topJoins
+      })
+      .then(deferred.resolve)
+      .catch(deferred.reject);
     return deferred.promise();
-  };
+  }
 }
 
-let generalDataCatalog = new GeneralDataCatalog();
-let sourceBoundCatalogs = {};
+const generalDataCatalog = new GeneralDataCatalog();
+const sourceBoundCatalogs = {};
 
 /**
  * Helper function to get the DataCatalog instance for a given data source.
@@ -676,15 +797,17 @@ let sourceBoundCatalogs = {};
  * @param {string} sourceType
  * @return {DataCatalog}
  */
-const getCatalog = function (sourceType) {
+const getCatalog = function(sourceType) {
   if (!sourceType) {
     throw new Error('getCatalog called without sourceType');
   }
-  return sourceBoundCatalogs[sourceType] || (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType));
+  return (
+    sourceBoundCatalogs[sourceType] ||
+    (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType))
+  );
 };
 
 export default {
-
   /**
    * Adds a detached (temporary) entry to the data catalog. This would allow autocomplete etc. of tables that haven't
    * been created yet.
@@ -704,7 +827,7 @@ export default {
    *
    * @return {Object}
    */
-  addTemporaryTable: function (options) {
+  addTemporaryTable: function(options) {
     return getCatalog(options.sourceType).addTemporaryTable(options);
   },
 
@@ -719,7 +842,7 @@ export default {
    *
    * @return {Promise}
    */
-  getEntry: function (options) {
+  getEntry: function(options) {
     return getCatalog(options.sourceType).getEntry(options);
   },
 
@@ -732,7 +855,7 @@ export default {
    *
    * @return {Promise}
    */
-  getMultiTableEntry: function (options) {
+  getMultiTableEntry: function(options) {
     return getCatalog(options.sourceType).getMultiTableEntry(options);
   },
 
@@ -753,12 +876,20 @@ export default {
    *
    * @return {CancellablePromise}
    */
-  getChildren:  function(options) {
-    let deferred = $.Deferred();
-    let cancellablePromises = [];
-    getCatalog(options.sourceType).getEntry(options).done(function (entry) {
-      cancellablePromises.push(entry.getChildren(options).done(deferred.resolve).fail(deferred.reject));
-    }).fail(deferred.reject);
+  getChildren: function(options) {
+    const deferred = $.Deferred();
+    const cancellablePromises = [];
+    getCatalog(options.sourceType)
+      .getEntry(options)
+      .done(entry => {
+        cancellablePromises.push(
+          entry
+            .getChildren(options)
+            .done(deferred.resolve)
+            .fail(deferred.reject)
+        );
+      })
+      .fail(deferred.reject);
     return new CancellablePromise(deferred, undefined, cancellablePromises);
   },
 
@@ -767,7 +898,7 @@ export default {
    *
    * @return {DataCatalog}
    */
-  getCatalog : getCatalog,
+  getCatalog: getCatalog,
 
   /**
    * @param {Object} [options]
@@ -784,14 +915,13 @@ export default {
    */
   updateAllNavigatorTags: generalDataCatalog.updateAllNavigatorTags.bind(generalDataCatalog),
 
-  enableCache: function () {
-    cacheEnabled = true
+  enableCache: function() {
+    cacheEnabled = true;
   },
 
-  disableCache: function () {
+  disableCache: function() {
     cacheEnabled = false;
   },
 
   applyCancellable: catalogUtils.applyCancellable
 };
-

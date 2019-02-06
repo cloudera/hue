@@ -14,35 +14,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './ext/jquery/hue.jquery.lib'
-import './ext/bootstrap.2.3.2.min'
-import _ from 'lodash'
-import filesize from 'filesize'
-import qq from './ext/fileuploader.custom'
-import page from 'page'
-import localforage from 'localforage'
+import 'ext/jquery/hue.jquery.lib';
+import 'ext/bootstrap.2.3.2.min';
+import _ from 'lodash';
+import filesize from 'filesize';
+import qq from 'ext/fileuploader.custom';
+import page from 'page';
+import localforage from 'localforage';
 
-import ko from 'knockout'
-import komapping from 'knockout.mapping'
-import 'ext/ko.editable.custom'
-import 'ext/ko.selectize.custom'
-import 'knockout-switch-case'
-import 'knockout-sortable'
-import 'knockout.validation'
+import ko from 'knockout';
+import komapping from 'knockout.mapping';
+import 'ext/ko.editable.custom';
+import 'ext/ko.selectize.custom';
+import 'knockout-switch-case';
+import 'knockout-sortable';
+import 'knockout.validation';
 
-import apiHelper from 'api/apiHelper'
-import CancellablePromise from 'api/cancellablePromise'
-import contextCatalog from 'catalog/contextCatalog'
-import dataCatalog from 'catalog/dataCatalog'
-import hueAnalytics from 'utils/hueAnalytics'
-import hueDebug from 'utils/hueDebug'
-import hueDrop from 'utils/hueDrop'
-import huePubSub from 'utils/huePubSub'
-import hueUtils from 'utils/hueUtils'
+import apiHelper from 'api/apiHelper';
+import CancellablePromise from 'api/cancellablePromise';
+import contextCatalog from 'catalog/contextCatalog';
+import dataCatalog from 'catalog/dataCatalog';
+import hueAnalytics from 'utils/hueAnalytics';
+import hueDebug from 'utils/hueDebug';
+import hueDrop from 'utils/hueDrop';
+import huePubSub from 'utils/huePubSub';
+import hueUtils from 'utils/hueUtils';
 
-import sqlUtils from 'sql/sqlUtils'
+import sqlUtils from 'sql/sqlUtils';
 
-import 'assist/assistViewModel'
+import 'assist/assistViewModel';
 
 // TODO: Migrate away
 window._ = _;

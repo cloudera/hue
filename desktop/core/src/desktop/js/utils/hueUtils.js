@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
+import $ from 'jquery';
 
 const bootstrapRatios = {
   span3() {
-    var windowWidth = $(window).width();
+    const windowWidth = $(window).width();
     if (windowWidth >= 1200) {
-    return 23.07692308;
-  } else if (windowWidth >= 768 && windowWidth <= 979) {
-    return 22.9281768;
-  } else {
-    return 23.17073171;
-  }
+      return 23.07692308;
+    } else if (windowWidth >= 768 && windowWidth <= 979) {
+      return 22.9281768;
+    } else {
+      return 23.17073171;
+    }
   },
   span9() {
-    var windowWidth = $(window).width();
+    const windowWidth = $(window).width();
     if (windowWidth >= 1200) {
       return 74.35897436;
     } else if (windowWidth >= 768 && windowWidth <= 979) {
@@ -49,22 +49,22 @@ const bootstrapRatios = {
  * @param selectors
  * @return {default}
  */
-const text2Url = (selectors) => {
-  var i = 0,
-    len = selectors.length;
+const text2Url = selectors => {
+  let i = 0;
+  const len = selectors.length;
 
   for (i; i < len; i++) {
-    var arr = [],
+    const arr = [],
       selector = selectors[i],
       val = selector.innerHTML.replace(/&nbsp;/g, ' ').split(' ');
 
-    val.forEach(function(word) {
-      var matched = null,
-        re = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/gi;
+    val.forEach(word => {
+      let matched = null;
+      const re = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/gi;
 
       if (re.test(word)) {
         matched = word.match(re);
-        word = word.replace(matched, '<a href="' + matched + '">' + matched + '</a>')
+        word = word.replace(matched, '<a href="' + matched + '">' + matched + '</a>');
         arr.push(word);
       } else {
         arr.push(word);
@@ -83,16 +83,26 @@ const text2Url = (selectors) => {
  * @param value
  * @return {*|jQuery}
  */
-const htmlEncode = (value) => {
-  return $('<div/>').text(value).html();
+const htmlEncode = value => {
+  return $('<div/>')
+    .text(value)
+    .html();
 };
 
-const html2text = (value) => {
-  return $('<div/>').html(value).text().replace(/\u00A0/g, ' ');
+const html2text = value => {
+  return $('<div/>')
+    .html(value)
+    .text()
+    .replace(/\u00A0/g, ' ');
 };
 
 const goFullScreen = () => {
-  if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+  if (
+    !document.fullscreenElement &&
+    !document.mozFullScreenElement &&
+    !document.webkitFullscreenElement &&
+    !document.msFullscreenElement
+  ) {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
     } else if (document.documentElement.msRequestFullscreen) {
@@ -106,8 +116,12 @@ const goFullScreen = () => {
 };
 
 const exitFullScreen = () => {
-  if (document.fullscreenElement ||
-    document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+  if (
+    document.fullscreenElement ||
+    document.mozFullScreenElement ||
+    document.webkitFullscreenElement ||
+    document.msFullscreenElement
+  ) {
     if (document.exitFullscreen) {
       document.exitFullscreen();
     } else if (document.msExitFullscreen) {
@@ -121,12 +135,12 @@ const exitFullScreen = () => {
 };
 
 const changeURL = (newURL, params) => {
-  var extraSearch = '';
+  let extraSearch = '';
   if (params) {
-    var newSearchKeys = Object.keys(params);
+    const newSearchKeys = Object.keys(params);
     if (newSearchKeys.length) {
       while (newSearchKeys.length) {
-        var newKey = newSearchKeys.pop();
+        const newKey = newSearchKeys.pop();
         extraSearch += newKey + '=' + params[newKey];
         if (newSearchKeys.length) {
           extraSearch += '&';
@@ -136,17 +150,17 @@ const changeURL = (newURL, params) => {
   }
 
   if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
-    var search = window.location.search;
+    let search = window.location.search;
     if (extraSearch) {
-      search += (search ? '&' : '?') + extraSearch
+      search += (search ? '&' : '?') + extraSearch;
     }
     newURL = window.location.pathname + search + '#!' + newURL.replace('/hue', '');
     window.history.pushState(null, null, newURL);
     return;
   }
 
-  var hashSplit = newURL.split('#');
-  var url = hashSplit[0];
+  const hashSplit = newURL.split('#');
+  let url = hashSplit[0];
   if (extraSearch) {
     url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;
   }
@@ -158,16 +172,16 @@ const changeURL = (newURL, params) => {
   window.history.pushState(null, null, url);
 };
 
-const replaceURL = (newURL) => {
+const replaceURL = newURL => {
   window.history.replaceState(null, null, newURL);
 };
 
 const changeURLParameter = (param, value) => {
   if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
-    var currentUrl = window.location.hash.replace('#!', '');
-    var parts = currentUrl.split('?');
-    var path = parts[0];
-    var search = parts.length > 1 ? parts[1] : '';
+    const currentUrl = window.location.hash.replace('#!', '');
+    const parts = currentUrl.split('?');
+    const path = parts[0];
+    let search = parts.length > 1 ? parts[1] : '';
     if (~search.indexOf(param + '=' + value)) {
       return;
     }
@@ -188,19 +202,24 @@ const changeURLParameter = (param, value) => {
 
     changeURL(search ? path + '?' + search : path);
   } else {
-    var newSearch = '';
+    let newSearch = '';
     if (window.location.getParameter(param, true) !== null) {
       newSearch += '?';
-      window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
-        if (p.split('=')[0] !== param) {
-          newSearch += p;
-        }
-      });
-      if (value){
+      window.location.search
+        .replace(/\?/gi, '')
+        .split('&')
+        .forEach(p => {
+          if (p.split('=')[0] !== param) {
+            newSearch += p;
+          }
+        });
+      if (value) {
         newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
       }
     } else {
-      newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
+      newSearch =
+        window.location.search +
+        (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '');
     }
 
     if (newSearch === '?') {
@@ -211,18 +230,18 @@ const changeURLParameter = (param, value) => {
   }
 };
 
-const removeURLParameter = (param) => {
+const removeURLParameter = param => {
   changeURLParameter(param, null);
 };
 
-const parseHivePseudoJson = (pseudoJson) => {
+const parseHivePseudoJson = pseudoJson => {
   // Hive returns a pseudo-json with parameters, like
   // "{Lead Developer=John Foo, Lead Developer Email=jfoo@somewhere.com, date=2013-07-11 }"
-  var parsedParams = {};
-  if (pseudoJson && pseudoJson.length > 2){
-    var splits = pseudoJson.substring(1, pseudoJson.length-1).split(', ');
-    splits.forEach(function(part){
-      if (part.indexOf('=') > -1){
+  const parsedParams = {};
+  if (pseudoJson && pseudoJson.length > 2) {
+    const splits = pseudoJson.substring(1, pseudoJson.length - 1).split(', ');
+    splits.forEach(part => {
+      if (part.indexOf('=') > -1) {
         parsedParams[part.split('=')[0]] = part.split('=')[1];
       }
     });
@@ -230,7 +249,7 @@ const parseHivePseudoJson = (pseudoJson) => {
   return parsedParams;
 };
 
-const isOverflowing = (element) => {
+const isOverflowing = element => {
   if (element instanceof jQuery) {
     element = element[0];
   }
@@ -238,12 +257,12 @@ const isOverflowing = (element) => {
 };
 
 const waitForRendered = (selector, condition, callback, timeout) => {
-  var $el = selector instanceof jQuery ? selector: $(selector);
+  const $el = selector instanceof jQuery ? selector : $(selector);
   if (condition($el)) {
     callback($el);
   } else {
     window.clearTimeout($el.data('waitForRenderTimeout'));
-    var waitForRenderTimeout = window.setTimeout(function () {
+    const waitForRenderTimeout = window.setTimeout(() => {
       waitForRendered(selector, condition, callback);
     }, timeout || 100);
     $el.data('waitForRenderTimeout', waitForRenderTimeout);
@@ -253,9 +272,8 @@ const waitForRendered = (selector, condition, callback, timeout) => {
 const waitForObservable = (observable, callback) => {
   if (observable()) {
     callback(observable);
-  }
-  else {
-    var subscription = observable.subscribe(function(newValue) {
+  } else {
+    const subscription = observable.subscribe(newValue => {
       if (newValue) {
         subscription.dispose();
         callback(observable);
@@ -267,34 +285,34 @@ const waitForObservable = (observable, callback) => {
 const waitForVariable = (variable, callback, timeout) => {
   if (variable) {
     callback(variable);
-  }
-  else {
-    window.setTimeout(function () {
+  } else {
+    window.setTimeout(() => {
       waitForVariable(variable, callback);
-    }, timeout || 100)
+    }, timeout || 100);
   }
 };
 
 const scrollbarWidth = () => {
-  var $parent, $children, width;
-  $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(HUE_CONTAINER);
-  $children = $parent.children();
-  width = $children.innerWidth() - $children.height(99).innerWidth();
+  const $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(
+    HUE_CONTAINER
+  );
+  const $children = $parent.children();
+  const width = $children.innerWidth() - $children.height(99).innerWidth();
   $parent.remove();
   return width;
 };
 
 const getSearchParameter = (search, name, returnNull) => {
-  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  const regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
     results = regex.exec(search);
-  if (returnNull && results === null){
+  if (returnNull && results === null) {
     return null;
   }
-  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
-const logError = (error) => {
+const logError = error => {
   if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
     if (typeof error !== 'undefined') {
       console.error(error);
@@ -305,19 +323,19 @@ const logError = (error) => {
 
 const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
 
-const deXSS = (str) => {
+const deXSS = str => {
   if (typeof str !== 'undefined' && str !== null && typeof str === 'string') {
     return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
   }
   return str;
 };
 
-const getStyleFromCSSClass = (cssClass) => {
-  for (var i = 0; i < document.styleSheets.length; i++) {
-    var cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
-    for (var x = 0; x < cssClasses.length; x++) {
+const getStyleFromCSSClass = cssClass => {
+  for (let i = 0; i < document.styleSheets.length; i++) {
+    const cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+    for (let x = 0; x < cssClasses.length; x++) {
       if (cssClasses[x].selectorText == cssClass) {
-        return (cssClasses[x].style) ? cssClasses[x].style : cssClasses[x];
+        return cssClasses[x].style ? cssClasses[x].style : cssClasses[x];
       }
     }
   }
@@ -328,15 +346,20 @@ const highlight = (text, searchTerm) => {
     return text;
   }
 
-  var remText = text;
-  var highLightedText = '';
+  let remText = text;
+  let highLightedText = '';
   searchTerm = searchTerm.toLowerCase();
 
+  let startIndex;
   do {
-    var remLowerText = remText.toLowerCase();
-    var startIndex = remLowerText.indexOf(searchTerm);
-    if(startIndex >= 0) {
-      highLightedText += remText.substring(0, startIndex) + '<strong>' + remText.substring(startIndex, startIndex + searchTerm.length) + '</strong>';
+    const remLowerText = remText.toLowerCase();
+    startIndex = remLowerText.indexOf(searchTerm);
+    if (startIndex >= 0) {
+      highLightedText +=
+        remText.substring(0, startIndex) +
+        '<strong>' +
+        remText.substring(startIndex, startIndex + searchTerm.length) +
+        '</strong>';
       remText = remText.substring(startIndex + searchTerm.length);
     } else {
       highLightedText += remText;
@@ -347,18 +370,18 @@ const highlight = (text, searchTerm) => {
 };
 
 const dfs = (node, callback) => {
-  if (!node || typeof(node) !== 'object') {
+  if (!node || typeof node !== 'object') {
     return;
   }
-  Object.keys(node).forEach(function(key) {
+  Object.keys(node).forEach(key => {
     callback(node, key);
     dfs(node[key], callback);
   });
 };
 
-const deleteAllEmptyStringKey = (node) => {
-  var fDeleteEmptyStringKey = function (node, key) {
-    if (node[key] || typeof(node[key]) !== 'string') {
+const deleteAllEmptyStringKey = node => {
+  const fDeleteEmptyStringKey = function(node, key) {
+    if (node[key] || typeof node[key] !== 'string') {
       return;
     }
     delete node[key];
@@ -366,12 +389,18 @@ const deleteAllEmptyStringKey = (node) => {
   dfs(node, fDeleteEmptyStringKey);
 };
 
+const s4 = () =>
+  Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
 
-const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+const UUID = () => s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 
-const UUID = () =>  s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-
-const escapeOutput = (str) =>  $('<span>').text(str).html().trim();
+const escapeOutput = str =>
+  $('<span>')
+    .text(str)
+    .html()
+    .trim();
 
 export default {
   bootstrapRatios: bootstrapRatios,
@@ -400,4 +429,4 @@ export default {
   deleteAllEmptyStringKey: deleteAllEmptyStringKey,
   UUID: UUID,
   escapeOutput: escapeOutput
-}
+};

@@ -14,11 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let hueDebug = {
-  clearCaches: function () {
-    var promises = [];
-    var clearInstance = function (prefix) {
-      promises.push(localforage.createInstance({name: prefix + LOGGED_USERNAME}).clear());
+import localforage from 'localforage';
+
+const hueDebug = {
+  clearCaches: function() {
+    const promises = [];
+    const clearInstance = function(prefix) {
+      promises.push(localforage.createInstance({ name: prefix + LOGGED_USERNAME }).clear());
     };
     clearInstance('HueContextCatalog_');
     clearInstance('HueDataCatalog_');
@@ -26,9 +28,9 @@ let hueDebug = {
     clearInstance('HueDataCatalog_hive_multiTable_');
     clearInstance('HueDataCatalog_impala_');
     clearInstance('HueDataCatalog_impala_multiTable_');
-    Promise.all(promises).then(function () {
+    Promise.all(promises).then(() => {
       console.log('Done! Refresh the browser.');
-    })
+    });
   }
 };
 

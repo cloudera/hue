@@ -16,21 +16,21 @@
 
 import $ from 'jquery';
 
-import apiQueueManager from './apiQueueManager'
-import CancellablePromise from './cancellablePromise'
-import hueDebug from '../utils/hueDebug'
-import huePubSub from '../utils/huePubSub'
-import hueUtils from '../utils/hueUtils'
+import apiQueueManager from 'api/apiQueueManager';
+import CancellablePromise from 'api/cancellablePromise';
+import hueDebug from 'utils/hueDebug';
+import huePubSub from 'utils/huePubSub';
+import hueUtils from 'utils/hueUtils';
 
-const AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
-const SAMPLE_API_PREFIX = "/notebook/api/sample/";
-const DOCUMENTS_API = "/desktop/api2/doc/";
-const DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
+const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
+const SAMPLE_API_PREFIX = '/notebook/api/sample/';
+const DOCUMENTS_API = '/desktop/api2/doc/';
+const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
-const HDFS_API_PREFIX = "/filebrowser/view=/";
-const ADLS_API_PREFIX = "/filebrowser/view=adl:/";
-const GIT_API_PREFIX = "/desktop/api/vcs/contents/";
-const S3_API_PREFIX = "/filebrowser/view=S3A://";
+const HDFS_API_PREFIX = '/filebrowser/view=/';
+const ADLS_API_PREFIX = '/filebrowser/view=adl:/';
+const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
+const S3_API_PREFIX = '/filebrowser/view=S3A://';
 const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 const CONFIG_APPS_API = '/desktop/api/configurations';
@@ -51,7 +51,7 @@ const NAV_URLS = {
   DELETE_TAGS: '/metadata/api/navigator/delete_tags',
   FIND_ENTITY: '/metadata/api/navigator/find_entity',
   LIST_TAGS: '/metadata/api/navigator/list_tags',
-  UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties',
+  UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties'
 };
 
 const NAV_OPT_URLS = {
@@ -62,7 +62,6 @@ const NAV_OPT_URLS = {
   TOP_TABLES: '/metadata/api/optimizer/top_tables',
   TABLE_DETAILS: '/metadata/api/optimizer/table_details'
 };
-
 
 /**
  *
@@ -77,19 +76,23 @@ const NAV_OPT_URLS = {
  * @param {Object} [options.editor] - Ace editor
  * @param {Object} [options.promise] - Optional promise that will be resolved if cached data exists
  */
-let fetchCached = function (options) {
-  var self = this;
-  var cacheIdentifier = self.getAssistCacheIdentifier(options);
-  var cachedData = $.totalStorage(cacheIdentifier) || {};
-  var cachedId = options.hash ? options.url + options.hash : options.url;
+const fetchCached = function(options) {
+  const self = this;
+  const cacheIdentifier = self.getAssistCacheIdentifier(options);
+  const cachedData = $.totalStorage(cacheIdentifier) || {};
+  const cachedId = options.hash ? options.url + options.hash : options.url;
 
-  if (options.refreshCache || typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
+  if (
+    options.refreshCache ||
+    typeof cachedData[cachedId] == 'undefined' ||
+    self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')
+  ) {
     if (typeof options.editor !== 'undefined' && options.editor !== null) {
       options.editor.showSpinner();
     }
-    return options.fetchFunction(function (data) {
+    return options.fetchFunction(data => {
       cachedData[cachedId] = {
-        timestamp: (new Date()).getTime(),
+        timestamp: new Date().getTime(),
         data: data
       };
       try {
@@ -98,7 +101,7 @@ let fetchCached = function (options) {
     });
   } else {
     if (options.promise) {
-      options.promise.resolve(cachedData[cachedId].data)
+      options.promise.resolve(cachedData[cachedId].data);
     }
 
     options.successCallback(cachedData[cachedId].data);
@@ -115,20 +118,20 @@ let fetchCached = function (options) {
  * @param {string} url
  * @return {CancellablePromise}
  */
-let genericNavOptMultiTableFetch = function (apiHelper, options, url) {
-  var deferred = $.Deferred();
+const genericNavOptMultiTableFetch = function(apiHelper, options, url) {
+  const deferred = $.Deferred();
 
-  var dbTables = {};
-  options.paths.forEach(function (path) {
+  const dbTables = {};
+  options.paths.forEach(path => {
     dbTables[path.join('.')] = true;
   });
-  var data = {
+  const data = {
     dbTables: ko.mapping.toJSON(Object.keys(dbTables))
   };
 
-  var request = apiHelper.simplePost(url, data, {
+  const request = apiHelper.simplePost(url, data, {
     silenceErrors: options.silenceErrors,
-    successCallback: function (data) {
+    successCallback: function(data) {
       data.hueTimestamp = Date.now();
       deferred.resolve(data);
     },
@@ -147,52 +150,51 @@ let genericNavOptMultiTableFetch = function (apiHelper, options, url) {
  * @constructor
  */
 class QueryResult {
-  constructor (sourceType, compute, response) {
-    var self = this;
+  constructor(sourceType, compute, response) {
+    const self = this;
     self.id = hueUtils.UUID();
     self.type = response.result.type || sourceType;
     self.compute = compute;
     self.status = response.status || 'running';
     self.result = response.result || {};
     self.result.type = 'table';
-  };
+  }
 }
 
 class ApiHelper {
-
   constructor() {
-    var self = this;
+    const self = this;
     self.queueManager = apiQueueManager;
 
-    huePubSub.subscribe('assist.clear.hdfs.cache', function () {
+    huePubSub.subscribe('assist.clear.hdfs.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.adls.cache', function () {
+    huePubSub.subscribe('assist.clear.adls.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.git.cache', function () {
+    huePubSub.subscribe('assist.clear.git.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'git' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.s3.cache', function () {
+    huePubSub.subscribe('assist.clear.s3.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.collections.cache', function () {
+    huePubSub.subscribe('assist.clear.collections.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.hbase.cache', function () {
+    huePubSub.subscribe('assist.clear.hbase.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.document.cache', function () {
+    huePubSub.subscribe('assist.clear.document.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     });
 
-    var clearAllCaches = function () {
+    const clearAllCaches = function() {
       self.clearDbCache({
         sourceType: 'hive',
         clearAll: true
@@ -222,10 +224,10 @@ class ApiHelper {
 
   hasExpired(timestamp, cacheType) {
     if (typeof hueDebug !== 'undefined' && typeof hueDebug.cacheTimeout !== 'undefined') {
-      return (new Date()).getTime() - timestamp > hueDebug.cacheTimeout;
+      return new Date().getTime() - timestamp > hueDebug.cacheTimeout;
     }
-    return (new Date()).getTime() - timestamp > CACHEABLE_TTL[cacheType];
-  };
+    return new Date().getTime() - timestamp > CACHEABLE_TTL[cacheType];
+  }
 
   /**
    * @param {string} sourceType
@@ -233,7 +235,7 @@ class ApiHelper {
    */
   getTotalStorageUserPrefix(sourceType) {
     return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
-  };
+  }
 
   /**
    * @param {object} options
@@ -242,9 +244,14 @@ class ApiHelper {
    * @returns {string}
    */
   getAssistCacheIdentifier(options) {
-    var self = this;
-    return "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
-  };
+    const self = this;
+    return (
+      'hue.assist.' +
+      (options.cacheType || 'default') +
+      '.' +
+      self.getTotalStorageUserPrefix(options.sourceType)
+    );
+  }
 
   /**
    *
@@ -253,18 +260,23 @@ class ApiHelper {
    * @param {*} [value] - Optional, undefined and null will remove the value
    */
   setInTotalStorage(owner, id, value) {
-    var self = this;
+    const self = this;
     try {
-      var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+      const cachedData =
+        $.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner)) || {};
       if (typeof value !== 'undefined' && value !== null) {
         cachedData[id] = value;
-        $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
+        $.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner), cachedData, {
+          secure: window.location.protocol.indexOf('https') > -1
+        });
       } else if (cachedData[id]) {
         delete cachedData[id];
-        $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
+        $.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner), cachedData, {
+          secure: window.location.protocol.indexOf('https') > -1
+        });
       }
     } catch (e) {}
-  };
+  }
 
   /**
    *
@@ -274,10 +286,11 @@ class ApiHelper {
    * @returns {*}
    */
   getFromTotalStorage(owner, id, defaultValue) {
-    var self = this;
-    var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+    const self = this;
+    const cachedData =
+      $.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner)) || {};
     return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
-  };
+  }
 
   /**
    * @param {string} owner - 'assist', 'viewModelA' etc.
@@ -286,22 +299,22 @@ class ApiHelper {
    * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
    */
   withTotalStorage(owner, id, observable, defaultValue, noInit) {
-    var self = this;
+    const self = this;
 
-    var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
+    const cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
 
-    if (! noInit && cachedValue !== 'undefined') {
+    if (!noInit && cachedValue !== 'undefined') {
       observable(cachedValue);
     }
 
-    observable.subscribe(function (newValue) {
+    observable.subscribe(newValue => {
       if (owner === 'assist' && id === 'assist_panel_visible') {
         huePubSub.publish('assist.forceRender');
       }
       self.setInTotalStorage(owner, id, newValue);
     });
     return observable;
-  };
+  }
 
   /**
    * @param {Object} [response]
@@ -309,12 +322,14 @@ class ApiHelper {
    * @returns {boolean} - True if actually an error
    */
   successResponseIsError(response) {
-    return typeof response !== 'undefined' && (
-      typeof response.traceback !== 'undefined' ||
-      (typeof response.status !== 'undefined' && response.status !== 0) ||
-      response.code === 503 ||
-      response.code === 500);
-  };
+    return (
+      typeof response !== 'undefined' &&
+      (typeof response.traceback !== 'undefined' ||
+        (typeof response.status !== 'undefined' && response.status !== 0) ||
+        response.code === 503 ||
+        response.code === 500)
+    );
+  }
 
   /**
    * @param {Object} options
@@ -323,14 +338,17 @@ class ApiHelper {
    * @returns {Function}
    */
   assistErrorCallback(options) {
-    return function (errorResponse) {
-      var errorMessage = 'Unknown error occurred';
+    return function(errorResponse) {
+      let errorMessage = 'Unknown error occurred';
       if (typeof errorResponse !== 'undefined' && errorResponse !== null) {
-        if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText === 'abort') {
+        if (
+          typeof errorResponse.statusText !== 'undefined' &&
+          errorResponse.statusText === 'abort'
+        ) {
           return;
         } else if (typeof errorResponse.responseText !== 'undefined') {
           try {
-            var errorJs = JSON.parse(errorResponse.responseText);
+            const errorJs = JSON.parse(errorResponse.responseText);
             if (typeof errorJs.message !== 'undefined') {
               errorMessage = errorJs.message;
             } else {
@@ -341,9 +359,15 @@ class ApiHelper {
           }
         } else if (typeof errorResponse.message !== 'undefined' && errorResponse.message !== null) {
           errorMessage = errorResponse.message;
-        } else if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText !== null) {
+        } else if (
+          typeof errorResponse.statusText !== 'undefined' &&
+          errorResponse.statusText !== null
+        ) {
           errorMessage = errorResponse.statusText;
-        } else if (errorResponse.error !== 'undefined' && Object.prototype.toString.call(errorResponse.error) === '[object String]' ) {
+        } else if (
+          errorResponse.error !== 'undefined' &&
+          Object.prototype.toString.call(errorResponse.error) === '[object String]'
+        ) {
           errorMessage = errorResponse.error;
         } else if (Object.prototype.toString.call(errorResponse) === '[object String]') {
           errorMessage = errorResponse;
@@ -353,7 +377,7 @@ class ApiHelper {
       if (!options || !options.silenceErrors) {
         hueUtils.logError(errorResponse);
         if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
-          $(document).trigger("error", errorMessage);
+          $(document).trigger('error', errorMessage);
         }
       }
 
@@ -362,16 +386,16 @@ class ApiHelper {
       }
       return errorMessage;
     };
-  };
+  }
 
   cancelActiveRequest(request) {
     if (typeof request !== 'undefined' && request !== null) {
-      var readyState = request.getReadyState ? request.getReadyState() : request.readyState;
+      const readyState = request.getReadyState ? request.getReadyState() : request.readyState;
       if (readyState < 4) {
         request.abort();
       }
     }
-  };
+  }
 
   /**
    * @param {string} url
@@ -384,10 +408,10 @@ class ApiHelper {
    * @return {Promise}
    */
   simplePost(url, data, options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var request = $.post(url, data, function (data) {
+    const request = $.post(url, data, data => {
       if (self.successResponseIsError(data)) {
         deferred.reject(self.assistErrorCallback(options)(data));
         return;
@@ -396,25 +420,24 @@ class ApiHelper {
         options.successCallback(data);
       }
       deferred.resolve(data);
-    })
-      .fail(self.assistErrorCallback(options));
+    }).fail(self.assistErrorCallback(options));
 
-    request.fail(function (data) {
+    request.fail(data => {
       deferred.reject(self.assistErrorCallback(options)(data));
     });
 
-    var promise = deferred.promise();
+    const promise = deferred.promise();
 
-    promise.getReadyState = function () {
+    promise.getReadyState = function() {
       return request.readyState;
     };
 
-    promise.abort = function () {
+    promise.abort = function() {
       request.abort();
     };
 
     return promise;
-  };
+  }
 
   /**
    * @param {Object} data
@@ -422,13 +445,18 @@ class ApiHelper {
    * @param {function} [options.successCallback]
    */
   saveSnippetToFile(data, options) {
-    var self = this;
-    $.post(SAVE_TO_FILE, data, function (result) {
-      if (typeof options.successCallback !== 'undefined') {
-        options.successCallback(result);
-      }
-    }, 'json').fail(self.assistErrorCallback(options));
-  };
+    const self = this;
+    $.post(
+      SAVE_TO_FILE,
+      data,
+      result => {
+        if (typeof options.successCallback !== 'undefined') {
+          options.successCallback(result);
+        }
+      },
+      'json'
+    ).fail(self.assistErrorCallback(options));
+  }
 
   /**
    * @param {string} url
@@ -439,48 +467,48 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   simpleGet(url, data, options) {
-    var self = this;
+    const self = this;
     if (!options) {
-      options = {}
+      options = {};
     }
-    return $.get(url, data, function (data) {
+    return $.get(url, data, data => {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);
       } else if (typeof options.successCallback !== 'undefined') {
         options.successCallback(data);
       }
-    })
-      .fail(self.assistErrorCallback(options));
-  };
+    }).fail(self.assistErrorCallback(options));
+  }
 
   fetchUsersAndGroups(options) {
-    var self = this;
     $.ajax({
-      method: "GET",
-      url: "/desktop/api/users/autocomplete",
+      method: 'GET',
+      url: '/desktop/api/users/autocomplete',
       data: options.data || {},
       contentType: 'application/json'
-    }).done(function(response) {
-      options.successCallback(response);
-    }).fail(function (response) {
-      options.errorCallback(response);
-    });
-  };
+    })
+      .done(response => {
+        options.successCallback(response);
+      })
+      .fail(response => {
+        options.errorCallback(response);
+      });
+  }
 
   fetchUsersByIds(options) {
-    var self = this;
     $.ajax({
-      method: "GET",
-      url: "/desktop/api/users",
-      data: { userids: options.userids},
+      method: 'GET',
+      url: '/desktop/api/users',
+      data: { userids: options.userids },
       contentType: 'application/json'
-    }).done(function(response) {
-      options.successCallback(response);
-    }).fail(function (response) {
-      options.errorCallback(response);
-    });
-  };
-
+    })
+      .done(response => {
+        options.successCallback(response);
+      })
+      .fail(response => {
+        options.errorCallback(response);
+      });
+  }
 
   /**
    *
@@ -492,8 +520,8 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   fetchStoragePreview(options) {
-    var self = this;
-    var url;
+    const self = this;
+    let url;
     if (options.type === 's3') {
       url = S3_API_PREFIX;
     } else if (options.type === 'adls') {
@@ -502,7 +530,7 @@ class ApiHelper {
       url = HDFS_API_PREFIX;
     }
 
-    var clonedPath = options.path.concat();
+    const clonedPath = options.path.concat();
     if (clonedPath.length && clonedPath[0] === '/') {
       clonedPath.shift();
     }
@@ -510,13 +538,13 @@ class ApiHelper {
     url += '&offset=' + (options.offset || 0);
     url += '&length=' + (options.length || 118784);
 
-    var deferred = $.Deferred();
+    const deferred = $.Deferred();
     $.ajax({
-      dataType: "json",
+      dataType: 'json',
       url: url,
-      success: function (data) {
+      success: function(data) {
         if (self.successResponseIsError(data)) {
-          deferred.reject(self.assistErrorCallback(options)(data))
+          deferred.reject(self.assistErrorCallback(options)(data));
         } else {
           deferred.resolve(data);
         }
@@ -525,7 +553,7 @@ class ApiHelper {
     });
 
     return deferred.promise();
-  };
+  }
 
   /**
    * @param {Object} options
@@ -541,25 +569,39 @@ class ApiHelper {
    * @param {string} [options.filter]
    */
   fetchHdfsPath(options) {
-    var self = this;
-    if (options.pathParts.length > 0 && (options.pathParts[0] === '/' || options.pathParts[0] === '')) {
+    const self = this;
+    if (
+      options.pathParts.length > 0 &&
+      (options.pathParts[0] === '/' || options.pathParts[0] === '')
+    ) {
       options.pathParts.shift();
     }
-    var url = HDFS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    let url =
+      HDFS_API_PREFIX +
+      encodeURI(options.pathParts.join('/')) +
+      '?format=json&sortby=name&descending=false&pagesize=' +
+      (options.pageSize || 500) +
+      '&pagenum=' +
+      (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
     }
-    var fetchFunction = function (storeInCache) {
+    const fetchFunction = function(storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
       return $.ajax({
-        dataType: "json",
+        dataType: 'json',
         url: url,
         timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+        success: function(data) {
+          if (
+            !data.error &&
+            !self.successResponseIsError(data) &&
+            typeof data.files !== 'undefined' &&
+            data.files !== null
+          ) {
             if (data.files.length > 2 && !options.filter) {
               storeInCache(data);
             }
@@ -570,19 +612,21 @@ class ApiHelper {
         }
       })
         .fail(self.assistErrorCallback(options))
-        .always(function () {
+        .always(() => {
           if (typeof options.editor !== 'undefined' && options.editor !== null) {
             options.editor.hideSpinner();
           }
         });
     };
 
-    return fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'hdfs',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
+    return fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 'hdfs',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
 
   /**
    * @param {Object} options
@@ -598,23 +642,34 @@ class ApiHelper {
    * @param {string} [options.filter]
    */
   fetchAdlsPath(options) {
-    var self = this;
+    const self = this;
     options.pathParts.shift();
-    var url = ADLS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    let url =
+      ADLS_API_PREFIX +
+      encodeURI(options.pathParts.join('/')) +
+      '?format=json&sortby=name&descending=false&pagesize=' +
+      (options.pageSize || 500) +
+      '&pagenum=' +
+      (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
     }
-    var fetchFunction = function (storeInCache) {
+    const fetchFunction = function(storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
       return $.ajax({
-        dataType: "json",
+        dataType: 'json',
         url: url,
         timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+        success: function(data) {
+          if (
+            !data.error &&
+            !self.successResponseIsError(data) &&
+            typeof data.files !== 'undefined' &&
+            data.files !== null
+          ) {
             if (data.files.length > 2 && !options.filter) {
               storeInCache(data);
             }
@@ -625,19 +680,21 @@ class ApiHelper {
         }
       })
         .fail(self.assistErrorCallback(options))
-        .always(function () {
+        .always(() => {
           if (typeof options.editor !== 'undefined' && options.editor !== null) {
             options.editor.hideSpinner();
           }
         });
     };
 
-    return fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'adls',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
+    return fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 'adls',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
 
   /**
    * @param {Object} options
@@ -650,41 +707,55 @@ class ApiHelper {
    * @param {string} options.fileType
    */
   fetchGitContents(options) {
-    var self = this;
-    var url = GIT_API_PREFIX + '?path=' + encodeURI(options.pathParts.join("/")) + '&fileType=' + options.fileType;
-    var fetchFunction = function (storeInCache) {
+    const self = this;
+    const url =
+      GIT_API_PREFIX +
+      '?path=' +
+      encodeURI(options.pathParts.join('/')) +
+      '&fileType=' +
+      options.fileType;
+    const fetchFunction = function(storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
       $.ajax({
-        dataType: "json",
+        dataType: 'json',
         url: url,
         timeout: options.timeout,
-        success: function (data) {
+        success: function(data) {
           if (!data.error && !self.successResponseIsError(data)) {
-            if (data.fileType === 'dir' && typeof data.files !== 'undefined' && data.files !== null) {
+            if (
+              data.fileType === 'dir' &&
+              typeof data.files !== 'undefined' &&
+              data.files !== null
+            ) {
               if (data.files.length > 2) {
                 storeInCache(data);
               }
               options.successCallback(data);
-            } else if (data.fileType === 'file' && typeof data.content !== 'undefined' && data.content !== null) {
+            } else if (
+              data.fileType === 'file' &&
+              typeof data.content !== 'undefined' &&
+              data.content !== null
+            ) {
               options.successCallback(data);
             }
           } else {
             self.assistErrorCallback(options)(data);
           }
         }
-      })
-        .fail(self.assistErrorCallback(options));
+      }).fail(self.assistErrorCallback(options));
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'git',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
+    fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 'git',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
 
   /**
    * @param {Object} options
@@ -700,24 +771,35 @@ class ApiHelper {
    * @param {string} [options.filter]
    */
   fetchS3Path(options) {
-    var self = this;
+    const self = this;
     options.pathParts.shift(); // remove the trailing /
-    var url = S3_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    let url =
+      S3_API_PREFIX +
+      encodeURI(options.pathParts.join('/')) +
+      '?format=json&sortby=name&descending=false&pagesize=' +
+      (options.pageSize || 500) +
+      '&pagenum=' +
+      (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
     }
-    var fetchFunction = function (storeInCache) {
+    const fetchFunction = function(storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
 
       $.ajax({
-        dataType: "json",
+        dataType: 'json',
         url: url,
         timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+        success: function(data) {
+          if (
+            !data.error &&
+            !self.successResponseIsError(data) &&
+            typeof data.files !== 'undefined' &&
+            data.files !== null
+          ) {
             if (data.files.length > 2 && !options.filter) {
               storeInCache(data);
             }
@@ -728,19 +810,21 @@ class ApiHelper {
         }
       })
         .fail(self.assistErrorCallback(options))
-        .always(function () {
+        .always(() => {
           if (typeof options.editor !== 'undefined' && options.editor !== null) {
             options.editor.hideSpinner();
           }
         });
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 's3',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
+    fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 's3',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
 
   /**
    * @param {Object} options
@@ -754,7 +838,7 @@ class ApiHelper {
    *
    */
   fetchDashboardTerms(options) {
-    var self = this;
+    const self = this;
     if (options.timeout === 0) {
       self.assistErrorCallback(options)({ status: -1 });
       return;
@@ -777,7 +861,7 @@ class ApiHelper {
         })
       },
       timeout: options.timeout,
-      success: function (data) {
+      success: function(data) {
         if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
           options.successCallback(data);
         } else {
@@ -787,7 +871,7 @@ class ApiHelper {
     })
       .fail(self.assistErrorCallback(options))
       .always(options.alwaysCallback);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -800,7 +884,7 @@ class ApiHelper {
    *
    */
   fetchDashboardStats(options) {
-    var self = this;
+    const self = this;
     if (options.timeout === 0) {
       self.assistErrorCallback(options)({ status: -1 });
       return;
@@ -819,29 +903,27 @@ class ApiHelper {
           name: options.fieldName,
           stats: {
             facet: ''
-          },
+          }
         }),
         query: ko.mapping.toJSON({
-          qs: [{q: ''}],
+          qs: [{ q: '' }],
           fqs: []
         })
       },
       timeout: options.timeout,
-      success: function (data) {
+      success: function(data) {
         if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
           options.successCallback(data);
+        } else if (data.status === 1) {
+          options.notSupportedCallback(data);
         } else {
-          if (data.status === 1) {
-            options.notSupportedCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
+          self.assistErrorCallback(options)(data);
         }
       }
     })
       .fail(self.assistErrorCallback(options))
       .always(options.alwaysCallback);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -852,22 +934,22 @@ class ApiHelper {
    * @param {Object} [options.editor] - Ace editor
    */
   fetchHBase(options) {
-    var self = this;
-    var suffix = 'getClusters';
+    const self = this;
+    let suffix = 'getClusters';
     if (options.parent.name !== '') {
       suffix = 'getTableList/' + options.parent.name;
     }
-    var url = HBASE_API_PREFIX + suffix;
-    var fetchFunction = function (storeInCache) {
+    const url = HBASE_API_PREFIX + suffix;
+    const fetchFunction = function(storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
       $.ajax({
-        dataType: "json",
+        dataType: 'json',
         url: url,
         timeout: options.timeout,
-        success: function (data) {
+        success: function(data) {
           if (!data.error && !self.successResponseIsError(data)) {
             storeInCache(data);
             options.successCallback(data);
@@ -877,19 +959,21 @@ class ApiHelper {
         }
       })
         .fail(self.assistErrorCallback(options))
-        .always(function () {
+        .always(() => {
           if (typeof options.editor !== 'undefined' && options.editor !== null) {
             options.editor.hideSpinner();
           }
         });
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'hbase',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
+    fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 'hbase',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
 
   /**
    * @param {Object} options
@@ -899,49 +983,53 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchResourceStats(options) {
-    var self = this;
+    const self = this;
 
-    var queryMetric = function (metricName) {
-      var now = Date.now();
+    const queryMetric = function(metricName) {
+      const now = Date.now();
       return self.simplePost('/metadata/api/prometheus/query', {
         query: ko.mapping.toJSON(metricName),
         start: Math.floor((now - options.pastMs) / 1000),
-        end:  Math.floor(now / 1000),
+        end: Math.floor(now / 1000),
         step: options.stepMs / 1000
-      })
+      });
     };
 
-    var combinedDeferred = $.Deferred();
+    const combinedDeferred = $.Deferred();
     $.when(
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // CPU percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
       queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
-      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}'), // Queued queries
-    ).done(function () {
-      var timestampIndex = {};
-      for (var j = 0; j < arguments.length; j++) {
-        var response = arguments[j];
-        if (response.data.result[0]) {
-          var values = response.data.result[0].values;
-          for (var i = 0; i < values.length; i++) {
-            if (!timestampIndex[values[i][0]]) {
-              timestampIndex[values[i][0]] = [values[i][0] * 1000, 0, 0, 0, 0, 0]; // Adjust back to milliseconds
+      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}') // Queued queries
+    )
+      .done(function() {
+        const timestampIndex = {};
+        for (let j = 0; j < arguments.length; j++) {
+          const response = arguments[j];
+          if (response.data.result[0]) {
+            const values = response.data.result[0].values;
+            for (let i = 0; i < values.length; i++) {
+              if (!timestampIndex[values[i][0]]) {
+                timestampIndex[values[i][0]] = [values[i][0] * 1000, 0, 0, 0, 0, 0]; // Adjust back to milliseconds
+              }
+              timestampIndex[values[i][0]][j + 1] = parseFloat(values[i][1]);
             }
-            timestampIndex[values[i][0]][j + 1] = parseFloat(values[i][1]);
           }
         }
-      }
-      var result = [];
-      Object.keys(timestampIndex).forEach(function (key) {
-        result.push(timestampIndex[key]);
-      });
-      result.sort(function (a,b) { return a[0] - b[0]; });
-      combinedDeferred.resolve(result);
-    }).fail(combinedDeferred.reject);
+        const result = [];
+        Object.keys(timestampIndex).forEach(key => {
+          result.push(timestampIndex[key]);
+        });
+        result.sort((a, b) => {
+          return a[0] - b[0];
+        });
+        combinedDeferred.resolve(result);
+      })
+      .fail(combinedDeferred.reject);
 
     return combinedDeferred.promise();
-  };
+  }
 
   /**
    * @param {Object} options
@@ -950,16 +1038,20 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   fetchConfigurations(options) {
-    var self = this;
+    const self = this;
     self.simpleGet(CONFIG_APPS_API, {}, options);
-  };
+  }
 
   saveGlobalConfiguration(options) {
-    var self = this;
-    self.simplePost(CONFIG_APPS_API, {
-      configuration: ko.mapping.toJSON(options.configuration)
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      CONFIG_APPS_API,
+      {
+        configuration: ko.mapping.toJSON(options.configuration)
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -974,15 +1066,19 @@ class ApiHelper {
    * @param {Number} [options.userId]
    */
   saveConfiguration(options) {
-    var self = this;
-    self.simplePost(CONFIG_SAVE_API, {
-      app: options.app,
-      properties: ko.mapping.toJSON(options.properties),
-      is_default: options.isDefault,
-      group_id: options.groupId,
-      user_id: options.userId
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      CONFIG_SAVE_API,
+      {
+        app: options.app,
+        properties: ko.mapping.toJSON(options.properties),
+        is_default: options.isDefault,
+        group_id: options.groupId,
+        user_id: options.userId
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -993,9 +1089,9 @@ class ApiHelper {
    * @param {string} [options.uuid]
    */
   fetchDocuments(options) {
-    var self = this;
+    const self = this;
 
-    var id = '';
+    let id = '';
     if (options.uuid) {
       id += options.uuid;
     }
@@ -1003,8 +1099,8 @@ class ApiHelper {
       id += options.type;
     }
 
-    var promise = self.queueManager.getQueued(DOCUMENTS_API, id);
-    var firstInQueue = typeof promise === 'undefined';
+    let promise = self.queueManager.getQueued(DOCUMENTS_API, id);
+    const firstInQueue = typeof promise === 'undefined';
     if (firstInQueue) {
       promise = $.Deferred();
       self.queueManager.addToQueue(promise, DOCUMENTS_API, id);
@@ -1016,7 +1112,7 @@ class ApiHelper {
       return;
     }
 
-    var data = {
+    const data = {
       uuid: options.uuid
     };
 
@@ -1028,15 +1124,15 @@ class ApiHelper {
       url: DOCUMENTS_API,
       data: data,
       traditional: true,
-      success: function (data) {
-        if (! self.successResponseIsError(data)) {
+      success: function(data) {
+        if (!self.successResponseIsError(data)) {
           promise.resolve(data);
         } else {
           promise.reject(data);
         }
       }
     }).fail(promise.reject);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -1051,7 +1147,7 @@ class ApiHelper {
    * @param {int} [options.limit]
    */
   searchDocuments(options) {
-    var self = this;
+    const self = this;
     return $.ajax({
       url: DOCUMENTS_SEARCH_API,
       data: {
@@ -1062,16 +1158,15 @@ class ApiHelper {
         limit: options.limit,
         include_trashed: options.include_trashed
       },
-      success: function (data) {
-        if (! self.successResponseIsError(data)) {
+      success: function(data) {
+        if (!self.successResponseIsError(data)) {
           options.successCallback(data);
         } else {
           self.assistErrorCallback(options)(data);
         }
       }
-    })
-      .fail(self.assistErrorCallback(options));
-  };
+    }).fail(self.assistErrorCallback(options));
+  }
 
   /**
    * @param {Object} options
@@ -1084,29 +1179,30 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchDocument(options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var request = $.ajax({
+    const self = this;
+    const deferred = $.Deferred();
+    const request = $.ajax({
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid,
         data: !!options.fetchContents
       },
-      success: function (data) {
-        if (! self.successResponseIsError(data)) {
-          deferred.resolve(data)
+      success: function(data) {
+        if (!self.successResponseIsError(data)) {
+          deferred.resolve(data);
         } else {
-          deferred.reject(self.assistErrorCallback({
-            silenceErrors: options.silenceErrors
-          }));
+          deferred.reject(
+            self.assistErrorCallback({
+              silenceErrors: options.silenceErrors
+            })
+          );
         }
       }
-    })
-      .fail(function (errorResponse) {
-        deferred.reject(self.assistErrorHandler(errorResponse))
-      });
+    }).fail(errorResponse => {
+      deferred.reject(self.assistErrorHandler(errorResponse));
+    });
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -1118,12 +1214,16 @@ class ApiHelper {
    * @param {string} options.name
    */
   createDocumentsFolder(options) {
-    var self = this;
-    self.simplePost(DOCUMENTS_API + 'mkdir', {
-      parent_uuid: ko.mapping.toJSON(options.parentUuid),
-      name: ko.mapping.toJSON(options.name)
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      DOCUMENTS_API + 'mkdir',
+      {
+        parent_uuid: ko.mapping.toJSON(options.parentUuid),
+        name: ko.mapping.toJSON(options.name)
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -1135,12 +1235,16 @@ class ApiHelper {
    * @param {string} options.name
    */
   updateDocument(options) {
-    var self = this;
-    self.simplePost(DOCUMENTS_API + 'update', {
-      uuid: ko.mapping.toJSON(options.uuid),
-      name: options.name
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      DOCUMENTS_API + 'update',
+      {
+        uuid: ko.mapping.toJSON(options.uuid),
+        name: options.name
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -1152,20 +1256,20 @@ class ApiHelper {
    * @param {FormData} options.formData
    */
   uploadDocument(options) {
-    var self = this;
+    const self = this;
     $.ajax({
       url: DOCUMENTS_API + 'import',
       type: 'POST',
-      success: function (data) {
-        if (! self.successResponseIsError(data)) {
+      success: function(data) {
+        if (!self.successResponseIsError(data)) {
           options.successCallback(data);
         } else {
           self.assistErrorCallback(options)(data);
         }
       },
       xhr: function() {
-        var myXhr = $.ajaxSettings.xhr();
-        if(myXhr.upload && options.progressHandler) {
+        const myXhr = $.ajaxSettings.xhr();
+        if (myXhr.upload && options.progressHandler) {
           myXhr.upload.addEventListener('progress', options.progressHandler, false);
         }
         return myXhr;
@@ -1175,9 +1279,8 @@ class ApiHelper {
       cache: false,
       contentType: false,
       processData: false
-    })
-      .fail(self.assistErrorCallback(options));
-  };
+    }).fail(self.assistErrorCallback(options));
+  }
 
   /**
    *
@@ -1189,12 +1292,16 @@ class ApiHelper {
    * @param {number} options.destinationId - The ID of the target document
    */
   moveDocument(options) {
-    var self = this;
-    self.simplePost(DOCUMENTS_API + 'move', {
-      source_doc_uuid: ko.mapping.toJSON(options.sourceId),
-      destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      DOCUMENTS_API + 'move',
+      {
+        source_doc_uuid: ko.mapping.toJSON(options.sourceId),
+        destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -1206,12 +1313,16 @@ class ApiHelper {
    * @param {string} [options.skipTrash] - Default false
    */
   deleteDocument(options) {
-    var self = this;
-    self.simplePost(DOCUMENTS_API + 'delete', {
-      uuid: ko.mapping.toJSON(options.uuid),
-      skip_trash: ko.mapping.toJSON(options.skipTrash || false)
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      DOCUMENTS_API + 'delete',
+      {
+        uuid: ko.mapping.toJSON(options.uuid),
+        skip_trash: ko.mapping.toJSON(options.skipTrash || false)
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -1222,11 +1333,15 @@ class ApiHelper {
    * @param {string} options.uuid
    */
   copyDocument(options) {
-    var self = this;
-    self.simplePost(DOCUMENTS_API + 'copy', {
-      uuid: ko.mapping.toJSON(options.uuid)
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      DOCUMENTS_API + 'copy',
+      {
+        uuid: ko.mapping.toJSON(options.uuid)
+      },
+      options
+    );
+  }
 
   /**
    * @param {Object} options
@@ -1237,11 +1352,15 @@ class ApiHelper {
    * @param {string} options.uuid
    */
   restoreDocument(options) {
-    var self = this;
-    self.simplePost(DOCUMENTS_API + 'restore', {
-      uuids: ko.mapping.toJSON(options.uuids)
-    }, options);
-  };
+    const self = this;
+    self.simplePost(
+      DOCUMENTS_API + 'restore',
+      {
+        uuids: ko.mapping.toJSON(options.uuids)
+      },
+      options
+    );
+  }
 
   /**
    *
@@ -1254,26 +1373,26 @@ class ApiHelper {
    * @param {boolean} [options.clearAll]
    */
   clearDbCache(options) {
-    var self = this;
-    var cacheIdentifier = self.getAssistCacheIdentifier(options);
+    const self = this;
+    const cacheIdentifier = self.getAssistCacheIdentifier(options);
     if (options.clearAll) {
       $.totalStorage(cacheIdentifier, {});
     } else {
-      var url = AUTOCOMPLETE_API_PREFIX;
+      let url = AUTOCOMPLETE_API_PREFIX;
       if (options.databaseName) {
         url += options.databaseName;
       }
       if (options.tableName) {
-        url += "/" + options.tableName;
+        url += '/' + options.tableName;
       }
       if (options.fields) {
-        url += options.fields.length > 0 ? "/" + options.fields.join("/") : "";
+        url += options.fields.length > 0 ? '/' + options.fields.join('/') : '';
       }
-      var cachedData = $.totalStorage(cacheIdentifier) || {};
+      const cachedData = $.totalStorage(cacheIdentifier) || {};
       delete cachedData[url];
       $.totalStorage(cacheIdentifier, cachedData);
     }
-  };
+  }
 
   /**
    * @param {Object} options
@@ -1284,11 +1403,14 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   invalidateSourceMetadata(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
-      var data = {
+    if (
+      options.sourceType === 'impala' &&
+      (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')
+    ) {
+      const data = {
         flush_all: options.invalidate === 'invalidateAndFlush',
         cluster: JSON.stringify(options.compute)
       };
@@ -1300,14 +1422,16 @@ class ApiHelper {
         data.table = options.path[1];
       }
 
-      var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
+      const request = self
+        .simplePost(IMPALA_INVALIDATE_API, data, options)
+        .done(deferred.resolve)
+        .fail(deferred.reject);
 
       return new CancellablePromise(deferred, request);
     }
 
     return deferred.resolve().promise();
-  };
-
+  }
 
   /**
    * @param {Object} options
@@ -1321,52 +1445,60 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchSourceMetadata(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var isQuery = options.sourceType.indexOf('-query') !== -1;
-    var sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
+    const isQuery = options.sourceType.indexOf('-query') !== -1;
+    const sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
 
-    var request = $.ajax({
+    const request = $.ajax({
       type: 'POST',
       url: AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
       data: {
         notebook: {},
         snippet: ko.mapping.toJSON({
           type: sourceType,
-          source: isQuery ? 'query' : 'data',
+          source: isQuery ? 'query' : 'data'
         }),
         cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       },
       timeout: options.timeout
-    }).done(function (data) {
-      data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
-      data.hueTimestamp = Date.now();
+    })
+      .done(data => {
+        data.notFound =
+          data.status === 0 &&
+          data.code === 500 &&
+          data.error &&
+          (data.error.indexOf('Error 10001') !== -1 ||
+            data.error.indexOf('AnalysisException') !== -1);
+        data.hueTimestamp = Date.now();
 
-      // TODO: Display warning in autocomplete when an entity can't be found
-      // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
-      // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
-      if (!data.notFound && self.successResponseIsError(data)) {
+        // TODO: Display warning in autocomplete when an entity can't be found
+        // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
+        // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
+        if (!data.notFound && self.successResponseIsError(data)) {
+          self.assistErrorCallback({
+            silenceErrors: options.silenceErrors,
+            errorCallback: deferred.reject
+          })(data);
+        } else {
+          deferred.resolve(data);
+        }
+      })
+      .fail(
         self.assistErrorCallback({
           silenceErrors: options.silenceErrors,
           errorCallback: deferred.reject
-        })(data);
-      } else {
-        deferred.resolve(data);
-      }
-    }).fail(self.assistErrorCallback({
-      silenceErrors: options.silenceErrors,
-      errorCallback: deferred.reject
-    }));
+        })
+      );
 
     return new CancellablePromise(deferred, request);
-  };
-
+  }
 
   updateSourceMetadata(options) {
-    var self = this;
-    var url;
-    var data = {
+    const self = this;
+    let url;
+    const data = {
       source_type: options.sourceType
     };
     if (options.path.length === 1) {
@@ -1401,7 +1533,7 @@ class ApiHelper {
       }
     }
     return self.simplePost(url, data, options);
-  };
+  }
 
   /**
    * Fetches the analysis for the given source and path
@@ -1416,15 +1548,19 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchAnalysis(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var url;
+    let url;
 
     if (options.path.length === 1) {
       url = '/metastore/databases/' + options.path[0] + '/metadata';
     } else {
-      url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
+      url =
+        '/' +
+        (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) +
+        '/api/table/' +
+        options.path[0];
 
       if (options.path.length > 1) {
         url += '/' + options.path[1] + '/';
@@ -1435,15 +1571,15 @@ class ApiHelper {
       }
     }
 
-    var data = {
+    const data = {
       format: 'json',
       cluster: JSON.stringify(options.compute),
       source_type: options.sourceType
     };
 
-    var request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
+    const request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
       silenceErrors: options.silenceErrors,
-      successCallback: function (response) {
+      successCallback: function(response) {
         if (options.path.length === 1) {
           if (response.data) {
             response.data.hueTimestamp = Date.now();
@@ -1452,14 +1588,14 @@ class ApiHelper {
             deferred.reject();
           }
         } else {
-          deferred.resolve(response)
+          deferred.resolve(response);
         }
       },
       errorCallback: deferred.reject
     });
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * Fetches the partitions for the given path
@@ -1473,44 +1609,50 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchPartitions(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
     // TODO: No sourceType needed?
-    var request = $.post('/metastore/table/' + options.path.join('/') + '/partitions', {
+    const request = $.post('/metastore/table/' + options.path.join('/') + '/partitions', {
       format: 'json',
       cluster: JSON.stringify(options.compute)
-    }).done(function (response) {
-      if (!self.successResponseIsError(response)) {
-        if (!response) {
-          response = {};
+    })
+      .done(response => {
+        if (!self.successResponseIsError(response)) {
+          if (!response) {
+            response = {};
+          }
+          response.hueTimestamp = Date.now();
+          deferred.resolve(response);
+        } else {
+          self.assistErrorCallback({
+            silenceErrors: options.silenceErrors,
+            errorCallback: deferred.reject
+          })(response);
         }
-        response.hueTimestamp = Date.now();
-        deferred.resolve(response);
-      } else {
-        self.assistErrorCallback({
-          silenceErrors: options.silenceErrors,
-          errorCallback: deferred.reject
-        })(response);
-      }
-    }).fail(function (response) {
-      // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
-      if (response && response.responseText && response.responseText.indexOf('is not partitioned') !== -1) {
-        deferred.resolve({
-          hueTimestamp: Date.now(),
-          partition_keys_json: [],
-          partition_values_json: []
-        })
-      } else {
-        self.assistErrorCallback({
-          silenceErrors: options.silenceErrors,
-          errorCallback: deferred.reject
-        })(response);
-      }
-    });
+      })
+      .fail(response => {
+        // Don't report any partitions if it's not partitioned instead of error to prevent unnecessary calls
+        if (
+          response &&
+          response.responseText &&
+          response.responseText.indexOf('is not partitioned') !== -1
+        ) {
+          deferred.resolve({
+            hueTimestamp: Date.now(),
+            partition_keys_json: [],
+            partition_values_json: []
+          });
+        } else {
+          self.assistErrorCallback({
+            silenceErrors: options.silenceErrors,
+            errorCallback: deferred.reject
+          })(response);
+        }
+      });
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * Refreshes the analysis for the given source and path
@@ -1525,51 +1667,65 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   refreshAnalysis(options) {
-    var self = this;
+    const self = this;
 
     if (options.path.length === 1) {
       return self.fetchAnalysis(options);
     }
-    var deferred = $.Deferred();
+    const deferred = $.Deferred();
 
-    var promises = [];
+    const promises = [];
 
-    var pollForAnalysis = function (url, delay) {
-      window.setTimeout(function () {
-        promises.push(self.simplePost(url, undefined, {
-          silenceErrors: options.silenceErrors,
-          successCallback: function (data) {
-            promises.pop();
-            if (data.isSuccess) {
-              promises.push(self.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject));
-            } else if (data.isFailure) {
-              deferred.reject(data);
-            } else {
-              pollForAnalysis(url, 1000);
-            }
-          },
-          errorCallback: deferred.reject
-        }));
+    const pollForAnalysis = (url, delay) => {
+      window.setTimeout(() => {
+        promises.push(
+          self.simplePost(url, undefined, {
+            silenceErrors: options.silenceErrors,
+            successCallback: function(data) {
+              promises.pop();
+              if (data.isSuccess) {
+                promises.push(
+                  self
+                    .fetchAnalysis(options)
+                    .done(deferred.resolve)
+                    .fail(deferred.reject)
+                );
+              } else if (data.isFailure) {
+                deferred.reject(data);
+              } else {
+                pollForAnalysis(url, 1000);
+              }
+            },
+            errorCallback: deferred.reject
+          })
+        );
       }, delay);
     };
 
-    var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/analyze/' + options.path.join('/') + '/';
+    const url =
+      '/' +
+      (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) +
+      '/api/analyze/' +
+      options.path.join('/') +
+      '/';
 
-    promises.push(self.simplePost(url, undefined, {
-      silenceErrors: options.silenceErrors,
-      successCallback: function (data) {
-        promises.pop();
-        if (data.status === 0 && data.watch_url) {
-          pollForAnalysis(data.watch_url, 500);
-        } else {
-          deferred.reject();
-        }
-      },
-      errorCallback: deferred.reject
-    }));
+    promises.push(
+      self.simplePost(url, undefined, {
+        silenceErrors: options.silenceErrors,
+        successCallback: function(data) {
+          promises.pop();
+          if (data.status === 0 && data.watch_url) {
+            pollForAnalysis(data.watch_url, 500);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      })
+    );
 
     return new CancellablePromise(deferred, undefined, promises);
-  };
+  }
 
   /**
    * Checks the status for the given snippet ID
@@ -1583,44 +1739,51 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   whenAvailable(options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var cancellablePromises = [];
+    const self = this;
+    const deferred = $.Deferred();
+    const cancellablePromises = [];
 
-    var waitTimeout = -1;
+    let waitTimeout = -1;
 
-    deferred.fail(function () {
+    deferred.fail(() => {
       window.clearTimeout(waitTimeout);
     });
 
-    var waitForAvailable = function () {
-      var request = self.simplePost('/notebook/api/check_status', {
-        notebook: options.notebookJson,
-        snippet: options.snippetJson,
-        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-      }, {
-        silenceErrors: options.silenceErrors
-      }).done(function (response) {
-        if (response && response.query_status && response.query_status.status) {
-          var status = response.query_status.status;
-          if (status === 'available') {
-            deferred.resolve();
-          } else if (status === 'running' || status === 'starting' || status === 'waiting') {
-            waitTimeout = window.setTimeout(function () {
-              waitForAvailable();
-            }, 500);
-          } else {
-            deferred.reject();
+    const waitForAvailable = () => {
+      const request = self
+        .simplePost(
+          '/notebook/api/check_status',
+          {
+            notebook: options.notebookJson,
+            snippet: options.snippetJson,
+            cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+          },
+          {
+            silenceErrors: options.silenceErrors
           }
-        }
-      }).fail(deferred.reject);
+        )
+        .done(response => {
+          if (response && response.query_status && response.query_status.status) {
+            const status = response.query_status.status;
+            if (status === 'available') {
+              deferred.resolve();
+            } else if (status === 'running' || status === 'starting' || status === 'waiting') {
+              waitTimeout = window.setTimeout(() => {
+                waitForAvailable();
+              }, 500);
+            } else {
+              deferred.reject();
+            }
+          }
+        })
+        .fail(deferred.reject);
 
       cancellablePromises.push(new CancellablePromise(request, request));
     };
 
     waitForAvailable();
     return new CancellablePromise(deferred, undefined, cancellablePromises);
-  };
+  }
 
   /**
    * Fetches samples for the given source and path
@@ -1637,75 +1800,103 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchSample(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var cancellablePromises = [];
+    const cancellablePromises = [];
 
-    var notebookJson = null;
-    var snippetJson = null;
-    var cancelled = false;
+    let notebookJson = null;
+    let snippetJson = null;
 
-    var cancelQuery = function () {
-      cancelled = true;
+    const cancelQuery = function() {
       if (notebookJson) {
-        self.simplePost('/notebook/api/cancel_statement', {
-          notebook: notebookJson,
-          snippet: snippetJson,
-          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-        }, { silenceErrors:  options.silenceErrors });
+        self.simplePost(
+          '/notebook/api/cancel_statement',
+          {
+            notebook: notebookJson,
+            snippet: snippetJson,
+            cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+          },
+          { silenceErrors: options.silenceErrors }
+        );
       }
     };
 
-    self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
-      notebook: {},
-      snippet: JSON.stringify({
-        type: options.sourceType,
-        compute: options.compute
-      }),
-      async: true,
-      operation: '"' + (options.operation || 'default') + '"',
-      cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-    }, {
-      silenceErrors: options.silenceErrors
-    }).done(function (sampleResponse) {
-      var queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
+    self
+      .simplePost(
+        SAMPLE_API_PREFIX + options.path.join('/'),
+        {
+          notebook: {},
+          snippet: JSON.stringify({
+            type: options.sourceType,
+            compute: options.compute
+          }),
+          async: true,
+          operation: '"' + (options.operation || 'default') + '"',
+          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
+        },
+        {
+          silenceErrors: options.silenceErrors
+        }
+      )
+      .done(sampleResponse => {
+        const queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
 
-      notebookJson = JSON.stringify({ type: options.sourceType });
-      snippetJson = JSON.stringify(queryResult);
+        notebookJson = JSON.stringify({ type: options.sourceType });
+        snippetJson = JSON.stringify(queryResult);
 
-      if (sampleResponse && sampleResponse.rows) { // Sync results
-        var data = { data: sampleResponse.rows, meta: sampleResponse.full_headers };
-        data.hueTimestamp = Date.now();
-        deferred.resolve(data);
-      } else {
-        cancellablePromises.push(
-          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, compute: options.compute, silenceErrors: options.silenceErrors }).done(function () {
-            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
-              notebook: notebookJson,
-              snippet: snippetJson,
-              rows: options.sampleCount || 100,
-              startOver: 'false'
-            }, {
-              silenceErrors: options.silenceErrors
-            }).done(function (sampleResponse) {
-              var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
-              data.hueTimestamp = Date.now();
-              deferred.resolve(data);
-            }).fail(deferred.reject);
+        if (sampleResponse && sampleResponse.rows) {
+          // Sync results
+          const data = { data: sampleResponse.rows, meta: sampleResponse.full_headers };
+          data.hueTimestamp = Date.now();
+          deferred.resolve(data);
+        } else {
+          cancellablePromises.push(
+            self
+              .whenAvailable({
+                notebookJson: notebookJson,
+                snippetJson: snippetJson,
+                compute: options.compute,
+                silenceErrors: options.silenceErrors
+              })
+              .done(() => {
+                const resultRequest = self
+                  .simplePost(
+                    '/notebook/api/fetch_result_data',
+                    {
+                      notebook: notebookJson,
+                      snippet: snippetJson,
+                      rows: options.sampleCount || 100,
+                      startOver: 'false'
+                    },
+                    {
+                      silenceErrors: options.silenceErrors
+                    }
+                  )
+                  .done(sampleResponse => {
+                    const data = (sampleResponse && sampleResponse.result) || {
+                      data: [],
+                      meta: []
+                    };
+                    data.hueTimestamp = Date.now();
+                    deferred.resolve(data);
+                  })
+                  .fail(deferred.reject);
 
-            cancellablePromises.push(resultRequest, resultRequest);
-          }).fail(deferred.reject)
-        );
-      }
-    }).fail(deferred.reject);
+                cancellablePromises.push(resultRequest, resultRequest);
+              })
+              .fail(deferred.reject)
+          );
+        }
+      })
+      .fail(deferred.reject);
 
     cancellablePromises.push({
       cancel: cancelQuery
     });
 
     return new CancellablePromise(deferred, undefined, cancellablePromises);
-  };
+  }
 
   /**
    * Fetches a navigator entity for the given source and path
@@ -1719,37 +1910,52 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchNavigatorMetadata(options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var url = NAV_URLS.FIND_ENTITY;
+    const self = this;
+    const deferred = $.Deferred();
+    let url = NAV_URLS.FIND_ENTITY;
 
     if (options.path.length === 1) {
       url += '?type=database&name=' + options.path[0];
     } else if (options.path.length === 2) {
-      url +=  (options.isView ? '?type=view' : '?type=table') + '&database=' + options.path[0] + '&name=' + options.path[1];
+      url +=
+        (options.isView ? '?type=view' : '?type=table') +
+        '&database=' +
+        options.path[0] +
+        '&name=' +
+        options.path[1];
     } else if (options.path.length === 3) {
-      url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
+      url +=
+        '?type=field&database=' +
+        options.path[0] +
+        '&table=' +
+        options.path[1] +
+        '&name=' +
+        options.path[2];
     } else {
       return new CancellablePromise($.Deferred().reject());
     }
 
-    var request = self.simplePost(url, {
-      notebook: {},
-      snippet: ko.mapping.toJSON({
-        type: 'nav'
-      })
-    }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: function (data) {
-        data = data.entity || data;
-        data.hueTimestamp = Date.now();
-        deferred.resolve(data);
+    const request = self.simplePost(
+      url,
+      {
+        notebook: {},
+        snippet: ko.mapping.toJSON({
+          type: 'nav'
+        })
       },
-      errorCallback: deferred.reject
-    });
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: function(data) {
+          data = data.entity || data;
+          data.hueTimestamp = Date.now();
+          deferred.resolve(data);
+        },
+        errorCallback: deferred.reject
+      }
+    );
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * Updates Navigator properties and custom metadata for the given entity
@@ -1764,8 +1970,8 @@ class ApiHelper {
    * @return {Promise}
    */
   updateNavigatorProperties(options) {
-    var self = this;
-    var data = { id: ko.mapping.toJSON(options.identity) };
+    const self = this;
+    const data = { id: ko.mapping.toJSON(options.identity) };
 
     if (options.properties) {
       data.properties = ko.mapping.toJSON(options.properties);
@@ -1776,8 +1982,8 @@ class ApiHelper {
     if (options.deletedCustomMetadataKeys) {
       data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
     }
-    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options)
-  };
+    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options);
+  }
 
   /**
    * Lists all available navigator tags
@@ -1788,13 +1994,13 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchAllNavigatorTags(options) {
-    var self = this;
+    const self = this;
 
-    var deferred = $.Deferred();
+    const deferred = $.Deferred();
 
-    var request = self.simplePost(NAV_URLS.LIST_TAGS, undefined, {
+    const request = self.simplePost(NAV_URLS.LIST_TAGS, undefined, {
       silenceErrors: options.silenceErrors,
-      successCallback: function (data) {
+      successCallback: function(data) {
         if (data && data.tags) {
           deferred.resolve(data.tags);
         } else {
@@ -1805,23 +2011,23 @@ class ApiHelper {
     });
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   addNavTags(entityId, tags) {
-    var self = this;
+    const self = this;
     return self.simplePost(NAV_URLS.ADD_TAGS, {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });
-  };
+  }
 
   deleteNavTags(entityId, tags) {
-    var self = this;
+    const self = this;
     return self.simplePost(NAV_URLS.DELETE_TAGS, {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });
-  };
+  }
 
   /**
    * Fetches navOpt popularity for the children of the given path
@@ -1832,9 +2038,9 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchNavOptPopularity(options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var url, data;
+    const self = this;
+    const deferred = $.Deferred();
+    let url, data;
 
     if (options.paths.length === 1 && options.paths[0].length === 1) {
       url = NAV_OPT_URLS.TOP_TABLES;
@@ -1843,8 +2049,8 @@ class ApiHelper {
       };
     } else {
       url = NAV_OPT_URLS.TOP_COLUMNS;
-      var dbTables = [];
-      options.paths.forEach(function (path) {
+      const dbTables = [];
+      options.paths.forEach(path => {
         dbTables.push(path.join('.'));
       });
       data = {
@@ -1852,9 +2058,9 @@ class ApiHelper {
       };
     }
 
-    var request = self.simplePost(url, data, {
+    const request = self.simplePost(url, data, {
       silenceErrors: options.silenceErrors,
-      successCallback: function (data) {
+      successCallback: function(data) {
         data.hueTimestamp = Date.now();
         deferred.resolve(data);
       },
@@ -1862,7 +2068,7 @@ class ApiHelper {
     });
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * Fetches the popular aggregate functions for the given tables
@@ -1874,7 +2080,7 @@ class ApiHelper {
    */
   fetchNavOptTopAggs(options) {
     return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
-  };
+  }
 
   /**
    * Fetches the popular columns for the given tables
@@ -1886,7 +2092,7 @@ class ApiHelper {
    */
   fetchNavOptTopColumns(options) {
     return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
-  };
+  }
 
   /**
    * Fetches the popular filters for the given tables
@@ -1898,7 +2104,7 @@ class ApiHelper {
    */
   fetchNavOptTopFilters(options) {
     return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
-  };
+  }
 
   /**
    * Fetches the popular joins for the given tables
@@ -1910,7 +2116,7 @@ class ApiHelper {
    */
   fetchNavOptTopJoins(options) {
     return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
-  };
+  }
 
   /**
    * Fetches navOpt meta for the given path, only possible for tables atm.
@@ -1922,27 +2128,31 @@ class ApiHelper {
    * @return {CancellablePromise}
    */
   fetchNavOptMeta(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var request = self.simplePost(NAV_OPT_URLS.TABLE_DETAILS, {
-      databaseName: options.path[0],
-      tableName: options.path[1]
-    }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: function (response) {
-        if (response.status === 0 && response.details) {
-          response.details.hueTimestamp = Date.now();
-          deferred.resolve(response.details);
-        } else {
-          deferred.reject();
-        }
+    const request = self.simplePost(
+      NAV_OPT_URLS.TABLE_DETAILS,
+      {
+        databaseName: options.path[0],
+        tableName: options.path[1]
       },
-      errorCallback: deferred.reject
-    });
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: function(response) {
+          if (response.status === 0 && response.details) {
+            response.details.hueTimestamp = Date.now();
+            deferred.resolve(response.details);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      }
+    );
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -1951,92 +2161,111 @@ class ApiHelper {
    * @param {string} options.queryId
    * @return {CancellablePromise}
    */
-  fetchQueryExecutionAnalysis(options)  {
-    var self = this;
+  fetchQueryExecutionAnalysis(options) {
+    const self = this;
     //var url = '/metadata/api/workload_analytics/get_impala_query/';
-    var url = '/impala/api/query/alanize';
-    var deferred = $.Deferred();
+    const url = '/impala/api/query/alanize';
+    const deferred = $.Deferred();
 
-    var tries = 0;
+    let tries = 0;
 
-    var cancellablePromises = [];
+    const cancellablePromises = [];
 
-    var promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+    const promise = new CancellablePromise(deferred, undefined, cancellablePromises);
 
-    var pollForAnalysis = function () {
+    const pollForAnalysis = () => {
       if (tries === 10) {
         deferred.reject();
         return;
       }
       tries++;
       cancellablePromises.pop(); // Remove the last one
-      cancellablePromises.push(deferred, self.simplePost(url, {
-        'cluster': JSON.stringify(options.compute),
-        'query_id': '"' + options.queryId + '"'
-      }, options).done(function (response) {
-        if (response && response.data) {
-          deferred.resolve(response.data)
-        } else {
-          var timeout = window.setTimeout(function () {
-            pollForAnalysis();
-          }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
-          promise.onCancel(function () {
-            window.clearTimeout(timeout);
+      cancellablePromises.push(
+        deferred,
+        self
+          .simplePost(
+            url,
+            {
+              cluster: JSON.stringify(options.compute),
+              query_id: '"' + options.queryId + '"'
+            },
+            options
+          )
+          .done(response => {
+            if (response && response.data) {
+              deferred.resolve(response.data);
+            } else {
+              const timeout = window.setTimeout(() => {
+                pollForAnalysis();
+              }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
+              promise.onCancel(() => {
+                window.clearTimeout(timeout);
+              });
+            }
           })
-        }
-      }).fail(deferred.reject));
+          .fail(deferred.reject)
+      );
     };
 
     pollForAnalysis();
 
     return promise;
-  };
+  }
 
-  fixQueryExecutionAnalysis(options)  {
-    var self = this;
-    var url = '/impala/api/query/alanize/fix';
-    var deferred = $.Deferred();
-    var request = self.simplePost(url, {
-      cluster: JSON.stringify(options.compute),
-      fix: JSON.stringify(options.fix),
-      start_time: options.start_time
-    }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: function (response) {
-        if (response.status === 0) {
-          deferred.resolve(response.details);
-        } else {
-          deferred.reject();
-        }
+  fixQueryExecutionAnalysis(options) {
+    const self = this;
+    const url = '/impala/api/query/alanize/fix';
+    const deferred = $.Deferred();
+
+    const request = self.simplePost(
+      url,
+      {
+        cluster: JSON.stringify(options.compute),
+        fix: JSON.stringify(options.fix),
+        start_time: options.start_time
       },
-      errorCallback: deferred.reject
-    });
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: function(response) {
+          if (response.status === 0) {
+            deferred.resolve(response.details);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      }
+    );
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
-  fetchQueryExecutionStatistics(options)  {
-    var self = this;
-    var url = '/impala/api/query/alanize/metrics';
-    var deferred = $.Deferred();
+  fetchQueryExecutionStatistics(options) {
+    const self = this;
+    const url = '/impala/api/query/alanize/metrics';
+    const deferred = $.Deferred();
 
-    var request = self.simplePost(url, {
-      'cluster': JSON.stringify(options.cluster),
-      'query_id': '"' + options.queryId + '"'
-    }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: function (response) {
-        if (response.status === 0) {
-          deferred.resolve(response.data);
-        } else {
-          deferred.reject();
-        }
+    const request = self.simplePost(
+      url,
+      {
+        'cluster': JSON.stringify(options.cluster),
+        'query_id': '"' + options.queryId + '"'
       },
-      errorCallback: deferred.reject
-    });
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: function(response) {
+          if (response.status === 0) {
+            deferred.resolve(response.data);
+          } else {
+            deferred.reject();
+          }
+        },
+        errorCallback: deferred.reject
+      }
+    );
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -2045,10 +2274,10 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchContextNamespaces(options) {
-    var self = this;
-    var url = '/desktop/api2/context/namespaces/' + options.sourceType;
+    const self = this;
+    const url = '/desktop/api2/context/namespaces/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -2057,10 +2286,10 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchContextComputes(options) {
-    var self = this;
-    var url = '/desktop/api2/context/computes/' + options.sourceType;
+    const self = this;
+    const url = '/desktop/api2/context/computes/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
-  };
+  }
 
   /**
    * @param {Object} options
@@ -2069,65 +2298,73 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchContextClusters(options) {
-    var self = this;
-    var url = '/desktop/api2/context/clusters/' + options.sourceType;
+    const self = this;
+    const url = '/desktop/api2/context/clusters/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
-  };
+  }
 
   getClusterConfig(data) {
     return $.post(FETCH_CONFIG, data);
-  };
+  }
 
   fetchHueDocsInteractive(query) {
-    var deferred = $.Deferred();
-    var request = $.post(INTERACTIVE_SEARCH_API, {
+    const deferred = $.Deferred();
+    const request = $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
       limit: 50,
       sources: '["documents"]'
-    }).done(function (data) {
-      if (data.status === 0) {
-        deferred.resolve(data);
-      } else {
-        deferred.reject(data);
-      }
-    }).fail(deferred.reject);
+    })
+      .done(data => {
+        if (data.status === 0) {
+          deferred.resolve(data);
+        } else {
+          deferred.reject(data);
+        }
+      })
+      .fail(deferred.reject);
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   fetchNavEntitiesInteractive(options) {
-    var deferred = $.Deferred();
-    var request = $.post(INTERACTIVE_SEARCH_API, {
+    const deferred = $.Deferred();
+    const request = $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(options.query),
       field_facets: ko.mapping.toJSON(options.facets || []),
       limit: 50,
       sources: '["sql", "hdfs", "s3"]'
-    }).done(function (data) {
-      if (data.status === 0) {
-        deferred.resolve(data);
-      } else {
-        deferred.reject(data);
-      }
-    }).fail(deferred.reject);
+    })
+      .done(data => {
+        if (data.status === 0) {
+          deferred.resolve(data);
+        } else {
+          deferred.reject(data);
+        }
+      })
+      .fail(deferred.reject);
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   searchEntities(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var request = self.simplePost(SEARCH_API, {
-      query_s: ko.mapping.toJSON(options.query),
-      limit: options.limit || 100,
-      raw_query: !!options.rawQuery,
-      sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
-    }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: deferred.resolve,
-      errorCallback: deferred.reject
-    });
+    const request = self.simplePost(
+      SEARCH_API,
+      {
+        query_s: ko.mapping.toJSON(options.query),
+        limit: options.limit || 100,
+        raw_query: !!options.rawQuery,
+        sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
+      },
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: deferred.resolve,
+        errorCallback: deferred.reject
+      }
+    );
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 
   /**
    *
@@ -2136,22 +2373,25 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   formatSql(options) {
-    var self = this;
-    var deferred = $.Deferred();
+    const self = this;
+    const deferred = $.Deferred();
 
-    var request = self.simplePost(FORMAT_SQL_API, {
-      statements: options.statements
-    }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: deferred.resolve,
-      errorCallback: deferred.reject
-    });
+    const request = self.simplePost(
+      FORMAT_SQL_API,
+      {
+        statements: options.statements
+      },
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: deferred.resolve,
+        errorCallback: deferred.reject
+      }
+    );
 
     return new CancellablePromise(deferred, request);
-  };
+  }
 }
 
-let apiHelper = new ApiHelper();
+const apiHelper = new ApiHelper();
 
 export default apiHelper;
-

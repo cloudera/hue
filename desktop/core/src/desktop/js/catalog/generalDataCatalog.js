@@ -14,18 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import localforage from 'localforage'
+import $ from 'jquery';
+import localforage from 'localforage';
 
-import apiHelper from '../api/apiHelper'
+import apiHelper from 'api/apiHelper';
 
 const STORAGE_POSTFIX = LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
 
 class GeneralDataCatalog {
-
   constructor() {
-    let self = this;
+    const self = this;
     self.store = localforage.createInstance({
       name: 'HueDataCatalog_' + STORAGE_POSTFIX
     });
@@ -41,12 +40,12 @@ class GeneralDataCatalog {
    * @return {Promise}
    */
   getAllNavigatorTags(options) {
-    let self = this;
+    const self = this;
     if (self.allNavigatorTagsPromise && (!options || !options.refreshCache)) {
       return self.allNavigatorTagsPromise;
     }
 
-    let deferred = $.Deferred();
+    const deferred = $.Deferred();
 
     if (!window.HAS_NAVIGATOR) {
       return deferred.reject().promise();
@@ -54,48 +53,63 @@ class GeneralDataCatalog {
 
     self.allNavigatorTagsPromise = deferred.promise();
 
-    let reloadAllTags = () => {
-      apiHelper.fetchAllNavigatorTags({
-        silenceErrors: options && options.silenceErrors,
-      }).done(deferred.resolve).fail(deferred.reject);
+    const reloadAllTags = () => {
+      apiHelper
+        .fetchAllNavigatorTags({
+          silenceErrors: options && options.silenceErrors
+        })
+        .done(deferred.resolve)
+        .fail(deferred.reject);
 
       if (window.CACHEABLE_TTL.default > 0) {
-        deferred.done(function (allTags) {
-          self.store.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
-        })
+        deferred.done(allTags => {
+          self.store.setItem('hue.dataCatalog.allNavTags', {
+            allTags: allTags,
+            hueTimestamp: Date.now(),
+            version: DATA_CATALOG_VERSION
+          });
+        });
       }
     };
 
     if (window.CACHEABLE_TTL.default > 0 && (!options || !options.refreshCache)) {
-      self.store.getItem('hue.dataCatalog.allNavTags').then(function (storeEntry) {
-        if (storeEntry && storeEntry.version === DATA_CATALOG_VERSION && (!storeEntry.hueTimestamp || (Date.now() - storeEntry.hueTimestamp) < CACHEABLE_TTL.default)) {
-          deferred.resolve(storeEntry.allTags);
-        } else {
-          reloadAllTags();
-        }
-      }).catch(reloadAllTags);
+      self.store
+        .getItem('hue.dataCatalog.allNavTags')
+        .then(storeEntry => {
+          if (
+            storeEntry &&
+            storeEntry.version === DATA_CATALOG_VERSION &&
+            (!storeEntry.hueTimestamp ||
+              Date.now() - storeEntry.hueTimestamp < CACHEABLE_TTL.default)
+          ) {
+            deferred.resolve(storeEntry.allTags);
+          } else {
+            reloadAllTags();
+          }
+        })
+        .catch(reloadAllTags);
     } else {
       reloadAllTags();
     }
 
     return self.allNavigatorTagsPromise;
-  };
+  }
 
   /**
    * @param {string[]} tagsToAdd
    * @param {string[]} tagsToRemove
    */
   updateAllNavigatorTags(tagsToAdd, tagsToRemove) {
-    let self = this;
+    const self = this;
     if (self.allNavigatorTagsPromise) {
-      self.allNavigatorTagsPromise.done(function (allTags) {
-        tagsToAdd.forEach(function (newTag) {
+      self.allNavigatorTagsPromise.done(allTags => {
+        tagsToAdd.forEach(newTag => {
           if (!allTags[newTag]) {
             allTags[newTag] = 0;
           }
           allTags[newTag]++;
         });
-        tagsToRemove.forEach(function (removedTag) {
+        tagsToRemove.forEach(removedTag => {
           if (!allTags[removedTag]) {
             allTags[removedTag]--;
             if (allTags[removedTag] === 0) {
@@ -103,10 +117,14 @@ class GeneralDataCatalog {
             }
           }
         });
-        self.store.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
+        self.store.setItem('hue.dataCatalog.allNavTags', {
+          allTags: allTags,
+          hueTimestamp: Date.now(),
+          version: DATA_CATALOG_VERSION
+        });
       });
     }
-  };
+  }
 }
 
-export default GeneralDataCatalog
+export default GeneralDataCatalog;
