@@ -109,7 +109,7 @@ module.exports = function(grunt) {
       },
       sqlSyntaxParser: {
         files: {
-          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlSyntaxParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlSyntaxParser.js']
+          'desktop/core/src/desktop/js/sql/parse/jison/sqlSyntaxParser.js': ['desktop/core/src/desktop/js/sql/parse/jison/sqlSyntaxParser.js']
         }
       },
       sqlStatementsParser: {

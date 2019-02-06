@@ -16,15 +16,16 @@
 
 <%!
   from desktop import conf
+  from webpack_loader import utils
 %>
 
-% if conf.DEV.get():
-importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
-importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }' + '?' + Math.random());
-% else:
-importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
-importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
-% endif
+% for js_file in utils.get_files('sqlSyntaxWebWorker'):
+  % if conf.DEV.get():
+    importScripts('${ js_file.get('url') }?' + Math.random());
+  % else:
+    importScripts('${ js_file.get('url') }');
+  % endif
+% endfor
 
 (function () {
 
@@ -56,7 +57,7 @@ importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
     }
     clearTimeout(this.throttle);
     this.throttle = setTimeout(function () {
-      var syntaxError = sqlSyntaxParser.parseSyntax(msg.data.beforeCursor, msg.data.afterCursor, msg.data.type, false);
+      var syntaxError = WorkerGlobalScope.sqlSyntaxParser.parseSyntax(msg.data.beforeCursor, msg.data.afterCursor, msg.data.type, false);
       if (syntaxError) {
         toAbsoluteLocation(msg.data.statementLocation, syntaxError.loc);
       }

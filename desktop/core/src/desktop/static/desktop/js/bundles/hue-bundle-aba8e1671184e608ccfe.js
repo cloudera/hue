@@ -148,15 +148,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
 
-var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
-var SAMPLE_API_PREFIX = "/notebook/api/sample/";
-var DOCUMENTS_API = "/desktop/api2/doc/";
-var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
+var AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
+var SAMPLE_API_PREFIX = '/notebook/api/sample/';
+var DOCUMENTS_API = '/desktop/api2/doc/';
+var DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 var FETCH_CONFIG = '/desktop/api2/get_config/';
-var HDFS_API_PREFIX = "/filebrowser/view=/";
-var ADLS_API_PREFIX = "/filebrowser/view=adl:/";
-var GIT_API_PREFIX = "/desktop/api/vcs/contents/";
-var S3_API_PREFIX = "/filebrowser/view=S3A://";
+var HDFS_API_PREFIX = '/filebrowser/view=/';
+var ADLS_API_PREFIX = '/filebrowser/view=adl:/';
+var GIT_API_PREFIX = '/desktop/api/vcs/contents/';
+var S3_API_PREFIX = '/filebrowser/view=S3A://';
 var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 var CONFIG_APPS_API = '/desktop/api/configurations';
@@ -204,7 +204,7 @@ var fetchCached = function fetchCached(options) {
   var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier) || {};
   var cachedId = options.hash ? options.url + options.hash : options.url;
 
-  if (options.refreshCache || typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
+  if (options.refreshCache || typeof cachedData[cachedId] == 'undefined' || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
     if (typeof options.editor !== 'undefined' && options.editor !== null) {
       options.editor.showSpinner();
     }
@@ -375,60 +375,57 @@ function () {
 
       return new Date().getTime() - timestamp > CACHEABLE_TTL[cacheType];
     }
-  }, {
-    key: "getTotalStorageUserPrefix",
-
     /**
      * @param {string} sourceType
      * @returns {string}
      */
+
+  }, {
+    key: "getTotalStorageUserPrefix",
     value: function getTotalStorageUserPrefix(sourceType) {
       return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
     }
-  }, {
-    key: "getAssistCacheIdentifier",
-
     /**
      * @param {object} options
      * @param {string} options.sourceType
      * @param {string} [options.cacheType] - Default value 'default'
      * @returns {string}
      */
+
+  }, {
+    key: "getAssistCacheIdentifier",
     value: function getAssistCacheIdentifier(options) {
       var self = this;
-      return "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
+      return 'hue.assist.' + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
     }
-  }, {
-    key: "setInTotalStorage",
-
     /**
      *
      * @param {string} owner - 'assist', 'viewModelA' etc.
      * @param {string} id
      * @param {*} [value] - Optional, undefined and null will remove the value
      */
+
+  }, {
+    key: "setInTotalStorage",
     value: function setInTotalStorage(owner, id, value) {
       var self = this;
 
       try {
-        var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+        var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner)) || {};
 
         if (typeof value !== 'undefined' && value !== null) {
           cachedData[id] = value;
-          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, {
+          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner), cachedData, {
             secure: window.location.protocol.indexOf('https') > -1
           });
         } else if (cachedData[id]) {
           delete cachedData[id];
-          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, {
+          jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner), cachedData, {
             secure: window.location.protocol.indexOf('https') > -1
           });
         }
       } catch (e) {}
     }
-  }, {
-    key: "getFromTotalStorage",
-
     /**
      *
      * @param {string} owner - 'assist', 'viewModelA' etc.
@@ -436,20 +433,23 @@ function () {
      * @param {*} [defaultValue]
      * @returns {*}
      */
+
+  }, {
+    key: "getFromTotalStorage",
     value: function getFromTotalStorage(owner, id, defaultValue) {
       var self = this;
-      var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+      var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage('hue.user.settings.' + self.getTotalStorageUserPrefix(owner)) || {};
       return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
     }
-  }, {
-    key: "withTotalStorage",
-
     /**
      * @param {string} owner - 'assist', 'viewModelA' etc.
      * @param {string} id
      * @param {Observable} observable
      * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
      */
+
+  }, {
+    key: "withTotalStorage",
     value: function withTotalStorage(owner, id, observable, defaultValue, noInit) {
       var self = this;
       var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
@@ -467,26 +467,26 @@ function () {
       });
       return observable;
     }
-  }, {
-    key: "successResponseIsError",
-
     /**
      * @param {Object} [response]
      * @param {number} [response.status]
      * @returns {boolean} - True if actually an error
      */
+
+  }, {
+    key: "successResponseIsError",
     value: function successResponseIsError(response) {
       return typeof response !== 'undefined' && (typeof response.traceback !== 'undefined' || typeof response.status !== 'undefined' && response.status !== 0 || response.code === 503 || response.code === 500);
     }
-  }, {
-    key: "assistErrorCallback",
-
     /**
      * @param {Object} options
      * @param {Function} [options.errorCallback]
      * @param {boolean} [options.silenceErrors]
      * @returns {Function}
      */
+
+  }, {
+    key: "assistErrorCallback",
     value: function assistErrorCallback(options) {
       return function (errorResponse) {
         var errorMessage = 'Unknown error occurred';
@@ -521,7 +521,7 @@ function () {
           utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].logError(errorResponse);
 
           if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).trigger("error", errorMessage);
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).trigger('error', errorMessage);
           }
         }
 
@@ -543,9 +543,6 @@ function () {
         }
       }
     }
-  }, {
-    key: "simplePost",
-
     /**
      * @param {string} url
      * @param {Object} data
@@ -556,6 +553,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "simplePost",
     value: function simplePost(url, data, options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -586,14 +586,14 @@ function () {
 
       return promise;
     }
-  }, {
-    key: "saveSnippetToFile",
-
     /**
      * @param {Object} data
      * @param {Object} options
      * @param {function} [options.successCallback]
      */
+
+  }, {
+    key: "saveSnippetToFile",
     value: function saveSnippetToFile(data, options) {
       var self = this;
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post(SAVE_TO_FILE, data, function (result) {
@@ -602,9 +602,6 @@ function () {
         }
       }, 'json').fail(self.assistErrorCallback(options));
     }
-  }, {
-    key: "simpleGet",
-
     /**
      * @param {string} url
      * @param {Object} data
@@ -613,6 +610,9 @@ function () {
      * @param {function} [options.errorCallback]
      * @param {boolean} [options.silenceErrors]
      */
+
+  }, {
+    key: "simpleGet",
     value: function simpleGet(url, data, options) {
       var self = this;
 
@@ -631,10 +631,9 @@ function () {
   }, {
     key: "fetchUsersAndGroups",
     value: function fetchUsersAndGroups(options) {
-      var self = this;
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        method: "GET",
-        url: "/desktop/api/users/autocomplete",
+        method: 'GET',
+        url: '/desktop/api/users/autocomplete',
         data: options.data || {},
         contentType: 'application/json'
       }).done(function (response) {
@@ -646,10 +645,9 @@ function () {
   }, {
     key: "fetchUsersByIds",
     value: function fetchUsersByIds(options) {
-      var self = this;
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        method: "GET",
-        url: "/desktop/api/users",
+        method: 'GET',
+        url: '/desktop/api/users',
         data: {
           userids: options.userids
         },
@@ -660,9 +658,6 @@ function () {
         options.errorCallback(response);
       });
     }
-  }, {
-    key: "fetchStoragePreview",
-
     /**
      *
      * @param {Object} options
@@ -672,6 +667,9 @@ function () {
      * @param {number} [options.length]
      * @param {boolean} [options.silenceErrors]
      */
+
+  }, {
+    key: "fetchStoragePreview",
     value: function fetchStoragePreview(options) {
       var self = this;
       var url;
@@ -695,7 +693,7 @@ function () {
       url += '&length=' + (options.length || 118784);
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-        dataType: "json",
+        dataType: 'json',
         url: url,
         success: function success(data) {
           if (self.successResponseIsError(data)) {
@@ -708,9 +706,6 @@ function () {
       });
       return deferred.promise();
     }
-  }, {
-    key: "fetchHdfsPath",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -724,6 +719,9 @@ function () {
      * @param {number} [options.page] - Default 1
      * @param {string} [options.filter]
      */
+
+  }, {
+    key: "fetchHdfsPath",
     value: function fetchHdfsPath(options) {
       var self = this;
 
@@ -731,7 +729,7 @@ function () {
         options.pathParts.shift();
       }
 
-      var url = HDFS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+      var url = HDFS_API_PREFIX + encodeURI(options.pathParts.join('/')) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
 
       if (options.filter) {
         url += '&filter=' + options.filter;
@@ -746,7 +744,7 @@ function () {
         }
 
         return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
+          dataType: 'json',
           url: url,
           timeout: options.timeout,
           success: function success(data) {
@@ -773,9 +771,6 @@ function () {
         fetchFunction: fetchFunction
       }));
     }
-  }, {
-    key: "fetchAdlsPath",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -789,10 +784,13 @@ function () {
      * @param {number} [options.page] - Default 1
      * @param {string} [options.filter]
      */
+
+  }, {
+    key: "fetchAdlsPath",
     value: function fetchAdlsPath(options) {
       var self = this;
       options.pathParts.shift();
-      var url = ADLS_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+      var url = ADLS_API_PREFIX + encodeURI(options.pathParts.join('/')) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
 
       if (options.filter) {
         url += '&filter=' + options.filter;
@@ -807,7 +805,7 @@ function () {
         }
 
         return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
+          dataType: 'json',
           url: url,
           timeout: options.timeout,
           success: function success(data) {
@@ -834,9 +832,6 @@ function () {
         fetchFunction: fetchFunction
       }));
     }
-  }, {
-    key: "fetchGitContents",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -847,9 +842,12 @@ function () {
      * @param {string[]} options.pathParts
      * @param {string} options.fileType
      */
+
+  }, {
+    key: "fetchGitContents",
     value: function fetchGitContents(options) {
       var self = this;
-      var url = GIT_API_PREFIX + '?path=' + encodeURI(options.pathParts.join("/")) + '&fileType=' + options.fileType;
+      var url = GIT_API_PREFIX + '?path=' + encodeURI(options.pathParts.join('/')) + '&fileType=' + options.fileType;
 
       var fetchFunction = function fetchFunction(storeInCache) {
         if (options.timeout === 0) {
@@ -860,7 +858,7 @@ function () {
         }
 
         jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
+          dataType: 'json',
           url: url,
           timeout: options.timeout,
           success: function success(data) {
@@ -887,9 +885,6 @@ function () {
         fetchFunction: fetchFunction
       }));
     }
-  }, {
-    key: "fetchS3Path",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -903,11 +898,14 @@ function () {
      * @param {number} [options.page] - Default 1
      * @param {string} [options.filter]
      */
+
+  }, {
+    key: "fetchS3Path",
     value: function fetchS3Path(options) {
       var self = this;
       options.pathParts.shift(); // remove the trailing /
 
-      var url = S3_API_PREFIX + encodeURI(options.pathParts.join("/")) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+      var url = S3_API_PREFIX + encodeURI(options.pathParts.join('/')) + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
 
       if (options.filter) {
         url += '&filter=' + options.filter;
@@ -922,7 +920,7 @@ function () {
         }
 
         jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
+          dataType: 'json',
           url: url,
           timeout: options.timeout,
           success: function success(data) {
@@ -949,9 +947,6 @@ function () {
         fetchFunction: fetchFunction
       }));
     }
-  }, {
-    key: "fetchDashboardTerms",
-
     /**
      * @param {Object} options
      * @param {String} options.collectionName
@@ -963,6 +958,9 @@ function () {
      * @param {Number} [options.timeout]
      *
      */
+
+  }, {
+    key: "fetchDashboardTerms",
     value: function fetchDashboardTerms(options) {
       var self = this;
 
@@ -1000,9 +998,6 @@ function () {
         }
       }).fail(self.assistErrorCallback(options)).always(options.alwaysCallback);
     }
-  }, {
-    key: "fetchDashboardStats",
-
     /**
      * @param {Object} options
      * @param {String} options.collectionName
@@ -1013,6 +1008,9 @@ function () {
      * @param {Number} [options.timeout]
      *
      */
+
+  }, {
+    key: "fetchDashboardStats",
     value: function fetchDashboardStats(options) {
       var self = this;
 
@@ -1050,19 +1048,14 @@ function () {
         success: function success(data) {
           if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
             options.successCallback(data);
+          } else if (data.status === 1) {
+            options.notSupportedCallback(data);
           } else {
-            if (data.status === 1) {
-              options.notSupportedCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
+            self.assistErrorCallback(options)(data);
           }
         }
       }).fail(self.assistErrorCallback(options)).always(options.alwaysCallback);
     }
-  }, {
-    key: "fetchHBase",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1071,6 +1064,9 @@ function () {
      * @param {Number} [options.timeout]
      * @param {Object} [options.editor] - Ace editor
      */
+
+  }, {
+    key: "fetchHBase",
     value: function fetchHBase(options) {
       var self = this;
       var suffix = 'getClusters';
@@ -1090,7 +1086,7 @@ function () {
         }
 
         jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
-          dataType: "json",
+          dataType: 'json',
           url: url,
           timeout: options.timeout,
           success: function success(data) {
@@ -1114,9 +1110,6 @@ function () {
         fetchFunction: fetchFunction
       }));
     }
-  }, {
-    key: "fetchResourceStats",
-
     /**
      * @param {Object} options
      * @param {Number} options.pastMs
@@ -1124,6 +1117,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "fetchResourceStats",
     value: function fetchResourceStats(options) {
       var self = this;
 
@@ -1173,15 +1169,15 @@ function () {
       }).fail(combinedDeferred.reject);
       return combinedDeferred.promise();
     }
-  }, {
-    key: "fetchConfigurations",
-
     /**
      * @param {Object} options
      * @param {Function} [options.successCallback]
      * @param {Function} [options.errorCallback]
      * @param {boolean} [options.silenceErrors]
      */
+
+  }, {
+    key: "fetchConfigurations",
     value: function fetchConfigurations(options) {
       var self = this;
       self.simpleGet(CONFIG_APPS_API, {}, options);
@@ -1194,9 +1190,6 @@ function () {
         configuration: ko.mapping.toJSON(options.configuration)
       }, options);
     }
-  }, {
-    key: "saveConfiguration",
-
     /**
      * @param {Object} options
      * @param {Function} [options.successCallback]
@@ -1209,6 +1202,9 @@ function () {
      * @param {Number} [options.groupId]
      * @param {Number} [options.userId]
      */
+
+  }, {
+    key: "saveConfiguration",
     value: function saveConfiguration(options) {
       var self = this;
       self.simplePost(CONFIG_SAVE_API, {
@@ -1219,9 +1215,6 @@ function () {
         user_id: options.userId
       }, options);
     }
-  }, {
-    key: "fetchDocuments",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1230,6 +1223,9 @@ function () {
      *
      * @param {string} [options.uuid]
      */
+
+  }, {
+    key: "fetchDocuments",
     value: function fetchDocuments(options) {
       var self = this;
       var id = '';
@@ -1277,9 +1273,6 @@ function () {
         }
       }).fail(promise.reject);
     }
-  }, {
-    key: "searchDocuments",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1292,6 +1285,9 @@ function () {
      * @param {int} [options.page]
      * @param {int} [options.limit]
      */
+
+  }, {
+    key: "searchDocuments",
     value: function searchDocuments(options) {
       var self = this;
       return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
@@ -1313,9 +1309,6 @@ function () {
         }
       }).fail(self.assistErrorCallback(options));
     }
-  }, {
-    key: "fetchDocument",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1326,6 +1319,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchDocument",
     value: function fetchDocument(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -1349,9 +1345,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "createDocumentsFolder",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1361,6 +1354,9 @@ function () {
      * @param {string} options.parentUuid
      * @param {string} options.name
      */
+
+  }, {
+    key: "createDocumentsFolder",
     value: function createDocumentsFolder(options) {
       var self = this;
       self.simplePost(DOCUMENTS_API + 'mkdir', {
@@ -1368,9 +1364,6 @@ function () {
         name: ko.mapping.toJSON(options.name)
       }, options);
     }
-  }, {
-    key: "updateDocument",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1380,6 +1373,9 @@ function () {
      * @param {string} options.uuid
      * @param {string} options.name
      */
+
+  }, {
+    key: "updateDocument",
     value: function updateDocument(options) {
       var self = this;
       self.simplePost(DOCUMENTS_API + 'update', {
@@ -1387,9 +1383,6 @@ function () {
         name: options.name
       }, options);
     }
-  }, {
-    key: "uploadDocument",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1399,6 +1392,9 @@ function () {
      *
      * @param {FormData} options.formData
      */
+
+  }, {
+    key: "uploadDocument",
     value: function uploadDocument(options) {
       var self = this;
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
@@ -1427,9 +1423,6 @@ function () {
         processData: false
       }).fail(self.assistErrorCallback(options));
     }
-  }, {
-    key: "moveDocument",
-
     /**
      *
      * @param {Function} options.successCallback
@@ -1439,6 +1432,9 @@ function () {
      * @param {number} options.sourceId - The ID of the source document
      * @param {number} options.destinationId - The ID of the target document
      */
+
+  }, {
+    key: "moveDocument",
     value: function moveDocument(options) {
       var self = this;
       self.simplePost(DOCUMENTS_API + 'move', {
@@ -1446,9 +1442,6 @@ function () {
         destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
       }, options);
     }
-  }, {
-    key: "deleteDocument",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1458,6 +1451,9 @@ function () {
      * @param {string} options.uuid
      * @param {string} [options.skipTrash] - Default false
      */
+
+  }, {
+    key: "deleteDocument",
     value: function deleteDocument(options) {
       var self = this;
       self.simplePost(DOCUMENTS_API + 'delete', {
@@ -1465,9 +1461,6 @@ function () {
         skip_trash: ko.mapping.toJSON(options.skipTrash || false)
       }, options);
     }
-  }, {
-    key: "copyDocument",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1476,15 +1469,15 @@ function () {
      *
      * @param {string} options.uuid
      */
+
+  }, {
+    key: "copyDocument",
     value: function copyDocument(options) {
       var self = this;
       self.simplePost(DOCUMENTS_API + 'copy', {
         uuid: ko.mapping.toJSON(options.uuid)
       }, options);
     }
-  }, {
-    key: "restoreDocument",
-
     /**
      * @param {Object} options
      * @param {Function} options.successCallback
@@ -1493,15 +1486,15 @@ function () {
      *
      * @param {string} options.uuid
      */
+
+  }, {
+    key: "restoreDocument",
     value: function restoreDocument(options) {
       var self = this;
       self.simplePost(DOCUMENTS_API + 'restore', {
         uuids: ko.mapping.toJSON(options.uuids)
       }, options);
     }
-  }, {
-    key: "clearDbCache",
-
     /**
      *
      * @param {Object} options
@@ -1512,6 +1505,9 @@ function () {
      * @param {string[]} [options.fields]
      * @param {boolean} [options.clearAll]
      */
+
+  }, {
+    key: "clearDbCache",
     value: function clearDbCache(options) {
       var self = this;
       var cacheIdentifier = self.getAssistCacheIdentifier(options);
@@ -1526,11 +1522,11 @@ function () {
         }
 
         if (options.tableName) {
-          url += "/" + options.tableName;
+          url += '/' + options.tableName;
         }
 
         if (options.fields) {
-          url += options.fields.length > 0 ? "/" + options.fields.join("/") : "";
+          url += options.fields.length > 0 ? '/' + options.fields.join('/') : '';
         }
 
         var cachedData = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier) || {};
@@ -1538,9 +1534,6 @@ function () {
         jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(cacheIdentifier, cachedData);
       }
     }
-  }, {
-    key: "invalidateSourceMetadata",
-
     /**
      * @param {Object} options
      * @param {string} options.sourceType
@@ -1549,6 +1542,9 @@ function () {
      * @param {ContextCompute} [options.compute]
      * @param {boolean} [options.silenceErrors]
      */
+
+  }, {
+    key: "invalidateSourceMetadata",
     value: function invalidateSourceMetadata(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -1573,9 +1569,6 @@ function () {
 
       return deferred.resolve().promise();
     }
-  }, {
-    key: "fetchSourceMetadata",
-
     /**
      * @param {Object} options
      * @param {string} options.sourceType
@@ -1587,6 +1580,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchSourceMetadata",
     value: function fetchSourceMetadata(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -1673,9 +1669,6 @@ function () {
 
       return self.simplePost(url, data, options);
     }
-  }, {
-    key: "fetchAnalysis",
-
     /**
      * Fetches the analysis for the given source and path
      *
@@ -1688,6 +1681,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchAnalysis",
     value: function fetchAnalysis(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -1730,9 +1726,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "fetchPartitions",
-
     /**
      * Fetches the partitions for the given path
      *
@@ -1744,6 +1737,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchPartitions",
     value: function fetchPartitions(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred(); // TODO: No sourceType needed?
@@ -1782,9 +1778,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "refreshAnalysis",
-
     /**
      * Refreshes the analysis for the given source and path
      *
@@ -1797,6 +1790,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "refreshAnalysis",
     value: function refreshAnalysis(options) {
       var self = this;
 
@@ -1843,9 +1839,6 @@ function () {
       }));
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, promises);
     }
-  }, {
-    key: "whenAvailable",
-
     /**
      * Checks the status for the given snippet ID
      * Note: similar to notebook and search check_status.
@@ -1857,6 +1850,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "whenAvailable",
     value: function whenAvailable(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -1894,9 +1890,6 @@ function () {
       waitForAvailable();
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
     }
-  }, {
-    key: "fetchSample",
-
     /**
      * Fetches samples for the given source and path
      *
@@ -1911,17 +1904,17 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchSample",
     value: function fetchSample(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       var cancellablePromises = [];
       var notebookJson = null;
       var snippetJson = null;
-      var cancelled = false;
 
       var cancelQuery = function cancelQuery() {
-        cancelled = true;
-
         if (notebookJson) {
           self.simplePost('/notebook/api/cancel_statement', {
             notebook: notebookJson,
@@ -1990,9 +1983,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
     }
-  }, {
-    key: "fetchNavigatorMetadata",
-
     /**
      * Fetches a navigator entity for the given source and path
      *
@@ -2004,6 +1994,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavigatorMetadata",
     value: function fetchNavigatorMetadata(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -2035,9 +2028,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "updateNavigatorProperties",
-
     /**
      * Updates Navigator properties and custom metadata for the given entity
      *
@@ -2050,6 +2040,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "updateNavigatorProperties",
     value: function updateNavigatorProperties(options) {
       var self = this;
       var data = {
@@ -2070,9 +2063,6 @@ function () {
 
       return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options);
     }
-  }, {
-    key: "fetchAllNavigatorTags",
-
     /**
      * Lists all available navigator tags
      *
@@ -2081,6 +2071,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchAllNavigatorTags",
     value: function fetchAllNavigatorTags(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -2115,9 +2108,6 @@ function () {
         tags: ko.mapping.toJSON(tags)
       });
     }
-  }, {
-    key: "fetchNavOptPopularity",
-
     /**
      * Fetches navOpt popularity for the children of the given path
      *
@@ -2126,6 +2116,9 @@ function () {
      * @param {string[][]} options.paths
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavOptPopularity",
     value: function fetchNavOptPopularity(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -2157,9 +2150,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "fetchNavOptTopAggs",
-
     /**
      * Fetches the popular aggregate functions for the given tables
      *
@@ -2168,12 +2158,12 @@ function () {
      * @param {string[][]} options.paths
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavOptTopAggs",
     value: function fetchNavOptTopAggs(options) {
       return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
     }
-  }, {
-    key: "fetchNavOptTopColumns",
-
     /**
      * Fetches the popular columns for the given tables
      *
@@ -2182,12 +2172,12 @@ function () {
      * @param {string[][]} options.paths
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavOptTopColumns",
     value: function fetchNavOptTopColumns(options) {
       return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
     }
-  }, {
-    key: "fetchNavOptTopFilters",
-
     /**
      * Fetches the popular filters for the given tables
      *
@@ -2196,12 +2186,12 @@ function () {
      * @param {string[][]} options.paths
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavOptTopFilters",
     value: function fetchNavOptTopFilters(options) {
       return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
     }
-  }, {
-    key: "fetchNavOptTopJoins",
-
     /**
      * Fetches the popular joins for the given tables
      *
@@ -2210,12 +2200,12 @@ function () {
      * @param {string[][]} options.paths
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavOptTopJoins",
     value: function fetchNavOptTopJoins(options) {
       return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
     }
-  }, {
-    key: "fetchNavOptMeta",
-
     /**
      * Fetches navOpt meta for the given path, only possible for tables atm.
      *
@@ -2225,6 +2215,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchNavOptMeta",
     value: function fetchNavOptMeta(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -2245,9 +2238,6 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "fetchQueryExecutionAnalysis",
-
     /**
      * @param {Object} options
      * @param {boolean} [options.silenceErrors]
@@ -2255,6 +2245,9 @@ function () {
      * @param {string} options.queryId
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "fetchQueryExecutionAnalysis",
     value: function fetchQueryExecutionAnalysis(options) {
       var self = this; //var url = '/metadata/api/workload_analytics/get_impala_query/';
 
@@ -2274,8 +2267,8 @@ function () {
         cancellablePromises.pop(); // Remove the last one
 
         cancellablePromises.push(deferred, self.simplePost(url, {
-          'cluster': JSON.stringify(options.compute),
-          'query_id': '"' + options.queryId + '"'
+          cluster: JSON.stringify(options.compute),
+          query_id: '"' + options.queryId + '"'
         }, options).done(function (response) {
           if (response && response.data) {
             deferred.resolve(response.data);
@@ -2323,8 +2316,8 @@ function () {
       var url = '/impala/api/query/alanize/metrics';
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       var request = self.simplePost(url, {
-        'cluster': JSON.stringify(options.compute),
-        'query_id': '"' + options.queryId + '"'
+        cluster: JSON.stringify(options.compute),
+        query_id: '"' + options.queryId + '"'
       }, {
         silenceErrors: options.silenceErrors,
         successCallback: function successCallback(response) {
@@ -2338,43 +2331,43 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "fetchContextNamespaces",
-
     /**
      * @param {Object} options
      * @param {boolean} [options.silenceErrors]
      * @param {string} options.sourceType
      * @return {Promise}
      */
+
+  }, {
+    key: "fetchContextNamespaces",
     value: function fetchContextNamespaces(options) {
       var self = this;
       var url = '/desktop/api2/context/namespaces/' + options.sourceType;
       return self.simpleGet(url, undefined, options);
     }
-  }, {
-    key: "fetchContextComputes",
-
     /**
      * @param {Object} options
      * @param {boolean} [options.silenceErrors]
      * @param {string} options.sourceType
      * @return {Promise}
      */
+
+  }, {
+    key: "fetchContextComputes",
     value: function fetchContextComputes(options) {
       var self = this;
       var url = '/desktop/api2/context/computes/' + options.sourceType;
       return self.simpleGet(url, undefined, options);
     }
-  }, {
-    key: "fetchContextClusters",
-
     /**
      * @param {Object} options
      * @param {boolean} [options.silenceErrors]
      * @param {string} options.sourceType
      * @return {Promise}
      */
+
+  }, {
+    key: "fetchContextClusters",
     value: function fetchContextClusters(options) {
       var self = this;
       var url = '/desktop/api2/context/clusters/' + options.sourceType;
@@ -2437,15 +2430,15 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
-  }, {
-    key: "formatSql",
-
     /**
      *
      * @param {Object} options
      * @param {string} options.statements
      * @param {boolean} [options.silenceErrors]
      */
+
+  }, {
+    key: "formatSql",
     value: function formatSql(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -2955,18 +2948,18 @@ function () {
 
         if (entry.catalogEntry.isArray() || entry.catalogEntry.isMapValue()) {
           if (sourceType === 'hive') {
-            parts.push("[]");
+            parts.push('[]');
           }
         } else {
           parts.push(sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name));
-          parts.push(".");
+          parts.push('.');
         }
 
         entry = entry.parent;
       }
 
       parts.reverse();
-      return parts.slice(1).join("");
+      return parts.slice(1).join('');
     }
   }, {
     key: "showContextPopover",
@@ -3162,12 +3155,12 @@ function () {
         silenceErrors: self.navigationSettings.rightAssist
       }).done(successCallback).fail(errorCallback);
     }
-  }, {
-    key: "createEntry",
-
     /**
      * @param {DataCatalogEntry} catalogEntry
      */
+
+  }, {
+    key: "createEntry",
     value: function createEntry(catalogEntry) {
       var self = this;
       return new AssistDbEntry(catalogEntry, self, self.assistDbNamespace, self.filter, self.i18n, self.navigationSettings);
@@ -3598,15 +3591,13 @@ function () {
     value: function highlightInside(catalogEntry) {
       var self = this;
       var foundDb;
-      var index;
 
       var findDatabase = function findDatabase() {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.each(self.databases(), function (idx, db) {
+        self.databases().foreach(function (db) {
           db.highlight(false);
 
           if (db.databaseName === catalogEntry.path[0]) {
             foundDb = db;
-            index = idx;
           }
         });
 
@@ -4337,19 +4328,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var PAGE_SIZE = 100;
 var TYPE_SPECIFICS = {
-  'adls': {
+  adls: {
     apiHelperFetchFunction: 'fetchAdlsPath',
     dblClickPubSubId: 'assist.dblClickAdlsItem',
     goHomePubSubId: 'assist.adls.go.home',
     selectEntryPubSubId: 'assist.selectAdlsEntry'
   },
-  'hdfs': {
+  hdfs: {
     apiHelperFetchFunction: 'fetchHdfsPath',
     dblClickPubSubId: 'assist.dblClickHdfsItem',
     goHomePubSubId: 'assist.hdfs.go.home',
     selectEntryPubSubId: 'assist.selectHdfsEntry'
   },
-  's3': {
+  s3: {
     apiHelperFetchFunction: 'fetchS3Path',
     dblClickPubSubId: 'assist.dblClickS3Item',
     goHomePubSubId: 'assist.s3.go.home',
@@ -4658,9 +4649,6 @@ function () {
     value: function openInImporter() {
       utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.in.importer', this.definition.path);
     }
-  }], [{
-    key: "getEntry",
-
     /**
      * Helper function to create an assistStorageEntry. It will load the entries starting from the root up until the
      * path or stop when a part is not found.
@@ -4669,6 +4657,9 @@ function () {
      * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
      * @return {Promise}
      */
+
+  }], [{
+    key: "getEntry",
     value: function getEntry(path, type) {
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
@@ -4751,7 +4742,6 @@ window.AssistStorageEntry = assist_assistStorageEntry__WEBPACK_IMPORTED_MODULE_4
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -4767,7 +4757,6 @@ __webpack_require__.r(__webpack_exports__);
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 
 /**
  * Wrapper function around ApiHelper calls, it will also save the entry on success.
@@ -4980,9 +4969,6 @@ function () {
       });
       return deferred.promise();
     }
-  }, {
-    key: "getNamespaces",
-
     /**
      * @param {Object} options
      * @param {string} options.sourceType
@@ -4990,6 +4976,9 @@ function () {
      * @param {boolean} [options.silenceErrors] - Default False
      * @return {Promise}
      */
+
+  }, {
+    key: "getNamespaces",
     value: function getNamespaces(options) {
       var self = this;
       var notifyForRefresh = self.namespacePromises[options.sourceType] && options.clearCache;
@@ -5114,9 +5103,6 @@ function () {
 
       return self.namespacePromises[options.sourceType];
     }
-  }, {
-    key: "getComputes",
-
     /**
      * @param {Object} options
      * @param {string} options.sourceType
@@ -5124,6 +5110,9 @@ function () {
      * @param {boolean} [options.clearCache] - Default False
      * @return {Promise}
      */
+
+  }, {
+    key: "getComputes",
     value: function getComputes(options) {
       var self = this;
 
@@ -5159,15 +5148,15 @@ function () {
       });
       return self.computePromises[options.sourceType];
     }
-  }, {
-    key: "getClusters",
-
     /**
      * @param {Object} options
      * @param {string} options.sourceType
      * @param {boolean} [options.silenceErrors] - Default False
      * @return {Promise}
      */
+
+  }, {
+    key: "getClusters",
     value: function getClusters(options) {
       var self = this;
 
@@ -5409,9 +5398,6 @@ function () {
       var self = this;
       return HAS_OPTIMIZER && (self.sourceType === 'hive' || self.sourceType === 'impala');
     }
-  }, {
-    key: "clearStorageCascade",
-
     /**
      * Clears the data catalog and cache for the given path and any children thereof.
      *
@@ -5419,6 +5405,9 @@ function () {
      * @param {ContextCompute} [compute] - The context compute
      * @param {string[]} rootPath - The path to clear
      */
+
+  }, {
+    key: "clearStorageCascade",
     value: function clearStorageCascade(namespace, compute, rootPath) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -5457,15 +5446,15 @@ function () {
       }).catch(keysDeferred.reject);
       return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.when.apply(jquery__WEBPACK_IMPORTED_MODULE_0___default.a, deletePromises);
     }
-  }, {
-    key: "persistCatalogEntry",
-
     /**
      * Updates the cache for the given entry
      *
      * @param {DataCatalogEntry} dataCatalogEntry
      * @return {Promise}
      */
+
+  }, {
+    key: "persistCatalogEntry",
     value: function persistCatalogEntry(dataCatalogEntry) {
       var self = this;
 
@@ -5488,9 +5477,6 @@ function () {
       }).then(deferred.resolve).catch(deferred.reject);
       return deferred.promise();
     }
-  }, {
-    key: "loadNavOptPopularityForTables",
-
     /**
      * Loads Navigator Optimizer popularity for multiple tables in one go.
      *
@@ -5503,6 +5489,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "loadNavOptPopularityForTables",
     value: function loadNavOptPopularityForTables(options) {
       var self = this;
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -5609,9 +5598,6 @@ function () {
       });
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].applyCancellable(new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__["default"](deferred, cancellablePromises), options);
     }
-  }, {
-    key: "getKnownEntry",
-
     /**
      * @param {Object} options
      * @param {ContextNamespace} options.namespace - The context namespace
@@ -5619,13 +5605,13 @@ function () {
      * @param {string|string[]} options.path
      * @return {DataCatalogEntry}
      */
+
+  }, {
+    key: "getKnownEntry",
     value: function getKnownEntry(options) {
       var self = this;
       return self.entries[generateEntryCacheId(options)];
     }
-  }, {
-    key: "addTemporaryTable",
-
     /**
      * Adds a temporary table to the data catalog. This would allow autocomplete etc. of tables that haven't
      * been created yet.
@@ -5644,6 +5630,9 @@ function () {
      *
      * @return {Object}
      */
+
+  }, {
+    key: "addTemporaryTable",
     value: function addTemporaryTable(options) {
       var self = this;
       var tableDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -5835,9 +5824,6 @@ function () {
         }
       };
     }
-  }, {
-    key: "getEntry",
-
     /**
      * @param {Object} options
      * @param {string|string[]} options.path
@@ -5848,6 +5834,9 @@ function () {
      * @param {boolean} [options.temporaryOnly] - Default: false
      * @return {Promise}
      */
+
+  }, {
+    key: "getEntry",
     value: function getEntry(options) {
       var self = this;
       var identifier = generateEntryCacheId(options);
@@ -5909,9 +5898,6 @@ function () {
 
       return self.entries[identifier];
     }
-  }, {
-    key: "getMultiTableEntry",
-
     /**
      *
      * @param {Object} options
@@ -5921,6 +5907,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "getMultiTableEntry",
     value: function getMultiTableEntry(options) {
       var self = this;
       var identifier = generateEntryCacheId(options);
@@ -5963,15 +5952,15 @@ function () {
 
       return self.multiTableEntries[identifier];
     }
-  }, {
-    key: "persistMultiTableEntry",
-
     /**
      * Updates the cache for the given multi tableentry
      *
      * @param {MultiTableEntry} multiTableEntry
      * @return {Promise}
      */
+
+  }, {
+    key: "persistMultiTableEntry",
     value: function persistMultiTableEntry(multiTableEntry) {
       var self = this;
 
@@ -5994,12 +5983,12 @@ function () {
     value: function disableCache() {
       cacheEnabled = false;
     }
-  }, {
-    key: "enableCache",
-
     /**
      * Enables the cache for subsequent operations, mainly used for test purposes
      */
+
+  }, {
+    key: "enableCache",
     value: function enableCache() {
       cacheEnabled = true;
     }
@@ -6398,15 +6387,15 @@ function () {
         }
       }
     }
-  }, {
-    key: "trackedPromise",
-
     /**
      * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
      *
      * @param {string} promiseName - The attribute name to use
      * @param {CancellablePromise} cancellablePromise
      */
+
+  }, {
+    key: "trackedPromise",
     value: function trackedPromise(promiseName, cancellablePromise) {
       var self = this;
       self[promiseName] = cancellablePromise;
@@ -6416,9 +6405,6 @@ function () {
         }
       });
     }
-  }, {
-    key: "clearCache",
-
     /**
      * Resets the entry and clears the cache
      *
@@ -6428,6 +6414,9 @@ function () {
      * @param {boolean} [options.silenceErrors] - Default false
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "clearCache",
     value: function clearCache(options) {
       var self = this;
 
@@ -6477,25 +6466,25 @@ function () {
       });
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](clearPromise, undefined, [invalidatePromise]);
     }
-  }, {
-    key: "save",
-
     /**
      * Save the entry to cache
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "save",
     value: function save() {
       var self = this;
       window.clearTimeout(self.saveTimeout);
       return self.dataCatalog.persistCatalogEntry(self);
     }
-  }, {
-    key: "saveLater",
-
     /**
      * Save the entry at a later point of time
      */
+
+  }, {
+    key: "saveLater",
     value: function saveLater() {
       var self = this;
 
@@ -6506,9 +6495,6 @@ function () {
         }, 1000);
       }
     }
-  }, {
-    key: "getChildren",
-
     /**
      * Get the children of the catalog entry, columns for a table entry etc.
      *
@@ -6520,6 +6506,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getChildren",
     value: function getChildren(options) {
       var self = this;
 
@@ -6611,9 +6600,6 @@ function () {
       }).fail(deferred.reject);
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('childrenPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [sourceMetaPromise])), options);
     }
-  }, {
-    key: "loadNavigatorMetaForChildren",
-
     /**
      * Loads navigator metadata for children, only applicable to databases and tables
      *
@@ -6624,6 +6610,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "loadNavigatorMetaForChildren",
     value: function loadNavigatorMetaForChildren(options) {
       var self = this;
       options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
@@ -6702,9 +6691,6 @@ function () {
       }).fail(deferred.reject));
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, null, cancellablePromises)), options);
     }
-  }, {
-    key: "applyNavOptResponseToChildren",
-
     /**
      * Helper function used when loading navopt metdata for children
      *
@@ -6714,6 +6700,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "applyNavOptResponseToChildren",
     value: function applyNavOptResponseToChildren(response, options) {
       var self = this;
       var deferred = $.Deferred();
@@ -6775,9 +6764,6 @@ function () {
       }).fail(deferred.reject);
       return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [childPromise]);
     }
-  }, {
-    key: "loadNavOptPopularityForChildren",
-
     /**
      * Loads nav opt popularity for the children of this entry.
      *
@@ -6788,6 +6774,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "loadNavOptPopularityForChildren",
     value: function loadNavOptPopularityForChildren(options) {
       var self = this;
       options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
@@ -6823,26 +6812,26 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
     }
-  }, {
-    key: "canHaveNavigatorMetadata",
-
     /**
      * Returns true if the catalog entry can have navigator metadata
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "canHaveNavigatorMetadata",
     value: function canHaveNavigatorMetadata() {
       var self = this;
       return window.HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala') && (self.isDatabase() || self.isTableOrView() || self.isColumn());
     }
-  }, {
-    key: "getResolvedComment",
-
     /**
      * Returns the currently known comment without loading any additional metadata
      *
      * @return {string}
      */
+
+  }, {
+    key: "getResolvedComment",
     value: function getResolvedComment() {
       var self = this;
 
@@ -6852,15 +6841,15 @@ function () {
 
       return self.sourceMeta && self.sourceMeta.comment || '';
     }
-  }, {
-    key: "getCommentObservable",
-
     /**
      * This can be used to get an observable for the comment which will be updated once a comment has been
      * resolved.
      *
      * @return {ko.observable}
      */
+
+  }, {
+    key: "getCommentObservable",
     value: function getCommentObservable() {
       var self = this;
 
@@ -6870,14 +6859,14 @@ function () {
 
       return self.commentObservable;
     }
-  }, {
-    key: "hasResolvedComment",
-
     /**
      * Checks whether the comment is known and has been loaded from the proper source
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "hasResolvedComment",
     value: function hasResolvedComment() {
       var self = this;
 
@@ -6887,9 +6876,6 @@ function () {
 
       return typeof self.sourceMeta !== 'undefined';
     }
-  }, {
-    key: "getComment",
-
     /**
      * Gets the comment for this entry, fetching it if necessary from the proper source.
      *
@@ -6901,6 +6887,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getComment",
     value: function getComment(options) {
       var self = this;
       var deferred = $.Deferred();
@@ -6940,9 +6929,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises), options);
     }
-  }, {
-    key: "updateNavigatorCustomMetadata",
-
     /**
      * Updates custom navigator metadata for the catalog entry
      *
@@ -6953,6 +6939,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "updateNavigatorCustomMetadata",
     value: function updateNavigatorCustomMetadata(modifiedCustomMetadata, deletedCustomMetadataKeys, apiOptions) {
       var self = this;
       var deferred = $.Deferred();
@@ -6990,9 +6979,6 @@ function () {
 
       return deferred.promise();
     }
-  }, {
-    key: "setComment",
-
     /**
      * Sets the comment in the proper source
      *
@@ -7003,6 +6989,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "setComment",
     value: function setComment(comment, apiOptions) {
       var self = this;
       var deferred = $.Deferred();
@@ -7059,9 +7048,6 @@ function () {
 
       return deferred.promise();
     }
-  }, {
-    key: "addNavigatorTags",
-
     /**
      * Adds a list of tags and updates the navigator metadata of the entry
      *
@@ -7069,6 +7055,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "addNavigatorTags",
     value: function addNavigatorTags(tags) {
       var self = this;
       var deferred = $.Deferred();
@@ -7097,9 +7086,6 @@ function () {
 
       return deferred.promise();
     }
-  }, {
-    key: "deleteNavigatorTags",
-
     /**
      * Removes a list of tags and updates the navigator metadata of the entry
      *
@@ -7107,6 +7093,9 @@ function () {
      *
      * @return {Promise}
      */
+
+  }, {
+    key: "deleteNavigatorTags",
     value: function deleteNavigatorTags(tags) {
       var self = this;
       var deferred = $.Deferred();
@@ -7135,81 +7124,78 @@ function () {
 
       return deferred.promise();
     }
-  }, {
-    key: "hasPossibleChildren",
-
     /**
      * Checks if the entry can have children or not without fetching additional metadata.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "hasPossibleChildren",
     value: function hasPossibleChildren() {
       var self = this;
       return self.path.length < 3 || !self.definition && !self.sourceMeta || self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type) || self.definition && /^(?:struct|array|map)/i.test(self.definition.type);
     }
-  }, {
-    key: "getIndex",
-
     /**
      * Returns the index representing the order in which the backend returned this entry.
      *
      * @return {number}
      */
+
+  }, {
+    key: "getIndex",
     value: function getIndex() {
       var self = this;
       return self.definition && self.definition.index ? self.definition.index : 0;
     }
-  }, {
-    key: "getSourceType",
-
     /**
      * Returns the source type of this entry.
      *
      * @return {string} - 'impala', 'hive', 'solr', etc.
      */
+
+  }, {
+    key: "getSourceType",
     value: function getSourceType() {
       var self = this;
       return self.dataCatalog.sourceType;
     }
-  }, {
-    key: "isSource",
-
     /**
      * Returns true if the entry represents a data source.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isSource",
     value: function isSource() {
       var self = this;
       return self.path.length === 0;
     }
-  }, {
-    key: "isDatabase",
-
     /**
      * Returns true if the entry is a database.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isDatabase",
     value: function isDatabase() {
       var self = this;
       return self.path.length === 1;
     }
-  }, {
-    key: "isTableOrView",
-
     /**
      * Returns true if the entry is a table or a view.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isTableOrView",
     value: function isTableOrView() {
       var self = this;
       return self.path.length === 2;
     }
-  }, {
-    key: "getTitle",
-
     /**
      * Returns the default title used for the entry, the qualified path with type for fields. Optionally include
      * the comment after, if already resolved.
@@ -7217,6 +7203,9 @@ function () {
      * @param {boolean} [includeComment] - Default false
      * @return {string}
      */
+
+  }, {
+    key: "getTitle",
     value: function getTitle(includeComment) {
       var self = this;
       var title = self.getQualifiedPath();
@@ -7235,27 +7224,27 @@ function () {
 
       return title;
     }
-  }, {
-    key: "getQualifiedPath",
-
     /**
      * Returns the fully qualified path for this entry.
      *
      * @return {string}
      */
+
+  }, {
+    key: "getQualifiedPath",
     value: function getQualifiedPath() {
       var self = this;
       return self.path.join('.');
     }
-  }, {
-    key: "getDisplayName",
-
     /**
      * Returns the display name for the entry, name or qualified path plus type for fields
      *
      * @param {boolean} qualified - Whether to use the qualified path or not, default false
      * @return {string}
      */
+
+  }, {
+    key: "getDisplayName",
     value: function getDisplayName(qualified) {
       var self = this;
       var displayName = qualified ? self.getQualifiedPath() : self.name;
@@ -7270,40 +7259,40 @@ function () {
 
       return displayName;
     }
-  }, {
-    key: "isPrimaryKey",
-
     /**
      * Returns true for columns that are a primary key. Note that the definition has to come from a parent entry, i.e.
      * getChildren().
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isPrimaryKey",
     value: function isPrimaryKey() {
       var self = this;
       return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
     }
-  }, {
-    key: "isPartitionKey",
-
     /**
      * Returns true if the entry is a partition key. Note that the definition has to come from a parent entry, i.e.
      * getChildren().
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isPartitionKey",
     value: function isPartitionKey() {
       var self = this;
       return self.definition && !!self.definition.partitionKey;
     }
-  }, {
-    key: "isTable",
-
     /**
      * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isTable",
     value: function isTable() {
       var self = this;
 
@@ -7321,97 +7310,94 @@ function () {
 
       return false;
     }
-  }, {
-    key: "isView",
-
     /**
      * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isView",
     value: function isView() {
       var self = this;
       return self.path.length === 2 && (self.sourceMeta && self.sourceMeta.is_view || self.definition && self.definition.type && self.definition.type.toLowerCase() === 'view');
     }
-  }, {
-    key: "isColumn",
-
     /**
      * Returns true if the entry is a column.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isColumn",
     value: function isColumn() {
       var self = this;
       return self.path.length === 3;
     }
-  }, {
-    key: "isComplex",
-
     /**
      * Returns true if the entry is a column. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isComplex",
     value: function isComplex() {
       var self = this;
       return self.path.length > 2 && (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type) || self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
     }
-  }, {
-    key: "isField",
-
     /**
      * Returns true if the entry is a field, i.e. column or child of a complex type.
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isField",
     value: function isField() {
       var self = this;
       return self.path.length > 2;
     }
-  }, {
-    key: "isArray",
-
     /**
      * Returns true if the entry is an array. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isArray",
     value: function isArray() {
       var self = this;
       return self.sourceMeta && /^array/i.test(self.sourceMeta.type) || self.definition && /^array/i.test(self.definition.type);
     }
-  }, {
-    key: "isMap",
-
     /**
      * Returns true if the entry is a map. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isMap",
     value: function isMap() {
       var self = this;
       return self.sourceMeta && /^map/i.test(self.sourceMeta.type) || self.definition && /^map/i.test(self.definition.type);
     }
-  }, {
-    key: "isMapValue",
-
     /**
      * Returns true if the entry is a map value. It will be accurate once the source meta has been loaded or if loaded
      * from a parent entry via getChildren().
      *
      * @return {boolean}
      */
+
+  }, {
+    key: "isMapValue",
     value: function isMapValue() {
       var self = this;
       return self.definition && self.definition.isMapValue;
     }
-  }, {
-    key: "getType",
-
     /**
      * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
@@ -7421,6 +7407,9 @@ function () {
      *
      * @return {string}
      */
+
+  }, {
+    key: "getType",
     value: function getType() {
       var self = this;
       var type = self.getRawType();
@@ -7431,9 +7420,6 @@ function () {
 
       return type.toLowerCase();
     }
-  }, {
-    key: "getRawType",
-
     /**
      * Returns the raw type of the entry. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
@@ -7442,13 +7428,13 @@ function () {
      *
      * @return {string}
      */
+
+  }, {
+    key: "getRawType",
     value: function getRawType() {
       var self = this;
       return self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
     }
-  }, {
-    key: "getSourceMeta",
-
     /**
      * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7460,6 +7446,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getSourceMeta",
     value: function getSourceMeta(options) {
       var self = this;
 
@@ -7473,9 +7462,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
     }
-  }, {
-    key: "getAnalysis",
-
     /**
      * Gets the analysis for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7488,6 +7474,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getAnalysis",
     value: function getAnalysis(options) {
       var self = this;
 
@@ -7501,9 +7490,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
     }
-  }, {
-    key: "getPartitions",
-
     /**
      * Gets the partitions for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7515,6 +7501,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getPartitions",
     value: function getPartitions(options) {
       var self = this;
 
@@ -7532,9 +7521,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
     }
-  }, {
-    key: "getNavigatorMeta",
-
     /**
      * Gets the Navigator metadata for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7546,6 +7532,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getNavigatorMeta",
     value: function getNavigatorMeta(options) {
       var self = this;
       options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
@@ -7564,9 +7553,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options);
     }
-  }, {
-    key: "getNavOptMeta",
-
     /**
      * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7578,6 +7564,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getNavOptMeta",
     value: function getNavOptMeta(options) {
       var self = this;
       options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
@@ -7596,9 +7585,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
     }
-  }, {
-    key: "getSample",
-
     /**
      * Gets the sample for the entry, if unknown it will first check if any parent table already has the sample. It
      * will fetch it if not cached or if the refresh option is set.
@@ -7612,6 +7598,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getSample",
     value: function getSample(options) {
       var self = this; // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
 
@@ -7699,9 +7688,6 @@ function () {
 
       return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise || reloadSample(self, options), options);
     }
-  }, {
-    key: "getTopAggs",
-
     /**
      * Gets the top aggregate UDFs for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7713,13 +7699,13 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopAggs",
     value: function getTopAggs(options) {
       var self = this;
       return getFromMultiTableCatalog(self, options, 'getTopAggs');
     }
-  }, {
-    key: "getTopFilters",
-
     /**
      * Gets the top filters for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7731,13 +7717,13 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopFilters",
     value: function getTopFilters(options) {
       var self = this;
       return getFromMultiTableCatalog(self, options, 'getTopFilters');
     }
-  }, {
-    key: "getTopJoins",
-
     /**
      * Gets the top joins for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
      *
@@ -7749,6 +7735,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopJoins",
     value: function getTopJoins(options) {
       var self = this;
       return getFromMultiTableCatalog(self, options, 'getTopJoins');
@@ -7871,13 +7860,13 @@ function () {
 
       return self.allNavigatorTagsPromise;
     }
-  }, {
-    key: "updateAllNavigatorTags",
-
     /**
      * @param {string[]} tagsToAdd
      * @param {string[]} tagsToRemove
      */
+
+  }, {
+    key: "updateAllNavigatorTags",
     value: function updateAllNavigatorTags(tagsToAdd, tagsToRemove) {
       var self = this;
 
@@ -8023,26 +8012,26 @@ function () {
     self.topJoins = undefined;
     self.topJoinsPromise = undefined;
   }
+  /**
+   * Save the multi table entry to cache
+   *
+   * @return {Promise}
+   */
+
 
   _createClass(MultiTableEntry, [{
     key: "save",
-
-    /**
-     * Save the multi table entry to cache
-     *
-     * @return {Promise}
-     */
     value: function save() {
       var self = this;
       window.clearTimeout(self.saveTimeout);
       return self.dataCatalog.persistMultiTableEntry(self);
     }
-  }, {
-    key: "saveLater",
-
     /**
      * Save the multi table entry at a later point of time
      */
+
+  }, {
+    key: "saveLater",
     value: function saveLater() {
       var self = this;
 
@@ -8053,15 +8042,15 @@ function () {
         }, 1000);
       }
     }
-  }, {
-    key: "trackedPromise",
-
     /**
      * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
      *
      * @param {string} promiseName - The attribute name to use
      * @param {CancellablePromise} cancellablePromise
      */
+
+  }, {
+    key: "trackedPromise",
     value: function trackedPromise(promiseName, cancellablePromise) {
       var self = this;
       self[promiseName] = cancellablePromise;
@@ -8071,9 +8060,6 @@ function () {
         }
       });
     }
-  }, {
-    key: "getTopAggs",
-
     /**
      * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -8085,13 +8071,13 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopAggs",
     value: function getTopAggs(options) {
       var self = this;
       return genericNavOptGet(self, options, 'topAggsPromise', 'topAggs', 'fetchNavOptTopAggs');
     }
-  }, {
-    key: "getTopColumns",
-
     /**
      * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -8103,13 +8089,13 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopColumns",
     value: function getTopColumns(options) {
       var self = this;
       return genericNavOptGet(self, options, 'topColumnsPromise', 'topColumns', 'fetchNavOptTopColumns');
     }
-  }, {
-    key: "getTopFilters",
-
     /**
      * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -8121,13 +8107,13 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopFilters",
     value: function getTopFilters(options) {
       var self = this;
       return genericNavOptGet(self, options, 'topFiltersPromise', 'topFilters', 'fetchNavOptTopFilters');
     }
-  }, {
-    key: "getTopJoins",
-
     /**
      * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
      *
@@ -8139,6 +8125,9 @@ function () {
      *
      * @return {CancellablePromise}
      */
+
+  }, {
+    key: "getTopJoins",
     value: function getTopJoins(options) {
       var self = this;
       return genericNavOptGet(self, options, 'topJoinsPromise', 'topJoins', 'fetchNavOptTopJoins');
@@ -17258,14 +17247,12 @@ var autocompleteFilter = function autocompleteFilter(filter, entries) {
       } else {
         suggestion.filterWeight = 2;
       }
-    } else {
-      if (suggestion.details && suggestion.details.comment && lowerCaseFilter.indexOf(' ') === -1) {
-        foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
+    } else if (suggestion.details && suggestion.details.comment && lowerCaseFilter.indexOf(' ') === -1) {
+      foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
 
-        if (foundIndex !== -1) {
-          suggestion.filterWeight = 1;
-          suggestion.matchComment = true;
-        }
+      if (foundIndex !== -1) {
+        suggestion.filterWeight = 1;
+        suggestion.matchComment = true;
       }
     }
 
@@ -17546,6 +17533,8 @@ var hueAnalytics = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_0__);
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17561,12 +17550,13 @@ __webpack_require__.r(__webpack_exports__);
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 var hueDebug = {
   clearCaches: function clearCaches() {
     var promises = [];
 
     var clearInstance = function clearInstance(prefix) {
-      promises.push(localforage.createInstance({
+      promises.push(localforage__WEBPACK_IMPORTED_MODULE_0___default.a.createInstance({
         name: prefix + LOGGED_USERNAME
       }).clear());
     };
@@ -17635,8 +17625,6 @@ var hueDrop = function hueDrop() {
         element.droppable({
           accept: '.draggableText',
           drop: function drop(e, ui) {
-            var droppedText = ui.helper.text();
-
             if (callback) {
               callback({
                 text: ui.helper.text(),
@@ -17886,16 +17874,16 @@ var bootstrapRatios = {
  */
 
 var text2Url = function text2Url(selectors) {
-  var i = 0,
-      len = selectors.length;
+  var i = 0;
+  var len = selectors.length;
 
-  for (i; i < len; i++) {
+  var _loop = function _loop() {
     var arr = [],
         selector = selectors[i],
         val = selector.innerHTML.replace(/&nbsp;/g, ' ').split(' ');
     val.forEach(function (word) {
-      var matched = null,
-          re = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/gi;
+      var matched = null;
+      var re = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/gi;
 
       if (re.test(word)) {
         matched = word.match(re);
@@ -17906,6 +17894,10 @@ var text2Url = function text2Url(selectors) {
       }
     });
     selector.innerHTML = arr.join(' ');
+  };
+
+  for (i; i < len; i++) {
+    _loop();
   }
 
   return _this;
@@ -18126,24 +18118,23 @@ var waitForVariable = function waitForVariable(variable, callback, timeout) {
 };
 
 var scrollbarWidth = function scrollbarWidth() {
-  var $parent, $children, width;
-  $parent = jquery__WEBPACK_IMPORTED_MODULE_0___default()('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(HUE_CONTAINER);
-  $children = $parent.children();
-  width = $children.innerWidth() - $children.height(99).innerWidth();
+  var $parent = jquery__WEBPACK_IMPORTED_MODULE_0___default()('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(HUE_CONTAINER);
+  var $children = $parent.children();
+  var width = $children.innerWidth() - $children.height(99).innerWidth();
   $parent.remove();
   return width;
 };
 
 var getSearchParameter = function getSearchParameter(search, name, returnNull) {
-  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
       results = regex.exec(search);
 
   if (returnNull && results === null) {
     return null;
   }
 
-  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
 var logError = function logError(error) {
@@ -18188,10 +18179,11 @@ var highlight = function highlight(text, searchTerm) {
   var remText = text;
   var highLightedText = '';
   searchTerm = searchTerm.toLowerCase();
+  var startIndex;
 
   do {
     var remLowerText = remText.toLowerCase();
-    var startIndex = remLowerText.indexOf(searchTerm);
+    startIndex = remLowerText.indexOf(searchTerm);
 
     if (startIndex >= 0) {
       highLightedText += remText.substring(0, startIndex) + '<strong>' + remText.substring(startIndex, startIndex + searchTerm.length) + '</strong>';
@@ -71138,4 +71130,4 @@ module.exports = __webpack_require__(/*! ./desktop/core/src/desktop/js/hue.js */
 /***/ })
 
 /******/ });
-//# sourceMappingURL=hue-bundle-72c7c47509e0d902668b.js.map
+//# sourceMappingURL=hue-bundle-aba8e1671184e608ccfe.js.map
