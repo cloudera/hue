@@ -56,7 +56,7 @@
     "webpack": "4.29.0",
     "webpack-bundle-tracker": "0.4.2-beta",
     "webpack-cli": "^3.2.1",
-    "webpack-shell-plugin": "^0.5.0"
+    "clean-webpack-plugin": "1.0.1"
   },
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",
@@ -64,7 +64,7 @@
     "watch": "./node_modules/.bin/grunt watch",
     "webpack": "webpack --config webpack.config.js",
     "dev": "webpack --watch -d",
-    "lint": "cd desktop/core/src/desktop/js/; eslint api/** assist/** catalog/** sql/** utils/**",
+    "lint": "eslint desktop/core/src/desktop/js",
     "lint-fix": "npm run lint -- --fix"
   },
   "files": []
