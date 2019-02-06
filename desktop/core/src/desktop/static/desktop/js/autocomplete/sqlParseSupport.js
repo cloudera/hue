@@ -534,7 +534,7 @@ var SqlParseSupport = (function () {
         if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length === 1 && location.identifierChain[0].name) {
           // Could be a cte reference
           parser.yy.locations.some(function (otherLocation) {
-            if (otherLocation.type === 'alias' && otherLocation.source === 'cte' && SqlUtils.identifierEquals(otherLocation.alias, location.identifierChain[0].name)) {
+            if (otherLocation.type === 'alias' && otherLocation.source === 'cte' && sqlUtils.identifierEquals(otherLocation.alias, location.identifierChain[0].name)) {
               // TODO: Possibly add the other location if we want to show the link in the future.
               //       i.e. highlight select definition on hover over alias, also for subquery references.
               location.type = 'alias';

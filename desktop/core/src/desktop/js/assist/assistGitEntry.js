@@ -14,7 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var AssistGitEntry = (function () {
+import ko from 'knockout'
+
+import huePubSub from '../utils/huePubSub'
+import apiHelper from '../api/apiHelper'
+
+class AssistGitEntry {
 
   /**
    * @param {object} options
@@ -22,14 +27,12 @@ var AssistGitEntry = (function () {
    * @param {string} options.definition.name
    * @param {string} options.definition.type (file, dir)
    * @param {AssistGitEntry} options.parent
-   * @param {ApiHelper} options.apiHelper
    * @constructor
    */
-  function AssistGitEntry (options) {
-    var self = this;
+  constructor(options) {
+    let self = this;
 
     self.definition = options.definition;
-    self.apiHelper = options.apiHelper;
     self.parent = options.parent;
     self.path = '';
     if (self.parent !== null) {
@@ -50,97 +53,82 @@ var AssistGitEntry = (function () {
     self.hasErrors = ko.observable(false);
     self.open = ko.observable(false);
 
-    self.open.subscribe(function(newValue) {
+    self.open.subscribe(newValue => {
       if (newValue && self.entries().length === 0) {
         self.loadEntries();
       }
     });
 
-    self.hasEntries = ko.computed(function() {
+    self.hasEntries = ko.pureComputed(() =>{
       return self.entries().length > 0;
     });
   }
 
-  AssistGitEntry.prototype.dblClick = function () {
-    var self = this;
+  dblClick() {
+    let self = this;
     if (self.definition.type !== 'file') {
       return;
     }
     self.hasErrors(false);
 
-    var successCallback = function(data) {
-      self.fileContent(data.content);
-      huePubSub.publish('assist.dblClickGitItem', self);
-    };
-
-    var errorCallback = function () {
-      self.hasErrors(true);
-      self.loading(false);
-    };
-
-    self.apiHelper.fetchGitContents({
+    apiHelper.fetchGitContents({
       pathParts: self.getHierarchy(),
       fileType: self.definition.type,
-      successCallback: successCallback,
-      errorCallback: errorCallback
+      successCallback: data => {
+        self.fileContent(data.content);
+        huePubSub.publish('assist.dblClickGitItem', self);
+      },
+      errorCallback: () => {
+        self.hasErrors(true);
+        self.loading(false);
+      }
     })
   };
 
-  AssistGitEntry.prototype.loadEntries = function(callback) {
-    var self = this;
+  loadEntries(callback) {
+    let self = this;
     if (self.loading()) {
       return;
     }
     self.loading(true);
     self.hasErrors(false);
 
-    var successCallback = function(data) {
-      var filteredFiles = $.grep(data.files, function (file) {
-        return file.name !== '.' && file.name !== '..';
-      });
-      self.entries($.map(filteredFiles, function (file) {
-        return new AssistGitEntry({
-          definition: file,
-          parent: self,
-          apiHelper: self.apiHelper
-        })
-      }));
-      self.loaded = true;
-      self.loading(false);
-      if (callback) {
-        callback();
-      }
-    };
-
-    var errorCallback = function () {
-      self.hasErrors(true);
-      self.loading(false);
-      if (callback) {
-        callback();
-      }
-    };
-
-    self.apiHelper.fetchGitContents({
+    apiHelper.fetchGitContents({
       pathParts: self.getHierarchy(),
       fileType: self.definition.type,
-      successCallback: successCallback,
-      errorCallback: errorCallback
+      successCallback: data => {
+        let filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
+        self.entries(filteredFiles.map(file => new AssistGitEntry({
+          definition: file,
+          parent: self
+        })));
+        self.loaded = true;
+        self.loading(false);
+        if (callback) {
+          callback();
+        }
+      },
+      errorCallback: () => {
+        self.hasErrors(true);
+        self.loading(false);
+        if (callback) {
+          callback();
+        }
+      }
     })
   };
 
-  AssistGitEntry.prototype.loadDeep = function(folders, callback) {
-    var self = this;
+  loadDeep(folders, callback) {
+    let self = this;
 
     if (folders.length === 0) {
       callback(self);
       return;
     }
 
-    var findNextAndLoadDeep = function () {
-      var nextName = folders.shift();
-      var foundEntry = $.grep(self.entries(), function (entry) {
-        return entry.definition.name === nextName && entry.definition.type === 'dir';
-      });
+    let findNextAndLoadDeep = () => {
+      let nextName = folders.shift();
+      let foundEntry = self.entries().filter(entry => entry.definition.name === nextName && entry.definition.type === 'dir');
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
       } else if (! self.hasErrors()) {
@@ -155,10 +143,10 @@ var AssistGitEntry = (function () {
     }
   };
 
-  AssistGitEntry.prototype.getHierarchy = function () {
-    var self = this;
-    var parts = [];
-    var entry = self;
+  getHierarchy() {
+    let self = this;
+    let parts = [];
+    let entry = self;
     while (entry != null) {
       parts.push(entry.definition.name);
       entry = entry.parent;
@@ -167,8 +155,8 @@ var AssistGitEntry = (function () {
     return parts;
   };
 
-  AssistGitEntry.prototype.toggleOpen = function () {
-    var self = this;
+  toggleOpen() {
+    let self = this;
     if (self.definition.type !== 'dir') {
       return;
     }
@@ -181,6 +169,6 @@ var AssistGitEntry = (function () {
       huePubSub.publish('assist.selectGitEntry', self);
     }
   };
+}
 
-  return AssistGitEntry;
-})();
+export default AssistGitEntry

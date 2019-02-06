@@ -190,7 +190,7 @@ var SqlUtils = (function () {
       }).done(function (childEntries) {
         var foundEntry = undefined;
         childEntries.some(function (childEntry) {
-          if (SqlUtils.identifierEquals(childEntry.name, nextField)) {
+          if (sqlUtils.identifierEquals(childEntry.name, nextField)) {
             foundEntry = childEntry;
             return true;
           }
@@ -221,7 +221,7 @@ var SqlUtils = (function () {
         sourceType: options.sourceType,
         namespace: options.namespace,
         compute: options.compute,
-        path: SqlUtils.identifierChainToPath(nextTable.identifierChain),
+        path: sqlUtils.identifierChainToPath(nextTable.identifierChain),
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
         temporaryOnly: options && options.temporaryOnly,
@@ -229,14 +229,14 @@ var SqlUtils = (function () {
       }).done(function (childEntries) {
         var foundEntry = undefined;
         childEntries.some(function (childEntry) {
-          if (SqlUtils.identifierEquals(childEntry.name, options.identifierChain[0].name)) {
+          if (sqlUtils.identifierEquals(childEntry.name, options.identifierChain[0].name)) {
             foundEntry = childEntry;
             return true;
           }
         });
 
         if (foundEntry && options.identifierChain.length > 1) {
-          findInTree(foundEntry, SqlUtils.identifierChainToPath(options.identifierChain.slice(1)));
+          findInTree(foundEntry, sqlUtils.identifierChainToPath(options.identifierChain.slice(1)));
         } else if (foundEntry) {
           deferred.resolve(foundEntry);
         } else {
@@ -258,7 +258,7 @@ var SqlUtils = (function () {
         temporaryOnly: options && options.temporaryOnly,
         silenceErrors: true
       }).done(function (entry) {
-        findInTree(entry, SqlUtils.identifierChainToPath(options.identifierChain))
+        findInTree(entry, sqlUtils.identifierChainToPath(options.identifierChain))
       })
     }
 

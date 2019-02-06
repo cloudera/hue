@@ -14,20 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var AssistHBaseEntry = (function () {
+import ko from 'knockout'
+
+import apiHelper from '../api/apiHelper'
+import huePubSub from '../utils/huePubSub'
+
+class AssistHBaseEntry {
 
   /**
    * @param {object} options
    * @param {object} options.definition
    * @param {string} options.definition.name
-   * @param {ApiHelper} options.apiHelper
    * @constructor
    */
-  function AssistHBaseEntry (options) {
-    var self = this;
+  constructor(options) {
+    let self = this;
 
     self.definition = options.definition;
-    self.apiHelper = options.apiHelper;
     self.path = self.definition.name;
 
     self.entries = ko.observableArray([]);
@@ -36,59 +39,50 @@ var AssistHBaseEntry = (function () {
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
 
-    self.hasEntries = ko.computed(function() {
-      return self.entries().length > 0;
-    });
+    self.hasEntries = ko.pureComputed(() => self.entries().length > 0);
   }
 
-  AssistHBaseEntry.prototype.loadEntries = function(callback) {
-    var self = this;
+  loadEntries(callback) {
+    let self = this;
     if (self.loading()) {
       return;
     }
     self.loading(true);
     self.hasErrors(false);
 
-    var successCallback = function(data) {
-      self.entries($.map(data.data, function (obj) {
-        return new AssistHBaseEntry({
-          definition: obj,
-          apiHelper: self.apiHelper
-        })
-      }));
-      self.loaded = true;
-      self.loading(false);
-      if (callback) {
-        callback();
-      }
-    };
-
-    var errorCallback = function () {
-      self.hasErrors(true);
-      self.loading(false);
-      if (callback) {
-        callback();
-      }
-    };
-
-    self.apiHelper.fetchHBase({
+    apiHelper.fetchHBase({
       parent: self.definition,
-      successCallback: successCallback,
-      errorCallback: errorCallback
+      successCallback: data => {
+        self.entries(data.data.map(obj => new AssistHBaseEntry({
+          definition: obj
+        })));
+        self.loaded = true;
+        self.loading(false);
+        if (callback) {
+          callback();
+        }
+      },
+      errorCallback: () => {
+        self.hasErrors(true);
+        self.loading(false);
+        if (callback) {
+          callback();
+        }
+      }
     })
   };
 
-  AssistHBaseEntry.prototype.open = function () {
+  open() {
     huePubSub.publish('assist.clickHBaseItem', this);
   };
 
-  AssistHBaseEntry.prototype.click = function () {
+  click() {
     huePubSub.publish('assist.clickHBaseItem', this);
   };
 
-  AssistHBaseEntry.prototype.dblClick = function () {
+  dblClick() {
     huePubSub.publish('assist.dblClickHBaseItem', this);
   };
+}
 
-  return AssistHBaseEntry;
-})();
+export default AssistHBaseEntry

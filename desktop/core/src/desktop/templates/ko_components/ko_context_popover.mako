@@ -736,12 +736,12 @@ from metadata.conf import has_navigator
             location: data.location,
             text: $.map(colsToExpand, function (column) {
               if (column.tableAlias) {
-                return SqlUtils.backTickIfNeeded(sourceType, column.tableAlias) + '.' + SqlUtils.backTickIfNeeded(sourceType, column.name);
+                return sqlUtils.backTickIfNeeded(sourceType, column.tableAlias) + '.' + sqlUtils.backTickIfNeeded(sourceType, column.name);
               }
               if (colIndex[column.name]) {
-                return SqlUtils.backTickIfNeeded(sourceType, column.table) + '.' + SqlUtils.backTickIfNeeded(sourceType, column.name);
+                return sqlUtils.backTickIfNeeded(sourceType, column.table) + '.' + sqlUtils.backTickIfNeeded(sourceType, column.name);
               }
-              return SqlUtils.backTickIfNeeded(sourceType, column.name)
+              return sqlUtils.backTickIfNeeded(sourceType, column.name)
             }).join(', ')
           });
           huePubSub.publish('context.popover.hide');
