@@ -16,15 +16,15 @@
 
 import $ from 'jquery';
 
-let hueAnalytics = {
-  log: function (app, page) {
+const hueAnalytics = {
+  log: function(app, page) {
     if (typeof trackOnGA == 'function') {
       trackOnGA(app + '/' + page);
     }
   },
-  convert: function (app, page) {
+  convert: function(app, page) {
     $.post('/desktop/log_analytics', {
-      page: app + '/' + page,
+      page: app + '/' + page
     });
   }
 };

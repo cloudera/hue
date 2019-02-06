@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from '../api/apiHelper'
-import CancellablePromise from '../api/cancellablePromise'
+import apiHelper from 'api/apiHelper';
 
 /**
  * Wrapper function around ApiHelper calls, it will also save the entry on success.
@@ -26,7 +25,8 @@ import CancellablePromise from '../api/cancellablePromise'
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors]
  */
-const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => apiHelper[apiHelperFunction]({
+const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) =>
+  apiHelper[apiHelperFunction]({
     sourceType: entry.dataCatalog.sourceType,
     compute: entry.compute,
     path: entry.path, // Set for DataCatalogEntry
@@ -70,9 +70,8 @@ const applyCancellable = (promise, options) => {
   return promise;
 };
 
-
 export default {
   applyCancellable: applyCancellable,
   fetchAndSave: fetchAndSave,
   setSilencedErrors: setSilencedErrors
-}
+};

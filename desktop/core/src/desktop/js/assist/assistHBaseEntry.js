@@ -14,13 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout'
+import ko from 'knockout';
 
-import apiHelper from '../api/apiHelper'
-import huePubSub from '../utils/huePubSub'
+import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
 
 class AssistHBaseEntry {
-
   /**
    * @param {object} options
    * @param {object} options.definition
@@ -28,7 +27,7 @@ class AssistHBaseEntry {
    * @constructor
    */
   constructor(options) {
-    let self = this;
+    const self = this;
 
     self.definition = options.definition;
     self.path = self.definition.name;
@@ -43,7 +42,7 @@ class AssistHBaseEntry {
   }
 
   loadEntries(callback) {
-    let self = this;
+    const self = this;
     if (self.loading()) {
       return;
     }
@@ -53,9 +52,14 @@ class AssistHBaseEntry {
     apiHelper.fetchHBase({
       parent: self.definition,
       successCallback: data => {
-        self.entries(data.data.map(obj => new AssistHBaseEntry({
-          definition: obj
-        })));
+        self.entries(
+          data.data.map(
+            obj =>
+              new AssistHBaseEntry({
+                definition: obj
+              })
+          )
+        );
         self.loaded = true;
         self.loading(false);
         if (callback) {
@@ -69,20 +73,20 @@ class AssistHBaseEntry {
           callback();
         }
       }
-    })
-  };
+    });
+  }
 
   open() {
     huePubSub.publish('assist.clickHBaseItem', this);
-  };
+  }
 
   click() {
     huePubSub.publish('assist.clickHBaseItem', this);
-  };
+  }
 
   dblClick() {
     huePubSub.publish('assist.dblClickHBaseItem', this);
-  };
+  }
 }
 
-export default AssistHBaseEntry
+export default AssistHBaseEntry;

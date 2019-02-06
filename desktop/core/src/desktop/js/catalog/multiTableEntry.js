@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import catalogUtils from './catalogUtils'
+import catalogUtils from 'catalog/catalogUtils';
 
 /**
  * Helper function to reload a NavOpt multi table attribute, like topAggs or topFilters
@@ -27,9 +27,18 @@ import catalogUtils from './catalogUtils'
  * @param {string} apiHelperFunction
  * @return {CancellablePromise}
  */
-const genericNavOptReload = function (multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
+const genericNavOptReload = function(
+  multiTableEntry,
+  options,
+  promiseAttribute,
+  dataAttribute,
+  apiHelperFunction
+) {
   if (multiTableEntry.dataCatalog.canHaveNavOptMetadata()) {
-    return multiTableEntry.trackedPromise(promiseAttribute, catalogUtils.fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options));
+    return multiTableEntry.trackedPromise(
+      promiseAttribute,
+      catalogUtils.fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options)
+    );
   }
   multiTableEntry[promiseAttribute] = $.Deferred().reject();
   return multiTableEntry[promiseAttribute];
@@ -49,18 +58,47 @@ const genericNavOptReload = function (multiTableEntry, options, promiseAttribute
  * @param {string} apiHelperFunction
  * @return {CancellablePromise}
  */
-const genericNavOptGet = function (multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
+const genericNavOptGet = function(
+  multiTableEntry,
+  options,
+  promiseAttribute,
+  dataAttribute,
+  apiHelperFunction
+) {
   if (options && options.cachedOnly) {
-    return catalogUtils.applyCancellable(multiTableEntry[promiseAttribute], options) || $.Deferred().reject(false).promise();
+    return (
+      catalogUtils.applyCancellable(multiTableEntry[promiseAttribute], options) ||
+      $.Deferred()
+        .reject(false)
+        .promise()
+    );
   }
   if (options && options.refreshCache) {
-    return catalogUtils.applyCancellable(genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+    return catalogUtils.applyCancellable(
+      genericNavOptReload(
+        multiTableEntry,
+        options,
+        promiseAttribute,
+        dataAttribute,
+        apiHelperFunction
+      ),
+      options
+    );
   }
-  return catalogUtils.applyCancellable(multiTableEntry[promiseAttribute] || genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+  return catalogUtils.applyCancellable(
+    multiTableEntry[promiseAttribute] ||
+      genericNavOptReload(
+        multiTableEntry,
+        options,
+        promiseAttribute,
+        dataAttribute,
+        apiHelperFunction
+      ),
+    options
+  );
 };
 
 class MultiTableEntry {
-
   /**
    *
    * @param {Object} options
@@ -70,7 +108,7 @@ class MultiTableEntry {
    * @constructor
    */
   constructor(options) {
-    let self = this;
+    const self = this;
     self.identifier = options.identifier;
     self.dataCatalog = options.dataCatalog;
     self.paths = options.paths;
@@ -86,7 +124,7 @@ class MultiTableEntry {
 
     self.topJoins = undefined;
     self.topJoinsPromise = undefined;
-  };
+  }
 
   /**
    * Save the multi table entry to cache
@@ -94,23 +132,23 @@ class MultiTableEntry {
    * @return {Promise}
    */
   save() {
-    let self = this;
+    const self = this;
     window.clearTimeout(self.saveTimeout);
     return self.dataCatalog.persistMultiTableEntry(self);
-  };
+  }
 
   /**
    * Save the multi table entry at a later point of time
    */
   saveLater() {
-    let self = this;
+    const self = this;
     if (CACHEABLE_TTL.default > 0) {
       window.clearTimeout(self.saveTimeout);
-      self.saveTimeout = window.setTimeout(function () {
+      self.saveTimeout = window.setTimeout(() => {
         self.save();
       }, 1000);
     }
-  };
+  }
   /**
    * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
    *
@@ -118,14 +156,14 @@ class MultiTableEntry {
    * @param {CancellablePromise} cancellablePromise
    */
   trackedPromise(promiseName, cancellablePromise) {
-    let self = this;
+    const self = this;
     self[promiseName] = cancellablePromise;
-    return cancellablePromise.fail(function () {
+    return cancellablePromise.fail(() => {
       if (cancellablePromise.cancelled) {
         delete self[promiseName];
       }
-    })
-  };
+    });
+  }
 
   /**
    * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
@@ -139,9 +177,9 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopAggs(options) {
-    let self = this;
+    const self = this;
     return genericNavOptGet(self, options, 'topAggsPromise', 'topAggs', 'fetchNavOptTopAggs');
-  };
+  }
 
   /**
    * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
@@ -155,9 +193,15 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopColumns(options) {
-    let self = this;
-    return genericNavOptGet(self, options, 'topColumnsPromise', 'topColumns', 'fetchNavOptTopColumns');
-  };
+    const self = this;
+    return genericNavOptGet(
+      self,
+      options,
+      'topColumnsPromise',
+      'topColumns',
+      'fetchNavOptTopColumns'
+    );
+  }
 
   /**
    * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
@@ -171,9 +215,15 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopFilters(options) {
-    let self = this;
-    return genericNavOptGet(self, options, 'topFiltersPromise', 'topFilters', 'fetchNavOptTopFilters');
-  };
+    const self = this;
+    return genericNavOptGet(
+      self,
+      options,
+      'topFiltersPromise',
+      'topFilters',
+      'fetchNavOptTopFilters'
+    );
+  }
 
   /**
    * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
@@ -187,9 +237,9 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopJoins(options) {
-    let self = this;
+    const self = this;
     return genericNavOptGet(self, options, 'topJoinsPromise', 'topJoins', 'fetchNavOptTopJoins');
-  };
+  }
 }
 
-export default MultiTableEntry
+export default MultiTableEntry;

@@ -16,80 +16,94 @@
 
 // Based on original pub/sub implementation from http://davidwalsh.name/pubsub-javascript
 
-let topics = {};
-let hOP = topics.hasOwnProperty;
+const topics = {};
+const hOP = topics.hasOwnProperty;
 
 const huePubSub = {
-  subscribe: function (topic, listener, app) {
+  subscribe: function(topic, listener, app) {
     if (!hOP.call(topics, topic)) {
       topics[topic] = [];
     }
 
-    let index = topics[topic].push({
-      listener: listener,
-      app: app,
-      status: 'running'
-    }) - 1;
+    const index =
+      topics[topic].push({
+        listener: listener,
+        app: app,
+        status: 'running'
+      }) - 1;
 
     return {
-      remove: function () {
+      remove: function() {
         delete topics[topic][index];
       }
     };
   },
-  removeAll: function (topic) {
+  removeAll: function(topic) {
     topics[topic] = [];
   },
-  subscribeOnce: function (topic, listener, app) {
-    let ephemeral = this.subscribe(topic, function () {
-      listener.apply(listener, arguments);
-      ephemeral.remove();
-    }, app);
-
+  subscribeOnce: function(topic, listener, app) {
+    const ephemeral = this.subscribe(
+      topic,
+      function() {
+        listener.apply(listener, arguments);
+        ephemeral.remove();
+      },
+      app
+    );
   },
-  publish: function (topic, info) {
+  publish: function(topic, info) {
     if (!hOP.call(topics, topic)) {
       return;
     }
 
-    topics[topic].forEach(function (item) {
+    topics[topic].forEach(item => {
       if (item.status === 'running') {
         item.listener(info);
       }
     });
   },
-  getTopics: function () {
+  getTopics: function() {
     return topics;
   },
-  pauseAppSubscribers: function (app) {
+  pauseAppSubscribers: function(app) {
     if (app) {
-      Object.keys(topics).forEach(function (topicName) {
-        topics[topicName].forEach(function (topic) {
-          if (typeof topic.app !== 'undefined' && topic.app !== null && (topic.app === app || topic.app.split('-')[0] === app)) {
+      Object.keys(topics).forEach(topicName => {
+        topics[topicName].forEach(topic => {
+          if (
+            typeof topic.app !== 'undefined' &&
+            topic.app !== null &&
+            (topic.app === app || topic.app.split('-')[0] === app)
+          ) {
             topic.status = 'paused';
           }
         });
       });
     }
   },
-  resumeAppSubscribers: function (app) {
+  resumeAppSubscribers: function(app) {
     if (app) {
-      Object.keys(topics).forEach(function (topicName) {
-        topics[topicName].forEach(function (topic) {
-          if (typeof topic.app !== 'undefined' && topic.app !== null && (topic.app === app || topic.app.split('-')[0] === app)) {
+      Object.keys(topics).forEach(topicName => {
+        topics[topicName].forEach(topic => {
+          if (
+            typeof topic.app !== 'undefined' &&
+            topic.app !== null &&
+            (topic.app === app || topic.app.split('-')[0] === app)
+          ) {
             topic.status = 'running';
           }
         });
       });
     }
   },
-  clearAppSubscribers: function (app) {
+  clearAppSubscribers: function(app) {
     if (app) {
-      Object.keys(topics).forEach(function (topicName) {
-        topics[topicName] = topics[topicName].filter(function(obj){ return obj.app !== app });
+      Object.keys(topics).forEach(topicName => {
+        topics[topicName] = topics[topicName].filter(obj => {
+          return obj.app !== app;
+        });
       });
     }
   }
 };
 
-export default huePubSub
+export default huePubSub;

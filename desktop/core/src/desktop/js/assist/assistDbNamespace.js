@@ -14,15 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import ko from 'knockout'
+import $ from 'jquery';
+import ko from 'knockout';
 
-import AssistDbEntry from './assistDbEntry'
-import dataCatalog from '../catalog/dataCatalog'
-import huePubSub from '../utils/huePubSub'
+import AssistDbEntry from 'assist/assistDbEntry';
+import dataCatalog from 'catalog/dataCatalog';
+import huePubSub from 'utils/huePubSub';
 
 class AssistDbNamespace {
-
   /**
    * @param {Object} options
    * @param {Object} options.i18n
@@ -33,7 +32,7 @@ class AssistDbNamespace {
    * @constructor
    */
   constructor(options) {
-    let self = this;
+    const self = this;
 
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
@@ -63,7 +62,12 @@ class AssistDbNamespace {
     self.hasErrors = ko.observable(false);
     self.invalidateOnRefresh = ko.observable('cache');
 
-    self.loadingTables = ko.pureComputed(() => typeof self.selectedDatabase() !== 'undefined' && self.selectedDatabase() !== null && self.selectedDatabase().loading());
+    self.loadingTables = ko.pureComputed(
+      () =>
+        typeof self.selectedDatabase() !== 'undefined' &&
+        self.selectedDatabase() !== null &&
+        self.selectedDatabase().loading()
+    );
 
     self.filter = {
       querySpec: ko.observable({}).extend({ rateLimit: 300 })
@@ -72,42 +76,56 @@ class AssistDbNamespace {
     self.hasEntries = ko.pureComputed(() => self.databases().length > 0);
 
     self.filteredEntries = ko.pureComputed(() => {
-      if (!self.filter.querySpec() || typeof self.filter.querySpec().query === 'undefined' || !self.filter.querySpec().query) {
+      if (
+        !self.filter.querySpec() ||
+        typeof self.filter.querySpec().query === 'undefined' ||
+        !self.filter.querySpec().query
+      ) {
         return self.databases();
       }
-      return self.databases().filter(database => database.catalogEntry.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1);
+      return self
+        .databases()
+        .filter(
+          database =>
+            database.catalogEntry.name
+              .toLowerCase()
+              .indexOf(self.filter.querySpec().query.toLowerCase()) !== -1
+        );
     });
 
     self.autocompleteFromEntries = (nonPartial, partial) => {
-      let result = [];
-      let partialLower = partial.toLowerCase();
+      const result = [];
+      const partialLower = partial.toLowerCase();
       self.databases().forEach(db => {
         if (db.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
-          result.push(nonPartial + partial + db.catalogEntry.name.substring(partial.length))
+          result.push(nonPartial + partial + db.catalogEntry.name.substring(partial.length));
         }
       });
       return result;
     };
 
     self.selectedDatabase.subscribe(() => {
-      let db = self.selectedDatabase();
+      const db = self.selectedDatabase();
       if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
         db.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(() => {
-          let applyPopularity = () => {
+          const applyPopularity = () => {
             db.entries().forEach(entry => {
-              if (entry.catalogEntry.navOptPopularity && entry.catalogEntry.navOptPopularity.popularity >= 5) {
-                entry.popularity(entry.catalogEntry.navOptPopularity.popularity )
+              if (
+                entry.catalogEntry.navOptPopularity &&
+                entry.catalogEntry.navOptPopularity.popularity >= 5
+              ) {
+                entry.popularity(entry.catalogEntry.navOptPopularity.popularity);
               }
             });
           };
 
           if (db.loading()) {
-            let subscription = db.loading.subscribe(() => {
+            const subscription = db.loading.subscribe(() => {
               subscription.dispose();
               applyPopularity();
             });
           } else if (db.entries().length === 0) {
-            let subscription = db.entries.subscribe(newEntries => {
+            const subscription = db.entries.subscribe(newEntries => {
               if (newEntries.length > 0) {
                 subscription.dispose();
                 applyPopularity();
@@ -123,25 +141,33 @@ class AssistDbNamespace {
     self.selectedDatabaseChanged = () => {
       if (self.selectedDatabase()) {
         if (!self.selectedDatabase().hasEntries() && !self.selectedDatabase().loading()) {
-          self.selectedDatabase().loadEntries()
+          self.selectedDatabase().loadEntries();
         }
         if (!self.navigationSettings.rightAssist) {
-          window.apiHelper.setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
+          window.apiHelper.setInTotalStorage(
+            'assist_' + self.sourceType + '_' + self.namespace.id,
+            'lastSelectedDb',
+            self.selectedDatabase().catalogEntry.name
+          );
           huePubSub.publish('assist.database.set', {
             sourceType: self.sourceType,
             namespace: self.namespace,
             name: self.selectedDatabase().catalogEntry.name
-          })
+          });
         }
       }
     };
 
-    let nestedFilter = {
+    const nestedFilter = {
       querySpec: ko.observable({}).extend({ rateLimit: 300 })
     };
 
     self.setDatabase = databaseName => {
-      if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().catalogEntry.name) {
+      if (
+        databaseName &&
+        self.selectedDatabase() &&
+        databaseName === self.selectedDatabase().catalogEntry.name
+      ) {
         return;
       }
       if (databaseName && self.dbIndex[databaseName]) {
@@ -149,7 +175,11 @@ class AssistDbNamespace {
         self.selectedDatabaseChanged();
         return;
       }
-      let lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
+      const lastSelectedDb = window.apiHelper.getFromTotalStorage(
+        'assist_' + self.sourceType + '_' + self.namespace.id,
+        'lastSelectedDb',
+        'default'
+      );
       if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
         self.selectedDatabase(self.dbIndex[lastSelectedDb]);
         self.selectedDatabaseChanged();
@@ -166,59 +196,83 @@ class AssistDbNamespace {
       self.loading(true);
       self.hasErrors(false);
 
-      let lastSelectedDbName = self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null;
+      const lastSelectedDbName = self.selectedDatabase()
+        ? self.selectedDatabase().catalogEntry.name
+        : null;
 
       self.selectedDatabase(null);
       self.databases([]);
 
-      dataCatalog.getEntry({ sourceType: self.sourceType, namespace: self.namespace, compute: self.compute(), path : [], definition: { type: 'source' } }).done(catalogEntry => {
-        self.catalogEntry = catalogEntry;
-        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(databaseEntries => {
-          self.dbIndex = {};
-          let hasNavMeta = false;
-          let dbs = [];
+      dataCatalog
+        .getEntry({
+          sourceType: self.sourceType,
+          namespace: self.namespace,
+          compute: self.compute(),
+          path: [],
+          definition: { type: 'source' }
+        })
+        .done(catalogEntry => {
+          self.catalogEntry = catalogEntry;
+          self.catalogEntry
+            .getChildren({ silenceErrors: self.navigationSettings.rightAssist })
+            .done(databaseEntries => {
+              self.dbIndex = {};
+              let hasNavMeta = false;
+              const dbs = [];
 
-          databaseEntries.forEach(catalogEntry => {
-            hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
-            let database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
-            self.dbIndex[catalogEntry.name] = database;
-            if (catalogEntry.name === lastSelectedDbName) {
-              self.selectedDatabase(database);
-              self.selectedDatabaseChanged();
-            }
-            dbs.push(database);
-          });
+              databaseEntries.forEach(catalogEntry => {
+                hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
+                const database = new AssistDbEntry(
+                  catalogEntry,
+                  null,
+                  self,
+                  nestedFilter,
+                  self.i18n,
+                  self.navigationSettings
+                );
+                self.dbIndex[catalogEntry.name] = database;
+                if (catalogEntry.name === lastSelectedDbName) {
+                  self.selectedDatabase(database);
+                  self.selectedDatabaseChanged();
+                }
+                dbs.push(database);
+              });
 
-          if (!hasNavMeta && !self.nonSqlType) {
-            self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
-          }
-          self.databases(dbs);
+              if (!hasNavMeta && !self.nonSqlType) {
+                self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+              }
+              self.databases(dbs);
 
-          if (typeof callback === 'function') {
-            callback();
-          }
-        }).fail(() => {
-          self.hasErrors(true);
-        }).always(() => {
-          self.loaded(true);
-          self.loadedDeferred.resolve();
-          self.loading(false);
-          self.reloading(false);
+              if (typeof callback === 'function') {
+                callback();
+              }
+            })
+            .fail(() => {
+              self.hasErrors(true);
+            })
+            .always(() => {
+              self.loaded(true);
+              self.loadedDeferred.resolve();
+              self.loading(false);
+              self.reloading(false);
+            });
         });
-      });
     };
 
     self.modalItem = ko.observable();
 
     if (!self.navigationSettings.rightAssist) {
       huePubSub.subscribe('data.catalog.entry.refreshed', details => {
-        if (self.namespace.id !== details.entry.namespace.id || details.entry.getSourceType() !== self.sourceType) {
+        if (
+          self.namespace.id !== details.entry.namespace.id ||
+          details.entry.getSourceType() !== self.sourceType
+        ) {
           return;
         }
         if (self.catalogEntry === details.entry) {
           self.initDatabases();
         } else {
-          let findAndReloadInside = entries => {
+          const findAndReloadInside = entries => {
             return entries.some(entry => {
               if (entry.catalogEntry.path.join('.') === details.entry.path.join('.')) {
                 entry.catalogEntry = details.entry;
@@ -226,7 +280,7 @@ class AssistDbNamespace {
                 return true;
               }
               return findAndReloadInside(entry.entries());
-            })
+            });
           };
           findAndReloadInside(self.databases());
         }
@@ -235,26 +289,24 @@ class AssistDbNamespace {
   }
 
   whenLoaded(callback) {
-    let self = this;
+    const self = this;
     self.loadedDeferred.done(callback);
-  };
+  }
 
   highlightInside(catalogEntry) {
-    let self = this;
+    const self = this;
     let foundDb;
-    let index;
 
-    let findDatabase = () => {
-      $.each(self.databases(), (idx, db) => {
+    const findDatabase = () => {
+      self.databases().foreach(db => {
         db.highlight(false);
         if (db.databaseName === catalogEntry.path[0]) {
           foundDb = db;
-          index = idx;
         }
       });
 
       if (foundDb) {
-        let whenLoaded = () => {
+        const whenLoaded = () => {
           if (self.selectedDatabase() !== foundDb) {
             self.selectedDatabase(foundDb);
           }
@@ -290,14 +342,14 @@ class AssistDbNamespace {
     } else {
       findDatabase();
     }
-  };
+  }
 
   triggerRefresh() {
-    let self = this;
+    const self = this;
     if (self.catalogEntry) {
       self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh() });
     }
-  };
+  }
 }
 
 export default AssistDbNamespace;

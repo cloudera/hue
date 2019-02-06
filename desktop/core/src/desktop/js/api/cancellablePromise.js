@@ -14,12 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from './apiHelper'
+import apiHelper from 'api/apiHelper';
 
 class CancellablePromise {
-
-  constructor (deferred, request, otherCancellables) {
-    var self = this;
+  constructor(deferred, request, otherCancellables) {
+    const self = this;
     self.cancelCallbacks = [];
     self.deferred = deferred;
     self.request = request;
@@ -38,13 +37,13 @@ class CancellablePromise {
    * @returns {CancellablePromise}
    */
   preventCancel() {
-    var self = this;
+    const self = this;
     self.cancelPrevented = true;
     return self;
-  };
+  }
 
   cancel() {
-    var self = this;
+    const self = this;
     if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
       return;
     }
@@ -58,66 +57,69 @@ class CancellablePromise {
     }
 
     if (self.otherCancellables) {
-      self.otherCancellables.forEach(function (cancellable) { if (cancellable.cancel) { cancellable.cancel() } });
+      self.otherCancellables.forEach(cancellable => {
+        if (cancellable.cancel) {
+          cancellable.cancel();
+        }
+      });
     }
 
     while (self.cancelCallbacks.length) {
       self.cancelCallbacks.pop()();
     }
     return self;
-  };
+  }
 
   onCancel(callback) {
-    var self = this;
+    const self = this;
     if (self.cancelled) {
       callback();
     } else {
       self.cancelCallbacks.push(callback);
     }
     return self;
-  };
+  }
 
   then() {
-    var self = this;
+    const self = this;
     self.deferred.then.apply(self.deferred, arguments);
     return self;
-  };
+  }
 
   done(callback) {
-    var self = this;
+    const self = this;
     self.deferred.done.apply(self.deferred, arguments);
     return self;
-  };
+  }
 
   fail(callback) {
-    var self = this;
+    const self = this;
     self.deferred.fail.apply(self.deferred, arguments);
     return self;
-  };
+  }
 
   always(callback) {
-    var self = this;
+    const self = this;
     self.deferred.always.apply(self.deferred, arguments);
     return self;
-  };
+  }
 
   pipe(callback) {
-    var self = this;
+    const self = this;
     self.deferred.pipe.apply(self.deferred, arguments);
     return self;
-  };
+  }
 
   progress(callback) {
-    var self = this;
+    const self = this;
     self.deferred.progress.apply(self.deferred, arguments);
     return self;
-  };
+  }
 
   state() {
-    var self = this;
+    const self = this;
     return self.deferred.state && self.deferred.state();
-  };
+  }
 }
 
 export default CancellablePromise;
-

@@ -14,13 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout'
+import ko from 'knockout';
 
-import huePubSub from '../utils/huePubSub'
-import apiHelper from '../api/apiHelper'
+import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
 
 class AssistGitEntry {
-
   /**
    * @param {object} options
    * @param {object} options.definition
@@ -30,7 +29,7 @@ class AssistGitEntry {
    * @constructor
    */
   constructor(options) {
-    let self = this;
+    const self = this;
 
     self.definition = options.definition;
     self.parent = options.parent;
@@ -38,7 +37,7 @@ class AssistGitEntry {
     if (self.parent !== null) {
       self.path = self.parent.path;
       if (self.parent.path !== '/') {
-        self.path += '/'
+        self.path += '/';
       }
     }
     self.path += self.definition.name;
@@ -59,13 +58,13 @@ class AssistGitEntry {
       }
     });
 
-    self.hasEntries = ko.pureComputed(() =>{
+    self.hasEntries = ko.pureComputed(() => {
       return self.entries().length > 0;
     });
   }
 
   dblClick() {
-    let self = this;
+    const self = this;
     if (self.definition.type !== 'file') {
       return;
     }
@@ -82,11 +81,11 @@ class AssistGitEntry {
         self.hasErrors(true);
         self.loading(false);
       }
-    })
-  };
+    });
+  }
 
   loadEntries(callback) {
-    let self = this;
+    const self = this;
     if (self.loading()) {
       return;
     }
@@ -97,11 +96,16 @@ class AssistGitEntry {
       pathParts: self.getHierarchy(),
       fileType: self.definition.type,
       successCallback: data => {
-        let filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
-        self.entries(filteredFiles.map(file => new AssistGitEntry({
-          definition: file,
-          parent: self
-        })));
+        const filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
+        self.entries(
+          filteredFiles.map(
+            file =>
+              new AssistGitEntry({
+                definition: file,
+                parent: self
+              })
+          )
+        );
         self.loaded = true;
         self.loading(false);
         if (callback) {
@@ -115,37 +119,39 @@ class AssistGitEntry {
           callback();
         }
       }
-    })
-  };
+    });
+  }
 
   loadDeep(folders, callback) {
-    let self = this;
+    const self = this;
 
     if (folders.length === 0) {
       callback(self);
       return;
     }
 
-    let findNextAndLoadDeep = () => {
-      let nextName = folders.shift();
-      let foundEntry = self.entries().filter(entry => entry.definition.name === nextName && entry.definition.type === 'dir');
+    const findNextAndLoadDeep = () => {
+      const nextName = folders.shift();
+      const foundEntry = self
+        .entries()
+        .filter(entry => entry.definition.name === nextName && entry.definition.type === 'dir');
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
-      } else if (! self.hasErrors()) {
+      } else if (!self.hasErrors()) {
         callback(self);
       }
     };
 
-    if (! self.loaded) {
+    if (!self.loaded) {
       self.loadEntries(findNextAndLoadDeep);
     } else {
       findNextAndLoadDeep();
     }
-  };
+  }
 
   getHierarchy() {
-    let self = this;
-    let parts = [];
+    const self = this;
+    const parts = [];
     let entry = self;
     while (entry != null) {
       parts.push(entry.definition.name);
@@ -153,10 +159,10 @@ class AssistGitEntry {
     }
     parts.reverse();
     return parts;
-  };
+  }
 
   toggleOpen() {
-    let self = this;
+    const self = this;
     if (self.definition.type !== 'dir') {
       return;
     }
@@ -168,7 +174,7 @@ class AssistGitEntry {
     } else {
       huePubSub.publish('assist.selectGitEntry', self);
     }
-  };
+  }
 }
 
-export default AssistGitEntry
+export default AssistGitEntry;

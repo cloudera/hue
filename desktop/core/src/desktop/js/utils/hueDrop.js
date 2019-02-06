@@ -14,21 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import huePubSub from './huePubSub';
 import $ from 'jquery';
 
-let jQuery = $;
+import huePubSub from 'utils/huePubSub';
 
 const hueDrop = () => {
-  var draggableMeta = {};
+  let draggableMeta = {};
 
-  huePubSub.subscribe('draggable.text.meta', function (meta) {
+  huePubSub.subscribe('draggable.text.meta', meta => {
     draggableMeta = meta;
   });
 
   return {
-    fromAssist: function (element, callback) {
-      if (typeof element === 'function' && !(element instanceof jQuery)) {
+    fromAssist: function(element, callback) {
+      if (typeof element === 'function' && !(element instanceof $)) {
         callback = element;
       }
       if (typeof element === 'string') {
@@ -37,8 +36,7 @@ const hueDrop = () => {
       if (element.length > 0) {
         element.droppable({
           accept: '.draggableText',
-          drop: function (e, ui) {
-            var droppedText = ui.helper.text();
+          drop: function(e, ui) {
             if (callback) {
               callback({
                 text: ui.helper.text(),
@@ -47,29 +45,28 @@ const hueDrop = () => {
             }
           }
         });
-      }
-      else {
+      } else {
         console.warn('hueDrop.fromAssist could not be attached to the element');
       }
     },
-    fromDesktop: function (element, callback, method) {
+    fromDesktop: function(element, callback, method) {
       if (window.FileReader) {
-        if (typeof element === 'function' && !(element instanceof jQuery)) {
+        if (typeof element === 'function' && !(element instanceof $)) {
           callback = element;
         }
         if (typeof element === 'string') {
           element = $(element);
         }
 
-        let handleFileSelect = (e) => {
+        const handleFileSelect = e => {
           e.stopPropagation();
           e.preventDefault();
-          var dt = e.dataTransfer;
-          var files = dt.files;
-          for (var i = 0, f; f = files[i]; i++) {
-            var reader = new FileReader();
-            reader.onload = (function (file) {
-              return function (e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          for (let i = 0, f; (f = files[i]); i++) {
+            const reader = new FileReader();
+            reader.onload = (function(file) {
+              return function(e) {
                 callback(e.target.result);
               };
             })(f);
@@ -89,7 +86,7 @@ const hueDrop = () => {
           }
         };
 
-        let handleDragOver = (e) => {
+        const handleDragOver = e => {
           e.stopPropagation();
           e.preventDefault();
           e.dataTransfer.dropEffect = 'copy';
@@ -101,8 +98,10 @@ const hueDrop = () => {
         } else {
           console.warn('hueDrop.fromDesktop could not be attached to the element');
         }
-      }  else {
-        console.warn('FileReader is not supported by your browser. Please consider upgrading to fully experience Hue!')
+      } else {
+        console.warn(
+          'FileReader is not supported by your browser. Please consider upgrading to fully experience Hue!'
+        );
       }
     }
   };

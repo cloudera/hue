@@ -116,11 +116,11 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _apiQueueManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./apiQueueManager */ "./desktop/core/src/desktop/js/api/apiQueueManager.js");
-/* harmony import */ var _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
-/* harmony import */ var _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/hueDebug */ "./desktop/core/src/desktop/js/utils/hueDebug.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
-/* harmony import */ var _utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
+/* harmony import */ var api_apiQueueManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/apiQueueManager */ "./desktop/core/src/desktop/js/api/apiQueueManager.js");
+/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! utils/hueDebug */ "./desktop/core/src/desktop/js/utils/hueDebug.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! utils/hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
@@ -256,7 +256,7 @@ var genericNavOptMultiTableFetch = function genericNavOptMultiTableFetch(apiHelp
     },
     errorCallback: deferred.reject
   });
-  return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+  return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
 };
 /**
  * Wrapper around the response from the Query API
@@ -272,7 +272,7 @@ var QueryResult = function QueryResult(sourceType, compute, response) {
   _classCallCheck(this, QueryResult);
 
   var self = this;
-  self.id = _utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].UUID();
+  self.id = utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].UUID();
   self.type = response.result.type || sourceType;
   self.compute = compute;
   self.status = response.status || 'running';
@@ -287,38 +287,38 @@ function () {
     _classCallCheck(this, ApiHelper);
 
     var self = this;
-    self.queueManager = _apiQueueManager__WEBPACK_IMPORTED_MODULE_1__["default"];
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.hdfs.cache', function () {
+    self.queueManager = api_apiQueueManager__WEBPACK_IMPORTED_MODULE_1__["default"];
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.hdfs.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 'hdfs'
       }), {});
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.adls.cache', function () {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.adls.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 'adls'
       }), {});
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.git.cache', function () {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.git.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 'git'
       }), {});
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.s3.cache', function () {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.s3.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 's3'
       }), {});
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.collections.cache', function () {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.collections.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 'collections'
       }), {});
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.hbase.cache', function () {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.hbase.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 'hbase'
       }), {});
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.document.cache', function () {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.document.cache', function () {
       jquery__WEBPACK_IMPORTED_MODULE_0___default.a.totalStorage(self.getAssistCacheIdentifier({
         sourceType: 'document'
       }), {});
@@ -356,7 +356,7 @@ function () {
       }), {});
     };
 
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.all.caches', clearAllCaches);
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('assist.clear.all.caches', clearAllCaches);
 
     if (window.performance && window.performance.navigation) {
       if (window.performance.navigation.type === 1 && location.href.indexOf('/metastore') !== -1) {
@@ -369,8 +369,8 @@ function () {
   _createClass(ApiHelper, [{
     key: "hasExpired",
     value: function hasExpired(timestamp, cacheType) {
-      if (typeof _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"] !== 'undefined' && typeof _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout !== 'undefined') {
-        return new Date().getTime() - timestamp > _utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout;
+      if (typeof utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"] !== 'undefined' && typeof utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout !== 'undefined') {
+        return new Date().getTime() - timestamp > utils_hueDebug__WEBPACK_IMPORTED_MODULE_3__["default"].cacheTimeout;
       }
 
       return new Date().getTime() - timestamp > CACHEABLE_TTL[cacheType];
@@ -460,7 +460,7 @@ function () {
 
       observable.subscribe(function (newValue) {
         if (owner === 'assist' && id === 'assist_panel_visible') {
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.forceRender');
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.forceRender');
         }
 
         self.setInTotalStorage(owner, id, newValue);
@@ -518,7 +518,7 @@ function () {
         }
 
         if (!options || !options.silenceErrors) {
-          _utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].logError(errorResponse);
+          utils_hueUtils__WEBPACK_IMPORTED_MODULE_5__["default"].logError(errorResponse);
 
           if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
             jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).trigger("error", errorMessage);
@@ -1347,7 +1347,7 @@ function () {
       }).fail(function (errorResponse) {
         deferred.reject(self.assistErrorHandler(errorResponse));
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "createDocumentsFolder",
@@ -1568,7 +1568,7 @@ function () {
         }
 
         var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
-        return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+        return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
       }
 
       return deferred.resolve().promise();
@@ -1622,7 +1622,7 @@ function () {
         silenceErrors: options.silenceErrors,
         errorCallback: deferred.reject
       }));
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "updateSourceMetadata",
@@ -1728,7 +1728,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "fetchPartitions",
@@ -1780,7 +1780,7 @@ function () {
           })(response);
         }
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "refreshAnalysis",
@@ -1841,7 +1841,7 @@ function () {
         },
         errorCallback: deferred.reject
       }));
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, promises);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, promises);
     }
   }, {
     key: "whenAvailable",
@@ -1888,11 +1888,11 @@ function () {
             }
           }
         }).fail(deferred.reject);
-        cancellablePromises.push(new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](request, request));
+        cancellablePromises.push(new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](request, request));
       };
 
       waitForAvailable();
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
     }
   }, {
     key: "fetchSample",
@@ -1988,7 +1988,7 @@ function () {
       cancellablePromises.push({
         cancel: cancelQuery
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
     }
   }, {
     key: "fetchNavigatorMetadata",
@@ -2016,7 +2016,7 @@ function () {
       } else if (options.path.length === 3) {
         url += '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
       } else {
-        return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().reject());
+        return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred().reject());
       }
 
       var request = self.simplePost(url, {
@@ -2033,7 +2033,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "updateNavigatorProperties",
@@ -2095,7 +2095,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "addNavTags",
@@ -2155,7 +2155,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "fetchNavOptTopAggs",
@@ -2243,7 +2243,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "fetchQueryExecutionAnalysis",
@@ -2262,7 +2262,7 @@ function () {
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       var tries = 0;
       var cancellablePromises = [];
-      var promise = new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
+      var promise = new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, undefined, cancellablePromises);
 
       var pollForAnalysis = function pollForAnalysis() {
         if (tries === 10) {
@@ -2314,7 +2314,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "fetchQueryExecutionStatistics",
@@ -2336,7 +2336,7 @@ function () {
         },
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "fetchContextNamespaces",
@@ -2400,7 +2400,7 @@ function () {
           deferred.reject(data);
         }
       }).fail(deferred.reject);
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "fetchNavEntitiesInteractive",
@@ -2418,7 +2418,7 @@ function () {
           deferred.reject(data);
         }
       }).fail(deferred.reject);
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "searchEntities",
@@ -2435,7 +2435,7 @@ function () {
         successCallback: deferred.resolve,
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }, {
     key: "formatSql",
@@ -2456,7 +2456,7 @@ function () {
         successCallback: deferred.resolve,
         errorCallback: deferred.reject
       });
-      return new _cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_2__["default"](deferred, request);
     }
   }]);
 
@@ -2542,7 +2542,7 @@ var apiQueueManager = new ApiQueueManager();
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -2610,7 +2610,7 @@ function () {
       self.cancelled = true;
 
       if (self.request) {
-        _apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].cancelActiveRequest(self.request);
+        api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].cancelActiveRequest(self.request);
       }
 
       if (self.state && self.state() === 'pending' && self.deferred.reject) {
@@ -2714,8 +2714,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
-/* harmony import */ var _sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../sql/sqlUtils */ "./desktop/core/src/desktop/js/sql/sqlUtils.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! sql/sqlUtils */ "./desktop/core/src/desktop/js/sql/sqlUtils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -2750,7 +2750,7 @@ var findNameInHierarchy = function findNameInHierarchy(entry, searchCondition) {
   }
 
   if (entry) {
-    return _sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name);
+    return sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name);
   }
 };
 
@@ -2958,7 +2958,7 @@ function () {
             parts.push("[]");
           }
         } else {
-          parts.push(_sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name));
+          parts.push(sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name));
           parts.push(".");
         }
 
@@ -2981,7 +2981,7 @@ function () {
       }
 
       self.statsVisible(true);
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('context.popover.show', {
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('context.popover.show', {
         data: {
           type: 'catalogEntry',
           catalogEntry: self.catalogEntry
@@ -2997,7 +2997,7 @@ function () {
           bottom: offset.top + $source.height() - 3
         }
       });
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('context.popover.hidden', function () {
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('context.popover.hidden', function () {
         self.statsVisible(false);
       });
     }
@@ -3034,14 +3034,14 @@ function () {
             if (path.length > 1) {
               foundEntry.highlightInside(path.slice(1));
             } else {
-              _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('assist.db.scrollToComplete', function () {
+              utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('assist.db.scrollToComplete', function () {
                 foundEntry.highlight(true); // Timeout is for animation effect
 
                 window.setTimeout(function () {
                   foundEntry.highlight(false);
                 }, 1800);
               });
-              _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.db.scrollTo', foundEntry);
+              utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.db.scrollTo', foundEntry);
             }
           }, 0);
         }
@@ -3184,18 +3184,18 @@ function () {
       var self = this;
 
       if (self.catalogEntry.isTableOrView()) {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.table.at.cursor', {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.table.at.cursor', {
           name: self.getTableName(),
           database: self.getDatabaseName()
         });
       } else if (self.catalogEntry.isColumn()) {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.column.at.cursor', {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.column.at.cursor', {
           name: self.getColumnName(),
           table: self.getTableName(),
           database: self.getDatabaseName()
         });
       } else {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.column.at.cursor', {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.column.at.cursor', {
           name: self.getComplexName(),
           table: self.getTableName(),
           database: self.getDatabaseName()
@@ -3208,9 +3208,9 @@ function () {
       var self = this;
 
       if (isSolr) {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry.name);
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry.name);
       } else {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbNamespace.sourceType);
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbNamespace.sourceType);
       }
     }
   }, {
@@ -3228,7 +3228,7 @@ function () {
       }
 
       if (IS_HUE_4) {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', url);
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', url);
       } else {
         window.open(url, '_blank');
       }
@@ -3241,7 +3241,7 @@ function () {
 
       if (window.IS_NEW_INDEXER_ENABLED) {
         if (window.IS_HUE_4) {
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/indexer/indexes/' + definitionName);
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/indexer/indexes/' + definitionName);
         } else {
           window.open('/indexer/indexes/' + definitionName);
         }
@@ -3252,14 +3252,14 @@ function () {
           if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
             window.location.hash = hash;
           } else {
-            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('app.gained.focus', function (app) {
+            utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('app.gained.focus', function (app) {
               if (app === 'indexes') {
                 window.setTimeout(function () {
                   window.location.hash = hash;
                 }, 0);
               }
             });
-            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/indexer');
+            utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/indexer');
           }
         } else {
           window.open('/indexer/' + hash);
@@ -3278,14 +3278,14 @@ function () {
       var self = this;
 
       if (self.catalogEntry.isTableOrView()) {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.table.selected', {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.table.selected', {
           sourceType: self.assistDbNamespace.sourceType,
           namespace: self.assistDbNamespace.namespace,
           database: self.databaseName,
           name: self.catalogEntry.name
         });
       } else if (self.catalogEntry.isDatabase()) {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.database.selected', {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.database.selected', {
           sourceType: self.assistDbNamespace.sourceType,
           namespace: self.assistDbNamespace.namespace,
           name: self.catalogEntry.name
@@ -3314,9 +3314,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _assistDbEntry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./assistDbEntry */ "./desktop/core/src/desktop/js/assist/assistDbEntry.js");
-/* harmony import */ var _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var assist_assistDbEntry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! assist/assistDbEntry */ "./desktop/core/src/desktop/js/assist/assistDbEntry.js");
+/* harmony import */ var catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -3460,7 +3460,7 @@ function () {
 
         if (!self.navigationSettings.rightAssist) {
           window.apiHelper.setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.database.set', {
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.database.set', {
             sourceType: self.sourceType,
             namespace: self.namespace,
             name: self.selectedDatabase().catalogEntry.name
@@ -3507,7 +3507,7 @@ function () {
       var lastSelectedDbName = self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null;
       self.selectedDatabase(null);
       self.databases([]);
-      _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_3__["default"].getEntry({
+      catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_3__["default"].getEntry({
         sourceType: self.sourceType,
         namespace: self.namespace,
         compute: self.compute(),
@@ -3525,7 +3525,7 @@ function () {
           var dbs = [];
           databaseEntries.forEach(function (catalogEntry) {
             hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
-            var database = new _assistDbEntry__WEBPACK_IMPORTED_MODULE_2__["default"](catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
+            var database = new assist_assistDbEntry__WEBPACK_IMPORTED_MODULE_2__["default"](catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
             self.dbIndex[catalogEntry.name] = database;
 
             if (catalogEntry.name === lastSelectedDbName) {
@@ -3561,7 +3561,7 @@ function () {
     self.modalItem = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
 
     if (!self.navigationSettings.rightAssist) {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('data.catalog.entry.refreshed', function (details) {
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('data.catalog.entry.refreshed', function (details) {
         if (self.namespace.id !== details.entry.namespace.id || details.entry.getSourceType() !== self.sourceType) {
           return;
         }
@@ -3621,7 +3621,7 @@ function () {
             }
 
             window.setTimeout(function () {
-              _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribeOnce('assist.db.scrollToComplete', function () {
+              utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribeOnce('assist.db.scrollToComplete', function () {
                 foundDb.highlight(true); // Timeout is for animation effect
 
                 window.setTimeout(function () {
@@ -3632,7 +3632,7 @@ function () {
               if (catalogEntry.path.length > 1) {
                 foundDb.highlightInside(catalogEntry.path.slice(1));
               } else {
-                _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.db.scrollTo', foundDb);
+                utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.db.scrollTo', foundDb);
               }
             }, 0);
           };
@@ -3684,10 +3684,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _assistDbNamespace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./assistDbNamespace */ "./desktop/core/src/desktop/js/assist/assistDbNamespace.js");
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../catalog/contextCatalog */ "./desktop/core/src/desktop/js/catalog/contextCatalog.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var assist_assistDbNamespace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! assist/assistDbNamespace */ "./desktop/core/src/desktop/js/assist/assistDbNamespace.js");
+/* harmony import */ var catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! catalog/contextCatalog */ "./desktop/core/src/desktop/js/catalog/contextCatalog.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -3739,8 +3739,8 @@ function () {
     self.i18n = options.i18n;
     self.nonSqlType = options.nonSqlType;
     self.navigationSettings = options.navigationSettings;
-    self.initialNamespace = options.initialNamespace || _api_apiHelper__WEBPACK_IMPORTED_MODULE_3__["default"].getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
-    self.initialCompute = options.initialCompute || _api_apiHelper__WEBPACK_IMPORTED_MODULE_3__["default"].getFromTotalStorage('contextSelector', 'lastSelectedCompute');
+    self.initialNamespace = options.initialNamespace || api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
+    self.initialCompute = options.initialCompute || api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].getFromTotalStorage('contextSelector', 'lastSelectedCompute');
     self.selectedNamespace = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
     self.namespaces = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observableArray();
     self.loadedDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -3791,13 +3791,13 @@ function () {
     self.hasNamespaces = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
       return self.namespaces().length > 0;
     });
-    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_5__["default"].subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+    utils_huePubSub__WEBPACK_IMPORTED_MODULE_5__["default"].subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
       if (self.sourceType !== sourceType) {
         return;
       }
 
       self.loading(true);
-      _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getNamespaces({
+      catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getNamespaces({
         sourceType: self.sourceType
       }).done(function (context) {
         var newNamespaces = [];
@@ -3812,7 +3812,7 @@ function () {
             existingNamespaceIndex[newNamespace.id].status(newNamespace.status);
             newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
           } else {
-            newNamespaces.push(new _assistDbNamespace__WEBPACK_IMPORTED_MODULE_2__["default"]({
+            newNamespaces.push(new assist_assistDbNamespace__WEBPACK_IMPORTED_MODULE_3__["default"]({
               sourceType: self.sourceType,
               namespace: newNamespace,
               i18n: self.i18n,
@@ -3841,13 +3841,13 @@ function () {
       self.loading(true);
 
       if (refresh) {
-        _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getComputes({
+        catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getComputes({
           sourceType: self.sourceType,
           clearCache: true
         });
       }
 
-      return _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getNamespaces({
+      return catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getNamespaces({
         sourceType: self.sourceType,
         clearCache: refresh
       }).done(function (context) {
@@ -3855,7 +3855,7 @@ function () {
         var activeNamespace;
         var activeCompute;
         context.namespaces.forEach(function (namespace) {
-          var assistNamespace = new _assistDbNamespace__WEBPACK_IMPORTED_MODULE_2__["default"]({
+          var assistNamespace = new assist_assistDbNamespace__WEBPACK_IMPORTED_MODULE_3__["default"]({
             sourceType: self.sourceType,
             namespace: namespace,
             i18n: self.i18n,
@@ -3965,8 +3965,8 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4047,12 +4047,12 @@ function () {
       }
 
       self.hasErrors(false);
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchGitContents({
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_1__["default"].fetchGitContents({
         pathParts: self.getHierarchy(),
         fileType: self.definition.type,
         successCallback: function successCallback(data) {
           self.fileContent(data.content);
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].publish('assist.dblClickGitItem', self);
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.dblClickGitItem', self);
         },
         errorCallback: function errorCallback() {
           self.hasErrors(true);
@@ -4071,7 +4071,7 @@ function () {
 
       self.loading(true);
       self.hasErrors(false);
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchGitContents({
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_1__["default"].fetchGitContents({
         pathParts: self.getHierarchy(),
         fileType: self.definition.type,
         successCallback: function successCallback(data) {
@@ -4158,10 +4158,10 @@ function () {
 
       if (self.definition.name === '..') {
         if (self.parent.parent) {
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].publish('assist.selectGitEntry', self.parent.parent);
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.selectGitEntry', self.parent.parent);
         }
       } else {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].publish('assist.selectGitEntry', self);
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.selectGitEntry', self);
       }
     }
   }]);
@@ -4184,8 +4184,8 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4246,7 +4246,7 @@ function () {
 
       self.loading(true);
       self.hasErrors(false);
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_1__["default"].fetchHBase({
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_1__["default"].fetchHBase({
         parent: self.definition,
         successCallback: function successCallback(data) {
           self.entries(data.data.map(function (obj) {
@@ -4274,17 +4274,17 @@ function () {
   }, {
     key: "open",
     value: function open() {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.clickHBaseItem', this);
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.clickHBaseItem', this);
     }
   }, {
     key: "click",
     value: function click() {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.clickHBaseItem', this);
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.clickHBaseItem', this);
     }
   }, {
     key: "dblClick",
     value: function dblClick() {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.dblClickHBaseItem', this);
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.dblClickHBaseItem', this);
     }
   }]);
 
@@ -4308,8 +4308,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 /* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4425,7 +4425,7 @@ function () {
   _createClass(AssistStorageEntry, [{
     key: "dblClick",
     value: function dblClick() {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, this);
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, this);
     }
   }, {
     key: "loadPreview",
@@ -4456,7 +4456,7 @@ function () {
 
       self.loading(true);
       self.hasErrors(false);
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"][TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"][TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
         pageSize: PAGE_SIZE,
         page: self.currentPage,
         filter: self.filter().trim() ? self.filter() : undefined,
@@ -4495,7 +4495,7 @@ function () {
   }, {
     key: "goHome",
     value: function goHome() {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[this.type].goHomePubSubId);
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[this.type].goHomePubSubId);
     }
   }, {
     key: "loadDeep",
@@ -4559,7 +4559,7 @@ function () {
           if (event.ctrlKey || event.metaKey || event.which === 2) {
             window.open('/hue' + self.definition.url, '_blank');
           } else {
-            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.link', self.definition.url);
+            utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.link', self.definition.url);
           }
         } else {
           window.open(self.definition.url, '_blank');
@@ -4572,10 +4572,10 @@ function () {
 
       if (self.definition.name === '..') {
         if (self.parent.parent) {
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self.parent.parent);
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self.parent.parent);
         }
       } else {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self);
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self);
       }
     }
   }, {
@@ -4590,7 +4590,7 @@ function () {
       self.currentPage++;
       self.loadingMore(true);
       self.hasErrors(false);
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"][TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"][TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
         pageSize: PAGE_SIZE,
         page: self.currentPage,
         filter: self.filter().trim() ? self.filter() : undefined,
@@ -4634,7 +4634,7 @@ function () {
         offset.top += positionAdjustment.top;
       }
 
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.popover.show', {
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.popover.show', {
         data: {
           type: 'storageEntry',
           storageEntry: entry
@@ -4649,14 +4649,14 @@ function () {
           bottom: offset.top + $source.height() - 3
         }
       });
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].subscribeOnce('context.popover.hidden', function () {
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].subscribeOnce('context.popover.hidden', function () {
         entry.contextPopoverVisible(false);
       });
     }
   }, {
     key: "openInImporter",
     value: function openInImporter() {
-      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.in.importer', this.definition.path);
+      utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.in.importer', this.definition.path);
     }
   }], [{
     key: "getEntry",
@@ -4750,8 +4750,8 @@ window.AssistStorageEntry = assist_assistStorageEntry__WEBPACK_IMPORTED_MODULE_4
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -4780,7 +4780,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 var fetchAndSave = function fetchAndSave(apiHelperFunction, attributeName, entry, apiOptions) {
-  return _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"][apiHelperFunction]({
+  return api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"][apiHelperFunction]({
     sourceType: entry.dataCatalog.sourceType,
     compute: entry.compute,
     path: entry.path,
@@ -4854,8 +4854,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4914,8 +4914,8 @@ function () {
     self.clusterPromises = {};
 
     var addPubSubs = function addPubSubs() {
-      if (typeof _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"] !== 'undefined') {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].subscribe('context.catalog.refresh', function () {
+      if (typeof utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"] !== 'undefined') {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].subscribe('context.catalog.refresh', function () {
           var namespacesToRefresh = Object.keys(self.namespaces);
           self.namespaces = {};
           self.namespacePromises = {};
@@ -4923,9 +4923,9 @@ function () {
           self.computePromises = {};
           self.clusters = {};
           self.clusterPromises = {};
-          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.refreshed');
+          utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.refreshed');
           namespacesToRefresh.forEach(function (sourceType) {
-            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.namespaces.refreshed', sourceType);
+            utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.namespaces.refreshed', sourceType);
           });
         });
       } else {
@@ -5017,7 +5017,7 @@ function () {
         window.clearTimeout(pollTimeout);
         window.setTimeout(function () {
           if (Object.keys(startingNamespaces).length) {
-            _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextNamespaces(options).done(function (namespaces) {
+            api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextNamespaces(options).done(function (namespaces) {
               if (namespaces[options.sourceType]) {
                 var _namespaces = _namespaces[options.sourceType];
 
@@ -5033,7 +5033,7 @@ function () {
                   });
 
                   if (statusChanged) {
-                    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.namespaces.refreshed', options.sourceType);
+                    utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.namespaces.refreshed', options.sourceType);
                   }
 
                   if (Object.keys(startingNamespaces).length) {
@@ -5059,7 +5059,7 @@ function () {
       });
 
       var fetchNamespaces = function fetchNamespaces() {
-        _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextNamespaces(options).done(function (namespaces) {
+        api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextNamespaces(options).done(function (namespaces) {
           if (namespaces[options.sourceType]) {
             var dynamic = namespaces.dynamicClusters;
             namespaces = namespaces[options.sourceType];
@@ -5086,7 +5086,7 @@ function () {
               deferred.resolve(self.namespaces[options.sourceType]);
 
               if (notifyForRefresh) {
-                _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.namespaces.refreshed', options.sourceType);
+                utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.catalog.namespaces.refreshed', options.sourceType);
               }
 
               if (self.namespaces[options.sourceType].namespaces.length) {
@@ -5143,7 +5143,7 @@ function () {
 
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       self.computePromises[options.sourceType] = deferred.promise();
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextComputes(options).done(function (computes) {
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextComputes(options).done(function (computes) {
         if (computes[options.sourceType]) {
           computes = computes[options.sourceType];
 
@@ -5182,7 +5182,7 @@ function () {
 
       var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
       self.clusterPromises[options.sourceType] = deferred.promise();
-      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextClusters(options).done(function (clusters) {
+      api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchContextClusters(options).done(function (clusters) {
         if (clusters && clusters[options.sourceType]) {
           self.clusters[options.sourceType] = clusters[options.sourceType];
           deferred.resolve(self.clusters[options.sourceType]);
@@ -5246,12 +5246,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
-/* harmony import */ var _catalogUtils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
-/* harmony import */ var _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dataCatalogEntry */ "./desktop/core/src/desktop/js/catalog/dataCatalogEntry.js");
-/* harmony import */ var _generalDataCatalog__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./generalDataCatalog */ "./desktop/core/src/desktop/js/catalog/generalDataCatalog.js");
-/* harmony import */ var _multiTableEntry__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./multiTableEntry */ "./desktop/core/src/desktop/js/catalog/multiTableEntry.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! catalog/catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
+/* harmony import */ var catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! catalog/dataCatalogEntry */ "./desktop/core/src/desktop/js/catalog/dataCatalogEntry.js");
+/* harmony import */ var catalog_generalDataCatalog__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! catalog/generalDataCatalog */ "./desktop/core/src/desktop/js/catalog/generalDataCatalog.js");
+/* harmony import */ var catalog_multiTableEntry__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! catalog/multiTableEntry */ "./desktop/core/src/desktop/js/catalog/multiTableEntry.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -5509,7 +5509,7 @@ function () {
       var cancellablePromises = [];
       var popularEntries = [];
       var pathsToLoad = [];
-      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].setSilencedErrors(options);
+      options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].setSilencedErrors(options);
       var existingPromises = [];
       options.paths.forEach(function (path) {
         var existingDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
@@ -5543,7 +5543,7 @@ function () {
         var loadDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
 
         if (pathsToLoad.length) {
-          cancellablePromises.push(_api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchNavOptPopularity({
+          cancellablePromises.push(api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchNavOptPopularity({
             silenceErrors: options.silenceErrors,
             paths: pathsToLoad
           }).done(function (data) {
@@ -5607,7 +5607,7 @@ function () {
           }).fail(deferred.reject);
         });
       });
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].applyCancellable(new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__["default"](deferred, cancellablePromises), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].applyCancellable(new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__["default"](deferred, cancellablePromises), options);
     }
   }, {
     key: "getKnownEntry",
@@ -5674,7 +5674,7 @@ function () {
       if (!self.temporaryEntries[sourceIdentifier]) {
         var sourceDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
         self.temporaryEntries[sourceIdentifier] = sourceDeferred.promise();
-        var sourceEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+        var sourceEntry = new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
           isTemporary: true,
           dataCatalog: self,
           namespace: options.namespace,
@@ -5702,7 +5702,7 @@ function () {
           if (!self.temporaryEntries[databaseIdentifier]) {
             var databaseDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
             self.temporaryEntries[databaseIdentifier] = databaseDeferred.promise();
-            var databaseEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+            var databaseEntry = new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
               isTemporary: true,
               dataCatalog: self,
               namespace: options.namespace,
@@ -5729,7 +5729,7 @@ function () {
               });
               self.temporaryEntries[tableIdentifier] = tableDeferred.promise();
               identifiersToClean.push(tableIdentifier);
-              var tableEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+              var tableEntry = new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
                 isTemporary: true,
                 dataCatalog: self,
                 namespace: options.namespace,
@@ -5777,7 +5777,7 @@ function () {
                   var columnDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
                   self.temporaryEntries[columnIdentifier] = columnDeferred.promise();
                   identifiersToClean.push(columnIdentifier);
-                  var columnEntry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+                  var columnEntry = new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
                     isTemporary: true,
                     dataCatalog: self,
                     namespace: options.namespace,
@@ -5864,7 +5864,7 @@ function () {
       self.entries[identifier] = deferred.promise();
 
       if (!cacheEnabled) {
-        deferred.resolve(new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+        deferred.resolve(new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
           dataCatalog: self,
           namespace: options.namespace,
           compute: options.compute,
@@ -5874,7 +5874,7 @@ function () {
       } else {
         self.store.getItem(identifier).then(function (storeEntry) {
           var definition = storeEntry ? storeEntry.definition : options.definition;
-          var entry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+          var entry = new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
             dataCatalog: self,
             namespace: options.namespace,
             compute: options.compute,
@@ -5891,7 +5891,7 @@ function () {
           deferred.resolve(entry);
         }).catch(function (error) {
           console.warn(error);
-          var entry = new _dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
+          var entry = new catalog_dataCatalogEntry__WEBPACK_IMPORTED_MODULE_5__["default"]({
             dataCatalog: self,
             namespace: options.namespace,
             compute: options.compute,
@@ -5933,14 +5933,14 @@ function () {
       self.multiTableEntries[identifier] = deferred.promise();
 
       if (!cacheEnabled) {
-        deferred.resolve(new _multiTableEntry__WEBPACK_IMPORTED_MODULE_7__["default"]({
+        deferred.resolve(new catalog_multiTableEntry__WEBPACK_IMPORTED_MODULE_7__["default"]({
           identifier: identifier,
           dataCatalog: self,
           paths: options.paths
         })).promise();
       } else {
         self.multiTableStore.getItem(identifier).then(function (storeEntry) {
-          var entry = new _multiTableEntry__WEBPACK_IMPORTED_MODULE_7__["default"]({
+          var entry = new catalog_multiTableEntry__WEBPACK_IMPORTED_MODULE_7__["default"]({
             identifier: identifier,
             dataCatalog: self,
             paths: options.paths
@@ -5953,7 +5953,7 @@ function () {
           deferred.resolve(entry);
         }).catch(function (error) {
           console.warn(error);
-          deferred.resolve(new _multiTableEntry__WEBPACK_IMPORTED_MODULE_7__["default"]({
+          deferred.resolve(new catalog_multiTableEntry__WEBPACK_IMPORTED_MODULE_7__["default"]({
             identifier: identifier,
             dataCatalog: self,
             paths: options.paths
@@ -6008,7 +6008,7 @@ function () {
   return DataCatalog;
 }();
 
-var generalDataCatalog = new _generalDataCatalog__WEBPACK_IMPORTED_MODULE_6__["default"]();
+var generalDataCatalog = new catalog_generalDataCatalog__WEBPACK_IMPORTED_MODULE_6__["default"]();
 var sourceBoundCatalogs = {};
 /**
  * Helper function to get the DataCatalog instance for a given data source.
@@ -6100,7 +6100,7 @@ var getCatalog = function getCatalog(sourceType) {
     getCatalog(options.sourceType).getEntry(options).done(function (entry) {
       cancellablePromises.push(entry.getChildren(options).done(deferred.resolve).fail(deferred.reject));
     }).fail(deferred.reject);
-    return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__["default"](deferred, undefined, cancellablePromises);
+    return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_3__["default"](deferred, undefined, cancellablePromises);
   },
 
   /**
@@ -6130,7 +6130,7 @@ var getCatalog = function getCatalog(sourceType) {
   disableCache: function disableCache() {
     cacheEnabled = false;
   },
-  applyCancellable: _catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].applyCancellable
+  applyCancellable: catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_4__["default"].applyCancellable
 });
 
 /***/ }),
@@ -6144,10 +6144,10 @@ var getCatalog = function getCatalog(sourceType) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
-/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
-/* harmony import */ var _catalogUtils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
-/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! catalog/catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6190,12 +6190,12 @@ var reloadSourceMeta = function reloadSourceMeta(dataCatalogEntry, options) {
     var deferred = $.Deferred();
     var cancellablePromises = [];
     dataCatalogEntry.dataCatalog.invalidatePromise.always(function () {
-      cancellablePromises.push(_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options).done(deferred.resolve).fail(deferred.reject));
+      cancellablePromises.push(catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options).done(deferred.resolve).fail(deferred.reject));
     });
-    return dataCatalogEntry.trackedPromise('sourceMetaPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises));
+    return dataCatalogEntry.trackedPromise('sourceMetaPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises));
   }
 
-  return dataCatalogEntry.trackedPromise('sourceMetaPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options));
+  return dataCatalogEntry.trackedPromise('sourceMetaPromise', catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options));
 };
 /**
  * Helper function to reload the navigator meta for the given entry
@@ -6210,7 +6210,7 @@ var reloadSourceMeta = function reloadSourceMeta(dataCatalogEntry, options) {
 
 var reloadNavigatorMeta = function reloadNavigatorMeta(dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.canHaveNavigatorMetadata()) {
-    return dataCatalogEntry.trackedPromise('navigatorMetaPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions)).done(function (navigatorMeta) {
+    return dataCatalogEntry.trackedPromise('navigatorMetaPromise', catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions)).done(function (navigatorMeta) {
       if (navigatorMeta && dataCatalogEntry.commentObservable) {
         dataCatalogEntry.commentObservable(dataCatalogEntry.getResolvedComment());
       }
@@ -6233,7 +6233,7 @@ var reloadNavigatorMeta = function reloadNavigatorMeta(dataCatalogEntry, apiOpti
 
 
 var reloadAnalysis = function reloadAnalysis(dataCatalogEntry, apiOptions) {
-  return dataCatalogEntry.trackedPromise('analysisPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions));
+  return dataCatalogEntry.trackedPromise('analysisPromise', catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions));
 };
 /**
  * Helper function to reload the partitions for the given entry
@@ -6247,7 +6247,7 @@ var reloadAnalysis = function reloadAnalysis(dataCatalogEntry, apiOptions) {
 
 
 var reloadPartitions = function reloadPartitions(dataCatalogEntry, apiOptions) {
-  return dataCatalogEntry.trackedPromise('partitionsPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions));
+  return dataCatalogEntry.trackedPromise('partitionsPromise', catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions));
 };
 /**
  * Helper function to reload the sample for the given entry
@@ -6261,7 +6261,7 @@ var reloadPartitions = function reloadPartitions(dataCatalogEntry, apiOptions) {
 
 
 var reloadSample = function reloadSample(dataCatalogEntry, apiOptions) {
-  return dataCatalogEntry.trackedPromise('samplePromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions));
+  return dataCatalogEntry.trackedPromise('samplePromise', catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions));
 };
 /**
  * Helper function to reload the nav opt metadata for the given entry
@@ -6276,7 +6276,7 @@ var reloadSample = function reloadSample(dataCatalogEntry, apiOptions) {
 
 var reloadNavOptMeta = function reloadNavOptMeta(dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.dataCatalog.canHaveNavOptMetadata()) {
-    return dataCatalogEntry.trackedPromise('navOptMetaPromise', _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions));
+    return dataCatalogEntry.trackedPromise('navOptMetaPromise', catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions));
   }
 
   dataCatalogEntry.navOptMetaPromise = $.Deferred.reject().promise();
@@ -6311,7 +6311,7 @@ var getFromMultiTableCatalog = function getFromMultiTableCatalog(catalogEntry, o
   }).done(function (multiTableEntry) {
     cancellablePromises.push(multiTableEntry[functionName](options).done(deferred.resolve).fail(deferred.reject));
   }).fail(deferred.reject);
-  return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises);
+  return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises);
 };
 /**
  * @param {DataCatalog} options.dataCatalog
@@ -6446,7 +6446,7 @@ function () {
         if (self.dataCatalog.invalidatePromise) {
           invalidatePromise = self.dataCatalog.invalidatePromise;
         } else {
-          invalidatePromise = _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].invalidateSourceMetadata({
+          invalidatePromise = api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].invalidateSourceMetadata({
             sourceType: self.getSourceType(),
             compute: self.compute,
             invalidate: invalidate,
@@ -6470,12 +6470,12 @@ function () {
       var saveDeferred = options.cascade ? self.dataCatalog.clearStorageCascade(self.namespace, self.compute, self.path) : self.save();
       var clearPromise = $.when(invalidatePromise, saveDeferred);
       clearPromise.always(function () {
-        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('data.catalog.entry.refreshed', {
+        utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('data.catalog.entry.refreshed', {
           entry: self,
           cascade: !!options.cascade
         });
       });
-      return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](clearPromise, undefined, [invalidatePromise]);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](clearPromise, undefined, [invalidatePromise]);
     }
   }, {
     key: "save",
@@ -6524,7 +6524,7 @@ function () {
       var self = this;
 
       if (self.childrenPromise && (!options || !options.refreshCache)) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.childrenPromise, options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.childrenPromise, options);
       }
 
       var deferred = $.Deferred();
@@ -6609,7 +6609,7 @@ function () {
           deferred.resolve(Array.prototype.slice.call(arguments));
         });
       }).fail(deferred.reject);
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('childrenPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [sourceMetaPromise])), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('childrenPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [sourceMetaPromise])), options);
     }
   }, {
     key: "loadNavigatorMetaForChildren",
@@ -6626,14 +6626,14 @@ function () {
      */
     value: function loadNavigatorMetaForChildren(options) {
       var self = this;
-      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+      options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
 
       if (!self.canHaveNavigatorMetadata() || self.isField()) {
         return $.Deferred().reject().promise();
       }
 
       if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaForChildrenPromise, options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaForChildrenPromise, options);
       }
 
       var deferred = $.Deferred();
@@ -6665,7 +6665,7 @@ function () {
           });
         };
 
-        cancellablePromises.push(_api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].searchEntities({
+        cancellablePromises.push(api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].searchEntities({
           query: query,
           rawQuery: true,
           limit: children.length,
@@ -6700,7 +6700,7 @@ function () {
           deferred.reject();
         }));
       }).fail(deferred.reject));
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, null, cancellablePromises)), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, null, cancellablePromises)), options);
     }
   }, {
     key: "applyNavOptResponseToChildren",
@@ -6773,7 +6773,7 @@ function () {
         });
         deferred.resolve(popularEntries);
       }).fail(deferred.reject);
-      return new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [childPromise]);
+      return new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, [childPromise]);
     }
   }, {
     key: "loadNavOptPopularityForChildren",
@@ -6790,14 +6790,14 @@ function () {
      */
     value: function loadNavOptPopularityForChildren(options) {
       var self = this;
-      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+      options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
 
       if (!self.dataCatalog.canHaveNavOptMetadata()) {
         return $.Deferred().reject().promise();
       }
 
       if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptPopularityForChildrenPromise, options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptPopularityForChildrenPromise, options);
       }
 
       var deferred = $.Deferred();
@@ -6810,7 +6810,7 @@ function () {
           }));
         }).fail(deferred.reject));
       } else if (self.isDatabase() || self.isTableOrView()) {
-        cancellablePromises.push(_api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].fetchNavOptPopularity({
+        cancellablePromises.push(api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].fetchNavOptPopularity({
           silenceErrors: options && options.silenceErrors,
           refreshCache: options && options.refreshCache,
           paths: [self.path]
@@ -6821,7 +6821,7 @@ function () {
         deferred.resolve([]);
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
     }
   }, {
     key: "canHaveNavigatorMetadata",
@@ -6938,7 +6938,7 @@ function () {
         resolveWithSourceMeta();
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises), options);
     }
   }, {
     key: "updateNavigatorCustomMetadata",
@@ -6968,7 +6968,7 @@ function () {
 
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
-            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateNavigatorProperties({
+            api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateNavigatorProperties({
               identity: navigatorMeta.identity,
               modifiedCustomMetadata: modifiedCustomMetadata,
               deletedCustomMetadataKeys: deletedCustomMetadataKeys
@@ -7018,7 +7018,7 @@ function () {
 
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
-            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateNavigatorProperties({
+            api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateNavigatorProperties({
               identity: navigatorMeta.identity,
               properties: {
                 description: comment
@@ -7041,7 +7041,7 @@ function () {
           }
         }).fail(deferred.reject);
       } else {
-        _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateSourceMetadata({
+        api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].updateSourceMetadata({
           sourceType: self.getSourceType(),
           path: self.path,
           properties: {
@@ -7076,7 +7076,7 @@ function () {
       if (self.canHaveNavigatorMetadata()) {
         self.getNavigatorMeta().done(function (navMeta) {
           if (navMeta && typeof navMeta.identity !== 'undefined') {
-            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].addNavTags(navMeta.identity, tags).done(function (entity) {
+            api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].addNavTags(navMeta.identity, tags).done(function (entity) {
               if (entity) {
                 self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
@@ -7114,7 +7114,7 @@ function () {
       if (self.canHaveNavigatorMetadata()) {
         self.getNavigatorMeta().done(function (navMeta) {
           if (navMeta && typeof navMeta.identity !== 'undefined') {
-            _api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].deleteNavTags(navMeta.identity, tags).done(function (entity) {
+            api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].deleteNavTags(navMeta.identity, tags).done(function (entity) {
               if (entity) {
                 self.navigatorMeta = entity;
                 self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
@@ -7464,14 +7464,14 @@ function () {
       var self = this;
 
       if (options && options.cachedOnly) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise, options) || $.Deferred().reject(false).promise();
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise, options) || $.Deferred().reject(false).promise();
       }
 
       if (options && options.refreshCache) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSourceMeta(self, options));
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSourceMeta(self, options));
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
     }
   }, {
     key: "getAnalysis",
@@ -7492,14 +7492,14 @@ function () {
       var self = this;
 
       if (options && options.cachedOnly) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise, options) || $.Deferred().reject(false).promise();
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise, options) || $.Deferred().reject(false).promise();
       }
 
       if (options && (options.refreshCache || options.refreshAnalysis)) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadAnalysis(self, options), options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadAnalysis(self, options), options);
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
     }
   }, {
     key: "getPartitions",
@@ -7523,14 +7523,14 @@ function () {
       }
 
       if (options && options.cachedOnly) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise, options) || $.Deferred().reject(false).promise();
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise, options) || $.Deferred().reject(false).promise();
       }
 
       if (options && options.refreshCache) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadPartitions(self, options), options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadPartitions(self, options), options);
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
     }
   }, {
     key: "getNavigatorMeta",
@@ -7548,21 +7548,21 @@ function () {
      */
     value: function getNavigatorMeta(options) {
       var self = this;
-      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+      options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
 
       if (!self.canHaveNavigatorMetadata()) {
         return $.Deferred().reject().promise();
       }
 
       if (options && options.cachedOnly) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise, options) || $.Deferred().reject(false).promise();
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise, options) || $.Deferred().reject(false).promise();
       }
 
       if (options && options.refreshCache) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadNavigatorMeta(self, options), options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadNavigatorMeta(self, options), options);
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options);
     }
   }, {
     key: "getNavOptMeta",
@@ -7580,21 +7580,21 @@ function () {
      */
     value: function getNavOptMeta(options) {
       var self = this;
-      options = _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
+      options = catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].setSilencedErrors(options);
 
       if (!self.dataCatalog.canHaveNavOptMetadata() || !self.isTableOrView()) {
         return $.Deferred().reject().promise();
       }
 
       if (options && options.cachedOnly) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise, options) || $.Deferred().reject(false).promise();
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise, options) || $.Deferred().reject(false).promise();
       }
 
       if (options && options.refreshCache) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadNavOptMeta(self, options), options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadNavOptMeta(self, options), options);
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
     }
   }, {
     key: "getSample",
@@ -7616,7 +7616,7 @@ function () {
       var self = this; // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
 
       if (options && options.operation && options.operation !== 'default') {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(_api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].fetchSample({
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(api_apiHelper__WEBPACK_IMPORTED_MODULE_0__["default"].fetchSample({
           sourceType: self.dataCatalog.sourceType,
           compute: self.compute,
           path: self.path,
@@ -7634,7 +7634,7 @@ function () {
           if (options && options.cachedOnly) {
             deferred.reject();
           } else {
-            cancellablePromises.push(_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSample(self, options), options).done(deferred.resolve).fail(deferred.reject));
+            cancellablePromises.push(catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSample(self, options), options).done(deferred.resolve).fail(deferred.reject));
           }
         };
 
@@ -7647,7 +7647,7 @@ function () {
           }
         }).done(function (tableEntry) {
           if (tableEntry && tableEntry.samplePromise) {
-            cancellablePromises.push(_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(tableEntry.samplePromise, options));
+            cancellablePromises.push(catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(tableEntry.samplePromise, options));
             tableEntry.samplePromise.done(function (parentSample) {
               var colSample = {
                 hueTimestamp: parentSample.hueTimestamp,
@@ -7686,18 +7686,18 @@ function () {
             revertToSpecific();
           }
         }).fail(revertToSpecific);
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('samplePromise', new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.trackedPromise('samplePromise', new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises)), options);
       }
 
       if (options && options.cachedOnly) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
       }
 
       if (options && options.refreshCache) {
-        return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSample(self, options), options);
+        return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(reloadSample(self, options), options);
       }
 
-      return _catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise || reloadSample(self, options), options);
+      return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(self.samplePromise || reloadSample(self, options), options);
     }
   }, {
     key: "getTopAggs",
@@ -7775,7 +7775,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -7842,7 +7842,7 @@ function () {
       self.allNavigatorTagsPromise = deferred.promise();
 
       var reloadAllTags = function reloadAllTags() {
-        _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAllNavigatorTags({
+        api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchAllNavigatorTags({
           silenceErrors: options && options.silenceErrors
         }).done(deferred.resolve).fail(deferred.reject);
 
@@ -7925,7 +7925,7 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _catalogUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
+/* harmony import */ var catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! catalog/catalogUtils */ "./desktop/core/src/desktop/js/catalog/catalogUtils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -7962,7 +7962,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var genericNavOptReload = function genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
   if (multiTableEntry.dataCatalog.canHaveNavOptMetadata()) {
-    return multiTableEntry.trackedPromise(promiseAttribute, _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options));
+    return multiTableEntry.trackedPromise(promiseAttribute, catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options));
   }
 
   multiTableEntry[promiseAttribute] = $.Deferred().reject();
@@ -7986,14 +7986,14 @@ var genericNavOptReload = function genericNavOptReload(multiTableEntry, options,
 
 var genericNavOptGet = function genericNavOptGet(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
   if (options && options.cachedOnly) {
-    return _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(multiTableEntry[promiseAttribute], options) || $.Deferred().reject(false).promise();
+    return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(multiTableEntry[promiseAttribute], options) || $.Deferred().reject(false).promise();
   }
 
   if (options && options.refreshCache) {
-    return _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+    return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
   }
 
-  return _catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(multiTableEntry[promiseAttribute] || genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+  return catalog_catalogUtils__WEBPACK_IMPORTED_MODULE_0__["default"].applyCancellable(multiTableEntry[promiseAttribute] || genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
 };
 
 var MultiTableEntry =
@@ -16576,13 +16576,13 @@ knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.selectize = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ext_jquery_hue_jquery_lib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ext/jquery/hue.jquery.lib */ "./desktop/core/src/desktop/js/ext/jquery/hue.jquery.lib.js");
-/* harmony import */ var _ext_bootstrap_2_3_2_min__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ext/bootstrap.2.3.2.min */ "./desktop/core/src/desktop/js/ext/bootstrap.2.3.2.min.js");
+/* harmony import */ var ext_jquery_hue_jquery_lib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ext/jquery/hue.jquery.lib */ "./desktop/core/src/desktop/js/ext/jquery/hue.jquery.lib.js");
+/* harmony import */ var ext_bootstrap_2_3_2_min__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ext/bootstrap.2.3.2.min */ "./desktop/core/src/desktop/js/ext/bootstrap.2.3.2.min.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var filesize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! filesize */ "./node_modules/filesize/lib/filesize.js");
 /* harmony import */ var filesize__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(filesize__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ext/fileuploader.custom */ "./desktop/core/src/desktop/js/ext/fileuploader.custom.js");
+/* harmony import */ var ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ext/fileuploader.custom */ "./desktop/core/src/desktop/js/ext/fileuploader.custom.js");
 /* harmony import */ var page__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! page */ "./node_modules/page/page.js");
 /* harmony import */ var page__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(page__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
@@ -16668,7 +16668,7 @@ window.ko.mapping = knockout_mapping__WEBPACK_IMPORTED_MODULE_8___default.a;
 window.localforage = localforage__WEBPACK_IMPORTED_MODULE_6___default.a;
 window.page = page__WEBPACK_IMPORTED_MODULE_5___default.a;
 window.sqlUtils = sql_sqlUtils__WEBPACK_IMPORTED_MODULE_23__["default"];
-window.qq = _ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__["default"];
+window.qq = ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__["default"];
 
 /***/ }),
 
@@ -16683,8 +16683,8 @@ window.qq = _ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__["default"];
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
-/* harmony import */ var _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
+/* harmony import */ var api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17348,8 +17348,8 @@ var identifierChainToPath = function identifierChainToPath(identifierChain) {
 var resolveCatalogEntry = function resolveCatalogEntry(options) {
   var cancellablePromises = [];
   var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
-  var promise = new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises);
-  _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(promise, options);
+  var promise = new api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises);
+  catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(promise, options);
 
   if (!options.identifierChain) {
     deferred.reject();
@@ -17408,7 +17408,7 @@ var resolveCatalogEntry = function resolveCatalogEntry(options) {
       return;
     }
 
-    cancellablePromises.push(_catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].getChildren({
+    cancellablePromises.push(catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].getChildren({
       sourceType: options.sourceType,
       namespace: options.namespace,
       compute: options.compute,
@@ -17439,7 +17439,7 @@ var resolveCatalogEntry = function resolveCatalogEntry(options) {
   if (options.tables) {
     findTable(options.tables.concat());
   } else {
-    _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].getEntry({
+    catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].getEntry({
       sourceType: options.sourceType,
       namespace: options.namespace,
       compute: options.compute,
@@ -17595,9 +17595,9 @@ var hueDebug = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _huePubSub__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17615,21 +17615,20 @@ __webpack_require__.r(__webpack_exports__);
 // limitations under the License.
 
 
-var jQuery = jquery__WEBPACK_IMPORTED_MODULE_1___default.a;
 
 var hueDrop = function hueDrop() {
   var draggableMeta = {};
-  _huePubSub__WEBPACK_IMPORTED_MODULE_0__["default"].subscribe('draggable.text.meta', function (meta) {
+  utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].subscribe('draggable.text.meta', function (meta) {
     draggableMeta = meta;
   });
   return {
     fromAssist: function fromAssist(element, callback) {
-      if (typeof element === 'function' && !(element instanceof jQuery)) {
+      if (typeof element === 'function' && !(element instanceof jquery__WEBPACK_IMPORTED_MODULE_0___default.a)) {
         callback = element;
       }
 
       if (typeof element === 'string') {
-        element = jquery__WEBPACK_IMPORTED_MODULE_1___default()(element);
+        element = jquery__WEBPACK_IMPORTED_MODULE_0___default()(element);
       }
 
       if (element.length > 0) {
@@ -17652,12 +17651,12 @@ var hueDrop = function hueDrop() {
     },
     fromDesktop: function fromDesktop(element, callback, method) {
       if (window.FileReader) {
-        if (typeof element === 'function' && !(element instanceof jQuery)) {
+        if (typeof element === 'function' && !(element instanceof jquery__WEBPACK_IMPORTED_MODULE_0___default.a)) {
           callback = element;
         }
 
         if (typeof element === 'string') {
-          element = jquery__WEBPACK_IMPORTED_MODULE_1___default()(element);
+          element = jquery__WEBPACK_IMPORTED_MODULE_0___default()(element);
         }
 
         var handleFileSelect = function handleFileSelect(e) {
@@ -71139,4 +71138,4 @@ module.exports = __webpack_require__(/*! ./desktop/core/src/desktop/js/hue.js */
 /***/ })
 
 /******/ });
-//# sourceMappingURL=hue-bundle-8e5037d20b056ab61e91.js.map
+//# sourceMappingURL=hue-bundle-72c7c47509e0d902668b.js.map

@@ -64,7 +64,7 @@
     "watch": "./node_modules/.bin/grunt watch",
     "webpack": "webpack --config webpack.config.js",
     "dev": "webpack --watch -d",
-    "lint": "cd desktop/core/src/desktop/static/desktop/js/; eslint assist autocomplete document",
+    "lint": "cd desktop/core/src/desktop/js/; eslint api/** assist/** catalog/** sql/** utils/**",
     "lint-fix": "npm run lint -- --fix"
   },
   "files": []

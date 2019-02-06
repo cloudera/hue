@@ -4,13 +4,13 @@ const normalGlobals = [
 ];
 const hueGlobals = [
   // global_js_constants.mako
-  'IS_HUE_4', 'AUTOCOMPLETE_TIMEOUT','CSRF_TOKEN','HAS_MULTI_CLUSTER',
+  'IS_HUE_4', 'AUTOCOMPLETE_TIMEOUT','CACHEABLE_TTL','CSRF_TOKEN','HAS_MULTI_CLUSTER',
   'DROPZONE_HOME_DIR', 'ENABLE_SQL_SYNTAX_CHECK', 'HAS_NAVIGATOR', 'HAS_OPTIMIZER', 'HAS_WORKLOAD_ANALYTICS',
   'HUE_CONTAINER', 'IS_EMBEDDED', 'IS_K8S_ONLY', 'HUE_VERSION', 'IS_NEW_INDEXER_ENABLED',
   'IS_S3_ENABLED', 'DOCUMENT_TYPES', 'LOGGED_USERNAME', 'USER_HOME_DIR', 'LOGGED_USERGROUPS', 'METASTORE_PARTITION_LIMIT',
 
   // other misc, TODO
-  'huePubSub', 'ApiHelper', 'SqlUtils', 'ContextCatalog', 'DataCatalog'
+  'huePubSub', 'ApiHelper', 'SqlUtils', 'trackOnGA', 'ContextCatalog', 'DataCatalog'
 ];
 
 const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {

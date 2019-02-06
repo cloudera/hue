@@ -14,16 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery'
-import ko from 'knockout'
+import $ from 'jquery';
+import ko from 'knockout';
 
-import AssistDbNamespace from './assistDbNamespace'
-import apiHelper from '../api/apiHelper'
-import contextCatalog from '../catalog/contextCatalog'
-import huePubSub from '../utils/huePubSub'
+import apiHelper from 'api/apiHelper';
+import AssistDbNamespace from 'assist/assistDbNamespace';
+import contextCatalog from 'catalog/contextCatalog';
+import huePubSub from 'utils/huePubSub';
 
 class AssistDbSource {
-
   /**
    * @param {Object} options
    * @param {Object} options.i18n
@@ -36,15 +35,19 @@ class AssistDbSource {
    * @constructor
    */
   constructor(options) {
-    let self = this;
+    const self = this;
 
     self.sourceType = options.type;
     self.name = options.name;
     self.i18n = options.i18n;
     self.nonSqlType = options.nonSqlType;
     self.navigationSettings = options.navigationSettings;
-    self.initialNamespace = options.initialNamespace || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
-    self.initialCompute = options.initialCompute || apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
+    self.initialNamespace =
+      options.initialNamespace ||
+      apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
+    self.initialCompute =
+      options.initialCompute ||
+      apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();
@@ -58,24 +61,33 @@ class AssistDbSource {
     };
 
     self.filteredNamespaces = ko.pureComputed(() => {
-      if (!self.filter.querySpec() || typeof self.filter.querySpec().query === 'undefined' || !self.filter.querySpec().query) {
+      if (
+        !self.filter.querySpec() ||
+        typeof self.filter.querySpec().query === 'undefined' ||
+        !self.filter.querySpec().query
+      ) {
         return self.namespaces();
       }
-      return self.namespaces().filter(namespace => namespace.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1);
+      return self
+        .namespaces()
+        .filter(
+          namespace =>
+            namespace.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1
+        );
     });
 
     self.autocompleteFromNamespaces = (nonPartial, partial) => {
-      let result = [];
-      let partialLower = partial.toLowerCase();
+      const result = [];
+      const partialLower = partial.toLowerCase();
       self.namespaces().forEach(namespace => {
         if (namespace.name.toLowerCase().indexOf(partialLower) === 0) {
-          result.push(nonPartial + partial + namespace.name.substring(partial.length))
+          result.push(nonPartial + partial + namespace.name.substring(partial.length));
         }
       });
       return result;
     };
 
-    let ensureDbSet = () => {
+    const ensureDbSet = () => {
       if (self.nonSqlType) {
         if (!self.selectedNamespace().selectedDatabase()) {
           self.selectedNamespace().selectedDatabase(self.selectedNamespace().databases()[0]);
@@ -92,7 +104,7 @@ class AssistDbSource {
       }
     });
 
-    self.hasNamespaces = ko.pureComputed(()  => self.namespaces().length > 0);
+    self.hasNamespaces = ko.pureComputed(() => self.namespaces().length > 0);
 
     huePubSub.subscribe('context.catalog.namespaces.refreshed', sourceType => {
       if (self.sourceType !== sourceType) {
@@ -100,101 +112,115 @@ class AssistDbSource {
       }
 
       self.loading(true);
-      contextCatalog.getNamespaces({ sourceType: self.sourceType }).done(context => {
-        let newNamespaces = [];
-        let existingNamespaceIndex = {};
-        self.namespaces().forEach(assistNamespace => {
-          existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
+      contextCatalog
+        .getNamespaces({ sourceType: self.sourceType })
+        .done(context => {
+          const newNamespaces = [];
+          const existingNamespaceIndex = {};
+          self.namespaces().forEach(assistNamespace => {
+            existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
+          });
+          context.namespaces.forEach(newNamespace => {
+            if (existingNamespaceIndex[newNamespace.id]) {
+              existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
+              existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
+              existingNamespaceIndex[newNamespace.id].status(newNamespace.status);
+              newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
+            } else {
+              newNamespaces.push(
+                new AssistDbNamespace({
+                  sourceType: self.sourceType,
+                  namespace: newNamespace,
+                  i18n: self.i18n,
+                  nonSqlType: self.nonSqlType,
+                  navigationSettings: self.navigationSettings
+                })
+              );
+            }
+          });
+          self.namespaces(newNamespaces);
+        })
+        .always(() => {
+          self.loading(false);
         });
-        context.namespaces.forEach(newNamespace => {
-          if (existingNamespaceIndex[newNamespace.id]) {
-            existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
-            existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
-            existingNamespaceIndex[newNamespace.id].status(newNamespace.status);
-            newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
-          } else {
-            newNamespaces.push(new AssistDbNamespace({
-              sourceType: self.sourceType,
-              namespace: newNamespace,
-              i18n: self.i18n,
-              nonSqlType: self.nonSqlType,
-              navigationSettings: self.navigationSettings
-            }));
-          }
-        });
-        self.namespaces(newNamespaces);
-      }).always(() => {
-        self.loading(false);
-      })
     });
   }
 
   whenLoaded(callback) {
-    let self = this;
+    const self = this;
     self.loadedDeferred.done(callback);
-  };
+  }
 
   loadNamespaces(refresh) {
-    let self = this;
+    const self = this;
     self.loading(true);
 
     if (refresh) {
       contextCatalog.getComputes({ sourceType: self.sourceType, clearCache: true });
     }
 
-    return contextCatalog.getNamespaces({ sourceType: self.sourceType, clearCache: refresh }).done(context => {
-      let assistNamespaces = [];
-      let activeNamespace;
-      let activeCompute;
-      context.namespaces.forEach(namespace => {
-        let assistNamespace = new AssistDbNamespace({
-          sourceType: self.sourceType,
-          namespace: namespace,
-          i18n: self.i18n,
-          nonSqlType: self.nonSqlType,
-          navigationSettings: self.navigationSettings
-        });
+    return contextCatalog
+      .getNamespaces({ sourceType: self.sourceType, clearCache: refresh })
+      .done(context => {
+        const assistNamespaces = [];
+        let activeNamespace;
+        let activeCompute;
+        context.namespaces.forEach(namespace => {
+          const assistNamespace = new AssistDbNamespace({
+            sourceType: self.sourceType,
+            namespace: namespace,
+            i18n: self.i18n,
+            nonSqlType: self.nonSqlType,
+            navigationSettings: self.navigationSettings
+          });
 
-        if (self.initialNamespace && namespace.id === self.initialNamespace.id) {
-          activeNamespace = assistNamespace;
-          if (self.initialCompute) {
-            activeNamespace.namespace.computes.some(compute => {
-              if (compute.id === self.initialCompute.id) {
-                activeCompute = compute;
-              }
-            })
+          if (self.initialNamespace && namespace.id === self.initialNamespace.id) {
+            activeNamespace = assistNamespace;
+            if (self.initialCompute) {
+              activeNamespace.namespace.computes.some(compute => {
+                if (compute.id === self.initialCompute.id) {
+                  activeCompute = compute;
+                }
+              });
+            }
+          }
+          assistNamespaces.push(assistNamespace);
+        });
+        self.namespaces(assistNamespaces);
+        if (!refresh) {
+          if (activeNamespace) {
+            self.selectedNamespace(activeNamespace);
+          } else if (assistNamespaces.length) {
+            self.selectedNamespace(assistNamespaces[0]);
+          }
+          if (activeCompute) {
+            self.selectedNamespace().compute(activeCompute);
+          } else if (
+            self.selectedNamespace() &&
+            self.selectedNamespace().namespace &&
+            self.selectedNamespace().namespace.computes &&
+            self.selectedNamespace().namespace.computes.length
+          ) {
+            self.selectedNamespace().compute(self.selectedNamespace().namespace.computes[0]);
           }
         }
-        assistNamespaces.push(assistNamespace);
+      })
+      .fail(() => {
+        self.hasErrors(true);
+      })
+      .always(() => {
+        self.loadedDeferred.resolve();
+        self.loading(false);
       });
-      self.namespaces(assistNamespaces);
-      if (!refresh) {
-        if (activeNamespace) {
-          self.selectedNamespace(activeNamespace);
-        } else if (assistNamespaces.length) {
-          self.selectedNamespace(assistNamespaces[0]);
-        }
-        if (activeCompute) {
-          self.selectedNamespace().compute(activeCompute);
-        } else if (self.selectedNamespace() && self.selectedNamespace().namespace && self.selectedNamespace().namespace.computes && self.selectedNamespace().namespace.computes.length) {
-          self.selectedNamespace().compute(self.selectedNamespace().namespace.computes[0]);
-        }
-      }
-    }).fail(() => {
-      self.hasErrors(true);
-    }).always(() => {
-      self.loadedDeferred.resolve();
-      self.loading(false);
-    })
-  };
+  }
 
   highlightInside(catalogEntry) {
-    let self = this;
+    const self = this;
     if (self.navigationSettings.rightAssist) {
       return;
     }
 
-    let whenLoaded = () => {
+    const whenLoaded = () => {
       self.namespaces().some(namespace => {
         if (namespace.namespace.id === catalogEntry.namespace.id) {
           if (self.selectedNamespace() !== namespace) {
@@ -205,29 +231,29 @@ class AssistDbSource {
           } else {
             self.selectedNamespace().initDatabases(() => {
               self.selectedNamespace().highlightInside(catalogEntry);
-            })
+            });
           }
           return true;
         }
-      })
+      });
     };
 
     if (self.namespaces().length) {
       whenLoaded();
     } else if (self.loading()) {
-      let loadingSub = self.loading.subscribe(() => {
+      const loadingSub = self.loading.subscribe(() => {
         loadingSub.dispose();
         whenLoaded();
-      })
+      });
     } else {
       self.loadNamespaces().done(whenLoaded);
     }
-  };
+  }
 
   triggerRefresh() {
-    let self = this;
+    const self = this;
     self.loadNamespaces(true);
-  };
+  }
 }
 
 export default AssistDbSource;
