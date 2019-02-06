@@ -84,9 +84,6 @@ var AssistDbSource = (function () {
       } else {
         ensureDbSet();
       }
-      return self.namespaces().filter(function (namespace) {
-        return namespace.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1
-      });
     });
 
     self.hasNamespaces = ko.pureComputed(function () {

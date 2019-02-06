@@ -1445,7 +1445,6 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ContextCompute} [options.compute]
    *
    * @param {ContextCompute} options.compute
    * @param {string} options.sourceType

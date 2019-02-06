@@ -116,7 +116,6 @@ var MetastoreViewModel = (function () {
           return;
         }
       }
-    });
 
       if (self.source().namespace().id !== databaseDef.namespace.id) {
         var found = self.source().namespaces().some(function (namespace) {
