@@ -2701,6 +2701,2046 @@ function () {
 
 /***/ }),
 
+/***/ "./desktop/core/src/desktop/js/assist/assistDbEntry.js":
+/*!*************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistDbEntry.js ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var _sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../sql/sqlUtils */ "./desktop/core/src/desktop/js/sql/sqlUtils.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+var findNameInHierarchy = function findNameInHierarchy(entry, searchCondition) {
+  var sourceType = entry.sourceType;
+
+  while (entry && !searchCondition(entry)) {
+    entry = entry.parent;
+  }
+
+  if (entry) {
+    return _sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name);
+  }
+};
+
+var AssistDbEntry =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {DataCatalogEntry} catalogEntry
+   * @param {AssistDbEntry} parent
+   * @param {AssistDbNamespace} assistDbNamespace
+   * @param {Object} filter
+   * @param {function} filter.querySpec (observable)
+   * @param {Object} i18n
+   * @param {string} i18n.errorLoadingTablePreview
+   * @param {Object} navigationSettings
+   * @constructor
+   */
+  function AssistDbEntry(catalogEntry, parent, assistDbNamespace, filter, i18n, navigationSettings) {
+    _classCallCheck(this, AssistDbEntry);
+
+    var self = this;
+    self.catalogEntry = catalogEntry;
+    self.parent = parent;
+    self.assistDbNamespace = assistDbNamespace;
+    self.filter = filter;
+    self.i18n = i18n;
+    self.navigationSettings = navigationSettings;
+    self.sourceType = assistDbNamespace.sourceType;
+    self.invalidateOnRefresh = assistDbNamespace.invalidateOnRefresh;
+    self.expandable = self.catalogEntry.hasPossibleChildren();
+    self.filterColumnNames = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.highlight = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.popularity = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(0);
+    self.loaded = false;
+    self.loading = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.open = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.entries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observableArray([]);
+    self.statsVisible = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.hasErrors = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.iconClass = '';
+
+    if (!self.navigationSettings.rightAssist) {
+      if (self.sourceType === 'solr') {
+        self.iconClass = 'fa-search';
+      } else if (self.sourceType === 'kafka') {
+        self.iconClass = 'fa-sitemap';
+      } else if (self.catalogEntry.isView()) {
+        self.iconClass = 'fa-eye';
+      } else {
+        self.iconClass = 'fa-table';
+      }
+    }
+
+    self.open.subscribe(function (newValue) {
+      if (newValue && self.entries().length === 0) {
+        self.loadEntries();
+      }
+    });
+    self.hasEntries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      return self.entries().length > 0;
+    });
+    self.filteredEntries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      var facets = self.filter.querySpec().facets;
+      var facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+      // Only text match on tables/views or columns if flag is set
+
+      var textMatch = !self.catalogEntry.isDatabase() && !self.filterColumnNames() || !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
+
+      if (facetMatch && textMatch) {
+        return self.entries();
+      }
+
+      return self.entries().filter(function (entry) {
+        var match = true;
+
+        if (match && !facetMatch) {
+          if (entry.catalogEntry.isField()) {
+            match = Object.keys(facets['type']).length === 2 && facets['type']['table'] && facets['type']['view'] || Object.keys(facets['type']).length === 1 && (facets['type']['table'] || facets['type']['view']) || facets['type'][entry.catalogEntry.getType()];
+          } else if (entry.catalogEntry.isTableOrView()) {
+            match = !facets['type']['table'] && !facets['type']['view'] || facets['type']['table'] && entry.catalogEntry.isTable() || facets['type']['view'] && entry.catalogEntry.isView();
+          }
+        }
+
+        if (match && !textMatch) {
+          var nameLower = entry.catalogEntry.name.toLowerCase();
+          match = self.filter.querySpec().text.every(function (text) {
+            return nameLower.indexOf(text.toLowerCase()) !== -1;
+          });
+        }
+
+        return match;
+      });
+    });
+
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.entries().forEach(function (entry) {
+        if (entry.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + entry.catalogEntry.name.substring(partial.length));
+        }
+      });
+      return result;
+    };
+
+    self.tableName = null;
+    self.columnName = null;
+    self.type = null;
+    self.databaseName = self.getHierarchy()[0];
+
+    if (self.catalogEntry.isTableOrView()) {
+      self.tableName = self.catalogEntry.name;
+      self.columnName = null;
+      self.type = self.catalogEntry.getType();
+    } else if (self.catalogEntry.isColumn()) {
+      self.tableName = parent.catalogEntry.name;
+      self.columnName = self.catalogEntry.name;
+    }
+
+    self.editorText = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      if (self.catalogEntry.isTableOrView()) {
+        return self.getTableName();
+      }
+
+      if (self.catalogEntry.isColumn()) {
+        return self.getColumnName() + ', ';
+      }
+
+      return self.getComplexName() + ', ';
+    });
+  }
+
+  _createClass(AssistDbEntry, [{
+    key: "knownFacetValues",
+    value: function knownFacetValues() {
+      var self = this;
+      var types = {};
+
+      if (self.parent === null) {
+        // Only find facets on the DB level
+        self.entries().forEach(function (tableEntry) {
+          if (!self.assistDbNamespace.nonSqlType) {
+            if (tableEntry.catalogEntry.isTable()) {
+              types.table = types.table ? types.table + 1 : 1;
+            } else if (tableEntry.catalogEntry.isView()) {
+              types.view = types.view ? types.view + 1 : 1;
+            }
+          }
+
+          if (tableEntry.open()) {
+            tableEntry.entries().forEach(function (colEntry) {
+              if (!types[colEntry.catalogEntry.getType()]) {
+                types[colEntry.catalogEntry.getType()] = 1;
+              } else {
+                types[colEntry.catalogEntry.getType()]++;
+              }
+            });
+          }
+        });
+      }
+
+      if (Object.keys(types).length) {
+        return {
+          type: types
+        };
+      }
+
+      return {};
+    }
+  }, {
+    key: "getDatabaseName",
+    value: function getDatabaseName() {
+      return findNameInHierarchy(this, function (entry) {
+        return entry.catalogEntry.isDatabase();
+      });
+    }
+  }, {
+    key: "getTableName",
+    value: function getTableName() {
+      return findNameInHierarchy(this, function (entry) {
+        return entry.catalogEntry.isTableOrView();
+      });
+    }
+  }, {
+    key: "getColumnName",
+    value: function getColumnName() {
+      return findNameInHierarchy(this, function (entry) {
+        return entry.catalogEntry.isColumn();
+      });
+    }
+  }, {
+    key: "getComplexName",
+    value: function getComplexName() {
+      var entry = this;
+      var sourceType = entry.sourceType;
+      var parts = [];
+
+      while (entry != null) {
+        if (entry.catalogEntry.isTableOrView()) {
+          break;
+        }
+
+        if (entry.catalogEntry.isArray() || entry.catalogEntry.isMapValue()) {
+          if (sourceType === 'hive') {
+            parts.push("[]");
+          }
+        } else {
+          parts.push(_sql_sqlUtils__WEBPACK_IMPORTED_MODULE_3__["default"].backTickIfNeeded(sourceType, entry.catalogEntry.name));
+          parts.push(".");
+        }
+
+        entry = entry.parent;
+      }
+
+      parts.reverse();
+      return parts.slice(1).join("");
+    }
+  }, {
+    key: "showContextPopover",
+    value: function showContextPopover(entry, event, positionAdjustment) {
+      var self = this;
+      var $source = jquery__WEBPACK_IMPORTED_MODULE_0___default()(event.target);
+      var offset = $source.offset();
+
+      if (positionAdjustment) {
+        offset.left += positionAdjustment.left;
+        offset.top += positionAdjustment.top;
+      }
+
+      self.statsVisible(true);
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('context.popover.show', {
+        data: {
+          type: 'catalogEntry',
+          catalogEntry: self.catalogEntry
+        },
+        showInAssistEnabled: !!self.navigationSettings.rightAssist,
+        orientation: self.navigationSettings.rightAssist ? 'left' : 'right',
+        pinEnabled: self.navigationSettings.pinEnabled,
+        source: {
+          element: event.target,
+          left: offset.left,
+          top: offset.top - 3,
+          right: offset.left + $source.width() + 1,
+          bottom: offset.top + $source.height() - 3
+        }
+      });
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('context.popover.hidden', function () {
+        self.statsVisible(false);
+      });
+    }
+  }, {
+    key: "triggerRefresh",
+    value: function triggerRefresh() {
+      var self = this;
+      self.catalogEntry.clearCache({
+        invalidate: self.invalidateOnRefresh(),
+        cascade: true
+      });
+    }
+  }, {
+    key: "highlightInside",
+    value: function highlightInside(path) {
+      var self = this;
+
+      var searchEntry = function searchEntry() {
+        var foundEntry;
+        self.entries().forEach(function (entry) {
+          entry.highlight(false);
+
+          if (entry.catalogEntry.name === path[0]) {
+            foundEntry = entry;
+          }
+        });
+
+        if (foundEntry) {
+          if (foundEntry.expandable && !foundEntry.open()) {
+            foundEntry.open(true);
+          }
+
+          window.setTimeout(function () {
+            if (path.length > 1) {
+              foundEntry.highlightInside(path.slice(1));
+            } else {
+              _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('assist.db.scrollToComplete', function () {
+                foundEntry.highlight(true); // Timeout is for animation effect
+
+                window.setTimeout(function () {
+                  foundEntry.highlight(false);
+                }, 1800);
+              });
+              _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.db.scrollTo', foundEntry);
+            }
+          }, 0);
+        }
+      };
+
+      if (self.entries().length === 0) {
+        if (self.loading()) {
+          var subscription = self.loading.subscribe(function (newVal) {
+            if (!newVal) {
+              subscription.dispose();
+              searchEntry();
+            }
+          });
+        } else {
+          self.loadEntries(searchEntry);
+        }
+      } else {
+        searchEntry();
+      }
+    }
+  }, {
+    key: "loadEntries",
+    value: function loadEntries(callback) {
+      var self = this;
+
+      if (!self.expandable || self.loading()) {
+        return;
+      }
+
+      self.loading(true);
+      var loadEntriesDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+
+      var successCallback = function successCallback(sourceMeta) {
+        self.entries([]);
+
+        if (!sourceMeta.notFound) {
+          self.catalogEntry.getChildren({
+            silenceErrors: self.navigationSettings.rightAssist
+          }).done(function (catalogEntries) {
+            self.hasErrors(false);
+            self.loading(false);
+            self.loaded = true;
+
+            if (catalogEntries.length === 0) {
+              self.entries([]);
+              return;
+            }
+
+            var newEntries = [];
+            catalogEntries.forEach(function (catalogEntry) {
+              newEntries.push(self.createEntry(catalogEntry));
+            });
+
+            if (sourceMeta.type === 'array') {
+              self.entries(newEntries);
+              self.entries()[0].open(true);
+            } else {
+              self.entries(newEntries);
+            }
+
+            loadEntriesDeferred.resolve(newEntries);
+
+            if (typeof callback === 'function') {
+              callback();
+            }
+          }).fail(function () {
+            self.loading(false);
+            self.loaded = true;
+            self.hasErrors(true);
+          });
+
+          if (!self.assistDbNamespace.nonSqlType) {
+            self.catalogEntry.loadNavigatorMetaForChildren({
+              silenceErrors: self.navigationSettings.rightAssist
+            });
+          }
+        } else {
+          self.hasErrors(true);
+          self.loading(false);
+          self.loaded = true;
+
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }
+      };
+
+      var errorCallback = function errorCallback() {
+        self.hasErrors(true);
+        self.loading(false);
+        self.loaded = true;
+        loadEntriesDeferred.resolve([]);
+      };
+
+      if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && !self.assistDbNamespace.nonSqlType) {
+        self.catalogEntry.loadNavOptPopularityForChildren({
+          silenceErrors: true
+        }).done(function () {
+          loadEntriesDeferred.done(function () {
+            if (!self.hasErrors()) {
+              self.entries().forEach(function (entry) {
+                if (entry.catalogEntry.navOptPopularity) {
+                  if (entry.catalogEntry.navOptPopularity.popularity) {
+                    entry.popularity(entry.catalogEntry.navOptPopularity.popularity);
+                  } else if (entry.catalogEntry.navOptPopularity.column_count) {
+                    entry.popularity(entry.catalogEntry.navOptPopularity.column_count);
+                  } else if (entry.catalogEntry.navOptPopularity.selectColumn) {
+                    entry.popularity(entry.catalogEntry.navOptPopularity.selectColumn.columnCount);
+                  }
+                }
+              });
+            }
+          });
+        });
+      }
+
+      self.catalogEntry.getSourceMeta({
+        silenceErrors: self.navigationSettings.rightAssist
+      }).done(successCallback).fail(errorCallback);
+    }
+  }, {
+    key: "createEntry",
+
+    /**
+     * @param {DataCatalogEntry} catalogEntry
+     */
+    value: function createEntry(catalogEntry) {
+      var self = this;
+      return new AssistDbEntry(catalogEntry, self, self.assistDbNamespace, self.filter, self.i18n, self.navigationSettings);
+    }
+  }, {
+    key: "getHierarchy",
+    value: function getHierarchy() {
+      var self = this;
+      return self.catalogEntry.path.concat();
+    }
+  }, {
+    key: "dblClick",
+    value: function dblClick() {
+      var self = this;
+
+      if (self.catalogEntry.isTableOrView()) {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.table.at.cursor', {
+          name: self.getTableName(),
+          database: self.getDatabaseName()
+        });
+      } else if (self.catalogEntry.isColumn()) {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.column.at.cursor', {
+          name: self.getColumnName(),
+          table: self.getTableName(),
+          database: self.getDatabaseName()
+        });
+      } else {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('editor.insert.column.at.cursor', {
+          name: self.getComplexName(),
+          table: self.getTableName(),
+          database: self.getDatabaseName()
+        });
+      }
+    }
+  }, {
+    key: "explore",
+    value: function explore(isSolr) {
+      var self = this;
+
+      if (isSolr) {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry.name);
+      } else {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbNamespace.sourceType);
+      }
+    }
+  }, {
+    key: "openInMetastore",
+    value: function openInMetastore() {
+      var self = this;
+      var url;
+
+      if (self.catalogEntry.isDatabase()) {
+        url = '/metastore/tables/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
+      } else if (self.catalogEntry.isTableOrView()) {
+        url = '/metastore/table/' + self.parent.catalogEntry.name + '/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
+      } else {
+        return;
+      }
+
+      if (IS_HUE_4) {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+  }, {
+    key: "openInIndexer",
+    value: function openInIndexer() {
+      var self = this;
+      var definitionName = self.catalogEntry.name;
+
+      if (window.IS_NEW_INDEXER_ENABLED) {
+        if (window.IS_HUE_4) {
+          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/indexer/indexes/' + definitionName);
+        } else {
+          window.open('/indexer/indexes/' + definitionName);
+        }
+      } else {
+        var hash = '#edit/' + definitionName;
+
+        if (window.IS_HUE_4) {
+          if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
+            window.location.hash = hash;
+          } else {
+            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].subscribeOnce('app.gained.focus', function (app) {
+              if (app === 'indexes') {
+                window.setTimeout(function () {
+                  window.location.hash = hash;
+                }, 0);
+              }
+            });
+            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('open.link', '/indexer');
+          }
+        } else {
+          window.open('/indexer/' + hash);
+        }
+      }
+    }
+  }, {
+    key: "toggleOpen",
+    value: function toggleOpen() {
+      var self = this;
+      self.open(!self.open());
+    }
+  }, {
+    key: "openItem",
+    value: function openItem() {
+      var self = this;
+
+      if (self.catalogEntry.isTableOrView()) {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.table.selected', {
+          sourceType: self.assistDbNamespace.sourceType,
+          namespace: self.assistDbNamespace.namespace,
+          database: self.databaseName,
+          name: self.catalogEntry.name
+        });
+      } else if (self.catalogEntry.isDatabase()) {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.database.selected', {
+          sourceType: self.assistDbNamespace.sourceType,
+          namespace: self.assistDbNamespace.namespace,
+          name: self.catalogEntry.name
+        });
+      }
+    }
+  }]);
+
+  return AssistDbEntry;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (AssistDbEntry);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/assist/assistDbNamespace.js":
+/*!*****************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistDbNamespace.js ***!
+  \*****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _assistDbEntry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./assistDbEntry */ "./desktop/core/src/desktop/js/assist/assistDbEntry.js");
+/* harmony import */ var _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+
+var AssistDbNamespace =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {Object} options
+   * @param {Object} options.i18n
+   * @param {string} options.sourceType
+   * @param {ContextNamespace} options.namespace
+   * @param {boolean} options.nonSqlType - Optional, default false
+   * @param {Object} options.navigationSettings
+   * @constructor
+   */
+  function AssistDbNamespace(options) {
+    _classCallCheck(this, AssistDbNamespace);
+
+    var self = this;
+    self.i18n = options.i18n;
+    self.navigationSettings = options.navigationSettings;
+    self.sourceType = options.sourceType;
+    self.nonSqlType = options.nonSqlType;
+    self.namespace = options.namespace;
+    self.status = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(options.namespace.status); // TODO: Compute selection in assist?
+
+    self.compute = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
+
+    if (self.namespace.computes.length) {
+      self.compute(self.namespace.computes[0]);
+    }
+
+    self.name = options.namespace.name;
+    self.dbIndex = {};
+    self.databases = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observableArray();
+    self.selectedDatabase = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
+    self.highlight = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.loadedPromise = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+    self.loadedDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+    self.loaded = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.loading = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.reloading = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.hasErrors = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.invalidateOnRefresh = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable('cache');
+    self.loadingTables = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      return typeof self.selectedDatabase() !== 'undefined' && self.selectedDatabase() !== null && self.selectedDatabase().loading();
+    });
+    self.filter = {
+      querySpec: knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable({}).extend({
+        rateLimit: 300
+      })
+    };
+    self.hasEntries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      return self.databases().length > 0;
+    });
+    self.filteredEntries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      if (!self.filter.querySpec() || typeof self.filter.querySpec().query === 'undefined' || !self.filter.querySpec().query) {
+        return self.databases();
+      }
+
+      return self.databases().filter(function (database) {
+        return database.catalogEntry.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1;
+      });
+    });
+
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.databases().forEach(function (db) {
+        if (db.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + db.catalogEntry.name.substring(partial.length));
+        }
+      });
+      return result;
+    };
+
+    self.selectedDatabase.subscribe(function () {
+      var db = self.selectedDatabase();
+
+      if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
+        db.catalogEntry.loadNavOptPopularityForChildren({
+          silenceErrors: true
+        }).done(function () {
+          var applyPopularity = function applyPopularity() {
+            db.entries().forEach(function (entry) {
+              if (entry.catalogEntry.navOptPopularity && entry.catalogEntry.navOptPopularity.popularity >= 5) {
+                entry.popularity(entry.catalogEntry.navOptPopularity.popularity);
+              }
+            });
+          };
+
+          if (db.loading()) {
+            var subscription = db.loading.subscribe(function () {
+              subscription.dispose();
+              applyPopularity();
+            });
+          } else if (db.entries().length === 0) {
+            var _subscription = db.entries.subscribe(function (newEntries) {
+              if (newEntries.length > 0) {
+                _subscription.dispose();
+
+                applyPopularity();
+              }
+            });
+          } else {
+            applyPopularity();
+          }
+        });
+      }
+    });
+
+    self.selectedDatabaseChanged = function () {
+      if (self.selectedDatabase()) {
+        if (!self.selectedDatabase().hasEntries() && !self.selectedDatabase().loading()) {
+          self.selectedDatabase().loadEntries();
+        }
+
+        if (!self.navigationSettings.rightAssist) {
+          window.apiHelper.setInTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
+          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.database.set', {
+            sourceType: self.sourceType,
+            namespace: self.namespace,
+            name: self.selectedDatabase().catalogEntry.name
+          });
+        }
+      }
+    };
+
+    var nestedFilter = {
+      querySpec: knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable({}).extend({
+        rateLimit: 300
+      })
+    };
+
+    self.setDatabase = function (databaseName) {
+      if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().catalogEntry.name) {
+        return;
+      }
+
+      if (databaseName && self.dbIndex[databaseName]) {
+        self.selectedDatabase(self.dbIndex[databaseName]);
+        self.selectedDatabaseChanged();
+        return;
+      }
+
+      var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
+
+      if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
+        self.selectedDatabase(self.dbIndex[lastSelectedDb]);
+        self.selectedDatabaseChanged();
+      } else if (self.databases().length > 0) {
+        self.selectedDatabase(self.databases()[0]);
+        self.selectedDatabaseChanged();
+      }
+    };
+
+    self.initDatabases = function (callback) {
+      if (self.loading()) {
+        return;
+      }
+
+      self.loading(true);
+      self.hasErrors(false);
+      var lastSelectedDbName = self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null;
+      self.selectedDatabase(null);
+      self.databases([]);
+      _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_3__["default"].getEntry({
+        sourceType: self.sourceType,
+        namespace: self.namespace,
+        compute: self.compute(),
+        path: [],
+        definition: {
+          type: 'source'
+        }
+      }).done(function (catalogEntry) {
+        self.catalogEntry = catalogEntry;
+        self.catalogEntry.getChildren({
+          silenceErrors: self.navigationSettings.rightAssist
+        }).done(function (databaseEntries) {
+          self.dbIndex = {};
+          var hasNavMeta = false;
+          var dbs = [];
+          databaseEntries.forEach(function (catalogEntry) {
+            hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
+            var database = new _assistDbEntry__WEBPACK_IMPORTED_MODULE_2__["default"](catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
+            self.dbIndex[catalogEntry.name] = database;
+
+            if (catalogEntry.name === lastSelectedDbName) {
+              self.selectedDatabase(database);
+              self.selectedDatabaseChanged();
+            }
+
+            dbs.push(database);
+          });
+
+          if (!hasNavMeta && !self.nonSqlType) {
+            self.catalogEntry.loadNavigatorMetaForChildren({
+              silenceErrors: true
+            });
+          }
+
+          self.databases(dbs);
+
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }).fail(function () {
+          self.hasErrors(true);
+        }).always(function () {
+          self.loaded(true);
+          self.loadedDeferred.resolve();
+          self.loading(false);
+          self.reloading(false);
+        });
+      });
+    };
+
+    self.modalItem = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
+
+    if (!self.navigationSettings.rightAssist) {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribe('data.catalog.entry.refreshed', function (details) {
+        if (self.namespace.id !== details.entry.namespace.id || details.entry.getSourceType() !== self.sourceType) {
+          return;
+        }
+
+        if (self.catalogEntry === details.entry) {
+          self.initDatabases();
+        } else {
+          var findAndReloadInside = function findAndReloadInside(entries) {
+            return entries.some(function (entry) {
+              if (entry.catalogEntry.path.join('.') === details.entry.path.join('.')) {
+                entry.catalogEntry = details.entry;
+                entry.loadEntries();
+                return true;
+              }
+
+              return findAndReloadInside(entry.entries());
+            });
+          };
+
+          findAndReloadInside(self.databases());
+        }
+      });
+    }
+  }
+
+  _createClass(AssistDbNamespace, [{
+    key: "whenLoaded",
+    value: function whenLoaded(callback) {
+      var self = this;
+      self.loadedDeferred.done(callback);
+    }
+  }, {
+    key: "highlightInside",
+    value: function highlightInside(catalogEntry) {
+      var self = this;
+      var foundDb;
+      var index;
+
+      var findDatabase = function findDatabase() {
+        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.each(self.databases(), function (idx, db) {
+          db.highlight(false);
+
+          if (db.databaseName === catalogEntry.path[0]) {
+            foundDb = db;
+            index = idx;
+          }
+        });
+
+        if (foundDb) {
+          var whenLoaded = function whenLoaded() {
+            if (self.selectedDatabase() !== foundDb) {
+              self.selectedDatabase(foundDb);
+            }
+
+            if (!foundDb.open()) {
+              foundDb.open(true);
+            }
+
+            window.setTimeout(function () {
+              _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].subscribeOnce('assist.db.scrollToComplete', function () {
+                foundDb.highlight(true); // Timeout is for animation effect
+
+                window.setTimeout(function () {
+                  foundDb.highlight(false);
+                }, 1800);
+              });
+
+              if (catalogEntry.path.length > 1) {
+                foundDb.highlightInside(catalogEntry.path.slice(1));
+              } else {
+                _utils_huePubSub__WEBPACK_IMPORTED_MODULE_4__["default"].publish('assist.db.scrollTo', foundDb);
+              }
+            }, 0);
+          };
+
+          if (foundDb.hasEntries()) {
+            whenLoaded();
+          } else {
+            foundDb.loadEntries(whenLoaded);
+          }
+        }
+      };
+
+      if (!self.loaded()) {
+        self.initDatabases(findDatabase);
+      } else {
+        findDatabase();
+      }
+    }
+  }, {
+    key: "triggerRefresh",
+    value: function triggerRefresh() {
+      var self = this;
+
+      if (self.catalogEntry) {
+        self.catalogEntry.clearCache({
+          invalidate: self.invalidateOnRefresh()
+        });
+      }
+    }
+  }]);
+
+  return AssistDbNamespace;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (AssistDbNamespace);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/assist/assistDbSource.js":
+/*!**************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistDbSource.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _assistDbNamespace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./assistDbNamespace */ "./desktop/core/src/desktop/js/assist/assistDbNamespace.js");
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../catalog/contextCatalog */ "./desktop/core/src/desktop/js/catalog/contextCatalog.js");
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+
+
+var AssistDbSource =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {Object} options
+   * @param {Object} options.i18n
+   * @param {string} options.type
+   * @param {ContextNamespace} [options.initialNamespace] - Optional initial namespace to use
+   * @param {ContextCompute} [options.initialCompute] - Optional initial compute to use
+   * @param {string} options.name
+   * @param {boolean} options.nonSqlType - Optional, default false
+   * @param {Object} options.navigationSettings
+   * @constructor
+   */
+  function AssistDbSource(options) {
+    _classCallCheck(this, AssistDbSource);
+
+    var self = this;
+    self.sourceType = options.type;
+    self.name = options.name;
+    self.i18n = options.i18n;
+    self.nonSqlType = options.nonSqlType;
+    self.navigationSettings = options.navigationSettings;
+    self.initialNamespace = options.initialNamespace || _api_apiHelper__WEBPACK_IMPORTED_MODULE_3__["default"].getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
+    self.initialCompute = options.initialCompute || _api_apiHelper__WEBPACK_IMPORTED_MODULE_3__["default"].getFromTotalStorage('contextSelector', 'lastSelectedCompute');
+    self.selectedNamespace = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
+    self.namespaces = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observableArray();
+    self.loadedDeferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+    self.loading = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.hasErrors = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.filter = {
+      querySpec: knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable({}).extend({
+        rateLimit: 300
+      })
+    };
+    self.filteredNamespaces = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      if (!self.filter.querySpec() || typeof self.filter.querySpec().query === 'undefined' || !self.filter.querySpec().query) {
+        return self.namespaces();
+      }
+
+      return self.namespaces().filter(function (namespace) {
+        return namespace.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) !== -1;
+      });
+    });
+
+    self.autocompleteFromNamespaces = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.namespaces().forEach(function (namespace) {
+        if (namespace.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + namespace.name.substring(partial.length));
+        }
+      });
+      return result;
+    };
+
+    var ensureDbSet = function ensureDbSet() {
+      if (self.nonSqlType) {
+        if (!self.selectedNamespace().selectedDatabase()) {
+          self.selectedNamespace().selectedDatabase(self.selectedNamespace().databases()[0]);
+          self.selectedNamespace().selectedDatabaseChanged();
+        }
+      }
+    };
+
+    self.selectedNamespace.subscribe(function (namespace) {
+      if (namespace && !namespace.loaded() && !namespace.loading()) {
+        namespace.initDatabases(ensureDbSet);
+      } else {
+        ensureDbSet();
+      }
+    });
+    self.hasNamespaces = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      return self.namespaces().length > 0;
+    });
+    _utils_huePubSub__WEBPACK_IMPORTED_MODULE_5__["default"].subscribe('context.catalog.namespaces.refreshed', function (sourceType) {
+      if (self.sourceType !== sourceType) {
+        return;
+      }
+
+      self.loading(true);
+      _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getNamespaces({
+        sourceType: self.sourceType
+      }).done(function (context) {
+        var newNamespaces = [];
+        var existingNamespaceIndex = {};
+        self.namespaces().forEach(function (assistNamespace) {
+          existingNamespaceIndex[assistNamespace.namespace.id] = assistNamespace;
+        });
+        context.namespaces.forEach(function (newNamespace) {
+          if (existingNamespaceIndex[newNamespace.id]) {
+            existingNamespaceIndex[newNamespace.id].namespace = newNamespace;
+            existingNamespaceIndex[newNamespace.id].name = newNamespace.name;
+            existingNamespaceIndex[newNamespace.id].status(newNamespace.status);
+            newNamespaces.push(existingNamespaceIndex[newNamespace.id]);
+          } else {
+            newNamespaces.push(new _assistDbNamespace__WEBPACK_IMPORTED_MODULE_2__["default"]({
+              sourceType: self.sourceType,
+              namespace: newNamespace,
+              i18n: self.i18n,
+              nonSqlType: self.nonSqlType,
+              navigationSettings: self.navigationSettings
+            }));
+          }
+        });
+        self.namespaces(newNamespaces);
+      }).always(function () {
+        self.loading(false);
+      });
+    });
+  }
+
+  _createClass(AssistDbSource, [{
+    key: "whenLoaded",
+    value: function whenLoaded(callback) {
+      var self = this;
+      self.loadedDeferred.done(callback);
+    }
+  }, {
+    key: "loadNamespaces",
+    value: function loadNamespaces(refresh) {
+      var self = this;
+      self.loading(true);
+
+      if (refresh) {
+        _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getComputes({
+          sourceType: self.sourceType,
+          clearCache: true
+        });
+      }
+
+      return _catalog_contextCatalog__WEBPACK_IMPORTED_MODULE_4__["default"].getNamespaces({
+        sourceType: self.sourceType,
+        clearCache: refresh
+      }).done(function (context) {
+        var assistNamespaces = [];
+        var activeNamespace;
+        var activeCompute;
+        context.namespaces.forEach(function (namespace) {
+          var assistNamespace = new _assistDbNamespace__WEBPACK_IMPORTED_MODULE_2__["default"]({
+            sourceType: self.sourceType,
+            namespace: namespace,
+            i18n: self.i18n,
+            nonSqlType: self.nonSqlType,
+            navigationSettings: self.navigationSettings
+          });
+
+          if (self.initialNamespace && namespace.id === self.initialNamespace.id) {
+            activeNamespace = assistNamespace;
+
+            if (self.initialCompute) {
+              activeNamespace.namespace.computes.some(function (compute) {
+                if (compute.id === self.initialCompute.id) {
+                  activeCompute = compute;
+                }
+              });
+            }
+          }
+
+          assistNamespaces.push(assistNamespace);
+        });
+        self.namespaces(assistNamespaces);
+
+        if (!refresh) {
+          if (activeNamespace) {
+            self.selectedNamespace(activeNamespace);
+          } else if (assistNamespaces.length) {
+            self.selectedNamespace(assistNamespaces[0]);
+          }
+
+          if (activeCompute) {
+            self.selectedNamespace().compute(activeCompute);
+          } else if (self.selectedNamespace() && self.selectedNamespace().namespace && self.selectedNamespace().namespace.computes && self.selectedNamespace().namespace.computes.length) {
+            self.selectedNamespace().compute(self.selectedNamespace().namespace.computes[0]);
+          }
+        }
+      }).fail(function () {
+        self.hasErrors(true);
+      }).always(function () {
+        self.loadedDeferred.resolve();
+        self.loading(false);
+      });
+    }
+  }, {
+    key: "highlightInside",
+    value: function highlightInside(catalogEntry) {
+      var self = this;
+
+      if (self.navigationSettings.rightAssist) {
+        return;
+      }
+
+      var whenLoaded = function whenLoaded() {
+        self.namespaces().some(function (namespace) {
+          if (namespace.namespace.id === catalogEntry.namespace.id) {
+            if (self.selectedNamespace() !== namespace) {
+              self.selectedNamespace(namespace);
+            }
+
+            if (self.selectedNamespace().hasEntries()) {
+              self.selectedNamespace().highlightInside(catalogEntry);
+            } else {
+              self.selectedNamespace().initDatabases(function () {
+                self.selectedNamespace().highlightInside(catalogEntry);
+              });
+            }
+
+            return true;
+          }
+        });
+      };
+
+      if (self.namespaces().length) {
+        whenLoaded();
+      } else if (self.loading()) {
+        var loadingSub = self.loading.subscribe(function () {
+          loadingSub.dispose();
+          whenLoaded();
+        });
+      } else {
+        self.loadNamespaces().done(whenLoaded);
+      }
+    }
+  }, {
+    key: "triggerRefresh",
+    value: function triggerRefresh() {
+      var self = this;
+      self.loadNamespaces(true);
+    }
+  }]);
+
+  return AssistDbSource;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (AssistDbSource);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/assist/assistGitEntry.js":
+/*!**************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistGitEntry.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+var AssistGitEntry =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {object} options
+   * @param {object} options.definition
+   * @param {string} options.definition.name
+   * @param {string} options.definition.type (file, dir)
+   * @param {AssistGitEntry} options.parent
+   * @constructor
+   */
+  function AssistGitEntry(options) {
+    _classCallCheck(this, AssistGitEntry);
+
+    var self = this;
+    self.definition = options.definition;
+    self.parent = options.parent;
+    self.path = '';
+
+    if (self.parent !== null) {
+      self.path = self.parent.path;
+
+      if (self.parent.path !== '/') {
+        self.path += '/';
+      }
+    }
+
+    self.path += self.definition.name;
+    self.fileContent = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable('');
+    self.entries = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observableArray([]);
+    self.loaded = false;
+    self.loading = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable(false);
+    self.loadingMore = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable(false);
+    self.hasErrors = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable(false);
+    self.open = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable(false);
+    self.open.subscribe(function (newValue) {
+      if (newValue && self.entries().length === 0) {
+        self.loadEntries();
+      }
+    });
+    self.hasEntries = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.pureComputed(function () {
+      return self.entries().length > 0;
+    });
+  }
+
+  _createClass(AssistGitEntry, [{
+    key: "dblClick",
+    value: function dblClick() {
+      var self = this;
+
+      if (self.definition.type !== 'file') {
+        return;
+      }
+
+      self.hasErrors(false);
+      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchGitContents({
+        pathParts: self.getHierarchy(),
+        fileType: self.definition.type,
+        successCallback: function successCallback(data) {
+          self.fileContent(data.content);
+          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].publish('assist.dblClickGitItem', self);
+        },
+        errorCallback: function errorCallback() {
+          self.hasErrors(true);
+          self.loading(false);
+        }
+      });
+    }
+  }, {
+    key: "loadEntries",
+    value: function loadEntries(callback) {
+      var self = this;
+
+      if (self.loading()) {
+        return;
+      }
+
+      self.loading(true);
+      self.hasErrors(false);
+      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"].fetchGitContents({
+        pathParts: self.getHierarchy(),
+        fileType: self.definition.type,
+        successCallback: function successCallback(data) {
+          var filteredFiles = data.files.filter(function (file) {
+            return file.name !== '.' && file.name !== '..';
+          });
+          self.entries(filteredFiles.map(function (file) {
+            return new AssistGitEntry({
+              definition: file,
+              parent: self
+            });
+          }));
+          self.loaded = true;
+          self.loading(false);
+
+          if (callback) {
+            callback();
+          }
+        },
+        errorCallback: function errorCallback() {
+          self.hasErrors(true);
+          self.loading(false);
+
+          if (callback) {
+            callback();
+          }
+        }
+      });
+    }
+  }, {
+    key: "loadDeep",
+    value: function loadDeep(folders, callback) {
+      var self = this;
+
+      if (folders.length === 0) {
+        callback(self);
+        return;
+      }
+
+      var findNextAndLoadDeep = function findNextAndLoadDeep() {
+        var nextName = folders.shift();
+        var foundEntry = self.entries().filter(function (entry) {
+          return entry.definition.name === nextName && entry.definition.type === 'dir';
+        });
+
+        if (foundEntry.length === 1) {
+          foundEntry[0].loadDeep(folders, callback);
+        } else if (!self.hasErrors()) {
+          callback(self);
+        }
+      };
+
+      if (!self.loaded) {
+        self.loadEntries(findNextAndLoadDeep);
+      } else {
+        findNextAndLoadDeep();
+      }
+    }
+  }, {
+    key: "getHierarchy",
+    value: function getHierarchy() {
+      var self = this;
+      var parts = [];
+      var entry = self;
+
+      while (entry != null) {
+        parts.push(entry.definition.name);
+        entry = entry.parent;
+      }
+
+      parts.reverse();
+      return parts;
+    }
+  }, {
+    key: "toggleOpen",
+    value: function toggleOpen() {
+      var self = this;
+
+      if (self.definition.type !== 'dir') {
+        return;
+      }
+
+      self.open(!self.open());
+
+      if (self.definition.name === '..') {
+        if (self.parent.parent) {
+          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].publish('assist.selectGitEntry', self.parent.parent);
+        }
+      } else {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_1__["default"].publish('assist.selectGitEntry', self);
+      }
+    }
+  }]);
+
+  return AssistGitEntry;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (AssistGitEntry);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/assist/assistHBaseEntry.js":
+/*!****************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistHBaseEntry.js ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+var AssistHBaseEntry =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {object} options
+   * @param {object} options.definition
+   * @param {string} options.definition.name
+   * @constructor
+   */
+  function AssistHBaseEntry(options) {
+    _classCallCheck(this, AssistHBaseEntry);
+
+    var self = this;
+    self.definition = options.definition;
+    self.path = self.definition.name;
+    self.entries = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observableArray([]);
+    self.loaded = false;
+    self.loading = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable(false);
+    self.hasErrors = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.observable(false);
+    self.hasEntries = knockout__WEBPACK_IMPORTED_MODULE_0___default.a.pureComputed(function () {
+      return self.entries().length > 0;
+    });
+  }
+
+  _createClass(AssistHBaseEntry, [{
+    key: "loadEntries",
+    value: function loadEntries(callback) {
+      var self = this;
+
+      if (self.loading()) {
+        return;
+      }
+
+      self.loading(true);
+      self.hasErrors(false);
+      _api_apiHelper__WEBPACK_IMPORTED_MODULE_1__["default"].fetchHBase({
+        parent: self.definition,
+        successCallback: function successCallback(data) {
+          self.entries(data.data.map(function (obj) {
+            return new AssistHBaseEntry({
+              definition: obj
+            });
+          }));
+          self.loaded = true;
+          self.loading(false);
+
+          if (callback) {
+            callback();
+          }
+        },
+        errorCallback: function errorCallback() {
+          self.hasErrors(true);
+          self.loading(false);
+
+          if (callback) {
+            callback();
+          }
+        }
+      });
+    }
+  }, {
+    key: "open",
+    value: function open() {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.clickHBaseItem', this);
+    }
+  }, {
+    key: "click",
+    value: function click() {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.clickHBaseItem', this);
+    }
+  }, {
+    key: "dblClick",
+    value: function dblClick() {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_2__["default"].publish('assist.dblClickHBaseItem', this);
+    }
+  }]);
+
+  return AssistHBaseEntry;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (AssistHBaseEntry);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/assist/assistStorageEntry.js":
+/*!******************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistStorageEntry.js ***!
+  \******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/apiHelper */ "./desktop/core/src/desktop/js/api/apiHelper.js");
+/* harmony import */ var _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+var PAGE_SIZE = 100;
+var TYPE_SPECIFICS = {
+  'adls': {
+    apiHelperFetchFunction: 'fetchAdlsPath',
+    dblClickPubSubId: 'assist.dblClickAdlsItem',
+    goHomePubSubId: 'assist.adls.go.home',
+    selectEntryPubSubId: 'assist.selectAdlsEntry'
+  },
+  'hdfs': {
+    apiHelperFetchFunction: 'fetchHdfsPath',
+    dblClickPubSubId: 'assist.dblClickHdfsItem',
+    goHomePubSubId: 'assist.hdfs.go.home',
+    selectEntryPubSubId: 'assist.selectHdfsEntry'
+  },
+  's3': {
+    apiHelperFetchFunction: 'fetchS3Path',
+    dblClickPubSubId: 'assist.dblClickS3Item',
+    goHomePubSubId: 'assist.s3.go.home',
+    selectEntryPubSubId: 'assist.selectS3Entry'
+  }
+};
+
+var AssistStorageEntry =
+/*#__PURE__*/
+function () {
+  /**
+   * @param {object} options
+   * @param {object} options.definition
+   * @param {string} options.definition.name
+   * @param {string} options.definition.type (file, dir)
+   * @param {string} options.type - The storage type ('adls', 'hdfs', 's3')
+   * @param {string} [options.originalType] - The original storage type ('adl', 's3a')
+   * @param {AssistStorageEntry} options.parent
+   * @constructor
+   */
+  function AssistStorageEntry(options) {
+    _classCallCheck(this, AssistStorageEntry);
+
+    var self = this;
+    self.type = options.type;
+    self.originalType = options.originalType;
+    self.definition = options.definition;
+    self.parent = options.parent;
+    self.path = '';
+
+    if (self.parent !== null) {
+      self.path = self.parent.path;
+
+      if (self.parent.path !== '/') {
+        self.path += '/';
+      }
+    }
+
+    self.path += self.definition.name;
+    self.currentPage = 1;
+    self.hasMorePages = true;
+    self.preview = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
+    self.contextPopoverVisible = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.filter = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable('').extend({
+      rateLimit: 400
+    });
+    self.filter.subscribe(function () {
+      self.currentPage = 1;
+      self.hasMorePages = true;
+      self.loadEntries();
+    });
+    self.entries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observableArray([]);
+    self.loaded = false;
+    self.loading = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.loadingMore = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.errorText = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable();
+    self.hasErrors = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.open = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.observable(false);
+    self.open.subscribe(function (newValue) {
+      if (newValue && self.entries().length === 0) {
+        if (self.definition.type === 'dir') {
+          self.loadEntries();
+        } else {
+          self.loadPreview();
+        }
+      }
+    });
+    self.hasEntries = knockout__WEBPACK_IMPORTED_MODULE_1___default.a.pureComputed(function () {
+      return self.entries().length > 0;
+    });
+  }
+
+  _createClass(AssistStorageEntry, [{
+    key: "dblClick",
+    value: function dblClick() {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, this);
+    }
+  }, {
+    key: "loadPreview",
+    value: function loadPreview() {
+      var self = this;
+      self.loading(true);
+      window.apiHelper.fetchStoragePreview({
+        path: self.getHierarchy(),
+        type: self.type,
+        silenceErrors: true
+      }).done(function (data) {
+        self.preview(data);
+      }).fail(function (errorText) {
+        self.hasErrors(true);
+        self.errorText(errorText);
+      }).always(function () {
+        self.loading(false);
+      });
+    }
+  }, {
+    key: "loadEntries",
+    value: function loadEntries(callback) {
+      var self = this;
+
+      if (self.loading()) {
+        return;
+      }
+
+      self.loading(true);
+      self.hasErrors(false);
+      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"][TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
+        pageSize: PAGE_SIZE,
+        page: self.currentPage,
+        filter: self.filter().trim() ? self.filter() : undefined,
+        pathParts: self.getHierarchy(),
+        successCallback: function successCallback(data) {
+          self.hasMorePages = data.page.next_page_number > self.currentPage;
+          var filteredFiles = data.files.filter(function (file) {
+            return file.name !== '.' && file.name !== '..';
+          });
+          self.entries(filteredFiles.map(function (file) {
+            file.url = encodeURI(file.url);
+            return new AssistStorageEntry({
+              type: self.type,
+              definition: file,
+              parent: self
+            });
+          }));
+          self.loaded = true;
+          self.loading(false);
+
+          if (callback) {
+            callback();
+          }
+        },
+        errorCallback: function errorCallback(errorText) {
+          self.hasErrors(true);
+          self.errorText(errorText);
+          self.loading(false);
+
+          if (callback) {
+            callback();
+          }
+        }
+      });
+    }
+  }, {
+    key: "goHome",
+    value: function goHome() {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[this.type].goHomePubSubId);
+    }
+  }, {
+    key: "loadDeep",
+    value: function loadDeep(folders, callback) {
+      var self = this;
+
+      if (folders.length === 0) {
+        callback(self);
+        return;
+      }
+
+      var nextName = folders.shift();
+      var loadedPages = 0;
+
+      var findNextAndLoadDeep = function findNextAndLoadDeep() {
+        var foundEntry = self.entries().filter(function (entry) {
+          return entry.definition.name === nextName;
+        });
+        var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
+
+        if (foundEntry.length === 1) {
+          foundEntry[0].loadDeep(folders, callback);
+        } else if (!passedAlphabetically && self.hasMorePages && loadedPages < 50) {
+          loadedPages++;
+          self.fetchMore(findNextAndLoadDeep, function () {
+            callback(self);
+          });
+        } else {
+          callback(self);
+        }
+      };
+
+      if (!self.loaded) {
+        self.loadEntries(findNextAndLoadDeep);
+      } else {
+        findNextAndLoadDeep();
+      }
+    }
+  }, {
+    key: "getHierarchy",
+    value: function getHierarchy() {
+      var self = this;
+      var parts = [];
+      var entry = self;
+
+      while (entry != null) {
+        parts.push(entry.definition.name);
+        entry = entry.parent;
+      }
+
+      parts.reverse();
+      return parts;
+    }
+  }, {
+    key: "toggleOpen",
+    value: function toggleOpen(data, event) {
+      var self = this;
+
+      if (self.definition.type === 'file') {
+        if (IS_HUE_4) {
+          if (event.ctrlKey || event.metaKey || event.which === 2) {
+            window.open('/hue' + self.definition.url, '_blank');
+          } else {
+            _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.link', self.definition.url);
+          }
+        } else {
+          window.open(self.definition.url, '_blank');
+        }
+
+        return;
+      }
+
+      self.open(!self.open());
+
+      if (self.definition.name === '..') {
+        if (self.parent.parent) {
+          _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self.parent.parent);
+        }
+      } else {
+        _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self);
+      }
+    }
+  }, {
+    key: "fetchMore",
+    value: function fetchMore(_successCallback, _errorCallback) {
+      var self = this;
+
+      if (!self.hasMorePages || self.loadingMore()) {
+        return;
+      }
+
+      self.currentPage++;
+      self.loadingMore(true);
+      self.hasErrors(false);
+      _api_apiHelper__WEBPACK_IMPORTED_MODULE_2__["default"][TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
+        pageSize: PAGE_SIZE,
+        page: self.currentPage,
+        filter: self.filter().trim() ? self.filter() : undefined,
+        pathParts: self.getHierarchy(),
+        successCallback: function successCallback(data) {
+          self.hasMorePages = data.page.next_page_number > self.currentPage;
+          var filteredFiles = data.files.filter(function (file) {
+            return file.name !== '.' && file.name !== '..';
+          });
+          self.entries(self.entries().concat(filteredFiles.map(function (file) {
+            return new AssistStorageEntry({
+              type: self.type,
+              definition: file,
+              parent: self
+            });
+          })));
+          self.loadingMore(false);
+
+          if (_successCallback) {
+            _successCallback();
+          }
+        },
+        errorCallback: function errorCallback() {
+          self.hasErrors(true);
+
+          if (_errorCallback) {
+            _errorCallback();
+          }
+        }
+      });
+    }
+  }, {
+    key: "showContextPopover",
+    value: function showContextPopover(entry, event, positionAdjustment) {
+      var $source = jquery__WEBPACK_IMPORTED_MODULE_0___default()(event.target);
+      var offset = $source.offset();
+      entry.contextPopoverVisible(true);
+
+      if (positionAdjustment) {
+        offset.left += positionAdjustment.left;
+        offset.top += positionAdjustment.top;
+      }
+
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('context.popover.show', {
+        data: {
+          type: 'storageEntry',
+          storageEntry: entry
+        },
+        pinEnabled: true,
+        orientation: 'right',
+        source: {
+          element: event.target,
+          left: offset.left,
+          top: offset.top - 3,
+          right: offset.left + $source.width() + 3,
+          bottom: offset.top + $source.height() - 3
+        }
+      });
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].subscribeOnce('context.popover.hidden', function () {
+        entry.contextPopoverVisible(false);
+      });
+    }
+  }, {
+    key: "openInImporter",
+    value: function openInImporter() {
+      _utils_huePubSub__WEBPACK_IMPORTED_MODULE_3__["default"].publish('open.in.importer', this.definition.path);
+    }
+  }], [{
+    key: "getEntry",
+
+    /**
+     * Helper function to create an assistStorageEntry. It will load the entries starting from the root up until the
+     * path or stop when a part is not found.
+     *
+     * @param {string} path - The path, can include the type i.e. '/tmp' or 's3:/tmp'.
+     * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
+     * @return {Promise}
+     */
+    value: function getEntry(path, type) {
+      var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+      var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
+      type = typeMatch ? typeMatch[1] : type || 'hdfs';
+      type = type.replace(/s3.*/i, 's3');
+      type = type.replace(/adl.*/i, 'adls');
+      var rootEntry = new AssistStorageEntry({
+        type: type.toLowerCase(),
+        originalType: typeMatch && typeMatch[1],
+        definition: {
+          name: '/',
+          type: 'dir'
+        },
+        parent: null,
+        apiHelper: window.apiHelper
+      });
+      path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+      rootEntry.loadDeep(path, deferred.resolve);
+      return deferred.promise();
+    }
+  }]);
+
+  return AssistStorageEntry;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (AssistStorageEntry);
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/assist/assistViewModel.js":
+/*!***************************************************************!*\
+  !*** ./desktop/core/src/desktop/js/assist/assistViewModel.js ***!
+  \***************************************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var assist_assistDbEntry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! assist/assistDbEntry */ "./desktop/core/src/desktop/js/assist/assistDbEntry.js");
+/* harmony import */ var assist_assistDbSource__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! assist/assistDbSource */ "./desktop/core/src/desktop/js/assist/assistDbSource.js");
+/* harmony import */ var assist_assistGitEntry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! assist/assistGitEntry */ "./desktop/core/src/desktop/js/assist/assistGitEntry.js");
+/* harmony import */ var assist_assistHBaseEntry__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! assist/assistHBaseEntry */ "./desktop/core/src/desktop/js/assist/assistHBaseEntry.js");
+/* harmony import */ var assist_assistStorageEntry__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! assist/assistStorageEntry */ "./desktop/core/src/desktop/js/assist/assistStorageEntry.js");
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+ // TODO: Get rid of
+
+window.AssistDbEntry = assist_assistDbEntry__WEBPACK_IMPORTED_MODULE_0__["default"];
+window.AssistDbSource = assist_assistDbSource__WEBPACK_IMPORTED_MODULE_1__["default"];
+window.AssistGitEntry = assist_assistGitEntry__WEBPACK_IMPORTED_MODULE_2__["default"];
+window.AssistHBaseEntry = assist_assistHBaseEntry__WEBPACK_IMPORTED_MODULE_3__["default"];
+window.AssistStorageEntry = assist_assistStorageEntry__WEBPACK_IMPORTED_MODULE_4__["default"];
+
+/***/ }),
+
 /***/ "./desktop/core/src/desktop/js/catalog/catalogUtils.js":
 /*!*************************************************************!*\
   !*** ./desktop/core/src/desktop/js/catalog/catalogUtils.js ***!
@@ -14298,8 +16338,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
-/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
+/* harmony import */ var knockout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(knockout__WEBPACK_IMPORTED_MODULE_1__);
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -14316,6 +16358,7 @@ __webpack_require__.r(__webpack_exports__);
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // Based on https://gist.githubusercontent.com/xtranophilist/8001624/raw/ko_selectize.js
+
 
 
 var inject_binding = function inject_binding(allBindings, key, value) {
@@ -14336,18 +16379,18 @@ var inject_binding = function inject_binding(allBindings, key, value) {
   };
 };
 
-knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.browserAwareSelectize = {
+knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.browserAwareSelectize = {
   init: function init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-    (window.isIE11 ? knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.options : knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.selectize).init.apply(null, arguments);
+    (window.isIE11 ? knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.options : knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.selectize).init.apply(null, arguments);
   },
   update: function update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-    (window.isIE11 ? knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.options : knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.selectize).update.apply(null, arguments);
+    (window.isIE11 ? knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.options : knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.selectize).update.apply(null, arguments);
   }
 };
-knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.selectize = {
+knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.selectize = {
   init: function init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     if (typeof allBindingsAccessor.get('optionsCaption') == 'undefined') allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', HUE_I18n.selectize.choose);
-    knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+    knockout__WEBPACK_IMPORTED_MODULE_1___default.a.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
     var options = {};
 
     if (allBindingsAccessor.get('optionsValue')) {
@@ -14378,7 +16421,7 @@ knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.selectize = {
       options.dropdownParent = 'body';
     }
 
-    var $select = $(element).selectize(options)[0].selectize;
+    var $select = jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).selectize(options)[0].selectize;
 
     if (typeof allBindingsAccessor.get('value') == 'function') {
       $select.addItem(allBindingsAccessor.get('value')());
@@ -14497,7 +16540,7 @@ knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.selectize = {
     var value_accessor = valueAccessor();
 
     if (allBindingsAccessor.has('selectedObjects')) {
-      allBindingsAccessor.get('selectedObjects')($.grep(value_accessor(), function (i) {
+      allBindingsAccessor.get('selectedObjects')(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.grep(value_accessor(), function (i) {
         var id = i[optionsValue];
 
         if (typeof i[optionsValue] == 'function') {
@@ -14509,7 +16552,7 @@ knockout__WEBPACK_IMPORTED_MODULE_0___default.a.bindingHandlers.selectize = {
     }
 
     if (allBindingsAccessor.has('object')) {
-      allBindingsAccessor.get('object')($.grep(value_accessor(), function (i) {
+      allBindingsAccessor.get('object')(jquery__WEBPACK_IMPORTED_MODULE_0___default.a.grep(value_accessor(), function (i) {
         var id = i[optionsValue];
 
         if (typeof i[optionsValue] == 'function') {
@@ -14566,6 +16609,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var utils_hueDrop__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! utils/hueDrop */ "./desktop/core/src/desktop/js/utils/hueDrop.js");
 /* harmony import */ var utils_huePubSub__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! utils/huePubSub */ "./desktop/core/src/desktop/js/utils/huePubSub.js");
 /* harmony import */ var utils_hueUtils__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! utils/hueUtils */ "./desktop/core/src/desktop/js/utils/hueUtils.js");
+/* harmony import */ var sql_sqlUtils__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! sql/sqlUtils */ "./desktop/core/src/desktop/js/sql/sqlUtils.js");
+/* harmony import */ var assist_assistViewModel__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! assist/assistViewModel */ "./desktop/core/src/desktop/js/assist/assistViewModel.js");
 // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -14581,6 +16626,8 @@ __webpack_require__.r(__webpack_exports__);
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+
 
 
 
@@ -14620,7 +16667,830 @@ window.ko = knockout__WEBPACK_IMPORTED_MODULE_7___default.a;
 window.ko.mapping = knockout_mapping__WEBPACK_IMPORTED_MODULE_8___default.a;
 window.localforage = localforage__WEBPACK_IMPORTED_MODULE_6___default.a;
 window.page = page__WEBPACK_IMPORTED_MODULE_5___default.a;
+window.sqlUtils = sql_sqlUtils__WEBPACK_IMPORTED_MODULE_23__["default"];
 window.qq = _ext_fileuploader_custom__WEBPACK_IMPORTED_MODULE_4__["default"];
+
+/***/ }),
+
+/***/ "./desktop/core/src/desktop/js/sql/sqlUtils.js":
+/*!*****************************************************!*\
+  !*** ./desktop/core/src/desktop/js/sql/sqlUtils.js ***!
+  \*****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js-exposed");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/cancellablePromise */ "./desktop/core/src/desktop/js/api/cancellablePromise.js");
+/* harmony import */ var _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../catalog/dataCatalog */ "./desktop/core/src/desktop/js/catalog/dataCatalog.js");
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+var hiveReservedKeywords = {
+  ALL: true,
+  ALTER: true,
+  AND: true,
+  ARRAY: true,
+  AS: true,
+  AUTHORIZATION: true,
+  BETWEEN: true,
+  BIGINT: true,
+  BINARY: true,
+  BOOLEAN: true,
+  BOTH: true,
+  BY: true,
+  CACHE: true,
+  CASE: true,
+  CAST: true,
+  CHAR: true,
+  COLUMN: true,
+  COMMIT: true,
+  CONF: true,
+  CONSTRAINT: true,
+  CREATE: true,
+  CROSS: true,
+  CUBE: true,
+  CURRENT: true,
+  CURRENT_DATE: true,
+  CURRENT_TIMESTAMP: true,
+  CURSOR: true,
+  DATABASE: true,
+  DATE: true,
+  DAYOFWEEK: true,
+  DECIMAL: true,
+  DELETE: true,
+  DESCRIBE: true,
+  DISTINCT: true,
+  DIV: true,
+  DOUBLE: true,
+  DROP: true,
+  ELSE: true,
+  END: true,
+  EXCHANGE: true,
+  EXTRACT: true,
+  EXISTS: true,
+  EXTENDED: true,
+  EXTERNAL: true,
+  FALSE: true,
+  FETCH: true,
+  FLOAT: true,
+  FLOOR: true,
+  FOLLOWING: true,
+  FOR: true,
+  FOREIGN: true,
+  FROM: true,
+  FULL: true,
+  FUNCTION: true,
+  GRANT: true,
+  GROUP: true,
+  GROUPING: true,
+  HAVING: true,
+  IF: true,
+  IMPORT: true,
+  IN: true,
+  INNER: true,
+  INSERT: true,
+  INT: true,
+  INTEGER: true,
+  INTERSECT: true,
+  INTERVAL: true,
+  INTO: true,
+  IS: true,
+  JOIN: true,
+  LATERAL: true,
+  LEFT: true,
+  LESS: true,
+  LIKE: true,
+  LOCAL: true,
+  MACRO: true,
+  MAP: true,
+  MORE: true,
+  NONE: true,
+  NOT: true,
+  NULL: true,
+  NUMERIC: true,
+  OF: true,
+  ON: true,
+  ONLY: true,
+  OR: true,
+  ORDER: true,
+  OUT: true,
+  OUTER: true,
+  OVER: true,
+  PARTIALSCAN: true,
+  PARTITION: true,
+  PERCENT: true,
+  PRECEDING: true,
+  PRECISION: true,
+  PRESERVE: true,
+  PRIMARY: true,
+  PROCEDURE: true,
+  RANGE: true,
+  READS: true,
+  REDUCE: true,
+  REFERENCES: true,
+  REGEXP: true,
+  REVOKE: true,
+  RIGHT: true,
+  RLIKE: true,
+  ROLLBACK: true,
+  ROLLUP: true,
+  ROW: true,
+  ROWS: true,
+  SELECT: true,
+  SET: true,
+  SMALLINT: true,
+  START: true,
+  TABLE: true,
+  TABLESAMPLE: true,
+  THEN: true,
+  TIME: true,
+  TIMESTAMP: true,
+  TO: true,
+  TRANSFORM: true,
+  TRIGGER: true,
+  TRUE: true,
+  TRUNCATE: true,
+  UNBOUNDED: true,
+  UNION: true,
+  UNIQUEJOIN: true,
+  UPDATE: true,
+  USER: true,
+  USING: true,
+  VALUES: true,
+  VARCHAR: true,
+  VIEWS: true,
+  WHEN: true,
+  WHERE: true,
+  WINDOW: true,
+  WITH: true
+};
+var extraHiveReservedKeywords = {
+  ASC: true,
+  CLUSTER: true,
+  DESC: true,
+  DISTRIBUTE: true,
+  FORMATTED: true,
+  FUNCTION: true,
+  INDEX: true,
+  INDEXES: true,
+  LIMIT: true,
+  LOCK: true,
+  SCHEMA: true,
+  SORT: true
+};
+var impalaReservedKeywords = {
+  ADD: true,
+  AGGREGATE: true,
+  ALL: true,
+  ALLOCATE: true,
+  ALTER: true,
+  ANALYTIC: true,
+  AND: true,
+  ANTI: true,
+  ANY: true,
+  API_VERSION: true,
+  ARE: true,
+  ARRAY: true,
+  ARRAY_AGG: true,
+  ARRAY_MAX_CARDINALITY: true,
+  AS: true,
+  ASC: true,
+  ASENSITIVE: true,
+  ASYMMETRIC: true,
+  AT: true,
+  ATOMIC: true,
+  AUTHORIZATION: true,
+  AVRO: true,
+  BEGIN_FRAME: true,
+  BEGIN_PARTITION: true,
+  BETWEEN: true,
+  BIGINT: true,
+  BINARY: true,
+  BLOB: true,
+  BLOCK_SIZE: true,
+  BOOLEAN: true,
+  BOTH: true,
+  BY: true,
+  CACHED: true,
+  CALLED: true,
+  CARDINALITY: true,
+  CASCADE: true,
+  CASCADED: true,
+  CASE: true,
+  CAST: true,
+  CHANGE: true,
+  CHAR: true,
+  CHARACTER: true,
+  CLASS: true,
+  CLOB: true,
+  CLOSE_FN: true,
+  COLLATE: true,
+  COLLECT: true,
+  COLUMN: true,
+  COLUMNS: true,
+  COMMENT: true,
+  COMMIT: true,
+  COMPRESSION: true,
+  COMPUTE: true,
+  CONDITION: true,
+  CONNECT: true,
+  CONSTRAINT: true,
+  CONTAINS: true,
+  CONVERT: true,
+  COPY: true,
+  CORR: true,
+  CORRESPONDING: true,
+  COVAR_POP: true,
+  COVAR_SAMP: true,
+  CREATE: true,
+  CROSS: true,
+  CUBE: true,
+  CURRENT: true,
+  CURRENT_DATE: true,
+  CURRENT_DEFAULT_TRANSFORM_GROUP: true,
+  CURRENT_PATH: true,
+  CURRENT_ROLE: true,
+  CURRENT_ROW: true,
+  CURRENT_SCHEMA: true,
+  CURRENT_TIME: true,
+  CURRENT_TRANSFORM_GROUP_FOR_TYPE: true,
+  CURSOR: true,
+  CYCLE: true,
+  DATA: true,
+  DATABASE: true,
+  DATABASES: true,
+  DATE: true,
+  DATETIME: true,
+  DEALLOCATE: true,
+  DEC: true,
+  DECFLOAT: true,
+  DECIMAL: true,
+  DECLARE: true,
+  DEFINE: true,
+  DELETE: true,
+  DELIMITED: true,
+  DEREF: true,
+  DESC: true,
+  DESCRIBE: true,
+  DETERMINISTIC: true,
+  DISCONNECT: true,
+  DISTINCT: true,
+  DIV: true,
+  DOUBLE: true,
+  DROP: true,
+  DYNAMIC: true,
+  EACH: true,
+  ELEMENT: true,
+  ELSE: true,
+  EMPTY: true,
+  ENCODING: true,
+  END: true,
+  END_FRAME: true,
+  END_PARTITION: true,
+  EQUALS: true,
+  ESCAPE: true,
+  ESCAPED: true,
+  EVERY: true,
+  EXCEPT: true,
+  EXEC: true,
+  EXECUTE: true,
+  EXISTS: true,
+  EXPLAIN: true,
+  EXTENDED: true,
+  EXTERNAL: true,
+  FALSE: true,
+  FETCH: true,
+  FIELDS: true,
+  FILEFORMAT: true,
+  FILES: true,
+  FILTER: true,
+  FINALIZE_FN: true,
+  FIRST: true,
+  FLOAT: true,
+  FOLLOWING: true,
+  FOR: true,
+  FOREIGN: true,
+  FORMAT: true,
+  FORMATTED: true,
+  FRAME_ROW: true,
+  FREE: true,
+  FROM: true,
+  FULL: true,
+  FUNCTION: true,
+  FUNCTIONS: true,
+  FUSION: true,
+  GET: true,
+  GLOBAL: true,
+  GRANT: true,
+  GROUP: true,
+  GROUPING: true,
+  GROUPS: true,
+  HASH: true,
+  HAVING: true,
+  HOLD: true,
+  IF: true,
+  IGNORE: true,
+  ILIKE: true,
+  IN: true,
+  INCREMENTAL: true,
+  INDICATOR: true,
+  INIT_FN: true,
+  INITIAL: true,
+  INNER: true,
+  INOUT: true,
+  INPATH: true,
+  INSENSITIVE: true,
+  INSERT: true,
+  INT: true,
+  INTEGER: true,
+  INTERMEDIATE: true,
+  INTERSECT: true,
+  INTERSECTION: true,
+  INTERVAL: true,
+  INTO: true,
+  INVALIDATE: true,
+  IREGEXP: true,
+  IS: true,
+  JOIN: true,
+  JSON_ARRAY: true,
+  JSON_ARRAYAGG: true,
+  JSON_EXISTS: true,
+  JSON_OBJECT: true,
+  JSON_OBJECTAGG: true,
+  JSON_QUERY: true,
+  JSON_TABLE: true,
+  JSON_TABLE_PRIMITIVE: true,
+  JSON_VALUE: true,
+  KEY: true,
+  KUDU: true,
+  LARGE: true,
+  LAST: true,
+  LATERAL: true,
+  LEADING: true,
+  LEFT: true,
+  LIKE: true,
+  LIKE_REGEX: true,
+  LIMIT: true,
+  LINES: true,
+  LISTAGG: true,
+  LOAD: true,
+  LOCAL: true,
+  LOCALTIMESTAMP: true,
+  LOCATION: true,
+  MAP: true,
+  MATCH: true,
+  MATCH_NUMBER: true,
+  MATCH_RECOGNIZE: true,
+  MATCHES: true,
+  MERGE: true,
+  MERGE_FN: true,
+  METADATA: true,
+  METHOD: true,
+  MODIFIES: true,
+  MULTISET: true,
+  NATIONAL: true,
+  NATURAL: true,
+  NCHAR: true,
+  NCLOB: true,
+  NO: true,
+  NONE: true,
+  NORMALIZE: true,
+  NOT: true,
+  NTH_VALUE: true,
+  NULL: true,
+  NULLS: true,
+  NUMERIC: true,
+  OCCURRENCES_REGEX: true,
+  OCTET_LENGTH: true,
+  OF: true,
+  OFFSET: true,
+  OMIT: true,
+  ON: true,
+  ONE: true,
+  ONLY: true,
+  OR: true,
+  ORDER: true,
+  OUT: true,
+  OUTER: true,
+  OVER: true,
+  OVERLAPS: true,
+  OVERLAY: true,
+  OVERWRITE: true,
+  PARQUET: true,
+  PARQUETFILE: true,
+  PARTITION: true,
+  PARTITIONED: true,
+  PARTITIONS: true,
+  PATTERN: true,
+  PER: true,
+  PERCENT: true,
+  PERCENTILE_CONT: true,
+  PERCENTILE_DISC: true,
+  PORTION: true,
+  POSITION: true,
+  POSITION_REGEX: true,
+  PRECEDES: true,
+  PRECEDING: true,
+  PREPARE: true,
+  PREPARE_FN: true,
+  PRIMARY: true,
+  PROCEDURE: true,
+  PRODUCED: true,
+  PTF: true,
+  PURGE: true,
+  RANGE: true,
+  RCFILE: true,
+  READS: true,
+  REAL: true,
+  RECOVER: true,
+  RECURSIVE: true,
+  REF: true,
+  REFERENCES: true,
+  REFERENCING: true,
+  REFRESH: true,
+  REGEXP: true,
+  REGR_AVGX: true,
+  REGR_AVGY: true,
+  REGR_COUNT: true,
+  REGR_INTERCEPT: true,
+  REGR_R2: true,
+  REGR_SLOPE: true,
+  REGR_SXX: true,
+  REGR_SXY: true,
+  REGR_SYY: true,
+  RELEASE: true,
+  RENAME: true,
+  REPEATABLE: true,
+  REPLACE: true,
+  REPLICATION: true,
+  RESTRICT: true,
+  RETURNS: true,
+  REVOKE: true,
+  RIGHT: true,
+  RLIKE: true,
+  ROLE: true,
+  ROLES: true,
+  ROLLBACK: true,
+  ROLLUP: true,
+  ROW: true,
+  ROWS: true,
+  RUNNING: true,
+  SAVEPOINT: true,
+  SCHEMA: true,
+  SCHEMAS: true,
+  SCOPE: true,
+  SCROLL: true,
+  SEARCH: true,
+  SEEK: true,
+  SELECT: true,
+  SEMI: true,
+  SENSITIVE: true,
+  SEQUENCEFILE: true,
+  SERDEPROPERTIES: true,
+  SERIALIZE_FN: true,
+  SET: true,
+  SHOW: true,
+  SIMILAR: true,
+  SKIP: true,
+  SMALLINT: true,
+  SOME: true,
+  SORT: true,
+  SPECIFIC: true,
+  SPECIFICTYPE: true,
+  SQLEXCEPTION: true,
+  SQLSTATE: true,
+  SQLWARNING: true,
+  STATIC: true,
+  STATS: true,
+  STORED: true,
+  STRAIGHT_JOIN: true,
+  STRING: true,
+  STRUCT: true,
+  SUBMULTISET: true,
+  SUBSET: true,
+  SUBSTRING_REGEX: true,
+  SUCCEEDS: true,
+  SYMBOL: true,
+  SYMMETRIC: true,
+  SYSTEM_TIME: true,
+  SYSTEM_USER: true,
+  TABLE: true,
+  TABLES: true,
+  TABLESAMPLE: true,
+  TBLPROPERTIES: true,
+  TERMINATED: true,
+  TEXTFILE: true,
+  THEN: true,
+  TIMESTAMP: true,
+  TIMEZONE_HOUR: true,
+  TIMEZONE_MINUTE: true,
+  TINYINT: true,
+  TO: true,
+  TRAILING: true,
+  TRANSLATE_REGEX: true,
+  TRANSLATION: true,
+  TREAT: true,
+  TRIGGER: true,
+  TRIM_ARRAY: true,
+  TRUE: true,
+  TRUNCATE: true,
+  UESCAPE: true,
+  UNBOUNDED: true,
+  UNCACHED: true,
+  UNION: true,
+  UNIQUE: true,
+  UNKNOWN: true,
+  UNNEST: true,
+  UPDATE: true,
+  UPDATE_FN: true,
+  UPSERT: true,
+  USE: true,
+  USER: true,
+  USING: true,
+  VALUE_OF: true,
+  VALUES: true,
+  VARBINARY: true,
+  VARCHAR: true,
+  VARYING: true,
+  VERSIONING: true,
+  VIEW: true,
+  WHEN: true,
+  WHENEVER: true,
+  WHERE: true,
+  WIDTH_BUCKET: true,
+  WINDOW: true,
+  WITH: true,
+  WITHIN: true,
+  WITHOUT: true
+};
+
+var identifierEquals = function identifierEquals(a, b) {
+  return a && b && a.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase() === b.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase();
+};
+
+var autocompleteFilter = function autocompleteFilter(filter, entries) {
+  var lowerCaseFilter = filter.toLowerCase();
+  return entries.filter(function (suggestion) {
+    // TODO: Extend with fuzzy matches
+    var foundIndex = suggestion.value.toLowerCase().indexOf(lowerCaseFilter);
+
+    if (foundIndex !== -1) {
+      if (foundIndex === 0 || suggestion.filterValue && suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0) {
+        suggestion.filterWeight = 3;
+      } else {
+        suggestion.filterWeight = 2;
+      }
+    } else {
+      if (suggestion.details && suggestion.details.comment && lowerCaseFilter.indexOf(' ') === -1) {
+        foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
+
+        if (foundIndex !== -1) {
+          suggestion.filterWeight = 1;
+          suggestion.matchComment = true;
+        }
+      }
+    }
+
+    if (foundIndex !== -1) {
+      suggestion.matchIndex = foundIndex;
+      suggestion.matchLength = filter.length;
+      return true;
+    }
+
+    return false;
+  });
+};
+
+var sortSuggestions = function sortSuggestions(suggestions, filter, sortOverride) {
+  suggestions.sort(function (a, b) {
+    if (filter) {
+      if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight !== 'undefined' && b.filterWeight !== a.filterWeight) {
+        return b.filterWeight - a.filterWeight;
+      }
+
+      if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight === 'undefined') {
+        return -1;
+      }
+
+      if (typeof a.filterWeight === 'undefined' && typeof b.filterWeight !== 'undefined') {
+        return 1;
+      }
+    }
+
+    if (sortOverride && sortOverride.partitionColumnsFirst) {
+      if (a.partitionKey && !b.partitionKey) {
+        return -1;
+      }
+
+      if (b.partitionKey && !a.partitionKey) {
+        return 1;
+      }
+    }
+
+    var aWeight = a.category.weight + (a.weightAdjust || 0);
+    var bWeight = b.category.weight + (b.weightAdjust || 0);
+
+    if (typeof aWeight !== 'undefined' && typeof bWeight !== 'undefined' && bWeight !== aWeight) {
+      return bWeight - aWeight;
+    }
+
+    if (typeof aWeight !== 'undefined' && typeof bWeight === 'undefined') {
+      return -1;
+    }
+
+    if (typeof aWeight === 'undefined' && typeof bWeight !== 'undefined') {
+      return 1;
+    }
+
+    return a.value.localeCompare(b.value);
+  });
+};
+
+var identifierChainToPath = function identifierChainToPath(identifierChain) {
+  return identifierChain.map(function (identifier) {
+    return identifier.name;
+  });
+};
+/**
+ *
+ * @param {Object} options
+ * @param {String} options.sourceType
+ * @param {ContextNamespace} options.namespace
+ * @param {ContextCompute} options.compute
+ * @param {boolean} [options.temporaryOnly] - Default: false
+ * @param {Object[]} [options.identifierChain]
+ * @param {Object[]} [options.tables]
+ * @param {Object} [options.cancellable]
+ * @param {Object} [options.cachedOnly]
+ *
+ * @return {CancellablePromise}
+ */
+
+
+var resolveCatalogEntry = function resolveCatalogEntry(options) {
+  var cancellablePromises = [];
+  var deferred = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.Deferred();
+  var promise = new _api_cancellablePromise__WEBPACK_IMPORTED_MODULE_1__["default"](deferred, undefined, cancellablePromises);
+  _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].applyCancellable(promise, options);
+
+  if (!options.identifierChain) {
+    deferred.reject();
+    return promise;
+  }
+
+  var findInTree = function findInTree(currentEntry, fieldsToGo) {
+    if (fieldsToGo.length === 0) {
+      deferred.reject();
+      return;
+    }
+
+    var nextField;
+
+    if (currentEntry.getType() === 'map') {
+      nextField = 'value';
+    } else if (currentEntry.getType() === 'array') {
+      nextField = 'item';
+    } else {
+      nextField = fieldsToGo.shift();
+    }
+
+    cancellablePromises.push(currentEntry.getChildren({
+      cancellable: options.cancellable,
+      cachedOnly: options.cachedOnly,
+      silenceErrors: true
+    }).done(function (childEntries) {
+      var foundEntry = undefined;
+      childEntries.some(function (childEntry) {
+        if (identifierEquals(childEntry.name, nextField)) {
+          foundEntry = childEntry;
+          return true;
+        }
+      });
+
+      if (foundEntry && fieldsToGo.length) {
+        findInTree(foundEntry, fieldsToGo);
+      } else if (foundEntry) {
+        deferred.resolve(foundEntry);
+      } else {
+        deferred.reject();
+      }
+    }).fail(deferred.reject));
+  };
+
+  var findTable = function findTable(tablesToGo) {
+    if (tablesToGo.length === 0) {
+      deferred.reject();
+      return;
+    }
+
+    var nextTable = tablesToGo.pop();
+
+    if (typeof nextTable.subQuery !== 'undefined') {
+      findTable(tablesToGo);
+      return;
+    }
+
+    cancellablePromises.push(_catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].getChildren({
+      sourceType: options.sourceType,
+      namespace: options.namespace,
+      compute: options.compute,
+      path: identifierChainToPath(nextTable.identifierChain),
+      cachedOnly: options && options.cachedOnly,
+      cancellable: options && options.cancellable,
+      temporaryOnly: options && options.temporaryOnly,
+      silenceErrors: true
+    }).done(function (childEntries) {
+      var foundEntry = undefined;
+      childEntries.some(function (childEntry) {
+        if (identifierEquals(childEntry.name, options.identifierChain[0].name)) {
+          foundEntry = childEntry;
+          return true;
+        }
+      });
+
+      if (foundEntry && options.identifierChain.length > 1) {
+        findInTree(foundEntry, identifierChainToPath(options.identifierChain.slice(1)));
+      } else if (foundEntry) {
+        deferred.resolve(foundEntry);
+      } else {
+        findTable(tablesToGo);
+      }
+    }).fail(deferred.reject));
+  };
+
+  if (options.tables) {
+    findTable(options.tables.concat());
+  } else {
+    _catalog_dataCatalog__WEBPACK_IMPORTED_MODULE_2__["default"].getEntry({
+      sourceType: options.sourceType,
+      namespace: options.namespace,
+      compute: options.compute,
+      path: [],
+      cachedOnly: options && options.cachedOnly,
+      cancellable: options && options.cancellable,
+      temporaryOnly: options && options.temporaryOnly,
+      silenceErrors: true
+    }).done(function (entry) {
+      findInTree(entry, identifierChainToPath(options.identifierChain));
+    });
+  }
+
+  return promise;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  autocompleteFilter: autocompleteFilter,
+  backTickIfNeeded: function backTickIfNeeded(sourceType, identifier) {
+    if (identifier.indexOf('`') === 0) {
+      return identifier;
+    }
+
+    var upperIdentifier = identifier.toUpperCase();
+
+    if (sourceType === 'hive' && (hiveReservedKeywords[upperIdentifier] || extraHiveReservedKeywords[upperIdentifier])) {
+      return '`' + identifier + '`';
+    }
+
+    if (sourceType === 'impala' && impalaReservedKeywords[upperIdentifier]) {
+      return '`' + identifier + '`';
+    }
+
+    if (sourceType !== 'impala' && sourceType !== 'hive' && (impalaReservedKeywords[upperIdentifier] || hiveReservedKeywords[upperIdentifier] || extraHiveReservedKeywords[upperIdentifier])) {
+      return '`' + identifier + '`';
+    }
+
+    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(identifier)) {
+      return '`' + identifier + '`';
+    }
+
+    return identifier;
+  },
+  locationEquals: function locationEquals(a, b) {
+    return a && b && a.first_line === b.first_line && a.first_column === b.first_column && a.last_line === b.last_line && a.last_column === b.last_column;
+  },
+  identifierEquals: identifierEquals,
+  sortSuggestions: sortSuggestions,
+  resolveCatalogEntry: resolveCatalogEntry,
+  identifierChainToPath: identifierChainToPath
+});
 
 /***/ }),
 
@@ -68269,4 +71139,4 @@ module.exports = __webpack_require__(/*! ./desktop/core/src/desktop/js/hue.js */
 /***/ })
 
 /******/ });
-//# sourceMappingURL=hue-bundle-fbeb7ee72f1233caa7d8.js.map
+//# sourceMappingURL=hue-bundle-8e5037d20b056ab61e91.js.map

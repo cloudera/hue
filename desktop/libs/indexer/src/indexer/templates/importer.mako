@@ -1641,7 +1641,7 @@ ${ assist.assistPanel() }
           var statementCols = [];
           var temporaryColumns = [];
           sampleCols.forEach(function (sampleCol) {
-            statementCols.push(SqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
+            statementCols.push(sqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
             var col = {
               name: sampleCol.name(),
               type: sampleCol.type()
@@ -1661,12 +1661,12 @@ ${ assist.assistPanel() }
 
           var statement = 'SELECT ';
           statement += statementCols.join(',\n    ');
-          statement += '\n FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
+          statement += '\n FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
           if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
             wizard.destination.fieldEditorValue(statement);
           }
           lastStatement = statement;
-          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName));
+          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName));
 
           var handle = dataCatalog.addTemporaryTable({
             sourceType: self.sourceType,

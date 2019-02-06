@@ -30,7 +30,7 @@ import 'knockout-switch-case'
 import 'knockout-sortable'
 import 'knockout.validation'
 
-import apiHelper from 'api/apiHelper';
+import apiHelper from 'api/apiHelper'
 import CancellablePromise from 'api/cancellablePromise'
 import contextCatalog from 'catalog/contextCatalog'
 import dataCatalog from 'catalog/dataCatalog'
@@ -39,6 +39,10 @@ import hueDebug from 'utils/hueDebug'
 import hueDrop from 'utils/hueDrop'
 import huePubSub from 'utils/huePubSub'
 import hueUtils from 'utils/hueUtils'
+
+import sqlUtils from 'sql/sqlUtils'
+
+import 'assist/assistViewModel'
 
 // TODO: Migrate away
 window._ = _;
@@ -56,4 +60,5 @@ window.ko = ko;
 window.ko.mapping = komapping;
 window.localforage = localforage;
 window.page = page;
+window.sqlUtils = sqlUtils;
 window.qq = qq;

@@ -4057,7 +4057,7 @@
           return location.resolvePathPromise;
         }
 
-        var promise = SqlUtils.resolveCatalogEntry({
+        var promise = sqlUtils.resolveCatalogEntry({
           sourceType: sourceType,
           namespace: namespace,
           compute: compute,
@@ -4704,7 +4704,7 @@
 
         var suppressedRules = window.apiHelper.getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
         if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
-          if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
+          if (self.snippet.positionStatement() && sqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
             self.snippet.positionStatement().syntaxError = true;
           }
           if (hueDebug.showSyntaxParseResult) {
@@ -4851,7 +4851,7 @@
                 silenceErrors: true
               }).done(function (entries) {
                 var containsColumn = entries.some(function (entry) {
-                  return SqlUtils.identifierEquals(entry.name, location.identifierChain[0].name);
+                  return sqlUtils.identifierEquals(entry.name, location.identifierChain[0].name);
                 });
 
                 if (containsColumn) {
@@ -4938,7 +4938,7 @@
             var uniqueIndex = {};
             var uniqueValues = [];
             for (var i = 0; i < possibleValues.length; i++) {
-              possibleValues[i].name = SqlUtils.backTickIfNeeded(self.snippet.type(), possibleValues[i].name);
+              possibleValues[i].name = sqlUtils.backTickIfNeeded(self.snippet.type(), possibleValues[i].name);
               var nameLower = possibleValues[i].name.toLowerCase();
               if ((nameLower === tokenValLower) || (tokenValLower.indexOf('`') === 0 && tokenValLower.replace(/`/g, '') === nameLower)) {
                 // Break if found
@@ -5796,28 +5796,28 @@
       var menu = ko.bindingHandlers.contextMenu.initContextMenu($tableDropMenu, $('.content-panel'));
 
       $tableDropMenu.find('.editor-drop-value').click(function () {
-        insertSqlAtCursor(SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' ', 0, menu);
+        insertSqlAtCursor(sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' ', 0, menu);
       });
 
       $tableDropMenu.find('.editor-drop-select').click(function () {
-        insertSqlAtCursor('SELECT * FROM ' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' LIMIT 100;', -1, menu);
+        insertSqlAtCursor('SELECT * FROM ' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' LIMIT 100;', -1, menu);
         $tableDropMenu.hide();
       });
 
       $tableDropMenu.find('.editor-drop-insert').click(function () {
-        insertSqlAtCursor('INSERT INTO ' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' VALUES ();', -2, menu);
+        insertSqlAtCursor('INSERT INTO ' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' VALUES ();', -2, menu);
       });
 
       $tableDropMenu.find('.editor-drop-update').click(function () {
-        insertSqlAtCursor('UPDATE ' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' SET ', 0, menu);
+        insertSqlAtCursor('UPDATE ' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ' SET ', 0, menu);
       });
 
       $tableDropMenu.find('.editor-drop-view').click(function () {
-        insertSqlAtCursor('DROP VIEW ' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ';', -1, menu);
+        insertSqlAtCursor('DROP VIEW ' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ';', -1, menu);
       });
 
       $tableDropMenu.find('.editor-drop-drop').click(function () {
-        insertSqlAtCursor('DROP TABLE ' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + SqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ';', -1, menu);
+        insertSqlAtCursor('DROP TABLE ' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) + '.' + sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) + ';', -1, menu);
       });
 
       $el.droppable({

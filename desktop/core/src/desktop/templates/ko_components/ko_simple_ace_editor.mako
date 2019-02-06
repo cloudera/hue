@@ -485,11 +485,11 @@ from desktop.views import _ko
             var result = self.entries();
 
             if (self.filter()) {
-              result = SqlUtils.autocompleteFilter(self.filter(), result);
+              result = sqlUtils.autocompleteFilter(self.filter(), result);
               huePubSub.publish('hue.ace.autocompleter.match.updated');
             }
 
-            SqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
+            sqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
 
             return result;
           });
@@ -604,11 +604,11 @@ from desktop.views import _ko
             var result = self.entries();
 
             if (self.filter()) {
-              result = SqlUtils.autocompleteFilter(self.filter(), result);
+              result = sqlUtils.autocompleteFilter(self.filter(), result);
               huePubSub.publish('hue.ace.autocompleter.match.updated');
             }
 
-            SqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
+            sqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
 
             return result;
           });

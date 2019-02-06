@@ -177,7 +177,7 @@ var AutocompleteResults = (function () {
       var result = self.entries();
 
       if (self.filter()) {
-        result = SqlUtils.autocompleteFilter(self.filter(), result);
+        result = sqlUtils.autocompleteFilter(self.filter(), result);
         huePubSub.publish('hue.ace.autocompleter.match.updated');
       }
 
@@ -199,7 +199,7 @@ var AutocompleteResults = (function () {
         return activeCategory === CATEGORIES.ALL || activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular());
       });
 
-      SqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
+      sqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
       self.sortOverride = null;
       return result;
     }).extend({ rateLimit: 200 });
@@ -515,7 +515,7 @@ var AutocompleteResults = (function () {
       databasesDeferred.done(function (catalogEntries) {
         catalogEntries.forEach(function (dbEntry) {
           databaseSuggestions.push({
-            value: prefix + SqlUtils.backTickIfNeeded(self.snippet.type(), dbEntry.name) + (suggestDatabases.appendDot ? '.' : ''),
+            value: prefix + sqlUtils.backTickIfNeeded(self.snippet.type(), dbEntry.name) + (suggestDatabases.appendDot ? '.' : ''),
             filterValue: dbEntry.name,
             meta: HUE_I18n.autocomplete.meta.database,
             category: CATEGORIES.DATABASE,
@@ -556,7 +556,7 @@ var AutocompleteResults = (function () {
                 return;
               }
               tableSuggestions.push({
-                value: prefix + SqlUtils.backTickIfNeeded(self.snippet.type(), tableEntry.name),
+                value: prefix + sqlUtils.backTickIfNeeded(self.snippet.type(), tableEntry.name),
                 filterValue: tableEntry.name,
                 tableName: tableEntry.name,
                 meta: HUE_I18n.autocomplete.meta[tableEntry.getType().toLowerCase()],
@@ -666,7 +666,7 @@ var AutocompleteResults = (function () {
               var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
               if (typeof column.alias !== 'undefined') {
                 columnSuggestions.push({
-                  value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
+                  value: sqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
                   filterValue: column.alias,
                   meta: type,
                   category: CATEGORIES.COLUMN,
@@ -676,7 +676,7 @@ var AutocompleteResults = (function () {
                 })
               } else if (typeof column.identifierChain !== 'undefined' && column.identifierChain.length > 0 && typeof column.identifierChain[column.identifierChain.length - 1].name !== 'undefined') {
                 columnSuggestions.push({
-                  value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.identifierChain[column.identifierChain.length - 1].name),
+                  value: sqlUtils.backTickIfNeeded(self.snippet.type(), column.identifierChain[column.identifierChain.length - 1].name),
                   filterValue: column.identifierChain[column.identifierChain.length - 1].name,
                   meta: type,
                   category: CATEGORIES.COLUMN,
@@ -702,7 +702,7 @@ var AutocompleteResults = (function () {
             var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
             if (column.alias) {
               columnSuggestions.push({
-                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
+                value: sqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
                 filterValue: column.alias,
                 meta: type,
                 category: CATEGORIES.COLUMN,
@@ -712,7 +712,7 @@ var AutocompleteResults = (function () {
               })
             } else if (column.identifierChain && column.identifierChain.length > 0) {
               columnSuggestions.push({
-                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.identifierChain[column.identifierChain.length - 1].name),
+                value: sqlUtils.backTickIfNeeded(self.snippet.type(), column.identifierChain[column.identifierChain.length - 1].name),
                 filterValue: column.identifierChain[column.identifierChain.length - 1].name,
                 meta: type,
                 category: CATEGORIES.COLUMN,
@@ -739,7 +739,7 @@ var AutocompleteResults = (function () {
           self.cancellablePromises.push(dataCatalogEntry.getChildren({ silenceErrors: true, cancellable: true })
             .done(function (childEntries) {
               childEntries.forEach(function (childEntry) {
-                var name = SqlUtils.backTickIfNeeded(self.snippet.type(), childEntry.name);
+                var name = sqlUtils.backTickIfNeeded(self.snippet.type(), childEntry.name);
                 if (self.snippet.type() === 'hive' && (childEntry.isArray() || childEntry.isMap())) {
                   name += '[]';
                 }

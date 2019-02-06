@@ -14,30 +14,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var AssistStorageEntry = (function () {
+import $ from 'jquery'
+import ko from 'knockout'
 
-  var PAGE_SIZE = 100;
+import apiHelper from '../api/apiHelper'
+import huePubSub from '../utils/huePubSub'
 
-  var TYPE_SPECIFICS = {
-    'adls': {
-      apiHelperFetchFunction: 'fetchAdlsPath',
-      dblClickPubSubId: 'assist.dblClickAdlsItem',
-      goHomePubSubId: 'assist.adls.go.home',
-      selectEntryPubSubId: 'assist.selectAdlsEntry'
-    },
-    'hdfs': {
-      apiHelperFetchFunction: 'fetchHdfsPath',
-      dblClickPubSubId: 'assist.dblClickHdfsItem',
-      goHomePubSubId: 'assist.hdfs.go.home',
-      selectEntryPubSubId: 'assist.selectHdfsEntry'
-    },
-    's3': {
-      apiHelperFetchFunction: 'fetchS3Path',
-      dblClickPubSubId: 'assist.dblClickS3Item',
-      goHomePubSubId: 'assist.s3.go.home',
-      selectEntryPubSubId: 'assist.selectS3Entry'
-    }
-  };
+const PAGE_SIZE = 100;
+
+const TYPE_SPECIFICS = {
+  'adls': {
+    apiHelperFetchFunction: 'fetchAdlsPath',
+    dblClickPubSubId: 'assist.dblClickAdlsItem',
+    goHomePubSubId: 'assist.adls.go.home',
+    selectEntryPubSubId: 'assist.selectAdlsEntry'
+  },
+  'hdfs': {
+    apiHelperFetchFunction: 'fetchHdfsPath',
+    dblClickPubSubId: 'assist.dblClickHdfsItem',
+    goHomePubSubId: 'assist.hdfs.go.home',
+    selectEntryPubSubId: 'assist.selectHdfsEntry'
+  },
+  's3': {
+    apiHelperFetchFunction: 'fetchS3Path',
+    dblClickPubSubId: 'assist.dblClickS3Item',
+    goHomePubSubId: 'assist.s3.go.home',
+    selectEntryPubSubId: 'assist.selectS3Entry'
+  }
+};
+
+class AssistStorageEntry {
 
   /**
    * @param {object} options
@@ -47,15 +53,13 @@ var AssistStorageEntry = (function () {
    * @param {string} options.type - The storage type ('adls', 'hdfs', 's3')
    * @param {string} [options.originalType] - The original storage type ('adl', 's3a')
    * @param {AssistStorageEntry} options.parent
-   * @param {ApiHelper} options.apiHelper
    * @constructor
    */
-  function AssistStorageEntry (options) {
-    var self = this;
+  constructor(options) {
+    let self = this;
     self.type = options.type;
     self.originalType = options.originalType;
     self.definition = options.definition;
-    self.apiHelper = options.apiHelper;
     self.parent = options.parent;
     self.path = '';
     if (self.parent !== null) {
@@ -72,7 +76,7 @@ var AssistStorageEntry = (function () {
 
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
-    self.filter.subscribe(function () {
+    self.filter.subscribe(() => {
       self.currentPage = 1;
       self.hasMorePages = true;
       self.loadEntries();
@@ -87,7 +91,7 @@ var AssistStorageEntry = (function () {
     self.hasErrors = ko.observable(false);
     self.open = ko.observable(false);
 
-    self.open.subscribe(function(newValue) {
+    self.open.subscribe(newValue => {
       if (newValue && self.entries().length === 0) {
         if (self.definition.type === 'dir') {
           self.loadEntries();
@@ -97,110 +101,95 @@ var AssistStorageEntry = (function () {
       }
     });
 
-    self.hasEntries = ko.computed(function() {
-      return self.entries().length > 0;
-    });
+    self.hasEntries = ko.pureComputed(() => self.entries().length > 0);
   }
 
-  AssistStorageEntry.prototype.dblClick = function () {
-    var self = this;
-    huePubSub.publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, self);
+  dblClick() {
+    huePubSub.publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, this);
   };
 
-  AssistStorageEntry.prototype.loadPreview = function () {
-    var self = this;
+  loadPreview() {
+    let self = this;
     self.loading(true);
     window.apiHelper.fetchStoragePreview({
       path: self.getHierarchy(),
       type: self.type,
       silenceErrors: true
-    }).done(function (data) {
+    }).done(data => {
       self.preview(data);
-    }).fail(function (errorText) {
+    }).fail(errorText => {
       self.hasErrors(true);
       self.errorText(errorText);
-    }).always(function () {
+    }).always(() => {
       self.loading(false);
     })
   };
 
-  AssistStorageEntry.prototype.loadEntries = function(callback) {
-    var self = this;
+  loadEntries(callback) {
+    let self = this;
     if (self.loading()) {
       return;
     }
     self.loading(true);
     self.hasErrors(false);
 
-    var successCallback = function(data) {
-      self.hasMorePages = data.page.next_page_number > self.currentPage;
-      var filteredFiles = $.grep(data.files, function (file) {
-        return file.name !== '.' && file.name !== '..';
-      });
-      self.entries($.map(filteredFiles, function (file) {
-        file.url = encodeURI(file.url);
-        return new AssistStorageEntry({
-          type: self.type,
-          definition: file,
-          parent: self,
-          apiHelper: self.apiHelper
-        })
-      }));
-      self.loaded = true;
-      self.loading(false);
-      if (callback) {
-        callback();
-      }
-    };
-
-    var errorCallback = function (errorText) {
-      self.hasErrors(true);
-      self.errorText(errorText);
-      self.loading(false);
-      if (callback) {
-        callback();
-      }
-    };
-
-    self.apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
+    apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
       filter: self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
-      successCallback: successCallback,
-      errorCallback: errorCallback
+      successCallback: data => {
+        self.hasMorePages = data.page.next_page_number > self.currentPage;
+        let filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
+        self.entries(filteredFiles.map(file => {
+          file.url = encodeURI(file.url);
+          return new AssistStorageEntry({
+            type: self.type,
+            definition: file,
+            parent: self
+          })
+        }));
+        self.loaded = true;
+        self.loading(false);
+        if (callback) {
+          callback();
+        }
+      },
+      errorCallback: errorText => {
+        self.hasErrors(true);
+        self.errorText(errorText);
+        self.loading(false);
+        if (callback) {
+          callback();
+        }
+      }
     })
   };
 
-  AssistStorageEntry.prototype.goHome = function () {
-    var self = this;
-    huePubSub.publish(TYPE_SPECIFICS[self.type].goHomePubSubId);
+  goHome() {
+    huePubSub.publish(TYPE_SPECIFICS[this.type].goHomePubSubId);
   };
 
-  AssistStorageEntry.prototype.loadDeep = function(folders, callback) {
-    var self = this;
+  loadDeep(folders, callback) {
+    let self = this;
 
     if (folders.length === 0) {
       callback(self);
       return;
     }
 
-    var nextName = folders.shift();
-    var loadedPages = 0;
-    var findNextAndLoadDeep = function () {
+    let nextName = folders.shift();
+    let loadedPages = 0;
 
-      var foundEntry = $.grep(self.entries(), function (entry) {
-        return entry.definition.name === nextName;
-      });
-      var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
+    let findNextAndLoadDeep = () =>{
+      let foundEntry = self.entries().filter(entry => entry.definition.name === nextName);
+      let passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
 
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
       } else if (!passedAlphabetically && self.hasMorePages && loadedPages < 50) {
         loadedPages++;
-        self.fetchMore(function () {
-          findNextAndLoadDeep();
-        }, function () {
+        self.fetchMore(findNextAndLoadDeep, () => {
           callback(self);
         });
       } else {
@@ -215,10 +204,10 @@ var AssistStorageEntry = (function () {
     }
   };
 
-  AssistStorageEntry.prototype.getHierarchy = function () {
-    var self = this;
-    var parts = [];
-    var entry = self;
+  getHierarchy() {
+    let self = this;
+    let parts = [];
+    let entry = self;
     while (entry != null) {
       parts.push(entry.definition.name);
       entry = entry.parent;
@@ -227,8 +216,8 @@ var AssistStorageEntry = (function () {
     return parts;
   };
 
-  AssistStorageEntry.prototype.toggleOpen = function (data, event) {
-    var self = this;
+  toggleOpen(data, event) {
+    let self = this;
     if (self.definition.type === 'file') {
       if (IS_HUE_4) {
         if (event.ctrlKey || event.metaKey || event.which === 2) {
@@ -251,8 +240,8 @@ var AssistStorageEntry = (function () {
     }
   };
 
-  AssistStorageEntry.prototype.fetchMore = function (successCallback, errorCallback) {
-    var self = this;
+  fetchMore(successCallback, errorCallback) {
+    let self = this;
     if (!self.hasMorePages || self.loadingMore()) {
       return;
     }
@@ -260,30 +249,25 @@ var AssistStorageEntry = (function () {
     self.loadingMore(true);
     self.hasErrors(false);
 
-    self.apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
+    apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
       filter: self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
-      successCallback: function (data) {
+      successCallback: data => {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
-        var filteredFiles = $.grep(data.files, function (file) {
-          return file.name !== '.' && file.name !== '..';
-        });
-        self.entries(self.entries().concat($.map(filteredFiles, function (file) {
-          return new AssistStorageEntry({
-            type: self.type,
-            definition: file,
-            parent: self,
-            apiHelper: self.apiHelper
-          })
-        })));
+        let filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
+        self.entries(self.entries().concat(filteredFiles.map(file => new AssistStorageEntry({
+          type: self.type,
+          definition: file,
+          parent: self
+        }))));
         self.loadingMore(false);
         if (successCallback) {
           successCallback();
         }
       },
-      errorCallback: function () {
+      errorCallback: () => {
         self.hasErrors(true);
         if (errorCallback) {
           errorCallback();
@@ -292,16 +276,15 @@ var AssistStorageEntry = (function () {
     });
   };
 
-  AssistStorageEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
-    var $source = $(event.target);
-    var offset = $source.offset();
+  showContextPopover(entry, event, positionAdjustment) {
+    let $source = $(event.target);
+    let offset = $source.offset();
     entry.contextPopoverVisible(true);
 
     if (positionAdjustment) {
       offset.left += positionAdjustment.left;
       offset.top += positionAdjustment.top;
     }
-
 
     huePubSub.publish('context.popover.show', {
       data: {
@@ -319,12 +302,12 @@ var AssistStorageEntry = (function () {
       }
     });
 
-    huePubSub.subscribeOnce('context.popover.hidden', function () {
+    huePubSub.subscribeOnce('context.popover.hidden', () => {
       entry.contextPopoverVisible(false);
     });
   };
 
-  AssistStorageEntry.prototype.openInImporter = function () {
+  openInImporter() {
     huePubSub.publish('open.in.importer', this.definition.path);
   };
 
@@ -336,14 +319,14 @@ var AssistStorageEntry = (function () {
    * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
    * @return {Promise}
    */
-  AssistStorageEntry.getEntry = function (path, type) {
-    var deferred = $.Deferred();
-    var typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
-    var type = typeMatch ? typeMatch[1] : (type || 'hdfs');
+  static getEntry(path, type) {
+    let deferred = $.Deferred();
+    let typeMatch = path.match(/^([^:]+):\/(\/.*)\/?/i);
+    type = typeMatch ? typeMatch[1] : (type || 'hdfs');
     type = type.replace(/s3.*/i, 's3');
-    type = type.replace(/adl.*/i, 'adls')
+    type = type.replace(/adl.*/i, 'adls');
 
-    var rootEntry = new AssistStorageEntry({
+    let rootEntry = new AssistStorageEntry({
       type: type.toLowerCase(),
       originalType: typeMatch && typeMatch[1],
       definition: {
@@ -354,12 +337,12 @@ var AssistStorageEntry = (function () {
       apiHelper: window.apiHelper
     });
 
-    var path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+    path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
 
     rootEntry.loadDeep(path, deferred.resolve);
 
     return deferred.promise();
   };
+}
 
-  return AssistStorageEntry;
-})();
+export default AssistStorageEntry

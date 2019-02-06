@@ -14,7 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var AssistDbEntry = (function () {
+import $ from 'jquery'
+import ko from 'knockout'
+
+import huePubSub from '../utils/huePubSub'
+import sqlUtils from '../sql/sqlUtils'
+
+const findNameInHierarchy = (entry, searchCondition) => {
+  let sourceType = entry.sourceType;
+  while (entry && !searchCondition(entry)) {
+    entry = entry.parent;
+  }
+  if (entry) {
+    return sqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name);
+  }
+};
+
+class AssistDbEntry {
   /**
    * @param {DataCatalogEntry} catalogEntry
    * @param {AssistDbEntry} parent
@@ -26,8 +42,8 @@ var AssistDbEntry = (function () {
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistDbEntry (catalogEntry, parent, assistDbNamespace, filter, i18n, navigationSettings) {
-    var self = this;
+  constructor (catalogEntry, parent, assistDbNamespace, filter, i18n, navigationSettings) {
+    let self = this;
     self.catalogEntry = catalogEntry;
     self.parent = parent;
     self.assistDbNamespace = assistDbNamespace;
@@ -65,28 +81,26 @@ var AssistDbEntry = (function () {
       }
     }
 
-    self.open.subscribe(function(newValue) {
+    self.open.subscribe(newValue => {
       if (newValue && self.entries().length === 0) {
         self.loadEntries();
       }
     });
 
-    self.hasEntries = ko.pureComputed(function() {
-      return self.entries().length > 0;
-    });
+    self.hasEntries = ko.pureComputed(() => self.entries().length > 0)
 
-    self.filteredEntries = ko.pureComputed(function () {
-      var facets = self.filter.querySpec().facets;
-      var facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+    self.filteredEntries = ko.pureComputed(() => {
+      let facets = self.filter.querySpec().facets;
+      let facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
       // Only text match on tables/views or columns if flag is set
-      var textMatch = (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
+      let textMatch = (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
 
       if (facetMatch && textMatch) {
         return self.entries();
       }
 
-      return self.entries().filter(function (entry) {
-        var match = true;
+      return self.entries().filter(entry => {
+        let match = true;
 
         if (match && !facetMatch) {
           if (entry.catalogEntry.isField()) {
@@ -99,20 +113,18 @@ var AssistDbEntry = (function () {
         }
 
         if (match && !textMatch) {
-          var nameLower = entry.catalogEntry.name.toLowerCase();
-          match = self.filter.querySpec().text.every(function (text) {
-            return nameLower.indexOf(text.toLowerCase()) !== -1
-          });
+          let nameLower = entry.catalogEntry.name.toLowerCase();
+          match = self.filter.querySpec().text.every(text => nameLower.indexOf(text.toLowerCase()) !== -1)
         }
 
         return match;
       });
     });
 
-    self.autocompleteFromEntries = function (nonPartial, partial) {
-      var result = [];
-      var partialLower = partial.toLowerCase();
-      self.entries().forEach(function (entry) {
+    self.autocompleteFromEntries = (nonPartial, partial) => {
+      let result = [];
+      let partialLower = partial.toLowerCase();
+      self.entries().forEach(entry => {
         if (entry.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
           result.push(nonPartial + partial + entry.catalogEntry.name.substring(partial.length))
         }
@@ -133,7 +145,7 @@ var AssistDbEntry = (function () {
       self.columnName = self.catalogEntry.name;
     }
 
-    self.editorText = ko.pureComputed(function () {
+    self.editorText = ko.pureComputed(() => {
       if (self.catalogEntry.isTableOrView()) {
         return self.getTableName();
       }
@@ -144,21 +156,11 @@ var AssistDbEntry = (function () {
     });
   }
 
-  var findNameInHierarchy = function (entry, searchCondition) {
-    var sourceType = entry.sourceType;
-    while (entry && !searchCondition(entry)) {
-      entry = entry.parent;
-    }
-    if (entry) {
-      return SqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name);
-    }
-  };
-
-  AssistDbEntry.prototype.knownFacetValues = function () {
-    var self = this;
-    var types = {};
+  knownFacetValues() {
+    let self = this;
+    let types = {};
     if (self.parent === null) { // Only find facets on the DB level
-      self.entries().forEach(function (tableEntry) {
+      self.entries().forEach(tableEntry => {
         if (!self.assistDbNamespace.nonSqlType) {
           if (tableEntry.catalogEntry.isTable()) {
             types.table =  types.table ? types.table + 1 : 1;
@@ -167,7 +169,7 @@ var AssistDbEntry = (function () {
           }
         }
         if (tableEntry.open()) {
-          tableEntry.entries().forEach(function (colEntry) {
+          tableEntry.entries().forEach(colEntry => {
             if (!types[colEntry.catalogEntry.getType()]) {
               types[colEntry.catalogEntry.getType()] = 1;
             } else {
@@ -183,22 +185,22 @@ var AssistDbEntry = (function () {
     return {};
   };
 
-  AssistDbEntry.prototype.getDatabaseName = function () {
-    return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isDatabase() });
+  getDatabaseName() {
+    return findNameInHierarchy(this, entry => entry.catalogEntry.isDatabase());
   };
 
-  AssistDbEntry.prototype.getTableName = function () {
-    return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isTableOrView() });
+  getTableName() {
+    return findNameInHierarchy(this, entry => entry.catalogEntry.isTableOrView());
   };
 
-  AssistDbEntry.prototype.getColumnName = function () {
-    return findNameInHierarchy(this, function (entry) { return entry.catalogEntry.isColumn() });
+  getColumnName() {
+    return findNameInHierarchy(this, entry => entry.catalogEntry.isColumn());
   };
 
-  AssistDbEntry.prototype.getComplexName = function () {
-    var entry = this;
-    var sourceType = entry.sourceType;
-    var parts = [];
+  getComplexName() {
+    let entry = this;
+    let sourceType = entry.sourceType;
+    let parts = [];
     while (entry != null) {
       if (entry.catalogEntry.isTableOrView()) {
         break;
@@ -208,7 +210,7 @@ var AssistDbEntry = (function () {
           parts.push("[]");
         }
       } else {
-        parts.push(SqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name));
+        parts.push(sqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name));
         parts.push(".");
       }
       entry = entry.parent;
@@ -217,10 +219,10 @@ var AssistDbEntry = (function () {
     return parts.slice(1).join("");
   };
 
-  AssistDbEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
-    var self = this;
-    var $source = $(event.target);
-    var offset = $source.offset();
+  showContextPopover(entry, event, positionAdjustment) {
+    let self = this;
+    let $source = $(event.target);
+    let offset = $source.offset();
     if (positionAdjustment) {
       offset.left += positionAdjustment.left;
       offset.top += positionAdjustment.top;
@@ -243,22 +245,22 @@ var AssistDbEntry = (function () {
         bottom: offset.top + $source.height() - 3
       }
     });
-    huePubSub.subscribeOnce('context.popover.hidden', function () {
+    huePubSub.subscribeOnce('context.popover.hidden', () => {
       self.statsVisible(false);
     });
   };
 
-  AssistDbEntry.prototype.triggerRefresh = function () {
-    var self = this;
+  triggerRefresh() {
+    let self = this;
     self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh(), cascade: true });
   };
 
-  AssistDbEntry.prototype.highlightInside = function (path) {
-    var self = this;
+  highlightInside(path) {
+    let self = this;
 
-    var searchEntry = function () {
-      var foundEntry;
-      $.each(self.entries(), function (idx, entry) {
+    let searchEntry = () => {
+      let foundEntry;
+      self.entries().forEach(entry => {
         entry.highlight(false);
         if (entry.catalogEntry.name === path[0]) {
           foundEntry = entry;
@@ -269,14 +271,14 @@ var AssistDbEntry = (function () {
           foundEntry.open(true);
         }
 
-        window.setTimeout(function () {
+        window.setTimeout(() => {
           if (path.length > 1) {
             foundEntry.highlightInside(path.slice(1));
           } else {
-            huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+            huePubSub.subscribeOnce('assist.db.scrollToComplete', () => {
               foundEntry.highlight(true);
               // Timeout is for animation effect
-              window.setTimeout(function () {
+              window.setTimeout(() => {
                 foundEntry.highlight(false);
               }, 1800);
             });
@@ -288,7 +290,7 @@ var AssistDbEntry = (function () {
 
     if (self.entries().length === 0) {
       if (self.loading()) {
-        var subscription = self.loading.subscribe(function (newVal) {
+        let subscription = self.loading.subscribe(newVal => {
           if (!newVal) {
             subscription.dispose();
             searchEntry();
@@ -302,19 +304,19 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.loadEntries = function(callback) {
-    var self = this;
+  loadEntries(callback) {
+    let self = this;
     if (!self.expandable || self.loading()) {
       return;
     }
     self.loading(true);
 
-    var loadEntriesDeferred = $.Deferred();
+    let loadEntriesDeferred = $.Deferred();
 
-    var successCallback = function(sourceMeta) {
+    let successCallback = sourceMeta => {
       self.entries([]);
       if (!sourceMeta.notFound) {
-        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (catalogEntries) {
+        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done( catalogEntries => {
           self.hasErrors(false);
           self.loading(false);
           self.loaded = true;
@@ -322,8 +324,8 @@ var AssistDbEntry = (function () {
             self.entries([]);
             return;
           }
-          var newEntries = [];
-          catalogEntries.forEach(function (catalogEntry) {
+          let newEntries = [];
+          catalogEntries.forEach(catalogEntry => {
             newEntries.push(self.createEntry(catalogEntry));
           });
           if (sourceMeta.type === 'array') {
@@ -337,7 +339,7 @@ var AssistDbEntry = (function () {
           if (typeof callback === 'function') {
             callback();
           }
-        }).fail(function () {
+        }).fail(() => {
           self.loading(false);
           self.loaded = true;
           self.hasErrors(true);
@@ -356,7 +358,7 @@ var AssistDbEntry = (function () {
       }
     };
 
-    var errorCallback = function () {
+    let errorCallback = () => {
       self.hasErrors(true);
       self.loading(false);
       self.loaded = true;
@@ -364,10 +366,10 @@ var AssistDbEntry = (function () {
     };
 
     if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && !self.assistDbNamespace.nonSqlType) {
-      self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
-        loadEntriesDeferred.done(function () {
+      self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(() => {
+        loadEntriesDeferred.done(() => {
           if (!self.hasErrors()) {
-            self.entries().forEach(function (entry) {
+            self.entries().forEach(entry => {
               if (entry.catalogEntry.navOptPopularity) {
                 if (entry.catalogEntry.navOptPopularity.popularity) {
                   entry.popularity(entry.catalogEntry.navOptPopularity.popularity)
@@ -389,18 +391,18 @@ var AssistDbEntry = (function () {
   /**
    * @param {DataCatalogEntry} catalogEntry
    */
-  AssistDbEntry.prototype.createEntry = function (catalogEntry) {
-    var self = this;
+  createEntry(catalogEntry) {
+    let self = this;
     return new AssistDbEntry(catalogEntry, self, self.assistDbNamespace, self.filter, self.i18n, self.navigationSettings)
   };
 
-  AssistDbEntry.prototype.getHierarchy = function () {
-    var self = this;
+  getHierarchy() {
+    let self = this;
     return self.catalogEntry.path.concat();
   };
 
-  AssistDbEntry.prototype.dblClick = function () {
-    var self = this;
+  dblClick() {
+    let self = this;
     if (self.catalogEntry.isTableOrView()) {
       huePubSub.publish('editor.insert.table.at.cursor', { name: self.getTableName(), database: self.getDatabaseName() });
     } else if (self.catalogEntry.isColumn()) {
@@ -410,8 +412,8 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.explore = function (isSolr) {
-    var self = this;
+  explore(isSolr) {
+    let self = this;
     if (isSolr) {
       huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry.name);
     }
@@ -420,9 +422,9 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.openInMetastore = function () {
-    var self = this;
-    var url;
+  openInMetastore() {
+    let self = this;
+    let url;
     if (self.catalogEntry.isDatabase()) {
       url = '/metastore/tables/' + self.catalogEntry.name + '?source=' + self.catalogEntry.getSourceType() + '&namespace=' + self.catalogEntry.namespace.id;
     } else if (self.catalogEntry.isTableOrView()) {
@@ -438,24 +440,24 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.openInIndexer = function () {
-    var self = this;
-    var definitionName = self.catalogEntry.name;
-    if (IS_NEW_INDEXER_ENABLED) {
-      if (IS_HUE_4) {
+  openInIndexer() {
+    let self = this;
+    let definitionName = self.catalogEntry.name;
+    if (window.IS_NEW_INDEXER_ENABLED) {
+      if (window.IS_HUE_4) {
         huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
       } else {
         window.open('/indexer/indexes/' + definitionName);
       }
     } else {
-      var hash = '#edit/' + definitionName;
-      if (IS_HUE_4) {
+      let hash = '#edit/' + definitionName;
+      if (window.IS_HUE_4) {
         if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
           window.location.hash = hash;
         } else {
-          huePubSub.subscribeOnce('app.gained.focus', function (app) {
+          huePubSub.subscribeOnce('app.gained.focus', app => {
             if (app === 'indexes') {
-              window.setTimeout(function () {
+              window.setTimeout(() => {
                 window.location.hash = hash;
               }, 0)
             }
@@ -468,13 +470,13 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.toggleOpen = function () {
-    var self = this;
+  toggleOpen() {
+    let self = this;
     self.open(!self.open());
   };
 
-  AssistDbEntry.prototype.openItem = function () {
-    var self = this;
+  openItem() {
+    let self = this;
     if (self.catalogEntry.isTableOrView()) {
       huePubSub.publish('assist.table.selected', {
         sourceType: self.assistDbNamespace.sourceType,
@@ -490,6 +492,6 @@ var AssistDbEntry = (function () {
       })
     }
   };
+}
 
-  return AssistDbEntry;
-})();
+export default AssistDbEntry;
