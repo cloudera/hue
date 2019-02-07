@@ -1,0 +1,83 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: hdfs-namenode
+spec:
+  ports:
+    - port: 9820
+      targetPort: 9820
+      protocol: TCP
+      name: nm-rpc
+    - port: 9870
+      targetPort: 9870
+      protocol: TCP
+      name: nm-web-ui
+  selector:
+    name: hdfs-namenode-{{ .Values.hdfs.nametag }}
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: hdfs-namenode-{{ .Values.hdfs.nametag }}
+spec:
+  serviceName: hdfs-namenode-{{ .Values.hdfs.nametag }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: hdfs-namenode-{{ .Values.hdfs.nametag }}
+    spec:
+#      initContainers:
+#        - name: hdfs-namenode-format-{{ .Values.hdfs.nametag }}
+#          image: kubernetes:5000/cloudera/hdfs-namenode:{{ .Values.hdfs.tag }}
+#          imagePullPolicy: Always
+#          command: ['bash', '-c', 'if [ ! -f /dfs/nn/current/VERSION ]; then java -Dnn.hostname=`hostname` org.apache.hadoop.hdfs.server.namenode.NameNode -format; fi']
+#          volumeMounts:
+#            - name: hdfs-namenode
+#              mountPath: /dfs/nn
+      containers:
+        - name: hdfs-namenode-{{ .Values.hdfs.nametag }}
+          image: {{ .Values.registry }}/hdfs-namenode:{{ .Values.hdfs.tag }}
+          imagePullPolicy: Always
+          ports:
+              - containerPort: 9820
+                protocol: TCP
+                name: nm-rpc
+              - containerPort: 9870
+                protocol: TCP
+                name: nm-web-ui
+#          volumeMounts:
+#            - name: hdfs-namenode
+#              mountPath: /dfs/nn
+#      volumes:
+#        - name: hdfs-namenode
+#          hostPath:
+#            path: /tmp/dfs/nn-{{ .Values.hdfs.nametag }}
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: hdfs-datanode-{{ .Values.hdfs.nametag }}
+spec:
+  serviceName: hdfs-datanode-{{ .Values.hdfs.nametag }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: hdfs-datanode-{{ .Values.hdfs.nametag }}
+    spec:
+      containers:
+        - name: hdfs-datanode-{{ .Values.hdfs.nametag }}
+          image: {{ .Values.registry }}/hdfs-datanode:{{ .Values.hdfs.tag }}
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 9864
+            protocol: TCP
+            name: dn-web-ui
+          volumeMounts:
+            - name: hdfs-datanode
+              mountPath: /dfs/dn
+      volumes:
+        - name: hdfs-datanode
+          hostPath:
+            path: /tmp/dfs/dn-{{ .Values.hdfs.nametag }}
