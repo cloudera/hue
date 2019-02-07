@@ -84,13 +84,14 @@ ${ dashboard.import_layout() }
             if (data.actions) {
               % if layout_json != '':
                 ko.utils.arrayForEach(data.actions, function (action) {
-                  var _w, actionId = action.id.substr(action.id.length - 4);
+                  var _w, actionId = action.id.substr(action.id.lastIndexOf('@'));
                   if (actionId === '@End') {
                     _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
                   }
                   else {
-                    if ($("[id^=wdg_" + actionId.toLowerCase() + "]").length > 0) {
-                      _w = viewModel.getWidgetById($("[id^=wdg_" + actionId.toLowerCase() + "]").attr("id").substr(4));
+                    var actionName = actionId.toLowerCase().substr(1)
+                    if ($("[id^=wdg_" + actionName + "]").length > 0) {
+                      _w = viewModel.getWidgetById($("[id^=wdg_" + actionName + "]").attr("id").substr(4));
                     }
                     else {
                       _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
@@ -162,4 +163,6 @@ ${ dashboard.import_layout() }
       %endif
     });
   })();
+
+//# sourceURL=list_oozie_workflow_graph.js
 </script>
