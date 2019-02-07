@@ -143,71 +143,26 @@ function showSection(section) {
   addFileBrowseButton();
 }
 
-function getFileBrowseButton(inputElement, folderSelectable, fileSelectable, uploadFile, createFolder) {
-  var modal = null;
-  if (fileSelectable && folderSelectable) {
-    modal = "#choosePath";
-  } else if (folderSelectable) {
-    modal = "#chooseDirectory";
-  } else {
-    modal = "#chooseFile";
-  }
-  var chooser = modal + " .chooser";
-
-  return $("<button>").addClass("btn").addClass("chooserBtn").text("..").click(function(e){
-    e.preventDefault();
-
-    $(chooser).jHueFileChooser({
-      initialPath: inputElement.val(),
-      onFileChoose: function(filePath) {
-        if (fileSelectable){
-          inputElement.val(filePath);
-          inputElement.change();
-          addFileBrowseButton();
-          $(modal).modal("hide");
-        }
-      },
-      onFolderChange: function(filePath) {
-        inputElement.val(filePath);
-        inputElement.change();
-      },
-      onFolderChoose: function(filePath) {
-        if (folderSelectable){
-          inputElement.val(filePath);
-          inputElement.change();
-          addFileBrowseButton();
-          $(modal).modal("hide");
-        }
-      },
-      createFolder: createFolder,
-      selectFolder: folderSelectable,
-      uploadFile: uploadFile,
-      forceRefresh: true
-    });
-    $(modal).modal("show");
-  })
-}
-
 function addFileBrowseButton() {
   // Filechooser.
   $(".pathChooserKo").each(function(){
     var self = $(this);
     if (!self.siblings().hasClass('chooserBtn')) {
-      self.after(getFileBrowseButton(self, true, true, false, true));
+      self.after(hueUtils.getFileBrowseButton(self, true, true, false, true));
     }
   });
 
   $(".pathFileChooserKo").each(function(){
     var self = $(this);
     if (!self.siblings().hasClass('chooserBtn')) {
-      self.after(getFileBrowseButton(self, false, true, true, false));
+      self.after(hueUtils.getFileBrowseButton(self, false, true, true, false));
     }
   });
 
   $(".pathFolderChooserKo").each(function(){
     var self = $(this);
     if (!self.siblings().hasClass('chooserBtn')) {
-      self.after(getFileBrowseButton(self, true, false, false, true));
+      self.after(hueUtils.getFileBrowseButton(self, true, false, false, true));
     }
   });
 }

@@ -21,8 +21,10 @@ import filesize from 'filesize';
 import qq from 'ext/fileuploader.custom';
 import page from 'page';
 import localforage from 'localforage';
+import sprintf from 'sprintf-js';
 
 import ko from 'knockout';
+import 'ko/ko.all';
 import komapping from 'knockout.mapping';
 import 'ext/ko.editable.custom';
 import 'ext/ko.selectize.custom';
@@ -39,13 +41,17 @@ import hueDebug from 'utils/hueDebug';
 import hueDrop from 'utils/hueDrop';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
+import AceLocationHandler from 'sql/aceLocationHandler';
 import sqlUtils from 'sql/sqlUtils';
+import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 import 'assist/assistViewModel';
 
 // TODO: Migrate away
 window._ = _;
+window.AceLocationHandler = AceLocationHandler;
 window.apiHelper = apiHelper;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
@@ -59,6 +65,9 @@ window.hueDrop = hueDrop;
 window.ko = ko;
 window.ko.mapping = komapping;
 window.localforage = localforage;
+window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.page = page;
+window.sprintf = sprintf;
 window.sqlUtils = sqlUtils;
+window.sqlWorkerHandler = sqlWorkerHandler;
 window.qq = qq;

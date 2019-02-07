@@ -588,24 +588,6 @@ var CollectionsViewModel = function(config) {
 
 // Utils
 
-function getFileBrowseButton(inputElement) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-    e.preventDefault();
-    $("#filechooser").jHueFileChooser({
-      initialPath: inputElement.val(),
-      onFileChoose: function (filePath) {
-        inputElement.val(filePath);
-        inputElement.trigger("change");
-        $("#chooseFile").modal("hide");
-      },
-      selectFolder: false,
-      createFolder: false
-    });
-    $("#chooseFile").modal("show");
-  });
-}
-
-
 function inferFields(field_data, collection) {
   var fields = [];
   $.each(field_data, function(index, value) {

@@ -948,7 +948,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 ko.bindingHandlers.fileChooser = {
   init: function(element, valueAccessor, allBindings, model) {
     var self = $(element);
-    self.after(getFileBrowseButton(self, true));
+    self.after(hueUtils.getFileBrowseButton(self, true));
   }
 };
 
@@ -1140,7 +1140,7 @@ ${ utils.path_chooser_libs(True) }
 <script>
   $(document).ready(function(){
     $("input[name='job_xml']").next().remove();
-    $("input[name='job_xml']").after(getFileBrowseButton($("input[name='job_xml']"), false));
+    $("input[name='job_xml']").after(hueUtils.getFileBrowseButton($("input[name='job_xml']"), false));
   });
 </script>
 

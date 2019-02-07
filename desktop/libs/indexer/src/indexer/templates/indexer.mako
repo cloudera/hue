@@ -239,7 +239,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
               <label for="path" class="control-label"><div>${ _('Table') }</div>
-                <input type="text" data-bind="value: createWizard.fileFormat().table, hivechooser: createWizard.fileFormat().table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'">
+                <input type="text" data-bind="value: createWizard.fileFormat().table, hiveChooser: createWizard.fileFormat().table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'">
               </label>
             </div>
 

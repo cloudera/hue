@@ -491,7 +491,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 
 <script type="text/javascript">
 function afterRender() {
-  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
+  $(".fileChooser:not(:has(~ button))").after(hueUtils.getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 }
 
 function validateAndUpdateCollection() {

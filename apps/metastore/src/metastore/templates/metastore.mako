@@ -121,7 +121,7 @@ ${ components.menubar(is_embeddable) }
     <!-- ko if: editingTable -->
       <!-- ko with: table -->
       <li class="editable-breadcrumb-input">
-        <input type="text" data-bind="hivechooser: { data: catalogEntry.name, database: $parent.catalogEntry.name, namespace: $parent.catalogEntry.namespace, compute: $parent.catalogEntry.compute, skipColumns: true, searchEverywhere: true, onChange: function(val) { $parent.setTableByName(val); $parent.editingTable(false); }, apiHelperUser: '${ user }', apiHelperType: $root.source().type }" autocomplete="off" />
+        <input type="text" data-bind="hiveChooser: { data: catalogEntry.name, database: $parent.catalogEntry.name, namespace: $parent.catalogEntry.namespace, compute: $parent.catalogEntry.compute, skipColumns: true, searchEverywhere: true, onChange: function(val) { $parent.setTableByName(val); $parent.editingTable(false); }, apiHelperUser: '${ user }', apiHelperType: $root.source().type }" autocomplete="off" />
       </li>
       <!-- /ko -->
     <!-- /ko -->

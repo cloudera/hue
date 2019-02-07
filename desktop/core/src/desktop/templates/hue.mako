@@ -484,7 +484,6 @@ ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>

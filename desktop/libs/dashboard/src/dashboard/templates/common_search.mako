@@ -75,7 +75,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
 
         <!-- ko if: $root.collection.engine() != 'solr' -->
         <!-- ko if: columns().length == 0 -->
-        <input type="text" class="no-margin" data-bind="hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }" style="margin-top: 1px">
+        <input type="text" class="no-margin" data-bind="hiveChooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }" style="margin-top: 1px">
         <!-- /ko -->
         <!-- /ko -->
 
@@ -483,7 +483,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
       <!-- ko if: properties.isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
-        <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
+        <div data-bind="dateRangePicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
       <!-- /ko -->
     <!-- /ko -->
 
@@ -949,7 +949,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="widget-section widget-editor-section">
         <div class="row-fluid">
           <div class="span9">
-            <div data-bind="freshereditor: {data: $root.collection.template.template}"></div>
+            <div data-bind="fresherEditor: { data: $root.collection.template.template }"></div>
           </div>
           <div class="span3">
             <div class="editor-title">${_('Available Fields')}</div>
@@ -2357,7 +2357,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
-          <div data-bind="daterangepicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
+          <div data-bind="dateRangePicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
         <!-- /ko -->
 
         <!-- /ko -->
@@ -2797,7 +2797,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
-                <input type="text" class="no-margin" data-bind="hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }">
+                <input type="text" class="no-margin" data-bind="hiveChooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }">
               </div>
             </div>
             <!-- /ko -->
@@ -3064,7 +3064,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 ## Extra code for style and custom JS
-<span id="extra" data-bind="augmenthtml: $root.collection.template.extracode"></span>
+<span id="extra" data-bind="augmentHtml: $root.collection.template.extracode"></span>
 
 
 <link rel="stylesheet" href="${ static('dashboard/css/search.css') }">

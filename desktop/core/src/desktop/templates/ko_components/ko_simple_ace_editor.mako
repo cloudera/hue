@@ -835,7 +835,7 @@ from desktop.views import _ko
           };
 
           if (sourceType === 'hive' || sourceType === 'impala') {
-            WorkerHandler.registerWorkers();
+            sqlWorkerHandler.registerWorkers();
             var aceLocationHandler = new AceLocationHandler({ editor: editor, editorId: $element.attr('id'), snippet: snippet });
             self.disposeFunctions.push(function () {
               aceLocationHandler.dispose();
