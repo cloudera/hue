@@ -235,8 +235,8 @@ be more appropriate if the long-term vision is to automatically tune the Impala 
 
 ### Ubuntu
 
-OS: Ubuntu 16.04 or 18.04
-Node count and size: 4 primary instances of m3.xlarge or 1 m4.2xlarge
+OS: Ubuntu 16.04 or 18.04.
+Node count and size: 4 primary instances of m3.xlarge (4CPU 15GB) or 1 m3.2xlarge (8CPU 30GB).
 
 https://microk8s.io/#quick-start
 
