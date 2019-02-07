@@ -182,7 +182,10 @@
       cpu: "${ _('CPU') }",
       io: "${ _('IO') }",
       execution: "${ _('Execution') }",
-      codegen: "${ _('CodeGen') }"
+      codegen: "${ _('CodeGen') }",
+      overview: "${ _('Overview') }",
+      topnodes: "${ _('Top Nodes') }",
+      compilation: "${ _('Compilation') }"
     }
   };
 

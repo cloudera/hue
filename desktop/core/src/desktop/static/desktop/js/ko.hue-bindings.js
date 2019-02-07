@@ -7589,10 +7589,12 @@
           return value + " ns";
         } else if (value - Math.pow(10, 6) < -Math.pow(10, 3) / 2) { // Make sure rounding doesn't cause numbers to have more than 4 significant digits.
           value = (value * 1.0) / Math.pow(10, 3);
-          return sprintf("%.1f us", value);
+          var sprint = value > 100 ? "%i us" : "%.1f us";
+          return sprintf(sprint, value);
         } else if (value - Math.pow(10, 9) < -Math.pow(10, 6) / 2) {
           value = (value * 1.0) / Math.pow(10, 6);
-          return sprintf("%.1f ms", value);
+          var sprint = value > 100 ? "%i ms" : "%.1f ms";
+          return sprintf(sprint, value);
         } else {
           // get the ms value
           var SECOND = 1;
@@ -7612,7 +7614,8 @@
           }
 
           if (value > SECOND) {
-            buffer += sprintf("%.1f s", value * 1.0 / SECOND);
+            var sprint = buffer.length ? "%i s" : "%.1f s";
+            buffer += sprintf(sprint, value * 1.0 / SECOND);
           }
           return buffer;
         }

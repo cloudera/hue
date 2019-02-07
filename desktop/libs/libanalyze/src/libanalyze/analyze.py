@@ -313,7 +313,7 @@ def metrics(profile):
   plan_json = utils.parse_plan_details(summary.val.info_strings.get('Plan')) if summary.val.info_strings.get('Plan') else {}
   if not execution_profile:
     return {}
-  counter_map = {'nodes': {}, 'max': 0}
+  counter_map = {'nodes': {}, 'max': 0, 'summary': {'timeline': summary.event_list(), 'properties': summary.metric_map()}}
   def flatten(node, counter_map=counter_map):
     is_plan_node = node.is_plan_node()
     is_parent_node = is_plan_node

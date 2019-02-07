@@ -135,7 +135,52 @@
       width: 2.2em !important;
       height: 2.2em !important;
     }
+    .clickable .hi {
+      width: 1.4em !important;
+      height: 1.4em !important;
+    }
+    .id {
+      display: none;
+    }
+    .node.active {
+      > rect {
+        filter: url(#dropshadow);
+        stroke: @hue-primary-color-dark;
+        fill: @hue-primary-color-light;
+      }
+    }
+    .node {
+      cursor: pointer;
+      rect {
+        fill: @cui-white;
+        stroke-width: 1px;
+      }
+      rect.active {
+        fill: @hue-primary-color-dark;
+      }
+    }
+    .node:hover rect {
+      fill: @cui-purple-gray-050;
+    }
+    .output {
+      path,
+      .node > rect {
+        stroke: @cui-gray-600;
+      }
+    }
     .buttons {
+      position: absolute;
+      background-color: white;
+      box-shadow: 0px 0px 5px 0px;
+      right: 45px;
+      bottom: 5px;
+      color: @cui-gray-600;
+      div {
+        line-height: 32px !important;
+        display: block;
+        width: 32px;
+        height: 32px;
+      }
       .hi {
         color: @cui-gray-600 !important;
         width: 2.2em !important;
@@ -149,47 +194,8 @@
         margin-left: 5px;
       }
     }
-    .id {
-      display: none;
-    }
-    .node.active {
-      > rect {
-        filter: url(#dropshadow);
-        stroke: @hue-primary-color-dark;
-        fill: @hue-primary-color-light;
-      }
-    }
-    .node {
-      rect.active {
-        fill: @hue-primary-color-dark;
-      }
-    }
-    .output {
-      path,
-      .node > rect {
-        stroke: @cui-gray-600;
-      }
-    }
-    .buttons {
-      position: absolute;
-      background-color: white;
-      box-shadow: 0px 0px 5px 0px;
-      right: 5px;
-      bottom: 5px;
-      color: @cui-gray-600;
-      div {
-        line-height: 32px !important;
-        display: block;
-        width: 32px;
-        height: 32px;
-      }
-    }
     .buttons div:hover {
       color: @hue-primary-color-dark;
-    }
-    .node rect {
-      fill: @cui-white;
-      stroke-width: 1px
     }
     .edgePath > path {
       fill: none;
@@ -230,9 +236,8 @@
       box-shadow: 0px 0px 10px 0px;
       color: @cui-gray-600;
       position: absolute;
-      display: none;
       top: 0px;
-      right: 0px;
+      right: -164px;
       width: 200px;
       height: 100%;
       flex-direction: column;
@@ -264,6 +269,7 @@
       }
       .details-content {
         overflow: scroll;
+        visibility: hidden;
       }
       .details-section {
         padding: 4px;
@@ -273,6 +279,7 @@
       }
       .metric-title {
         background-color: @hue-primary-color-light;
+        cursor: pointer;
         padding: 4px;
         .fa {
           padding-top: 0px;
@@ -285,7 +292,6 @@
         }
       }
       .metrics {
-        overflow-y: scroll;
         max-height: calc(~"100% - 40px");
       }
       .legend-icon {
@@ -302,44 +308,63 @@
       .details-section .timeline {
         margin-bottom: 10px;
       }
-      table {
-        display: table;
+      table.clickable tr {
+        cursor: pointer;
       }
-      table tr {
-        display: table-cell;
+      table.clickable tr:hover {
+        background-color: @cui-purple-gray-050;
       }
       table tr td {
         color: @cui-gray-800;
         max-width: 107px;
         overflow: hidden;
-        display: block;
         white-space: nowrap;
         padding-right: 5px;
         text-overflow: ellipsis;
       }
-      table thead tr td {
+      table thead tr:nth-child(odd) {
+        background-color:@cui-white;
+      }
+      table tr:nth-child(odd) {
+        background-color: @cui-gray-050;
+      }
+      table.column {
+        display: table;
+      }
+      table.column tr {
+        display: table-cell;
+      }
+      table.column tr td {
+        display: block;
+      }
+      table.column tr:nth-child(1) td {
+        border-right: 1px solid @cui-gray-300;
+      }
+      table.column thead tr td:nth-child(odd) {
+        background-color:@cui-white;
+      }
+      table.column tr td:nth-child(odd) {
+        background-color: @cui-gray-050;
+      }
+      table.column thead tr td {
         background-color: #FFFFFF;
         border-bottom: 1px solid @cui-gray-300;
         text-transform: capitalize;
       }
-      table tr:nth-child(1) td {
-        border-right: 1px solid @cui-gray-300;
-      }
-      table thead tr td:nth-child(odd) {
-        background-color:@cui-white;
-      }
-      table tr td:nth-child(odd) {
-        background-color: @cui-gray-050;
-      }
     }
   }
-  .query-plan.open .details {
-    display: flex;
+  .query-plan.open {
+    .details {
+      right: 0px;
+      display: flex;
+      .details-content {
+        visibility: visible;
+      }
+    }
+    .buttons {
+      right: 208px;
+    }
   }
-  .query-plan.open .buttons {
-    right: 208px;
-  }
-
   div[data-jobType="queries"] pre {
     overflow-x: auto;
     white-space: pre;
