@@ -191,9 +191,9 @@ class QueryApi(Api):
         if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
           return { 'svg': 'hi-broadcast' }
         elif re.search(r'hash', o['label_detail'], re.IGNORECASE):
-          return { 'font': 'fa-random' }
+          return { 'svg': 'hi-random' }
         else:
-          return { 'font': 'fa-exchange' }
+          return { 'svg': 'hi-exchange' }
       def get_sigma_icon (o):
         if re.search(r'streaming', o['label_detail'], re.IGNORECASE):
           return { 'svg': 'hi-sigma-stream' }
@@ -204,8 +204,8 @@ class QueryApi(Api):
         'SORT': { 'type': 'SORT', 'icon': { 'svg': 'hi-sort' } },
         'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
         'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
-        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'font': 'fa-files-o' } },
-        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'fa-table' } },
+        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'svg': 'hi-copy' } },
+        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'hi-table' } },
         'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
         'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
         'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'fn': get_sigma_icon } },

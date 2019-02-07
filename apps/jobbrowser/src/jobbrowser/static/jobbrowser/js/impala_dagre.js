@@ -58,8 +58,8 @@ function impalaDagre(id) {
 
   function createActions () {
     svg.on('click', function () {
-      hideDetail();
       clearSelection();
+      showDetailGlobal();
     });
     d3.select("#"+id)
       .style('position', 'relative')
@@ -172,11 +172,13 @@ function impalaDagre(id) {
   }
 
   function getNode(id) {
-    return _impalaDagree._plan && _impalaDagree._plan.metrics && _impalaDagree._plan.metrics.nodes[id];
+    return _impalaDagree._plan && _impalaDagree._plan.metrics && (_impalaDagree._plan.metrics.nodes[id] || _impalaDagree._plan.metrics[id]);
   }
 
   function getId(key) {
-    return parseInt(key.split(':')[0], 10);
+    var id = key.split(':')[0];
+    var nid = parseInt(id, 10);
+    return Number.isNaN(nid) ? id : nid;
   }
 
   function getKey(node) {
@@ -244,7 +246,10 @@ function impalaDagre(id) {
     }
     var timeline = node.timeline;
     var hosts = getProperty(node, path);
-    if (timeline[minmax]) {
+    if (!hosts) {
+      return '';
+    }
+    if (timeline[minmax] && hosts[timeline[minmax]]) {
       return hosts[timeline[minmax]][metric];
     } else {
       return Object.keys(hosts).filter(function (key) { return key !== 'averaged'; }).reduce(function (previous, host) {
@@ -289,16 +294,12 @@ function impalaDagre(id) {
 
   // This is not exact, but shows some approximation of reality.
   function getCPUTimelineData(key) {
-    var datum = getTimelineData(key);
-    if (!datum || !datum.hosts[datum.min] || !datum.hosts[datum.min]['Node Lifecycle Event Timeline']) {
+    var timeline = getTimelineData(key);
+    if (!timeline) {
       return;
     }
     var id = getId(key);
     var localTime = getMaxValue(key, 'LocalTime');
-    var timeline = datum.hosts[datum.min]['Node Lifecycle Event Timeline'];
-    if (!timeline.length) {
-      return;
-    }
     var last = timeline.filter(function(time) {
       return time.name !== 'Closed';
     }); // Close time is normally wait time;
@@ -322,10 +323,14 @@ function impalaDagre(id) {
       time = { start_time: openFinished.start_time + middle, duration: localTime.value, value: openFinished.value - middle, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
     } else if (key.indexOf('UNION') >= 0 || (key.indexOf('AGGREGATE') >= 0 && states_by_name[key].detail.indexOf('STREAMING') >= 0)) {
       time = { start_time: openFinished.value, duration: localTime.value, value: localTime.value + openFinished.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
-    } else if (key.indexOf('SCAN') >= 0 && firstBatchReturned) {
+    } else if (key.indexOf('SCAN') >= 0) {
       var doublet = getScanCPUIOTimelineData(key);
       var doubletSum = sum(doublet, 'value');
-      time = [{ start_time: firstBatchReturned.start_time, duration: doublet[0].value, value: firstBatchReturned.start_time + doublet[0].value, unit: last.unit, clazz: 'io', name: window.HUE_I18n.profile.io }, { start_time: firstBatchReturned.start_time + doublet[0].value, duration: doublet[1].value, value: firstBatchReturned.start_time + doubletSum, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }];
+      if (firstBatchReturned && firstBatchReturned.start_time + doubletSum < last.value) {
+        time = [{ start_time: firstBatchReturned.start_time, duration: doublet[0].value, value: firstBatchReturned.start_time + doublet[0].value, unit: last.unit, clazz: 'io', name: window.HUE_I18n.profile.io }, { start_time: firstBatchReturned.start_time + doublet[0].value, duration: doublet[1].value, value: firstBatchReturned.start_time + doubletSum, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }];
+      } else {
+        time = [{ start_time: last.value - doubletSum, duration: doublet[0].value, value: last.value - doublet[1].value, unit: last.unit, clazz: 'io', name: window.HUE_I18n.profile.io }, { start_time: last.value - doublet[1].value, duration: doublet[1].value, value: last.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }];
+      }
     } else {
       time = { start_time: last.value - localTime.value, duration: localTime.value, value: last.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
     }
@@ -337,16 +342,14 @@ function impalaDagre(id) {
     if (!timeline) {
       return timeline;
     }
-    var fragment = getFragment(key);
-    if (fragment) {
-      return timeline;
-    }
     var initTime = getMaxFragmentMetric(key, 'TotalTime', 'children.CodeGen.hosts');
     if (!initTime) {
       return timeline;
     }
     initTime.duration = initTime.value;
     initTime.name = window.HUE_I18n.profile.codegen;
+    initTime.color = colors[2];
+    initTime.start_time = 0;
     return [initTime].concat(timeline);
   }
 
@@ -363,6 +366,16 @@ function impalaDagre(id) {
     var cpuExchange = getMaxValue(key, 'LocalTime');
     var ioTime = getMaxValue(key, 'ChildTime');
     return [ioTime, cpuExchange];
+  }
+
+  function getTopNodes() {
+    return Object.keys(states_by_name).map(function (key) {
+      var timeline = getCPUTimelineData(key);
+      var sumTime = sum(timeline, 'duration')
+      return { name: states_by_name[key].label, duration: sumTime, unit: 5, key: key, icon: states_by_name[key].icon  };
+    }).sort(function (a, b) {
+      return b.duration - a.duration;
+    });
   }
 
   function getExchangeCPUIOTimelineData(key) {
@@ -382,54 +395,78 @@ function impalaDagre(id) {
     return [ krpcTime, networkTime, cpuExchange];
   }
 
-  function getTimelineData(key) {
+  function getTimelineData(key, name) {
     var id = getId(key);
     var node = getNode(id);
-    if (!node || !node.timeline) {
-      return;
+    if (!name) {
+      name = 'Node Lifecycle Event Timeline';
     }
-    var timeline = node.timeline;
-    var times = Object.keys(timeline.hosts);
-    for (var i = 0; i < times.length; i++) {
-      if (!timeline.hosts[times[i]]['Node Lifecycle Event Timeline']) {
-        continue;
-      }
-      timeline.hosts[times[i]]['Node Lifecycle Event Timeline'].forEach(function (time, index, array) {
-        time.color = colors[index % colors.length];
-        return time;
+    return node && node.timeline && ((node.timeline.hosts && node.timeline.hosts[node.timeline.min]) || node.timeline)[name];
+  }
+  
+  function getMinData(data) {
+    return data && ((data.hosts && data.hosts[data.min]) || data);
+  }
+
+  function renderTimeline(timeline, max) {
+    if (!timeline) {
+      return '';
+    }
+    var end = max || timeline[timeline.length - 1].value;
+    var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
+    var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
+    html += timeline.map(function(time, index) {
+      var clazz = time.clazz ? 'class="' + time.clazz + '"' : '';
+      var fill = time.clazz ? '' : 'style="fill:' + (time.color || colors[index % colors.length]) + '"';
+      return '<rect ' + clazz + ' x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10" ' + fill + '></rect>';
+    }).join('');
+    html += '</svg>';
+    return html;
+  }
+
+  function showDetailGlobal() {
+    var details = d3.select('.query-plan .details');
+    var key = getKey(id);
+    details.html('<header class="metric-title">' + getIcon({ svg: 'hi-sitemap' }) + '<h4>' + window.HUE_I18n.profile.overview + '</h4></div>')
+    var detailsContent = details.append('div').classed('details-content', true);
+
+    var topNodes = getTopNodes();
+    if (topNodes && topNodes.length) {
+      var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
+      var cpuTimelineTitle = cpuTimelineSection.append('header');
+      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-filter');
+      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.topnodes + ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')');
+      var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable', true);
+      var cpuTimelineSectionTableRows = cpuTimelineSectionTable.selectAll('tr').data(topNodes).enter().append('tr').on('click', function (node) {
+        select(node.key);
+        zoomToNode(node.key);
       });
+      cpuTimelineSectionTableRows.append('td').html(function (time) { return '' + getIcon(time.icon) + '<div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTableRows.append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
-    return timeline;
+
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), 'Compilation', null);
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.HUE_I18n.profile.execution, null);
+
+    d3.select('.query-plan .details .metric-title').on('click', function () {
+      toggleDetails();
+    });
   }
 
-  function renderTimeline(key) {
-    var datum = getTimelineData(key);
-    if (!datum || !datum.hosts[datum.min] || !datum.hosts[datum.min]['Node Lifecycle Event Timeline']) {
-      return '';
-    }
-    var end = getMetricsMax() || 10;
-    var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
-    var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
-    html += datum.hosts[datum.min]['Node Lifecycle Event Timeline'].map(function(time, index) {
-      return '<rect x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10" style="fill:' + time.color  +'"></rect>';
-    }).join('');
-    html += '</svg>';
-    return html;
-  }
+  function appendTimelineAndLegend(detailsContent, data, title, max) {
+    var timeline = renderTimeline(data, max);
+    if (timeline) {
+      var executionSum = sum(data, 'duration');
+      var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
+      var cpuTimelineTitle = cpuTimelineSection.append('header');
+      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
+      cpuTimelineTitle.append('h5').text(title + ' (' + ko.bindingHandlers.numberFormat.human(executionSum, 5) + ')');
+      cpuTimelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
-  function renderCPUTimeline(key) {
-    var datum = getCPUTimelineData(key);
-    if (!datum) {
-      return '';
+      var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('column', true);
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
-    var end = getMetricsMax() || 10;
-    var divider = end > 33554428 ? 1000000 : 1; // values are in NS, scaling to MS as max pixel value is 33554428px ~9h in MS
-    var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (end / divider) + ' 10" class="timeline" preserveAspectRatio="none">';
-    html += datum.map(function(time, index) {
-      return '<rect class="' + time.clazz + '" x="' + (time.start_time / divider) + '" width="' + (time.duration / divider)  + '" height="10"></rect>';
-    }).join('');
-    html += '</svg>';
-    return html;
   }
 
   function showDetail(id) {
@@ -446,22 +483,8 @@ function impalaDagre(id) {
     details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
 
-    var executionTimeline = renderCPUTimeline(key);
-    var executionTimelineData = getExecutionTimelineData(key);
-    if (executionTimeline) {
-      var executionSum = sum(executionTimelineData, 'duration');
-      var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
-      var cpuTimelineTitle = cpuTimelineSection.append('header');
-      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
-      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.execution + ' (' + ko.bindingHandlers.numberFormat.human(executionSum, 5) + ')');
-      cpuTimelineSection.node().appendChild($.parseXML(executionTimeline).children[0]);
-
-      var cpuTimelineSectionTable = cpuTimelineSection.append('table');
-      cpuTimelineSectionTable.append('tr').selectAll('td').data(executionTimelineData).enter().append('td').html(function (time) { return '<div class="legend-icon ' + time.clazz + '"></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
-      cpuTimelineSectionTable.append('tr').selectAll('td').data(executionTimelineData).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
-    }
-
-    var timeline = renderTimeline(key, '');
+    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.HUE_I18n.profile.execution, getMetricsMax());
+    var timeline = renderTimeline(getTimelineData(key), getMetricsMax());
     if (timeline) {
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
@@ -469,13 +492,13 @@ function impalaDagre(id) {
       timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline);
       timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
-      var timelineSectionTable = timelineSection.append('table');
+      var timelineSectionTable = timelineSection.append('table').classed('column', true);
       timelineSectionTable.append('thead').selectAll('tr').data(['\u00A0'].concat(Object.keys(node.timeline.hosts).sort())).enter().append('tr').append('td').text(function (host, i) { return i > 0 ? 'Host ' + i : host; }).attr('title', function (host) { return host; });
       var timelineSectionTableBody = timelineSectionTable.append('tbody');
       var timelineHosts = Object.keys(node.timeline.hosts).sort().map(function (host) { return node.timeline.hosts[host]; });
       var timelineSectionTableCols = timelineSectionTableBody.selectAll('tr').data(timelineHosts);
       var timelineSectionTableCol0 = timelineSectionTableBody.selectAll('tr').data(timelineHosts.slice(0,1));
-      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time) { return '<div class="legend-icon" style="background-color:' + time.color +' "></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time, index) { return '<div class="legend-icon" style="background-color:' + colors[index % colors.length]+' "></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
       timelineSectionTableCols.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
@@ -486,7 +509,7 @@ function impalaDagre(id) {
     metricsTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-bar-chart');
     metricsTitle.append('h5').text(window.HUE_I18n.profile.metrics);
 
-    var metricsContent = metricsSection.append('table').classed('metrics', true);
+    var metricsContent = metricsSection.append('table').classed('column metrics', true);
     var metricsHosts = Object.keys(data.properties.hosts).sort().map(function (key) { return data.properties.hosts[key]; });
     var metricsCols = metricsContent.selectAll('tr').data(metricsHosts);
     var metricsCols0 = metricsContent.selectAll('tr').data(metricsHosts.slice(0,1));
@@ -496,13 +519,17 @@ function impalaDagre(id) {
 
     var metricsChildSectionsContent = metricsChildSections.enter().append('div');
     metricsChildSectionsContent.append('header').append('h5').text(function (key) { return key; });
-    var metricsChildSectionsContentTable = metricsChildSectionsContent.append('table').classed('metrics', true);
+    var metricsChildSectionsContentTable = metricsChildSectionsContent.append('table').classed('column metrics', true);
     var fChildrenHosts = function (key) { return Object.keys(data.children[key].hosts).sort().map(function (host) { return data.children[key].hosts[host]; }); };
     var metricsChildSectionsContentCols = metricsChildSectionsContentTable.selectAll('tr').data(function (key) { return fChildrenHosts(key); });
     var metricsChildSectionsContentCols0 = metricsChildSectionsContentTable.selectAll('tr').data(function (key) { return fChildrenHosts(key).slice(0,1); });
     metricsChildSectionsContentCols0.enter().append('tr').selectAll('td').data(function (host) { return Object.keys(host).sort(); }).enter().append('td').text(function (x) { return x; }).attr('title', function (x) { return x; });
     metricsChildSectionsContentCols.enter().append('tr').selectAll('td').data(function (x) { return Object.keys(x).sort().map(function (key) {return x[key]; }) }).enter().append('td').text(function(datum) { return ko.bindingHandlers.numberFormat.human(datum.value, datum.unit);});
     metricsChildSectionsContentTable.append('thead').selectAll('tr').data(function (key) { return ['\u00A0'].concat(Object.keys(data.children[key].hosts).sort()); }).enter().append('tr').append('td').text(function (x, i) { return i > 0 ? x === 'averaged' ? x : 'Host ' + (i - 1) : x; }).attr('title', function (x) {return x;});
+
+    d3.select('.query-plan .details .metric-title').on('click', function () {
+      toggleDetails();
+    });
   }
 
   function hideDetail(id) {
@@ -540,13 +567,17 @@ function impalaDagre(id) {
     return (avg1 * count1 + avg2 * count2) / (count1 + count2);
   }
 
+  function toggleDetails() {
+    var queryPlan = d3.select('.query-plan');
+    queryPlan.classed('open', !queryPlan.classed('open'));
+  }
+
   function renderGraph() {
     var plan = _impalaDagree._plan;
     if (!plan || !plan.plan_json.plan_nodes || !plan.plan_json.plan_nodes.length) return;
     var states = [];
     var edges = [];
     var colour_idx = 0;
-
     var max_node_time = 0;
     plan.plan_json["plan_nodes"].forEach(function(parent) {
       max_node_time = Math.max(
@@ -554,6 +585,7 @@ function impalaDagre(id) {
       // Pick a new colour for each plan fragment
       colour_idx = (colour_idx + 1) % colours.length;
     });
+    showDetailGlobal();
     var avgStates = average(states, 'max_time_val');
     var edgesIO = edges.filter(function (edge) {
       return edge.content.unit === 5;
@@ -578,7 +610,7 @@ function impalaDagre(id) {
         html += "<span class='detail'>" + state.predicates + "</span><br/>";
       }
       html += "<span class='id'>" + state.name + "</span></span>";
-      html += renderCPUTimeline(state.name);
+      html += renderTimeline(getCPUTimelineData(state.name), getMetricsMax());
       html += "</div>";
 
       var style = state.style;
@@ -605,6 +637,9 @@ function impalaDagre(id) {
       var node = g.node(v);
       node.rx = node.ry = 5;
     });
+    d3.select('.query-plan .details .metric-title').on('click', function () {
+      toggleDetails();
+    });
 
     // Create the renderer
     var render = new dagreD3.render();
@@ -616,7 +651,6 @@ function impalaDagre(id) {
     if (is_first) {
       var initialScale = 1;
       _impalaDagree.init(initialScale);
-      svg.attr('height', Math.min(g.graph().height * initialScale + 40, 600));
       is_first = false;
     }
 
