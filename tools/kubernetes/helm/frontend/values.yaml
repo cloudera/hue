@@ -1,0 +1,13 @@
+registry: "docker-registry.infra.cloudera.com/cloudera/datawarehouse"
+helmRepo: "http://dataware-1.vpc.cloudera.com:8879"
+tag: "v2"
+registryImpalaTag: "v2"
+loadBalancerIp: "127.0.0.1"
+domain: "127.0.0.1.nip.io"
+hue:
+  replicas: 1
+  awsAccessKeyId: ""
+  awsSecretAccessKey: ""
+  awsRegion: "us-east-1"
+  prometheusHost: "prometheus-server.prometheus"
+  provisionerApi: "http://provisioner"
