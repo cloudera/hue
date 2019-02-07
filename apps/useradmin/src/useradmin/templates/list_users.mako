@@ -240,6 +240,12 @@ ${layout.menubar(section='users')}
                 $.jHueNotify.info("${ _('The users and groups were updated correctly.') }")
                 $usersComponents.find(".sync-ldap").modal("hide");
               }
+            },
+            error: function(data) {
+              $usersComponents.find('input[type="submit"]').removeAttr("disabled");
+              huePubSub.publish('open.link', data.url);
+              $.jHueNotify.error(data.responseJSON['message']);
+              $usersComponents.find(".sync-ldap").modal("hide");
             }
           });
           % endif

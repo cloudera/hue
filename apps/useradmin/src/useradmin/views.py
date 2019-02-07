@@ -557,10 +557,11 @@ def add_ldap_users(request):
         connection = ldap_access.get_connection_from_server(server)
         users = import_ldap_users(connection, username_pattern, False, import_by_dn, failed_users=failed_ldap_users)
       except (ldap.LDAPError, LdapBindException), e:
-        LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
       except ValidationError, e:
-        raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was a problem with some of the LDAP information: %s')) % str(e))
 
       if users and form.cleaned_data['ensure_home_directory']:
         for user in users:
@@ -701,7 +702,11 @@ def sync_ldap_users_groups(request):
     if form.is_valid():
       is_ensuring_home_directory = form.cleaned_data['ensure_home_directory']
       server = form.cleaned_data.get('server')
-      connection = ldap_access.get_connection_from_server(server)
+      try:
+        connection = ldap_access.get_connection_from_server(server)
+      except (ldap.LDAPError, LdapBindException), e:
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
 
       failed_ldap_users = []
 
@@ -736,8 +741,8 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
     users = sync_ldap_users(connection, failed_users=failed_users)
     groups = sync_ldap_groups(connection, failed_users=failed_users)
   except (ldap.LDAPError, LdapBindException), e:
-    LOG.error("LDAP Exception: %s" % e)
-    raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+    LOG.error("LDAP Exception: %s" % smart_str(e))
+    raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
 
   # Create home dirs for every user sync'd
   if is_ensuring_home_directory:
@@ -768,7 +773,7 @@ def sync_ldap_users(connection, failed_users=None):
   """
   users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
   for user in users:
-    _import_ldap_users(connection, user.username, failed_users=failed_users)
+    _import_ldap_users(connection, smart_str(user.username), failed_users=failed_users)
   return users
 
 
