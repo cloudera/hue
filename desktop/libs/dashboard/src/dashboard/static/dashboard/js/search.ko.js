@@ -2054,7 +2054,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
 
   self.build = function () {
-    self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+    self.intervalOptions = ko.observableArray(ko.bindingHandlers.dateRangePicker.INTERVAL_OPTIONS);
     self.isNested = ko.observable(false);
 
     // Models
@@ -2981,7 +2981,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
   };
 
   self.reset = function() {
-    self.intervalOptions(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+    self.intervalOptions(ko.bindingHandlers.dateRangePicker.INTERVAL_OPTIONS);
     self.isNested(false);
 
     // Models

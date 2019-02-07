@@ -250,14 +250,14 @@ const parseHivePseudoJson = pseudoJson => {
 };
 
 const isOverflowing = element => {
-  if (element instanceof jQuery) {
+  if (element instanceof $) {
     element = element[0];
   }
   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
 };
 
 const waitForRendered = (selector, condition, callback, timeout) => {
-  const $el = selector instanceof jQuery ? selector : $(selector);
+  const $el = selector instanceof $ ? selector : $(selector);
   if (condition($el)) {
     callback($el);
   } else {
@@ -334,7 +334,7 @@ const getStyleFromCSSClass = cssClass => {
   for (let i = 0; i < document.styleSheets.length; i++) {
     const cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
     for (let x = 0; x < cssClasses.length; x++) {
-      if (cssClasses[x].selectorText == cssClass) {
+      if (cssClasses[x].selectorText === cssClass) {
         return cssClasses[x].style ? cssClasses[x].style : cssClasses[x];
       }
     }
@@ -402,8 +402,212 @@ const escapeOutput = str =>
     .html()
     .trim();
 
+const getFileBrowseButton = (
+  inputElement,
+  selectFolder,
+  valueAccessor,
+  stripHdfsPrefix,
+  allBindingsAccessor,
+  isAddon,
+  isNestedModal,
+  linkMarkup
+) => {
+  let _btn;
+  if (isAddon) {
+    _btn = $('<span>')
+      .addClass('add-on muted pointer filechooser-clickable')
+      .text('..');
+  } else if (linkMarkup) {
+    _btn = $('<a>')
+      .addClass('btn')
+      .addClass('fileChooserBtn filechooser-clickable')
+      .text('..');
+  } else {
+    _btn = $('<button>')
+      .addClass('btn')
+      .addClass('fileChooserBtn filechooser-clickable')
+      .text('..');
+  }
+  _btn.click(e => {
+    e.preventDefault();
+    if (!isNestedModal) {
+      $(window.HUE_CONTAINER).addClass('modal-open');
+    }
+
+    function callFileChooser() {
+      let _initialPath = $.trim(inputElement.val()) !== '' ? inputElement.val() : '/';
+      if (
+        (allBindingsAccessor &&
+          allBindingsAccessor().filechooserOptions &&
+          allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty &&
+          inputElement.val() === '') ||
+        (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)
+      ) {
+        _initialPath = '';
+      }
+      if (inputElement.data('fullPath')) {
+        _initialPath = inputElement.data('fullPath');
+      }
+      if (_initialPath.indexOf('hdfs://') > -1) {
+        _initialPath = _initialPath.substring(7);
+      }
+
+      let supportSelectFolder = !!selectFolder;
+      if (
+        allBindingsAccessor &&
+        typeof allBindingsAccessor().filechooserOptions !== 'undefined' &&
+        typeof allBindingsAccessor().filechooserOptions.selectFolder !== 'undefined'
+      ) {
+        supportSelectFolder = allBindingsAccessor().filechooserOptions.selectFolder;
+      }
+
+      $('#filechooser').jHueFileChooser({
+        suppressErrors: true,
+        selectFolder: supportSelectFolder,
+        onFolderChoose: function(filePath) {
+          handleChoice(filePath, stripHdfsPrefix);
+          if (selectFolder) {
+            $('#chooseFile').modal('hide');
+            if (!isNestedModal) {
+              $('.modal-backdrop').remove();
+            }
+          }
+        },
+        onFileChoose: function(filePath) {
+          handleChoice(filePath, stripHdfsPrefix);
+          $('#chooseFile').modal('hide');
+          if (!isNestedModal) {
+            $('.modal-backdrop').remove();
+          }
+        },
+        createFolder:
+          allBindingsAccessor &&
+          allBindingsAccessor().filechooserOptions &&
+          allBindingsAccessor().filechooserOptions.createFolder,
+        uploadFile:
+          allBindingsAccessor &&
+          allBindingsAccessor().filechooserOptions &&
+          allBindingsAccessor().filechooserOptions.uploadFile,
+        initialPath: _initialPath,
+        errorRedirectPath: '',
+        forceRefresh: true,
+        showExtraHome:
+          allBindingsAccessor &&
+          allBindingsAccessor().filechooserOptions &&
+          allBindingsAccessor().filechooserOptions.showExtraHome,
+        extraHomeProperties:
+          allBindingsAccessor &&
+          allBindingsAccessor().filechooserOptions &&
+          allBindingsAccessor().filechooserOptions.extraHomeProperties
+            ? allBindingsAccessor().filechooserOptions.extraHomeProperties
+            : {},
+        filterExtensions:
+          allBindingsAccessor && allBindingsAccessor().filechooserFilter
+            ? allBindingsAccessor().filechooserFilter
+            : '',
+        displayOnlyFolders:
+          allBindingsAccessor &&
+          allBindingsAccessor().filechooserOptions &&
+          allBindingsAccessor().filechooserOptions.displayOnlyFolders
+      });
+      if (window.isIE11) {
+        const oldFocus = $().modal.Constructor.prototype.enforceFocus;
+        $().modal.Constructor.prototype.enforceFocus = function() {};
+        $('#chooseFile').modal('show');
+        window.setTimeout(() => {
+          $().modal.Constructor.prototype.enforceFocus = oldFocus;
+        }, 5000);
+      } else {
+        $('#chooseFile').modal('show');
+      }
+      if (!isNestedModal) {
+        $('#chooseFile').on('hidden', () => {
+          $(window.HUE_CONTAINER).removeClass('modal-open');
+          $('.modal-backdrop').remove();
+        });
+      }
+    }
+
+    // check if it's a relative path
+    callFileChooser();
+
+    function handleChoice(filePath, stripHdfsPrefix) {
+      if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator) {
+        filePath =
+          inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] +
+          '=' +
+          filePath;
+      }
+      if (
+        allBindingsAccessor &&
+        allBindingsAccessor().filechooserOptions &&
+        allBindingsAccessor().filechooserOptions.deploymentDir
+      ) {
+        inputElement.data('fullPath', filePath);
+        inputElement.attr('data-original-title', filePath);
+        if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) === 0) {
+          filePath = filePath.substr(
+            allBindingsAccessor().filechooserOptions.deploymentDir.length + 1
+          );
+        }
+      }
+      if (stripHdfsPrefix) {
+        inputElement.val(filePath);
+      } else {
+        inputElement.val('hdfs://' + filePath);
+      }
+      inputElement.change();
+      if (valueAccessor) {
+        if (typeof valueAccessor() == 'function' || typeof valueAccessor().value == 'function') {
+          if (valueAccessor().value) {
+            valueAccessor().value(inputElement.val());
+            if (valueAccessor().displayJustLastBit) {
+              inputElement.data('fullPath', inputElement.val());
+              inputElement.attr('data-original-title', inputElement.val());
+              const _val = inputElement.val();
+              inputElement.val(_val.split('/')[_val.split('/').length - 1]);
+            }
+          } else {
+            valueAccessor()(inputElement.val());
+          }
+        } else {
+          valueAccessor(inputElement.val());
+        }
+      }
+    }
+  });
+  if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled) {
+    _btn.addClass('disabled').attr('disabled', 'disabled');
+  }
+  return _btn;
+};
+
+const stripHtml = html => {
+  const tmp = document.createElement('DIV');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText;
+};
+
+const stripHtmlFromFunctions = template => {
+  // strips HTML from inside the functions
+  let _tmpl = template;
+  const _mustacheFunctions = _tmpl.match(/{{#(.[\s\S]*?){{\//g);
+  if (_mustacheFunctions) {
+    $.each(_mustacheFunctions, (cnt, fn) => {
+      _tmpl = _tmpl.replace(
+        fn,
+        fn.substr(0, fn.indexOf('}}') + 2) +
+          $.trim(stripHtml(fn.substr(fn.indexOf('}}') + 2).slice(0, -3))) +
+          '{{/'
+      );
+    });
+  }
+  return _tmpl;
+};
+
 export default {
   bootstrapRatios: bootstrapRatios,
+  getFileBrowseButton: getFileBrowseButton,
   text2Url: text2Url,
   htmlEncode: htmlEncode,
   html2text: html2text,
@@ -428,5 +632,6 @@ export default {
   dfs: dfs,
   deleteAllEmptyStringKey: deleteAllEmptyStringKey,
   UUID: UUID,
-  escapeOutput: escapeOutput
+  escapeOutput: escapeOutput,
+  stripHtmlFromFunctions: stripHtmlFromFunctions
 };

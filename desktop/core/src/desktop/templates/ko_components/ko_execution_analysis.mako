@@ -26,7 +26,6 @@ from desktop.views import _ko
 
 <%def name="executionAnalysis()">
   <script src="${ static('desktop/ext/js/d3-tip.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/sprintf.min.js') }"></script>
   <script type="text/html" id="hue-execution-analysis-template">
     <div class="hue-execution-analysis">
       <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->

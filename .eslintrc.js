@@ -6,11 +6,12 @@ const hueGlobals = [
   // global_js_constants.mako
   'IS_HUE_4', 'AUTOCOMPLETE_TIMEOUT','CACHEABLE_TTL','CSRF_TOKEN','HAS_MULTI_CLUSTER',
   'DROPZONE_HOME_DIR', 'ENABLE_SQL_SYNTAX_CHECK', 'HAS_NAVIGATOR', 'HAS_OPTIMIZER', 'HAS_WORKLOAD_ANALYTICS',
-  'HUE_CONTAINER', 'IS_EMBEDDED', 'IS_K8S_ONLY', 'HUE_VERSION', 'IS_NEW_INDEXER_ENABLED',
-  'IS_S3_ENABLED', 'DOCUMENT_TYPES', 'LOGGED_USERNAME', 'USER_HOME_DIR', 'LOGGED_USERGROUPS', 'METASTORE_PARTITION_LIMIT',
+  'HUE_CONTAINER', 'IS_EMBEDDED', 'isIE11', 'IS_K8S_ONLY', 'HUE_VERSION', 'IS_NEW_INDEXER_ENABLED','HUE_I18n',
+  'IS_S3_ENABLED', 'KO_DATERANGEPICKER_LABELS', 'DOCUMENT_TYPES', 'LOGGED_USERNAME', 'USER_HOME_DIR',
+  'LOGGED_USERGROUPS', 'METASTORE_PARTITION_LIMIT', 'WorkerGlobalScope',
 
   // other misc, TODO
-  'huePubSub', 'ApiHelper', 'SqlUtils', 'trackOnGA', 'ContextCatalog', 'DataCatalog'
+  'ace', 'CodeMirror', 'Dropzone', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA'
 ];
 
 const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {

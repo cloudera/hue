@@ -431,7 +431,7 @@ ${ assist.assistPanel() }
               <div>
                 <label class="control-label">
                   <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
-                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <input type="text" class="input-xlarge" data-bind="hiveChooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
                   <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
                 </label>
               </div>
@@ -558,7 +558,7 @@ ${ assist.assistPanel() }
 
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <input type="text" class="input-xxlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+            <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'altus' -->

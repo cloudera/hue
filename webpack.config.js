@@ -5,9 +5,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
   mode: 'development',
-  // optimization: {
-  //   minimize: true
-  // },
+  optimization: {
+    minimize: true
+  },
   performance: {
     maxEntrypointSize: 400 * 1024, // 400kb
     maxAssetSize: 400 * 1024 // 400kb

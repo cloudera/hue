@@ -3320,7 +3320,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      WorkerHandler.registerWorkers();
+      sqlWorkerHandler.registerWorkers();
 
       if (viewModel.isOptimizerEnabled()) {
         % if OPTIMIZER.AUTO_UPLOAD_QUERIES.get():

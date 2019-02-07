@@ -978,24 +978,6 @@ function showSection(section) {
 }
 
 
-// File browser button
-function getFileBrowseButton(inputElement) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-    e.preventDefault();
-    $("#filechooser").jHueFileChooser({
-      initialPath: inputElement.val(),
-      onFileChoose: function (filePath) {
-        inputElement.val(filePath);
-        inputElement.trigger("change");
-        $("#chooseFile").modal("hide");
-      },
-      selectFolder: false,
-      createFolder: false
-    });
-    $("#chooseFile").modal("show");
-  });
-}
-
 function folderChooser(inputElement) {
   $("#folderchooser").jHueFileChooser({
     initialPath: inputElement.val(),

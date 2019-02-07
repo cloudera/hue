@@ -1794,7 +1794,7 @@ var editables = function() {
     emptytext: "${ _('Empty description') }"
   });
 
-  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
+  $(".fileChooser:not(:has(~ button))").after(hueUtils.getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 };
 
 $(document).one('fetched.design', editables);
@@ -2871,7 +2871,7 @@ $('.left-panel').on('mousewheel', function(e){
 % endif
 viewModel.design.fileResources.values.subscribe(function() {
   // File chooser button for file resources.
-  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
+  $(".fileChooser:not(:has(~ button))").after(hueUtils.getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
 
 % if action == 'watch-results':

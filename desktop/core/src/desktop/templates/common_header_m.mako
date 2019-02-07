@@ -174,7 +174,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
   <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
-  <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
   <script src="${ static('desktop/js/ace/ace.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>

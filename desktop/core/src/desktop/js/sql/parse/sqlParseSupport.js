@@ -23,10 +23,10 @@ const identifierEquals = (a, b) =>
     .replace(/^\s*`/, '')
     .replace(/`\s*$/, '')
     .toLowerCase() ===
-  b
-    .replace(/^\s*`/, '')
-    .replace(/`\s*$/, '')
-    .toLowerCase();
+    b
+      .replace(/^\s*`/, '')
+      .replace(/`\s*$/, '')
+      .toLowerCase();
 
 // endsWith polyfill from hue_utils.js, needed as workers live in their own js environment
 if (!String.prototype.endsWith) {
