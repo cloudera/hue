@@ -24,6 +24,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm as AuthAuthenticationForm, UserCreationForm as AuthUserCreationForm
 from django.forms import CharField, TextInput, PasswordInput, ChoiceField, ValidationError
 from django.utils.safestring import mark_safe
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import conf
@@ -157,7 +158,8 @@ class LdapAuthenticationForm(AuthenticationForm):
           else:
             get_ldap_connection(conf.LDAP)
         except Exception as e:
-          raise ValidationError(_("LDAP server %s Error: %s" % (server_key, str(e))))
+          LOG.error("LDAP Exception: %s" % smart_str(e))
+          raise ValidationError(_("LDAP server %s Error: %s").encode('utf-8') % (server_key, str(e)))
 
         raise ValidationError(
           self.error_messages['invalid_login'])

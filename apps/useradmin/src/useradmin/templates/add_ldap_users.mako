@@ -80,6 +80,9 @@ ${ layout.menubar(section='users') }
           huePubSub.publish('open.link', '${ url('useradmin.views.list_users') }');
           $.jHueNotify.info("${ _('User added/synced correctly') }");
         }
+      },
+      error: function (data) {
+        $.jHueNotify.error(data.responseJSON['message']);
       }
     });
     %endif

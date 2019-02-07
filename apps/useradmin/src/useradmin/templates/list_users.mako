@@ -250,6 +250,9 @@ ${layout.menubar(section='users')}
             },
             error: function(data) {
               $usersComponents.find('input[type="submit"]').removeAttr("disabled");
+              huePubSub.publish('open.link', data.url);
+              $.jHueNotify.error(data.responseJSON['message']);
+              $usersComponents.find(".sync-ldap").modal("hide");
             }
           });
           % endif
