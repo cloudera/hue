@@ -179,6 +179,10 @@
     profile: {
       timeline: "${ _('Timeline') }",
       metrics: "${ _('Metrics') }",
+      cpu: "${ _('CPU') }",
+      io: "${ _('IO') }",
+      execution: "${ _('Execution') }",
+      codegen: "${ _('CodeGen') }"
     }
   };
 

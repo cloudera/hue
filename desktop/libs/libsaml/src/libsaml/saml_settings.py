@@ -79,7 +79,9 @@ def config_settings_loader(request):
         'optional_attributes': libsaml.conf.OPTIONAL_ATTRIBUTES.get(),
 
         'logout_requests_signed': str(libsaml.conf.LOGOUT_REQUESTS_SIGNED.get()).lower(),
-        'authn_requests_signed': str(libsaml.conf.AUTHN_REQUESTS_SIGNED.get()).lower()
+        'authn_requests_signed': str(libsaml.conf.AUTHN_REQUESTS_SIGNED.get()).lower(),
+        'want_response_signed': str(libsaml.conf.WANT_RESPONSE_SIGNED.get()).lower(),
+        'want_assertions_signed': str(libsaml.conf.WANT_ASSERTIONS_SIGNED.get()).lower()
       },
     },
 

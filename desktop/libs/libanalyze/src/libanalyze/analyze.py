@@ -204,17 +204,19 @@ class Node(object):
         return m.group(2)
 
   def augmented_host(self):
-    if self.fragment_instance:
-      c = self.fragment_instance
-    elif self.fragment:
-      if self.fragment.is_averaged():
-        return 'averaged'
-      c = self.fragment.children[0]
+    if self.is_fragment_instance():
+      c = self
     elif self.is_fragment():
       if self.is_averaged():
         return 'averaged'
       else:
         c = self.children[0]
+    elif self.fragment_instance:
+      c = self.fragment_instance
+    elif self.fragment:
+      if self.fragment.is_averaged():
+        return 'averaged'
+      c = self.fragment.children[0]
     else:
       return None
     m = re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', c.val.name)
@@ -321,6 +323,9 @@ def metrics(profile):
       elif node.is_fragment_instance():
         is_parent_node = True
         nid = node.fragment.id()
+      elif node.is_fragment() and node.is_averaged():
+        is_parent_node = True
+        nid = node.id()
       elif node.fragment:
         nid = node.fragment.id()
       else:
@@ -353,16 +358,21 @@ def metrics(profile):
 
   for nodeid, node in counter_map['nodes'].iteritems():
     host_min = {'value': sys.maxint, 'host' : None}
+    host_max = {'value': -(sys.maxint - 1), 'host' : None}
     for host_name, host_value in node['timeline']['hosts'].iteritems():
-      if host_value.get('Node Lifecycle Event Timeline'):
-        value = host_value['Node Lifecycle Event Timeline'][len(host_value['Node Lifecycle Event Timeline']) - 1]['value']
-        if value < host_min['value']:
-          host_min['value'] = value
-          host_min['host'] = host_name
+      for event_name, event in host_value.iteritems():
+        if len(event):
+          value = event[len(event) - 1]['value']
+          if value < host_min['value']:
+            host_min['value'] = value
+            host_min['host'] = host_name
+          if value > host_max['value']:
+            host_max['value'] = value
+            host_max['host'] = host_name
     node['timeline']['min'] = host_min.get('host', '')
+    node['timeline']['max'] = host_max.get('host', '')
     if node['timeline']['min']:
-      node_min = node['timeline']['hosts'][node['timeline']['min']]['Node Lifecycle Event Timeline']
-      counter_map['max'] = max(node_min[len(node_min) - 1]['value'], counter_map['max'])
+      counter_map['max'] = max(host_min['value'], counter_map['max'])
 
   counter_map['ImpalaServer'] = profile.find_by_name('ImpalaServer').metric_map()
   return counter_map
