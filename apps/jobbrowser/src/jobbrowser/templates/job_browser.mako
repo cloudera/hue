@@ -3421,7 +3421,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {
           case '':
-            h = 'jobs';
+            h = 'dataware2-clusters';
           case 'slas':
           case 'oozie-info':
           case 'jobs':
