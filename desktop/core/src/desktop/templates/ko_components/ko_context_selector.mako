@@ -349,6 +349,11 @@ from desktop.views import _ko
           $.when(self[TYPES_INDEX.namespace.lastPromise], self[TYPES_INDEX.compute.lastPromise]).done(function () {
             window.clearTimeout(self.reloadDatabaseThrottle);
             self.reloadDatabaseThrottle = window.setTimeout(function () {
+              if (!self[TYPES_INDEX.namespace.name]()) {
+                self.availableDatabases([]);
+                self.loadingDatabases(false);
+                return;
+              }
               DataCatalog.getEntry({
                 sourceType: ko.unwrap(self.sourceType),
                 namespace: self[TYPES_INDEX.namespace.name](),
