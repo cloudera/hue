@@ -56,7 +56,7 @@ var MetastoreViewModel = (function () {
       if (!self.source()) {
         return true;
       }
-      if (!self.source().namespace()) {
+      if (self.source().loading()) {
         return true;
       }
       return false;
