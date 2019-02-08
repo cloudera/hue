@@ -86,7 +86,12 @@ ${ components.menubar(is_embeddable) }
     <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onSelect: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
     <!-- ko with: source -->
     <!-- ko if: window.HAS_MULTI_CLUSTER -->
+    <!-- ko if: namespaces().length === 0 -->
+    <i class="margin-left-10 fa fa-warning"></i> ${ _('No namespaces found') }
+    <!-- /ko -->
+    <!-- ko if: namespaces().length > 0 -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onSelect: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
   </div>
