@@ -40,8 +40,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 
 
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>

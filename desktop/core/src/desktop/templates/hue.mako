@@ -460,11 +460,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
-<script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
-<script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
-<script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-<script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 
@@ -479,8 +474,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 <script>ace.config.set("basePath", "/static/desktop/js/ace");</script>
-
-<script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 
