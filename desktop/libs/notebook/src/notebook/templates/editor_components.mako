@@ -121,7 +121,6 @@ from desktop.auth.backend import is_admin
 <!--[if IE 9]>
   <script src="${ static('desktop/ext/js/classList.min.js') }" type="text/javascript" charset="utf-8"></script>
 <![endif]-->
-<script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />

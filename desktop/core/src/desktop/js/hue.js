@@ -14,9 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'ext/jquery/hue.jquery.lib';
+import 'jquery/jquery.all';
 import 'ext/bootstrap.2.3.2.min';
 import _ from 'lodash';
+import Dropzone from 'dropzone';
 import filesize from 'filesize';
 import qq from 'ext/fileuploader.custom';
 import page from 'page';
@@ -56,6 +57,7 @@ window.apiHelper = apiHelper;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
 window.dataCatalog = dataCatalog;
+window.Dropzone = Dropzone;
 window.filesize = filesize;
 window.hueUtils = hueUtils;
 window.hueAnalytics = hueAnalytics;

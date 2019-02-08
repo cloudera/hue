@@ -16,8 +16,7 @@
 
 import $ from 'jquery';
 import ko from 'knockout';
-
-// TODO: Depends on MediumEditor
+import MediumEditor from 'medium-editor';
 
 ko.bindingHandlers.medium = {
   init: function(element, valueAccessor, allBindings) {
