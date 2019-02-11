@@ -5,7 +5,7 @@
     "MetadataLoadTime",
     "PlanningTime"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "condition": "float(vars['MetadataLoadTime']) / float(vars['PlanningTime']) > 0.5 and vars['MetadataLoadTime'] > 2000000000",
     "expr": "vars['MetadataLoadTime']",

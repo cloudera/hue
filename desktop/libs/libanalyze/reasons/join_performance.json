@@ -5,6 +5,7 @@
     "ProbeRows",
     "ProbeTime"
   ],
+  "unit": 5,
   "rule": {
     "expr": "vars['ProbeTime'] - float(vars['ProbeRows']) / 0.005",
     "message": "Excess time (over expected time) spent in the hash join",

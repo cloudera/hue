@@ -4,9 +4,10 @@
   "metric_names": [
     "RowsRead", "RowsReturned"
   ],
+  "unit": 5,
   "rule": {
     "condition": "vars['RowsReturned'] < vars['RowsRead']",
-    "expr": "vars['RowsRead'] - vars['RowsReturned']",
+    "expr": "(vars['RowsRead'] - vars['RowsReturned']) / 40.0 * 1000",
     "message": "Kudu could not evaluate the predicate and it was evaluated by Impala. Kudu supports predicates =, <=, <, >, >=, BETWEEN, or IN.",
     "label": "Kudu predicate optimization"
   },

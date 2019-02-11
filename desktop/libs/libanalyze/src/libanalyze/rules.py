@@ -170,10 +170,10 @@ class SQLOperatorReason:
                 local_vars['vars'].update(dict(zip(self.kwargs['info_names'], metric_values)))
                 expr_data = exprs.Expr.evaluate(self.kwargs['fix']['data'], local_vars)
 
-        msg = self.rule["label"] + ": " + self.rule["message"]
         return {
             "impact": impact,
-            "message": msg,
+            "message": self.rule["message"],
+            "label": self.rule["label"],
             "data": expr_data
         }
 
@@ -238,10 +238,10 @@ class SummaryReason(SQLOperatorReason):
                     if (impact is None or impact < expr_val):
                         impact = expr_val
 
-        msg = self.rule["label"] + ": " + self.rule["message"]
         return {
             "impact": impact,
-            "message": msg
+            "message": self.rule["message"],
+            "label": self.rule["label"]
         }
 
 class JoinOrderStrategyCheck(SQLOperatorReason):
@@ -282,7 +282,8 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
         if (impact > 0):
             return {
                 "impact": impact,
-                "message": "Wrong join order - RHS %d; LHS %d" % (rhsRows, lhsRows)
+                "message": "RHS %d; LHS %d" % (rhsRows, lhsRows),
+                "label": "Wrong join order"
             }
 
         bcost = rhsRows * hosts
@@ -290,7 +291,8 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
         impact = (networkcost - min(bcost, scost) - 1) / hosts / 0.01
         return {
             "impact": impact,
-            "message": "Wrong join strategy - RHS %d; LHS %d" % (rhsRows, lhsRows)
+            "message": "RHS %d; LHS %d" % (rhsRows, lhsRows),
+            "label": "Wrong join strategy"
         }
 
 class ExplodingJoinCheck(SQLOperatorReason):
@@ -319,7 +321,8 @@ class ExplodingJoinCheck(SQLOperatorReason):
             impact = probeTime * (rowsReturned - probeRows) / rowsReturned
         return {
             "impact": impact,
-            "message": "Exploding join: %d input rows are exploded to %d output rows" % (probeRows, rowsReturned)
+            "message": "%d input rows are exploded to %d output rows" % (probeRows, rowsReturned),
+            "label": "Exploding join"
         }
 
 class NNRpcCheck(SQLOperatorReason):
@@ -336,14 +339,15 @@ class NNRpcCheck(SQLOperatorReason):
         }
         :return:
         """
-        totalStorageTime = models.query_avg_fragment_metric_by_node_nid(profile, plan_node_id, "TotalStorageWaitTime")
+        totalStorageTime = models.query_avg_fragment_metric_by_node_nid(profile, plan_node_id, "TotalStorageWaitTime", 0)
         hdfsRawReadTime = models.query_node_by_id(profile, plan_node_id, "TotalRawHdfsReadTime(*)", True)[0][0]
         avgReadThreads = models.query_node_by_id(profile, plan_node_id, "AverageHdfsReadThreadConcurrency", True)[0][0]
         avgReadThreads = max(1, to_double(avgReadThreads))
         impact = max(0, (totalStorageTime - hdfsRawReadTime) / avgReadThreads)
         return {
             "impact": impact,
-            "message": "This is the time waiting for HDFS NN RPC."
+            "message": "This is the time waiting for HDFS NN RPC.",
+            "label": "HDFS NN RPC"
         }
 
 class TopDownAnalysis:
@@ -488,7 +492,7 @@ class TopDownAnalysis:
                 fix.update(cause.kwargs['fix'])
                 if evaluation.get('data'):
                   fix['data'] = evaluation['data']
-                reason = models.Reason(message=evaluation['message'], impact=evaluation['impact'], unit=cause.kwargs.get('unit_id', ''), fix=fix)
+                reason = models.Reason(name=evaluation['label'], message=evaluation['message'], impact=evaluation['impact'], unit=cause.kwargs.get('unit', ''), fix=fix)
                 reasons.append(reason)
         return sorted(reasons, key=lambda x: x.impact, reverse=True)
 
@@ -614,7 +618,8 @@ class TopDownAnalysis:
             counter_map = node.counter_map()
 
             # Load the metric data as if the object would be loaded from the DB
-            local_time = counter_map['TotalTime'].value - child_time
+            local_time = max(counter_map['TotalTime'].value - child_time, 0)
+            has_spilled = False
 
             # Make sure to substract the wait time for the exchange node
             if is_plan_node and re.search(r'EXCHANGE_NODE', node.val.name) is not None:
@@ -634,14 +639,24 @@ class TopDownAnalysis:
             if re.search(r'KUDU_SCAN_NODE', node.val.name):
               child_time = counter_map.get('KuduClientTime', models.TCounter(value=0)).value
               local_time = counter_map['TotalTime'].value
-              counter_map['TotalTime'].value = child_time + local_time
             if re.search(r'HDFS_SCAN_NODE', node.val.name):
               child_time = counter_map.get('TotalRawHdfsReadTime(*)', models.TCounter(value=0)).value
               local_time = counter_map['TotalTime'].value
-              counter_map['TotalTime'].value = local_time + child_time
+            if re.search(r'Buffer pool', node.val.name):
+              local_time = counter_map.get('WriteIoWaitTime', models.TCounter(value=0)).value + counter_map.get('ReadIoWaitTime', models.TCounter(value=0)).value + counter_map.get('AllocTime', models.TCounter(value=0)).value
+            if counter_map.get('SpilledPartitions', 0) > 0:
+              has_spilled = True
+
+            if re.search(r'AGGREGATION', node.val.name):
+              grouping_aggregator = node.find_by_name('GroupingAggregator')
+              if grouping_aggregator and grouping_aggregator.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
+                has_spilled = True
 
             # For Hash Join, if the "LocalTime" metrics
             if is_plan_node and re.search(r'HASH_JOIN_NODE', node.val.name) is not None:
+                hash_join_builder = node.find_by_name('Hash Join Builder')
+                if hash_join_builder and hash_join_builder.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
+                  has_spilled = True
                 if ("LocalTime" in counter_map):
                     local_time = counter_map["LocalTime"].value
                 else:
@@ -649,13 +664,18 @@ class TopDownAnalysis:
                         counter_map["BuildTime"].value
 
             # Add two virtual metrics for local_time and child_time
+            if has_spilled:
+              spill_time = 0
+              buffer_pool = node.find_by_name('Buffer pool')
+              if buffer_pool:
+                spill_time = buffer_pool.counter_map()['LocalTime'].value
+              node.val.counters.append(models.TCounter(name='SpillTime', value=spill_time, unit=5))
             node.val.counters.append(models.TCounter(name='LocalTime', value=local_time, unit=5))
             node.val.counters.append(models.TCounter(name='ChildTime', value=child_time, unit=5))
 
         profile.foreach_lambda(add_host)
 
     def run(self, profile):
-        self.pre_process(profile)
         contributors = self.process(profile)
         topContributors = self.getTopContributor(100, contributors)
 

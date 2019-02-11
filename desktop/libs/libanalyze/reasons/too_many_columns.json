@@ -6,7 +6,7 @@
     "NumColumns",
     "LocalTime"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "condition": "vars['NumColumns'] > 15",
     "expr": "float(vars['NumColumns'] - 15) / float(vars['NumColumns']) * vars['LocalTime']",

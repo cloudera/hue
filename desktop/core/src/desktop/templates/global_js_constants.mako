@@ -185,7 +185,9 @@
       codegen: "${ _('CodeGen') }",
       overview: "${ _('Overview') }",
       topnodes: "${ _('Top Nodes') }",
-      compilation: "${ _('Compilation') }"
+      compilation: "${ _('Compilation') }",
+      planning: "${ _('Planning') }",
+      risks: "${ _('Risks') }"
     }
   };
 
