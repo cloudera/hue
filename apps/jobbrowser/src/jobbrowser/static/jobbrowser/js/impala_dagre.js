@@ -300,6 +300,7 @@ function impalaDagre(id) {
     }
     var id = getId(key);
     var localTime = getMaxValue(key, 'LocalTime');
+    localTime = $.extend({}, localTime, { clazz: 'cpu' });
     var last = timeline.filter(function(time) {
       return time.name !== 'Closed';
     }); // Close time is normally wait time;
@@ -312,29 +313,57 @@ function impalaDagre(id) {
     last = last[last.length - 1];
     var time;
     if (!openFinished) {
-      var end = getMetricsMax() || 10;
-      time = { start_time: end - localTime.value, duration: localTime.value, value: end, unit: localTime.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
+      var end = getMetricsMax() || localTime.value;
+      time = _timelineBefore(end, [localTime]);
     } else if (key.indexOf('EXCHANGE') >= 0 && firstBatchReturned) {
       var triplet = getExchangeCPUIOTimelineData(key);
-      var tripletSum = sum(triplet, 'value');
-      time = [{ start_time: firstBatchReturned.value, duration: triplet[0].value, value: firstBatchReturned.value + triplet[0].value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }, { start_time: firstBatchReturned.value + triplet[0].value, duration: triplet[1].value, value: firstBatchReturned.value + tripletSum - triplet[2].value, clazz: 'io', unit: last.unit, name: window.HUE_I18n.profile.io }, { start_time: firstBatchReturned.value + tripletSum - triplet[2].value, duration: triplet[2].value, value: firstBatchReturned.value + tripletSum, clazz: 'cpu', unit: last.unit, name: window.HUE_I18n.profile.cpu }]
+      time = _timelineAfter(firstBatchReturned.value, triplet);
     } else if (key.indexOf('JOIN') >= 0) {
       var middle = (openFinished.duration - localTime.value) / 2;
-      time = { start_time: openFinished.start_time + middle, duration: localTime.value, value: openFinished.value - middle, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
+      var node = getNode(key);
+      var spillTime = getMaxValue(key, 'SpillTime');
+      var joinTimeline;
+      if (spillTime) {
+        joinTimeline = [$.extend({}, spillTime, { clazz: 'io' }), $.extend({}, localTime, {value: localTime.value - spillTime.value})];
+      } else {
+        joinTimeline = [localTime];
+      }
+      time = _timelineAfter(openFinished.start_time + middle, joinTimeline);
     } else if (key.indexOf('UNION') >= 0 || (key.indexOf('AGGREGATE') >= 0 && states_by_name[key].detail.indexOf('STREAMING') >= 0)) {
-      time = { start_time: openFinished.value, duration: localTime.value, value: localTime.value + openFinished.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
+      time = _timelineAfter(openFinished.value, [localTime]);
+    } else if (key.indexOf('AGGREGATE') >= 0) {
+      var spillTime = getMaxValue(key, 'SpillTime');
+      var aggTimeline;
+      if (spillTime) {
+        aggTimeline = [$.extend({}, spillTime, { clazz: 'io' }), $.extend({}, localTime, {value: localTime.value - spillTime.value})];
+      } else {
+        aggTimeline = [localTime];
+      }
+      time = _timelineBefore(last.value, aggTimeline);
     } else if (key.indexOf('SCAN') >= 0) {
       var doublet = getScanCPUIOTimelineData(key);
       var doubletSum = sum(doublet, 'value');
       if (firstBatchReturned && firstBatchReturned.start_time + doubletSum < last.value) {
-        time = [{ start_time: firstBatchReturned.start_time, duration: doublet[0].value, value: firstBatchReturned.start_time + doublet[0].value, unit: last.unit, clazz: 'io', name: window.HUE_I18n.profile.io }, { start_time: firstBatchReturned.start_time + doublet[0].value, duration: doublet[1].value, value: firstBatchReturned.start_time + doubletSum, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }];
+        time = _timelineAfter(firstBatchReturned.start_time, doublet);
       } else {
-        time = [{ start_time: last.value - doubletSum, duration: doublet[0].value, value: last.value - doublet[1].value, unit: last.unit, clazz: 'io', name: window.HUE_I18n.profile.io }, { start_time: last.value - doublet[1].value, duration: doublet[1].value, value: last.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu }];
+        time = _timelineBefore(last.value, doublet);
       }
     } else {
-      time = { start_time: last.value - localTime.value, duration: localTime.value, value: last.value, unit: last.unit, clazz: 'cpu', name: window.HUE_I18n.profile.cpu };
+      time = _timelineBefore(last.value, [localTime]);
     }
-    return time.length ? time : [ time ];
+    return time;
+  }
+
+  function _timelineBefore(end_time, timeline) {
+    var timelineSum = sum(timeline, 'value');
+    return _timelineAfter(end_time - timelineSum, timeline);
+  }
+
+  function _timelineAfter(start_time, timeline) {
+    var total = 0;
+    return timeline.map(function (event, index) {
+      return $.extend({}, event, { start_time: start_time + total, duration: event.value, value: start_time + (total += event.value), name: window.HUE_I18n.profile[event.clazz]});
+    });
   }
 
   function getExecutionTimelineData(key) {
@@ -346,11 +375,16 @@ function impalaDagre(id) {
     if (!initTime) {
       return timeline;
     }
-    initTime.duration = initTime.value;
-    initTime.name = window.HUE_I18n.profile.codegen;
-    initTime.color = colors[2];
-    initTime.start_time = 0;
-    return [initTime].concat(timeline);
+    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);
+  }
+
+  function getHealthData(key, startTime) {
+    var id = getId(key);
+    var node = getNode(id);
+    if (!node || !node.health) {
+      return;
+    }
+    return _timelineAfter(startTime, node.health.map(function (risk) { return $.extend({}, risk, { value: risk.impact }) }));
   }
 
   function getFragment(id) {
@@ -364,14 +398,21 @@ function impalaDagre(id) {
 
   function getScanCPUIOTimelineData(key) {
     var cpuExchange = getMaxValue(key, 'LocalTime');
+    cpuExchange.clazz = 'cpu';
     var ioTime = getMaxValue(key, 'ChildTime');
+    ioTime.clazz = 'io';
     return [ioTime, cpuExchange];
   }
 
   function getTopNodes() {
     return Object.keys(states_by_name).map(function (key) {
       var timeline = getCPUTimelineData(key);
-      var sumTime = sum(timeline, 'duration')
+      var sumTime;
+      if (timeline) {
+        sumTime = sum(timeline, 'duration');
+      } else {
+        sumTime = states_by_name[key].max_time_val;
+      }
       return { name: states_by_name[key].label, duration: sumTime, unit: 5, key: key, icon: states_by_name[key].icon  };
     }).sort(function (a, b) {
       return b.duration - a.duration;
@@ -383,6 +424,7 @@ function impalaDagre(id) {
     var node = getNode(id);
     var timeline = node.timeline;
     var cpuExchange = getMaxValue(key, 'LocalTime');
+    cpuExchange = $.extend({}, cpuExchange, { clazz: 'cpu' });
 
     var sender = Object.keys(states_by_name).filter(function(node) {
       return states_by_name[node].parent == key;
@@ -391,8 +433,10 @@ function impalaDagre(id) {
       return [{ value: 0, unit: 0 }, { value: 0, unit: 0 }, { value: 0, unit: 0 }];
     }
     var networkTime = getMaxTotalNetworkTime(sender, key);
+    networkTime = $.extend({}, networkTime, { clazz: 'io' });
     var krpcTime = getMaxFragmentMetric(sender, 'LocalTime', 'children.KrpcDataStreamSender.hosts');
-    return [ krpcTime, networkTime, cpuExchange];
+    krpcTime = $.extend({}, krpcTime, { clazz: 'cpu' });
+    return [krpcTime, networkTime, cpuExchange];
   }
 
   function getTimelineData(key, name) {
@@ -435,7 +479,8 @@ function impalaDagre(id) {
       var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
       var cpuTimelineTitle = cpuTimelineSection.append('header');
       cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-filter');
-      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.topnodes + ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')');
+      var metricsMax = getMetricsMax() ? ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')' : '';
+      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.topnodes + metricsMax);
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable', true);
       var cpuTimelineSectionTableRows = cpuTimelineSectionTable.selectAll('tr').data(topNodes).enter().append('tr').on('click', function (node) {
         select(node.key);
@@ -445,26 +490,26 @@ function impalaDagre(id) {
       cpuTimelineSectionTableRows.append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
-    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), 'Compilation', null);
-    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.HUE_I18n.profile.execution, null);
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), window.HUE_I18n.profile.planning, '#hi-access-time');
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.HUE_I18n.profile.execution, '#hi-access-time');
 
     d3.select('.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
   }
 
-  function appendTimelineAndLegend(detailsContent, data, title, max) {
+  function appendTimelineAndLegend(detailsContent, data, title, icon, max) {
     var timeline = renderTimeline(data, max);
     if (timeline) {
       var executionSum = sum(data, 'duration');
       var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
       var cpuTimelineTitle = cpuTimelineSection.append('header');
-      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
+      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', icon);
       cpuTimelineTitle.append('h5').text(title + ' (' + ko.bindingHandlers.numberFormat.human(executionSum, 5) + ')');
       cpuTimelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('column', true);
-      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><div class="metric-name" title="' + time.name + (time.message ? ': ' + time.message : '') + '">' + time.name + '</div>'; });
       cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
   }
@@ -483,13 +528,18 @@ function impalaDagre(id) {
     details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
 
-    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.HUE_I18n.profile.execution, getMetricsMax());
-    var timeline = renderTimeline(getTimelineData(key), getMetricsMax());
+    var cpuTimelineData = getCPUTimelineData(key);
+    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.HUE_I18n.profile.execution, '#hi-microchip', getMetricsMax());
+    appendTimelineAndLegend(detailsContent, getHealthData(key, cpuTimelineData[0] && cpuTimelineData[0].start_time), window.HUE_I18n.profile.risks, '#hi-heart', getMetricsMax());
+
+    var timelineData = getTimelineData(key);
+    var timeline = renderTimeline(timelineData, getMetricsMax());
     if (timeline) {
+      var timelineSum = sum(timelineData, 'duration');
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
       timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
-      timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline);
+      timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline + ' (' + ko.bindingHandlers.numberFormat.human(timelineSum, 5) + ')');
       timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var timelineSectionTable = timelineSection.append('table').classed('column', true);

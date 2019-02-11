@@ -317,15 +317,18 @@ def metrics(profile):
   def flatten(node, counter_map=counter_map):
     is_plan_node = node.is_plan_node()
     is_parent_node = is_plan_node
+    bIncludeInMinMax = True
     if not is_plan_node:
       if node.plan_node:
         nid = node.plan_node.id()
       elif node.is_fragment_instance():
         is_parent_node = True
         nid = node.fragment.id()
+        bIncludeInMinMax = False
       elif node.is_fragment() and node.is_averaged():
         is_parent_node = True
         nid = node.id()
+        bIncludeInMinMax = False
       elif node.fragment:
         nid = node.fragment.id()
       else:
@@ -348,6 +351,7 @@ def metrics(profile):
         counter_map['nodes'][nid]['other'] = plan_json[nid]
       if is_plan_node:
         counter_map['nodes'][nid]['fragment'] = node.fragment.id()
+      counter_map['nodes'][nid]['timeline']['minmax'] = bIncludeInMinMax
     else:
       name = node.name()
       if counter_map['nodes'][nid]['children'].get(name) is None:
@@ -359,6 +363,8 @@ def metrics(profile):
   for nodeid, node in counter_map['nodes'].iteritems():
     host_min = {'value': sys.maxint, 'host' : None}
     host_max = {'value': -(sys.maxint - 1), 'host' : None}
+    if not node['timeline']['minmax']:
+      continue
     for host_name, host_value in node['timeline']['hosts'].iteritems():
       for event_name, event in host_value.iteritems():
         if len(event):

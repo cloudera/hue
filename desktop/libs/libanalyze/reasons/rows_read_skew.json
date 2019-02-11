@@ -8,7 +8,7 @@
     "max",
     "avg"
   ],
-  "unit_id": 0,
+  "unit": 5,
   "rule": {
     "expr": "(vars['max'] - vars['avg']) / 40.0 * 1000",
     "message": "The skew (max-avg) in rows processed",
