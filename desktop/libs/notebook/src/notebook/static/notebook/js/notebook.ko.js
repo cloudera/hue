@@ -991,18 +991,13 @@ var EditorViewModel = (function() {
     self.progress = ko.observable(typeof snippet.progress !== "undefined" && snippet.progress != null ? snippet.progress : 0);
     self.jobs = ko.observableArray(typeof snippet.jobs !== "undefined" && snippet.jobs != null ? snippet.jobs : []);
 
-    var executeNextTimeout = -1;
+    self.executeNextTimeout = -1;
     var refreshTimeouts = {};
     self.onDdlExecute = function () {
       if (self.result.handle() && self.result.handle().has_more_statements) {
-        window.clearTimeout(executeNextTimeout);
-        executeNextTimeout = setTimeout(function () {
-          // Prevent execution when statement selection has changed
-          if (self.lastExecutedStatements === self.statement()) {
-            self.execute(true); // Execute next, need to wait as we disabled fast click
-          } else {
-            self.result.cancelBatchExecution();
-          }
+        window.clearTimeout(self.executeNextTimeout);
+        self.executeNextTimeout = setTimeout(function () {
+          self.execute(true); // Execute next, need to wait as we disabled fast click
         }, 1000);
       }
       if (self.lastExecutedStatement() && /CREATE|DROP/i.test(self.lastExecutedStatement().firstToken)) {
@@ -1510,8 +1505,27 @@ var EditorViewModel = (function() {
     }
 
     self.lastExecutedStatements = undefined;
+    self.lastExecutedSelectionRange = undefined;
 
     self.execute = function (automaticallyTriggered) {
+      if (!automaticallyTriggered && self.ace()) {
+        var selectionRange = self.ace().getSelectionRange();
+
+        if (self.lastExecutedSelectionRange &&
+          (selectionRange.start.row !== selectionRange.end.row && selectionRange.start.column !== selectionRange.end.column) &&
+          (selectionRange.start.row !== self.lastExecutedSelectionRange.start.row ||
+            selectionRange.start.column !== self.lastExecutedSelectionRange.start.column ||
+            selectionRange.end.row !== self.lastExecutedSelectionRange.end.row ||
+            selectionRange.end.column !== self.lastExecutedSelectionRange.end.column)) {
+         // Manual execute and there is a selection that is different from the last execute
+          self.result.cancelBatchExecution();
+        }
+        self.lastExecutedSelectionRange = selectionRange;
+      }
+
+      if (self.isCanceling()) {
+        return;
+      }
       var now = (new Date()).getTime();
       if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return; // Prevent fast clicks
@@ -1524,20 +1538,6 @@ var EditorViewModel = (function() {
         } else {
           self.result.clear()
         }
-      }
-
-      if (self.editorMode() && self.result.statements_count() > 1 && self.lastExecutedStatements !== self.statement()) {
-        self.lastExecutedStatements = self.statement();
-        if (automaticallyTriggered) {
-          if (self.executingBlockingOperation) {
-            self.executingBlockingOperation.abort();
-            self.executingBlockingOperation = null;
-          }
-          self.result.cancelBatchExecution();
-        } else {
-          self.reexecute();
-        }
-        return;
       }
 
       if (self.type() === 'impala') {
@@ -1570,12 +1570,6 @@ var EditorViewModel = (function() {
 
       if (self.result.handle()) {
         self.close();
-      }
-
-      if (self.isSqlDialect() && self.positionStatement()) {
-        self.lastExecutedStatement(self.positionStatement());
-      } else {
-        self.lastExecutedStatement(null);
       }
 
       self.errors([]);
@@ -1611,6 +1605,15 @@ var EditorViewModel = (function() {
         notebook: vm.editorMode() ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
+        try {
+          if (self.isSqlDialect() && data && data.handle) {
+            self.lastExecutedStatement(sqlStatementsParser.parse(data.handle.statement)[0]);
+          } else {
+            self.lastExecutedStatement(null);
+          }
+        } catch (e) {
+          self.lastExecutedStatement(null);
+        }
         self.statusForButtons('executed');
         huePubSub.publish('ace.set.autoexpand', { autoExpand: true, snippet: self });
         stopLongOperationTimeout();
@@ -2014,13 +2017,10 @@ var EditorViewModel = (function() {
                     self.fetchResultSize(10, _query_id);
                   }, 2000);
                   self.checkDdlNotification(); // DDL CTAS with Impala
+                } else if (self.lastExecutedStatement()) {
+                  self.checkDdlNotification();
                 } else {
-                  // Is DDL
-                  if (self.lastExecutedStatement()) {
-                    self.checkDdlNotification();
-                  } else {
-                    self.onDdlExecute();
-                  }
+                  self.onDdlExecute();
                 }
               }
               if (notebook.isExecutingAll()) {
@@ -2058,12 +2058,15 @@ var EditorViewModel = (function() {
     self.checkDdlNotification = function() {
       if (self.lastExecutedStatement() && /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(self.lastExecutedStatement().firstToken)) {
         self.onDdlExecute();
+      } else {
+        window.clearTimeout(self.executeNextTimeout);
       }
     };
 
     self.isCanceling = ko.observable(false);
 
     self.cancel = function () {
+      window.clearTimeout(self.executeNextTimeout);
       self.isCanceling(true);
       if (self.checkStatusTimeout != null) {
         clearTimeout(self.checkStatusTimeout);
@@ -2071,11 +2074,12 @@ var EditorViewModel = (function() {
       }
       hueAnalytics.log('notebook', 'cancel');
 
+      if (self.executingBlockingOperation != null) {
+        self.executingBlockingOperation.abort();
+        self.executingBlockingOperation = null;
+      }
+
       if ($.isEmptyObject(self.result.handle())) { // Query was not even submitted yet
-        if (self.executingBlockingOperation != null) {
-          self.executingBlockingOperation.abort();
-          self.executingBlockingOperation = null;
-        }
         self.statusForButtons('canceled');
         self.status('failed');
         self.isCanceling(false);
@@ -2310,13 +2314,11 @@ var EditorViewModel = (function() {
     self.init = function () {
       if ((self.status() == 'running' || self.status() == 'available') && notebook.isHistory()) {
         self.checkStatus();
-      }
-      else if (self.status() == 'loading') {
+      } else if (self.status() == 'loading') {
         self.status('failed');
         self.progress(0);
         self.jobs([]);
-      }
-      else if (self.status() == 'ready-execute') {
+      } else if (self.status() == 'ready-execute') {
         self.execute();
       }
     };
