@@ -223,14 +223,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <input id="clusterCreateName" type="text" placeholder="${ _('Name') }" data-bind="clearable: jobs.createClusterName, valueUpdate: 'afterkeydown'">
 
         <!-- ko if: $root.interface() == 'dataware2-clusters' -->
-        <label for="clusterCreateWorkers">${ _('Workers') }</label>
-        <input id="clusterCreateWorkers" type="number" min="1" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
-        <label class="checkbox" style="float: right;">
-          <input type="checkbox" data-bind="checked: jobs.createClusterAutoPause"> ${ _('Auto pause') }
-        </label>
-        <label class="checkbox" style="margin-right: 10px; float: right;">
-          <input type="checkbox" data-bind="checked: jobs.createClusterAutoResize"> ${ _('Auto resize') }
-        </label>
+          <label for="clusterCreateWorkers">${ _('Workers') }</label>
+          <input id="clusterCreateWorkers" type="number" min="1" data-bind="value: jobs.createClusterWorkers, valueUpdate: 'afterkeydown'" class="input-mini" placeholder="${_('Size')}">
+          ##<label class="checkbox" style="float: right;">
+          ##  <input type="checkbox" data-bind="checked: jobs.createClusterAutoPause"> ${ _('Auto pause') }
+          ##</label>
+          <label class="checkbox" style="margin-right: 10px; float: right;">
+            <input type="checkbox" data-bind="checked: jobs.createClusterAutoResize"> ${ _('Auto resize') }
+          </label>
+          <br>
+
+          <label class="checkbox" style="margin-right: 10px;">
+            <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Remote storage') }
+          </label>
+
+          <span data-bind="visible: jobs.createClusterHasRemoteStorage">
+            <label for="clusterCreateRemoteData">${ _('Data') }</label>
+            <input id="clusterCreateRemoteData" type="text" placeholder="${ _('hdfs-namenode:9820') }" data-bind="clearable: jobs.clusterCreateRemoteData, valueUpdate: 'afterkeydown'">
+            <label for="clusterCreateRemoteMetadata">${ _('HMS') }</label>
+            <input id="clusterCreateRemoteMetadata" type="text" placeholder="${ _('thrift://hive:9083') }" data-bind="clearable: jobs.clusterCreateRemoteMetadata, valueUpdate: 'afterkeydown'">
+          </span>
         <!-- /ko -->
         <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
         <label for="clusterCreateSize">${ _('Size') }</label>
@@ -3081,12 +3093,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.createClusterShowWorkers = ko.observable(false);
       self.createClusterAutoResize = ko.observable(false);
       self.createClusterAutoPause = ko.observable(false);
+      self.createClusterHasRemoteStorage = ko.observable(false);
+      self.clusterCreateRemoteData = ko.observable('hdfs-namenode:9820');
+      self.clusterCreateRemoteMetadata = ko.observable('thrift://hive:9083');
+
 
       self.createClusterFormReset = function() {
         self.createClusterName('');
         self.createClusterWorkers(1);
         self.createClusterAutoResize(false);
         self.createClusterAutoPause(false);
+        self.createClusterHasRemoteStorage(false);
       }
 
       self.createCluster = function() {
@@ -3109,8 +3126,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $.post("/metadata/api/analytic_db/create_cluster/", {
             "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
             "cluster_name": self.createClusterName(),
-            "cluster_hdfs_host": "hdfs-namenode",
-            "cluster_hdfs_port": 9820,
+            "clusterCreateRemoteData": self.clusterCreateRemoteData(),
+            "clusterCreateRemoteMetadata": self.clusterCreateRemoteMetadata(),
+            "cluster_hdfs_host": "hdfs-namenode", // old
+            "cluster_hdfs_port": 9820, // old
             "cdh_version": "CDH515",
             "public_key": "public_key",
             "instance_type": "m4.xlarge",
@@ -3239,11 +3258,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         };
 
         var interfaces = [
+          {'interface': 'dataware2-clusters', 'label': '${ _ko('Warehouses') }', 'condition': dataWarehouse2InterfaceCondition},
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
           {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'dataware-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouseInterfaceCondition},
-          {'interface': 'dataware2-clusters', 'label': '${ _ko('Warehouses') }', 'condition': dataWarehouse2InterfaceCondition},
           {'interface': 'engines', 'label': '${ _ko('') }', 'condition': enginesInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
@@ -3261,8 +3280,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.availableInterfaces.subscribe(function (newInterfaces) {
         if (self.interface() && !newInterfaces.some(function (newInterface) {
           return newInterface.interface === self.interface();
-        })) {
-          self.selectInterface(newInterfaces[0]);
+        })) {console.log('availableInterfaces.subscribe ' + JSON.stringify(newInterfaces[0])); // {"interface":"jobs","label":"Jobs"}
+          //self.selectInterface(newInterfaces[0]);
+          //self.selectInterface(newInterfaces[0]['interface']);        
+          self.selectInterface('dataware2-clusters');
         }
       });
 
@@ -3308,14 +3329,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var flatAvailableInterfaces = self.availableInterfaces().map(function (i) {
           return i.interface;
         });
-        if (flatAvailableInterfaces.indexOf(name) != -1 || name == 'oozie-info') {
+        if (flatAvailableInterfaces.indexOf(name) != -1 || name == 'oozie-info' || name == 'dataware2-clusters') {
           return name;
         } else {
           return flatAvailableInterfaces[0];
         }
       };
-      self.selectInterface = function(interface) {
-        interface = self.isValidInterface(interface);
+      self.selectInterface = function(interface) {console.log('[' + interface);
+        interface = self.isValidInterface(interface);console.log(interface + ']');
         self.interface(interface);
         self.resetBreadcrumbs();
 
@@ -3349,7 +3370,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return availableInterface.interface === interfaceToSet;
         })) {
           interfaceToSet = self.availableInterfaces()[0].interface;
-        }
+        }console.log('onClusterSelect ' + interfaceToSet);
         self.selectInterface(interfaceToSet);
       };
 
@@ -3421,7 +3442,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {
           case '':
-            h = 'dataware2-clusters';
+            h = '${ IS_K8S_ONLY.get() and 'dataware2-clusters' or 'jobs' }';
           case 'slas':
           case 'oozie-info':
           case 'jobs':
@@ -3435,6 +3456,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
+            console.log('h ' + h)
             self.selectInterface(h);
             break;
           default:
