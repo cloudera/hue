@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: impala-worker-{{ .Values.name }}
+spec:
+  clusterIP: None
+  ports:
+    - port: 21000
+      targetPort: 21000
+      name: im-sr
+      protocol: TCP
+    - port: 21050
+      name: thrift
+      protocol: TCP
+    - port: 22000
+      name: state-heartbeat
+      protocol: TCP
+    - port: 23000
+      name: state-heartbeat-topic
+      protocol: TCP
+  selector:
+    name: impala-worker-{{ .Values.name }}

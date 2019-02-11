@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: impala-config
+data:
+  core-site.xml: |
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+    <configuration>
+      <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://{{ .Values.hdfs.namenode.host }}:{{ .Values.hdfs.namenode.port }}</value>
+      </property>
+    </configuration>
+
+  hdfs-site.xml: |
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+    <configuration>
+      {{ if .Values.aws.accessKeyId }}
+      <property>
+        <name>fs.s3a.access.key</name>
+        <value>{{ .Values.aws.accessKeyId }}</value>
+      </property>
+      {{ end }}
+      {{ if .Values.aws.accessKeyId }}
+      <property>
+        <name>fs.s3a.secret.key</name>
+        <value>{{ .Values.aws.secretAccessKey }}</value>
+      </property>
+      {{ end }}
+      <property>
+        <name>dfs.datanode.hdfs-blocks-metadata.enabled</name>
+        <value>true</value>
+        <description>Needed for Impala</description>
+      </property>
+      <property>
+        <name>dfs.client.file-block-storage-locations.timeout.millis</name>
+        <value>10000</value>
+      </property>
+    </configuration>
+
+  hive-site.xml: |
+    <configuration>
+      <property>
+        <name>hive.metastore.uris</name>
+        <value>{{ .Values.metastore.uris }}</value>
+        <description>IP address (or fully-qualified domain name) and port of the metastore host</description>
+      </property>
+    </configuration>

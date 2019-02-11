@@ -170,7 +170,7 @@ from desktop.views import _ko
           }
         });
 
-        % if not IS_EMBEDDED.get():
+        % if not IS_EMBEDDED.get() and not IS_K8S_ONLY.get():
         var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
         huePubSub.subscribe('check.job.browser', checkYarnBrowserStatus);
