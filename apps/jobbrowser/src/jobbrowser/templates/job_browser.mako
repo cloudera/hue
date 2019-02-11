@@ -234,10 +234,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <br>
 
           <label class="checkbox" style="margin-right: 10px;">
-            <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Remote storage') }
+            <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Remote') }
           </label>
 
           <span data-bind="visible: jobs.createClusterHasRemoteStorage">
+            <label for="clusterCreateRemoteCluster">${ _('Compute Cluster') }</label>
+            <input id="clusterCreateRemoteCluster" type="text" data-bind="clearable: jobs.clusterCreateRemoteCluster, valueUpdate: 'afterkeydown'">
             <label for="clusterCreateRemoteData">${ _('Data') }</label>
             <input id="clusterCreateRemoteData" type="text" placeholder="${ _('hdfs-namenode:9820') }" data-bind="clearable: jobs.clusterCreateRemoteData, valueUpdate: 'afterkeydown'">
             <label for="clusterCreateRemoteMetadata">${ _('HMS') }</label>
@@ -3094,6 +3096,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.createClusterAutoResize = ko.observable(false);
       self.createClusterAutoPause = ko.observable(false);
       self.createClusterHasRemoteStorage = ko.observable(false);
+
+      self.clusterCreateRemoteCluster = ko.observable(window.location.hostname);
       self.clusterCreateRemoteData = ko.observable('hdfs-namenode:9820');
       self.clusterCreateRemoteMetadata = ko.observable('thrift://hive:9083');
 
