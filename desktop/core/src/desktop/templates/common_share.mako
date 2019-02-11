@@ -27,10 +27,10 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="user-search-autocomp-no-match">
-   <div class="no-match">
-     <span>${ _('No match found') }</span>
-   </div>
- </script>
+  <div class="no-match">
+    <span>${ _('No match found') }</span>
+  </div>
+</script>
 
 
 <div id="documentShareModal" class="modal hide fade">

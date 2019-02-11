@@ -238,6 +238,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </label>
 
           <span data-bind="visible: jobs.createClusterHasRemoteStorage">
+          
+          <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: ['aaaa', 'bbbb'], valueObservable: jobs.clusterCreateRemoteCluster, textInput: jobs.clusterCreateRemoteCluster" class="ui-autocomplete-input" autocomplete="off">
+          
             <label for="clusterCreateRemoteCluster">${ _('Compute Cluster') }</label>
             <input id="clusterCreateRemoteCluster" type="text" data-bind="clearable: jobs.clusterCreateRemoteCluster, valueUpdate: 'afterkeydown'">
             <label for="clusterCreateRemoteData">${ _('Data') }</label>
@@ -3107,7 +3110,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.createClusterWorkers(1);
         self.createClusterAutoResize(false);
         self.createClusterAutoPause(false);
-        self.createClusterHasRemoteStorage(false);
+        self.createClusterHasRemoteStorage(true);
       }
 
       self.createCluster = function() {
