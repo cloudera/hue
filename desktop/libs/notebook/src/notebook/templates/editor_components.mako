@@ -340,7 +340,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <ul class="dropdown-menu pull-right">
           <li>
           <!-- ko if: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
               <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
             </a>
           <!-- /ko -->
