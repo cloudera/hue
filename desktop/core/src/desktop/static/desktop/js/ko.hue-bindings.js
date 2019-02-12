@@ -253,6 +253,9 @@
       if (typeof $().hueAutocomplete === 'undefined') {
         $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
           _renderItemData: function( ul, item ) {
+            if (options.classPrefix == 'hue2-') {
+            ul = $("#menu2 ul")
+            }
             if (item.error && this.options.errorTemplate) {
               var $li = $('<li data-bind="template: { name: \'' + this.options.errorTemplate + '\' }">')
                   .addClass(this.options.classPrefix + 'autocomplete-item')
@@ -268,6 +271,8 @@
             } else if (item.divider) {
               $('<li/>').addClass(this.options.classPrefix + 'autocomplete-divider').appendTo(ul);
             } else {
+              item.data = item;
+              console.log(item);
               var $li = $('<li data-bind="template: { name: \'' + this.options.itemTemplate + '\', data: $data }">')
                 .addClass(this.options.classPrefix + 'autocomplete-item')
                 .appendTo(ul)
@@ -7407,7 +7412,7 @@
       $.extend(options, value);
 
       $(element).addClass('dropzone');
-      
+
       $(element).on('click', function (e) {
         e.stopPropagation();
       });

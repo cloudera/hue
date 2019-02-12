@@ -216,6 +216,95 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </table>
   </script>
 
+<script type="text/html" id="user-search-autocomp-item2">
+  <a data-bind="click: function(e){ }, clickBubble: false">
+    <div>
+      ##<i data-bind="css: icon"></i>
+      <span data-bind="text: label"></span>
+    </div>
+  </a>
+</script>
+
+<script type="text/html" id="user-search-autocomp-no-match2">
+  <div class="no-match">
+    <span>${ _('No match found') }</span>
+  </div>
+</script>
+
+<script type="text/javascript">
+function handleTypeaheadSelection2() {
+  
+  return;
+  
+  searchAutoCompInput = $("#userSearchAutocomp").val();
+  selectedUserOrGroup = shareViewModel.userMap[searchAutoCompInput] ? shareViewModel.userMap[searchAutoCompInput] : shareViewModel.groupMap[searchAutoCompInput];
+  if (selectedUserOrGroup != null) {
+    if (selectedUserOrGroup.hasOwnProperty("username")) {
+      shareViewModel.selectedDoc().perms[shareViewModel.selectedPerm()].users.push(selectedUserOrGroup);
+    }
+    else {
+      shareViewModel.selectedDoc().perms[shareViewModel.selectedPerm()].groups.push(selectedUserOrGroup);
+    }
+    shareViewModel.selectedDoc.valueHasMutated();
+    shareDocFinal();
+  }
+  selectedUserOrGroup = null;
+  $("#userSearchAutocomp").val('');
+}
+
+function source2(request, callback) {
+  callback(['bb', 'ff', 'nn'].filter(word => word.indexOf(request.term) != -1));
+}
+
+function source(request, callback) {
+  callback(['aaa', 'aa', 'bb'].filter(word => word.indexOf(request.term) != -1));
+/**
+  var successCallback = function (data) {
+    var JSON_USERS_GROUPS = data;
+    shareViewModel.items = [];
+    $.each(JSON_USERS_GROUPS.users, function (i, user) {
+      var label = prettifyUsername(user);
+      var highLightedLabel = hueUtils.highlight(label, request.term);
+      shareViewModel.userMap[label] = user;
+      shareViewModel.items.push({
+        data: {
+          "icon": "fa fa-user",
+          "label": highLightedLabel
+        },
+        value: label
+      });
+      shareViewModel.idToUserMap[user.id] = user;
+    });
+    $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+      shareViewModel.groupMap[group.name] = group;
+      var highLightedLabel = hueUtils.highlight(group.name, request.term);
+      shareViewModel.items.push({
+        data: {
+          "icon": "fa fa-users",
+          "label": highLightedLabel
+        },
+        value: group.name
+      });
+    });
+
+    if(shareViewModel.items.length == 0){
+      shareViewModel.items.push({
+        'noMatch': true
+      });
+    }
+
+    callback(shareViewModel.items);
+
+    }
+
+  shareViewModel.apiHelper.fetchUsersAndGroups({
+    data: {filter: request.term},
+    successCallback: successCallback,
+    errorCallback: errorCallback
+  });*/
+}
+</script>
+
   <script type="text/html" id="create-cluster-content">
     <form>
       <fieldset>
@@ -237,9 +326,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Remote') }
           </label>
 
-          <span data-bind="visible: jobs.createClusterHasRemoteStorage">
+<span data-bind="visible: jobs.createClusterHasRemoteStorage">
           
-          <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: ['aaaa', 'bbbb'], valueObservable: jobs.clusterCreateRemoteCluster, textInput: jobs.clusterCreateRemoteCluster" class="ui-autocomplete-input" autocomplete="off">
+            <div id="menu22="></div>
+            ##<input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.searchInput, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.searchInput }, textInput: jobs.searchInput" class="ui-autocomplete-input" autocomplete="off">
+            ##<input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source2, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.searchInput, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.searchInput }, textInput: jobs.searchInput" class="ui-autocomplete-input" autocomplete="off">
           
             <label for="clusterCreateRemoteCluster">${ _('Compute Cluster') }</label>
             <input id="clusterCreateRemoteCluster" type="text" data-bind="clearable: jobs.clusterCreateRemoteCluster, valueUpdate: 'afterkeydown'">
@@ -3099,7 +3190,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.createClusterAutoResize = ko.observable(false);
       self.createClusterAutoPause = ko.observable(false);
       self.createClusterHasRemoteStorage = ko.observable(false);
-
+      
+      self.searchInput = ko.observable('');
       self.clusterCreateRemoteCluster = ko.observable(window.location.hostname);
       self.clusterCreateRemoteData = ko.observable('hdfs-namenode:9820');
       self.clusterCreateRemoteMetadata = ko.observable('thrift://hive:9083');
@@ -3110,7 +3202,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.createClusterWorkers(1);
         self.createClusterAutoResize(false);
         self.createClusterAutoPause(false);
-        self.createClusterHasRemoteStorage(true);
+        self.createClusterHasRemoteStorage(false);
       }
 
       self.createCluster = function() {
