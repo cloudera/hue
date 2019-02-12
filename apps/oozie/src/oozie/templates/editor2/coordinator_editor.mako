@@ -162,11 +162,15 @@ ${ scheduler.import_sla_cron(coordinator_json) }
   shareViewModel.setDocUuid('${ doc_uuid }');
 
   function showChooseWorkflow() {
+    $("#chooseWorkflowDemiModal").removeAttr("disabled");
+    $("#chooseWorkflowDemiModal")[0].style.display = "block";
     $("#chooseWorkflowDemiModal").modal("show");
   }
 
   function selectWorkflow(wf) {
     viewModel.coordinator.properties.workflow(wf.uuid());
+    $("#chooseWorkflowDemiModal").attr('disabled','disabled');
+    $("#chooseWorkflowDemiModal")[0].style.display = "none";
     $("#chooseWorkflowDemiModal").modal("hide");
   }
 
@@ -183,6 +187,8 @@ ${ scheduler.import_sla_cron(coordinator_json) }
     $("#chooseWorkflowDemiModal").modal({
       show: false
     });
+    $("#chooseWorkflowDemiModal").attr('disabled','disabled');
+    $("#chooseWorkflowDemiModal")[0].style.display = "none";
 
     $(window).bind("keydown", "esc", function () {
       if ($(".demi-modal.fade.in").length > 0) {
