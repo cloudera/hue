@@ -63,6 +63,10 @@ def query_node_by_id(profile, node_id, metric_name, averaged=False):
 
   return map(lambda x: L(x['value'], x['unit'], 0, x['node'].fragment.id(), x['node'].host(), 0, x['node'].id(), x['node'].name(), value=x['value'], unit=x['unit'], fragment_id=0, fid=x['node'].fragment.id(), host=x['node'].host(), node_id=x['node'].id(), name=x['node'].name(), node=x['node']), metric)
 
+def query_node_by_id_value(profile, node_id, metric_name, averaged=False, default=0):
+  results = query_node_by_id(profile, node_id, metric_name, averaged)
+  return results and results[0][0] or default
+
 def _filter_averaged(result, averaged=False):
   #nodes = filter(lambda x: x.fragment.is_averaged() == averaged, result)
   # Averaged results are not always present. If we're looking for averaged results, sort by averaged and get first result (hopefully getting averaged!).
