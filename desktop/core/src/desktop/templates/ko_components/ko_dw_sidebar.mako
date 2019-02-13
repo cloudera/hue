@@ -24,6 +24,15 @@
 
 <%def name="dwSidebar()">
   <script type="text/html" id="hue-dw-sidebar-template">
+    <div class="hue-dw-brand" data-bind="css: { 'collapsed': collapsed }, toggle: leftNavVisible">
+##       <!-- ko if: collapsed -->
+##       <img src="${ static('desktop/art/cloudera-data-warehouse-logo.svg') }">
+##       <!-- /ko -->
+##       <!-- ko ifnot: collapsed -->
+      <img src="${ static('desktop/art/cloudera-data-warehouse-3.svg') }">
+##       <!-- /ko -->
+    </div>
+
     <div class="sidebar">
       <div class="sidebar-content" data-bind="foreach: items">
         <!-- ko if: $index() !== 0 -->
@@ -63,6 +72,11 @@
         var self = this;
         self.pocClusterMode = params.pocClusterMode;
         // self.items =  params.items; // TODO: Once we have the proper apps in cluster config.
+
+        self.leftNavVisible = ko.observable(false);
+        self.leftNavVisible.subscribe(function (val) {
+          huePubSub.publish('hue.toggle.left.nav', val);
+        });
 
         self.items = ko.pureComputed(function () {
           var appCategory = {

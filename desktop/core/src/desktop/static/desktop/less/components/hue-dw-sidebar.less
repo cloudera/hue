@@ -21,6 +21,28 @@
 @sidebar-category-font-size: 16px;
 @sidebar-left-spacing: 10px;
 
+.hue-dw-brand {
+  width: 247px;
+  height: 50px;
+  position:fixed;
+  left:0;
+  top:0;
+  background-color: #333d52;
+  z-index:500000;
+  transition: width @sidebar-animation-duration;
+  overflow: hidden;
+
+  &.collapsed {
+    width: 46px;
+  }
+
+  img {
+    min-width: 191px;
+    max-width: 191px;
+    margin: 9px 9px;
+  }
+}
+
 .hue-dw-sidebar-container {
   position: relative;
   .flex(0 0);
@@ -153,7 +175,7 @@
 
 
   &.collapsed {
-    .flex-basis(50px);
+    .flex-basis(49px);
 
     .sidebar {
       .sidebar-category-item,
@@ -184,7 +206,7 @@
     flex-shrink: 0;
 
     &.collapsed {
-      width: @collapsed-sidebar-width;
+      width: 47px;
     }
   }
 }
