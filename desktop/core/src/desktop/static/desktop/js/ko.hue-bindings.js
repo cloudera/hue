@@ -7506,12 +7506,12 @@
       init: function (element, valueAccessor, allBindingsAccessor) {
         var id = $(element).attr("id");
         var self = this;
-        self._impalaDagre = impalaDagre(id);
+        element._impalaDagre = impalaDagre(id);
         var clickSubscription = huePubSub.subscribe('impala.node.moveto', function(value) {
-          self._impalaDagre.moveTo(value);
+          element._impalaDagre.moveTo(value);
         });
         var selectSubscription = huePubSub.subscribe('impala.node.select', function(value) {
-          self._impalaDagre.select(value);
+          element._impalaDagre.select(value);
         });
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
           clickSubscription.remove();
@@ -7520,9 +7520,9 @@
       },
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
-        this._impalaDagre.metrics(props.metrics);
-        this._impalaDagre.height(props.height);
-        this._impalaDagre.update(props.value);
+        element._impalaDagre.metrics(props.metrics);
+        element._impalaDagre.height(props.height);
+        element._impalaDagre.update(props.value);
       }
     };
   })();
