@@ -88,7 +88,8 @@
               { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
               { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
               { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
-              { displayName: 'Warehouses', url: '/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
+              { displayName: 'Warehouses', url: '/jobbrowser#!dataware2-clusters', icon: 'warehouses' },
+              { displayName: 'Dashboards', url: '/dashboard', icon: 'dashboard' },
             ]
           } else { // DE mode
             appCategory.children = [
