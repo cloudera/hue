@@ -181,18 +181,16 @@ ${ hueIcons.symbols() }
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
+        % if not (IS_MULTICLUSTER_ONLY.get() and has_multi_cluster()):
         <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
         <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-          % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
-            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() === 'dw'">
-            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 22px; margin-top:3px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
-          % else:
             <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
-          % endif
         </a>
+        % endif
+
         % endif
 
         % if not IS_MULTICLUSTER_ONLY.get():
@@ -1484,6 +1482,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }, 0);
           }
         });
+
+        huePubSub.subscribe('hue.toggle.left.nav', self.leftNavVisible);
 
         // TODO: Drop. Just for PoC
         self.pocClusterMode = ko.observable();
