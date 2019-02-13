@@ -163,12 +163,12 @@ function impalaDagre(id) {
       return;
     }
     clearSelection();
-    $("g.node:contains('" + key + "')").attr('class', 'node active');
+    $('#' + id + " g.node:contains('" + key + "')").attr('class', 'node active');
     showDetail(node);
   }
 
   function clearSelection() {
-    $("g.node").attr('class', 'node'); // addClass doesn't work in svg on our version of jQuery
+    $('#' + id + " g.node").attr('class', 'node'); // addClass doesn't work in svg on our version of jQuery
   }
 
   function getNode(id) {
@@ -200,7 +200,7 @@ function impalaDagre(id) {
     if (!key) {
       return;
     }
-    var n = $("g.node:contains('" + key + "')")[0];
+    var n = $('#' + id + " g.node:contains('" + key + "')")[0];
     var t = d3.transform(d3.select(n).attr("transform")),
         x = t.translate[0],
         y = t.translate[1];
@@ -469,11 +469,10 @@ function impalaDagre(id) {
   }
 
   function showDetailGlobal() {
-    var details = d3.select('.query-plan .details');
+    var details = d3.select('#' + id + '.query-plan .details');
     var key = getKey(id);
     details.html('<header class="metric-title">' + getIcon({ svg: 'hi-sitemap' }) + '<h4>' + window.HUE_I18n.profile.overview + '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
-
     var topNodes = getTopNodes();
     if (topNodes && topNodes.length) {
       var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
@@ -483,7 +482,7 @@ function impalaDagre(id) {
       cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.topnodes + metricsMax);
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable', true);
       var cpuTimelineSectionTableRows = cpuTimelineSectionTable.selectAll('tr').data(topNodes).enter().append('tr').on('click', function (node) {
-        select(node.key);
+        select(getId(node.key));
         zoomToNode(node.key);
       });
       cpuTimelineSectionTableRows.append('td').html(function (time) { return '' + getIcon(time.icon) + '<div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
@@ -493,7 +492,7 @@ function impalaDagre(id) {
     appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), window.HUE_I18n.profile.planning, '#hi-access-time');
     appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.HUE_I18n.profile.execution, '#hi-access-time');
 
-    d3.select('.query-plan .details .metric-title').on('click', function () {
+    d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
   }
@@ -514,17 +513,17 @@ function impalaDagre(id) {
     }
   }
 
-  function showDetail(id) {
+  function showDetail(key) {
     var data;
-    var node = getNode(id);
+    var node = getNode(key);
     if (!node) {
       return;
     }
     var data = node;
 
-    d3.select('.query-plan').classed('open', true);
-    var details = d3.select('.query-plan .details');
-    var key = getKey(id);
+    d3.select('#' + id + '.query-plan').classed('open', true);
+    var details = d3.select('#' + id + '.query-plan .details');
+    var key = getKey(key);
     details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
 
@@ -577,13 +576,13 @@ function impalaDagre(id) {
     metricsChildSectionsContentCols.enter().append('tr').selectAll('td').data(function (x) { return Object.keys(x).sort().map(function (key) {return x[key]; }) }).enter().append('td').text(function(datum) { return ko.bindingHandlers.numberFormat.human(datum.value, datum.unit);});
     metricsChildSectionsContentTable.append('thead').selectAll('tr').data(function (key) { return ['\u00A0'].concat(Object.keys(data.children[key].hosts).sort()); }).enter().append('tr').append('td').text(function (x, i) { return i > 0 ? x === 'averaged' ? x : 'Host ' + (i - 1) : x; }).attr('title', function (x) {return x;});
 
-    d3.select('.query-plan .details .metric-title').on('click', function () {
+    d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
   }
 
   function hideDetail(id) {
-    d3.select('.query-plan').classed('open', false);
+    d3.select('#' + id + '.query-plan').classed('open', false);
   }
 
   function getProperty(object, path) {
@@ -618,7 +617,7 @@ function impalaDagre(id) {
   }
 
   function toggleDetails() {
-    var queryPlan = d3.select('.query-plan');
+    var queryPlan = d3.select('#' + id + '.query-plan');
     queryPlan.classed('open', !queryPlan.classed('open'));
   }
 
@@ -650,7 +649,7 @@ function impalaDagre(id) {
     // Keep a map of names to states for use when processing edges.
     states.forEach(function(state) {
       // Build the label for the node from the name and the detail
-      var html = "<div onclick=\"event.stopPropagation(); huePubSub.publish('impala.node.select', " + getId(state.name) + ");\">"; // TODO: Remove Hue dependency
+      var html = "<div attr-id='" + state.name + "'>";
       html += getIcon(state.icon);
       html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
       var aboveAverageClass = state.max_time_val > avgCombined ? 'above-average' : '';
@@ -687,7 +686,7 @@ function impalaDagre(id) {
       var node = g.node(v);
       node.rx = node.ry = 5;
     });
-    d3.select('.query-plan .details .metric-title').on('click', function () {
+    d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
 
@@ -696,6 +695,11 @@ function impalaDagre(id) {
 
     // Run the renderer. This is what draws the final graph.
     render(inner, g);
+    d3.selectAll('#' + id + ' g.node').on('click', function () {
+      d3.event.stopPropagation();
+      var name = d3.select(this).select('div > div').attr('attr-id');
+      select(getId(name));
+    });
 
     // Center the graph, but only the first time through (so as to not lose user zooms).
     if (is_first) {

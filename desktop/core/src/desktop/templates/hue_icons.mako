@@ -18,7 +18,7 @@
 %>
 
 <%def name="symbols()">
-  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="height: 0; margin: 0; border: none; width: 0;">
 
     <symbol id="hi-empty" viewBox="0 0 640 640">
     </symbol>
@@ -391,6 +391,19 @@
     <symbol id="hi-heart" viewBox="0 0 1024 1024">
       <path d="M886.250667 552.490667 512 927.957333l-374.229333-375.466667C79.786667 505.429333 42.666667 433.536 42.666667 352.896 42.666667 211.029333 157.290667 96.042667 298.666667 96.042667c89.088 0 167.488 45.717333 213.333333 114.986667 45.845333-69.269333 124.245333-114.986667 213.333333-114.986667 141.376 0 256 114.986667 256 256.832C981.333333 433.536 944.213333 505.429333 886.250667 552.490667zM832.341333 458.858667l-138.858667 0-53.888-197.610667-20.586667 5.610667-20.117333-7.104-93.226667 317.034667-101.077333-252.672-20.245333 6.741333-19.989333-7.509333-50.794667 135.509333L192.341333 458.858667l0 42.666667 128 0 19.989333 7.509333 44.672-119.168 107.114667 267.754667 40.469333-13.504-3.477333-8.661333 3.349333 1.173333 85.76-291.562667 44.202667 162.090667 20.586667-5.610667 149.333333 0L832.341333 458.858667z" />
     </symbol>
+    <defs>
+      <filter id="dropshadow" height="130%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+        <feOffset dx="0" dy="0" result="offsetBlur"/> <!-- how much to offset -->
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.5"/> <!-- slope is the opacity of the shadow -->
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode/> <!-- this contains the offset blurred image -->
+          <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+        </feMerge>
+      </filter>
+    </defs>
   </svg>
 
   <script type="text/html" id="app-switcher-icon-template">
