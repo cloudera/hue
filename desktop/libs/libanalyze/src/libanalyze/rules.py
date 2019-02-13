@@ -622,7 +622,7 @@ class TopDownAnalysis:
             has_spilled = False
 
             # Make sure to substract the wait time for the exchange node
-            if is_plan_node and re.search(r'EXCHANGE_NODE', node.val.name) is not None:
+            if is_plan_node and node.node_name == 'EXCHANGE_NODE':
                 async_time = counter_map.get('AsyncTotalTime', models.TCounter(value=0)).value
                 inactive_time = counter_map['InactiveTotalTime'].value
                 if inactive_time == 0:
@@ -630,38 +630,35 @@ class TopDownAnalysis:
                   inactive_time = dequeue.counter_map().get('DataWaitTime', models.TCounter(value=0)).value if dequeue else 0
                 local_time = counter_map['TotalTime'].value - inactive_time - async_time
                 child_time = counter_map['TotalTime'].value - local_time
-            if re.search(r'KrpcDataStreamSender', node.val.name) is not None and node.fragment_instance:
+            elif node.node_name == 'KrpcDataStreamSender' and node.fragment_instance:
               local_time = counter_map.get('SerializeBatchTime', models.TCounter(value=0)).value
               child_time = counter_map['TotalTime'].value - local_time
-            if re.search(r'HBASE_SCAN_NODE', node.val.name):
+            elif node.node_name == 'HBASE_SCAN_NODE':
               local_time = counter_map['TotalTime'].value - counter_map.get('TotalRawHBaseReadTime(*)', models.TCounter(value=0)).value
               child_time = counter_map['TotalTime'].value - local_time
-            if re.search(r'KUDU_SCAN_NODE', node.val.name):
+            elif node.node_name == 'KUDU_SCAN_NODE':
               child_time = counter_map.get('KuduClientTime', models.TCounter(value=0)).value
               local_time = counter_map['TotalTime'].value
-            if re.search(r'HDFS_SCAN_NODE', node.val.name):
+            elif node.node_name == 'HDFS_SCAN_NODE':
               child_time = counter_map.get('TotalRawHdfsReadTime(*)', models.TCounter(value=0)).value
               local_time = counter_map['TotalTime'].value
-            if re.search(r'Buffer pool', node.val.name):
+            elif node.node_name == 'Buffer pool':
               local_time = counter_map.get('WriteIoWaitTime', models.TCounter(value=0)).value + counter_map.get('ReadIoWaitTime', models.TCounter(value=0)).value + counter_map.get('AllocTime', models.TCounter(value=0)).value
-            if counter_map.get('SpilledPartitions', 0) > 0:
-              has_spilled = True
-
-            if re.search(r'AGGREGATION', node.val.name):
+            elif node.node_name == 'AGGREGATION':
               grouping_aggregator = node.find_by_name('GroupingAggregator')
               if grouping_aggregator and grouping_aggregator.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
                 has_spilled = True
-
-            # For Hash Join, if the "LocalTime" metrics
-            if is_plan_node and re.search(r'HASH_JOIN_NODE', node.val.name) is not None:
-                hash_join_builder = node.find_by_name('Hash Join Builder')
-                if hash_join_builder and hash_join_builder.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
-                  has_spilled = True
-                if ("LocalTime" in counter_map):
-                    local_time = counter_map["LocalTime"].value
-                else:
-                    local_time = counter_map["ProbeTime"].value +\
-                        counter_map["BuildTime"].value
+            elif is_plan_node and node.node_name == 'HASH_JOIN_NODE': # For Hash Join, if the "LocalTime" metrics
+              hash_join_builder = node.find_by_name('Hash Join Builder')
+              if hash_join_builder and hash_join_builder.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
+                has_spilled = True
+              if ("LocalTime" in counter_map):
+                  local_time = counter_map["LocalTime"].value
+              else:
+                  local_time = counter_map["ProbeTime"].value +\
+                      counter_map["BuildTime"].value
+            if counter_map.get('SpilledPartitions', 0) > 0:
+              has_spilled = True
 
             # Add two virtual metrics for local_time and child_time
             if has_spilled:
@@ -672,6 +669,16 @@ class TopDownAnalysis:
               node.val.counters.append(models.TCounter(name='SpillTime', value=spill_time, unit=5))
             node.val.counters.append(models.TCounter(name='LocalTime', value=local_time, unit=5))
             node.val.counters.append(models.TCounter(name='ChildTime', value=child_time, unit=5))
+
+        nodes = {}
+        def create_map(node, nodes=nodes):
+          nid = node.id()
+          if nid:
+            if not nodes.get(nid):
+              nodes[nid] = []
+            nodes[nid].append(node)
+        profile.foreach_lambda(create_map)
+        profile.nodes = nodes
 
         profile.foreach_lambda(add_host)
 
