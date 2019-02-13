@@ -256,8 +256,8 @@ function source2(request, callback) {
   callback(['bb', 'ff', 'nn'].filter(word => word.indexOf(request.term) != -1));
 }
 
-function source(request, callback) {
-  callback(['aaa', 'aa', 'bb'].filter(word => word.indexOf(request.term) != -1));
+function sourceClusterCreateRemoteClustersOld(request, callback) {
+  callback(jobBrowserViewModel.jobs.clusterCreateRemoteClusters().filter(word => word.indexOf(request.term) != -1));
 /**
   var successCallback = function (data) {
     var JSON_USERS_GROUPS = data;
@@ -326,16 +326,15 @@ function source(request, callback) {
             <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Remote') }
           </label>
 
-<span data-bind="visible: jobs.createClusterHasRemoteStorage">
+          <span data-bind="visible: jobs.createClusterHasRemoteStorage">
           
-            <div id="menu22="></div>
-            ##<input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.searchInput, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.searchInput }, textInput: jobs.searchInput" class="ui-autocomplete-input" autocomplete="off">
-            ##<input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source2, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.searchInput, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.searchInput }, textInput: jobs.searchInput" class="ui-autocomplete-input" autocomplete="off">
-          
+            <div id="menu22"></div>
             <label for="clusterCreateRemoteCluster">${ _('Compute Cluster') }</label>
-            <input id="clusterCreateRemoteCluster" type="text" data-bind="clearable: jobs.clusterCreateRemoteCluster, valueUpdate: 'afterkeydown'">
+            <input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: jobs.sourceClusterCreateRemoteClusters, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.clusterCreateRemoteCluster, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.clusterCreateRemoteCluster }, textInput: jobs.clusterCreateRemoteCluster" class="ui-autocomplete-input" autocomplete="off">
+
             <label for="clusterCreateRemoteData">${ _('Data') }</label>
             <input id="clusterCreateRemoteData" type="text" placeholder="${ _('hdfs-namenode:9820') }" data-bind="clearable: jobs.clusterCreateRemoteData, valueUpdate: 'afterkeydown'">
+
             <label for="clusterCreateRemoteMetadata">${ _('HMS') }</label>
             <input id="clusterCreateRemoteMetadata" type="text" placeholder="${ _('thrift://hive:9083') }" data-bind="clearable: jobs.clusterCreateRemoteMetadata, valueUpdate: 'afterkeydown'">
           </span>
@@ -3193,9 +3192,13 @@ function source(request, callback) {
       
       self.searchInput = ko.observable('');
       self.clusterCreateRemoteCluster = ko.observable(window.location.hostname);
+      self.clusterCreateRemoteClusters = ko.observable([window.location.hostname]);
       self.clusterCreateRemoteData = ko.observable('hdfs-namenode:9820');
       self.clusterCreateRemoteMetadata = ko.observable('thrift://hive:9083');
 
+      self.sourceClusterCreateRemoteClusters = function(request, callback) {
+        callback(self.clusterCreateRemoteClusters().filter(word => word.indexOf(request.term) != -1));
+      }
 
       self.createClusterFormReset = function() {
         self.createClusterName('');
