@@ -32,12 +32,18 @@
         <!-- ko foreach: children -->
         <!-- ko if: $component.collapsed -->
         <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, tooltip: { placement: 'right' }, click: function() { if (url.startsWith('/jobbrowser')) { huePubSub.publish('context.selector.set.cluster', 'AltusV2'); } }">
+          <!-- ko ifnot: $component.collapsed -->
+          <span class="sidebar-caret"><i class="fa fa-caret-right"></i></span>
+          <!-- /ko -->
           <span class="sidebar-icon with-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
           <span class="sidebar-item-name" data-bind="text: displayName"></span>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: $component.collapsed -->
         <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, click: function() { if (url.startsWith('/jobbrowser')) { huePubSub.publish('context.selector.set.cluster', 'AltusV2'); } }">
+          <!-- ko ifnot: $component.collapsed -->
+          <span class="sidebar-caret"><i class="fa fa-caret-right"></i></span>
+          <!-- /ko -->
           <span class="sidebar-icon without-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
           <span class="sidebar-item-name" data-bind="text: displayName"></span>
         </a>
