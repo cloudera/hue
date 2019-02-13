@@ -261,10 +261,10 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
         """
         self.metric_names = ["Hosts", "Broadcast", "BuildRows", "ProbeRows"]
 
-        hosts = models.query_node_by_id(profile, plan_node_id, "Hosts", True)[0][0]
-        isBroadcast = models.query_node_by_id(profile, plan_node_id, "Broadcast", True)[0][0]
-        buildRows = models.query_node_by_id(profile, plan_node_id, "BuildRows", True)[0][0]
-        probeRows = models.query_node_by_id(profile, plan_node_id, "ProbeRows", True)[0][0]
+        hosts = models.query_node_by_id_value(profile, plan_node_id, "Hosts", True)
+        isBroadcast = models.query_node_by_id_value(profile, plan_node_id, "Broadcast", True)
+        buildRows = models.query_node_by_id_value(profile, plan_node_id, "BuildRows", True)
+        probeRows = models.query_node_by_id_value(profile, plan_node_id, "ProbeRows", True)
 
         rhsRows = 0
         lhsRows = 0
@@ -311,10 +311,10 @@ class ExplodingJoinCheck(SQLOperatorReason):
         """
         self.metric_names = ["Hosts", "Broadcast", "BuildRows", "ProbeRows"]
 
-        hosts = models.query_node_by_id(profile, plan_node_id, "Hosts", True)[0][0]
-        probeRows = models.query_node_by_id(profile, plan_node_id, "ProbeRows", True)[0][0]
-        probeTime = models.query_node_by_id(profile, plan_node_id, "ProbeTime", True)[0][0]
-        rowsReturned = models.query_node_by_id(profile, plan_node_id, "RowsReturned", True)[0][0]
+        hosts = models.query_node_by_id_value(profile, plan_node_id, "Hosts", True)
+        probeRows = models.query_node_by_id_value(profile, plan_node_id, "ProbeRows", True)
+        probeTime = models.query_node_by_id_value(profile, plan_node_id, "ProbeTime", True)
+        rowsReturned = models.query_node_by_id_value(profile, plan_node_id, "RowsReturned", True)
 
         impact = 0
         if (rowsReturned > 0):
@@ -340,8 +340,8 @@ class NNRpcCheck(SQLOperatorReason):
         :return:
         """
         totalStorageTime = models.query_avg_fragment_metric_by_node_nid(profile, plan_node_id, "TotalStorageWaitTime", 0)
-        hdfsRawReadTime = models.query_node_by_id(profile, plan_node_id, "TotalRawHdfsReadTime(*)", True)[0][0]
-        avgReadThreads = models.query_node_by_id(profile, plan_node_id, "AverageHdfsReadThreadConcurrency", True)[0][0]
+        hdfsRawReadTime = models.query_node_by_id_value(profile, plan_node_id, "TotalRawHdfsReadTime(*)", True)
+        avgReadThreads = models.query_node_by_id_value(profile, plan_node_id, "AverageHdfsReadThreadConcurrency", True)
         avgReadThreads = max(1, to_double(avgReadThreads))
         impact = max(0, (totalStorageTime - hdfsRawReadTime) / avgReadThreads)
         return {
