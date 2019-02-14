@@ -1,0 +1,27 @@
+Hue Celery/RabbitMQ Install
+
+Installation tested on Ubuntu 16.04
+
+echo "deb https://packages.erlang-solutions.com/ubuntu $(lsb_release -sc) contrib" >> /etc/apt/sources.list.d/erlang.list
+wget https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+sudo apt-key add erlang_solutions.asc
+
+echo "deb https://dl.bintray.com/rabbitmq/debian $(lsb_release -sc) main" >> /etc/apt/sources.list.d/rabbitmq.list
+wget -O- https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc | sudo apt-key add -
+wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+
+
+apt update -y
+apt-get install -y erlang
+apt-get install -y rabbitmq-server
+
+systemctl enable rabbitmq-server
+systemctl start rabbitmq-server
+
+rabbitmq-plugins enable rabbitmq_management
+rabbitmqctl cluster_status
+rabbitmqctl add_user hueuser cloudera
+rabbitmqctl add_vhost huevhost
+rabbitmqctl set_user_tags hueuser administrator
+rabbitmqctl set_permissions -p huevhost hueuser ".*" ".*" ".*"
+rabbitmqctl delete_user guest
