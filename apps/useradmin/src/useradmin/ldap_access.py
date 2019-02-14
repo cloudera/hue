@@ -280,14 +280,16 @@ class LdapConnection(object):
             'name': group_name
           }
 
-          if group_member_attr in data and 'posixGroup' not in data['objectClass']:
+          if group_member_attr in data and group_member_attr not in 'memberUid':
             ldap_info['members'] = data[group_member_attr]
           else:
+            LOG.warn('Skipping import of non-posix users since group_member_attr is memberUid or group did not contain any members')
             ldap_info['members'] = []
 
           if 'posixGroup' in data['objectClass'] and 'memberUid' in data:
             ldap_info['posix_members'] = data['memberUid']
           else:
+            LOG.warn('Skipping import of posix users.  posixGroup not an objectClass or  no memberUids found')
             ldap_info['posix_members'] = []
 
           group_info.append(ldap_info)
