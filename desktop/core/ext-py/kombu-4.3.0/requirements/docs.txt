@@ -1,0 +1,2 @@
+git+https://github.com/celery/sphinx_celery.git
+-r extras/mongodb.txt
