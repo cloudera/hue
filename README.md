@@ -1,5 +1,20 @@
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
+Building locally
+----------------
+   * Follow the installation instructions [here](http://cloudera.github.io/hue/latest/admin-manual/manual.html#installation).
+   * Download python: 2.7.6 < Install Python Version < 3.X.Y
+   
+```
+export LDFLAGS=-L/usr/local/opt/openssl/lib
+xcode_sdk_path="$(xcrun --show-sdk-path -f)"
+CPPFLAGS='-I'"$xcode_sdk_path"'/usr/include/sasl -I/usr/local/opt/openssl/include' make apps SKIP_PYTHONDEV_CHECK=1
+```
+
+Helpful tips:
+   *  `make clean apps` is your friend
+   *  There may be an error w/ SSL certifcate handling in the build; if so, the 'apparent' problem may be the MacOS version. Last successful build has been on MacOSX High Sierra.
+
 
 Query. Explore. Repeat.
 -----------------------

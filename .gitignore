@@ -108,3 +108,6 @@ dependency-reduced-pom.xml
 node_modules/
 
 junitresults*
+
+#Eggs
+*.eggs/
