@@ -263,7 +263,6 @@ if USE_NEW_EDITOR.get():
       %endif
 
       % if 'jobbrowser' in apps:
-      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
       var lastJobBrowserRequest = null;
 
@@ -287,7 +286,7 @@ if USE_NEW_EDITOR.get():
                 $("#jobBrowserCount").addClass("hide");
               }
             }
-          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS);
         }).fail(function () {
           window.clearTimeout(checkJobBrowserStatusIdx);
         });

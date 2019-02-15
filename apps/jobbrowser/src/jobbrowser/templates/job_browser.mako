@@ -2491,6 +2491,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.loadingJob = ko.observable(false);
       var lastFetchJobRequest = null;
       var lastUpdateJobRequest = null;
+      var lastFetchLogsRequest = null;
+      var lastFetchProfileRequest = null;
+      var lastFetchStatusRequest = null;
 
       self._fetchJob = function (callback) {
         if (vm.interface() == 'engines') {
@@ -2633,28 +2636,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.updateJob = function () {
-        vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
         huePubSub.publish('graph.refresh.view');
+        var deferred = $.Deferred();
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
-          lastFetchJobRequest = self._fetchJob(function (data) {
+          vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
+          lastUpdateJobRequest = self._fetchJob(function (data) {
+            var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
               window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
               vm.job = ko.mapping.fromJS(data.app, {}, vm.job);
             } else {
-              vm.job().fetchStatus();
+              requests.push(vm.job().fetchStatus());
             }
-            vm.job().fetchLogs(vm.job().logActive());
-            var profile = $("div[data-jobType] .tab-content .active").data("profile")
+            requests.push(vm.job().fetchLogs(vm.job().logActive()));
+            var profile = $("div[data-jobType] .tab-content .active").data("profile");
             if (profile) {
-              vm.job().fetchProfile(profile);
+              requests.push(vm.job().fetchProfile(profile));
             }
+            $.when.apply(this, requests).done(function (){
+              deferred.resolve();
+            });
           });
         }
+        return deferred;
       };
 
       self.fetchLogs = function (name) {
         name = name || 'default';
-        $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
+        vm.apiHelper.cancelActiveRequest(lastFetchLogsRequest);
+        lastFetchLogsRequest = $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2672,10 +2682,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $(document).trigger("error", data.message);
           }
         });
+        return lastFetchLogsRequest;
       };
 
       self.fetchProfile = function (name, callback) {
-        $.post("/jobbrowser/api/job/profile", {
+        vm.apiHelper.cancelActiveRequest(lastFetchProfileRequest);
+        lastFetchProfileRequest = $.post("/jobbrowser/api/job/profile", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2692,10 +2704,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $(document).trigger("error", data.message);
           }
         });
+        return lastFetchProfileRequest;
       };
 
       self.fetchStatus = function () {
-        $.post("/jobbrowser/api/job", {
+        vm.apiHelper.cancelActiveRequest(lastFetchStatusRequest);
+        lastFetchStatusRequest = $.post("/jobbrowser/api/job", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(self.mainType)
@@ -2709,6 +2723,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $(document).trigger("error", data.message);
           }
         });
+        return lastFetchStatusRequest;
       };
 
       self.control = function (action) {
@@ -3073,6 +3088,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.totalApps(data.total);
           }
         });
+        return lastFetchJobsRequest;
       };
 
       self.createClusterShow = ko.observable(false);
@@ -3356,23 +3372,36 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.jobs = new Jobs(self);
       self.job = ko.observable();
 
-      var updateJobInterval = -1;
-      var updateJobsInterval = -1;
+      var updateJobTimeout = -1;
+      var updateJobsTimeout = -1;
       self.job.subscribe(function(val) {
         self.monitorJob(val);
       });
 
       self.monitorJob = function(job) {
-        window.clearInterval(updateJobInterval);
-        window.clearInterval(updateJobsInterval);
+        window.clearTimeout(updateJobTimeout);
+        window.clearTimeout(updateJobsTimeout);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
-              updateJobInterval = setInterval(job.updateJob, 5000, 'jobbrowser');
+              var _updateJob = function () {
+                var def = job.updateJob();
+                if (def) {
+                  def.done(function () {
+                    updateJobTimeout = setTimeout(_updateJob, window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS);
+                  });
+                }
+              };
+              updateJobTimeout = setTimeout(_updateJob, window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS);
             }
           }
           else {
-            updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
+            var _updateJobs = function () {
+              self.jobs.updateJobs().done(function () {
+                setTimeout(_updateJobs, window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS);
+              });
+            };
+            updateJobsTimeout = setTimeout(_updateJobs, window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS);
           }
         }
       };

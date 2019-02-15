@@ -163,7 +163,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
       % if 'jobbrowser' in apps:
       if (!IS_HUE_4) {
-        var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
         var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
         var lastJobBrowserRequest = null;
 
@@ -186,7 +185,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
                     $("#jobBrowserCount").hide();
                   }
                 }
-                checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+                checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS);
               }).fail(function () {
             window.clearTimeout(checkJobBrowserStatusIdx);
           });
