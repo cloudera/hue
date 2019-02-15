@@ -972,9 +972,11 @@ JavaScript.
 * We recommend developing with the Chrome console.
 
 ## Building
+
 ### Documentation
 
 Building with
+
 ```
 make docs
 ```
@@ -982,8 +984,17 @@ make docs
 ### CSS / LESS
 
 After changing the CSS in a .less file, rebuilding with:
+
 ```
 make css
+```
+
+### SQL Autocomplete
+
+Install jison from branch https://github.com/JohanAhlen/jison and run "npm install -g". Then:
+
+```
+make sql-all-parsers
 ```
 
 ### Internationalization
