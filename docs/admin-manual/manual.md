@@ -77,7 +77,7 @@ tarball, you'll need these library development packages and tools installed on y
 
     brew install mysql maven gmp openssl libffi && brew cask install java8
 
-#### Install Xcode command line tools 
+#### Install Xcode command line tools
     sudo xcode-select --install
 
 #### Fix openssl errors
@@ -487,7 +487,7 @@ using a proper SSL Certificate.  Self-signed certificates don't
 work.
 </div>
 
-Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers 
+Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers
 having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.
 
 DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:
@@ -1416,6 +1416,12 @@ your bug reports.
 
    </div>
 </div>
+
+
+<div class="row-fluid footer">
+  Documentation improvements? <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">Feel free to edit this page on GitHub and send a pull request!</a>
+</div>
+
 
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.treed.js"></script>

@@ -1294,6 +1294,12 @@ and greatest in build technologies.
    </div>
 </div>
 
+
+<div class="row-fluid footer">
+  Documentation improvements? <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">Feel free to edit this page on GitHub and send a pull request!</a>
+</div>
+
+
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.treed.js"></script>
 <script src="../js/jquery.highlight.js"></script>

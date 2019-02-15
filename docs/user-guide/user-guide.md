@@ -250,7 +250,7 @@ MapReduce or [Impala jobs](#impala-queries) that the query generated.
 
 ### Downloading and Exporting Query Results
 
-To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query. 
+To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query.
 
 ![image](images/note.jpg) Two of them offer great scalability:
 1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
@@ -1492,6 +1492,12 @@ A basic read only version is done [HUE-951](https://issues.cloudera.org/browse/H
 
    </div>
 </div>
+
+
+<div class="row-fluid footer">
+  Documentation improvements? <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">Feel free to edit this page on GitHub and send a pull request!</a>
+</div>
+
 
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.treed.js"></script>
