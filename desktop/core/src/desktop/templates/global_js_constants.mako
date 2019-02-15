@@ -58,6 +58,9 @@
 
   window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
   window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
+  window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS = 30000;
+  window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
+  window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
 
   window.HUE_I18n = {
     autocomplete: {
