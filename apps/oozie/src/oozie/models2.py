@@ -587,7 +587,7 @@ def _update_adj_list(adj_list):
     elif adj_list[node]['node_type'] == 'end':
       adj_list[node]['uuid'] = '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'
     else:
-      adj_list[node]['uuid'] = node[-4:] + str(uuid.uuid4())[4:]
+      adj_list[node]['uuid'] = node + str(uuid.uuid4())[len(node):]
 
     uuids[id] = adj_list[node]['uuid']
     id += 1
