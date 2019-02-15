@@ -1234,6 +1234,9 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
         except LdapSearchException, e:
           LOG.warn("Failed to find LDAP user: %s" % e)
 
+        if user_info is None:
+          continue
+
         if len(user_info) > 1:
           LOG.warn('Found multiple users for member %s.' % member)
         else:

@@ -346,13 +346,18 @@ class LdapConnection(object):
     self._ldap_filter = ldap_filter
     self._attrlist = attrlist
 
-    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
-    result_type, result_data = self.ldap_handle.result(ldap_result_id)
+    try:
+      ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
+      result_type, result_data = self.ldap_handle.result(ldap_result_id)
 
-    if result_type == ldap.RES_SEARCH_RESULT:
-      return self._transform_find_user_results(result_data, user_name_attr)
-    else:
-      return []
+      if result_type == ldap.RES_SEARCH_RESULT:
+        return self._transform_find_user_results(result_data, user_name_attr)
+      else:
+        return []
+    except ldap.LDAPError, e:
+       LOG.warn("LDAP Error: %s" % e)
+
+    return None
 
   def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """
