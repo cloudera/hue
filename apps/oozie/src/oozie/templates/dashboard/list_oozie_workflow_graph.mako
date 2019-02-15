@@ -163,6 +163,4 @@ ${ dashboard.import_layout() }
       %endif
     });
   })();
-
-//# sourceURL=list_oozie_workflow_graph.js
 </script>
