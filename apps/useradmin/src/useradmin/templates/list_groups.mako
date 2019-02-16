@@ -169,11 +169,11 @@ ${layout.menubar(section='groups')}
     $groupsComponents.find('.delete-group form').ajaxForm({
       dataType:  'json',
       success: function(data) {
+        $groupsComponents.find(".delete-group").modal("hide");
+        $.jHueNotify.info("${ _('The groups were deleted.') }");
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
         }
-        $.jHueNotify.info("${ _('The groups were deleted.') }");
-        $groupsComponents.find(".delete-group").modal("hide");
       }
     });
     % endif
