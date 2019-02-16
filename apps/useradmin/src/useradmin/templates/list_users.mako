@@ -200,20 +200,20 @@ ${layout.menubar(section='users')}
     $usersComponents.find('.delete-user form').ajaxForm({
       dataType:  'json',
       success: function(data) {
+        $usersComponents.find(".delete-user").modal("hide");
+        $.jHueNotify.info("${ _('The users were deleted.') }")
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
         }
-        $.jHueNotify.info("${ _('The users were deleted.') }")
-        $usersComponents.find(".delete-user").modal("hide");
       },
       error: function(response, status, err) {
+        $usersComponents.find(".delete-user").modal("hide");
         if (response.responseJSON && response.responseJSON.message && response.status == 401) {
           $.jHueNotify.error(response.responseJSON.message);
         }
         else {
           $.jHueNotify.error("${ _('An unknown error has occurred while deleting the user. Please try again.') }");
         }
-        $usersComponents.find(".delete-user").modal("hide");
       }
     });
     % endif
@@ -243,16 +243,16 @@ ${layout.menubar(section='users')}
                 renderUseradminErrors(data.errors);
               }
               else if (data && data.url) {
-                huePubSub.publish('open.link', data.url);
-                $.jHueNotify.info("${ _('The users and groups were updated correctly.') }")
                 $usersComponents.find(".sync-ldap").modal("hide");
+                $.jHueNotify.info("${ _('The users and groups were updated correctly.') }");
+                huePubSub.publish('open.link', data.url);
               }
             },
             error: function(data) {
               $usersComponents.find('input[type="submit"]').removeAttr("disabled");
-              huePubSub.publish('open.link', data.url);
-              $.jHueNotify.error(data.responseJSON['message']);
               $usersComponents.find(".sync-ldap").modal("hide");
+              $.jHueNotify.error(data.responseJSON['message']);
+              huePubSub.publish('open.link', data.url);
             }
           });
           % endif
