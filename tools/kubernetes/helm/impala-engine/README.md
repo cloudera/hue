@@ -1,4 +1,4 @@
-# Cloudera Impala Chart
+# Impala Chart
 
 This is a MVP to get an Helm chart to get an Impala compute cluster ported to Kubernetes.
 It provides a basic Impala warehouses creation and autoscaling.

@@ -1,4 +1,4 @@
-Congratulations, you've launched the Cloudera Data Warehouse!
+Congratulations, you've launched the Hue SQL Editor for Data Warehouses!
 
 To check the status of your installation run:
 
@@ -18,13 +18,5 @@ Or directly:
   export WEB_PORT=$(kubectl get service hue -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
 
   echo http://$WEB_HOST:$WEB_PORT
-
-
-The REST API is available at:
-
-  export API_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
-  export API_PORT=$(kubectl get service provisioner -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
-
-  echo http://$API_HOST:$API_PORT
 
 Happy Querying!

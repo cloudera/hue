@@ -4,11 +4,8 @@ metadata:
   name: hue-config
 data:
   hue-ini: |
-    [metadata]
-    [[k8s]]
-    api_url={{ .Values.hue.provisionerApi }}
-    [[prometheus]]
-    api_url=http://{{ .Values.hue.prometheusHost }}/api
+    [impala]
+    server_host={{ .Values.impala.server_host }}
 
     [aws]
     [[aws_accounts]]
@@ -30,7 +27,7 @@ spec:
     spec:
       containers:
         - name: hue
-          image: {{ .Values.registry }}/hue-frontend:{{ .Values.tag }}
+          image: {{ .Values.registry }}/hue:{{ .Values.tag }}
           imagePullPolicy: Always
           ports:
             - containerPort: 8888
