@@ -543,6 +543,8 @@ class Attempt:
     logs = []
     attempt = self.task.job.job_attempts['jobAttempt'][-1]
     log_link = attempt['logsLink']
+    if not log_link:
+      return ['', '', '']
 
     # Generate actual task log link from logsLink url
     if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING'):
@@ -641,6 +643,22 @@ class YarnOozieAttempt(Attempt):
     if not hasattr(self, 'diagnostics'):
       self.diagnostics = ''
     setattr(self, 'type', 'Oozie Launcher')
+    if self.finishedTime == 0:
+      finishTime = int(time.time() * 1000)
+    else:
+      finishTime = self.finishedTime
+    if self.startTime == 0:
+      durationInMillis = None
+    else:
+      durationInMillis = finishTime - self.startTime
+
+    setattr(self, 'duration', durationInMillis)
+    setattr(self, 'durationInMillis', durationInMillis)
+    setattr(self, 'durationFormatted', self.duration and format_duration_in_millis(self.duration))
+    setattr(self, 'finishTimeFormatted', format_unixtime_ms(finishTime))
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
+    setattr(self, 'status', 'RUNNING' if self.finishedTime == 0 else 'SUCCEEDED')
+    setattr(self, 'properties', {})
 
 class Container:
 
