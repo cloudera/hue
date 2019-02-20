@@ -126,7 +126,7 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
 # For Django admin interface
-STATIC_URL = '/static/'
+STATIC_URL = '/dwx-sql/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 

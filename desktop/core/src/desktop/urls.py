@@ -59,6 +59,7 @@ admin.autodiscover()
 
 # Some django-wide URLs
 dynamic_patterns = [
+  url(r'^dwx-sql/hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
   url(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
   url(r'^accounts/login/$', desktop_auth_views.dt_login), # Deprecated
   url(r'^accounts/logout/$', desktop_auth_views.dt_logout, {'next_page': '/'}),
@@ -103,6 +104,7 @@ dynamic_patterns += [
   # Mobile
   url(r'^assist_m', desktop_views.assist_m),
   # Hue 4
+  url(r'^dwx-sql/hue.*/$', desktop_views.hue, name='desktop_views_hue'),
   url(r'^hue.*/$', desktop_views.hue, name='desktop_views_hue'),
   url(r'^403$', desktop_views.path_forbidden),
   url(r'^404$', desktop_views.not_found),
@@ -116,13 +118,18 @@ dynamic_patterns += [
   url(r'^jasmine', desktop_views.jasmine),
 
   # JS that needs to be mako
+  
+  url(r'^dwx-sql/desktop/globalJsConstants.js', desktop_views.global_js_constants),
   url(r'^desktop/globalJsConstants.js', desktop_views.global_js_constants),
 
-  # Web workers
+  # Web workers  
+  url(r'^dwx-sql/desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
+  url(r'^dwx-sql/desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),
   url(r'^desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
   url(r'^desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),
 
   # Unsupported browsers
+  url(r'^dwx-sql/boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
   url(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
 
   # Top level web page!
@@ -155,6 +162,7 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
   url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
+  url(r'^dwx-sql/desktop/api2/get_config/?$', desktop_api2.get_config),
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   url(r'^desktop/api2/context/namespaces/(?P<interface>\w+)/?$', desktop_api2.get_context_namespaces),
   url(r'^desktop/api2/context/computes/(?P<interface>\w+)/?$', desktop_api2.get_context_computes),
@@ -194,6 +202,10 @@ if METRICS.ENABLE_WEB_METRICS.get():
   dynamic_patterns += [
     url(r'^desktop/metrics/', include('desktop.lib.metrics.urls'))
   ]
+
+
+# dynamic_patterns = [url(r'^dwx-sql/', include(dynamic_patterns))]
+
 
 dynamic_patterns += [
   url(r'^admin/', include(admin.site.urls)),
