@@ -13,35 +13,36 @@ Goals
 * Autoscale data warehouses and cluster nodes based on usage
 * Intelligently tune performance without human intervention
 
-Done
-
-* Single line install in any Kubernetes cluster
-* Create, scale up/down compute warehouse (with v1 graceful shutdown of executors)
-* Autoscale warehouse based on CPU (HPA)
-* Basic warehouse metrics like queries in flight, total number of queries... (note: to change to directly come the impalads)
-* Easy troubleshooting of queries: via humanized query profile, query improvement recommendations...
-
-Todo
-
-* [ ] Readiness/Liveness probes
-* [ ] Auto pause/Auto resume warehouses
-* [ ] Productionize provisioning service in Thunderhead
-* [ ] Add priority class and preemption support
-* [ ] Session cookie affinity for Hue when load-balanced
-* [ ] Validate external storage (HDFS, HMS)
-* [ ] Run containers as non root
-* [ ] Add proper metric endpoint to impalads and scrape every 5s
-* [ ] Persist DB
-* [ ] Log collection
-* [ ] Security: Istio, etc. TBD
-* [ ] Lot of stability testing when warehouses come up & down, shrink & grow...
-
 
 ## Quick Start
 
-Assuming you have a Kubernetes cluster configured with [Helm][3] installed and images pushed (if not, check the [K8s Cluster](#K8s_Cluster) section below):
+Assuming you have a Kubernetes cluster configured with [Helm][3] installed and images pushed (if not, check the [K8s Cluster](#K8s_Cluster) section below).
+The compute cluster can either query data within the same Kubernetes cluster (#1) or on an external remote cluster (#2).
 
-1. Remote storage
+Clone the Hue repository and start from the Helm directory ``tools/kubernetes/helm``.
+
+```
+cd tools/kubernetes/helm
+```
+
+1. Local storage
+
+For quick use and pointing to a local storage, boot the local storage and warehouse.
+
+```
+helm install mock-storage
+helm install impala-engine --set-string name=finance -n finance
+```
+
+And follow-up the instructions printed on the screen.
+
+Afterwards, to delete the `finance` compute:
+
+```
+helm delete finance --purge
+```
+
+2. Remote storage
 
 Boot a `finance` compute pointing to a remote storage (here in cluster `data-lake-1.gethue.com`):
 
@@ -60,39 +61,6 @@ impala-statestore-fin2-84b9844686-rng9n   1/1     Running   0          8s
 impala-worker-fin2-7d6df9ff54-wpt5h       1/1     Running   0          8s
 ```
 
-Afterwards, to delete the `finance` compute:
-
-```
-helm delete finance --purge
-```
-
-2. Local storage
-
-For quick use and pointing to a local storage, boot the local storage and warehouse:
-
-```
-helm repo add cloudera http://gethue.com:8879
-
-helm install cloudera/mock-storage
-helm install cloudera/impala-engine --set-string name=finance -n finance
-```
-
-And follow-up the instructions printed on the screen.
-
-Note:
-
-To serve the packages
-
-```
-mkdir repo
-
-helm package impala-engine -d repo
-helm package frontend -d repo
-helm package mock-storage -d repo
-
-helm serve --repo-path repo --address gethue.com:8879
-```
-
 3. Web UI
 
 Instead of using the CLI, use the Web UI to create the `finance` warehouse in 3 clicks:
@@ -104,6 +72,23 @@ helm install cloudera/mock-storage
 ```
 
 And follow-up the instructions printed on the screen.
+
+
+Note: in order to have Hue be able to start an Impala cluster, it needs access to the Impala Helm charts. One way is to serve the Helm repo and
+configure Hue to point to it via ```tools/kubernetes/helm/frontend/values.yaml```.
+
+To serve the Helm packages:
+
+```
+cd tools/kubernetes/helm
+mkdir repo
+
+helm package impala-engine -d repo
+helm package frontend -d repo
+helm package mock-storage -d repo
+
+helm serve --repo-path repo --address gethue.com:8879
+```
 
 ## Installation
 
@@ -229,7 +214,6 @@ are added automatically by the cluster autoscaler.
 The autoscaling design for Impala is TBD.  It could be accomplished with using [Horizontal Pod Autoscaling][7]
 and [custom metrics][8] or a custom controller.  A custom controller may
 be more appropriate if the long-term vision is to automatically tune the Impala cluster.
-
 
 ## K8s Cluster
 

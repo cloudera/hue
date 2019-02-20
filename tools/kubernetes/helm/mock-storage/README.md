@@ -1,4 +1,4 @@
-# Cloudera Data Warehouse Mock Storage Chart
+# Mock Storage Chart
 
 This chart schedules a mini HDFS and Hive to run inside the K8s cluster. It enables quick demoing of the Data Warehouse app.
 

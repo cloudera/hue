@@ -1,6 +1,6 @@
-# Cloudera Data Warehouse Frontend Chart
+# Hue Chart
 
-This is a MVP to get an Helm chart to boot the frontend of the Data Warehouse. It is the main dependency as
+This is a MVP to get an Helm chart for Hue. It is the main dependency as
 the warehouses can then be created directly via the Web UI.
 
 
@@ -44,8 +44,7 @@ http://$WEB_HOST:$WEB_PORT
 
 On the Data Warehouse page, create warehouses that will spawn Impala compute containers.
 
-Query table via the Editor. If using S3, pick up some [CREATE TABLES here](http://github.mtv.cloudera.com/romain/SQL-test-cases/tree/master/altus-dw).
-If using HDFS, use the Data Import http://$WEB_HOST:$WEB_PORT/hue/importer.
+Query table via the Editor. If using S3, create  some external tables. If using HDFS, use the Data Import http://$WEB_HOST:$WEB_PORT/hue/importer.
 
 ## API
 
