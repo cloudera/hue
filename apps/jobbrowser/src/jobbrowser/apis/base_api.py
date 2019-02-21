@@ -56,7 +56,7 @@ def get_api(user, interface, cluster=None):
   elif interface == 'dataware-clusters':
     return DataWarehouseClusterApi(user)
   elif interface == 'dataware2-clusters':
-    return DataWarehouseClusterApi(user, version=2)
+    return DataWarehouseClusterApi(user, version=3) # 2
   elif interface == 'dataeng-jobs':
     return DataEngJobApi(user)
   elif interface == 'livy-sessions':

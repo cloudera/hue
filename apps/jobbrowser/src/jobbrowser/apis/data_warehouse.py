@@ -23,7 +23,7 @@ from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
+from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api, DataWarehouseXApi
 
 from jobbrowser.apis.base_api import Api
 
@@ -41,7 +41,7 @@ class DataWarehouseClusterApi(Api):
     super(DataWarehouseClusterApi, self).__init__(user)
 
     self.version = version
-    self.api = DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user) 
+    self.api = DataWarehouseXApi(self.user) if version == 3 else DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user) 
 
 
   def apps(self, filters):

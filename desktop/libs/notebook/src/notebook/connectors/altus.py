@@ -341,3 +341,116 @@ class DataWarehouse2Api():
 
   def update_cluster(self, **params):
     return self._root.post('updateCluster', data=json.dumps(params), contenttype="application/json")
+
+
+class DataWarehouseXApi():
+
+  def __init__(self, user=None):
+    self._api_url = K8S.API_URL.get().rstrip('/')
+
+    self.user = user
+    self._client = HttpClient(self._api_url, logger=LOG)
+    self._client.set_verify(False)
+    self._root = Resource(self._client)
+
+    CLUSTER_PROPERTIES = {
+        "spec": {
+            "sdx": {
+                "cmHostname": "nightly6x-unsecure",
+                "cmDomain": "vpc.cloudera.com"
+            },
+            "ingress": {
+                "impaladShellPort": 31000,
+                "impaladJdbcPort": 32000
+            },
+            "executor": {
+                "numExecutors": 3,
+                "cpuRequest": "200m",
+                "memRequest": "512Mi"
+            }
+        }
+    }
+
+  # DP API
+  def list_k8_clusters(self):
+    '''{
+      "items": [
+        {
+          "name": "prithvi-openshift", 
+          "spec": {
+            "ip_address": "172.28.197.217"
+          }
+        }
+      ]
+    }'''
+    clusters = self._root.get('computecluster')
+
+    for cluster in clusters['items']:
+      cluster['clusterName'] = cluster['name']
+      cluster['workersGroupSize'] = ''
+      cluster['instanceType'] = ''
+      cluster['progress'] = ''
+      cluster['creationDate'] = str(datetime.now())
+    return clusters
+
+
+  # DP API
+  def list_sdx_namespaces(self):
+    '''{
+      "items": [
+        {
+          "name": "nightly", 
+          "spec": {
+            "cm_domain": "vpc.cloudera.com", 
+            "cm_hostname": "nightly6x-unsecure"
+          }
+        }
+      ]
+    }'''
+    return self._root.get('sdx')
+
+
+  def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
+        cloudera_manager_username='hue', cloudera_manager_password='hue'):
+    data = {
+      'clusterName': cluster_name,
+      'cdhVersion': cdh_version or 'CDH6.3',
+      'workerCpuCores': 1,
+      'workerMemoryInGib': 1,
+      'workerReplicas': workers_group_size,
+      'workerAutoResize': False
+    }
+
+    data = self.CLUSTER_PROPERTIES.copy()
+    data['spec']['executor']['numExecutors'] = workers_group_size
+
+    return self._root.post('dwxcluster/%s' % cluster_name, data=json.dumps(data), contenttype="application/json")
+
+
+  def list_clusters(self):
+    clusters = self._root.get('dwxcluster')
+    for cluster in clusters['items']:
+      cluster['clusterName'] = cluster['name']
+      cluster['workersGroupSize'] = cluster['workerReplicas']
+      cluster['instanceType'] = 'Data Warehouse'# '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
+      cluster['creationDate'] = str(datetime.now())
+    cluster['clusters'] = cluster['items']
+    return clusters
+
+
+  def delete_cluster(self, cluster_id):
+    return {
+      'result': self._root.delete('dwxcluster/%s' % cluster_id)
+    }
+
+
+  def describe_cluster(self, cluster_id):
+    data = self._root.get('dwxcluster/%s' % cluster_id)
+#     data['cluster']['clusterName'] = data['cluster']['name']
+#     data['cluster']['cdhVersion'] = 'Data Warehouse'
+    return data
+
+
+  def update_cluster(self, **params):
+    return self._root.put('dwxcluster', data=json.dumps(params), contenttype="application/json")

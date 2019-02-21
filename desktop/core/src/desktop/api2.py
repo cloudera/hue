@@ -35,7 +35,8 @@ from django.views.decorators.http import require_POST
 
 from metadata.conf import has_navigator
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
-from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
+from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api,\
+  DataWarehouseXApi
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
@@ -97,7 +98,11 @@ def get_context_namespaces(request, interface):
       # Note: attaching computes to namespaces might be done via the frontend in the future
       if interface == 'impala':
         if IS_K8S_ONLY.get():
-          adb_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+          if True:
+            api_class = DataWarehouseXApi
+          else:
+            api_class = DataWarehouse2Api
+          adb_clusters = api_class(request.user).list_clusters()['clusters']
         else:
           adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
         for _cluster in adb_clusters: # Add "fake" namespace if needed
@@ -153,7 +158,11 @@ def get_context_computes(request, interface):
   if has_altus_clusters:
     if interface == 'impala' or interface == 'report':
       if IS_K8S_ONLY.get():
-        dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+        if True:
+          api_class = DataWarehouseXApi
+        else:
+          api_class = DataWarehouse2Api
+        dw_clusters = api_class(request.user).list_clusters()['clusters']
       else:
         dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
 
