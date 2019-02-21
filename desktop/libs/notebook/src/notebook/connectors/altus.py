@@ -464,6 +464,10 @@ class DataWarehouseXApi():
       'publicPort': cluster['spec']['ingress']['impaladJdbcPort'],
     }
 
+    cluster['publicHost'] = '%(publicHost)s' % cluster['coordinatorEndpoint']
+    cluster['publicPort'] = cluster['coordinatorEndpoint']['publicPort']
+    cluster['type'] = 'dp-dwx'
+
 
   def delete_cluster(self, cluster_id):
     try:
