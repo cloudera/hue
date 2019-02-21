@@ -437,7 +437,7 @@ class DataWarehouseXApi():
 
   def _massage_cluster_data(self, cluster):
     cluster['clusterName'] = cluster['metadata']['name']
-    cluster['workersGroupSize'] = cluster['spec']['executor']['numExecutors']
+    cluster['workerReplicas'] = cluster['spec']['executor']['numExecutors']
     cluster['instanceType'] = 'Data Warehouse %(cpuRequest)s %(memRequest)s' % cluster['spec']['executor']
     cluster['progress'] = ''
     cluster['status'] = cluster['status']['conditions'][0]['type'].upper()
@@ -446,28 +446,43 @@ class DataWarehouseXApi():
 #       cluster['crn'] = cluster['metadata']['uid']
     cluster['crn'] = cluster['metadata']['name']
     
-    cluster['workerAutoResizeMax'] = cluster['workerAutoResizeMin'] = cluster['workerReplicasOnline'] = cluster['workerReplicas'] = cluster['workersGroupSize']
+    cluster['workerAutoResizeMax'] = cluster['workerAutoResizeMin'] = cluster['workerReplicasOnline'] = cluster['workersGroupSize'] = cluster['workerReplicas']
     cluster['workerAutoResizeCpu'] = 80
-    cluster['workerAutoResize'] = True
+    cluster['workerAutoResize'] = False
     cluster['coordinatorEndpoint'] = {'publicHost': cluster['spec']['ingress']['impaladShellPort']}
 
 
   def delete_cluster(self, cluster_id):
-    return {
-      'result': self._root.delete('dwxcluster/%s' % cluster_id)
-    }
+    try:
+      self._root.delete('dwxcluster/%s' % cluster_id)
+    except Exception, e:
+      LOG.info('"Expected"')
+      LOG.info(e)
+
+    return {'result': True}
 
 
   def describe_cluster(self, cluster_id):
     cluster = self._root.get('dwxcluster/%s' % cluster_id)
     
     self._massage_cluster_data(cluster)
-    
-#     data['cluster']['clusterName'] = data['cluster']['name']
-#     data['cluster']['cdhVersion'] = 'Data Warehouse'
 
     return {'cluster': cluster} # TODO
 
 
   def update_cluster(self, **params):
-    return self._root.put('dwxcluster', data=json.dumps(params), contenttype="application/json")
+    cluster_name = params['clusterName']
+
+    template = {
+#        "spec": {
+#           "template": {
+             "spec": {
+                "executor": {
+                    "numExecutors": params['workerReplicas']
+                }
+             }
+#           }
+#        }
+    }
+    
+    return self._root.put('dwxcluster/%s' % cluster_name, data=json.dumps(template), contenttype="application/json")
