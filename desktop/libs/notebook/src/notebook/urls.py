@@ -17,6 +17,8 @@
 
 from django.conf.urls import url
 
+from desktop.conf import URL_PREFIX
+
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
 #
@@ -28,6 +30,7 @@ from django.conf.urls import url
 # Start DBProxy server
 from notebook import views as notebook_views
 from notebook import api as notebook_api
+
 
 # Views
 urlpatterns = [
@@ -97,3 +100,9 @@ urlpatterns += [
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
 ]
+
+if URL_PREFIX.get():
+  for _url in urlpatterns:
+    if _url._regex.startswith('^'):
+      _url._regex = '^%s' % URL_PREFIX.get() + _url._regex[1:] 
+

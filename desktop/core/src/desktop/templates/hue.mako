@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster, URL_PREFIX
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
@@ -126,7 +126,7 @@
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
 
-  <script src="/desktop/globalJsConstants.js?v=${ hue_version() }"></script>
+  <script src="/${ URL_PREFIX.get() }desktop/globalJsConstants.js?v=${ hue_version() }"></script>
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
@@ -272,7 +272,7 @@ ${ hueIcons.symbols() }
             <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
             % endif
             <li class="divider"></li>
-            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            <li><a title="${_('Sign out')}" href="/${ URL_PREFIX.get() }accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
           </ul>
         </div>
         % endif
@@ -842,7 +842,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
           $rawHtml.find('a[href]').each(function () {
             var link = $(this).attr('href');
-            if (link.startsWith('/') && !link.startsWith('/hue')){
+            if (link.startsWith('/') && !link.startsWith('/${ URL_PREFIX.get() }hue')){
               link = '/hue' + link;
             }
             $(this).attr('href', link);
@@ -931,7 +931,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (loadedApps.indexOf(app) == -1){
               loadedApps.push(app);
             }
-            var baseURL = EMBEDDABLE_PAGE_URLS[app].url;
+            var baseURL = "dwx-sql/" + EMBEDDABLE_PAGE_URLS[app].url;
             if (self.currentContextParams() !== null) {
               if (loadDeep && self.currentContextParams()[0]) {
                 baseURL += self.currentContextParams()[0];
@@ -1042,7 +1042,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         // prepend /hue to all the link on this page
         $('${ '.hue-embedded-container a[href]' if IS_EMBEDDED.get() else 'a[href]' }').each(function () {
           var link = $(this).attr('href');
-          if (link.startsWith('/') && !link.startsWith('/hue')){
+          if (link.startsWith('/') && !link.startsWith('/${ URL_PREFIX.get() }hue')){
             link = '/hue' + link;
           }
           $(this).attr('href', link);
@@ -1056,7 +1056,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         }
         page({ hashbang: true });
         % else:
-        page.base('/hue');
+        page.base('/${ URL_PREFIX.get() }hue');
         % endif
 
         var getUrlParameter = function (name) {

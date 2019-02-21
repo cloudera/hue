@@ -155,30 +155,31 @@ var CancellablePromise = (function () {
 })();
 
 var ApiHelper = (function () {
+  var API_PREFIX = '/dwx-sql'; // TODO from settings.URL_PREFIX
 
-  var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
-  var SAMPLE_API_PREFIX = "/notebook/api/sample/";
-  var DOCUMENTS_API = "/desktop/api2/doc/";
-  var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
-  var FETCH_CONFIG = '/desktop/api2/get_config/';
-  var HDFS_API_PREFIX = "/filebrowser/view=/";
-  var ADLS_API_PREFIX = "/filebrowser/view=adl:/";
-  var GIT_API_PREFIX = "/desktop/api/vcs/contents/";
-  var S3_API_PREFIX = "/filebrowser/view=S3A://";
-  var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
-  var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
-  var CONFIG_APPS_API = '/desktop/api/configurations';
-  var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
-  var SOLR_FIELDS_API = '/indexer/api/index/list/';
-  var DASHBOARD_TERMS_API = '/dashboard/get_terms';
-  var DASHBOARD_STATS_API = '/dashboard/get_stats';
-  var FORMAT_SQL_API = '/notebook/api/format';
+  var AUTOCOMPLETE_API_PREFIX = API_PREFIX + "/notebook/api/autocomplete/";
+  var SAMPLE_API_PREFIX = API_PREFIX + "/notebook/api/sample/";
+  var DOCUMENTS_API = API_PREFIX + "/desktop/api2/doc/";
+  var DOCUMENTS_SEARCH_API = API_PREFIX + "/desktop/api2/docs/";
+  var FETCH_CONFIG = API_PREFIX + '/desktop/api2/get_config/';
+  var HDFS_API_PREFIX = API_PREFIX + "/filebrowser/view=/";
+  var ADLS_API_PREFIX = API_PREFIX + "/filebrowser/view=adl:/";
+  var GIT_API_PREFIX = API_PREFIX + "/desktop/api/vcs/contents/";
+  var S3_API_PREFIX = API_PREFIX + "/filebrowser/view=S3A://";
+  var IMPALA_INVALIDATE_API = API_PREFIX + '/impala/api/invalidate';
+  var CONFIG_SAVE_API = API_PREFIX + '/desktop/api/configurations/save/';
+  var CONFIG_APPS_API = API_PREFIX + '/desktop/api/configurations';
+  var SOLR_COLLECTIONS_API = API_PREFIX + '/indexer/api/indexes/list/';
+  var SOLR_FIELDS_API = API_PREFIX + '/indexer/api/index/list/';
+  var DASHBOARD_TERMS_API = API_PREFIX + '/dashboard/get_terms';
+  var DASHBOARD_STATS_API = API_PREFIX + '/dashboard/get_stats';
+  var FORMAT_SQL_API = API_PREFIX + '/notebook/api/format';
 
-  var SEARCH_API = '/desktop/api/search/entities';
-  var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
+  var SEARCH_API = API_PREFIX + '/desktop/api/search/entities';
+  var INTERACTIVE_SEARCH_API = API_PREFIX + '/desktop/api/search/entities_interactive';
 
-  var HBASE_API_PREFIX = '/hbase/api/';
-  var SAVE_TO_FILE = '/filebrowser/save';
+  var HBASE_API_PREFIX = API_PREFIX + '/hbase/api/';
+  var SAVE_TO_FILE = API_PREFIX + '/filebrowser/save';
 
   var NAV_URLS = {
     ADD_TAGS: '/metadata/api/navigator/add_tags',
@@ -2107,7 +2108,7 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.fetchQueryExecutionStatistics = function (options)  {
     var self = this;
-    var url = '/impala/api/query/alanize/metrics';
+    var url = API_PREFIX + '/impala/api/query/alanize/metrics';
     var deferred = $.Deferred();
 
     var request = self.simplePost(url, {
@@ -2136,7 +2137,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchContextNamespaces = function (options) {
     var self = this;
-    var url = '/desktop/api2/context/namespaces/' + options.sourceType;
+    var url = API_PREFIX + '/desktop/api2/context/namespaces/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 
@@ -2148,7 +2149,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchContextComputes = function (options) {
     var self = this;
-    var url = '/desktop/api2/context/computes/' + options.sourceType;
+    var url = API_PREFIX + '/desktop/api2/context/computes/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 
@@ -2160,7 +2161,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchContextClusters = function (options) {
     var self = this;
-    var url = '/desktop/api2/context/clusters/' + options.sourceType;
+    var url = API_PREFIX + '/desktop/api2/context/clusters/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
   };
 

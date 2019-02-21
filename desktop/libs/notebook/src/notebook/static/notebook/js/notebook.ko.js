@@ -604,7 +604,7 @@ var EditorViewModel = (function() {
     self.externalStatementLoaded = ko.observable(false);
     self.getExternalStatement = function() {
       self.externalStatementLoaded(false);
-      $.post("/notebook/api/get_external_statement", {
+      $.post("/dwx-sql/notebook/api/get_external_statement", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
@@ -1367,7 +1367,7 @@ var EditorViewModel = (function() {
         if (unknownResponse) {
           lastComplexityRequest = $.ajax({
             type: 'POST',
-            url: '/notebook/api/optimizer/statement/risk',
+            url: '/dwx-sql/notebook/api/optimizer/statement/risk',
             timeout: 30000, // 30 seconds
             data: {
               notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -1601,7 +1601,7 @@ var EditorViewModel = (function() {
 
       self.currentQueryTab('queryHistory');
 
-      self.executingBlockingOperation = $.post("/notebook/api/execute/" + self.type(), {
+      self.executingBlockingOperation = $.post("/dwx-sql/notebook/api/execute/" + self.type(), {
         notebook: vm.editorMode() ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
@@ -1745,7 +1745,7 @@ var EditorViewModel = (function() {
       self.progress(0);
       self.status('ready');
 
-      $.post("/notebook/api/explain", {
+      $.post("/dwx-sql/notebook/api/explain", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
@@ -1776,7 +1776,7 @@ var EditorViewModel = (function() {
       self.hasSuggestion(null);
       var positionStatement = self.positionStatement();
 
-      lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
+      lastCompatibilityRequest = $.post("/dwx-sql/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.compatibilitySourcePlatform().value,
@@ -1858,7 +1858,7 @@ var EditorViewModel = (function() {
           startLongOperationTimeout();
           self.isFetchingData = true;
           hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
-          $.post("/notebook/api/fetch_result_data", {
+          $.post("/dwx-sql/notebook/api/fetch_result_data", {
             notebook: ko.mapping.toJSON(notebook.getContext()),
             snippet: ko.mapping.toJSON(self.getContext()),
             rows: rows,
@@ -1938,7 +1938,7 @@ var EditorViewModel = (function() {
     };
 
     self.fetchResultMetadata = function () {
-      $.post("/notebook/api/fetch_result_metadata", {
+      $.post("/dwx-sql/notebook/api/fetch_result_metadata", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
@@ -1956,7 +1956,7 @@ var EditorViewModel = (function() {
     };
 
     self.fetchResultSize = function(n, query_id) {
-      $.post("/notebook/api/fetch_result_size", {
+      $.post("/dwx-sql/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
@@ -1981,7 +1981,7 @@ var EditorViewModel = (function() {
     };
 
     self.checkStatus = function () {
-      $.post("/notebook/api/check_status", {
+      $.post("/dwx-sql/notebook/api/check_status", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
@@ -2077,7 +2077,7 @@ var EditorViewModel = (function() {
         notebook.isExecutingAll(false);
       } else {
         self.statusForButtons('canceling');
-        $.post("/notebook/api/cancel_statement", {
+        $.post("/dwx-sql/notebook/api/cancel_statement", {
           notebook: ko.mapping.toJSON(notebook.getContext()),
           snippet: ko.mapping.toJSON(self.getContext())
         }, function (data) {
@@ -2107,7 +2107,7 @@ var EditorViewModel = (function() {
         self.checkStatusTimeout = null;
       }
 
-      $.post("/notebook/api/close_statement", {
+      $.post("/dwx-sql/notebook/api/close_statement", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
@@ -2125,7 +2125,7 @@ var EditorViewModel = (function() {
     };
 
     self.getLogs = function () {
-      $.post("/notebook/api/get_logs", {
+      $.post("/dwx-sql/notebook/api/get_logs", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         from: self.result.logLines,
@@ -2281,7 +2281,7 @@ var EditorViewModel = (function() {
     self.getSimilarQueries = function () {
       hueAnalytics.log('notebook', 'get_query_similarity');
 
-      $.post("/notebook/api/optimizer/statement/similarity", {
+      $.post("/dwx-sql/notebook/api/optimizer/statement/similarity", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.type()
@@ -2566,7 +2566,7 @@ var EditorViewModel = (function() {
         }
       };
 
-      $.post("/notebook/api/create_session", {
+      $.post("/dwx-sql/notebook/api/create_session", {
         notebook: ko.mapping.toJSON(self.getContext()),
         session: ko.mapping.toJSON(session), // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
         cluster: ko.mapping.toJSON(compute ? compute : '')
@@ -2671,7 +2671,7 @@ var EditorViewModel = (function() {
       }
       var editorMode = vm.editorMode() || (self.isPresentationMode() && vm.editorType() != 'notebook'); // Editor should not convert to Notebook in presentation mode
 
-      $.post("/notebook/api/notebook/save", {
+      $.post("/dwx-sql/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
         "editorMode": editorMode
       }, function (data) {
@@ -2735,7 +2735,7 @@ var EditorViewModel = (function() {
 
     self.close = function () {
       hueAnalytics.log('notebook', 'close');
-      $.post("/notebook/api/notebook/close", {
+      $.post("/dwx-sql/notebook/api/notebook/close", {
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode()
       });
@@ -2775,7 +2775,7 @@ var EditorViewModel = (function() {
     };
 
     self.closeSession = function (session, silent, callback) {
-      $.post("/notebook/api/close_session", {
+      $.post("/dwx-sql/notebook/api/close_session", {
         session: ko.mapping.toJSON(session)
       }, function (data) {
         if (! silent && data && data.status != 0 && data.status != -2 && data.message) {
@@ -2796,7 +2796,7 @@ var EditorViewModel = (function() {
       var QUERIES_PER_PAGE = 50;
       self.loadingHistory(true);
 
-      $.get("/notebook/api/get_history", {
+      $.get("/dwx-sql/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
         limit: QUERIES_PER_PAGE,
         page: self.historyCurrentPage(),
@@ -2848,7 +2848,7 @@ var EditorViewModel = (function() {
       }).slice(0, 25);
 
       function updateHistoryCall(item) {
-        $.post("/notebook/api/check_status", {
+        $.post("/dwx-sql/notebook/api/check_status", {
           notebook: ko.mapping.toJSON({id: item.uuid()}),
         }).done(function (data) {
             var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : 'failed');
@@ -2898,7 +2898,7 @@ var EditorViewModel = (function() {
 
     self.clearHistory = function (type) {
       hueAnalytics.log('notebook', 'clearHistory');
-      $.post("/notebook/api/clear_history", {
+      $.post("/dwx-sql/notebook/api/clear_history", {
         notebook: ko.mapping.toJSON(self.getContext()),
         doc_type: self.selectedSnippet(),
         is_notification_manager: vm.isNotificationManager(),
@@ -3101,12 +3101,12 @@ var EditorViewModel = (function() {
     var self = this;
 
     self.URLS = {
-      editor: '/notebook/editor',
-      editorMobile: '/notebook/editor_m',
-      notebook: '/notebook/notebook',
-      hue4: '/hue/editor',
-      hue4_notebook: '/hue/notebook',
-      report: '/hue/dashboard/new_search?engine=report'
+      editor: '/dwx-sql/hue/notebook/editor',
+      editorMobile: '/dwx-sql/hue/notebook/editor_m',
+      notebook: '/dwx-sql/hue/notebook/notebook',
+      hue4: '/dwx-sql/hue/editor',
+      hue4_notebook: '/dwx-sql/hue/notebook',
+      report: '/dwx-sql/hue/dashboard/new_search?engine=report'
     };
 
     self.huePubSubId = options.huePubSubId || 'editor';
@@ -3519,7 +3519,7 @@ var EditorViewModel = (function() {
 
     self.openNotebook = function (uuid, queryTab, skipUrlChange, callback) {
       var deferredOpen = new $.Deferred();
-      $.get('/desktop/api2/doc/', {
+      $.get('/dwx-sql/desktop/api2/doc/', {
         uuid: uuid,
         data: true,
         dependencies: true
@@ -3562,7 +3562,7 @@ var EditorViewModel = (function() {
 
     self.newNotebook = function (editorType, callback, queryTab) {
       huePubSub.publish('active.snippet.type.changed', editorType);
-      $.post("/notebook/api/create_notebook", {
+      $.post("/dwx-sql/notebook/api/create_notebook", {
         type: editorType || options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {

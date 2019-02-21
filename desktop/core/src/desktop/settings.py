@@ -35,6 +35,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
+from desktop.conf import URL_PREFIX
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -125,8 +126,10 @@ STATICFILES_DIRS = (
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
+URL_PREFIX = '/dwx-sql'
+
 # For Django admin interface
-STATIC_URL = '/dwx-sql/static/'
+STATIC_URL = URL_PREFIX + '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 

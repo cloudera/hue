@@ -1607,6 +1607,12 @@ IS_K8S_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+URL_PREFIX = Config(
+  key='url_prefix',
+  default='dwx-sql/',
+  help=_('Append this prefix to all URLs. e.g. with "warehouse/",  hue/ --> warehouse/hue')
+)
+
 
 def get_clusters(user):
   clusters = []
