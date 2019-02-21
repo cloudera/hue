@@ -61,7 +61,7 @@ admin.autodiscover()
 dynamic_patterns = [
   url(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
   url(r'^accounts/login/$', desktop_auth_views.dt_login), # Deprecated
-  url(r'^accounts/logout/$', desktop_auth_views.dt_logout, {'next_page': '/'}),
+  url(r'^accounts/logout/$', desktop_auth_views.dt_logout, {'next_page': URL_PREFIX.get() or '/'}),
   url(r'^profile$', desktop_auth_views.profile),
   url(r'^login/oauth/?$', desktop_auth_views.oauth_login),
   url(r'^login/oauth_authenticated/?$', desktop_auth_views.oauth_authenticated),

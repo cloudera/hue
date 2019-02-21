@@ -36,19 +36,19 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
 from desktop.auth import forms as auth_forms
-from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
-from desktop.log.access import access_log, access_warn, last_access_map
-from desktop.conf import OAUTH
+from desktop.log.access import access_warn, last_access_map
+from desktop.conf import OAUTH, URL_PREFIX
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from hadoop.fs.exceptions import WebHdfsException
+from notebook.connectors.base import get_api
 from useradmin.models import get_profile, UserProfile
 from useradmin.views import ensure_home_directory, require_change_password
-from notebook.connectors.base import get_api
+
 
 LOG = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ def dt_login_old(request, from_modal=False):
 @login_notrequired
 @watch_login
 def dt_login(request, from_modal=False):
-  redirect_to = request.GET.get('next', '/')
+  redirect_to = request.GET.get('next', URL_PREFIX.get() + '/')
   is_first_login_ever = first_login_ever()
   backend_names = auth_forms.get_backend_names()
   is_active_directory = auth_forms.is_active_directory()
@@ -209,11 +209,14 @@ def dt_logout(request, next_page=None):
   # Close Impala session on logout
   session_app = "impala"
   if request.user.has_hue_permission(action='access', app=session_app):
-    session = {"type":session_app,"sourceMethod":"dt_logout"}
+    session = {"type": session_app,"sourceMethod": "dt_logout"}
     try:
       get_api(request, session).close_session(session)
     except Exception, e:
       LOG.warn("Error closing Impala session: %s" % e)
+
+  if URL_PREFIX.get() and (next_page is None or next_page == '/'):
+    next_page = URL_PREFIX.get()
 
   backends = get_backends()
   if backends:

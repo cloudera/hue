@@ -272,7 +272,7 @@ ${ hueIcons.symbols() }
             <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
             % endif
             <li class="divider"></li>
-            <li><a title="${_('Sign out')}" href="/${ URL_PREFIX.get() }accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            <li><a title="${_('Sign out')}" href="/${ URL_PREFIX.get() }hue/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
           </ul>
         </div>
         % endif
@@ -1084,7 +1084,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/about/', app: 'admin_wizard' },
           { url: '/about/admin_wizard', app: 'admin_wizard' },
           { url: '/accounts/logout', app: function () {
-            location.href = '/accounts/logout';
+            location.href = '/${ URL_PREFIX.get() }accounts/logout';
           }},
           { url: '/dashboard/admin/collections', app: function (ctx) {
             page('/home/?type=search-dashboard');

@@ -438,7 +438,7 @@ AXES_BEHIND_REVERSE_PROXY = desktop.conf.AUTH.BEHIND_REVERSE_PROXY.get()
 AXES_REVERSE_PROXY_HEADER = desktop.conf.AUTH.REVERSE_PROXY_HEADER.get()
 
 
-LOGIN_URL = '/hue/accounts/login'
+LOGIN_URL = URL_PREFIX + '/hue/accounts/login'
 
 
 # SAML
