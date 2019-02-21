@@ -1170,9 +1170,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
             page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
           }},
-          { url: '/jobbrowser/jobs/application_*', app: function (ctx) {
-            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
-          }},
           { url: '/jobbrowser*', app: 'jobbrowser'},
           { url: '/logs', app: 'logs' },
           { url: '/metastore', app: function () {
@@ -1298,7 +1295,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.link', function (href) {
           if (href) {
-            var prefix = '${ '' if IS_EMBEDDED.get() else '/hue' }';
+            var prefix = '${ '' if IS_EMBEDDED.get() else '/dwx-sql/hue' }';
             if (href.startsWith('/') && !href.startsWith(prefix)){
               page(prefix + href);
             } else {

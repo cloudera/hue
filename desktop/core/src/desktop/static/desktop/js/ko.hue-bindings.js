@@ -113,7 +113,7 @@
           if (url) {
             var prefix = '';
             if (IS_HUE_4) {
-              prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
+              prefix = '/dwx-sql/hue' + (url.indexOf('/') === 0 ? '' : '/');
             }
             if ($(element).attr('target')) {
               window.open(prefix + url, $(element).attr('target'));
@@ -132,7 +132,7 @@
       var url = ko.unwrap(valueAccessor());
       if (url) {
         if (IS_HUE_4) {
-          $(element).attr('href', '/hue' + (url.indexOf('/') === 0 ? url : '/' + url));
+          $(element).attr('href', '/dwx-sql/hue' + (url.indexOf('/') === 0 ? url : '/' + url));
         } else {
           $(element).attr('href', url);
         }
