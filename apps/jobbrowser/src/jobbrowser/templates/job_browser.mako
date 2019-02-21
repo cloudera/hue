@@ -3237,8 +3237,8 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
           $.post("/${ URL_PREFIX.get() }metadata/api/analytic_db/create_cluster/", {
             "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
             "cluster_name": self.createClusterName(),
-            "clusterCreateRemoteCompute": self.clusterCreateRemoteCompute(),
-            "clusterCreateRemoteNamespace": self.clusterCreateRemoteNamespace(),
+            "clusterCreateRemoteCompute": ko.mapping.toJSON(self.clusterCreateRemoteCompute()),
+            "clusterCreateRemoteNamespace": ko.mapping.toJSON(self.clusterCreateRemoteNamespace()),
             "clusterCreateRemoteData": self.clusterCreateRemoteData(), // old
             "clusterCreateRemoteMetadata": self.clusterCreateRemoteMetadata(), // old
             "cluster_hdfs_host": "hdfs-namenode", // old

@@ -424,7 +424,8 @@ class DataWarehouseXApi():
     data = self.CLUSTER_PROPERTIES.copy()
     data['spec']['executor']['numExecutors'] = workers_group_size
     if environment_name:
-      data['spec']['compute'] = environment_name['spec'] # Cpmpute
+      data['spec']['compute'] = environment_name['spec'] # Compute
+      data['spec']['compute']['name'] = environment_name['name']
     if namespace_name:
       data['spec']['sdx'] = namespace_name['spec']
 
@@ -446,7 +447,10 @@ class DataWarehouseXApi():
     cluster['workerReplicas'] = cluster['spec']['executor']['numExecutors']
     cluster['instanceType'] = 'Data Warehouse %(cpuRequest)s %(memRequest)s' % cluster['spec']['executor']
     cluster['progress'] = ''
-    cluster['status'] = cluster['status']['conditions'][0]['type'].upper()
+    if 'status' in cluster:
+      cluster['status'] = cluster['status']['conditions'][0]['type'].upper()
+    else:
+      cluster['status'] = 'CREATING'
     cluster['creationDate'] = cluster['metadata']['creationTimestamp']
 
 #       cluster['crn'] = cluster['metadata']['uid']
@@ -456,7 +460,7 @@ class DataWarehouseXApi():
     cluster['workerAutoResizeCpu'] = 80
     cluster['workerAutoResize'] = False
     cluster['coordinatorEndpoint'] = {
-      'publicHost': 'impalad-%(clusterName)s-external-shell' % cluster,
+      'publicHost': '%(ip_address)s' % cluster['spec']['compute'],
       'publicPort': cluster['spec']['ingress']['impaladJdbcPort'],
     }
 

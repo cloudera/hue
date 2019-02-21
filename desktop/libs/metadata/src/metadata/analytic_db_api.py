@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
@@ -56,8 +57,8 @@ def create_cluster(request):
   instance_type = request.POST.get('instance_type', "workers_group_size"'')
   workers_group_size = int(request.POST.get('workers_group_size', '3'))
 
-  environment_name = request.POST.get('clusterCreateRemoteCompute')
-  namespace_name = request.POST.get('clusterCreateRemoteNamespace')
+  environment_name = json.loads(request.POST.get('clusterCreateRemoteCompute', '{}'))
+  namespace_name = json.loads(request.POST.get('clusterCreateRemoteNamespace', '{}'))
 
 #   environment_name = request.POST.get('environment_name')
 #   namespace_name = request.POST.get('namespace_name', 'null')
