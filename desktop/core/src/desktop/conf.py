@@ -1555,7 +1555,7 @@ EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
 )
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
-  key='use_new_editor',
+  key='',
   default=True,
   type=coerce_bool,
   help=_('Choose whether to show the new SQL editor.')
@@ -1894,6 +1894,9 @@ def config_validator(user):
                                                     '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
   if notebook_doc:
     notebook_doc.delete()
+
+  if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
+    res.append(('[desktop] use_new_editor', unicode(_('This configuration flag has been deprecated.'))))
 
   return res
 
