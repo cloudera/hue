@@ -191,6 +191,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                   <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
                   <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                   <!-- ko case: 'text' -->Text<!-- /ko -->
+                  <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
                   <!-- ko case: $default -->SQL<!-- /ko -->
                   <!-- /ko -->
                 </span>
@@ -219,6 +220,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
                 <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                 <!-- ko case: 'text' -->Text<!-- /ko -->
+                <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
                 <!-- ko case: $default -->SQL<!-- /ko -->
               <!-- /ko -->
               <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
