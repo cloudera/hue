@@ -36,7 +36,7 @@ def get_query_server_config(cluster_config=None):
   query_server = {
       'server_name': _get_server_name(cluster_config),
       'server_host': conf.SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
-      'server_port': conf.SERVER_PORT.get() if not cluster_config else 21050,
+      'server_port': conf.SERVER_PORT.get() if not cluster_config else cluster_config.get('server_port', 21050),
       'principal': conf.IMPALA_PRINCIPAL.get(),
       'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
       'querycache_rows': conf.QUERYCACHE_ROWS.get(),

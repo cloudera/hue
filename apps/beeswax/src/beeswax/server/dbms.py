@@ -24,7 +24,7 @@ from django.urls import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
-from desktop.conf import CLUSTER_ID
+from desktop.conf import CLUSTER_ID, URL_PREFIX
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
@@ -121,7 +121,9 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
 
 def get_cluster_config(cluster=None):
   if cluster and cluster.get('id') != CLUSTER_ID.get():
-    if 'altus:dataware:k8s' in cluster['id']:
+    if URL_PREFIX.get():
+      cluster_config = {'server_host': cluster['coordinatorEndpoint']['publicHost'], 'server_port': cluster['coordinatorEndpoint']['publicPort'], 'name': cluster['name']}
+    elif 'altus:dataware:k8s' in cluster['id']:
       compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
       cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
     else:

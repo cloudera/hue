@@ -455,7 +455,10 @@ class DataWarehouseXApi():
     cluster['workerAutoResizeMax'] = cluster['workerAutoResizeMin'] = cluster['workerReplicasOnline'] = cluster['workersGroupSize'] = cluster['workerReplicas']
     cluster['workerAutoResizeCpu'] = 80
     cluster['workerAutoResize'] = False
-    cluster['coordinatorEndpoint'] = {'publicHost': cluster['spec']['ingress']['impaladShellPort']}
+    cluster['coordinatorEndpoint'] = {
+      'publicHost': 'impalad-%(clusterName)s-external-shell' % cluster,
+      'publicPort': cluster['spec']['ingress']['impaladJdbcPort'],
+    }
 
 
   def delete_cluster(self, cluster_id):
