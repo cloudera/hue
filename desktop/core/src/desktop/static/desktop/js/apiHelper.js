@@ -182,20 +182,20 @@ var ApiHelper = (function () {
   var SAVE_TO_FILE = API_PREFIX + '/filebrowser/save';
 
   var NAV_URLS = {
-    ADD_TAGS: '/metadata/api/navigator/add_tags',
-    DELETE_TAGS: '/metadata/api/navigator/delete_tags',
-    FIND_ENTITY: '/metadata/api/navigator/find_entity',
-    LIST_TAGS: '/metadata/api/navigator/list_tags',
-    UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties',
+    ADD_TAGS: API_PREFIX + '/metadata/api/navigator/add_tags',
+    DELETE_TAGS: API_PREFIX + '/metadata/api/navigator/delete_tags',
+    FIND_ENTITY: API_PREFIX + '/metadata/api/navigator/find_entity',
+    LIST_TAGS: API_PREFIX + '/metadata/api/navigator/list_tags',
+    UPDATE_PROPERTIES: API_PREFIX + '/metadata/api/navigator/update_properties',
   };
 
   var NAV_OPT_URLS = {
-    TOP_AGGS: '/metadata/api/optimizer/top_aggs',
-    TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
-    TOP_FILTERS: '/metadata/api/optimizer/top_filters',
-    TOP_JOINS: '/metadata/api/optimizer/top_joins',
-    TOP_TABLES: '/metadata/api/optimizer/top_tables',
-    TABLE_DETAILS: '/metadata/api/optimizer/table_details'
+    TOP_AGGS: API_PREFIX + '/metadata/api/optimizer/top_aggs',
+    TOP_COLUMNS: API_PREFIX + '/metadata/api/optimizer/top_columns',
+    TOP_FILTERS: API_PREFIX + '/metadata/api/optimizer/top_filters',
+    TOP_JOINS: API_PREFIX + '/metadata/api/optimizer/top_joins',
+    TOP_TABLES: API_PREFIX + '/metadata/api/optimizer/top_tables',
+    TABLE_DETAILS: API_PREFIX + '/metadata/api/optimizer/table_details'
   };
 
   function ApiHelper () {
