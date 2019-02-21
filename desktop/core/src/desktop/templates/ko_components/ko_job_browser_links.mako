@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from desktop.conf import IS_EMBEDDED, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY
+from desktop.conf import IS_EMBEDDED, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, URL_PREFIX
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
@@ -101,7 +101,7 @@ from desktop.views import _ko
 
         var lastYarnBrowserRequest = null;
         var checkYarnBrowserStatus = function() {
-          return $.post("/jobbrowser/jobs/", {
+          return $.post("/${ URL_PREFIX.get() }jobbrowser/jobs/", {
               "format": "json",
               "state": "running",
               "user": "${user.username}"
@@ -116,7 +116,7 @@ from desktop.views import _ko
         };
         var lastScheduleBrowserRequest = null;
         var checkScheduleBrowserStatus = function() {
-          return $.post("/jobbrowser/api/jobs", {
+          return $.post("/${ URL_PREFIX.get() }jobbrowser/api/jobs", {
               interface: ko.mapping.toJSON("schedules"),
               filters: ko.mapping.toJSON([
                   {"text": "user:${user.username}"},
@@ -157,7 +157,7 @@ from desktop.views import _ko
 
         // Load the mini jobbrowser
         $.ajax({
-          url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
+          url: '/${ URL_PREFIX.get() }jobbrowser/apps?is_embeddable=true&is_mini=true',
           beforeSend: function (xhr) {
             xhr.setRequestHeader('X-Requested-With', 'Hue');
           },
