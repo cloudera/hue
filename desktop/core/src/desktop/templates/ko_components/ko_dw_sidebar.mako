@@ -86,11 +86,11 @@
           };
           if (self.pocClusterMode() === 'dw') {
             appCategory.children = [
-              { displayName: 'Editor', url: '/${ URL_PREFIX.get() }editor/?type=impala', icon: 'editor' },
-              { displayName: 'Catalog', url: '/${ URL_PREFIX.get() }metastore/tables', icon: 'tables' },
-              { displayName: 'Importer', url: '/${ URL_PREFIX.get() }indexer/importer', icon: 'hdfs' },
-              { displayName: 'Warehouses', url: '/${ URL_PREFIX.get() }jobbrowser#!dataware2-clusters', icon: 'warehouses' },
-              { displayName: 'Dashboards', url: '/${ URL_PREFIX.get() }dashboard', icon: 'dashboard' },
+              { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
+              { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
+              { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
+              { displayName: 'Warehouses', url: '/jobbrowser#!dataware2-clusters', icon: 'warehouses' },
+              { displayName: 'Dashboards', url: '/dashboard', icon: 'dashboard' },
             ]
           } else { // DE mode
             appCategory.children = [
