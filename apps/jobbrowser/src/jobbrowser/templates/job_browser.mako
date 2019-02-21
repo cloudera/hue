@@ -257,7 +257,7 @@ function source2(request, callback) {
 }
 
 function sourceClusterCreateRemoteClustersOld(request, callback) {
-  callback(jobBrowserViewModel.jobs.clusterCreateRemoteClusters().filter(word => word.indexOf(request.term) != -1));
+  callback(jobBrowserViewModel.jobs.clusterCreateRemoteComputes().filter(word => word.indexOf(request.term) != -1));
 /**
   var successCallback = function (data) {
     var JSON_USERS_GROUPS = data;
@@ -317,26 +317,32 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
           ##<label class="checkbox" style="float: right;">
           ##  <input type="checkbox" data-bind="checked: jobs.createClusterAutoPause"> ${ _('Auto pause') }
           ##</label>
-          <label class="checkbox" style="margin-right: 10px; float: right;">
-            <input type="checkbox" data-bind="checked: jobs.createClusterAutoResize"> ${ _('Auto resize') }
-          </label>
+          ##<label class="checkbox" style="margin-right: 10px; float: right;">
+          ##  <input type="checkbox" data-bind="checked: jobs.createClusterAutoResize"> ${ _('Auto resize') }
+          ##</label>
           <br>
 
           <label class="checkbox" style="margin-right: 10px;">
-            <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Remote') }
+            <input type="checkbox" data-bind="checked: jobs.createClusterHasRemoteStorage"> ${ _('Custom Compute & Namespace') }
           </label>
 
           <span data-bind="visible: jobs.createClusterHasRemoteStorage">
           
             <div id="menu22"></div>
-            <label for="clusterCreateRemoteCluster">${ _('Compute Cluster') }</label>
-            <input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: jobs.sourceClusterCreateRemoteClusters, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.clusterCreateRemoteCluster, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.clusterCreateRemoteCluster }, textInput: jobs.clusterCreateRemoteCluster" class="ui-autocomplete-input" autocomplete="off">
+            <label for="clusterCreateRemoteCompute">${ _('Compute Cluster') }</label>
+            <select data-bind="options: jobs.clusterCreateRemoteComputes,
+                       optionsText: 'name',
+                       value: jobs.clusterCreateRemoteCompute"></select>
+            ##<input placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: jobs.sourceClusterCreateRemoteClusters, itemTemplate: 'user-search-autocomp-item2', noMatchTemplate: 'user-search-autocomp-no-match2', valueObservable: jobs.clusterCreateRemoteCompute, showSpinner: true, classPrefix: 'hue2-', onEnter: handleTypeaheadSelection2, appendTo: $('#menu2') }, clearable: { value: jobs.clusterCreateRemoteCompute }, textInput: jobs.clusterCreateRemoteCompute" class="ui-autocomplete-input" autocomplete="off">
 
-            <label for="clusterCreateRemoteData">${ _('Data') }</label>
-            <input id="clusterCreateRemoteData" type="text" placeholder="${ _('hdfs-namenode:9820') }" data-bind="clearable: jobs.clusterCreateRemoteData, valueUpdate: 'afterkeydown'">
+            ##<label for="clusterCreateRemoteData">${ _('Data') }</label>
+            ##<input id="clusterCreateRemoteData" type="text" placeholder="${ _('hdfs-namenode:9820') }" data-bind="clearable: jobs.clusterCreateRemoteData, valueUpdate: 'afterkeydown'">
 
-            <label for="clusterCreateRemoteMetadata">${ _('HMS') }</label>
-            <input id="clusterCreateRemoteMetadata" type="text" placeholder="${ _('thrift://hive:9083') }" data-bind="clearable: jobs.clusterCreateRemoteMetadata, valueUpdate: 'afterkeydown'">
+            <label for="clusterCreateRemoteNamespaces">${ _('Data Namespaces') }</label>
+            <select data-bind="options: jobs.clusterCreateRemoteNamespaces,
+                       optionsText: 'description',
+                       value: jobs.clusterCreateRemoteNamespace"></select>
+            ##<input id="clusterCreateRemoteMetadata" type="text" placeholder="${ _('thrift://hive:9083') }" data-bind="clearable: jobs.clusterCreateRemoteMetadata, valueUpdate: 'afterkeydown'">
           </span>
         <!-- /ko -->
         <!-- ko if: $root.cluster() && $root.cluster()['type'] == 'altus-engines' -->
@@ -3191,13 +3197,16 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
       self.createClusterHasRemoteStorage = ko.observable(false);
       
       self.searchInput = ko.observable('');
-      self.clusterCreateRemoteCluster = ko.observable(window.location.hostname);
-      self.clusterCreateRemoteClusters = ko.observable([window.location.hostname]);
+      self.clusterCreateRemoteCompute = ko.observable();
+      self.clusterCreateRemoteComputes = ko.observable([]);
+      self.clusterCreateRemoteNamespace = ko.observable();
+      self.clusterCreateRemoteNamespaces = ko.observable([]);
+      
       self.clusterCreateRemoteData = ko.observable('hdfs-namenode:9820');
       self.clusterCreateRemoteMetadata = ko.observable('thrift://hive:9083');
 
       self.sourceClusterCreateRemoteClusters = function(request, callback) {
-        callback(self.clusterCreateRemoteClusters().filter(word => word.indexOf(request.term) != -1));
+        callback(self.clusterCreateRemoteComputes().filter(word => word.indexOf(request.term) != -1));
       }
 
       self.createClusterFormReset = function() {
@@ -3228,8 +3237,10 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
           $.post("/${ URL_PREFIX.get() }metadata/api/analytic_db/create_cluster/", {
             "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
             "cluster_name": self.createClusterName(),
-            "clusterCreateRemoteData": self.clusterCreateRemoteData(),
-            "clusterCreateRemoteMetadata": self.clusterCreateRemoteMetadata(),
+            "clusterCreateRemoteCompute": self.clusterCreateRemoteCompute(),
+            "clusterCreateRemoteNamespace": self.clusterCreateRemoteNamespace(),
+            "clusterCreateRemoteData": self.clusterCreateRemoteData(), // old
+            "clusterCreateRemoteMetadata": self.clusterCreateRemoteMetadata(), // old
             "cluster_hdfs_host": "hdfs-namenode", // old
             "cluster_hdfs_port": 9820, // old
             "cdh_version": "CDH515",
@@ -3607,6 +3618,14 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
         huePubSub.subscribe('browser.job.open.link', function (id) {
           openJob(id);
         }, 'jobbrowser');
+        
+        $.post("/${ URL_PREFIX.get() }metadata/api/analytic_db/list_computes/", function(data) {
+          jobBrowserViewModel.jobs.clusterCreateRemoteComputes(data.data);
+        });
+          
+        $.post("/${ URL_PREFIX.get() }metadata/api/analytic_db/list_namespaces/", function(data) {
+          jobBrowserViewModel.jobs.clusterCreateRemoteNamespaces(data.data);
+        });
       % else:
         ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
         jobBrowserViewModel.isMini(true);

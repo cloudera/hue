@@ -407,7 +407,7 @@ class DataWarehouseXApi():
         }
       ]
     }'''
-    return self._root.get('sdx')
+    return self._root.get('sdx')['items']
 
 
   def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
@@ -423,12 +423,17 @@ class DataWarehouseXApi():
 
     data = self.CLUSTER_PROPERTIES.copy()
     data['spec']['executor']['numExecutors'] = workers_group_size
+    if environment_name:
+      data['spec']['compute'] = environment_name['spec'] # Cpmpute
+    if namespace_name:
+      data['spec']['sdx'] = namespace_name['spec']
 
     return self._root.post('dwxcluster/%s' % cluster_name, data=json.dumps(data), contenttype="application/json")
 
 
   def list_clusters(self):
     clusters = self._root.get('dwxcluster')
+
     for cluster in clusters['items']:
       self._massage_cluster_data(cluster)
 

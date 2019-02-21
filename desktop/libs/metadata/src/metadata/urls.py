@@ -91,10 +91,12 @@ urlpatterns += [
 ]
 
 
-# Altus API
+# Altus / K8s API
 urlpatterns += [
   url(r'^api/analytic_db/create_cluster/?$', analytic_db_api.create_cluster, name='create_cluster'),
   url(r'^api/analytic_db/update_cluster/?$', analytic_db_api.update_cluster, name='update_cluster'),
+  url(r'^api/analytic_db/list_computes/?$', analytic_db_api.get_computes, name='get_computes'),
+  url(r'^api/analytic_db/list_namespaces/?$', analytic_db_api.get_namespaces, name='get_namespaces'),
 ]
 urlpatterns += [
   url(r'^api/dataeng/create_cluster/?$', dataeng_api.create_cluster, name='create_cluster'),

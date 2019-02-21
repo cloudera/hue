@@ -54,9 +54,13 @@ def create_cluster(request):
   cdh_version = request.POST.get('cdh_version')
   public_key = request.POST.get('public_key')
   instance_type = request.POST.get('instance_type', "workers_group_size"'')
-  environment_name = request.POST.get('environment_name')
   workers_group_size = int(request.POST.get('workers_group_size', '3'))
-  namespace_name = request.POST.get('namespace_name', 'null')
+
+  environment_name = request.POST.get('clusterCreateRemoteCompute')
+  namespace_name = request.POST.get('clusterCreateRemoteNamespace')
+
+#   environment_name = request.POST.get('environment_name')
+#   namespace_name = request.POST.get('namespace_name', 'null')
 
   api = DataWarehouseXApi(request.user) if is_k8 and URL_PREFIX.get() else DataWarehouse2Api(request.user) if is_k8 else AnalyticDbApi(request.user)
 
@@ -115,3 +119,45 @@ def update_cluster(request):
     response['message'] = 'Data Warehouse API: %s' % data['details']
 
   return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def get_computes(request):
+  response = {'status': -1}
+
+  api = DataWarehouseXApi(request.user)
+
+  data = api.list_k8_clusters()
+
+  if data:
+    response['status'] = 0
+    response['data'] = data
+  else:
+    response['message'] = 'Data Warehouse API: %s' % data['details']
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def get_namespaces(request):
+  response = {'status': -1}
+
+  api = DataWarehouseXApi(request.user)
+
+  data = api.list_sdx_namespaces()
+  
+  for namespace in data:
+    namespace['description'] = namespace['name']
+    if namespace['spec'].get('cm_hostname'):
+      namespace['description'] += ' ' + namespace['spec'].get('cm_hostname') 
+
+  if data:
+    response['status'] = 0
+    response['data'] = data
+  else:
+    response['message'] = 'Data Warehouse API: %s' % data['details']
+
+  return JsonResponse(response)
+
