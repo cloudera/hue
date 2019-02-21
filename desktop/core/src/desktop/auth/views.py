@@ -89,7 +89,8 @@ def dt_login_old(request, from_modal=False):
 @login_notrequired
 @watch_login
 def dt_login(request, from_modal=False):
-  redirect_to = request.GET.get('next', URL_PREFIX.get() + '/')
+  redirect_to = request.GET.get('next', '/')
+  redirect_to = '/' + URL_PREFIX.get()
   is_first_login_ever = first_login_ever()
   backend_names = auth_forms.get_backend_names()
   is_active_directory = auth_forms.is_active_directory()
@@ -215,7 +216,7 @@ def dt_logout(request, next_page=None):
     except Exception, e:
       LOG.warn("Error closing Impala session: %s" % e)
 
-  if URL_PREFIX.get() and (next_page is None or next_page == '/'):
+  if URL_PREFIX.get(): # and (next_page is None or next_page == '/'):
     next_page = URL_PREFIX.get()
 
   backends = get_backends()

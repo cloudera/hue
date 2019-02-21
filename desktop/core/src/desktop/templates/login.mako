@@ -144,7 +144,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     %if login_errors and not form['username'].errors and not form['password'].errors:
       %if form.errors:
         % for error in form.errors:
-         ${ form.errors[error]|unicode,n }
+          ${ form.errors[error]|unicode,n }
         % endfor
       %endif
     %endif
