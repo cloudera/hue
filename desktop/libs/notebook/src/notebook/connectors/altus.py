@@ -429,17 +429,27 @@ class DataWarehouseXApi():
   def list_clusters(self):
     clusters = self._root.get('dwxcluster')
     for cluster in clusters['items']:
-      cluster['clusterName'] = cluster['metadata']['name']
-      cluster['workersGroupSize'] = cluster['spec']['executor']['numExecutors']
-      cluster['instanceType'] = 'Data Warehouse %(cpuRequest)s %(memRequest)s' % cluster['spec']['executor']
-      cluster['progress'] = ''
-      cluster['status'] = cluster['status']['conditions'][0]['type']
-      cluster['creationDate'] = cluster['metadata']['creationTimestamp']
-      cluster['crn'] = cluster['metadata']['uid']
+      self._massage_cluster_data(cluster)
 
     clusters['clusters'] = clusters['items'] # TODO remove one level everywhere
 
     return clusters
+
+  def _massage_cluster_data(self, cluster):
+    cluster['clusterName'] = cluster['metadata']['name']
+    cluster['workersGroupSize'] = cluster['spec']['executor']['numExecutors']
+    cluster['instanceType'] = 'Data Warehouse %(cpuRequest)s %(memRequest)s' % cluster['spec']['executor']
+    cluster['progress'] = ''
+    cluster['status'] = cluster['status']['conditions'][0]['type'].upper()
+    cluster['creationDate'] = cluster['metadata']['creationTimestamp']
+
+#       cluster['crn'] = cluster['metadata']['uid']
+    cluster['crn'] = cluster['metadata']['name']
+    
+    cluster['workerAutoResizeMax'] = cluster['workerAutoResizeMin'] = cluster['workerReplicasOnline'] = cluster['workerReplicas'] = cluster['workersGroupSize']
+    cluster['workerAutoResizeCpu'] = 80
+    cluster['workerAutoResize'] = True
+    cluster['coordinatorEndpoint'] = {'publicHost': cluster['spec']['ingress']['impaladShellPort']}
 
 
   def delete_cluster(self, cluster_id):
@@ -449,10 +459,14 @@ class DataWarehouseXApi():
 
 
   def describe_cluster(self, cluster_id):
-    data = self._root.get('dwxcluster/%s' % cluster_id)
+    cluster = self._root.get('dwxcluster/%s' % cluster_id)
+    
+    self._massage_cluster_data(cluster)
+    
 #     data['cluster']['clusterName'] = data['cluster']['name']
 #     data['cluster']['cdhVersion'] = 'Data Warehouse'
-    return data
+
+    return {'cluster': cluster} # TODO
 
 
   def update_cluster(self, **params):

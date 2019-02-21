@@ -107,7 +107,7 @@ class DataWarehouseClusterApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING', 'Running']:
+    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING', 'RUNNING']:
       return 'RUNNING'
     elif status == 'STOPPED':
       return 'PAUSED'
