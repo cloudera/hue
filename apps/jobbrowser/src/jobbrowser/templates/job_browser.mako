@@ -1388,6 +1388,12 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('Editor') }</li>
+          <li>
+            <a data-bind="hueLink: '/editor/?type=impala'">
+              <i class="altus-icon altus-sql-editor"></i> ${ _('Editor') }
+            </a>
+          </li>
           <li class="nav-header">${ _('Workers Online') }</li>
           <li>
             <span data-bind="text: properties['properties']['workerReplicasOnline']"></span>
