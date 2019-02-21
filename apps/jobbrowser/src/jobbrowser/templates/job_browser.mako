@@ -16,7 +16,7 @@
 <%
 from django.utils.translation import ugettext as _
 
-from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4
+from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4, URL_PREFIX
 from desktop.views import commonheader, commonfooter, _ko
 from metadata.conf import PROMETHEUS
 
@@ -2605,7 +2605,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
           return;
         }
 
-        return $.post("/jobbrowser/api/job/" + vm.interface(), {
+        return $.post("/${ URL_PREFIX.get() }jobbrowser/api/job/" + vm.interface(), {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
@@ -2761,7 +2761,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
 
       self.fetchLogs = function (name) {
         name = name || 'default';
-        $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
+        $.post("/${ URL_PREFIX.get() }jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2782,7 +2782,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
       };
 
       self.fetchProfile = function (name, callback) {
-        $.post("/jobbrowser/api/job/profile", {
+        $.post("/${ URL_PREFIX.get() }jobbrowser/api/job/profile", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2802,7 +2802,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
       };
 
       self.fetchStatus = function () {
-        $.post("/jobbrowser/api/job", {
+        $.post("/${ URL_PREFIX.get() }jobbrowser/api/job", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(self.mainType)
@@ -2856,7 +2856,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
 
       ## TODO Move to control
       self.updateCluster = function() {
-        $.post("/metadata/api/analytic_db/update_cluster/", {
+        $.post("/${ URL_PREFIX.get() }metadata/api/analytic_db/update_cluster/", {
           "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
           "cluster_name": self.id(),
           "workers_group_size": self.updateClusterWorkers(),
@@ -2873,7 +2873,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
       }
 
       self.troubleshoot = function (action) {
-        $.post('/metadata/api/workload_analytics/get_operation_execution_details', {
+        $.post('/${ URL_PREFIX.get() }metadata/api/workload_analytics/get_operation_execution_details', {
           operation_id: ko.mapping.toJSON(self.id())
         }, function(data) {
           console.log(ko.mapping.toJSON(data));
@@ -3103,7 +3103,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
 
 
       self._fetchJobs = function (callback) {
-        return $.post("/jobbrowser/api/jobs/" + vm.interface(), {
+        return $.post("/${ URL_PREFIX.get() }jobbrowser/api/jobs/" + vm.interface(), {
           cluster: ko.mapping.toJSON(vm.compute),
           interface: ko.mapping.toJSON(vm.interface),
           filters: ko.mapping.toJSON(self.filters),
@@ -3210,7 +3210,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
 
       self.createCluster = function() {
         if (vm.interface().indexOf('dataeng') != -1) {
-          $.post("/metadata/api/dataeng/create_cluster/", {
+          $.post("/${ URL_PREFIX.get() }metadata/api/dataeng/create_cluster/", {
             "cluster_name": "cluster_name",
             "cdh_version": "CDH515",
             "public_key": "public_key",
@@ -3225,7 +3225,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
             huePubSub.publish('context.catalog.refresh');
           });
         } else {
-          $.post("/metadata/api/analytic_db/create_cluster/", {
+          $.post("/${ URL_PREFIX.get() }metadata/api/analytic_db/create_cluster/", {
             "is_k8": vm.interface().indexOf('dataware2-clusters') != -1,
             "cluster_name": self.createClusterName(),
             "clusterCreateRemoteData": self.clusterCreateRemoteData(),
@@ -3290,7 +3290,7 @@ function sourceClusterCreateRemoteClustersOld(request, callback) {
       }
 
       self._control = function (app_ids, action, callback) {
-        $.post("/jobbrowser/api/job/action/" + vm.interface() + "/" + action, {
+        $.post("/${ URL_PREFIX.get() }jobbrowser/api/job/action/" + vm.interface() + "/" + action, {
           app_ids: ko.mapping.toJSON(app_ids),
           interface: ko.mapping.toJSON(vm.interface),
           operation: ko.mapping.toJSON({action: action})

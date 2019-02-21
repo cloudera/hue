@@ -28,11 +28,7 @@ from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api, DataWare
 from jobbrowser.apis.base_api import Api
 
 
-
 LOG = logging.getLogger(__name__)
-
-
-RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
 
 
 class DataWarehouseClusterApi(Api):
@@ -111,7 +107,7 @@ class DataWarehouseClusterApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING']:
+    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING', 'Running']:
       return 'RUNNING'
     elif status == 'STOPPED':
       return 'PAUSED'

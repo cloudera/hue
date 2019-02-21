@@ -20,9 +20,11 @@ import logging
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
+from desktop.conf import URL_PREFIX
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
+
+from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api, DataWarehouseXApi
 
 
 LOG = logging.getLogger(__name__)
@@ -56,7 +58,8 @@ def create_cluster(request):
   workers_group_size = int(request.POST.get('workers_group_size', '3'))
   namespace_name = request.POST.get('namespace_name', 'null')
 
-  api = DataWarehouse2Api(request.user) if is_k8 else AnalyticDbApi(request.user)
+  api = DataWarehouseXApi(request.user) if is_k8 and URL_PREFIX.get() else DataWarehouse2Api(request.user) if is_k8 else AnalyticDbApi(request.user)
+
   data = api.create_cluster(
       cloud_provider='aws',
       cluster_name=cluster_name,
@@ -102,7 +105,7 @@ def update_cluster(request):
   else:
     params['workerReplicas'] = int(request.POST.get('workers_group_size', '3'))
 
-  api = DataWarehouse2Api(request.user)
+  api = DataWarehouseXApi(request.user) if URL_PREFIX.get() else DataWarehouse2Api(request.user)
   data = api.update_cluster(**params)
 
   if data:

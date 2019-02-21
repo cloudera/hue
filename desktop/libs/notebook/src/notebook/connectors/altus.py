@@ -344,7 +344,24 @@ class DataWarehouse2Api():
 
 
 class DataWarehouseXApi():
-
+  CLUSTER_PROPERTIES = {
+      "spec": {
+          "sdx": {
+              "cmHostname": "nightly6x-unsecure",
+              "cmDomain": "vpc.cloudera.com"
+          },
+          "ingress": {
+              "impaladShellPort": 31000,
+              "impaladJdbcPort": 32000
+          },
+          "executor": {
+              "numExecutors": 3,
+              "cpuRequest": "200m",
+              "memRequest": "512Mi"
+          }
+      }
+  }
+ 
   def __init__(self, user=None):
     self._api_url = K8S.API_URL.get().rstrip('/')
 
@@ -352,24 +369,6 @@ class DataWarehouseXApi():
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_verify(False)
     self._root = Resource(self._client)
-
-    CLUSTER_PROPERTIES = {
-        "spec": {
-            "sdx": {
-                "cmHostname": "nightly6x-unsecure",
-                "cmDomain": "vpc.cloudera.com"
-            },
-            "ingress": {
-                "impaladShellPort": 31000,
-                "impaladJdbcPort": 32000
-            },
-            "executor": {
-                "numExecutors": 3,
-                "cpuRequest": "200m",
-                "memRequest": "512Mi"
-            }
-        }
-    }
 
   # DP API
   def list_k8_clusters(self):
@@ -430,12 +429,16 @@ class DataWarehouseXApi():
   def list_clusters(self):
     clusters = self._root.get('dwxcluster')
     for cluster in clusters['items']:
-      cluster['clusterName'] = cluster['name']
-      cluster['workersGroupSize'] = cluster['workerReplicas']
-      cluster['instanceType'] = 'Data Warehouse'# '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
-      cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
-      cluster['creationDate'] = str(datetime.now())
-    cluster['clusters'] = cluster['items']
+      cluster['clusterName'] = cluster['metadata']['name']
+      cluster['workersGroupSize'] = cluster['spec']['executor']['numExecutors']
+      cluster['instanceType'] = 'Data Warehouse %(cpuRequest)s %(memRequest)s' % cluster['spec']['executor']
+      cluster['progress'] = ''
+      cluster['status'] = cluster['status']['conditions'][0]['type']
+      cluster['creationDate'] = cluster['metadata']['creationTimestamp']
+      cluster['crn'] = cluster['metadata']['uid']
+
+    clusters['clusters'] = clusters['items'] # TODO remove one level everywhere
+
     return clusters
 
 
