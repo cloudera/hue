@@ -173,8 +173,8 @@ def get_context_computes(request, interface):
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
           'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '', # Old DW2
           'publicHost': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
-          'publicPort': IS_K8S_ONLY.get() and '%(publicPort)s' % cluster['coordinatorEndpoint'] or '',
-          'type': 'altus-dw'
+          'publicPort': IS_K8S_ONLY.get() and cluster['coordinatorEndpoint']['publicPort'] or '',
+          'type': 'dp-dwx' #'altus-dw'
         } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and 'TERMINAT' not in cluster['status'])]
       )
 

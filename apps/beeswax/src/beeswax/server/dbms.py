@@ -121,8 +121,8 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
 
 def get_cluster_config(cluster=None):
   if cluster and cluster.get('id') != CLUSTER_ID.get():
-    if URL_PREFIX.get():
-      cluster_config = {'server_host': cluster['coordinatorEndpoint']['publicHost'], 'server_port': cluster['coordinatorEndpoint']['publicPort'], 'name': cluster['name']}
+    if 'dp-dwx' in cluster.get('type', ''):
+      cluster_config = {'server_host': cluster['publicHost'], 'server_port': cluster['publicPort'], 'name': cluster['name']}
     elif 'altus:dataware:k8s' in cluster['id']:
       compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
       cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
