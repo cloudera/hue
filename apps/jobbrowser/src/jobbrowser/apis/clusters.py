@@ -23,7 +23,7 @@ from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from notebook.connectors.altus import DataWarehouse2Api
+from notebook.connectors.altus import DataWarehouseXApi
 
 from jobbrowser.apis.base_api import Api
 
@@ -41,20 +41,26 @@ class ClusterApi(Api):
     super(ClusterApi, self).__init__(user)
 
     self.version = version
-    self.api = DataWarehouse2Api(self.user) 
+    self.api = DataWarehouseXApi(self.user) 
 
 
   def apps(self, filters):
-    #jobs = self.api.list_clusters()
-
-    return {
-      u'status': 0,
-      u'total': 3,
-      u'apps': [
+    if self.version == 2:
+      clusters = [
+        {u'status': u'ONLINE', u'name': cluster['name'], u'submitted': u'2019-02-21 08:34:39.128886', u'queue': u'group', u'user': u'jo0', u'canWrite': False, u'duration': 0, u'progress': u'100 / 100', u'type': u'Openshift', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:jo0/cbf7bbb1-f956-45e4-a269-d239efbc9996', u'apiStatus': u'RUNNING'}
+        for cluster in self.api.list_k8_clusters()
+      ]
+    else:
+      clusters = [
         {u'status': u'ONLINE', u'name': u'Internal EDH', u'submitted': u'2018-10-04 08:34:39.128886', u'queue': u'group', u'user': u'jo0', u'canWrite': False, u'duration': 0, u'progress': u'100 / 100', u'type': u'GKE 100 nodes 100CPU 20TB', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:jo0/cbf7bbb1-f956-45e4-a269-d239efbc9996', u'apiStatus': u'RUNNING'},
         {u'status': u'ONLINE', u'name': u'gke_gcp-eng-dsdw_us-west2-b_impala-demo', u'submitted': u'2018-10-04 08:34:39.128881', u'queue': u'group', u'user': u'r0', u'canWrite': False, u'duration': 0, u'progress': u'4 / 4', u'type': u'GKE 4 nodes 16CPU 64GB', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:r0/0da5e627-ee33-45c5-9179-cc6b95008d2e', u'apiStatus': u'RUNNING'},
         {u'status': u'ONLINE', u'name': u'DW-fraud', u'submitted': u'2018-10-04 08:34:39.128881', u'queue': u'group', u'user': u'r0', u'canWrite': False, u'duration': 0, u'progress': u'50 / 50', u'type': u'OpenShift 50 nodes 30CPU 2TB', u'id': u'crn:altus:engine:k8s:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:r0/0da5e627-ee33-45c5-9179-cc6b95008d2e', u'apiStatus': u'RUNNING'},
       ]
+      
+    return {
+      u'status': 0,
+      u'total': len(clusters),
+      u'apps': clusters
     }
 
     return {
@@ -70,8 +76,8 @@ class ClusterApi(Api):
         'duration': ((datetime.now() - parser.parse(app['creationDate']).replace(tzinfo=None)).seconds * 1000) if app['creationDate'] else 0,
         'submitted': app['creationDate'],
         'canWrite': True
-      } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
-      'total': len(jobs['clusters'])
+      } for app in sorted(clusters['clusters'], key=lambda a: a['creationDate'], reverse=True)],
+      'total': len(clusters['clusters'])
     }
 
 

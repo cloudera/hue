@@ -23,6 +23,7 @@ from django.utils.translation import ugettext as _
 
 from hadoop.fs.hadoopfs import Hdfs
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.conf import URL_PREFIX
 
 
 LOG = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ def get_api(user, interface, cluster=None):
   elif interface == 'bundles':
     return BundleApi(user)
   elif interface == 'engines':
-    return ClusterApi(user)
+    return ClusterApi(user, version=2 if URL_PREFIX.get() else 1)
   elif interface == 'dataeng-clusters':
     return DataEngClusterApi(user)
   elif interface == 'dataware-clusters':

@@ -386,11 +386,12 @@ class DataWarehouseXApi():
 
     for cluster in clusters['items']:
       cluster['clusterName'] = cluster['name']
-      cluster['workersGroupSize'] = ''
+      cluster['workersGroupSize'] = cluster['spec']['ip_address']
       cluster['instanceType'] = ''
       cluster['progress'] = ''
       cluster['creationDate'] = str(datetime.now())
-    return clusters
+
+    return clusters['items']
 
 
   # DP API
