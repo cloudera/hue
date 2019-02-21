@@ -1196,7 +1196,7 @@ var Collection = function (vm, collection) {
     self.removeFacet(function(){return facet_json.widget_id});
     hueAnalytics.log('dashboard', 'add_facet/' + facet_json.widgetType);
 
-    $.post("/dashboard/template/new_facet", {
+    $.post("/dwx-sql/dashboard/template/new_facet", {
         "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
         "label": facet_json.name,
@@ -1492,7 +1492,7 @@ var Collection = function (vm, collection) {
   });
 
   self.switchCollection = function() {
-    $.post("/dashboard/get_collection", {
+    $.post("/dwx-sql/dashboard/get_collection", {
         name: self.name(),
         engine: self.engine(),
         source: self.source()
@@ -1555,7 +1555,7 @@ var Collection = function (vm, collection) {
   }
 
   self.syncFields = function() {
-    $.post("/dashboard/get_collection", {
+    $.post("/dwx-sql/dashboard/get_collection", {
         name: self.name(),
         engine: self.engine(),
         source: self.source()
@@ -1571,7 +1571,7 @@ var Collection = function (vm, collection) {
   };
 
   self.syncDynamicFields = function () {
-    $.post("/dashboard/index/fields/dynamic", {
+    $.post("/dwx-sql/dashboard/index/fields/dynamic", {
         name: self.name(),
         engine: self.engine(),
         source: self.source()
@@ -1588,7 +1588,7 @@ var Collection = function (vm, collection) {
   };
 
   self.getNestedDocuments = function () {
-    $.post("/dashboard/index/fields/nested_documents", {
+    $.post("/dwx-sql/dashboard/index/fields/nested_documents", {
         collection: ko.mapping.toJSON(self),
         engine: self.engine()
       }, function (data) {
@@ -1909,7 +1909,7 @@ var NewTemplate = function (vm, initial) {
 
   self.syncCollections = function () {
     vm.isSyncingCollections(true);
-    $.post("/dashboard/get_collections", {
+    $.post("/dwx-sql/dashboard/get_collections", {
         collection: ko.mapping.toJSON(vm.collection),
         show_all: false
       }, function (data) {
@@ -2275,7 +2275,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     };
 
     self.checkStatus = function (facet) { // TODO: have a common generic with Notebook
-      $.post("/notebook/api/check_status", {
+      $.post("/dwx-sql/notebook/api/check_status", {
         notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
         snippet: ko.mapping.toJSON(facet.queryResult().getContext())
       }, function (data) {
@@ -2321,7 +2321,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       hueAnalytics.log('dashboard', 'cancel');
 
       multiQs = $.map(self.asyncSearchesCounter(), function (facet) {
-        $.post("/notebook/api/cancel_statement", {
+        $.post("/dwx-sql/notebook/api/cancel_statement", {
           notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
           snippet: ko.mapping.toJSON(facet.queryResult().getContext())
         }, function (data) {
@@ -2341,7 +2341,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     };
 
     self.close = function (facet) {
-      $.post("/notebook/api/close_statement", {
+      $.post("/dwx-sql/notebook/api/close_statement", {
         notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
         snippet: ko.mapping.toJSON(facet.queryResult().getContext())
       }, function (data) {
@@ -2370,7 +2370,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       if (!self.collection.async()) {
         self._loadResults(facet, facet.queryResult().asyncResult());
       } else {
-        $.post("/dashboard/search", {
+        $.post("/dwx-sql/dashboard/search", {
           collection: ko.mapping.toJSON(self.collection),
           query: ko.mapping.toJSON(self.query),
           facet: ko.mapping.toJSON(facet),
@@ -2387,7 +2387,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     };
 
     self.fetchResultSize = function (facet) {
-      $.post("/notebook/api/fetch_result_size", {
+      $.post("/dwx-sql/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
         snippet: ko.mapping.toJSON(facet.queryResult)
       }, function (data) {
@@ -2471,7 +2471,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         });
 
         multiQs = $.map(self.collection.facets(), function (facet) {
-          return $.post("/dashboard/search", {
+          return $.post("/dwx-sql/dashboard/search", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
             facet: ko.mapping.toJSON(facet)
@@ -2502,7 +2502,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
       if (self.collection.engine() != 'report') {
         multiQs.concat([
-          $.post("/dashboard/search", {
+          $.post("/dwx-sql/dashboard/search", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
             layout: ko.mapping.toJSON(self.columns)
