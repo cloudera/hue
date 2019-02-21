@@ -226,7 +226,11 @@ for app in appmanager.DESKTOP_MODULES:
     else:
       namespace = {}
     if namespace or app in appmanager.DESKTOP_APPS:
-      app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include(app.urls, **namespace)))
+#       if app.name == 'notebook':
+#         for _url in app.urls.urlpatterns:
+#           if _url._regex.startswith('^'):
+#             _url._regex = _url._regex[1:] 
+      app_urls_patterns.append(url('^' + URL_PREFIX.get() + re.escape(app.name) + '/', include(app.urls, **namespace)))
       app.urls_imported = True
 
 static_patterns.append(

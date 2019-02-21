@@ -4097,7 +4097,7 @@
           };
 
           // For syntax checking
-          var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
+          var aceSqlSyntaxWorker = new Worker('/dwx-sql' + '/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
           aceSqlSyntaxWorker.onmessage = function (e) {
             if (e.data.ping) {
               aceSqlSyntaxWorker.isReady = true;
@@ -4111,7 +4111,7 @@
           });
 
           // For location marking
-          var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
+          var aceSqlLocationWorker = new Worker('/dwx-sql' + '/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
           aceSqlLocationWorker.onmessage = function (e) {
             if (e.data.ping) {
               aceSqlLocationWorker.isReady = true;

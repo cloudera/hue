@@ -19,6 +19,8 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 
 from django.utils.translation import ugettext as _
+
+from desktop.conf import URL_PREFIX
 from desktop.views import _ko
 %>
 
@@ -73,14 +75,14 @@ from desktop.views import _ko
           else {
             post['set'] = ko.mapping.toJSON(postParams);
           }
-          $.post('/desktop/api2/user_preferences/default_app', post, function (data) {
+          $.post('/${ URL_PREFIX.get() }desktop/api2/user_preferences/default_app', post, function (data) {
             self.parseCurrentFavorite(data, true);
           });
         };
 
         if (self.isHue4()) {
           // Load the fav app status
-          $.get('/desktop/api2/user_preferences/default_app', function (data) {
+          $.get('/${ URL_PREFIX.get() }desktop/api2/user_preferences/default_app', function (data) {
             self.parseCurrentFavorite(data);
           });
         }

@@ -931,7 +931,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (loadedApps.indexOf(app) == -1){
               loadedApps.push(app);
             }
-            var baseURL = "dwx-sql/" + EMBEDDABLE_PAGE_URLS[app].url;
+            var baseURL = EMBEDDABLE_PAGE_URLS[app].url;
             if (self.currentContextParams() !== null) {
               if (loadDeep && self.currentContextParams()[0]) {
                 baseURL += self.currentContextParams()[0];
@@ -961,7 +961,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }
             baseURL = encodeURI(baseURL);
             $.ajax({
-              url: baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
+              url: "/dwx-sql" + baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
               beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },

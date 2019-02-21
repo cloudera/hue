@@ -17,8 +17,6 @@
 
 from django.conf.urls import url
 
-from desktop.conf import URL_PREFIX
-
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
 #
@@ -52,7 +50,7 @@ urlpatterns = [
 
 # APIs
 urlpatterns += [
-  url(r'^api/create_notebook/?$', notebook_api.create_notebook, name='create_notebook'),
+  url(r'api/create_notebook/?$', notebook_api.create_notebook, name='create_notebook'),
   url(r'^api/create_session/?$', notebook_api.create_session, name='create_session'),
   url(r'^api/close_session/?$', notebook_api.close_session, name='close_session'),
   url(r'^api/execute/?(?P<engine>.+)?$', notebook_api.execute, name='execute'),
@@ -100,9 +98,3 @@ urlpatterns += [
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
 ]
-
-if URL_PREFIX.get():
-  for _url in urlpatterns:
-    if _url._regex.startswith('^'):
-      _url._regex = '^%s' % URL_PREFIX.get() + _url._regex[1:] 
-
