@@ -26,7 +26,6 @@ from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
-from notebook.conf import ENABLE_QUERY_ANALYSIS
 
 
 OPTIMIZER_AUTH_PASSWORD = None
@@ -208,7 +207,7 @@ K8S = ConfigSection(
     API_URL=Config(
       key='api_url',
       help=_t('API URL to Kubernetes API or compatible service.'),
-      default='http://provisioner.com/'),
+      default='http://localhost:5000'),
   )
 )
 
