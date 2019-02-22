@@ -343,6 +343,11 @@ class DataWarehouse2Api():
     return self._root.post('updateCluster', data=json.dumps(params), contenttype="application/json")
 
 
+
+IMPALA_SHELL_PORT = 31000 # Should do global Django cache instead if multiple Hues
+IMPALA_JDBC_PORT = 31000
+
+
 class DataWarehouseXApi():
   CLUSTER_PROPERTIES = {
       "spec": {
@@ -351,8 +356,8 @@ class DataWarehouseXApi():
               "cmDomain": "vpc.cloudera.com"
           },
           "ingress": {
-              "impaladShellPort": 31000,
-              "impaladJdbcPort": 32000
+              "impaladShellPort": IMPALA_SHELL_PORT,
+              "impaladJdbcPort": IMPALA_JDBC_PORT
           },
           "executor": {
               "numExecutors": 3,
@@ -422,6 +427,9 @@ class DataWarehouseXApi():
     }
 
     data = self.CLUSTER_PROPERTIES.copy()
+    IMPALA_SHELL_PORT += 1
+    IMPALA_JDBC_PORT += 1
+    
     data['spec']['executor']['numExecutors'] = workers_group_size
     if environment_name:
       data['spec']['compute'] = environment_name['spec'] # Compute
