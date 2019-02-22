@@ -343,29 +343,27 @@ class DataWarehouse2Api():
     return self._root.post('updateCluster', data=json.dumps(params), contenttype="application/json")
 
 
-
-IMPALA_SHELL_PORT = 31000 # Should do global Django cache instead if multiple Hues
-IMPALA_JDBC_PORT = 31000
-
+# Should do global Django cache/db instead if multiple Hues
+CLUSTER_PROPERTIES = {
+    "spec": {
+        "sdx": {
+            "cmHostname": "nightly6x-unsecure",
+            "cmDomain": "vpc.cloudera.com"
+        },
+        "ingress": {
+            "impaladShellPort": 31000,
+            "impaladJdbcPort": 32000
+        },
+        "executor": {
+            "numExecutors": 3,
+            "cpuRequest": "200m",
+            "memRequest": "512Mi"
+        }
+    }
+}
 
 class DataWarehouseXApi():
-  CLUSTER_PROPERTIES = {
-      "spec": {
-          "sdx": {
-              "cmHostname": "nightly6x-unsecure",
-              "cmDomain": "vpc.cloudera.com"
-          },
-          "ingress": {
-              "impaladShellPort": IMPALA_SHELL_PORT,
-              "impaladJdbcPort": IMPALA_JDBC_PORT
-          },
-          "executor": {
-              "numExecutors": 3,
-              "cpuRequest": "200m",
-              "memRequest": "512Mi"
-          }
-      }
-  }
+
  
   def __init__(self, user=None):
     self._api_url = K8S.API_URL.get().rstrip('/')
@@ -417,6 +415,8 @@ class DataWarehouseXApi():
 
   def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
         cloudera_manager_username='hue', cloudera_manager_password='hue'):
+    global CLUSTER_PROPERTIES
+
     data = {
       'clusterName': cluster_name,
       'cdhVersion': cdh_version or 'CDH6.3',
@@ -426,10 +426,10 @@ class DataWarehouseXApi():
       'workerAutoResize': False
     }
 
-    data = self.CLUSTER_PROPERTIES.copy()
-    IMPALA_SHELL_PORT += 1
-    IMPALA_JDBC_PORT += 1
-    
+    data = CLUSTER_PROPERTIES.copy()
+    CLUSTER_PROPERTIES['spec']['ingress']['impaladShellPort'] += 1
+    CLUSTER_PROPERTIES['spec']['ingress']['impaladJdbcPort'] += 1
+
     data['spec']['executor']['numExecutors'] = workers_group_size
     if environment_name:
       data['spec']['compute'] = environment_name['spec'] # Compute
