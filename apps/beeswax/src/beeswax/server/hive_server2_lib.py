@@ -108,9 +108,13 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     rows = self.describe
-    col_row_index = 2
+    col_row_index = 1
     try:
-      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+      cols = map(itemgetter('col_name'), rows[col_row_index:])
+      if cols.index('') == 0: # TEZ starts at 1 vs Hive, Impala starts at 2
+        col_row_index = col_row_index + 1
+        cols.pop(0)
+      end_cols_index = cols.index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
     except ValueError:  # DESCRIBE on columns and nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
