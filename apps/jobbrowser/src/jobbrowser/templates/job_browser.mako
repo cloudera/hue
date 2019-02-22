@@ -2504,6 +2504,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
           if (data.status == 0) {
+            if (data.app) {
+              huePubSub.publish('jobbrowser.data', [data.app]);
+            }
             if (callback) {
               callback(data);
             };
@@ -3014,6 +3017,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
           if (data.status == 0) {
+            if (data.apps && data.apps.length) {
+              huePubSub.publish('jobbrowser.data', data.apps);
+            }
             if (callback) {
               callback(data);
             };
