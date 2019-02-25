@@ -793,12 +793,9 @@ ${ commonshare() | n,unicode }
   var SqlAutocompleter2 = {};
 </script>
 
-<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/sqlFunctions.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ assist.assistJSModels() }
 
@@ -809,7 +806,6 @@ ${ assist.assistJSModels() }
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.ui.position.min.js') }"></script>
 <script src="${ static('desktop/js/queryBuilder.js') }"></script>
 <script>
   // query-builder-menu is the class to use

@@ -32,20 +32,13 @@
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 ## TODO lot of those re-imported
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
 
 
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/js/ko.selectize.js') }"></script>
 
 ${ assist.assistJSModels() }
 

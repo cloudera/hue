@@ -43,14 +43,10 @@ from desktop.auth.backend import is_admin
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 % if not is_embeddable:
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 % endif
 
 <script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
@@ -58,9 +54,6 @@ from desktop.auth.backend import is_admin
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
 
-<script src="${ static('desktop/js/ko.selectize.js') }"></script>
-<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
@@ -68,7 +61,6 @@ from desktop.auth.backend import is_admin
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfstree.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
@@ -79,7 +71,6 @@ from desktop.auth.backend import is_admin
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.ui.position.min.js') }"></script>
 <script src="${ static('desktop/js/queryBuilder.js') }"></script>
 <script>
 

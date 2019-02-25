@@ -28,10 +28,7 @@ ${ commonheader(_("Create table manually"), 'metastore', user, request) | n,unic
 <span class="notebook">
 ${ layout.metastore_menubar() }
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 
 ${ assist.assistJSModels() }
 

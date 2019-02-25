@@ -23,15 +23,14 @@ import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.impalaDagre = (function() {
   return {
-    init: function(element) {
+    init: function(element, valueAccessor, allBindingsAccessor) {
       const id = $(element).attr('id');
-      const self = this;
-      self._impalaDagre = impalaDagre(id);
+      element._impalaDagre = impalaDagre(id);
       const clickSubscription = huePubSub.subscribe('impala.node.moveto', value => {
-        self._impalaDagre.moveTo(value);
+        element._impalaDagre.moveTo(value);
       });
       const selectSubscription = huePubSub.subscribe('impala.node.select', value => {
-        self._impalaDagre.select(value);
+        element._impalaDagre.select(value);
       });
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         clickSubscription.remove();
@@ -40,9 +39,9 @@ ko.bindingHandlers.impalaDagre = (function() {
     },
     update: function(element, valueAccessor) {
       const props = ko.unwrap(valueAccessor());
-      this._impalaDagre.metrics(props.metrics);
-      this._impalaDagre.height(props.height);
-      this._impalaDagre.update(props.value);
+      element._impalaDagre.metrics(props.metrics);
+      element._impalaDagre.height(props.height);
+      element._impalaDagre.update(props.value);
     }
   };
 })();

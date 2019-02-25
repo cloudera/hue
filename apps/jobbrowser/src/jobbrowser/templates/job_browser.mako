@@ -52,8 +52,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/d3.v5.js') }"></script>
 
 % if ENABLE_QUERY_BROWSER.get():

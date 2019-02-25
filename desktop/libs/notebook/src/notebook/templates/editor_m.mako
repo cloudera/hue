@@ -162,16 +162,11 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 </div>
 
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
-<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 ${ assist.assistJSModels() }
