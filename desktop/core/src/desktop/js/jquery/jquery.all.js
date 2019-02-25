@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'jquery';
+import $ from 'jquery';
 import 'jquery/jquery.migration';
 
 import 'jquery.cookie';
@@ -49,5 +49,5 @@ import 'jquery/plugins/jquery.tableextender2';
 import 'jquery/plugins/jquery.tablescroller';
 import 'jquery/plugins/jquery.titleupdater';
 
-// window.$ = $;
-// window.jQuery = $;
+window.$ = $;
+window.jQuery = $;
