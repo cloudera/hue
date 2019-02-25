@@ -41,14 +41,6 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader'
       },
-      { test: /lodash$/, loader: 'expose-loader?_' },
-      {
-        test: /jquery.js$/,
-        loader: [
-          'expose-loader?$',
-          'expose-loader?jQuery'
-        ]
-      },
       { include: /\.json$/, loaders: ['json-loader'] }
     ]
   },
