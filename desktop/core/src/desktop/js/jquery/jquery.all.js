@@ -19,7 +19,9 @@ import 'jquery/jquery.migration';
 
 import 'jquery.cookie';
 import 'jquery-form';
-import 'selectize';
+import 'jquery/plugins/jquery.selectize';
+import 'selectize-plugin-clear';
+
 import 'jquery-ui/ui/widgets/autocomplete';
 import 'jquery-ui/ui/widgets/mouse';
 import 'jquery-ui/ui/widgets/draggable';
@@ -36,9 +38,11 @@ import 'jquery/plugins/jquery.filechooser';
 import 'jquery/plugins/jquery.hdfs.autocomplete';
 import 'jquery/plugins/jquery.hiveautocomplete';
 import 'jquery/plugins/jquery.horizontalscrollbar';
+import 'jquery/plugins/jquery.huedatatable';
 import 'jquery/plugins/jquery.notify';
 import 'jquery/plugins/jquery.rowselector';
 import 'jquery/plugins/jquery.scrollleft';
+import 'jquery/plugins/jquery.scrollup';
 import 'jquery/plugins/jquery.selector';
 import 'jquery/plugins/jquery.tableextender';
 import 'jquery/plugins/jquery.tableextender2';

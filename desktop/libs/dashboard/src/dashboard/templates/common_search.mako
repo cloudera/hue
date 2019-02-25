@@ -3077,8 +3077,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.gridster.min.css') }">
 
-<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
-
 ${ dashboard.import_layout(True) }
 
 % if not is_embeddable:
@@ -3092,9 +3090,6 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
-<script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.gridster.with-extras.min.js') }"></script>

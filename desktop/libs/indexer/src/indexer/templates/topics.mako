@@ -30,7 +30,6 @@ MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
 
 %if not is_embeddable:
 ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unicode }
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
 ${ assist.assistJSModels() }
@@ -51,7 +50,6 @@ ${ assist.assistPanel() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
-<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 

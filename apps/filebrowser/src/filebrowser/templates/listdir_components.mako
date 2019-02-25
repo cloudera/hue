@@ -669,7 +669,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </tr>
   </script>
 
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 

@@ -27,11 +27,7 @@
 %if not is_embeddable:
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 
 ${ assist.assistJSModels() }
 

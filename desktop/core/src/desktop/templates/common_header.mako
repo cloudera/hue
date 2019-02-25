@@ -24,6 +24,8 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
 from desktop.auth.backend import is_admin
 
+from webpack_loader.templatetags.webpack_loader import render_bundle
+
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
   home_url = url('desktop_views_home2')
@@ -133,52 +135,26 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 
-  <script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
-  <script src="${ static('desktop/js/jquery.migration.js') }"></script>
-  <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
-  <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
-  <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
-  <script src="${ static('desktop/js/jquery.selector.js') }"></script>
-  <script src="${ static('desktop/js/jquery.delayedinput.js') }"></script>
-  <script src="${ static('desktop/js/jquery.rowselector.js') }"></script>
-  <script src="${ static('desktop/js/jquery.notify.js') }"></script>
-  <script src="${ static('desktop/js/jquery.titleupdater.js') }"></script>
-  <script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
-  <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
-  <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
-  <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-  <script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
-  <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
-  <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-  <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
+  ${ render_bundle('hue') | n,unicode }
+
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
-  <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
-  <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
   <script src="${ static('desktop/js/popover-extra-placements.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
-  <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 
 % if user.is_authenticated():
 
-  <script src="${ static('desktop/js/sqlUtils.js') }"></script>
   <script src="${ static('desktop/js/ace/ace.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
   <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
   <script src="${ static('desktop/js/ace.extended.js') }"></script>
-  <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>

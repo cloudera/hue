@@ -21,6 +21,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
 home_url = url('desktop_views_home')
 from desktop.conf import USE_NEW_EDITOR
+
+from webpack_loader.templatetags.webpack_loader import render_bundle
+
 if USE_NEW_EDITOR.get():
   home_url = url('desktop_views_home2')
 %>
@@ -159,12 +162,9 @@ if USE_NEW_EDITOR.get():
     }
   </script>
 
-  <script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
-  <script src="${ static('desktop/js/jquery.migration.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+  ${ render_bundle('hue') | n,unicode }
+
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
@@ -172,8 +172,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
-  <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
   <script src="${ static('desktop/js/ace/ace.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>

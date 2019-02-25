@@ -132,7 +132,6 @@
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
-  <script src="${ static('desktop/js/hue4.utils.js') }"></script>
 </head>
 
 <body>
@@ -460,9 +459,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
@@ -477,9 +473,6 @@ ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 
-<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
-
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
@@ -490,7 +483,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
 

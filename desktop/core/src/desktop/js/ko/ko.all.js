@@ -14,6 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ko from 'knockout';
+import komapping from 'knockout.mapping';
+import 'knockout-switch-case';
+import 'knockout-sortable';
+import 'knockout.validation';
+
+import 'ext/ko.editable.custom';
+import 'ext/ko.selectize.custom';
+
 import 'ko/bindings/ko.aceEditor';
 import 'ko/bindings/ko.aceResizer';
 import 'ko/bindings/ko.appAwareTemplateContextMenu';
@@ -111,3 +120,6 @@ import 'ko/extenders/ko.toJson';
 
 import 'ko/observables/ko.observableArrayDefault';
 import 'ko/observables/ko.observableDefault';
+
+window.ko = ko;
+window.ko.mapping = komapping;

@@ -35,6 +35,7 @@
     "minimist": "^1.2.0",
     "page": "1.8.6",
     "selectize": "0.12.6",
+    "selectize-plugin-clear": "0.0.3",
     "sprintf-js": "1.1.2"
   },
   "devDependencies": {
