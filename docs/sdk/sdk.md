@@ -997,6 +997,15 @@ Install jison from branch https://github.com/JohanAhlen/jison and run "npm insta
 make sql-all-parsers
 ```
 
+### Ace Editor
+
+After modifying files under tools/ace-editor run the following to build ace.js
+
+```
+npm install
+make ace
+```
+
 ### Internationalization
 
 How to update all the messages and compile them::
