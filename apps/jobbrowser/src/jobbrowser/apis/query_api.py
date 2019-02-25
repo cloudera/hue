@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
 from libanalyze import analyze as analyzer, rules
+from notebook.conf import ENABLE_QUERY_ANALYSIS
 
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 LOG = logging.getLogger(__name__)
@@ -181,11 +182,12 @@ class QueryApi(Api):
     ANALYZER.pre_process(profile)
     metrics = analyzer.metrics(profile)
 
-    result = ANALYZER.run(profile)
-    if result and result[0]:
-      for factor in result[0]['result']:
-        if factor['reason'] and factor['result_id'] and metrics['nodes'].get(factor['result_id']):
-          metrics['nodes'][factor['result_id']]['health'] = factor['reason']
+    if ENABLE_QUERY_ANALYSIS.get():
+      result = ANALYZER.run(profile)
+      if result and result[0]:
+        for factor in result[0]['result']:
+          if factor['reason'] and factor['result_id'] and metrics['nodes'].get(factor['result_id']):
+            metrics['nodes'][factor['result_id']]['health'] = factor['reason']
     return metrics
 
   def _query(self, appid):
