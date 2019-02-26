@@ -143,7 +143,7 @@ function impalaDagre(id) {
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
                    "content": networkTime,
-                   "style": { label: text,
+                   "style": { label: '',
                               style: "stroke-dasharray: 5, 5;",
                               labelpos: index === 0 && count > 1 ? 'l' : 'r' }});
     }
@@ -367,7 +367,8 @@ function impalaDagre(id) {
   }
 
   function getExecutionTimelineData(key) {
-    var timeline = getCPUTimelineData(key)
+    // Temporarely remove CodeGen, until we can present it in a better way.
+    /*var timeline = getCPUTimelineData(key)
     if (!timeline) {
       return timeline;
     }
@@ -375,7 +376,8 @@ function impalaDagre(id) {
     if (!initTime) {
       return timeline;
     }
-    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);
+    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);*/
+    return getCPUTimelineData(key);
   }
 
   function getHealthData(key, startTime) {
@@ -635,6 +637,14 @@ function impalaDagre(id) {
       colour_idx = (colour_idx + 1) % colours.length;
     });
     showDetailGlobal();
+    states.forEach(function (state) {
+      var cpuTimeline = getCPUTimelineData(state.name);
+      var max_time_val = cpuTimeline && sum(cpuTimeline, 'duration') || state.max_time_val;
+      var max_time = ko.bindingHandlers.numberFormat.human(max_time_val, 5);
+      state.max_time_val = max_time_val;
+      state.max_time = max_time;
+      state.cpu_timeline = cpuTimeline;
+    });
     var avgStates = average(states, 'max_time_val');
     var edgesIO = edges.filter(function (edge) {
       return edge.content.unit === 5;
@@ -652,14 +662,14 @@ function impalaDagre(id) {
       var html = "<div attr-id='" + state.name + "'>";
       html += getIcon(state.icon);
       html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
-      var aboveAverageClass = state.max_time_val > avgCombined ? 'above-average' : '';
+      var aboveAverageClass = state.max_time_val > avgStates ? 'above-average' : '';
       html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
       if (state.predicates) {
         html += "<span class='detail'>" + state.predicates + "</span><br/>";
       }
       html += "<span class='id'>" + state.name + "</span></span>";
-      html += renderTimeline(getCPUTimelineData(state.name), getMetricsMax());
+      html += renderTimeline(state.cpu_timeline, getMetricsMax());
       html += "</div>";
 
       var style = state.style;
