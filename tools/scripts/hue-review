@@ -20,6 +20,10 @@ shift 3;
 exec $RBT post \
 	-o \
 	-X /'*.css' \
+	-X /'*/js/bundles/**' \
+	-X /'*AutocompleteParser.js' \
+	-X /'*.json' \
+	-X /'*SyntaxParser.js' \
 	--description="$(git whatchanged $REVLIST)" \
 	--target-groups=hue \
 	--target-people="$REVIEWER" \

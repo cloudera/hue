@@ -191,6 +191,7 @@ Frontend third party dependencies (some checked in and some via npm)
 |TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
 |tzdetect.js|?|MIT|https://github.com/Canop/tzdetect.js|
 |Webpack|4.29.0|MIT|https://www.npmjs.com/package/webpack|
+|Webpack Bundle Analyzer|3.0.4|MIT|https://www.npmjs.com/package/webpack-bundle-analyzer|
 |Webpack Bundel Tracker|0.4.2-beta|MIT|https://www.npmjs.com/package/webpack-bundle-tracker|
 |Webpack cli|3.2.1|MIT|https://www.npmjs.com/package/webpack-cli|
 |Webpack clean plugin|1.0.1|MIT|https://www.npmjs.com/package/clean-webpack-plugin|

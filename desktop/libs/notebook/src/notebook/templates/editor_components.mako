@@ -25,6 +25,7 @@ from desktop.conf import IS_EMBEDDED
 from metadata.conf import has_optimizer, OPTIMIZER
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
 from desktop.auth.backend import is_admin
+from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%def name="includes(is_embeddable=False, suffix='')">
@@ -41,13 +42,12 @@ from desktop.auth.backend import is_admin
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
 
-<script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+${ render_bundle('vendors~notebook') | n,unicode }
+${ render_bundle('notebook') | n,unicode }
+
 % if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 % endif
-
-<script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
@@ -61,7 +61,6 @@ from desktop.auth.backend import is_admin
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/jquery.hdfstree.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
