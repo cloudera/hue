@@ -1,11 +1,12 @@
 {
   "type": "SQLOperator",
-  "node_name": ["HashJoinNode", "AGGREGATION_NODE"],
-  "metric_names": "SpilledPartitions",
+  "node_name": ["HASH_JOIN_NODE", "AGGREGATION_NODE"],
+  "metric_names": "SpillTime",
+  "unit": 5,
   "rule": {
-    "condition": "vars['SpilledPartitions'] > 0",
-    "expr": "1",
-    "message": "This operation has spilled to disk. Check if the ressource configuration of Impala can be changed to allow for a higher memory limit.",
+    "condition": "vars['SpillTime'] > 0",
+    "expr": "vars['SpillTime']",
+    "message": "This operation has spilled to disk. Check if the resource configuration of Impala can be changed to allow for a higher memory limit.",
     "label": " Spilled Partitions"
   },
   "fix": {

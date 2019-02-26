@@ -179,13 +179,25 @@ class QueryApi(Api):
     query_profile = self.api.get_query_profile_encoded(appid)
     profile = analyzer.analyze(analyzer.parse_data(query_profile))
     ANALYZER.pre_process(profile)
-    return analyzer.metrics(profile)
+    metrics = analyzer.metrics(profile)
+
+    result = ANALYZER.run(profile)
+    if result and result[0]:
+      for factor in result[0]['result']:
+        if factor['reason'] and factor['result_id'] and metrics['nodes'].get(factor['result_id']):
+          metrics['nodes'][factor['result_id']]['health'] = factor['reason']
+    return metrics
 
   def _query(self, appid):
     query = self.api.get_query(query_id=appid)
     query['summary'] = query.get('summary').strip() if query.get('summary') else ''
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
-    query['metrics'] = self._metrics(appid)
+    try:
+      query['metrics'] = self._metrics(appid)
+    except Exception, e:
+      query['metrics'] = {'nodes' : {}}
+      LOG.exception('Could not parse profile: %s' % e)
+
     if query.get('plan_json'):
       def get_exchange_icon (o):
         if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
@@ -196,7 +208,7 @@ class QueryApi(Api):
           return { 'svg': 'hi-exchange' }
       def get_sigma_icon (o):
         if re.search(r'streaming', o['label_detail'], re.IGNORECASE):
-          return { 'svg': 'hi-sigma-stream' }
+          return { 'svg': 'hi-sigma' }
         else:
           return { 'svg': 'hi-sigma' }
       mapping = {

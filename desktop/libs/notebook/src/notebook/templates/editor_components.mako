@@ -191,6 +191,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                   <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
                   <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                   <!-- ko case: 'text' -->Text<!-- /ko -->
+                  <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
                   <!-- ko case: $default -->SQL<!-- /ko -->
                   <!-- /ko -->
                 </span>
@@ -219,6 +220,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
                 <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                 <!-- ko case: 'text' -->Text<!-- /ko -->
+                <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
                 <!-- ko case: $default -->SQL<!-- /ko -->
               <!-- /ko -->
               <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
@@ -340,7 +342,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <ul class="dropdown-menu pull-right">
           <li>
           <!-- ko if: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
               <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
             </a>
           <!-- /ko -->
@@ -3795,21 +3797,29 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           return;
         }
         if (jobs.length > 0) {
+          var progress = 0;
+          var parent;
           jobs.forEach(function (job) {
-            if ($("#" + job.shortId).length > 0) {
-              var _job = ko.dataFor($("#" + job.shortId)[0]);
-              if (!isNaN(parseInt(job.mapsPercentComplete))) {
-                _job.percentJob(parseInt(job.mapsPercentComplete));
-              }
+            var id = job.shortId || job.id;
+            var el = $(".jobs-overlay li:contains(" + id + ')');
+            if (!el.length) {
+              return;
+            }
+            var context = ko.contextFor(el[0]);
+            parent = context.$parent;
+            var _job = context.$data;
+            progress = parseInt(job.mapsPercentComplete);
+            if (isNaN(progress)) {
+              progress = parseInt(job.progress);
+            }
+            if (!isNaN(progress)) {
+              _job.percentJob(progress);
+            } else {
+              progress = 0;
             }
           });
-        } else {
-          if (viewModel.selectedNotebook()) {
-            viewModel.selectedNotebook().snippets().forEach(function (snippet) {
-              snippet.jobs().forEach(function (job) {
-                job.percentJob(100);
-              });
-            });
+          if (parent && parent.jobs().length == 1) {
+            parent.progress(Math.max(progress, parent.progress()));
           }
         }
       }, HUE_PUB_SUB_EDITOR_ID);

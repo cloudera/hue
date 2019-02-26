@@ -361,15 +361,24 @@ def get_api(request, snippet):
     from notebook.connectors.dataeng import DataEngApi
     return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
   elif interface == 'jdbc':
-    if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
-      from notebook.connectors.jdbc import JdbcApi
-      return JdbcApi(request.user, interpreter=interpreter)
-    else:
+    if interpreter['options'] and interpreter['options'].get('url', '').find('teradata') >= 0:
       from notebook.connectors.jdbc_teradata import JdbcApiTeradata
       return JdbcApiTeradata(request.user, interpreter=interpreter)
+    elif interpreter['options'] and interpreter['options'].get('url', '').find('presto') >= 0:
+      from notebook.connectors.jdbc_presto import JdbcApiPresto
+      return JdbcApiPresto(request.user, interpreter=interpreter)
+    elif interpreter['options'] and interpreter['options'].get('url', '').find('clickhouse') >= 0:
+      from notebook.connectors.jdbc_clickhouse import JdbcApiClickhouse
+      return JdbcApiClickhouse(request.user, interpreter=interpreter)
+    else:
+      from notebook.connectors.jdbc import JdbcApi
+      return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'presto':
+    from notebook.connectors.jdbc_presto import JdbcApiPresto
+    return JdbcApiPresto(request.user, interpreter=interpreter)
   elif interface == 'sqlalchemy':
     from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)

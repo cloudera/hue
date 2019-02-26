@@ -203,20 +203,49 @@ SSL_CIPHER_LIST = Config(
   # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
   # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
   # Opera 5 and Safari 1.
-  default=(
-      "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:"
-      "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:"
-      "DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:"
-      "kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:"
-      "ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:"
-      "ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:"
-      "ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:"
-      "DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:"
-      "DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:"
-      "AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:"
-      "!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:"
-      "!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
-  ))
+  default=':'.join([
+    'ECDHE-RSA-AES128-GCM-SHA256',
+    'ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-RSA-AES256-GCM-SHA384',
+    'ECDHE-ECDSA-AES256-GCM-SHA384',
+    'DHE-RSA-AES128-GCM-SHA256',
+    'DHE-DSS-AES128-GCM-SHA256',
+    'kEDH+AESGCM',
+    'ECDHE-RSA-AES128-SHA256',
+    'ECDHE-ECDSA-AES128-SHA256',
+    'ECDHE-RSA-AES128-SHA',
+    'ECDHE-ECDSA-AES128-SHA',
+    'ECDHE-RSA-AES256-SHA384',
+    'ECDHE-ECDSA-AES256-SHA384',
+    'ECDHE-RSA-AES256-SHA',
+    'ECDHE-ECDSA-AES256-SHA',
+    'DHE-RSA-AES128-SHA256',
+    'DHE-RSA-AES128-SHA',
+    'DHE-DSS-AES128-SHA256',
+    'DHE-RSA-AES256-SHA256',
+    'DHE-DSS-AES256-SHA',
+    'DHE-RSA-AES256-SHA',
+    'AES128-GCM-SHA256',
+    'AES256-GCM-SHA384',
+    'AES128-SHA256',
+    'AES256-SHA256',
+    'AES128-SHA',
+    'AES256-SHA',
+    'AES',
+    'CAMELLIA',
+    'DES-CBC3-SHA',
+    '!aNULL',
+    '!eNULL',
+    '!EXPORT',
+    '!DES',
+    '!RC4',
+    '!MD5',
+    '!PSK',
+    '!aECDH',
+    '!EDH-DSS-DES-CBC3-SHA',
+    '!EDH-RSA-DES-CBC3-SHA',
+    '!KRB5-DES-CBC3-SHA',
+  ]))
 
 SSL_PASSWORD = Config(
   key="ssl_password",
@@ -1526,7 +1555,7 @@ EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
 )
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
-  key='use_new_editor',
+  key='',
   default=True,
   type=coerce_bool,
   help=_('Choose whether to show the new SQL editor.')
@@ -1865,6 +1894,9 @@ def config_validator(user):
                                                     '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
   if notebook_doc:
     notebook_doc.delete()
+
+  if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
+    res.append(('[desktop] use_new_editor', unicode(_('This configuration flag has been deprecated.'))))
 
   return res
 

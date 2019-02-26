@@ -18,7 +18,7 @@ The link:user-guide/user-guide.html[user guide] has instructions about how to us
 
 SDK
 ---
-We encourage you to link:sdk/sdk.html[build or extend applications] within the Hue environment.
+It is encouraged to link:sdk/sdk.html[build or extend applications] within the Hue environment.
 
 Release Notes
 -------------
@@ -53,7 +53,3 @@ Release Notes
 * March 31, 2010 --- link:release-notes/release-notes-0.4.0.html[Version 0.4.0]
 * November 23, 2009 --- link:release-notes/release-notes-0.3.0.html[Version 0.3.0]
 * October 2, 2009 --- Version 0.2.0
-
-
-
-Documentation improvements? link:https://github.com/cloudera/hue/tree/master/docs[Feel free to send a pull request].

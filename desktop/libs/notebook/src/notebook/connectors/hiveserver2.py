@@ -20,6 +20,7 @@ import binascii
 import copy
 import hashlib
 import logging
+import json
 import re
 import StringIO
 import struct
@@ -187,6 +188,7 @@ class HS2Api(Api):
         properties = self.get_properties(lang)
 
     response['properties'] = properties
+    response['configuration'] = json.loads(session.properties)
     response['reuse_session'] = reuse_session
     response['session_id'] = ''
 
@@ -643,6 +645,8 @@ DROP TABLE IF EXISTS `%(table)s`;
       session = self._get_session(notebook, 'hive')
       if not session:
         LOG.warn('Cannot get jobs, failed to find active HS2 session for user: %s' % self.user.username)
+      elif session.get('configuration') and session['configuration'].get('hive.execution.engine'):
+        return session['configuration'].get('hive.execution.engine')
       else:
         properties = session['properties']
         settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)

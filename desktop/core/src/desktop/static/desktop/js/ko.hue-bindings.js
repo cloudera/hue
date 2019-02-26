@@ -7506,12 +7506,12 @@
       init: function (element, valueAccessor, allBindingsAccessor) {
         var id = $(element).attr("id");
         var self = this;
-        self._impalaDagre = impalaDagre(id);
+        element._impalaDagre = impalaDagre(id);
         var clickSubscription = huePubSub.subscribe('impala.node.moveto', function(value) {
-          self._impalaDagre.moveTo(value);
+          element._impalaDagre.moveTo(value);
         });
         var selectSubscription = huePubSub.subscribe('impala.node.select', function(value) {
-          self._impalaDagre.select(value);
+          element._impalaDagre.select(value);
         });
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
           clickSubscription.remove();
@@ -7520,9 +7520,9 @@
       },
       update: function (element, valueAccessor) {
         var props = ko.unwrap(valueAccessor());
-        this._impalaDagre.metrics(props.metrics);
-        this._impalaDagre.height(props.height);
-        this._impalaDagre.update(props.value);
+        element._impalaDagre.metrics(props.metrics);
+        element._impalaDagre.height(props.height);
+        element._impalaDagre.update(props.value);
       }
     };
   })();
@@ -7586,7 +7586,7 @@
       humanTime: function (value) {
         value = value * 1;
         if (value < Math.pow(10, 3)) {
-          return value + " ns";
+          return sprintf("%i ns", value);
         } else if (value - Math.pow(10, 6) < -Math.pow(10, 3) / 2) { // Make sure rounding doesn't cause numbers to have more than 4 significant digits.
           value = (value * 1.0) / Math.pow(10, 3);
           var sprint = value > 100 ? "%i us" : "%.1f us";
@@ -7604,17 +7604,18 @@
           var buffer = "";
 
           if (value > (HOUR)) {
-            buffer += sprintf("%i h ", value / HOUR);
+            buffer += sprintf("%i h", value / HOUR);
             value = value % HOUR;
           }
 
-          if (value > MINUTE) {
-            buffer += sprintf("%i m ", value / MINUTE);
+          if (buffer.length < 4 && value > MINUTE) {
+            var sprint = buffer.length ? " %i m" : "%i m";
+            buffer += sprintf(sprint, value / MINUTE);
             value = value % MINUTE;
           }
 
-          if (value > SECOND) {
-            var sprint = buffer.length ? "%i s" : "%.1f s";
+          if (buffer.length < 4 && value > SECOND) {
+            var sprint = buffer.length ? " %i s" : "%.1f s";
             buffer += sprintf(sprint, value * 1.0 / SECOND);
           }
           return buffer;

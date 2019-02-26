@@ -595,7 +595,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-yarn-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'Oozie Launcher' -->
+  <!-- ko if: type() == 'Oozie Launcher' || type() == 'TEZ' -->
     <div data-bind="template: { name: 'job-oozie-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
@@ -610,8 +610,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko if: type() == 'SPARK_EXECUTOR' -->
     <div data-bind="template: { name: 'job-spark-executor-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
-</script>
 
+</script>
 
 <script type="text/html" id="job-yarn-page${ SUFFIX }">
   <div class="row-fluid">
@@ -889,6 +889,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
             <li class="nav-header">${ _('Elapsed time') }</li>
             <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
+            <!-- ko if: diagnostics -->
+              <li class="nav-header">${ _('Diagnostics') }</li>
+              <li><span data-bind="text: diagnostics, attr: { title: diagnostics }"></span>%</li>
+            <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </ul>
@@ -905,7 +909,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" id="job-oozie-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
-          % for name in ['stdout', 'stderr']:
+          % for name in ['stdout', 'stderr', 'syslog']:
             <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
@@ -927,7 +931,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['attempts']()['task_list']">
-              <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
+              <tr class="pointer" data-bind="click: function() { $root.job().id(appAttemptId); $root.job().fetchJob(); }">
                 <td data-bind="text: containerId"></td>
                 <td data-bind="text: nodeId"></td>
                 <td data-bind="text: id"></td>
@@ -952,30 +956,23 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li class="break-word"><span data-bind="text: id"></span></li>
-          <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: type"></span></li>
           <!-- ko with: properties -->
+          <li class="nav-header">${ _('Attempt Id') }</li>
+          <li class="break-word"><span data-bind="text: appAttemptId"></span></li>
           <li class="nav-header">${ _('State') }</li>
           <li><span data-bind="text: state"></span></li>
           <!-- ko if: !$root.isMini() -->
-          <li class="nav-header">${ _('Finish time') }</li>
-          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
-          <li class="nav-header">${ _('Assigned Container ID') }</li>
-          <li><span data-bind="text: assignedContainerId"></span></li>
-          <li class="nav-header">${ _('Host') }</li>
-          <li><span data-bind="text: host"></span></li>
-          <li class="nav-header">${ _('RPC Port') }</li>
-          <li><span data-bind="text: rpcPort"></span></li>
-          <li class="nav-header">${ _('Diagnostics Info') }</li>
-          <li><span data-bind="text: diagnosticsInfo"></span></li>
+          <li class="nav-header">${ _('Start time') }</li>
+          <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
+          <li class="nav-header">${ _('Node Http Address') }</li>
+          <li><span data-bind="text: nodeHttpAddress"></span></li>
+          <li class="nav-header">${ _('Elapsed time') }</li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <!-- /ko -->
           <!-- /ko -->
         </ul>
       </div>
     </div>
-
     <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
     </div>
   </div>
@@ -1534,19 +1531,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
             <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: { value: properties.plan && properties.plan(), height:$root.isMini() ? 535 : 600 }">
               <svg style="width:100%;height:100%;position:relative;" id="queries-page-plan-svg${ SUFFIX }">
-                <defs>
-                  <filter id="dropshadow" height="130%">
-                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
-                    <feOffset dx="0" dy="0" result="offsetBlur"/> <!-- how much to offset -->
-                    <feComponentTransfer>
-                      <feFuncA type="linear" slope="0.5"/> <!-- slope is the opacity of the shadow -->
-                    </feComponentTransfer>
-                    <feMerge>
-                      <feMergeNode/> <!-- this contains the offset blurred image -->
-                      <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
-                    </feMerge>
-                  </filter>
-                </defs>
                 <g/>
               </svg>
             </div>
@@ -2466,7 +2450,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'Oozie Launcher'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
@@ -2504,6 +2488,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.loadingJob = ko.observable(false);
       var lastFetchJobRequest = null;
       var lastUpdateJobRequest = null;
+      var lastFetchLogsRequest = null;
+      var lastFetchProfileRequest = null;
+      var lastFetchStatusRequest = null;
 
       self._fetchJob = function (callback) {
         if (vm.interface() == 'engines') {
@@ -2517,6 +2504,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
           if (data.status == 0) {
+            if (data.app) {
+              huePubSub.publish('jobbrowser.data', [data.app]);
+            }
             if (callback) {
               callback(data);
             };
@@ -2646,28 +2636,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.updateJob = function () {
-        vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
         huePubSub.publish('graph.refresh.view');
+        var deferred = $.Deferred();
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
-          lastFetchJobRequest = self._fetchJob(function (data) {
+          vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
+          lastUpdateJobRequest = self._fetchJob(function (data) {
+            var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
               window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
               vm.job = ko.mapping.fromJS(data.app, {}, vm.job);
             } else {
-              vm.job().fetchStatus();
+              requests.push(vm.job().fetchStatus());
             }
-            vm.job().fetchLogs(vm.job().logActive());
-            var profile = $("div[data-jobType] .tab-content .active").data("profile")
+            requests.push(vm.job().fetchLogs(vm.job().logActive()));
+            var profile = $("div[data-jobType] .tab-content .active").data("profile");
             if (profile) {
-              vm.job().fetchProfile(profile);
+              requests.push(vm.job().fetchProfile(profile));
             }
+            $.when.apply(this, requests).done(function (){
+              deferred.resolve();
+            });
           });
         }
+        return deferred;
       };
 
       self.fetchLogs = function (name) {
         name = name || 'default';
-        $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
+        vm.apiHelper.cancelActiveRequest(lastFetchLogsRequest);
+        lastFetchLogsRequest = $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2685,10 +2682,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $(document).trigger("error", data.message);
           }
         });
+        return lastFetchLogsRequest;
       };
 
       self.fetchProfile = function (name, callback) {
-        $.post("/jobbrowser/api/job/profile", {
+        vm.apiHelper.cancelActiveRequest(lastFetchProfileRequest);
+        lastFetchProfileRequest = $.post("/jobbrowser/api/job/profile", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2705,10 +2704,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $(document).trigger("error", data.message);
           }
         });
+        return lastFetchProfileRequest;
       };
 
       self.fetchStatus = function () {
-        $.post("/jobbrowser/api/job", {
+        vm.apiHelper.cancelActiveRequest(lastFetchStatusRequest);
+        lastFetchStatusRequest = $.post("/jobbrowser/api/job", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(self.mainType)
@@ -2722,6 +2723,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $(document).trigger("error", data.message);
           }
         });
+        return lastFetchStatusRequest;
       };
 
       self.control = function (action) {
@@ -3015,6 +3017,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
           if (data.status == 0) {
+            if (data.apps && data.apps.length) {
+              huePubSub.publish('jobbrowser.data', data.apps);
+            }
             if (callback) {
               callback(data);
             };
@@ -3086,6 +3091,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.totalApps(data.total);
           }
         });
+        return lastFetchJobsRequest;
       };
 
       self.createClusterShow = ko.observable(false);
@@ -3369,23 +3375,36 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.jobs = new Jobs(self);
       self.job = ko.observable();
 
-      var updateJobInterval = -1;
-      var updateJobsInterval = -1;
+      var updateJobTimeout = -1;
+      var updateJobsTimeout = -1;
       self.job.subscribe(function(val) {
         self.monitorJob(val);
       });
 
       self.monitorJob = function(job) {
-        window.clearInterval(updateJobInterval);
-        window.clearInterval(updateJobsInterval);
+        window.clearTimeout(updateJobTimeout);
+        window.clearTimeout(updateJobsTimeout);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
-              updateJobInterval = setInterval(job.updateJob, 5000, 'jobbrowser');
+              var _updateJob = function () {
+                var def = job.updateJob();
+                if (def) {
+                  def.done(function () {
+                    updateJobTimeout = setTimeout(_updateJob, window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS);
+                  });
+                }
+              };
+              updateJobTimeout = setTimeout(_updateJob, window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS);
             }
           }
           else {
-            updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
+            var _updateJobs = function () {
+              self.jobs.updateJobs().done(function () {
+                setTimeout(_updateJobs, window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS);
+              });
+            };
+            updateJobsTimeout = setTimeout(_updateJobs, window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS);
           }
         }
       };

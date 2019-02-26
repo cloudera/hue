@@ -100,6 +100,8 @@ def list_configurations(request):
 def list_for_autocomplete(request):
   extended_user_object = request.GET.get('extend_user') == 'true'
   autocomplete_filter = request.GET.get('filter', "")
+  count = int(request.GET.get("count", 100))
+
   if is_admin(request.user):
     users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
     groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
@@ -115,8 +117,8 @@ def list_for_autocomplete(request):
   if not request.GET.get('include_myself'):
     users = users.exclude(pk=request.user.pk)
 
-  users = users[:100]
-  groups = groups[:100]
+  users = users[:count]
+  groups = groups[:count]
 
   response = {
     'users': massage_users_for_json(users, extended_user_object),
@@ -558,10 +560,11 @@ def add_ldap_users(request):
         connection = ldap_access.get_connection_from_server(server)
         users = import_ldap_users(connection, username_pattern, False, import_by_dn, failed_users=failed_ldap_users)
       except (ldap.LDAPError, LdapBindException), e:
-        LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
       except ValidationError, e:
-        raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was a problem with some of the LDAP information: %s')) % str(e))
 
       if users and form.cleaned_data['ensure_home_directory']:
         for user in users:
@@ -634,10 +637,11 @@ def add_ldap_groups(request):
                                     import_members_recursive=import_members_recursive, sync_users=True,
                                     import_by_dn=import_by_dn, failed_users=failed_ldap_users)
       except (ldap.LDAPError, LdapBindException), e:
-        LOG.error(_("LDAP Exception: %s") % e)
-        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
       except ValidationError, e:
-        raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was a problem with some of the LDAP information: %s')) % str(e))
 
       unique_users = set()
       if is_ensuring_home_directories and groups:
@@ -702,7 +706,11 @@ def sync_ldap_users_groups(request):
     if form.is_valid():
       is_ensuring_home_directory = form.cleaned_data['ensure_home_directory']
       server = form.cleaned_data.get('server')
-      connection = ldap_access.get_connection_from_server(server)
+      try:
+        connection = ldap_access.get_connection_from_server(server)
+      except (ldap.LDAPError, LdapBindException), e:
+        LOG.error("LDAP Exception: %s" % smart_str(e))
+        raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
 
       failed_ldap_users = []
 
@@ -737,8 +745,8 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
     users = sync_ldap_users(connection, failed_users=failed_users)
     groups = sync_ldap_groups(connection, failed_users=failed_users)
   except (ldap.LDAPError, LdapBindException), e:
-    LOG.error("LDAP Exception: %s" % e)
-    raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+    LOG.error("LDAP Exception: %s" % smart_str(e))
+    raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
 
   # Create home dirs for every user sync'd
   if is_ensuring_home_directory:
@@ -773,7 +781,7 @@ def sync_ldap_users(connection, failed_users=None):
   """
   users = User.objects.filter(userprofile__creation_method=UserProfile.CreationMethod.EXTERNAL.name).all()
   for user in users:
-    _import_ldap_users(connection, user.username, failed_users=failed_users)
+    _import_ldap_users(connection, smart_str(user.username), failed_users=failed_users)
   return users
 
 
@@ -1227,6 +1235,9 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           user_info = connection.find_users(member, find_by_dn=True)
         except LdapSearchException, e:
           LOG.warn("Failed to find LDAP user: %s" % e)
+
+        if user_info is None:
+          continue
 
         if len(user_info) > 1:
           LOG.warn('Found multiple users for member %s.' % member)

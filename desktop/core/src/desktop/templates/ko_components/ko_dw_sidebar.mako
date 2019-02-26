@@ -24,6 +24,15 @@
 
 <%def name="dwSidebar()">
   <script type="text/html" id="hue-dw-sidebar-template">
+    <div class="hue-dw-brand" data-bind="css: { 'collapsed': collapsed }, toggle: leftNavVisible">
+##       <!-- ko if: collapsed -->
+##       <img src="${ static('desktop/art/cloudera-data-warehouse-logo.svg') }">
+##       <!-- /ko -->
+##       <!-- ko ifnot: collapsed -->
+      <img src="${ static('desktop/art/cloudera-data-warehouse-3.svg') }">
+##       <!-- /ko -->
+    </div>
+
     <div class="sidebar">
       <div class="sidebar-content" data-bind="foreach: items">
         <!-- ko if: $index() !== 0 -->
@@ -32,12 +41,18 @@
         <!-- ko foreach: children -->
         <!-- ko if: $component.collapsed -->
         <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, tooltip: { placement: 'right' }, click: function() { if (url.startsWith('/jobbrowser')) { huePubSub.publish('context.selector.set.cluster', 'AltusV2'); } }">
+          <!-- ko ifnot: $component.collapsed -->
+          <span class="sidebar-caret"><i class="fa fa-caret-right"></i></span>
+          <!-- /ko -->
           <span class="sidebar-icon with-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
           <span class="sidebar-item-name" data-bind="text: displayName"></span>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: $component.collapsed -->
         <a role="button" class="sidebar-item" data-bind="hueLink: url, attr: { title: displayName }, css: { 'active': url === $component.activeUrl() }, click: function() { if (url.startsWith('/jobbrowser')) { huePubSub.publish('context.selector.set.cluster', 'AltusV2'); } }">
+          <!-- ko ifnot: $component.collapsed -->
+          <span class="sidebar-caret"><i class="fa fa-caret-right"></i></span>
+          <!-- /ko -->
           <span class="sidebar-icon without-tooltip"><!-- ko template: { name: 'app-icon-template' } --><!--/ko--></span>
           <span class="sidebar-item-name" data-bind="text: displayName"></span>
         </a>
@@ -58,6 +73,11 @@
         self.pocClusterMode = params.pocClusterMode;
         // self.items =  params.items; // TODO: Once we have the proper apps in cluster config.
 
+        self.leftNavVisible = ko.observable(false);
+        self.leftNavVisible.subscribe(function (val) {
+          huePubSub.publish('hue.toggle.left.nav', val);
+        });
+
         self.items = ko.pureComputed(function () {
           var appCategory = {
             displayName: 'Apps',
@@ -68,7 +88,8 @@
               { displayName: 'Editor', url: '/editor/?type=impala', icon: 'editor' },
               { displayName: 'Catalog', url: '/metastore/tables', icon: 'tables' },
               { displayName: 'Importer', url: '/indexer/importer', icon: 'hdfs' },
-              { displayName: 'Warehouses', url: '/jobbrowser#!dataware2-clusters', icon: 'warehouses' }
+              { displayName: 'Warehouses', url: '/jobbrowser#!dataware2-clusters', icon: 'warehouses' },
+              { displayName: 'Dashboards', url: '/dashboard', icon: 'dashboard' },
             ]
           } else { // DE mode
             appCategory.children = [
