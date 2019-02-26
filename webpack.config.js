@@ -25,6 +25,7 @@ module.exports = {
   },
   entry: {
     hue: ['./desktop/core/src/desktop/js/hue.js'],
+    login: ['./desktop/core/src/desktop/js/login.js'],
     sqlSyntaxWebWorker: ['./desktop/core/src/desktop/js/sql/sqlSyntaxWebWorker.js'],
   },
   output: {

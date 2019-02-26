@@ -135,7 +135,11 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 
-  ${ render_bundle('hue') | n,unicode }
+  % if section == "login":
+    ${ render_bundle('login') | n,unicode }
+  %else:
+    ${ render_bundle('hue') | n,unicode }
+  % endif
 
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
