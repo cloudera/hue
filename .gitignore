@@ -108,3 +108,6 @@ dependency-reduced-pom.xml
 node_modules/
 
 junitresults*
+
+# Generated js bundles
+desktop/core/src/desktop/static/desktop/js/bundles/
