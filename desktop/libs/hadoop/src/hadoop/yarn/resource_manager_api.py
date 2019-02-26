@@ -131,7 +131,7 @@ class ResourceManagerApi(object):
   def appattempts_attempt(self, app_id, attempt_id):
     attempts = self.appattempts(app_id)
     for attempt in attempts['appAttempts']['appAttempt']:
-      if attempt['id'] == attempt_id:
+      if attempt['id'] == attempt_id or attempt.get('appAttemptId'):
         return attempt
     raise PopupException('Application {} does not have application attempt with id {}'.format(app_id, attempt_id))
 

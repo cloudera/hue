@@ -2188,7 +2188,7 @@ var EditorViewModel = (function() {
             });
           }
           if (self.status() == 'running') { // Maybe the query finished or failed in the meantime
-            self.progress(data.progress)
+            self.progress(Math.max(data.progress, self.progress()))
           };
         } else {
           self._ajaxError(data);
@@ -2455,6 +2455,7 @@ var EditorViewModel = (function() {
     self.avoidClosing = false;
 
     self.canSave = vm.canSave;
+    self.configuration = ko.observable(typeof notebook.configuration != "undefined" && notebook.configuration != null ? notebook.configuration : null);
 
 
     self.getSession = function (session_type) {

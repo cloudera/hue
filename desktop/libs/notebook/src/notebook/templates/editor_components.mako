@@ -3795,21 +3795,29 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           return;
         }
         if (jobs.length > 0) {
+          var progress = 0;
+          var parent;
           jobs.forEach(function (job) {
-            if ($("#" + job.shortId).length > 0) {
-              var _job = ko.dataFor($("#" + job.shortId)[0]);
-              if (!isNaN(parseInt(job.mapsPercentComplete))) {
-                _job.percentJob(parseInt(job.mapsPercentComplete));
-              }
+            var id = job.shortId || job.id;
+            var el = $(".jobs-overlay li:contains(" + id + ')');
+            if (!el.length) {
+              return;
+            }
+            var context = ko.contextFor(el[0]);
+            parent = context.$parent;
+            var _job = context.$data;
+            progress = parseInt(job.mapsPercentComplete);
+            if (isNaN(progress)) {
+              progress = parseInt(job.progress);
+            }
+            if (!isNaN(progress)) {
+              _job.percentJob(progress);
+            } else {
+              progress = 0;
             }
           });
-        } else {
-          if (viewModel.selectedNotebook()) {
-            viewModel.selectedNotebook().snippets().forEach(function (snippet) {
-              snippet.jobs().forEach(function (job) {
-                job.percentJob(100);
-              });
-            });
+          if (parent && parent.jobs().length == 1) {
+            parent.progress(Math.max(progress, parent.progress()));
           }
         }
       }, HUE_PUB_SUB_EDITOR_ID);

@@ -150,12 +150,12 @@ class YarnApi(JobBrowserApi):
           job = SparkJob(app, rm_api=self.resource_manager_api, hs_api=self.spark_history_server_api)
         elif app['state'] in ('KILLED', 'FAILED'):
           job = KilledYarnJob(self.resource_manager_api, app)
-        elif app['applicationType'] == 'Oozie Launcher':
+        elif app['applicationType'] == 'Oozie Launcher' or app['applicationType'] == 'TEZ':
           job = OozieYarnJob(self.resource_manager_api, app)
         else:  # Job succeeded, attempt to fetch from JHS
           job = self._get_job_from_history_server(job_id)
       else:
-        if app['applicationType'] == 'Oozie Launcher':
+        if app['applicationType'] == 'Oozie Launcher' or app['applicationType'] == 'TEZ':
           job = OozieYarnJob(self.resource_manager_api, app)
         elif app['state'] == 'ACCEPTED':
           raise ApplicationNotRunning(app_id, app)
