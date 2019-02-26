@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'jquery/jquery.all';
+import 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
 import _ from 'lodash';
 import Dropzone from 'dropzone';
@@ -47,6 +47,9 @@ import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 import 'assist/assistViewModel';
 
+// TODO: Move to notebook.js
+import EditorViewModel from 'apps/notebook/notebook.ko';
+
 // TODO: Migrate away
 window._ = _;
 window.AceLocationHandler = AceLocationHandler;
@@ -55,6 +58,7 @@ window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
 window.dataCatalog = dataCatalog;
 window.Dropzone = Dropzone;
+window.EditorViewModel = EditorViewModel;
 window.filesize = filesize;
 window.hueUtils = hueUtils;
 window.hueAnalytics = hueAnalytics;

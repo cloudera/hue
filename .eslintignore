@@ -1,2 +1,3 @@
 /desktop/core/src/desktop/js/ext/**
 /desktop/core/src/desktop/js/sql/parse/sqlSyntaxParser.js
+/desktop/core/src/desktop/js/utils/json.bigDataParse.js

@@ -1,14 +1,12 @@
 const webpack = require('webpack');
 const BundleTracker = require('webpack-bundle-tracker');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-var CleanObsoleteChunks = require('webpack-clean-obsolete-chunks');
+const CleanObsoleteChunks = require('webpack-clean-obsolete-chunks');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   devtool: 'source-map',
   mode: 'development',
-  optimization: {
-    minimize: true
-  },
   performance: {
     maxEntrypointSize: 400 * 1024, // 400kb
     maxAssetSize: 400 * 1024 // 400kb
@@ -26,7 +24,16 @@ module.exports = {
   entry: {
     hue: ['./desktop/core/src/desktop/js/hue.js'],
     login: ['./desktop/core/src/desktop/js/login.js'],
+    notebook: ['./desktop/core/src/desktop/js/apps/notebook/notebook.js'],
     sqlSyntaxWebWorker: ['./desktop/core/src/desktop/js/sql/sqlSyntaxWebWorker.js'],
+  },
+  optimization: {
+    minimize: true,
+    splitChunks: {
+      chunks (chunk) {
+        return chunk.name !== 'sqlSyntaxWebWorker' && chunk.name !== 'login';
+      }
+    }
   },
   output: {
     path:  __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles',
@@ -48,7 +55,7 @@ module.exports = {
   },
 
   plugins: [
-    // new WebpackShellPlugin({ onBuildStart:[__dirname + '/tools/scripts/clean_js_bundles.sh ' +  __dirname ] }),
+    // new BundleAnalyzerPlugin({ analyzerPort: 9000 }),
     new CleanObsoleteChunks(),
     new CleanWebpackPlugin([__dirname + '/desktop/core/src/desktop/static/desktop/js/bundles']),
     new BundleTracker({ filename: './webpack-stats.json' }),

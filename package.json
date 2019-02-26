@@ -9,7 +9,14 @@
   },
   "author": "Cloudera, Inc.",
   "contributors": [
-    "Johan Ahlen <johan.ahlen@cloudera.com>"
+    "Romain Rigaux <romain.rigaux@cloudera.com>",
+    "Jean-François Desjeans Gauthier <jgauthier@cloudera.com>",
+    "Prakash Ranade <ranade@cloudera.com>",
+    "Ying Chen <yingchen@cloudera.com>",
+    "Weixia Xu <weixia@cloudera.com>",
+    "Joe Heyming <jheyming@cloudera.com>",
+    "Johan Ahlen <johan.ahlen@cloudera.com>",
+    "Andrew Yao <andyao@cloudera.com>"
   ],
   "license": "Apache",
   "private": true,
@@ -17,6 +24,7 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
+    "clipboard": "1.7.1",
     "dropzone": "5.5.1",
     "filesize": "4.0.0",
     "jquery": "3.3.1",
@@ -59,6 +67,7 @@
     "load-grunt-tasks": "4.0.0",
     "prettier": "1.16.1",
     "webpack": "4.29.0",
+    "webpack-bundle-analyzer": "^3.0.4",
     "webpack-bundle-tracker": "0.4.2-beta",
     "webpack-clean-obsolete-chunks": "^0.4.0",
     "webpack-cli": "^3.2.1"

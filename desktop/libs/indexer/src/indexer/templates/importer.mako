@@ -42,8 +42,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 ${ assist.assistJSModels() }
 
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
-
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 ${ assist.assistPanel() }

@@ -450,6 +450,9 @@ ${ hueIcons.symbols() }
 
 ${ commonshare() | n,unicode }
 
+${ render_bundle('vendors~hue~notebook') | n,unicode }
+${ render_bundle('vendors~hue') | n,unicode }
+${ render_bundle('hue~notebook') | n,unicode }
 ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
@@ -483,7 +486,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
 <script>
@@ -739,6 +741,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         var loadScript = function (scriptUrl) {
+          if (scriptUrl.indexOf('-bundle') !== -1) {
+            var s = document.createElement('script');
+            s.src = scriptUrl;
+            s.type = "text/javascript";
+            s.async = false;
+            document.getElementsByTagName('head')[0].appendChild(s);
+            return $.Deferred().resolve({ url: scriptUrl, head: true }).promise();
+          }
           var deferred = $.Deferred();
           $.ajax({
             url: scriptUrl,
