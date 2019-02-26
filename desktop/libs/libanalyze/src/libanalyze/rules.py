@@ -621,8 +621,9 @@ class TopDownAnalysis:
             local_time = max(counter_map['TotalTime'].value - child_time, 0)
             has_spilled = False
 
+            node_name = node.name()
             # Make sure to substract the wait time for the exchange node
-            if is_plan_node and node.node_name == 'EXCHANGE_NODE':
+            if is_plan_node and node_name == 'EXCHANGE_NODE':
                 async_time = counter_map.get('AsyncTotalTime', models.TCounter(value=0)).value
                 inactive_time = counter_map['InactiveTotalTime'].value
                 if inactive_time == 0:
@@ -630,25 +631,29 @@ class TopDownAnalysis:
                   inactive_time = dequeue.counter_map().get('DataWaitTime', models.TCounter(value=0)).value if dequeue else 0
                 local_time = counter_map['TotalTime'].value - inactive_time - async_time
                 child_time = counter_map['TotalTime'].value - local_time
-            elif node.node_name == 'KrpcDataStreamSender' and node.fragment_instance:
-              local_time = counter_map.get('SerializeBatchTime', models.TCounter(value=0)).value
+            elif node_name == 'KrpcDataStreamSender' and node.fragment_instance:
+              inactive_time = counter_map.get('InactiveTotalTime', models.TCounter(value=0)).value
+              if inactive_time == 0:
+                local_time = counter_map.get('SerializeBatchTime', models.TCounter(value=0)).value
+              else:
+                local_time = counter_map['TotalTime'].value - inactive_time
               child_time = counter_map['TotalTime'].value - local_time
-            elif node.node_name == 'HBASE_SCAN_NODE':
+            elif node_name == 'HBASE_SCAN_NODE':
               local_time = counter_map['TotalTime'].value - counter_map.get('TotalRawHBaseReadTime(*)', models.TCounter(value=0)).value
               child_time = counter_map['TotalTime'].value - local_time
-            elif node.node_name == 'KUDU_SCAN_NODE':
+            elif node_name == 'KUDU_SCAN_NODE':
               child_time = counter_map.get('KuduClientTime', models.TCounter(value=0)).value
               local_time = counter_map['TotalTime'].value
-            elif node.node_name == 'HDFS_SCAN_NODE':
+            elif node_name == 'HDFS_SCAN_NODE':
               child_time = counter_map.get('TotalRawHdfsReadTime(*)', models.TCounter(value=0)).value
               local_time = counter_map['TotalTime'].value
-            elif node.node_name == 'Buffer pool':
+            elif node_name == 'Buffer pool':
               local_time = counter_map.get('WriteIoWaitTime', models.TCounter(value=0)).value + counter_map.get('ReadIoWaitTime', models.TCounter(value=0)).value + counter_map.get('AllocTime', models.TCounter(value=0)).value
-            elif node.node_name == 'AGGREGATION':
+            elif node_name == 'AGGREGATION':
               grouping_aggregator = node.find_by_name('GroupingAggregator')
               if grouping_aggregator and grouping_aggregator.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
                 has_spilled = True
-            elif is_plan_node and node.node_name == 'HASH_JOIN_NODE': # For Hash Join, if the "LocalTime" metrics
+            elif is_plan_node and node_name == 'HASH_JOIN_NODE': # For Hash Join, if the "LocalTime" metrics
               hash_join_builder = node.find_by_name('Hash Join Builder')
               if hash_join_builder and hash_join_builder.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
                 has_spilled = True
