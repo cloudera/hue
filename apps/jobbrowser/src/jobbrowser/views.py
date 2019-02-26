@@ -357,8 +357,8 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
           log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
-    elif app['applicationType'] == 'Oozie Launcher' or app['applicationType'] == 'TEZ':
-      log_link = app.get('amContainerLogs')
+    elif app['applicationType'] == 'Oozie Launcher':
+      log_link = app['amContainerLogs']
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
   except Exception, e:

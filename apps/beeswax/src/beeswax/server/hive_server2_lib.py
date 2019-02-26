@@ -108,13 +108,9 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     rows = self.describe
-    col_row_index = 1
+    col_row_index = 2
     try:
-      cols = map(itemgetter('col_name'), rows[col_row_index:])
-      if cols.index('') == 0: # TEZ starts at 1 vs Hive, Impala starts at 2
-        col_row_index = col_row_index + 1
-        cols.pop(0)
-      end_cols_index = cols.index('')
+      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
     except ValueError:  # DESCRIBE on columns and nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
@@ -638,12 +634,8 @@ class HiveServerClient:
     )
 
     # HS2 does not return properties in TOpenSessionResp
-    # TEZ returns properties, but we need the configuration to detect engine
-    properties = session.get_properties()
-    if not properties or self.query_server['server_name'] == 'beeswax':
-      configuration = self.get_configuration()
-      properties.update(configuration)
-      session.properties = json.dumps(properties)
+    if not session.get_properties():
+      session.properties = json.dumps(self.get_configuration())
       session.save()
 
     return session
