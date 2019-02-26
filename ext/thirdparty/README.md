@@ -189,11 +189,11 @@ Frontend third party dependencies (some checked in and some via npm)
 |TopoJSON|1.0.0|BSD|https://github.com/topojson/topojson|
 |TotalStorage|1.1.3|MIT|https://github.com/Upstatement/jquery-total-storage|
 |TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
-|TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
 |tzdetect.js|?|MIT|https://github.com/Canop/tzdetect.js|
 |Webpack|4.29.0|MIT|https://www.npmjs.com/package/webpack|
 |Webpack Bundel Tracker|0.4.2-beta|MIT|https://www.npmjs.com/package/webpack-bundle-tracker|
 |Webpack cli|3.2.1|MIT|https://www.npmjs.com/package/webpack-cli|
 |Webpack clean plugin|1.0.1|MIT|https://www.npmjs.com/package/clean-webpack-plugin|
+|Webpack Clean Obsolete Chunks plugin|0.4.0|MIT|https://github.com/GProst/webpack-clean-obsolete-chunks|
 |wysihtml5|0.3.0|MIT|https://github.com/xing/wysihtml5|
 |X-editable|1.5.1|MIT|http://github.com/vitalets/x-editable|"
