@@ -357,7 +357,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
           log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
-    elif app['applicationType'] == 'Oozie Launcher' or app['applicationType'] == 'TEZ':
+    elif app.get('amContainerLogs'):
       log_link = app.get('amContainerLogs')
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
@@ -366,12 +366,10 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
   if log_link:
     link = '/%s/' % name
-    if app['applicationType'] == 'Oozie Launcher' and app['state'] != 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
-      params = {}
-    else:
-      params = {
-        'doAs': request.user.username
-      }
+    params = {
+      'doAs': request.user.username
+    }
+      
     if offset != 0:
       params['start'] = offset
 
@@ -401,7 +399,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 @check_job_permission
 def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   """
-  Try to smartly detect the most useful task attempt (e.g. Oozie launcher, failed task) and get its MR logs.
+  Try to smartly detect the most useful task attempt (e.g. YarnV2, failed task) and get its MR logs.
   """
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
@@ -547,6 +545,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
       "joblnk": job_link,
       "task": task,
       "logs": logs,
+      "logs_list": attempt.get_log_list(),
       "first_log_tab": first_log_tab,
   }
 
@@ -558,6 +557,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
   if request.GET.get('format') == 'json':
     response = {
       "logs": context['logs'],
+      "logsList": context['logs_list'],
       "isRunning": job.status.lower() in ('running', 'pending', 'prep')
     }
     return JsonResponse(response)

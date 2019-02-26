@@ -589,12 +589,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-yarn-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'Oozie Launcher' || type() == 'TEZ' -->
-    <div data-bind="template: { name: 'job-oozie-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- ko if: type() == 'YarnV2' -->
+    <div data-bind="template: { name: 'job-yarnv2-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'Oozie Launcher_ATTEMPT' -->
-    <div data-bind="template: { name: 'job-oozie-attempt-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- ko if: type() == 'YarnV2_ATTEMPT' -->
+    <div data-bind="template: { name: 'job-yarnv2-attempt-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'SPARK' -->
@@ -857,7 +857,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="job-oozie-page${ SUFFIX }">
+<script type="text/html" id="job-yarnv2-page${ SUFFIX }">
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -896,21 +896,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a class="jb-logs-link" href="#job-oozie-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#job-oozie-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-oozie-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
+        <li class="active"><a class="jb-logs-link" href="#job-yarnv2-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-yarnv2-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-yarnv2-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="job-oozie-page-logs${ SUFFIX }">
-          <ul class="nav nav-tabs">
-          % for name in ['stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
-          % endfor
+        <div class="tab-pane active" id="job-yarnv2-page-logs${ SUFFIX }">
+          <ul class="nav nav-tabs" data-bind="foreach: logsList">
+            <li data-bind="css: { 'active': $data == $parent.logActive() }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $parent.fetchLogs($data); $parent.logActive($data); }, text: $data"></a></li>
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="job-oozie-page-attempts${ SUFFIX }">
+        <div class="tab-pane" id="job-yarnv2-page-attempts${ SUFFIX }">
           <table class="table table-condensed">
             <thead>
             <tr>
@@ -945,7 +943,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="job-oozie-attempt-page${ SUFFIX }">
+<script type="text/html" id="job-yarnv2-attempt-page${ SUFFIX }">
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -2362,6 +2360,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.logActive = ko.observable('default');
       self.logsByName = ko.observable({});
+      self.logsList = ko.observable(['default', 'stdout', 'stderr', 'syslog']);
       self.logs = ko.pureComputed(function() {
         return self.logsByName()[self.logActive()];
       });
@@ -2444,7 +2443,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'Oozie Launcher'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
@@ -2669,6 +2668,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             var result = self.logsByName();
             result[name] = data.logs.logs;
             self.logsByName(result);
+            if (data.logs.logsList && data.logs.logsList.length) {
+              self.logsList(['default'].concat(data.logs.logsList));
+            }
             if ($('.jb-panel pre:visible').length > 0){
               $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 75));
             }

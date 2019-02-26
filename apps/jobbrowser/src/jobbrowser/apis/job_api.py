@@ -191,7 +191,7 @@ class YarnApi(Api):
       }
       if hasattr(job, 'metrics'):
         common['metrics'] = job.metrics
-    elif app['applicationType'] == 'Oozie Launcher' or app['applicationType'] == 'TEZ':
+    elif app['applicationType'] == 'YarnV2':
       common['properties'] = {
         'startTime': job.startTime,
         'finishTime': job.finishTime,
@@ -220,11 +220,14 @@ class YarnApi(Api):
 
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     logs = ''
+    logs_list = []
     try:
-      if app_type == 'TEZ' or app_type == 'MAPREDUCE' or app_type == 'Oozie Launcher':
+      if app_type == 'YarnV2' or app_type == 'MAPREDUCE':
         if log_name == 'default':
           response = job_single_logs(MockDjangoRequest(self.user), job=appid)
-          logs = json.loads(response.content).get('logs')
+          parseResponse = json.loads(response.content)
+          logs = parseResponse.get('logs')
+          logs_list = parseResponse.get('logsList')
           if logs and len(logs) == 4:
             logs = logs[1]
         else:
@@ -237,7 +240,7 @@ class YarnApi(Api):
         logs = None
     except PopupException, e:
       LOG.warn('No task attempt found for logs: %s' % smart_str(e))
-    return {'logs': logs}
+    return {'logs': logs, 'logsList': logs_list}
 
 
   def profile(self, appid, app_type, app_property, app_filters):
@@ -257,7 +260,7 @@ class YarnApi(Api):
           'executor_list': NativeYarnApi(self.user).get_job(jobid=appid).get_executors(),
           'filter_text': ''
         }
-    elif app_type == 'Oozie Launcher' or app_type == 'TEZ':
+    elif app_type == 'YarnV2':
       if app_property == 'attempts':
         return {
           'task_list': NativeYarnApi(self.user).get_job(jobid=appid).job_attempts['jobAttempt'],
