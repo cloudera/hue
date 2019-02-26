@@ -1581,6 +1581,16 @@ ${ assist.assistPanel() }
           if (args) {
             loadFromObj(args);
           }
+
+          setTimeout(function () {
+            var types = type.args.filter(function(x){ return x && x.type !== 'checkbox'});
+            for (var i = 0; i < types.length; i++) {
+              self[types[i].name].subscribe(function() {
+                // Update the data preview when tweaking Format options on step 1
+                viewModel.createWizard.guessFieldTypes();
+              });
+            }
+          }); // Prevent notification on start
         }
       };
 
