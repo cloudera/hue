@@ -158,15 +158,9 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
   <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
   <script src="${ static('desktop/js/ace.extended.js') }"></script>
-  <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
-  <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
-  <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-  <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
-  <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-  <script src="${ static('desktop/js/autocompleter.js') }"></script>
 
   <script>
     ace.config.set("basePath", "/static/desktop/js/ace");

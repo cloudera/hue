@@ -478,7 +478,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>

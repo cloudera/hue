@@ -1540,13 +1540,6 @@ IS_EMBEDDED = Config(
   help=_('Choose whether Hue is embedded or not.')
 )
 
-USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
-  key='use_new_autocompleter',
-  default=True,
-  type=coerce_bool,
-  help=_('Enable the improved editor autocomplete dropdown.')
-)
-
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   key='editor_autocomplete_timeout',
   type=int,

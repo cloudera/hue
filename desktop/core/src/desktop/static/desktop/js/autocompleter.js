@@ -32,18 +32,11 @@ var Autocompleter = (function () {
     self.topTables = {};
 
     var initializeAutocompleter = function () {
-      if (self.snippet.isSqlDialect()) {
-        self.autocompleter = new SqlAutocompleter2({
-          snippet: self.snippet,
-          timeout: self.timeout
-        });
-      } else {
-        self.autocompleter = new HdfsAutocompleter({
-          user: options.user,
-          snippet: options.snippet,
-          timeout: options.timeout
-        });
-      }
+      self.autocompleter = new HdfsAutocompleter({
+        user: options.user,
+        snippet: options.snippet,
+        timeout: options.timeout
+      });
     };
     self.snippet.type.subscribe(function () {
       initializeAutocompleter();
