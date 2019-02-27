@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, IS_K8S_ONLY
+  from desktop.conf import IS_EMBEDDED, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY
   from desktop.models import hue_version
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -34,6 +34,8 @@
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
     optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
   };
+
+  window.DEV = '${ conf.DEV.get() }' === 'True';
 
   %if request and request.COOKIES and request.COOKIES.get('csrftoken', '') != '':
     window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';
@@ -56,6 +58,7 @@
 
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
+  window.IS_MULTICLUSTER_ONLY = '${ IS_MULTICLUSTER_ONLY.get() }' === 'True';
   window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
   window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
   window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS = 30000;
@@ -154,6 +157,12 @@
     metastore: {
       errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}'
     },
+    nav: {
+      apps: '${ _('Apps') }',
+      browsers: '${ _('Browsers') }',
+      documents: '${ _('Documents') }',
+      editor: '${ _('Editor') }',
+    },
     selectize: {
       choose: "${ _('Choose...') }",
       editTags: "${ _('Edit tags') }"
@@ -191,6 +200,10 @@
       compilation: "${ _('Compilation') }",
       planning: "${ _('Planning') }",
       risks: "${ _('Risks') }"
+    },
+    general: {
+      addMore: '${ _('Add more...') }',
+      offlineOrError: '${ _('It looks like you are offline or an unknown error happened. Please refresh the page.') }'
     }
   };
 

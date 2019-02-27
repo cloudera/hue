@@ -27,7 +27,7 @@ ko.bindingHandlers.hueLink = {
         return function(data, event) {
           const url = ko.unwrap(valueAccessor());
           if (url) {
-            let prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
+            const prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
             if ($(element).attr('target')) {
               window.open(prefix + url, $(element).attr('target'));
             } else if (event.ctrlKey || event.metaKey || event.which === 2) {

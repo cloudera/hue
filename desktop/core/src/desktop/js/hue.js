@@ -46,6 +46,10 @@ import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 import 'assist/assistViewModel';
+import OnePageViewModel from 'onePageViewModel';
+import SideBarViewModel from 'sideBarViewModel';
+import SidePanelViewModel from 'sidePanelViewModel';
+import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Move to notebook.js
 import EditorViewModel from 'apps/notebook/notebook.ko';
@@ -76,3 +80,70 @@ window.SqlFunctions = SqlFunctions;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
 window.qq = qq;
+
+$(document).ready(() => {
+  const onePageViewModel = new OnePageViewModel();
+  ko.applyBindings(onePageViewModel, $('.page-content')[0]);
+
+  const sidePanelViewModel = new SidePanelViewModel();
+  ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
+  ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
+  ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
+  ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
+
+  const topNavViewModel = new TopNavViewModel(onePageViewModel);
+  if (!window.IS_EMBEDDED) {
+    ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
+  }
+
+  const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
+  ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
+  if (window.IS_MULTICLUSTER_ONLY) {
+    ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+  }
+
+  huePubSub.publish('cluster.config.get.config');
+
+  $(document).on('hideHistoryModal', e => {
+    $('#clearNotificationHistoryModal').modal('hide');
+  });
+
+  huePubSub.subscribe('query.and.watch', query => {
+    $.post(
+      query['url'],
+      {
+        format: 'json',
+        sourceType: query['sourceType']
+      },
+      resp => {
+        if (resp.history_uuid) {
+          huePubSub.publish('open.editor.query', resp.history_uuid);
+        } else if (resp.message) {
+          $(document).trigger('error', resp.message);
+        }
+      }
+    ).fail(xhr => {
+      $(document).trigger('error', xhr.responseText);
+    });
+  });
+
+  let clickThrottle = -1;
+
+  $(window).click(e => {
+    window.clearTimeout(clickThrottle);
+    clickThrottle = window.setTimeout(() => {
+      if (
+        $(e.target).parents('.navbar-default').length > 0 &&
+        $(e.target).closest('.history-panel').length === 0 &&
+        $(e.target).closest('.btn-toggle-jobs-panel').length === 0 &&
+        $(e.target).closest('.hamburger-hue').length === 0 &&
+        $('.jobs-panel').is(':visible')
+      ) {
+        huePubSub.publish('hide.jobs.panel');
+        huePubSub.publish('hide.history.panel');
+      }
+    }, 10);
+  });
+
+  $('.page-content').jHueScrollUp();
+});

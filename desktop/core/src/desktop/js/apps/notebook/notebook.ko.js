@@ -2071,7 +2071,7 @@ const Snippet = function(vm, notebook, snippet) {
 
         if (vm.editorMode() && data.history_id) {
           if (!vm.isNotificationManager()) {
-            let url = vm.URLS.editor + '?editor=' + data.history_id;
+            const url = vm.URLS.editor + '?editor=' + data.history_id;
             vm.changeURL(url);
           }
           notebook.id(data.history_id);

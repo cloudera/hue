@@ -14,9 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'ext/bootstrap-datepicker.min';
-import 'jquery/plugins/jquery.hdfstree';
-import 'ext/jquery.hotkeys';
-import Clipboard from 'clipboard';
+import ko from 'knockout';
 
-window.Clipboard = Clipboard;
+const proxiedKoRegister = ko.components.register;
+const registeredComponents = [];
+
+ko.components.register = function() {
+  // This guarantees a ko component is only registered once
+  // Some currently get registered twice when switching between notebook and editor
+  if (registeredComponents.indexOf(arguments[0]) === -1) {
+    registeredComponents.push(arguments[0]);
+    return proxiedKoRegister.apply(this, arguments);
+  }
+};
