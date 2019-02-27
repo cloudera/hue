@@ -203,7 +203,7 @@ INSTALLED_APPS = [
     # App that keeps track of failed logins.
     'axes',
     'webpack_loader',
-    'django_celery_results',
+    #'django_celery_results',
 ]
 
 WEBPACK_LOADER = {
@@ -216,22 +216,6 @@ WEBPACK_LOADER = {
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')
 ]
-
-# Celery
-CELERY_BROKER_URL='pyamqp://hueuser:cloudera@localhost:5672/huevhost/'
-#CELERY_BIN=
-#CELERY_RESULT_BACKEND='django-db'
-CELERY_APP="desktop"
-CELERYD_OPTS="--time-limit=300 --concurrency=8"
-
-# %n will be replaced with the first part of the nodename.
-CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
-CELERYD_PID_FILE="/var/run/celery/%n.pid"
-CELERY_CREATE_DIRS=1
-CELERYD_USER="root"
-CELERYD_GROUP="root"
-
-CELERY_RESULT_BACKEND = 'django-db'
 
 # Keep default values up to date
 GTEMPLATE_CONTEXT_PROCESSORS = (
@@ -656,3 +640,25 @@ if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
           }
       }
   })
+
+
+################################################################
+# Celery settings
+################################################################
+
+if desktop.conf.TASK_SERVER.ENABLED.get():
+  CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
+  
+  CELERY_ACCEPT_CONTENT = ['json']
+  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.RESULT_BACKEND.get()
+  CELERY_TASK_SERIALIZER = 'json'
+  
+  CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
+
+# %n will be replaced with the first part of the nodename.
+# CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+# CELERYD_PID_FILE="/var/run/celery/%n.pid"
+# CELERY_CREATE_DIRS = 1
+# CELERYD_USER = desktop.conf.SERVER_USER.get()
+# CELERYD_GROUP = desktop.conf.SERVER_GROUP.get()
+

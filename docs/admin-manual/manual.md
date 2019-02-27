@@ -217,7 +217,6 @@ components. Your Hue installation is now running.
 
 # Configuration
 
-
 ## Reference Architecture
 * 3 Hues and 1 Load Balancer
 * Databases: MySQL InnoDB, PostgreSQL, Oracle
@@ -236,6 +235,41 @@ Hue is often run with:
 * Cherrypy with Httpd
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
 * [NGINX](Using NGINX to speed up Hue)
+
+### Task Server
+
+Make sure you have Rabbit MQ installed and running.
+
+```
+sudo apt-get install rabbitmq-server -y
+```
+
+In hue.ini, telling the API server that the Task Server is available:
+
+```
+[desktop]
+[[task_server]]
+enabled=true
+```
+
+Starting the  Task server:
+
+```
+./build/env/bin/celery worker -l info -A desktop
+```
+
+Running a test tasks:
+
+```
+./build/env/bin/hue shell
+
+from desktop.celery import debug_task
+
+debug_task.delay()
+debug_task.delay().get() # Works if result backend is setup and task_server is true in the hue.ini
+
+```
+
 
 ### Proxy
 
