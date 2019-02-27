@@ -40,7 +40,6 @@ from notebook.decorators import check_editor_access_permission, check_document_a
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
 
-import notebook.tasks as ntasks
 
 LOG = logging.getLogger(__name__)
 
@@ -314,7 +313,7 @@ def copy(request):
 
 
 @check_document_access_permission()
-def download_new(request):
+def download(request):
   if not ENABLE_DOWNLOAD.get():
     return serve_403_error(request)
 
@@ -333,27 +332,6 @@ def download_new(request):
 
   return response
 
-@check_document_access_permission()
-def download(request):
-  if not ENABLE_DOWNLOAD.get():
-    return serve_403_error(request)
-
-  notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
-  file_format = request.POST.get('format', 'csv')
-
-  ntasks.download.delay(request.POST, notebook, snippet, file_format)
-  #response = get_api(request, snippet).download(notebook, snippet, file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
-  response = {}
-
-  if response:
-    request.audit = {
-      'operation': 'DOWNLOAD',
-      'operationText': 'User %s downloaded results from %s as %s' % (request.user.username, _get_snippet_name(notebook), file_format),
-      'allowed': True
-    }
-
-  return response
 
 def install_examples(request):
   response = {'status': -1, 'message': ''}

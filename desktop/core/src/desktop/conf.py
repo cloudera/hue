@@ -40,7 +40,7 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              validate_path, list_of_compiled_res, coerce_str_lowercase, \
                              coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
-from desktop.lib.paths import get_desktop_root
+from desktop.lib.paths import get_desktop_root, get_run_root
 
 LOG = logging.getLogger(__name__)
 
@@ -1608,6 +1608,39 @@ IS_K8S_ONLY = Config(
   type=coerce_bool,
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
+
+
+def task_server_default_result_directory():
+  """Local directory to store task results."""
+  return 'file://%s' % get_run_root('logs')
+
+
+TASK_SERVER = ConfigSection(
+  key="task_server",
+  help=_("Task Server configuration."),
+  members=dict(
+    ENABLED= Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If resource intensive or blocking can be delegated to an already running task server.')
+    ),
+    BROKER_URL = Config(
+      key='broker_url',
+      default='amqp://guest:guest@localhost//',
+      help=_('How the task server and tasks communicate.')
+    ),
+    RESULT_BACKEND = Config(
+      key='result_backend',
+      dynamic_default=task_server_default_result_directory,
+      help=_('Local file system path used to store task results when using the file result backend.')
+    ),
+    RESULT_CELERYD_OPTS = Config(
+      key='celeryd_opts',
+      default='--time-limit=300',
+      help=_('Default options provided to the task server at startup.')
+    )
+))
 
 
 def get_clusters(user):
