@@ -30,8 +30,7 @@
               }
             };
           }
-        },
-        useNewAutocompleter: true
+        }
       });
 
       try {

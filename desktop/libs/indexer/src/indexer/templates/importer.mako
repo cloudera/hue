@@ -31,13 +31,6 @@
 %if not is_embeddable:
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
-## TODO lot of those re-imported
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
-
-
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 
 ${ assist.assistJSModels() }

@@ -54,13 +54,7 @@ ${ render_bundle('notebook') | n,unicode }
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
 
-<script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
@@ -1196,7 +1190,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Right-click to expand with columns") }',
         highlightedRange: result.statement_range,
-        useNewAutocompleter: $root.useNewAutocompleter,
         readOnly: $root.isPresentationMode(),
         aceOptions: {
           showLineNumbers: $root.editorMode(),
@@ -1205,10 +1198,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           minLines: $root.editorMode() ? null : 3
         }
       }, style: {opacity: statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1', 'min-height': $root.editorMode() ? '0' : '48px', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
-      % if conf.USE_NEW_AUTOCOMPLETER.get():
       <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, snippet: $data } } --><!-- /ko -->
-      % endif
-
 
       <ul class="table-drop-menu hue-context-menu">
         <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
@@ -2835,9 +2825,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       userId: ${ user.id },
       suffix: '${ suffix }',
       assistAvailable: true,
-      % if conf.USE_NEW_AUTOCOMPLETER.get():
-      useNewAutocompleter: true,
-      % endif
       autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
       snippetViewSettings: {
         default: {

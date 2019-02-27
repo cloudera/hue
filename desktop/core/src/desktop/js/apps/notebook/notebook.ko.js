@@ -2886,8 +2886,7 @@ const Snippet = function(vm, notebook, snippet) {
     snippet: self,
     user: vm.user,
     optEnabled: false,
-    timeout: vm.autocompleteTimeout,
-    useNewAutocompleter: vm.useNewAutocompleter
+    timeout: vm.autocompleteTimeout
   });
 
   self.init = function() {
@@ -3930,7 +3929,6 @@ function EditorViewModel(
     });
     return foundInterpreter.length > 0 ? foundInterpreter[0].name : self.editorType();
   });
-  self.useNewAutocompleter = options.useNewAutocompleter || false;
   self.autocompleteTimeout = options.autocompleteTimeout;
   self.selectedNotebook = ko.observable();
 

@@ -260,12 +260,8 @@ ko.bindingHandlers.aceEditor = {
     const initAutocompleters = function() {
       if (editor.completers) {
         editor.completers.length = 0;
-        if (snippet.type() === 'hive' || snippet.type() === 'impala') {
-          if (options.useNewAutocompleter) {
-            editor.useHueAutocompleter = true;
-          } else {
-            editor.completers.push(snippet.autocompleter);
-          }
+        if (snippet.isSqlDialect()) {
+          editor.useHueAutocompleter = true;
         } else {
           editor.completers.push(langTools.snippetCompleter);
           editor.completers.push(langTools.textCompleter);

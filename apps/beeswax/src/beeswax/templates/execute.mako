@@ -794,12 +794,9 @@ ${ commonshare() | n,unicode }
 </script>
 
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ assist.assistJSModels() }
 
-<script src="${ static('desktop/js/autocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 %if ENABLE_QUERY_BUILDER.get():
@@ -1194,8 +1191,7 @@ var autocompleter = new Autocompleter({
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,
   optEnabled: false,
-  timeout: AUTOCOMPLETE_TIMEOUT,
-  useNewAutocompleter: false
+  timeout: AUTOCOMPLETE_TIMEOUT
 });
 
 var totalStorageUserPrefix = apiHelper.getTotalStorageUserPrefix(snippetType);

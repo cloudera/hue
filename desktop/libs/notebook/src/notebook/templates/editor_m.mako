@@ -78,7 +78,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
         highlightedRange: result.statement_range,
-        useNewAutocompleter: $root.useNewAutocompleter,
         aceOptions: {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
@@ -161,13 +160,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 
 </div>
 
-
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
-
 ${ assist.assistJSModels() }
 
 <script type="text/javascript">
@@ -181,9 +173,6 @@ ${ assist.assistJSModels() }
     user: '${ user.username }',
     userId: ${ user.id },
     assistAvailable: true,
-    % if conf.USE_NEW_AUTOCOMPLETER.get():
-      useNewAutocompleter: true,
-    % endif
     autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
