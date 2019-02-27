@@ -254,12 +254,14 @@ namespace. See ``apps/about/src/about/urls.py`` for an example.
 ## Pre-requisites
 
 
-### Software
+### Dependencies
 
-Developing for the Hue SDK has similar requirements to running
-Hue itself.  We require Python 2.7, Django (1.11 included
-with our distribution), Hadoop (Apache Hadoop 2+), Java (Java 1.8),
-, a browser (latest Chrome, Firefox or IE11+) and npm (6.4+).
+* The OS specific dependencies listed [here](http://cloudera.github.io/hue/latest/admin-manual/manual.html)
+* Python 2.7
+* Django (1.11 included with our distribution)
+* Hadoop (Apache Hadoop 2+)
+* Java (Java 1.8)
+* npm (6.4+)
 
 ### Recommended Reading / Important Technologies
 
