@@ -57,7 +57,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
       <div class="app-header">
         <a href="#" data-bind="hueLink: '${ url('dashboard:new_search') }'">
           <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
-          <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'dashboard' }} --><!-- /ko -->
+          <!-- ko component: { name: 'hue-favorite-app', params: { app: 'dashboard' }} --><!-- /ko -->
         </a>
       </div>
     </div>
@@ -195,20 +195,11 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
               <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
             </a>
           </li>
-          <!-- ko if: IS_HUE_4 -->
           <li>
             <a href="javascript:void(0);" data-bind="publish: { 'assist.show.documents': 'search-dashboard' }">
               <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
             </a>
           </li>
-          <!-- /ko -->
-          <!-- ko ifnot: IS_HUE_4 -->
-          <li>
-            <a href="${ url('dashboard:admin_collections') }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
-            </a>
-          </li>
-          <!-- /ko -->
           <li data-bind="visible: columns().length != 0" class="divider"></li>
           <li data-bind="visible: isSaved()">
             <a class="share-link" data-bind="click: prepareShareModal, css: {'isShared': isShared()}">

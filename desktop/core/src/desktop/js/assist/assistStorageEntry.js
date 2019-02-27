@@ -226,14 +226,10 @@ class AssistStorageEntry {
   toggleOpen(data, event) {
     const self = this;
     if (self.definition.type === 'file') {
-      if (IS_HUE_4) {
-        if (event.ctrlKey || event.metaKey || event.which === 2) {
-          window.open('/hue' + self.definition.url, '_blank');
-        } else {
-          huePubSub.publish('open.link', self.definition.url);
-        }
+      if (event.ctrlKey || event.metaKey || event.which === 2) {
+        window.open('/hue' + self.definition.url, '_blank');
       } else {
-        window.open(self.definition.url, '_blank');
+        huePubSub.publish('open.link', self.definition.url);
       }
       return;
     }

@@ -1204,13 +1204,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           $(document).trigger("info", data.message);
           self.workflow.tracker().markCurrentStateAsClean();
           huePubSub.publish('assist.document.refresh');
-          if (window.location.search.indexOf("workflow") == -1 && !IS_HUE_4) {
-            window.location.hash = '#workflow=' + data.id;
-          } else if (IS_HUE_4) {
-            hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
-          }
-        }
-        else {
+          hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
+        } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -1241,7 +1236,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitPopup = function () {
     $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
-      format: IS_HUE_4 ? 'json' : 'html',
+      format: 'json',
       cluster: self.compute() ? ko.mapping.toJSON(self.compute()) : '{}'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
@@ -1253,7 +1248,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitActionPopup = function (w) {
     $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
-      format: IS_HUE_4 ? 'json' : 'html'
+      format: 'json'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1263,12 +1258,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.schedule = function () {
     hueAnalytics.log('oozie/editor/workflow', 'schedule');
-    if (IS_HUE_4) {
-      huePubSub.publish('open.link', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
-    }
-    else {
-      window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
-    }
+    huePubSub.publish('open.link', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
 
 

@@ -16,7 +16,7 @@
 <%
 from django.utils.translation import ugettext as _
 
-from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4
+from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
 from metadata.conf import PROMETHEUS
 
@@ -2829,11 +2829,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         $('canvas').remove();
 
-        if (!IS_HUE_4) {
-          huePubSub.subscribe('hue4.process.headers', function (opts) {
-            opts.callback(opts.response);
-          });
-        }
         if (vm.job().type() === 'workflow') {
           $('#workflow-page-graph${ SUFFIX }').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
           $.ajax({
@@ -2957,11 +2952,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
-      % if is_hue4():
-        self.paginationResultPage = ko.observable(100);
-      % else:
-        self.paginationResultPage = ko.observable(50);
-      % endif
+      self.paginationResultPage = ko.observable(100);
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),

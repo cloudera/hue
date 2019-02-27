@@ -121,10 +121,6 @@ if USE_NEW_EDITOR.get():
     % endif
   </style>
 
-  <script type="text/javascript">
-    var IS_HUE_4 = false;
-  </script>
-
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
 
   % if user.is_authenticated():
@@ -218,7 +214,7 @@ if USE_NEW_EDITOR.get():
 ${ hueIcons.symbols() }
 
 
-% if conf.DISABLE_HUE_3.get() and conf.IS_HUE_4.get() and request.environ.get("PATH_INFO").find("/hue/") < 0:
+% if request.environ.get("PATH_INFO").find("/hue/") < 0:
   <script>
     window.location.replace("/");
   </script>
@@ -311,7 +307,7 @@ ${ hueIcons.symbols() }
     <%
       view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
     %>
-    % if view_profile or conf.IS_HUE_4.get():
+    % if view_profile:
     <li class="dropdown">
       <a title="${'Administration' if view_profile else ''}" href="#" data-rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
         <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
@@ -331,9 +327,6 @@ ${ hueIcons.symbols() }
         % if is_admin(user):
           <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
         % endif
-      % endif
-      % if conf.IS_HUE_4.get():
-      <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 4)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 4')}</a></li>
       % endif
       </ul>
     </li>

@@ -158,7 +158,7 @@ from desktop.views import _ko
   <script type="text/html" id="hdfs-context-items">
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw" data-bind="css: {'fa-folder-open-o': definition.type === 'dir', 'fa-file-text-o': definition.type === 'file'}"></i> ${ _('Open in Browser') }</a></li>
-    <!-- ko if: IS_HUE_4 && definition.type === 'file' -->
+    <!-- ko if: definition.type === 'file' -->
     <li><a href="javascript:void(0);" data-bind="click: openInImporter"><!-- ko template: { name: 'app-icon-template', data: { icon: 'importer' } } --><!-- /ko --> ${ _('Open in Importer') }</a></li>
     <!-- /ko -->
     <!-- ko if: $currentApp() === 'editor' -->
@@ -1936,22 +1936,16 @@ from desktop.views import _ko
 
         huePubSub.subscribe('assist.dblClickHBaseItem', function (entry) {
           var hash = self.selectedHBaseEntry().definition.name + '/' + entry.definition.name;
-          if (IS_HUE_4) {
-            if (window.location.pathname.startsWith('/hue/hbase')) {
-              window.location.hash = hash;
-            }
-            else {
-              self.lastClickeHBaseEntry = entry;
-              huePubSub.subscribeOnce('app.gained.focus', function (app) {
-                if (app === 'hbase' && self.HBaseLoaded) {
-                  delayChangeHash(hash);
-                }
-              });
-              huePubSub.publish('open.link', '/hbase');
-            }
-          }
-          else {
-            window.open('/hbase/#' + hash);
+          if (window.location.pathname.startsWith('/hue/hbase')) {
+            window.location.hash = hash;
+          } else {
+            self.lastClickeHBaseEntry = entry;
+            huePubSub.subscribeOnce('app.gained.focus', function (app) {
+              if (app === 'hbase' && self.HBaseLoaded) {
+                delayChangeHash(hash);
+              }
+            });
+            huePubSub.publish('open.link', '/hbase');
           }
         });
 
@@ -3639,7 +3633,7 @@ from desktop.views import _ko
           self.dashboardAssistantTabAvailable(type === 'dashboard');
           self.schedulesTabAvailable(false);
           if (type !== 'dashboard') {
-            if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
+            if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True') {
               huePubSub.subscribeOnce('set.current.app.view.model', function (viewModel) {
                 // Async
                 self.schedulesTabAvailable(!!viewModel.selectedNotebook);
@@ -3647,8 +3641,7 @@ from desktop.views import _ko
               });
               huePubSub.publish('get.current.app.view.model');
             } else {
-              // Right assist is only available in the Hue 3 editor and notebook.
-              self.schedulesTabAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
+              self.schedulesTabAvailable(false);
             }
           }
           updateTabs();
@@ -3657,14 +3650,12 @@ from desktop.views import _ko
         var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', updateContentsForType);
         self.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
-        if (IS_HUE_4) {
-          huePubSub.subscribe('set.current.app.name', function (appName) {
-            if (appName === 'dashboard') {
-              updateContentsForType(appName);
-            }
-          });
-          huePubSub.publish('get.current.app.name');
-        }
+        huePubSub.subscribe('set.current.app.name', function (appName) {
+          if (appName === 'dashboard') {
+            updateContentsForType(appName);
+          }
+        });
+        huePubSub.publish('get.current.app.name');
         updateTabs();
       }
 

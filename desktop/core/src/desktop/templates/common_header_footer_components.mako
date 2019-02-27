@@ -161,40 +161,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
         placement: "bottom"
       });
 
-      % if 'jobbrowser' in apps:
-      if (!IS_HUE_4) {
-        var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
-        var lastJobBrowserRequest = null;
-
-        function checkJobBrowserStatus() {
-          if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
-            return;
-          }
-          window.clearTimeout(checkJobBrowserStatusIdx);
-          lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
-                "format": "json",
-                "state": "running",
-                "user": "${user.username}"
-              },
-              function (data) {
-                if (data != null && data.jobs != null) {
-                  huePubSub.publish('jobbrowser.data', data.jobs);
-                  if (data.jobs.length > 0) {
-                    $("#jobBrowserCount").show().text(data.jobs.length);
-                  } else {
-                    $("#jobBrowserCount").hide();
-                  }
-                }
-                checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS);
-              }).fail(function () {
-            window.clearTimeout(checkJobBrowserStatusIdx);
-          });
-        }
-
-        huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
-      }
-      % endif
-
       function openDropdown(which, timeout){
         var _this = which;
         var _timeout = timeout!=null?timeout:800;
@@ -307,20 +273,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
 </div>
 
 <script type="text/javascript">
-
-  huePubSub.subscribe('set.hue.version', function (version) {
-    $.post("/desktop/api2/user_preferences/hue_version", {
-      set: version
-    }, function (data) {
-      if (data && data.status == 0) {
-        location.href = version === 3 && '${ conf.DISABLE_HUE_3.get() }' == 'False' ? window.location.pathname.substr(4) + window.location.search : '/hue' + window.location.pathname + window.location.search
-      }
-      else {
-        $.jHueNotify.error("${ _('An error occurred while saving your default Hue preference. Please try again...') }");
-      }
-    });
-  });
-
 
   $(document).ready(function () {
 
@@ -615,14 +567,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
     _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
 
     ga('send', 'pageview', {
-      'page': '/remote/${ version }/' + (IS_HUE_4 ? '4/' : '3/') + _pathName
+      'page': '/remote/${ version }/4/' + _pathName
     });
 
     function trackOnGA(path) {
       if (typeof ga != "undefined" && ga != null) {
         ga('set', 'referrer', 'http://gethue.com'); // we force the referrer to prevent leaking sensitive information
         ga('send', 'pageview', {
-          'page': '/remote/${ version }/' + (IS_HUE_4 ? '4/' : '3/') + path
+          'page': '/remote/${ version }/4/' + path
         });
       }
     }

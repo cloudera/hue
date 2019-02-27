@@ -109,10 +109,8 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
 
 
 <script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("workflow") > -1) {
-      location.href = (IS_HUE_4 ? '/hue' : '') + "/oozie/editor/workflow/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
+  if (window.location.hash && window.location.hash.indexOf('workflow') !== -1) {
+    location.href = '/hue/oozie/editor/workflow/edit/?' + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, '');
   }
 </script>
 

@@ -44,12 +44,10 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
   </div>
 
   <div class="container-fluid">
-    % if is_hue_4:
-      <div class="alert">
-        ${ _('This is the old Pig Editor, it is recommended to instead use the new ') }
-        <a href="${ url('notebook:editor') }?type=pig" target="_blank">${_('Editor')}</a>
-      </div>
-    % endif
+    <div class="alert">
+      ${ _('This is the old Pig Editor, it is recommended to instead use the new ') }
+      <a href="${ url('notebook:editor') }?type=pig" target="_blank">${_('Editor')}</a>
+    </div>
   </div>
 
   <div class="container-fluid">

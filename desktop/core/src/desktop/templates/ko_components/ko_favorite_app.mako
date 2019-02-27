@@ -25,11 +25,9 @@ from desktop.views import _ko
 <%def name="favoriteApp()">
 
   <script type="text/html" id="hue-favorite-app-template">
-    <!-- ko if: isHue4 -->
     <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp, tooltip: { placement: 'bottom', title: isFavorite() ? '${ _ko("Unset from default application") }' : '${ _ko("Set as default application") }' }">
       <i class="fa inactive-action" data-bind="css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
     </div>
-    <!-- /ko -->
   </script>
 
   <script type="text/javascript">
@@ -37,7 +35,6 @@ from desktop.views import _ko
 
       var FavoriteApp = function (params) {
         var self = this;
-        self.isHue4 = ko.observable(params.hue4);
         self.isFavorite = ko.observable(false);
         self.app = params.app;
         self.interpreter = params.interpreter;
@@ -69,8 +66,7 @@ from desktop.views import _ko
           var post = {};
           if (self.isFavorite()) {
             post['delete'] = true;
-          }
-          else {
+          } else {
             post['set'] = ko.mapping.toJSON(postParams);
           }
           $.post('/desktop/api2/user_preferences/default_app', post, function (data) {
@@ -78,12 +74,10 @@ from desktop.views import _ko
           });
         };
 
-        if (self.isHue4()) {
-          // Load the fav app status
-          $.get('/desktop/api2/user_preferences/default_app', function (data) {
-            self.parseCurrentFavorite(data);
-          });
-        }
+        // Load the fav app status
+        $.get('/desktop/api2/user_preferences/default_app', function (data) {
+          self.parseCurrentFavorite(data);
+        });
       };
 
       ko.components.register('hue-favorite-app', {

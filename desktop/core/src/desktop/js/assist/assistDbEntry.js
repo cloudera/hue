@@ -497,42 +497,30 @@ class AssistDbEntry {
       return;
     }
 
-    if (IS_HUE_4) {
-      huePubSub.publish('open.link', url);
-    } else {
-      window.open(url, '_blank');
-    }
+    huePubSub.publish('open.link', url);
   }
 
   openInIndexer() {
     const self = this;
     const definitionName = self.catalogEntry.name;
     if (window.IS_NEW_INDEXER_ENABLED) {
-      if (window.IS_HUE_4) {
-        huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
-      } else {
-        window.open('/indexer/indexes/' + definitionName);
-      }
+      huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
     } else {
       const hash = '#edit/' + definitionName;
-      if (window.IS_HUE_4) {
-        if (
-          window.location.pathname.startsWith('/hue/indexer') &&
-          !window.location.pathname.startsWith('/hue/indexer/importer')
-        ) {
-          window.location.hash = hash;
-        } else {
-          huePubSub.subscribeOnce('app.gained.focus', app => {
-            if (app === 'indexes') {
-              window.setTimeout(() => {
-                window.location.hash = hash;
-              }, 0);
-            }
-          });
-          huePubSub.publish('open.link', '/indexer');
-        }
+      if (
+        window.location.pathname.startsWith('/hue/indexer') &&
+        !window.location.pathname.startsWith('/hue/indexer/importer')
+      ) {
+        window.location.hash = hash;
       } else {
-        window.open('/indexer/' + hash);
+        huePubSub.subscribeOnce('app.gained.focus', app => {
+          if (app === 'indexes') {
+            window.setTimeout(() => {
+              window.location.hash = hash;
+            }, 0);
+          }
+        });
+        huePubSub.publish('open.link', '/indexer');
       }
     }
   }

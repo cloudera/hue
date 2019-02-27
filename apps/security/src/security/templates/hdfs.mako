@@ -101,7 +101,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" data-bind="value: $root.assist.path" autocomplete="off" />
-                  <a data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" class="btn btn-inverse">
+                  <a target="self" data-bind="hueLink: '/filebrowser/view=' + $root.assist.path()" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
@@ -162,7 +162,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
 
                     <span data-bind="visible: ! $root.assist.showAclsAsText()">
                       <h4>${ _('Path') }</h4>
-                      <a class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), text: $root.assist.path(), attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" rel="tooltip"></a>
+                      <a class="force-word-break" target="self" data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), text: $root.assist.path()" title="${ _('Open in File Browser') }" rel="tooltip"></a>
 
                       <h4>${ _('User/Group') }</h4>
                       <i class="fa fa-user" style="color: #999999" title="${_('User')}"></i> <span title="${_('User')}" data-bind="text: $root.assist.owner"></span>&nbsp;
@@ -235,7 +235,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
       <div class="span4">
         <h4>${ _('to apply to the selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li><a class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + path, text: path, attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
+          <li><a target="self" class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + path, text: path" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
         </ul>
       </div>
     </div>

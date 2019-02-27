@@ -27,10 +27,7 @@ ko.bindingHandlers.hueLink = {
         return function(data, event) {
           const url = ko.unwrap(valueAccessor());
           if (url) {
-            let prefix = '';
-            if (window.IS_HUE_4) {
-              prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
-            }
+            let prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
             if ($(element).attr('target')) {
               window.open(prefix + url, $(element).attr('target'));
             } else if (event.ctrlKey || event.metaKey || event.which === 2) {
@@ -51,11 +48,7 @@ ko.bindingHandlers.hueLink = {
   update: function(element, valueAccessor) {
     const url = ko.unwrap(valueAccessor());
     if (url) {
-      if (window.IS_HUE_4) {
-        $(element).attr('href', '/hue' + (url.indexOf('/') === 0 ? url : '/' + url));
-      } else {
-        $(element).attr('href', url);
-      }
+      $(element).attr('href', '/hue' + (url.indexOf('/') === 0 ? url : '/' + url));
     } else {
       $(element).attr('href', 'javascript: void(0);');
     }
