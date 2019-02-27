@@ -32,7 +32,6 @@ from useradmin.views import import_ldap_groups
 
 from desktop import conf, middleware
 from desktop.auth import backend
-from desktop.conf import is_hue4
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 
@@ -679,10 +678,7 @@ class TestLogin(PseudoHdfsTestBase):
     client.get('/accounts/logout')
     # Login
     response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
-    if is_hue4():
-      template = 'hue.mako'
-    else:
-      template = 'admin_wizard.mako'
+    template = 'hue.mako'
     assert_true(any([template in _template.filename for _template in response.templates]), response.content) # Go to superuser wizard
 
   def test_login_expiration(self):

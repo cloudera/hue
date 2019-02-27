@@ -211,14 +211,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
                 <!-- ko case: $default -->SQL<!-- /ko -->
               <!-- /ko -->
-              <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
+              <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
               % endif
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
                 Notebook
-              <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'notebook' }} --><!-- /ko -->
+              <!-- ko component: { name: 'hue-favorite-app', params: { app: 'notebook' }} --><!-- /ko -->
             <!-- /ko -->
           </li>
 
@@ -341,16 +341,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- /ko -->
           </li>
           <li>
-            <!-- ko if: IS_HUE_4 -->
             <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
               <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
             </a>
-            <!-- /ko -->
-            <!-- ko ifnot: IS_HUE_4 -->
-            <a href="javascript:void(0)" class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType()">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
-            </a>
-            <!-- /ko -->
           </li>
           <li class="divider"></li>
           <!-- ko if: $root.canSave -->
@@ -2841,9 +2834,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       user: '${ user.username }',
       userId: ${ user.id },
       suffix: '${ suffix }',
-      % if is_embeddable:
-      hue4: true,
-      % endif
       assistAvailable: true,
       % if conf.USE_NEW_AUTOCOMPLETER.get():
       useNewAutocompleter: true,

@@ -440,30 +440,26 @@ except ImportError, e:
             format: ko.mapping.toJSON(self.saveTarget()),
             destination: ko.mapping.toJSON(self.savePath()),
             overwrite: ko.mapping.toJSON(self.saveOverwrite()),
-            is_embedded: ko.mapping.toJSON(IS_HUE_4),
+            is_embedded: ko.mapping.toJSON(true),
             start_time: ko.mapping.toJSON((new Date()).getTime())
           },
           function(resp) {
             if (resp.status == 0) {
-              if (IS_HUE_4) {
-                $(".modal-backdrop").remove();
-                if (self.saveTarget() == 'hdfs-file') {
-                  $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('open.link', resp.watch_url);
-                } else if (self.saveTarget() == 'search-index') {
-                  $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('open.importer.query', resp);
-                } else if (self.saveTarget() == 'dashboard') {
-                   $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('open.link', resp.watch_url);
-                } else if (resp.history_uuid) {
-                  $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-                } else if (resp && resp.message) {
-                  $(document).trigger("error", resp.message);
-                }
-              } else {
-                window.location.href = resp.watch_url;
+              $(".modal-backdrop").remove();
+              if (self.saveTarget() == 'hdfs-file') {
+                $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('open.link', resp.watch_url);
+              } else if (self.saveTarget() == 'search-index') {
+                $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('open.importer.query', resp);
+              } else if (self.saveTarget() == 'dashboard') {
+                 $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('open.link', resp.watch_url);
+              } else if (resp.history_uuid) {
+                $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+              } else if (resp && resp.message) {
+                $(document).trigger("error", resp.message);
               }
             } else {
               $(document).trigger('error', resp.message);

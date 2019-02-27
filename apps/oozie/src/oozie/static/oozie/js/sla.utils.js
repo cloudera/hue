@@ -45,7 +45,7 @@ function getSLArow(row) {
     getSLAStatusLabel(row.slaStatus),
     emptyStringIfNull(row.appName),
     emptyStringIfNull(row.appType),
-    IS_HUE_4 ? '<a href="/hue/jobbrowser/#!id=' + row.id + '">' + row.id + '</a>' : '<a href="' + row.appUrl + '#showSla" data-row-selector="true">' + row.id + '</a>',
+    '<a href="/hue/jobbrowser/#!id=' + row.id + '">' + row.id + '</a>',
     '<span class="nominalTime">' + emptyStringIfNull(row.nominalTime) + '</span>',
     '<span class="expectedStart">' + emptyStringIfNull(row.expectedStart) + '</span>',
     '<span class="actualStart">' + emptyStringIfNull(row.actualStart) + '</span>',

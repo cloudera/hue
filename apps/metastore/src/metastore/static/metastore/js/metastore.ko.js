@@ -27,7 +27,6 @@ var MetastoreViewModel = (function () {
     self.partitionsLimit = options.partitionsLimit;
     self.assistAvailable = ko.observable(true);
     self.apiHelper = window.apiHelper;
-    self.isHue4 = ko.observable(options.hue4);
     self.isLeftPanelVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
@@ -143,10 +142,7 @@ var MetastoreViewModel = (function () {
     });
 
     huePubSub.subscribe('metastore.url.change', function () {
-      var prefix = '/metastore/';
-      if (self.isHue4()){
-        prefix = '/hue' + prefix;
-      }
+      var prefix = '/hue/metastore/';
       if (self.source() && self.source().namespace()) {
         var params = {
           source: self.source().type
@@ -247,7 +243,7 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadUrl = function () {
     var self = this;
 
-    var path = (IS_HUE_4 ? window.location.pathname.substr(4) : window.location.pathname);
+    var path = window.location.pathname.substr(4);
     if (!path) {
       path = '/metastore/tables';
     }

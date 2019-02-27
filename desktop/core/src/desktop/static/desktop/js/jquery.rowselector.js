@@ -44,14 +44,8 @@
       if (!$(e.target).is("a")) {
         var href = $.trim($(_this.element).attr("href"));
         if (href != "" && href != "#" && href.indexOf("void(0)") == -1) {
-          if (IS_HUE_4) {
-            huePubSub.publish('open.link', $(_this.element).attr("href"));
-          }
-          else {
-            location.href = $(_this.element).attr("href");
-          }
-        }
-        else {
+          huePubSub.publish('open.link', $(_this.element).attr("href"));
+        } else {
           $(_this.element).click();
         }
       }

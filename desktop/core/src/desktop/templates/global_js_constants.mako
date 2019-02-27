@@ -109,7 +109,7 @@
       'link-workflow': '${_('Job Design')}',
       'notebook': '${_('Notebook')}',
       'oozie-bundle2': '${_('Oozie Bundle')}',
-      'oozie-coordinator2': IS_HUE_4 ? '${_('Oozie Schedule')}' : '${_('Oozie Coordinator')}',
+      'oozie-coordinator2': '${_('Oozie Schedule')}',
       'oozie-workflow2': '${_('Oozie Workflow')}',
       'query-hive': '${_('Hive Query')}',
       'query-impala': '${_('Impala Query')}',

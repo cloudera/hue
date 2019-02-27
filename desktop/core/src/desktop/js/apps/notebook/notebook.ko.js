@@ -2071,11 +2071,7 @@ const Snippet = function(vm, notebook, snippet) {
 
         if (vm.editorMode() && data.history_id) {
           if (!vm.isNotificationManager()) {
-            let url =
-              '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
-            if (vm.isHue4()) {
-              url = vm.URLS.hue4 + '?editor=' + data.history_id;
-            }
+            let url = vm.URLS.editor + '?editor=' + data.history_id;
             vm.changeURL(url);
           }
           notebook.id(data.history_id);
@@ -3420,15 +3416,11 @@ const Notebook = function(vm, notebook) {
                   '&statement=' +
                   self.snippets()[0].result.handle().statement_id
               );
-            } else if (vm.isHue4()) {
-              vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
             } else {
-              vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+              vm.changeURL(vm.URLS.editor + '?editor=' + data.id);
             }
-          } else if (vm.isHue4()) {
-            vm.changeURL(vm.URLS.hue4_notebook + '?notebook=' + data.id);
           } else {
-            vm.changeURL('/notebook/notebook?notebook=' + data.id);
+            vm.changeURL(vm.URLS.notebook + '?notebook=' + data.id);
           }
           if (typeof callback == 'function') {
             callback();
@@ -3627,13 +3619,7 @@ const Notebook = function(vm, notebook) {
         if (self.isHistory()) {
           self.id(null);
           self.uuid(hueUtils.UUID());
-          if (vm.isHue4()) {
-            vm.changeURL(vm.URLS.hue4 + '?type=' + vm.editorType());
-          } else {
-            vm.changeURL(
-              '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType()
-            );
-          }
+          vm.changeURL(vm.URLS.editor + '?type=' + vm.editorType());
         }
       }
     ).fail(xhr => {
@@ -3714,16 +3700,6 @@ const Notebook = function(vm, notebook) {
           }
         });
       };
-
-      if (!IS_HUE_4) {
-        huePubSub.subscribe(
-          'hue4.process.headers',
-          opts => {
-            opts.callback(opts.response);
-          },
-          vm.huePubSubId
-        );
-      }
 
       getCoordinator();
     }
@@ -3860,11 +3836,8 @@ function EditorViewModel(
   const self = this;
 
   self.URLS = {
-    editor: '/notebook/editor',
-    editorMobile: '/notebook/editor_m',
-    notebook: '/notebook/notebook',
-    hue4: '/hue/editor',
-    hue4_notebook: '/hue/notebook',
+    editor: '/hue/editor',
+    notebook: '/hue/notebook',
     report: '/hue/dashboard/new_search?engine=report'
   };
 
@@ -3873,7 +3846,6 @@ function EditorViewModel(
   self.userId = options.userId;
   self.suffix = options.suffix;
   self.isMobile = ko.observable(options.mobile);
-  self.isHue4 = ko.observable(options.hue4);
   self.isNotificationManager = ko.observable(options.is_notification_manager || false);
   self.editorType = ko.observable(options.editor_type);
   self.editorType.subscribe(newVal => {
@@ -4392,21 +4364,9 @@ function EditorViewModel(
             if (self.editorMode()) {
               self.editorType(data.document.type.substring('query-'.length));
               huePubSub.publish('active.snippet.type.changed', self.editorType());
-              if (self.isHue4()) {
-                self.changeURL(
-                  self.URLS.hue4 + '?editor=' + data.document.id + '&type=' + self.editorType()
-                );
-              } else {
-                self.changeURL(
-                  (self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) +
-                    '?editor=' +
-                    data.document.id +
-                    '&type=' +
-                    self.editorType()
-                );
-              }
-            } else if (self.isHue4()) {
-              self.changeURL(self.URLS.hue4_notebook + '?notebook=' + data.document.id);
+              self.changeURL(
+                self.URLS.editor + '?editor=' + data.document.id + '&type=' + self.editorType()
+              );
             } else {
               self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
             }

@@ -47,7 +47,7 @@ LOG = logging.getLogger(__name__)
 
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
-  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0 and is_hue4()
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
 
 def coerce_database(database):
   if database == 'mysql':
@@ -1581,14 +1581,9 @@ DJANGO_DEBUG_TOOL_USERS = Config(
   help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
 )
 
-def is_hue4():
-  """Hue is configured to show version 4."""
-  return IS_HUE_4.get()
-
-
 USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
   key='use_new_side_panels',
-  dynamic_default=is_hue4,
+  default=True,
   type=coerce_bool,
   help=_('Choose whether to show extended left and right panels.')
 )
@@ -1605,21 +1600,6 @@ USE_NEW_CHARTS = Config(
   default=False,
   type=coerce_bool,
   help=_('Choose whether to use new charting library across the whole Hue.')
-)
-
-
-IS_HUE_4 = Config( # To remove in Hue 5
-  key='is_hue_4',
-  default=True,
-  type=coerce_bool,
-  help=_('Choose whether to enable the new Hue 4 interface.')
-)
-
-DISABLE_HUE_3 = Config( # To remove in Hue 5
-  key='disable_hue_3',
-  default=True,
-  type=coerce_bool,
-  help=_('Choose whether to still allow users to enable the old Hue 3 interface.')
 )
 
 IS_MULTICLUSTER_ONLY = Config(

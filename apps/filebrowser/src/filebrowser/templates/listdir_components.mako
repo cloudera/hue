@@ -1668,7 +1668,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       self.submitSelected = function() {
         % if 'oozie' in apps:
-          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, {'format': IS_HUE_4 ? 'json' : 'html'}, function (response) {
+          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, { 'format': 'json' }, function (response) {
             $('#submit-wf-modal').html(response);
             $('#submit-wf-modal').modal('show');
           });

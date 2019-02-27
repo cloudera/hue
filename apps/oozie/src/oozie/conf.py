@@ -19,7 +19,6 @@ import os.path
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from desktop.conf import is_hue4
 from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 from liboozie.conf import get_oozie_status
@@ -64,7 +63,7 @@ REMOTE_SAMPLE_DIR = Config(
 
 def get_oozie_job_count():
   '''Returns the maximum of jobs fetched by the API depending on the Hue version'''
-  return 100 if is_hue4() else 50
+  return 100
 
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',

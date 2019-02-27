@@ -643,7 +643,7 @@ ${ assist.assistPanel() }
     var IndexesViewModel = function (options) {
       var self = this;
 
-      self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
+      self.baseURL = '/hue/indexer/indexes/';
 
       self.activeNamespace = ko.observable();
       self.activeCompute = ko.observable();
@@ -656,7 +656,6 @@ ${ assist.assistPanel() }
 
       self.assistAvailable = ko.observable(true);
       self.apiHelper = window.apiHelper;
-      self.isHue4 = ko.observable(options.hue4);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
@@ -885,9 +884,6 @@ ${ assist.assistPanel() }
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
-        % if is_embeddable:
-          hue4: true,
-        % endif
         index: '${ index }'
       };
       var viewModel = new IndexesViewModel(options);

@@ -387,7 +387,7 @@ from desktop.views import _ko
                 <li class="app-header">
                   <a href="/hue/useradmin">
                     <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-                    <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'home' }} --><!-- /ko -->
+                    <!-- ko component: { name: 'hue-favorite-app', params: { app: 'home' }} --><!-- /ko -->
                   </a>
                 </li>
                <!-- ko with: activeEntry -->

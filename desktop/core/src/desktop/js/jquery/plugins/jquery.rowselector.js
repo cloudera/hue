@@ -54,11 +54,7 @@ Plugin.prototype.init = function() {
       if (!$(e.target).is('a')) {
         const href = $.trim($(_this.element).attr('href'));
         if (href != '' && href != '#' && href.indexOf('void(0)') == -1) {
-          if (window.IS_HUE_4) {
-            huePubSub.publish('open.link', $(_this.element).attr('href'));
-          } else {
-            location.href = $(_this.element).attr('href');
-          }
+          huePubSub.publish('open.link', $(_this.element).attr('href'));
         } else {
           $(_this.element).click();
         }

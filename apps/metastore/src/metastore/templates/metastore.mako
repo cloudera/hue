@@ -181,23 +181,13 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
         </td>
         <td title="${_('Query partition data')}">
-          <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function() { queryAndWatchUrl(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
-          <!-- /ko -->
-          <!-- ko if: ! IS_HUE_4 -->
-            <a data-bind="attr: { 'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a>
-          <!-- /ko -->
+          <a data-bind="click: function() { queryAndWatchUrl(notebookUrl, $root.source().type); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
         </td>
         <td data-bind="text: partitionSpec"></td>
         <td data-bind="visible: $root.source().type != 'impala'">
-          <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function () { browsePartitionFolder(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
-              ${_('Files')}
-            </a>
-          <!-- /ko -->
-          <!-- ko if: ! IS_HUE_4 -->
-            <a data-bind="attr: { 'href': browseUrl }" title="${_('Browse partition files')}">${_('Files')}</a>
-          <!-- /ko -->
+          <a data-bind="click: function () { browsePartitionFolder(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
+            ${_('Files')}
+          </a>
         </td>
       </tr>
       <!-- /ko -->
@@ -926,12 +916,7 @@ ${ components.menubar(is_embeddable) }
               <!-- ko with: database -->
               <!-- ko with: table -->
               % if USE_NEW_EDITOR.get():
-                <!-- ko if: IS_HUE_4 -->
                 <a href="javascript: void(0);" class="btn btn-default" data-bind="click: function() { queryAndWatch(catalogEntry); }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
-                <!-- /ko -->
-                <!-- ko if: ! IS_HUE_4 -->
-                <a class="btn btn-default" data-bind="attr: { 'href': '/notebook/browse/' + catalogEntry.path.join('/') }" title="${_('Query')}"><i class="fa fa-play fa-fw"></i> ${_('Query')}</a>
-                <!-- /ko -->
               % else:
                 <a class="btn btn-default" data-bind="attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i> ${_('Browse Data')}</a>
               % endif
@@ -1062,12 +1047,8 @@ ${ components.menubar(is_embeddable) }
   }
 
   function queryAndWatch(catalogEntry) {
-    if (!IS_HUE_4) {
-      location.href = '/notebook/browse/' + catalogEntry.path.join('/')
-    } else {
-      queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getSourceType(),
-              catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute)
-    }
+    queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getSourceType(),
+            catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute)
   }
 
   (function () {
@@ -1078,9 +1059,6 @@ ${ components.menubar(is_embeddable) }
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
-        % if is_embeddable:
-        hue4: true,
-        % endif
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
         navigatorEnabled: '${ is_navigator_enabled }' === 'True',
         optimizerUrl: '${ optimizer_url }',
