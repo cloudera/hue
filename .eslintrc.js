@@ -11,7 +11,7 @@ const hueGlobals = [
   'LOGGED_USERGROUPS', 'METASTORE_PARTITION_LIMIT', 'WorkerGlobalScope',
 
   // other misc, TODO
-  'ace', 'CodeMirror', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA'
+  'ace', 'Autocompleter', 'CodeMirror', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA'
 ];
 
 const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {

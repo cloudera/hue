@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import ko from 'knockout';
+import 'ko/ko.init';
 import komapping from 'knockout.mapping';
 import 'knockout-switch-case';
 import 'knockout-sortable';
