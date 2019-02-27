@@ -152,6 +152,7 @@ desktop: virtual-env
 ###################################
 .PHONY: apps
 apps: desktop
+	npm install
 	npm run webpack
 	@$(MAKE) -C $(APPS_DIR) env-install
 
