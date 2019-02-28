@@ -20,9 +20,9 @@ shift 3;
 exec $RBT post \
 	-o \
 	-X /'*.css' \
-	-X /'*AutocompleteParser.js' \
+	-X /'*Parser.js' \
 	-X /'*.json' \
-	-X /'*SyntaxParser.js' \
+	-X /'desktop/core/ext-py/*' \
 	--description="$(git whatchanged $REVLIST)" \
 	--target-groups=hue \
 	--target-people="$REVIEWER" \
