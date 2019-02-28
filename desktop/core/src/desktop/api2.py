@@ -140,15 +140,14 @@ def get_context_computes(request, interface):
   clusters = get_clusters(request.user).values()
   has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type']]
 
-  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
-    computes.extend([{
-        'id': cluster['id'],
-        'name': cluster['name'],
-        'namespace': cluster['id'],
-        'interface': interface,
-        'type': cluster['type']
-      } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
-    ])
+  computes.extend([{
+      'id': cluster['id'],
+      'name': cluster['name'],
+      'namespace': cluster['id'],
+      'interface': interface,
+      'type': cluster['type']
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+  ])
 
   if has_altus_clusters:
     if interface == 'impala' or interface == 'report':
