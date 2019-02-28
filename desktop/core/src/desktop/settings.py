@@ -206,9 +206,6 @@ INSTALLED_APPS = [
     #'django_celery_results',
 ]
 
-if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
-  INSTALLED_APPS.append('django_celery_beat')
-
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -666,3 +663,6 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
 # CELERYD_USER = desktop.conf.SERVER_USER.get()
 # CELERYD_GROUP = desktop.conf.SERVER_GROUP.get()
 
+  if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
+    INSTALLED_APPS.append('django_celery_beat')
+    INSTALLED_APPS.append('timezone_field')
