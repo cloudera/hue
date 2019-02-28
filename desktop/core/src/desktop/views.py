@@ -355,10 +355,6 @@ def memory(request):
       heap = heap[int(command[3])]
   return HttpResponse(str(heap), content_type="text/plain")
 
-@login_notrequired
-def jasmine(request):
-  return render('jasmine.mako', request, None)
-
 
 def global_js_constants(request):
   return HttpResponse(render('global_js_constants.mako', request, {

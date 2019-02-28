@@ -4,14 +4,19 @@ const normalGlobals = [
 ];
 const hueGlobals = [
   // global_js_constants.mako
-  'AUTOCOMPLETE_TIMEOUT','CACHEABLE_TTL','CSRF_TOKEN','HAS_MULTI_CLUSTER',
-  'DROPZONE_HOME_DIR', 'ENABLE_SQL_SYNTAX_CHECK', 'HAS_NAVIGATOR', 'HAS_OPTIMIZER', 'HAS_WORKLOAD_ANALYTICS',
-  'HUE_CONTAINER', 'IS_EMBEDDED', 'isIE11', 'IS_K8S_ONLY', 'HUE_VERSION', 'IS_NEW_INDEXER_ENABLED','HUE_I18n',
-  'IS_S3_ENABLED', 'KO_DATERANGEPICKER_LABELS', 'DOCUMENT_TYPES', 'LOGGED_USERNAME', 'USER_HOME_DIR',
-  'LOGGED_USERGROUPS', 'METASTORE_PARTITION_LIMIT', 'WorkerGlobalScope',
+  'AUTOCOMPLETE_TIMEOUT', 'CACHEABLE_TTL', 'CSRF_TOKEN', 'DOCUMENT_TYPES', 'DROPZONE_HOME_DIR',
+  'ENABLE_SQL_SYNTAX_CHECK', 'HAS_MULTI_CLUSTER', 'HAS_NAVIGATOR', 'HAS_OPTIMIZER', 'HAS_WORKLOAD_ANALYTICS',
+  'HUE_CONTAINER', 'HUE_I18n', 'HUE_VERSION', 'IS_EMBEDDED', 'IS_K8S_ONLY', 'IS_NEW_INDEXER_ENABLED', 'IS_S3_ENABLED',
+  'isIE11', 'KO_DATERANGEPICKER_LABELS', 'LOGGED_USERGROUPS', 'LOGGED_USERNAME', 'METASTORE_PARTITION_LIMIT',
+  'USER_HOME_DIR', 'WorkerGlobalScope',
 
-  // other misc, TODO
-  'ace', 'Autocompleter', 'CodeMirror', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA'
+  // other misc
+  'ace', 'Autocompleter', 'CodeMirror', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role',
+  'sqlStatementsParser', 'trackOnGA',
+
+  // jasmine
+  'afterAll', 'afterEach', 'beforeAll', 'beforeEach', 'describe', 'expect', 'fail', 'fit', 'it', 'jasmine', 'xdescribe',
+  'xit'
 ];
 
 const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {

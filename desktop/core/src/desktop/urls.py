@@ -112,9 +112,6 @@ dynamic_patterns += [
   url(r'^ko_editor', desktop_views.ko_editor),
   url(r'^ko_metastore', desktop_views.ko_metastore),
 
-  # Jasmine
-  url(r'^jasmine', desktop_views.jasmine),
-
   # JS that needs to be mako
   url(r'^desktop/globalJsConstants.js', desktop_views.global_js_constants),
 

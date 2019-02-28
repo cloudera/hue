@@ -20,7 +20,6 @@ from oozie.views import editor as oozie_views_editor
 from oozie.views import editor2 as oozie_views_editor2
 from oozie.views import api as oozie_views_api
 from oozie.views import dashboard as oozie_views_dashboard
-from oozie.views import common as oozie_views_common
 
 
 IS_URL_NAMESPACED = True
@@ -144,8 +143,4 @@ urlpatterns += [
   url(r'^list_oozie_info/$', oozie_views_dashboard.list_oozie_info, name='list_oozie_info'),
 
   url(r'^list_oozie_sla/$', oozie_views_dashboard.list_oozie_sla, name='list_oozie_sla'),
-]
-
-urlpatterns += [
-  url(r'^jasmine', oozie_views_common.jasmine, name='jasmine'),
 ]

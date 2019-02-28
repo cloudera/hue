@@ -312,6 +312,12 @@ const getSearchParameter = (search, name, returnNull) => {
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+if (!window.location.getParameter) {
+  window.location.getParameter = function(name, returnNull) {
+    return getSearchParameter(window.location.search, name, returnNull);
+  };
+}
+
 const logError = error => {
   if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
     if (typeof error !== 'undefined') {
