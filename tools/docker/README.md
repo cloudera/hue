@@ -72,11 +72,9 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:01
           RX bytes:10626 (10.6 KB)  TX bytes:648 (648.0 B)
 ```
 
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/login.png "Hue First Login")
-
-
 ## Next
 
 You can then configure Hue and start using it!
 
-Read more about configuring Hue on our [blog](http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/). The development version uses the configuration file ``desktop/conf/pseudo-distributed.ini``.
+Read more about configuring Hue on our [blog](http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/).
+The development version uses the configuration file [``desktop/conf/pseudo-distributed.ini``.](/desktop/conf/pseudo-distributed.ini).
