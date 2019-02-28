@@ -206,6 +206,10 @@ INSTALLED_APPS = [
     #'django_celery_results',
 ]
 
+if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
+  INSTALLED_APPS.append('django_celery_beat')
+
+
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'desktop/js/bundles/',
