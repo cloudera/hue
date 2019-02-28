@@ -10,10 +10,19 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 * [Helm](helm)
    * [Hue](helm/hue)
 * YAML
+   * Hue (TBD)
    * NGINX (TBD)
    * Task Server (TBD)
-* Containers
-   * [Hue](services/hue)
+* [Container Images](/tools/docker)
+   * [Hue](/tools/docker/hue)
+
+## Hue
+
+Update the Hue pods:
+
+```
+kubectl delete pods `kubectl get pods | grep hue | grep -v postgres | cut -d" " -f1`
+```
 
 ## K8s Cluster
 
