@@ -53,7 +53,7 @@ import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
 import EditorViewModel from 'apps/notebook/notebook.ko'; // In history, indexer, importer, editor etc.
-import sqlStatementsParser from 'parse/sqlStatementsParser';  // In search.ko and notebook.ko
+import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
 import globalSearchParser from 'parse/globalSearchParser'; // ko inline autocomp
 import solrQueryParser from 'parse/solrQueryParser'; // simple ace editor

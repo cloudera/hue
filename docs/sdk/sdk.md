@@ -1246,9 +1246,11 @@ Or just some parts of the tests, e.g.:
     build/env/bin/hue test specific impala.tests:TestMockedImpala
     build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
-Jasmine tests (from your browser):
+Jasmine tests:
 
-[http://localhost:8000/jasmine](http://localhost:8000/jasmine)
+Requires Chrome to be installed
+
+    npm run test 
 
 
 ## Longer story
@@ -1297,10 +1299,25 @@ Point to an Impalad and trigger the Impala tests:
     build/env/bin/hue test impala impalad-01.gethue.com
 
 
-### Run the Jasmine tests
+### Create and run the Jasmine tests
 
-* NodeJS (https://nodejs.org/)
-* PhantomJS (npm install -g phantomjs-prebuilt)
+Add them in a "spec" subfolder relative to the file under test and the filename of the test has to end with "Spec.js".
+
+    someFile.js              <- File under test
+    ├── spec/
+    │   ├── someFileSpec.js  <- File containing tests
+
+Run all the tests once with:
+
+    npm run test
+
+Run all the tests during development with:
+
+    npm run test-dev
+    
+In this mode it will watch the files and run tests when changes are detected.
+    
+See ```karma.config.js``` for various options
 
 
 ### Special environment variables
