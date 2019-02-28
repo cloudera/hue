@@ -17,7 +17,7 @@ helm install hue -f values.yaml
 
 And follow-up the instructions printed on the screen.
 
-E.g. by default it comes with the UI, a temporary DB and a REST API:
+E.g. by default it comes with a temporary DB and ingres load balancer:
 
 ```
 kubectl get pods
