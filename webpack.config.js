@@ -25,13 +25,14 @@ module.exports = {
     hue: ['./desktop/core/src/desktop/js/hue.js'],
     login: ['./desktop/core/src/desktop/js/login.js'],
     notebook: ['./desktop/core/src/desktop/js/apps/notebook/notebook.js'],
+    sqlLocationWebWorker: ['./desktop/core/src/desktop/js/sql/sqlLocationWebWorker.js'],
     sqlSyntaxWebWorker: ['./desktop/core/src/desktop/js/sql/sqlSyntaxWebWorker.js'],
   },
   optimization: {
     minimize: true,
     splitChunks: {
       chunks (chunk) {
-        return chunk.name !== 'sqlSyntaxWebWorker' && chunk.name !== 'login';
+        return chunk.name !== 'sqlSyntaxWebWorker' && chunk.name !== 'sqlLocationWebWorker' && chunk.name !== 'login';
       }
     }
   },

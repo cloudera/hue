@@ -54,7 +54,6 @@ ${ render_bundle('notebook') | n,unicode }
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
 
-<script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>

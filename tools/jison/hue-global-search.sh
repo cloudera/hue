@@ -19,11 +19,15 @@ echo "Make sure you install jison first (npm install jison -g)"
 echo ""
 echo "Generating parser..."
 
-pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
+pushd ../../desktop/core/src/desktop/js/parse/jison
 
 echo "Creating Global Search parser..."
-jison globalSearchParser.jison
-grunt uglify:globalSearchParser
+jison globalSearchParser.jison -m js
+
+# Add ES6 style import/export
+sed -i '' $'s#var globalSearchParser = #import SqlParseSupport from \'parse/sqlParseSupport\';\\\n\\\nvar globalSearchParser = #' globalSearchParser.js
+echo 'export default globalSearchParser;' >> globalSearchParser.js
+
 cat license.txt globalSearchParser.js > ../globalSearchParser.js
 rm globalSearchParser.js
 

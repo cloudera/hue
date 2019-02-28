@@ -19,11 +19,14 @@ echo "Make sure you install jison first (npm install jison -g)"
 echo ""
 echo "Generating parser..."
 
-pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
+pushd ../../desktop/core/src/desktop/js/parse/jison
 
 echo "Creating SOLR Formula parser..."
-jison solrFormulaParser.jison
-grunt uglify:solrFormulaParser
+jison solrFormulaParser.jison -m js
+
+# Add ES6 style export
+echo 'export default solrFormulaParser;' >> solrFormulaParser.js
+
 cat license.txt solrFormulaParser.js > ../solrFormulaParser.js
 rm solrFormulaParser.js
 

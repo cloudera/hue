@@ -15,16 +15,11 @@
 ## limitations under the License.
 
 <%!
-  from desktop import conf
   from webpack_loader import utils
 %>
 
 % for js_file in utils.get_files('sqlSyntaxWebWorker'):
-  % if conf.DEV.get():
-    importScripts('${ js_file.get('url') }?' + Math.random());
-  % else:
-    importScripts('${ js_file.get('url') }');
-  % endif
+  importScripts('${ js_file.get('url') }');
 % endfor
 
 (function () {
