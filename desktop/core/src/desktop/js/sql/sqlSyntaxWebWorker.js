@@ -14,6 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import sqlSyntaxParser from 'sql/parse/sqlSyntaxParser';
+import sqlSyntaxParser from 'parse/sqlSyntaxParser';
 
 WorkerGlobalScope.sqlSyntaxParser = sqlSyntaxParser;

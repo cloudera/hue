@@ -19,11 +19,14 @@ echo "Make sure you install jison first (npm install jison -g)"
 echo ""
 echo "Generating parser..."
 
-pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
+pushd ../../desktop/core/src/desktop/js/parse/jison
 
 echo "Creating SQL statements parser..."
-jison sqlStatementsParser.jison
-grunt uglify:sqlStatementsParser
+jison sqlStatementsParser.jison -m js
+
+# Add ES6 style export
+echo 'export default sqlStatementsParser;' >> sqlStatementsParser.js
+
 cat license.txt sqlStatementsParser.js > ../sqlStatementsParser.js
 rm sqlStatementsParser.js
 

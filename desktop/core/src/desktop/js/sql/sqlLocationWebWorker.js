@@ -14,15 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-%left 'AND' 'OR'
-%left 'BETWEEN'
-%left 'NOT' '!' '~'
-%left '=' '<' '>' 'COMPARISON_OPERATOR'
-%left '-' '*' 'ARITHMETIC_OPERATOR'
+import sqlAutocompleteParser from 'parse/sqlAutocompleteParser';
 
-%left ';' ','
-%nonassoc 'IN' 'IS' '<impala>ILIKE' '<impala>IREGEXP' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
-
-%start SqlSyntax
-
-%%
+WorkerGlobalScope.sqlAutocompleteParser = sqlAutocompleteParser;

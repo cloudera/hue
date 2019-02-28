@@ -40,7 +40,7 @@ import 'utils/json.bigDataParse';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import AceLocationHandler from 'sql/aceLocationHandler';
-import SqlParseSupport from 'sql/parse/sqlParseSupport';
+import SqlParseSupport from 'parse/sqlParseSupport';
 import sqlUtils from 'sql/sqlUtils';
 import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
@@ -51,8 +51,13 @@ import SideBarViewModel from 'sideBarViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
 
-// TODO: Move to notebook.js
-import EditorViewModel from 'apps/notebook/notebook.ko';
+// TODO: Remove from global scope
+import EditorViewModel from 'apps/notebook/notebook.ko'; // In history, indexer, importer, editor etc.
+import sqlStatementsParser from 'parse/sqlStatementsParser';  // In search.ko and notebook.ko
+import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
+import globalSearchParser from 'parse/globalSearchParser'; // ko inline autocomp
+import solrQueryParser from 'parse/solrQueryParser'; // simple ace editor
+import solrFormulaParser from 'parse/solrFormulaParser'; // simple ace editor
 
 // TODO: Migrate away
 window._ = _;
@@ -64,22 +69,27 @@ window.dataCatalog = dataCatalog;
 window.Dropzone = Dropzone;
 window.EditorViewModel = EditorViewModel;
 window.filesize = filesize;
-window.hueUtils = hueUtils;
+window.globalSearchParser = globalSearchParser;
 window.hueAnalytics = hueAnalytics;
 window.hueDebug = hueDebug;
-window.huePubSub = huePubSub;
 window.hueDrop = hueDrop;
+window.huePubSub = huePubSub;
+window.hueUtils = hueUtils;
 window.localforage = localforage;
 window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.page = page;
-window.sprintf = sprintf;
 window.PigFunctions = PigFunctions;
+window.qq = qq;
+window.solrQueryParser = solrQueryParser;
+window.solrFormulaParser = solrFormulaParser;
+window.sprintf = sprintf;
+window.sqlAutocompleteParser = sqlAutocompleteParser;
+window.SqlFunctions = SqlFunctions;
 window.SqlParseSupport = SqlParseSupport;
 window.SqlSetOptions = SqlSetOptions;
-window.SqlFunctions = SqlFunctions;
+window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
-window.qq = qq;
 
 $(document).ready(() => {
   const onePageViewModel = new OnePageViewModel();

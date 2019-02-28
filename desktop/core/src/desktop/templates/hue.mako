@@ -472,11 +472,6 @@ ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 
-<script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>

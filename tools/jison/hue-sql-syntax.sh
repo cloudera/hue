@@ -19,7 +19,7 @@ echo "Make sure you install jison first (npm install jison -g)"
 echo ""
 echo "Generating parser..."
 
-pushd ../../desktop/core/src/desktop/js/sql/parse/jison
+pushd ../../desktop/core/src/desktop/js/parse/jison
 
 # === Syntax parser ===
 cat syntax_header.jison sql_main.jison sql_valueExpression.jison  sql_alter.jison sql_analyze.jison sql_create.jison sql_drop.jison sql_grant.jison sql_insert.jison sql_load.jison sql_set.jison sql_show.jison sql_update.jison sql_use.jison syntax_footer.jison > sqlSyntaxParser.jison
@@ -32,7 +32,7 @@ jison sqlSyntaxParser.jison sql.jisonlex -m js
 sed -i '' 's/loc: yyloc,/loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(''),/' sqlSyntaxParser.js
 
 # Add ES6 style import/export
-sed -i '' $'s#var sqlSyntaxParser = #import SqlParseSupport from \'sql/parse/sqlParseSupport\';\\\n\\\nvar sqlSyntaxParser = #' sqlSyntaxParser.js
+sed -i '' $'s#var sqlSyntaxParser = #import SqlParseSupport from \'parse/sqlParseSupport\';\\\n\\\nvar sqlSyntaxParser = #' sqlSyntaxParser.js
 echo 'export default sqlSyntaxParser;' >> sqlSyntaxParser.js
 
 cat license.txt sqlSyntaxParser.js > ../sqlSyntaxParser.js

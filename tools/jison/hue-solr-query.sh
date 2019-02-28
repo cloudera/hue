@@ -19,11 +19,14 @@ echo "Make sure you install jison first (npm install jison -g)"
 echo ""
 echo "Generating parser..."
 
-pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
+pushd ../../desktop/core/src/desktop/js/parse/jison
 
 echo "Creating SOLR Query parser..."
-jison solrQueryParser.jison
-grunt uglify:solrQueryParser
+jison solrQueryParser.jison -m js
+
+# Add ES6 style export
+echo 'export default solrQueryParser;' >> solrQueryParser.js
+
 cat license.txt solrQueryParser.js > ../solrQueryParser.js
 rm solrQueryParser.js
 

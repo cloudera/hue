@@ -20,7 +20,7 @@ import AssistStorageEntry from 'assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
-import SqlParseSupport from 'sql/parse/sqlParseSupport';
+import SqlParseSupport from 'parse/sqlParseSupport';
 import sqlUtils from 'sql/sqlUtils';
 
 // TODO: depends on Ace, sqlStatementsParser
