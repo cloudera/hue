@@ -1639,7 +1639,13 @@ TASK_SERVER = ConfigSection(
       key='celeryd_opts',
       default='--time-limit=300',
       help=_('Default options provided to the task server at startup.')
-    )
+    ),
+    BEAT_ENABLED= Config(
+      key='beat_enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('Switch on the integration with the Task Scheduler.')
+    ),
 ))
 
 

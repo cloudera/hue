@@ -270,6 +270,17 @@ debug_task.delay().get() # Works if result backend is setup and task_server is t
 
 ```
 
+Starting the Task Scheduler server:
+
+```
+./build/env/bin/celery -A core beat -l info
+```
+
+or when Django Celery Beat is enabled:
+
+```
+./build/env/bin/celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+```
 
 ### Proxy
 
