@@ -25,25 +25,25 @@ from desktop.views import _ko
 <%def name="inlineAutocomplete()">
 
   <script type="text/html" id="inline-autocomplete-template">
-    <div class="inline-autocomplete-container">
+    <div class="inline-autocomp-container">
       <div>
         <!-- ko if: showMagnify -->
           <!-- ko ifnot: spin -->
-          <i style="top: 6px;" class="inline-autocomplete-magnify-icon fa fa-fw fa-search"></i>
+          <i style="top: 6px;" class="inline-autocomp-magnify-icon fa fa-fw fa-search"></i>
           <!-- /ko -->
           <!-- ko if: spin -->
-          <i class="inline-autocomplete-magnify-icon fa fa-fw fa-spinner fa-spin"></i>
+          <i class="inline-autocomp-magnify-icon fa fa-fw fa-spinner fa-spin"></i>
           <!-- /ko -->
         <!-- /ko-->
-        <input class="inline-autocomplete-input" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" data-bind="
+        <input class="inline-autocomp-input" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" data-bind="
           attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
           textInput: searchInput,
           hasFocus: hasFocus,
           clearable: { value: searchInput, onClear: onClear },
-          css: { 'inline-autocomplete-magnify-input': showMagnify }">
-        <input class="inline-autocomplete-autocomplete" disabled type="text" data-bind="
+          css: { 'inline-autocomp-magnify-input': showMagnify }">
+        <input class="inline-autocomp-autocomp" disabled type="text" data-bind="
           value: inlineAutocomplete,
-          css: { 'inline-autocomplete-magnify-input': showMagnify }">
+          css: { 'inline-autocomp-magnify-input': showMagnify }">
       </div>
     </div>
 
