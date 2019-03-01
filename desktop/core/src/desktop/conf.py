@@ -1831,22 +1831,43 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
-  from beeswax.models import Session
+  from beeswax.models import QueryHistory, SavedQuery, Session
   from desktop.lib import i18n
-  from desktop.models import Document2 # Avoid cyclic loop
+  from desktop.models import Document, Document2 # Avoid cyclic loop
   from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
+  from oozie.models import Job
 
   res = []
 
-  doc2_count = Document2.objects.filter(is_history=True).count()
+  doc_count = Document.objects.count()
+  if doc_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('DOCUMENT_CLEANUP_WARNING', unicode(_('Desktop Document has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc_count)))))
+
+  doc2_count = Document2.objects.count()
   if doc2_count > DOCUMENT2_MAX_ENTRIES:
     res.append(('DOCUMENT2_CLEANUP_WARNING', unicode(_('Desktop Document2 has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
 
-  session_count = Session.objects.filter(status_code__gte=-10000).count()
+  session_count = Session.objects.count()
   if session_count > DOCUMENT2_MAX_ENTRIES:
     res.append(('SESSION_CLEANUP_WARNING', unicode(_('Desktop Session has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
+
+  qh_count = QueryHistory.objects.count()
+  if qh_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('QueryHistory_CLEANUP_WARNING', unicode(_('Query History has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, qh_count)))))
+
+  sq_count = SavedQuery.objects.count()
+  if sq_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('SavedQuery_CLEANUP_WARNING', unicode(_('Saved Query has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, sq_count)))))
+
+  job_count = Job.objects.count()
+  if job_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('OOZIEJOB_CLEANUP_WARNING', unicode(_('Oozie Job has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
 
   if not get_secret_key():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
