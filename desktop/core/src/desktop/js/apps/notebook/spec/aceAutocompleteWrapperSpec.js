@@ -13,47 +13,56 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-(function() {
 
-  describe('autocompleter.js', function () {
+import AceAutocompleteWrapper from '../aceAutocompleteWrapper';
 
-    it('should not throw exceptions', function (done) {
-      var subject = new Autocompleter({
-        snippet: {
-          isSqlDialect: function () { return true },
-          type: ko.observable('hive'),
-          database: function() { return 'default'; },
-          getApiHelper: function () {
-            return {
-              loadDatabases: function (options) {
-                options.successCallback(['bla', undefined])
-              }
-            };
-          }
+describe('aceAutocompleteWrapper.js', () => {
+  it('should not throw exceptions', done => {
+    const subject = new AceAutocompleteWrapper({
+      snippet: {
+        isSqlDialect: function() {
+          return true;
+        },
+        type: ko.observable('hive'),
+        database: function() {
+          return 'default';
+        },
+        getApiHelper: function() {
+          return {
+            loadDatabases: function(options) {
+              options.successCallback(['bla', undefined]);
+            }
+          };
         }
-      });
+      }
+    });
 
-      try {
-        subject.getCompletions({
-          getTextBeforeCursor: function () {
+    try {
+      subject.getCompletions(
+        {
+          getTextBeforeCursor: function() {
             return 'SELECT * FROM (SELECT * FROM tbl) a JOIN (SELECT * FROM tbl) b ON a.c=';
           },
-          getTextAfterCursor: function () {
+          getTextAfterCursor: function() {
             return '';
           },
-          hideSpinner: function () {
+          hideSpinner: function() {
             expect(true).toBeTruthy(); // Prevent jasmine warning
             done();
           },
-          showSpinner: function () {}
-        }, undefined, undefined, undefined, function () {
+          showSpinner: function() {}
+        },
+        undefined,
+        undefined,
+        undefined,
+        () => {
           expect(true).toBeTruthy(); // Prevent jasmine warning
           done();
-        });
-      } catch (e) {
-        expect(false).toBeTruthy('Got unexpected exception');
-        done();
-      }
-    });
+        }
+      );
+    } catch (e) {
+      expect(false).toBeTruthy('Got unexpected exception');
+      done();
+    }
   });
-})();
+});

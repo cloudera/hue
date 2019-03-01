@@ -14,12 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var HdfsAutocompleter = (function () {
+import apiHelper from 'api/apiHelper';
 
-  var TIME_TO_LIVE_IN_MILLIS = 60000; // 1 minute
-  var BASE_PATH = "/filebrowser/view=";
-  var PARAMETERS = "?pagesize=100&format=json";
+const TIME_TO_LIVE_IN_MILLIS = 60000; // 1 minute
 
+class HdfsAutocompleter {
   /**
    * @param {object} options
    * @param {string} options.user
@@ -28,36 +27,34 @@ var HdfsAutocompleter = (function () {
    *
    * @constructor
    */
-  function HdfsAutocompleter(options) {
-    var self = this;
+  constructor(options) {
+    const self = this;
     self.user = options.user;
     self.snippet = options.snippet;
-    self.timeout = options.timeout
+    self.timeout = options.timeout;
   }
 
-  HdfsAutocompleter.prototype.getTotalStorageUserPrefix = function () {
-    var self = this;
+  getTotalStorageUserPrefix() {
+    const self = this;
     return self.user;
-  };
+  }
 
-  HdfsAutocompleter.prototype.hasExpired = function (timestamp) {
-    return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
-  };
+  hasExpired(timestamp) {
+    return new Date().getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
+  }
 
-  HdfsAutocompleter.prototype.extractFields = function (data) {
-    var files = $.map(data.files, function (file) {
+  extractFields(data) {
+    const files = data.files.map(file => {
       return {
         name: file.name,
         type: file.type
-      }
+      };
     });
 
-    files.sort(function (a, b) {
-      return a.name.localeCompare(b.name);
-    });
+    files.sort((a, b) => a.name.localeCompare(b.name));
 
-    var result = [];
-    files.forEach(function(field, idx) {
+    const result = [];
+    files.forEach((field, idx) => {
       if (field.name !== '..' && field.name !== '.') {
         result.push({
           value: field.name,
@@ -67,23 +64,23 @@ var HdfsAutocompleter = (function () {
       }
     });
     return result;
-  };
+  }
 
-  HdfsAutocompleter.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
-    var self = this;
+  autocomplete(beforeCursor, afterCursor, callback, editor) {
+    const self = this;
 
-    var onFailure = function () {
+    const onFailure = function() {
       callback([]);
     };
 
     if (beforeCursor.match(/["'](?:\/[^\/]*)+/)) {
-      var parts = beforeCursor.split('/');
+      const parts = beforeCursor.split('/');
       // Drop the first " or '
       parts.shift();
       // Last one is either partial name or empty
       parts.pop();
 
-      var successCallback = function (data) {
+      const successCallback = function(data) {
         if (!data.error) {
           callback(self.extractFields(data));
         } else {
@@ -91,7 +88,7 @@ var HdfsAutocompleter = (function () {
         }
       };
 
-      self.snippet.getApiHelper().fetchHdfsPath({
+      apiHelper.fetchHdfsPath({
         pathParts: parts,
         successCallback: successCallback,
         silenceErrors: true,
@@ -102,10 +99,9 @@ var HdfsAutocompleter = (function () {
     } else {
       onFailure();
     }
-  };
+  }
 
-  HdfsAutocompleter.prototype.getDocTooltip = function (item) {
-  };
+  getDocTooltip(item) {}
+}
 
-  return HdfsAutocompleter;
-})();
+export default HdfsAutocompleter;

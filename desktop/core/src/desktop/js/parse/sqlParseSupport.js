@@ -1294,7 +1294,7 @@ const initSqlParser = function(parser) {
           if (!isColumnLocation && isColumnWrapper && aliasMatch) {
             // TODO: add alias on table in suggestColumns (needs support in sqlAutocomplete3.js)
             // the case is: SELECT cu.| FROM customers cu;
-            // This prevents alias from being added automatically in sqlAutocompleter3.js
+            // This prevents alias from being added automatically in sqlAutocompleter.js
             wrapper.tables = [{ identifierChain: foundPrimary.identifierChain }];
           } else {
             wrapper.tables = [

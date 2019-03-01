@@ -1,0 +1,11 @@
+{
+  "spec_dir": "desktop/core/src/desktop/js",
+  "spec_files": [
+    "**/*[sS]pec.js"
+  ],
+  "helpers": [
+    "spec_helpers/**/*.js"
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": false
+}

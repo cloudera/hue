@@ -24,7 +24,7 @@ import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import GeneralDataCatalog from 'catalog/generalDataCatalog';
 import MultiTableEntry from 'catalog/multiTableEntry';
 
-const STORAGE_POSTFIX = LOGGED_USERNAME;
+const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
 
 let cacheEnabled = true;

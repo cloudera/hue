@@ -57,7 +57,7 @@ Plugin.prototype.setOptions = function(options) {
   this.options.labels = $.extend(
     {},
     defaults.labels,
-    HUE_I18n.jHueTableExtender,
+    window.HUE_I18n.jHueTableExtender,
     options ? options.labels : {}
   );
   this._defaults = defaults;

@@ -33,7 +33,7 @@ import huePubSub from 'utils/huePubSub';
  * @property {ContextCompute} computes
  */
 
-const STORAGE_POSTFIX = LOGGED_USERNAME;
+const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const CONTEXT_CATALOG_VERSION = 4;
 const NAMESPACES_CONTEXT_TYPE = 'namespaces';
 const DISABLE_CACHE = true;

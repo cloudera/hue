@@ -234,7 +234,7 @@ class ApiHelper {
    * @returns {string}
    */
   getTotalStorageUserPrefix(sourceType) {
-    return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
+    return sourceType + '_' + window.LOGGED_USERNAME + '_' + window.location.hostname;
   }
 
   /**

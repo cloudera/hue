@@ -26,17 +26,18 @@ import sprintf from 'sprintf-js';
 
 import 'ko/ko.all';
 
+import 'utils/customIntervals';
+import 'utils/json.bigDataParse';
 import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import contextCatalog from 'catalog/contextCatalog';
-import 'utils/customIntervals';
 import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
+import HueColors from 'utils/hueColors';
 import hueDebug from 'utils/hueDebug';
 import hueDrop from 'utils/hueDrop';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import 'utils/json.bigDataParse';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import AceLocationHandler from 'sql/aceLocationHandler';
@@ -53,11 +54,13 @@ import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
 import EditorViewModel from 'apps/notebook/notebook.ko'; // In history, indexer, importer, editor etc.
-import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
-import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
 import globalSearchParser from 'parse/globalSearchParser'; // ko inline autocomp
-import solrQueryParser from 'parse/solrQueryParser'; // simple ace editor
+import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import solrFormulaParser from 'parse/solrFormulaParser'; // simple ace editor
+import solrQueryParser from 'parse/solrQueryParser'; // simple ace editor
+import SqlAutocompleter from 'sql/sqlAutocompleter';
+import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
+import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 
 // TODO: Migrate away
 window._ = _;
@@ -70,7 +73,9 @@ window.Dropzone = Dropzone;
 window.EditorViewModel = EditorViewModel;
 window.filesize = filesize;
 window.globalSearchParser = globalSearchParser;
+window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
+window.HueColors = HueColors;
 window.hueDebug = hueDebug;
 window.hueDrop = hueDrop;
 window.huePubSub = huePubSub;
@@ -80,9 +85,10 @@ window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.page = page;
 window.PigFunctions = PigFunctions;
 window.qq = qq;
-window.solrQueryParser = solrQueryParser;
 window.solrFormulaParser = solrFormulaParser;
+window.solrQueryParser = solrQueryParser;
 window.sprintf = sprintf;
+window.SqlAutocompleter = SqlAutocompleter;
 window.sqlAutocompleteParser = sqlAutocompleteParser;
 window.SqlFunctions = SqlFunctions;
 window.SqlParseSupport = SqlParseSupport;

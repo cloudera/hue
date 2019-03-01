@@ -36,7 +36,7 @@ ko.bindingHandlers.dropzone = {
         '<div class="pull-right">' +
         '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
         '<span data-dz-remove><a href="javascript:undefined;" title="' +
-        HUE_I18n.dropzone.cancelUpload +
+        window.HUE_I18n.dropzone.cancelUpload +
         '"><i class="fa fa-fw fa-times"></i></a></span>' +
         '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
         '</div>' +
@@ -73,7 +73,7 @@ ko.bindingHandlers.dropzone = {
         $('#progressStatusBar div').width(progress.toFixed() + '%');
       },
       canceled: function() {
-        $.jHueNotify.info(HUE_I18n.dropzone.uploadCanceled);
+        $.jHueNotify.info(window.HUE_I18n.dropzone.uploadCanceled);
       },
       complete: function(file) {
         if (file.xhr.response !== '') {
@@ -85,7 +85,10 @@ ko.bindingHandlers.dropzone = {
                 value.onError(file.name);
               }
             } else {
-              $(document).trigger('info', response.path + ' ' + HUE_I18n.dropzone.uploadSucceeded);
+              $(document).trigger(
+                'info',
+                response.path + ' ' + window.HUE_I18n.dropzone.uploadSucceeded
+              );
               if (value.onComplete) {
                 value.onComplete(response.path);
               }

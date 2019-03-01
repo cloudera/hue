@@ -1248,9 +1248,7 @@ Or just some parts of the tests, e.g.:
 
 Jasmine tests:
 
-Requires Chrome to be installed
-
-    npm run test 
+    npm run test
 
 
 ## Longer story
@@ -1311,13 +1309,11 @@ Run all the tests once with:
 
     npm run test
 
-Run all the tests during development with:
+Optionally to use Karma and headless chrome for the tests you can run
 
-    npm run test-dev
-    
-In this mode it will watch the files and run tests when changes are detected.
-    
-See ```karma.config.js``` for various options
+    npm run test-karma
+
+See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
 
 
 ### Special environment variables

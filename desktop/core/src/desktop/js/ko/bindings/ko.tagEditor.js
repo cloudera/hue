@@ -168,7 +168,7 @@ ko.bindingHandlers.tagEditor = {
       if (!options.readOnly && !options.hasErrors()) {
         $('<i>')
           .addClass('fa fa-pencil selectize-edit pointer')
-          .attr('title', HUE_I18n.selectize.editTags)
+          .attr('title', window.HUE_I18n.selectize.editTags)
           .appendTo($readOnlyInner);
         $readOnlyInner.click(() => {
           showEdit();
@@ -243,7 +243,7 @@ ko.bindingHandlers.tagEditor = {
         if (!options.readOnly && !options.hasErrors()) {
           $('<i>')
             .addClass('fa fa-pencil selectize-edit pointer')
-            .attr('title', HUE_I18n.selectize.editTags)
+            .attr('title', window.HUE_I18n.selectize.editTags)
             .appendTo($readOnlyInner);
           $readOnlyInner.click(() => {
             showEdit();

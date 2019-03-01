@@ -470,12 +470,7 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 <script>ace.config.set("basePath", "/static/desktop/js/ace");</script>
 
-<script src="${ static('desktop/js/hue.colors.js') }"></script>
-
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
 <script>

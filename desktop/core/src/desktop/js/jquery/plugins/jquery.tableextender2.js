@@ -220,7 +220,7 @@ Plugin.prototype.setOptions = function(options) {
   this.options.labels = $.extend(
     {},
     DEFAULT_OPTIONS.labels,
-    HUE_I18n.jHueTableExtender,
+    window.HUE_I18n.jHueTableExtender,
     options ? options.labels : {}
   );
 };

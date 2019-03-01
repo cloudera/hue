@@ -120,11 +120,11 @@ function Plugin(element, options) {
   this.element = element;
   $(element).data('jHueFileChooser', this);
 
-  this.options = $.extend({}, defaults, { user: LOGGED_USERNAME }, options);
+  this.options = $.extend({}, defaults, { user: window.LOGGED_USERNAME }, options);
   this.options.labels = $.extend(
     {},
     defaults.labels,
-    HUE_I18n.jHueFileChooser,
+    window.HUE_I18n.jHueFileChooser,
     options ? options.labels : {}
   );
   this._defaults = defaults;
@@ -135,11 +135,11 @@ function Plugin(element, options) {
 
 Plugin.prototype.setOptions = function(options) {
   const self = this;
-  self.options = $.extend({}, defaults, { user: LOGGED_USERNAME }, options);
+  self.options = $.extend({}, defaults, { user: window.LOGGED_USERNAME }, options);
   self.options.labels = $.extend(
     {},
     defaults.labels,
-    HUE_I18n.jHueFileChooser,
+    window.HUE_I18n.jHueFileChooser,
     options ? options.labels : {}
   );
   const initialPath = $.trim(self.options.initialPath);

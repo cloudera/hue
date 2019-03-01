@@ -19,7 +19,7 @@ import localforage from 'localforage';
 
 import apiHelper from 'api/apiHelper';
 
-const STORAGE_POSTFIX = LOGGED_USERNAME;
+const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
 
 class GeneralDataCatalog {
