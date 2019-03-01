@@ -774,10 +774,10 @@ from desktop.views import _ko
       var AVAILABLE_AUTOCOMPLETERS = {
         'solrFormula': SolrFormulaAutocompleter,
         'solrQuery':  SolrQueryAutocompleter,
-        'impalaQuery': SqlAutocompleter3,
-        'hiveQuery': SqlAutocompleter3,
-        'impala': SqlAutocompleter3,
-        'hive': SqlAutocompleter3
+        'impalaQuery': SqlAutocompleter,
+        'hiveQuery': SqlAutocompleter,
+        'impala': SqlAutocompleter,
+        'hive': SqlAutocompleter
       };
 
       var SimpleAceEditor = function (params, element) {

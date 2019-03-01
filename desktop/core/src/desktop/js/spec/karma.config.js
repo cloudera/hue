@@ -1,12 +1,12 @@
 module.exports = function(config) {
   config.set({
-    basePath: 'desktop/core/src/desktop/js',
-    frameworks: ['jasmine'],
+    basePath: '../',
+    frameworks: ['jasmine-ajax', 'jasmine'],
     files: ['**/spec/*[sS]pec.js'],
     preprocessors: {
       '**/spec/*[sS]pec.js': ['webpack']
     },
-    reporters: ['progress'],
+    reporters: ['spec'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_ERROR,
@@ -18,12 +18,13 @@ module.exports = function(config) {
         rules: [
           {
             test: /\.js$/i,
-            exclude:/(node_modules)/,
-            loader:'babel-loader',
+            exclude: /(node_modules)/,
+            loader: 'babel-loader',
             options: {
-              presets:['@babel/preset-env']
+              presets: ['@babel/preset-env']
             }
-          }
+          },
+          { type: 'javascript/auto', include: /\.json$/, loaders: ['json-loader'] }
         ]
       }
     },
@@ -31,5 +32,5 @@ module.exports = function(config) {
       noInfo: true,
       stats: 'errors-only'
     }
-  })
+  });
 };

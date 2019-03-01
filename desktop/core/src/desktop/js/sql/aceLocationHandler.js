@@ -224,13 +224,13 @@ class AceLocationHandler {
                 let tooltipText;
                 if (token.syntaxError.expected.length > 0) {
                   tooltipText =
-                    HUE_I18n.syntaxChecker.didYouMean +
+                    window.HUE_I18n.syntaxChecker.didYouMean +
                     ' "' +
                     token.syntaxError.expected[0].text +
                     '"?';
                 } else {
                   tooltipText =
-                    HUE_I18n.syntaxChecker.couldNotFind +
+                    window.HUE_I18n.syntaxChecker.couldNotFind +
                     ' "' +
                     (token.qualifiedIdentifier || token.value) +
                     '"';
@@ -252,12 +252,12 @@ class AceLocationHandler {
                 let tooltipText;
                 if (token.syntaxError.expected.length > 0) {
                   tooltipText =
-                    HUE_I18n.syntaxChecker.didYouMean +
+                    window.HUE_I18n.syntaxChecker.didYouMean +
                     ' "' +
                     token.syntaxError.expected[0].text +
                     '"?';
                 } else if (token.syntaxError.expectedStatementEnd) {
-                  tooltipText = HUE_I18n.syntaxChecker.expectedStatementEnd;
+                  tooltipText = window.HUE_I18n.syntaxChecker.expectedStatementEnd;
                 }
                 if (tooltipText) {
                   const endCoordinates = self.editor.renderer.textToScreenCoordinates(

@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Autocompleter = (function () {
+import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 
+class AceAutocompleteWrapper {
   /**
    * @param {Object} options {object}
    * @param options.snippet
@@ -24,62 +25,64 @@ var Autocompleter = (function () {
    * @param {Number} options.timeout
    * @constructor
    */
-  function Autocompleter(options) {
-    var self = this;
+  constructor(options) {
+    const self = this;
     self.snippet = options.snippet;
     self.timeout = options.timeout;
-    
+
     self.topTables = {};
 
-    var initializeAutocompleter = function () {
+    const initializeAutocompleter = function() {
       self.autocompleter = new HdfsAutocompleter({
         user: options.user,
         snippet: options.snippet,
         timeout: options.timeout
       });
     };
-    self.snippet.type.subscribe(function () {
+    self.snippet.type.subscribe(() => {
       initializeAutocompleter();
     });
     initializeAutocompleter();
   }
 
   // TODO: See why we need this one.
-  Autocompleter.prototype.initializeAutocompleter = function () {
-    var self = this;
-  };
+  initializeAutocompleter() {}
 
   // ACE Format for autocompleter
-  Autocompleter.prototype.getCompletions = function (editor, session, pos, prefix, callback) {
-    var self = this;
-    if (! self.autocompleter) {
+  getCompletions(editor, session, pos, prefix, callback) {
+    const self = this;
+    if (!self.autocompleter) {
       return;
     }
 
-    var before = editor.getTextBeforeCursor();
-    var after = editor.getTextAfterCursor(";");
+    const before = editor.getTextBeforeCursor();
+    const after = editor.getTextAfterCursor(';');
 
     try {
-      self.autocomplete(before, after, function(result) {
-        callback(null, result);
-      }, editor);
+      self.autocomplete(
+        before,
+        after,
+        result => {
+          callback(null, result);
+        },
+        editor
+      );
     } catch (err) {
       editor.hideSpinner();
     }
-  };
+  }
 
-  Autocompleter.prototype.getDocTooltip = function (item) {
-    var self = this;
+  getDocTooltip(item) {
+    const self = this;
     return self.autocompleter.getDocTooltip(item);
-  };
+  }
 
-
-  Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback, editor) {
-    var self = this;
+  autocomplete(beforeCursor, afterCursor, callback, editor) {
+    const self = this;
     if (self.autocompleter) {
       self.autocompleter.autocomplete(beforeCursor, afterCursor, callback, editor);
     }
-  };
+  }
+}
 
-  return Autocompleter;
-})();
+export default AceAutocompleteWrapper;

@@ -1186,7 +1186,7 @@ var snippet = {
   database: ko.observable()
 };
 
-var autocompleter = new Autocompleter({
+var autocompleter = new AceAutocompleteWrapper({
   snippet: snippet,
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,

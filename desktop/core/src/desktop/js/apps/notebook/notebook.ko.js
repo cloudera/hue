@@ -18,13 +18,12 @@ import $ from 'jquery';
 import ko from 'knockout';
 import komapping from 'knockout.mapping';
 
+import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-
-// TODO: import Autocompleter
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -2882,7 +2881,7 @@ const Snippet = function(vm, notebook, snippet) {
     );
   };
 
-  self.autocompleter = new Autocompleter({
+  self.autocompleter = new AceAutocompleteWrapper({
     snippet: self,
     user: vm.user,
     optEnabled: false,

@@ -57,7 +57,7 @@ function Plugin(element, options) {
   this.options.labels = $.extend(
     {},
     defaults.labels,
-    HUE_I18n.jHueHdfsTree,
+    window.HUE_I18n.jHueHdfsTree,
     options ? options.labels : {}
   );
   this._defaults = defaults;

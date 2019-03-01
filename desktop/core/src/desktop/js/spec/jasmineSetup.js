@@ -14,24 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import localforage from 'localforage';
+import JasmineCore from 'jasmine-core';
+import { JSDOM } from 'jsdom';
 
-const hueDebug = {
-  clearCaches: function() {
-    const promises = [];
-    const clearInstance = function(prefix) {
-      promises.push(localforage.createInstance({ name: prefix + window.LOGGED_USERNAME }).clear());
-    };
-    clearInstance('HueContextCatalog_');
-    clearInstance('HueDataCatalog_');
-    clearInstance('HueDataCatalog_hive_');
-    clearInstance('HueDataCatalog_hive_multiTable_');
-    clearInstance('HueDataCatalog_impala_');
-    clearInstance('HueDataCatalog_impala_multiTable_');
-    Promise.all(promises).then(() => {
-      console.log('Done! Refresh the browser.');
-    });
-  }
+const jsdom = new JSDOM('<!doctype html><html><body></body></html>', {
+  url: 'https://www.gethue.com/hue',
+  contentType: 'text/html',
+  includeNodeLocations: true,
+  storageQuota: 10000000
+});
+
+const { window } = jsdom;
+
+global.document = window.document;
+global.window = window;
+global.self = global;
+global.navigator = {
+  userAgent: 'node.js'
 };
+global.localStorage = window.localStorage;
+global.sessionStorage = window.sessionStorage;
 
-export default hueDebug;
+global.getJasmineRequireObj = function() {
+  return JasmineCore;
+};

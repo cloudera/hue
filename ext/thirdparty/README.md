@@ -114,6 +114,7 @@ Frontend third party dependencies (some checked in and some via npm)
 |Babel eslint|10.0.1|MIT|https://www.npmjs.com/package/babel-eslint|
 |Babel jscs|3.0.0-beta1|MIT|https://www.npmjs.com/package/babel-jscs|
 |Babel loader|8.0.5|MIT|https://www.npmjs.com/package/babel-loader|
+|Babel Plugin Module Resolver|3.2.0|MIT|https://www.npmjs.com/package/babel-plugin-module-resolver|
 |Babel preset-env|7.3.1|MIT|https://www.npmjs.com/package/@babel/preset-env|
 |Bootstrap|2.3.2|Apache|https://github.com/twbs/bootstrap|
 |bootstrap slider|?|Apache|https://github.com/seiyria/bootstrap-slider|
@@ -144,7 +145,8 @@ Frontend third party dependencies (some checked in and some via npm)
 |Grunt contrib less|2.0.0|MIT|https://www.npmjs.com/package/grunt-contrib-less|
 |Grunt contrib uglify|4.0.0|MIT|https://www.npmjs.com/package/grunt-contrib-uglify|
 |Grunt contrib watch|1.1.0|MIT|https://www.npmjs.com/package/grunt-contrib-watch|
-|Jasmine|2.3.4|MIT|https://github.com/jasmine/jasmine|
+|Jasmine|3.3.0,3.3.1|MIT|https://github.com/jasmine/jasmine|
+|Jasmine types|3.3.9|MIT|https://www.npmjs.com/package/@types/jasmine|
 |jqCron|?|MIT|https://github.com/arnapou/jqcron|
 |jQuery|2.2.4+3.3.1|MIT|https://github.com/jquery/jquery|
 |jQuery Basic Table|?|MIT|https://github.com/jerrylow/basictable|
@@ -158,6 +160,14 @@ Frontend third party dependencies (some checked in and some via npm)
 |jQuery Hotkeys Plugin|0.2.0|MIT|https://github.com/jeresig/jquery.hotkeys|
 |jQuery UI|1.10.4+1.12.1|MIT|https://github.com/jquery/jquery-ui|
 |jQuery visible|?|MIT|https://github.com/customd/jquery-visible|
+|JSDom|13.2.0|MIT|https://www.npmjs.com/package/jsdom|
+|JSON Loader|0.5.7|MIT|https://www.npmjs.com/package/json-loader|
+|Karma|4.0.1|MIT|https://www.npmjs.com/package/karma|
+|Karma Chrome Launcher|2.2.0|MIT|https://www.npmjs.com/package/karma-chrome-launcher|
+|Karma Jasmine|2.0.1|MIT|https://www.npmjs.com/package/karma-jasmine|
+|Karma Jasmine Ajax|0.1.13|MIT|https://www.npmjs.com/package/karma-jasmine-ajax|
+|Karma Mocha Reporter|2.2.5|MIT|https://www.npmjs.com/package/karma-mocha-reporter|
+|Karma Webpack|3.0.5|MIT|https://www.npmjs.com/package/karma-webpack|
 |Knockout Mapping|2.4.3|MIT|https://www.npmjs.com/package/knockout.mapping|
 |Knockout Sortable|1.1.0|MIT|https://www.npmjs.com/package/knockout-sortable|
 |Knockout Switch/Case|2.0.1|MIT|https://github.com/mbest/knockout-switch-case|

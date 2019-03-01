@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
+
 import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';

@@ -66,12 +66,15 @@
     "grunt-contrib-less": "2.0.0",
     "grunt-contrib-uglify": "4.0.0",
     "grunt-contrib-watch": "1.1.0",
-    "jasmine-core": "3.3.0",
+    "jasmine": "^3.3.1",
     "jsdom": "13.2.0",
+    "json-loader": "0.5.7",
     "karma": "^4.0.0",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "",
+    "karma-jasmine-ajax": "^0.1.13",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-jasmine": "^2.0.1",
+    "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.0-rc.6",
     "load-grunt-tasks": "4.0.0",
     "prettier": "1.16.1",
@@ -90,8 +93,8 @@
     "lint": "eslint desktop/core/src/desktop/js",
     "lint-debug": "npm run lint -- --debug",
     "lint-fix": "npm run lint -- --fix",
-    "test": "karma start karma.config.js --single-run",
-    "test-dev": "karma start karma.config.js"
+    "test": "babel-node desktop/core/src/desktop/js/spec/run.js",
+    "test-karma": "karma start desktop/core/src/desktop/js/spec/karma.config.js --single-run"
   },
   "files": []
 }

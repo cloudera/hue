@@ -14,24 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import localforage from 'localforage';
+import Jasmine from 'jasmine';
+import './jasmineSetup';
+import './globalJsConstants';
+import './jquery.test';
+import './jquery.plugins';
 
-const hueDebug = {
-  clearCaches: function() {
-    const promises = [];
-    const clearInstance = function(prefix) {
-      promises.push(localforage.createInstance({ name: prefix + window.LOGGED_USERNAME }).clear());
-    };
-    clearInstance('HueContextCatalog_');
-    clearInstance('HueDataCatalog_');
-    clearInstance('HueDataCatalog_hive_');
-    clearInstance('HueDataCatalog_hive_multiTable_');
-    clearInstance('HueDataCatalog_impala_');
-    clearInstance('HueDataCatalog_impala_multiTable_');
-    Promise.all(promises).then(() => {
-      console.log('Done! Refresh the browser.');
-    });
-  }
-};
+import ko from 'knockout';
+import komapping from 'knockout.mapping';
 
-export default hueDebug;
+global.ko = ko;
+global.ko.mapping = komapping;
+
+const jasmine = new Jasmine();
+global.jasmine = jasmine;
+
+// modify this line to point to your jasmine.json
+jasmine.loadConfigFile('desktop/core/src/desktop/js/spec/jasmine.json');
+jasmine.execute();
