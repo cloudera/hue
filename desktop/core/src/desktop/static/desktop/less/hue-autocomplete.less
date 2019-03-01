@@ -21,6 +21,7 @@
 .hue-ace-autocompleter {
   position: fixed;
   .display-flex();
+
   z-index: 999;
   max-height: 250px;
   align-items: flex-start;
@@ -31,10 +32,10 @@
   .flex(0 0 300px);
   .display-flex();
   .flex-direction(column);
+
   width: 300px;
   max-height: 250px;
   overflow: hidden;
-
   border: 1px solid @cui-gray-300;
   border-radius: 2px;
   background-color: @cui-white;
@@ -52,7 +53,8 @@
 
 .autocompleter-header {
   .flex(0 0 20px);
-  position:relative;
+
+  position: relative;
   padding: 5px;
   background-color: @cui-gray-050;
   line-height: 20px;
@@ -105,16 +107,18 @@
   height: 19px;
   clear: both;
   background-color: @cui-white;
-  padding:3px;
+  padding: 3px;
   cursor: pointer;
   position: relative;
-  font: 12px/normal @font-family-monospace;direction: ltr;
+  font: 12px/normal @font-family-monospace;
+  direction: ltr;
   line-height: 18px;
 }
 
 .autocompleter-suggestion:hover {
   background-color: @cui-blue-010;
 }
+
 .autocompleter-suggestion.selected {
   background-color: @hue-primary-color-light;
 }
@@ -126,6 +130,7 @@
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
   b {
     font-weight: bolder;
   }
@@ -198,6 +203,7 @@
   color: @cui-gray-700;
   font-style: italic;
 }
+
 .autocompleter-details-contents .details-comment * {
   font-size: 13px !important;
   line-height: 14px !important;
@@ -206,7 +212,7 @@
 
 .autocompleter-details-contents .details-code {
   background-color: @cui-gray-050;
-  padding:3px;
+  padding: 3px;
   color: @cui-gray-700;
   font: 12px/normal @font-family-monospace;
   direction: ltr;

@@ -20,27 +20,35 @@
   & > ul {
     margin: 0;
     list-style-type: none;
+
     & > li {
       border: 1px solid @cui-white;
       background: @cui-white !important;
       overflow: hidden;
+
       h2 {
         cursor: move;
       }
-      .grid-left-bar, .edit-dimensions {
+
+      .grid-left-bar,
+      .edit-dimensions {
         opacity: 0;
       }
+
       .query-builder {
         h2 {
           cursor: default;
         }
+
         .edit-dimensions {
           opacity: 1;
         }
       }
     }
+
     & > li:hover {
-      .grid-left-bar, .edit-dimensions {
+      .grid-left-bar,
+      .edit-dimensions {
         opacity: 1;
       }
     }
@@ -49,6 +57,7 @@
   .card-widget {
     width: 100% !important;
     margin: 0 !important;
+
     .card-heading {
       font-size: 16px !important;
       font-weight: bold !important;

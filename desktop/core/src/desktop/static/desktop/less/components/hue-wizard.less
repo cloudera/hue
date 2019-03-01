@@ -24,6 +24,7 @@
   margin-top: -10px;
   z-index: 100;
   padding-top: 10px;
+
   ol {
     margin: 0;
   }
@@ -32,52 +33,64 @@
 .step-indicator {
   border-collapse: separate;
   display: table;
-  margin-left: 0px;
+  margin-left: 0;
   position: relative;
   table-layout: fixed;
   vertical-align: middle;
   width: 100%;
+
   li {
     display: table-cell;
     float: none;
     padding: 0;
     width: 49%;
   }
+
   li.arrow {
     width: 2%;
     text-align: center;
   }
+
   .active .step {
     border-color: @cui-blue-700;
     color: @cui-blue-700;
   }
+
   .active .caption {
     color: @cui-blue-700;
   }
+
   .complete .step {
     border-color: @cui-green-500;
     color: @cui-green-500;
   }
+
   .complete .caption {
     color: @cui-green-500;
   }
+
   .error .step {
     border-color: @cui-red-400;
     color: @cui-red-400;
   }
+
   .error .caption {
     color: @cui-red-400;
   }
+
   .active.complete .step {
     border-color: @cui-blue-700;
     color: @cui-blue-700;
   }
+
   .active.complete .caption {
     color: @cui-blue-700;
   }
+
   .inactive .caption {
     color: @cui-gray-300;
   }
+
   .step {
     background-color: @cui-white;
     border: 1px solid @cui-gray-300;
@@ -91,6 +104,7 @@
     position: relative;
     z-index: 1;
   }
+
   .caption {
     box-sizing: border-box;
     color: @cui-gray-300;

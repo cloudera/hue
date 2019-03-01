@@ -23,7 +23,6 @@
 @sidebar-left-spacing: 16px;
 
 .hue-sidebar {
-
   .sidebar-content {
     position: absolute;
     top: 0;
@@ -32,7 +31,6 @@
     left: 0;
     padding-top: 20px;
     background-color: @cui-white;
-
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -65,10 +63,10 @@
       white-space: nowrap;
       position: relative;
 
-
       .sidebar-icon {
         float: left;
         padding: 0 14px 0 @sidebar-left-spacing;
+
         &.with-tooltip {
           display: none;
         }
@@ -94,14 +92,15 @@
       background: @cui-blue-050;
       color: @cui-blue-500;
 
-      .fa:before {
+      .fa::before {
         color: @cui-blue-500;
       }
     }
 
     .sidebar-item:hover {
       color: @cui-blue-500;
-      .fa:before {
+
+      .fa::before {
         color: @cui-blue-500;
       }
     }
