@@ -36,7 +36,7 @@ from django.contrib.auth.models import User, Group
 from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
 from django.urls import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden, HttpResponse
+from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden, HttpResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
@@ -64,10 +64,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
-from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
-from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
-from filebrowser.conf import SHOW_UPLOAD_BUTTON
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
@@ -164,10 +161,14 @@ def download(request, path):
         else:
             raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
-    response = StreamingHttpResponse(_file_reader(fh), content_type=content_type)
-    response["Last-Modified"] = http_date(stats['mtime'])
-    response["Content-Length"] = stats['size']
-    response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
+    if REDIRECT_DOWNLOAD.get() and hasattr(fh, 'read_url'):
+      response = HttpResponseRedirect(fh.read_url())
+      setattr(response, 'redirect_override', True)
+    else:
+      response = StreamingHttpResponse(_file_reader(fh), content_type=content_type)
+      response["Last-Modified"] = http_date(stats['mtime'])
+      response["Content-Length"] = stats['size']
+      response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
 
     request.audit = {
         'operation': 'DOWNLOAD',

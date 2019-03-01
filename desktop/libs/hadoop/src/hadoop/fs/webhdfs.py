@@ -25,6 +25,7 @@ import posixpath
 import stat
 import threading
 import time
+import urllib
 
 from urlparse import urlparse
 from django.utils.encoding import smart_str
@@ -522,6 +523,29 @@ class WebHdfs(Hdfs):
       if key.lower() == "path":
         return self.normpath(value)
 
+  def is_web_accessible(self):
+    return True
+
+  def read_url(self, path, offset=0, length=None, bufsize=None):
+    """
+    read(path, offset, length[, bufsize]) -> data
+
+    Read data from a file.
+    """
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'OPEN'
+    params['offset'] = long(offset)
+    if length is not None:
+      params['length'] = long(length)
+    if bufsize is not None:
+      params['bufsize'] = bufsize
+    if self._security_enabled:
+      token = self.get_delegation_token(self.user)
+      if token:
+        params['delegation'] = token
+    quoted_path = urllib.quote(smart_str(path))
+    return self._client._make_url(quoted_path, params)
 
   def read(self, path, offset, length, bufsize=None):
     """
@@ -855,7 +879,7 @@ class WebHdfs(Hdfs):
     params['renewer'] = renewer
     headers = self._getheaders()
     res = self._root.get(params=params, headers=headers)
-    return res['Token']['urlString']
+    return res['Token'] and res['Token']['urlString']
 
 
   def do_as_user(self, username, fn, *args, **kwargs):
@@ -906,6 +930,10 @@ class File(object):
     self._path = fs_normpath(path)
     self._pos = 0
     self._mode = mode
+    if fs.is_web_accessible():
+      def read_url(fs=fs):
+        return fs.read_url(self._path, self._pos)
+      self.read_url = read_url
 
     try:
       self._stat = fs.stats(path)
