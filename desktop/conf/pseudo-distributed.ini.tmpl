@@ -1303,6 +1303,9 @@
   # Flag to enable the extraction of a uploaded archive in HDFS.
   ## enable_extract_uploaded_archive=true
 
+  # Redirect client to WebHdfs or S3 for file download. Note: Turning this on will override notebook/redirect_whitelist for user selected file downloads on WebHdfs & S3.
+  ## redirect_download=true
+
 
 ###########################################################################
 # Settings to configure Pig
@@ -1581,6 +1584,9 @@
       # this may not make sense if DNS is not configured in this way for custom endpoints.
       # e.g. Use boto.s3.connection.OrdinaryCallingFormat for https://s3.amazonaws.com/<bucket-name>
       ## calling_format=boto.s3.connection.OrdinaryCallingFormat
+
+      # The time in seconds before a delegate key is expired. Used when filebrowser/redirect_download is used. Default to 4 Hours.
+      ## key_expiry=14400
 
 ###########################################################################
 # Settings for the Azure lib

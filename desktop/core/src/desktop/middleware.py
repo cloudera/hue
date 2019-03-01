@@ -673,7 +673,7 @@ class EnsureSafeRedirectURLMiddleware(object):
   Middleware to white list configured redirect URLs.
   """
   def process_response(self, request, response):
-    if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location'):
+    if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location') and not hasattr(response, 'redirect_override'):
       redirection_patterns = desktop.conf.REDIRECT_WHITELIST.get()
       location = response['Location']
 
