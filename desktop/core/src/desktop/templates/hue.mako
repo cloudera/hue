@@ -167,6 +167,9 @@
 
 ${ hueIcons.symbols() }
 
+<!-- fake fields are a workaround for chrome autofill getting the wrong fields, readonly needed for 1password -->
+<input style="display:none" readonly autocomplete="false" type="text" name="fakeusernameremembered"/>
+<input style="display:none" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
 
 <div class="main-page">
   % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
