@@ -21,6 +21,7 @@
   from {
     -webkit-transform: rotateY(0deg);
   }
+
   to {
     -webkit-transform: rotateY(-360deg);
   }
@@ -32,11 +33,13 @@
   margin: auto;
   margin-bottom: 50px;
   background: @cui-white;
-  border: 1px solid #E0E2E3;
+  border: 1px solid #e0e2e3;
   border-radius: 4px;
+
   a {
     white-space: normal;
   }
+
   .logo {
     background-color: @cui-white;
     width: 70px;
@@ -50,16 +53,19 @@
     margin-top: 35px;
     margin-bottom: 35px;
   }
+
   h3 {
     color: @hue-primary-color-dark;
     margin-bottom: 25px;
     text-align: center;
   }
+
   .empty-logo {
     background-color: @cui-white;
     width: 70px;
     height: 70px;
   }
+
   .logo img {
     margin-top: 2px;
   }
@@ -67,9 +73,12 @@
   form {
     margin-left: 75px;
     margin-right: 75px;
-    input[type='submit'], .login-container form select {
+
+    input[type='submit'],
+    .login-container form select {
       width: 100%;
     }
+
     .text-input {
       padding: 1px 10px 1px 19px;
       border: 1px solid @cui-gray-400;
@@ -77,9 +86,9 @@
       margin-bottom: 20px;
       -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
       box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-      -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-      transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+      -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 
       input:focus {
         border-color: initial !important;
@@ -88,18 +97,24 @@
         box-shadow: none !important;
       }
     }
+
     .text-input.error {
-      border-color: #D0021B;
+      border-color: #d0021b;
     }
+
     ul.errorlist li {
-      color: #D0021B;
+      color: #d0021b;
       padding: 0;
       font-weight: normal;
       font-style: normal;
       margin-top: -10px;
       margin-bottom: 20px;
     }
-    input[type='text'], input[type='password'], input[type='text']:hover, input[type='password']:hover {
+
+    input[type='text'],
+    input[type='password'],
+    input[type='text']:hover,
+    input[type='password']:hover {
       padding: 0;
       border: none;
       box-shadow: none;
@@ -129,10 +144,10 @@
     text-align: center;
     margin-bottom: 20px;
   }
-
 }
 
-:-webkit-autofill, :-webkit-autofill:focus {
+:-webkit-autofill,
+:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 

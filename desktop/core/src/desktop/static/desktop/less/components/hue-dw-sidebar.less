@@ -24,11 +24,11 @@
 .hue-dw-brand {
   width: 247px;
   height: 50px;
-  position:fixed;
-  left:0;
-  top:0;
+  position: fixed;
+  left: 0;
+  top: 0;
   background-color: #333d52;
-  z-index:500000;
+  z-index: 500000;
   transition: width @sidebar-animation-duration;
   overflow: hidden;
 
@@ -47,6 +47,7 @@
   position: relative;
   .flex(0 0);
   .flex-basis(250px);
+
   transition: flex-basis @sidebar-animation-duration;
 
   .sidebar {
@@ -59,9 +60,9 @@
     background-color: #323543;
     box-shadow: 0 0 3px 0 @cui-gray-600;
 
-    .fa:before {
+    .fa::before {
       font-size: 16px;
-      color: #B8BEC4;
+      color: #b8bec4;
     }
 
     .sidebar-content {
@@ -76,18 +77,19 @@
     .sidebar-item {
       display: block;
       line-height: 36px;
-      color: #B8BEC4;
+      color: #b8bec4;
       white-space: nowrap;
       font-size: 16px;
 
       .sidebar-caret {
         opacity: 0;
-        float:left;
+        float: left;
       }
 
       .sidebar-icon {
         float: left;
         padding: 0 16px 0 14px;
+
         &.with-tooltip {
           display: none;
         }
@@ -110,7 +112,7 @@
         opacity: 1;
       }
 
-      .fa:before {
+      .fa::before {
         color: #5eab41;
       }
     }
@@ -118,7 +120,8 @@
     .sidebar-item:not(.active):hover {
       background-color: #404350;
       color: @cui-white;
-      .fa:before {
+
+      .fa::before {
         background-color: #404350;
         color: @cui-white;
       }
@@ -149,7 +152,7 @@
       line-height: 36px;
       width: 100%;
       text-align: right;
-      color: #B8BEC4;
+      color: #b8bec4;
       box-shadow: 0 0 3px 0 @cui-gray-600;
 
       span {
@@ -159,7 +162,8 @@
       &:hover {
         background-color: #404350;
         color: @cui-white;
-        .fa:before {
+
+        .fa::before {
           background-color: #404350;
           color: @cui-white;
         }
@@ -173,7 +177,6 @@
     }
   }
 
-
   &.collapsed {
     .flex-basis(49px);
 
@@ -186,12 +189,14 @@
       .sidebar-icon.without-tooltip {
         display: none;
       }
+
       .sidebar-icon.with-tooltip {
         display: initial;
       }
 
       .sidebar-action-button {
         text-align: center;
+
         span {
           padding-right: 0;
         }

@@ -31,7 +31,8 @@ module.exports = function(grunt) {
         options: {
           paths: ['desktop/core/src/desktop/static/desktop/less'],
           compress: true,
-          banner: '/*!\nLicensed to Cloudera, Inc. under one\nor more contributor license agreements.  See the NOTICE file\ndistributed with this work for additional information\nregarding copyright ownership.  Cloudera, Inc. licenses this file\nto you under the Apache License, Version 2.0 (the\n"License"); you may not use this file except in compliance\nwith the License.  You may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n */'
+          banner: '/*!\nLicensed to Cloudera, Inc. under one\nor more contributor license agreements.  See the NOTICE file\ndistributed with this work for additional information\nregarding copyright ownership.  Cloudera, Inc. licenses this file\nto you under the Apache License, Version 2.0 (the\n"License"); you may not use this file except in compliance\nwith the License.  You may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n */',
+          javascriptEnabled: true
         },
         files: {
           'desktop/core/src/desktop/static/desktop/css/hue-bootstrap-embedded.css': 'desktop/core/src/desktop/static/desktop/less/hue-bootstrap-embedded.less',
@@ -99,6 +100,6 @@ module.exports = function(grunt) {
         ],
         tasks: ['less']
       }
-    }
+    },
   });
 };

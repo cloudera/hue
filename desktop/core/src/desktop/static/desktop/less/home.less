@@ -23,6 +23,7 @@
 .doc-browser-container {
   .display-flex();
   .flex-direction(column);
+
   position: absolute;
   top: 0;
   bottom: 0;
@@ -35,6 +36,7 @@
   .flex(0 0 auto);
   .display-flex();
   .flex-wrap(nowrap);
+
   overflow: hidden;
   padding: 2px;
   padding-bottom: 0;
@@ -59,8 +61,10 @@
 
 .doc-browser-list {
   .flex(1 1 auto);
+
   overflow-y: scroll;
   overflow-x: hidden;
+  padding: 4px 0;
 }
 
 .doc-browser-breadcrumbs {
@@ -103,10 +107,6 @@
   position: absolute;
   right: 10px;
   z-index: 10;
-}
-
-.doc-browser-list {
-  padding: 4px 0;
 }
 
 .doc-browser-entries {
@@ -157,6 +157,7 @@
 .doc-browser-row {
   .display-flex();
   .flex-wrap(nowrap);
+
   width: 100%;
   height: 100%;
 }
@@ -164,6 +165,7 @@
 .doc-browser-primary-col {
   .flex(1);
   .nowrap-ellipsis();
+
   min-width: 200px;
   vertical-align: middle;
   padding-left: 8px;
@@ -185,6 +187,7 @@
 
 .doc-browser-attr-group {
   .flex(0 1 770px);
+
   white-space: nowrap;
   float: right;
   display: inline-block;
@@ -196,7 +199,7 @@
 }
 
 .doc-browser-attr-col {
-  display: inline-block;;
+  display: inline-block;
   height: 30px;
   line-height: 30px;
   vertical-align: middle;
@@ -217,21 +220,25 @@
 
 .doc-browser-description {
   .nowrap-ellipsis();
+
   width: 300px;
 }
 
 .doc-browser-type {
   .nowrap-ellipsis();
+
   width: 130px;
 }
 
 .doc-browser-owner {
   .nowrap-ellipsis();
+
   width: 130px;
 }
 
 .doc-browser-modified {
   .nowrap-ellipsis();
+
   width: 130px;
 }
 

@@ -17,12 +17,10 @@
 */
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
-
 @import "hue-assist";
 @import "hue-autocomplete";
 @import "hue-cui-overrides.less";
 @import "hue-cross-version.less";
-
 @import "components/hue-clearable.less";
 
 .svg-hue-logo-main {
@@ -30,12 +28,12 @@
 }
 
 .svg-hue-logo-trunk {
-  fill: #D7B9EB;
+  fill: #d7b9eb;
 }
 
 .subnav {
   background-color: @cui-gray-100;
-  background-image: -moz-linear-gradient(center top, @cui-gray-050 0%, @cui-gray-100 100%);
+  background-image: -moz-linear-gradient(center top, @cui-gray-050 0, @cui-gray-100 100%);
   background-repeat: repeat-x;
   border: 1px solid @cui-gray-200;
   border-radius: 4px;
@@ -65,7 +63,8 @@
   border-left: 1px solid @cui-gray-050;
 }
 
-.subnav .nav > .active > a, .subnav .nav > .active > a:hover {
+.subnav .nav > .active > a,
+.subnav .nav > .active > a:hover {
   background-color: @cui-gray-100;
   border-left: 0 none;
   border-right-color: @cui-gray-300;
@@ -74,11 +73,13 @@
   padding-left: 13px;
 }
 
-.subnav .nav > .active > a .caret, .subnav .nav > .active > a:hover .caret {
+.subnav .nav > .active > a .caret,
+.subnav .nav > .active > a:hover .caret {
   border-top-color: @cui-gray-700;
 }
 
-.subnav .nav > li:first-child > a, .subnav .nav > li:first-child > a:hover {
+.subnav .nav > li:first-child > a,
+.subnav .nav > li:first-child > a:hover {
   border-left: 0 none;
   border-radius: 4px 0 0 4px;
   -webkit-border-radius: 4px 0 0 4px;
@@ -97,12 +98,12 @@
 }
 
 .subnav-fixed {
-  border-color: #D5D5D5;
+  border-color: #d5d5d5;
   border-radius: 0;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-width: 0 0 1px;
-  box-shadow: 0 1px 0 #FFFFFF inset, 0 1px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 0 #fff inset, 0 1px 5px rgba(0, 0, 0, 0.1);
   left: 0;
   position: fixed;
   right: 0;
@@ -115,7 +116,8 @@
   padding: 0 1px;
 }
 
-.subnav .nav > li:first-child > a, .subnav .nav > li:first-child > a:hover {
+.subnav .nav > li:first-child > a,
+.subnav .nav > li:first-child > a:hover {
   border-radius: 0;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -145,12 +147,14 @@
 .search-container {
   .display-flex;
   .flex(1 1 37px);
+
   position: relative;
   margin: 8px 10px 0 10px;
 }
 
 .search-container > input {
   .flex(1 1 100%);
+
   border-radius: 4px 0 0 4px;
   border: 1px solid @cui-gray-300;
   border-right: none;
@@ -160,6 +164,7 @@
 
 .search-container > a {
   .flex(0 0 31px);
+
   margin-bottom: 0;
   cursor: pointer;
   border-bottom-right-radius: 4px;
@@ -196,11 +201,12 @@
 .dropdown-menu > li > a > svg {
   color: @hue-primary-color-dark;
 }
+
 .dropdown-menu > li.active > a > svg,
 .dropdown-menu > li > a:hover > svg,
 .dropdown-menu > li > a:focus > svg,
 .dropdown-menu > li > a:active > svg {
-  color: #FFF !important;
+  color: #fff !important;
 }
 
 .dropdown-menu .svg-app-icon {
