@@ -2125,7 +2125,14 @@ class SparkAction(Action):
           'help_text': _('Path to file to put in the running directory.'),
           'type': ''
      },
-    'class': {
+     'archives': {
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
+          'type': ''
+     },
+     'class': {
           'name': 'class',
           'label': _('Main class'),
           'value': '',
