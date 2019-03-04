@@ -629,7 +629,7 @@ def save_coordinator(request):
     scheduled_doc.can_read_or_exception(request.user)
     coordinator_doc.dependencies = [scheduled_doc]
 
-  coordinator_doc1 = coordinator_doc.doc.get()
+  coordinator_doc1 = coordinator_doc._get_doc1(doc2_type='coordinator2')
   coordinator_doc.update_data(coordinator_data)
   coordinator_doc.name = coordinator_doc1.name = coordinator_data['name']
   coordinator_doc.description = coordinator_doc1.description = coordinator_data['properties']['description']
