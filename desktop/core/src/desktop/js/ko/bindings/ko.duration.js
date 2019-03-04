@@ -35,16 +35,16 @@ ko.bindingHandlers.duration = (function() {
     humanTime: function(value) {
       value = value * 1;
       if (value < Math.pow(10, 3)) {
-        return sprintf('%i ns', value);
+        return sprintf.sprintf('%i ns', value);
       } else if (value - Math.pow(10, 6) < -Math.pow(10, 3) / 2) {
         // Make sure rounding doesn't cause numbers to have more than 4 significant digits.
         value = (value * 1.0) / Math.pow(10, 3);
         const sprint = value > 100 ? '%i us' : '%.1f us';
-        return sprintf(sprint, value);
+        return sprintf.sprintf(sprint, value);
       } else if (value - Math.pow(10, 9) < -Math.pow(10, 6) / 2) {
         value = (value * 1.0) / Math.pow(10, 6);
         const sprint = value > 100 ? '%i ms' : '%.1f ms';
-        return sprintf(sprint, value);
+        return sprintf.sprintf(sprint, value);
       } else {
         // get the ms value
         const SECOND = 1;
@@ -54,19 +54,19 @@ ko.bindingHandlers.duration = (function() {
         let buffer = '';
 
         if (value > HOUR) {
-          buffer += sprintf('%i h', value / HOUR);
+          buffer += sprintf.sprintf('%i h', value / HOUR);
           value = value % HOUR;
         }
 
         if (buffer.length < 4 && value > MINUTE) {
           const sprint = buffer.length ? ' %i m' : '%i m';
-          buffer += sprintf(sprint, value / MINUTE);
+          buffer += sprintf.sprintf(sprint, value / MINUTE);
           value = value % MINUTE;
         }
 
         if (buffer.length < 4 && value > SECOND) {
           const sprint = buffer.length ? ' %i s' : '%.1f s';
-          buffer += sprintf(sprint, (value * 1.0) / SECOND);
+          buffer += sprintf.sprintf(sprint, (value * 1.0) / SECOND);
         }
         return buffer;
       }

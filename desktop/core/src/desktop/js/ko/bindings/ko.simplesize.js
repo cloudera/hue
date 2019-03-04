@@ -44,12 +44,12 @@ ko.bindingHandlers.simplesize = (function() {
 
       // Special case small numbers (including 0), because they're exact.
       if (bytes < 1000) {
-        return sprintf('%d', bytes);
+        return sprintf.sprintf('%d', bytes);
       }
 
       let index = Math.floor(that.getBaseLog(bytes, 1000));
       index = Math.min(that.units.length - 1, index);
-      return sprintf('%.1f %s', bytes / Math.pow(1000, index), that.units[index]);
+      return sprintf.sprintf('%.1f %s', bytes / Math.pow(1000, index), that.units[index]);
     }
   });
 })();
