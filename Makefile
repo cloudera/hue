@@ -154,6 +154,8 @@ desktop: virtual-env
 apps: desktop
 	npm install
 	npm run webpack
+	npm run webpack-login
+	npm run webpack-workers
 	@$(MAKE) -C $(APPS_DIR) env-install
 
 ###################################

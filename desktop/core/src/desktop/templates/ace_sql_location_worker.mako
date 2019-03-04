@@ -18,7 +18,7 @@
   from webpack_loader import utils
 %>
 
-% for js_file in utils.get_files('sqlLocationWebWorker'):
+% for js_file in utils.get_files('sqlLocationWebWorker', config='WORKERS'):
   importScripts('${ js_file.get('url') }');
 % endfor
 

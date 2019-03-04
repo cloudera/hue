@@ -106,7 +106,7 @@ dependency-reduced-pom.xml
 
 # Node Modules
 node_modules/
-webpack-stats.json
+webpack-stats*.json
 
 junitresults*
 

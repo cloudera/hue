@@ -90,6 +90,8 @@
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",
     "webpack": "webpack --config webpack.config.js",
+    "webpack-login": "webpack --config webpack.config.login.js",
+    "webpack-workers": "webpack --config webpack.config.workers.js",
     "dev": "webpack --watch -d",
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",

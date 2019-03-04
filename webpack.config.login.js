@@ -22,17 +22,13 @@ module.exports = {
     }
   },
   entry: {
-    hue: ['./desktop/core/src/desktop/js/hue.js'],
-    notebook: ['./desktop/core/src/desktop/js/apps/notebook/notebook.js']
+    login: ['./desktop/core/src/desktop/js/login.js']
   },
   optimization: {
     minimize: true,
-    splitChunks: {
-      chunks: 'all'
-    }
   },
   output: {
-    path:  __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
+    path:  __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login',
     filename: '[name]-bundle-[hash].js'
   },
   module: {
@@ -53,8 +49,8 @@ module.exports = {
   plugins: [
     // new BundleAnalyzerPlugin({ analyzerPort: 9000 }),
     new CleanObsoleteChunks(),
-    new CleanWebpackPlugin([__dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue']),
-    new BundleTracker({ filename: './webpack-stats.json' }),
+    new CleanWebpackPlugin([__dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login']),
+    new BundleTracker({ filename: './webpack-stats-login.json' }),
     new webpack.BannerPlugin('\nLicensed to Cloudera, Inc. under one\nor more contributor license agreements.  See the NOTICE file\ndistributed with this work for additional information\nregarding copyright ownership.  Cloudera, Inc. licenses this file\nto you under the Apache License, Version 2.0 (the\n"License"); you may not use this file except in compliance\nwith the License.  You may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n')
   ]
 };
