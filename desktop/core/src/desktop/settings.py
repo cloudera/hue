@@ -209,8 +209,16 @@ INSTALLED_APPS = [
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'desktop/js/bundles/',
+        'BUNDLE_DIR_NAME': 'desktop/js/bundles/hue/',
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'desktop/js/bundles/workers/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-workers.json')
+    },
+    'LOGIN': {
+        'BUNDLE_DIR_NAME': 'desktop/js/bundles/login/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-login.json')
     }
 }
 

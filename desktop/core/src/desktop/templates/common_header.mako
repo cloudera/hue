@@ -132,7 +132,7 @@ if USE_NEW_EDITOR.get():
   % endif
 
   % if section == "login":
-    ${ render_bundle('login') | n,unicode }
+    ${ render_bundle('login', config='LOGIN') | n,unicode }
   %else:
     ${ render_bundle('vendors~hue~notebook') | n,unicode }
     ${ render_bundle('vendors~hue') | n,unicode }
