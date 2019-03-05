@@ -2348,7 +2348,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
       self.isRunning = ko.computed(function() {
-        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED' || job.isRunning;
+        return ['RUNNING', 'PAUSED'].indexOf(self.apiStatus()) != -1 || job.isRunning;
       });
 
       self.user = ko.observableDefault(job.user);
@@ -2371,15 +2371,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.coordinatorActions = ko.pureComputed(function() {
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
-          var apps = [];
-          self.properties['tasks']().forEach(function (instance) {
-            var job = new Job(vm, ko.mapping.toJS(instance));
-            job.resumeEnabled = function() { return false };
+          var apps = self.properties['tasks']().map(function (instance) {
+            var job = new CoordinatorAction(vm, ko.mapping.toJS(instance), self);
             job.properties = instance;
-            apps.push(job);
+            return job;
           });
           var instances = new Jobs(vm);
-          instances.apps(apps)
+          instances.apps(apps);
           instances.isCoordinator(true);
           return instances;
         }
@@ -2857,6 +2855,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
           });
         }
+      };
+    };
+
+    var CoordinatorAction = function (vm, job, coordinator) {
+      var self = this;
+      Job.apply(self, [vm, job]);
+      self.coordinator = coordinator;
+
+      self.canWrite = ko.computed(function () {
+        return self.coordinator.canWrite();
+      });
+
+      self.resumeEnabled = function () {
+        return false;
       };
     };
 
@@ -3470,7 +3482,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     $(document).ready(function () {
       var jobBrowserViewModel = new JobBrowserViewModel();
-      function openJob(id) {
+      var openJob = function(id) {
         if (jobBrowserViewModel.job() == null) {
           jobBrowserViewModel.job(new Job(jobBrowserViewModel, {}));
         }
@@ -3533,7 +3545,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.publish('cluster.config.get.config');
 
       huePubSub.subscribe('submit.rerun.popup.return', function (data) {
-        $.jHueNotify.info('${_('Rerun submitted.')}');
+        $.jHueNotify.info('${_("Rerun submitted.")}');
         $('#rerun-modal${ SUFFIX }').modal('hide');
 
         jobBrowserViewModel.job().apiStatus('RUNNING');
