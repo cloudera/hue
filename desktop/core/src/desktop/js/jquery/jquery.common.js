@@ -29,7 +29,9 @@ import 'jquery-ui/ui/widgets/droppable';
 import 'jquery-ui/ui/widgets/resizable';
 import 'jquery-ui/ui/widgets/sortable';
 
+import 'ext/jquery.chosen.1.0.0.min';
 import 'ext/jquery.dataTables.1.8.2.min';
+import 'ext/jquery.select2.3.5.1.min';
 import 'ext/jquery.total-storage.1.1.3.min';
 
 import 'jquery/plugins/jquery.datatables.sorting';

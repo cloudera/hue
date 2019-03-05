@@ -16,6 +16,7 @@
 
 import 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
+import 'ext/bootstrap-editable.1.5.1.min';
 import _ from 'lodash';
 import Dropzone from 'dropzone';
 import filesize from 'filesize';

@@ -26,7 +26,6 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 %endif
 
 <div id="indexesComponents">
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 
 <style type="text/css">
@@ -479,7 +478,6 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 
 </div>
 
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script>
   routie.setPathname('/indexer');

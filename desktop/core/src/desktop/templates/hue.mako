@@ -90,6 +90,8 @@
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 % endif
+  <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
   <script type="text/javascript">
 % if IS_EMBEDDED.get():
   // Bootstrap 2.3.2 relies on the hide css class presence for modals but doesn't remove it when opened for fade type
@@ -464,7 +466,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>

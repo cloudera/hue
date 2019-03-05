@@ -14,9 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'ext/bootstrap-datepicker.min';
-import 'jquery/plugins/jquery.hdfstree';
-import 'ext/jquery.hotkeys';
 import Clipboard from 'clipboard';
+import 'jquery-mousewheel';
+
+import 'ext/bootstrap-datepicker.min';
+import 'ext/jquery.hotkeys';
+import 'jquery/plugins/jquery.hdfstree';
+import 'ext/markdown.min';
 
 window.Clipboard = Clipboard;
