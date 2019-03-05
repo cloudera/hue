@@ -35,15 +35,10 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
 % endif
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 
-<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
-
-${ render_bundle('vendors~notebook') | n,unicode }
-${ render_bundle('notebook') | n,unicode }
 
 % if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
@@ -54,10 +49,7 @@ ${ render_bundle('notebook') | n,unicode }
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
 
-<script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
-
+<script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
 %if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
@@ -96,10 +88,8 @@ ${ render_bundle('notebook') | n,unicode }
 <!-- End query builder imports -->
 % endif
 
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
+${ render_bundle('vendors~notebook') | n,unicode }
+${ render_bundle('notebook') | n,unicode }
 
 <!--[if IE 9]>
   <script src="${ static('desktop/ext/js/classList.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -107,8 +97,6 @@ ${ render_bundle('notebook') | n,unicode }
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
-
-<script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
 </%def>
 
@@ -134,7 +122,6 @@ ${ render_bundle('notebook') | n,unicode }
   }
 % endif
 </style>
-
 
 ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 

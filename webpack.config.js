@@ -29,6 +29,9 @@ module.exports = {
     minimize: true,
     splitChunks: {
       chunks: 'all'
+    },
+    runtimeChunk: {
+      name: 'hue'
     }
   },
   output: {
