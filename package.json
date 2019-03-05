@@ -31,6 +31,7 @@
     "jquery-ui": "1.12.1",
     "jquery.cookie": "1.4.1",
     "jquery-form": "4.2.2",
+    "jquery-mousewheel": "3.1.13",
     "knockout": "3.4.2",
     "knockout.mapping": "2.4.3",
     "knockout-sortable": "1.1.0",
@@ -42,6 +43,7 @@
     "medium-editor": "5.23.3",
     "minimist": "^1.2.0",
     "page": "1.8.6",
+    "select2": "3.5.1",
     "selectize": "0.12.6",
     "selectize-plugin-clear": "0.0.3",
     "sprintf-js": "1.1.2"

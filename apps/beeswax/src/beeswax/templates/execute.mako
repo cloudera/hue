@@ -849,12 +849,8 @@ ${ assist.assistJSModels() }
 <script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
 
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
-
-<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
-<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ assist.assistPanel() }
 
@@ -1129,11 +1125,7 @@ ${ assist.assistPanel() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
 
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
-
 ${ charting.import_charts() }
-
 
 <script type="text/javascript">
 
