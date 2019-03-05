@@ -47,22 +47,22 @@ Directly boot the image:
 docker run -it -p 8888:8888 gethue/hue:latest
 ```
 
-Hue should then be up and running on your default Docker IP on the port 8888, so usually [http://192.168.99.100:8888](http://192.168.99.100:8888).
+Hue should then be up and running on your default Docker IP on the port 8888, so usually [http://127.0.0.1:8888](http://127.0.0.1:8888).
 
 
 #### Configuration
 
 By default the Hue container is using 
-[``tools/docker/hue/conf/defaults.ini``.](/tools/docker/hue/conf/defaults.ini) on top of [``desktop/conf/hue.ini``.](/desktop/conf/hue.ini)
-which assumes localhost for all the data services.
+[``tools/docker/hue/conf/z-defaults.ini``](/tools/docker/hue/conf/z-defaults.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini)
+which assumes localhost for all the data services and uses and embedded sqlite database that often errors.
 
-In order to point to the services, use the simplified ini [``hue.ini``.](/tools/docker/hue/hue.ini), edit the values before starting it via:
+In order to point to external services, use the simplified ini [``hue.ini``](/tools/docker/hue/hue.ini), edit the values before starting it via:
 
 ```
 docker run -it -p 8888:8888 -v $PWD/tools/docker/hue/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue
 ```
 
-or copy the full one:
+or copy the [``desktop/conf.dist/hue.ini``](/desktop/conf.dist/hue.ini):
 
 ```
 cp /desktop/conf.dist/hue.ini .
@@ -90,23 +90,16 @@ docker-compose up -d
 
 
 **Note**
-If 192.168.99.100 does not work, get the IP of the docker container with:
+If http://127.0.0.1:8888 does not work, get the IP of the docker container with:
 ```
 sudo docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                            NAMES
-b7950388c1db        gethue/hue:latest   "bash"              10 minutes ago      Up 10 minutes       22/tcp, 0.0.0.0:8888->8888/tcp   agitated_mccarthy
+4064b02b42c9        gethue/hue          "./startup.sh"      About a minute ago   Up About a minute   0.0.0.0:8888->8888/tcp   awesome_wiles
 ```
 
-Then get ``inet addr``, so in our case [http://172.17.0.1:8888](http://172.17.0.1:8888):
 ```
-sudo docker exec -it b7950388c1db /sbin/ifconfig eth0
-eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:01
-          inet addr:172.17.0.1  Bcast:0.0.0.0  Mask:255.255.0.0
-          inet6 addr: fe80::42:acff:fe11:1/64 Scope:Link
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:67 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0
-          RX bytes:10626 (10.6 KB)  TX bytes:648 (648.0 B)
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 4064b02b42c9
+172.17.0.2
 ```
 
+So in our case [http://172.17.0.2:8888](http://172.17.0.2:8888).

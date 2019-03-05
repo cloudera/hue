@@ -2,7 +2,7 @@
 # Build an image from a remote github or local cloned Hue repository.
 
 FROM ubuntu:16.04
-MAINTAINER Hue Project "https://github.com/cloudera/hue"
+LABEL description="Hue Project https://github.com/cloudera/hue"
 
 RUN apt-get update -y && apt-get install -y \
   build-essential \
@@ -23,6 +23,8 @@ RUN apt-get update -y && apt-get install -y \
   libgmp3-dev \
   libz-dev \
   software-properties-common \
+  nodejs \
+  npm \
   git \
   sudo \
   maven \
@@ -37,6 +39,10 @@ ADD . /hue
 
 RUN cd /hue && PREFIX=/usr/share make install
 RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
+
+# As not doing a `make prod` above
+RUN rm /usr/share/hue/desktop/conf/*
+COPY desktop/conf.dist /usr/share/hue/desktop/conf
 
 COPY tools/docker/hue/conf /usr/share/hue/desktop/conf
 COPY tools/docker/hue/startup.sh /usr/share/hue
