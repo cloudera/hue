@@ -3151,6 +3151,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json' + '${ "&is_mini=true" if is_mini else "" | n }', function(response) {
             $('#rerun-modal${ SUFFIX }').modal('show');
             vm.job().rerunModalContent(response);
+            // Force Knockout to handle the update of rerunModalContent before trying to modify its DOM
+            ko.tasks.runEarly();
 
             var frag = document.createDocumentFragment();
             vm.job().coordinatorActions().selectedJobs().forEach(function (item) {
