@@ -8,10 +8,10 @@ Hue is an open source SQL Workbench for browsing, querying and visualizing data 
 
 It features:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL and submit jobs.
-   * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data.
-   * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows.
-   * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog.
+   * [Editors](http://gethue.com/sql-editor/) to query with SQL and submit jobs
+   * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
+   * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
+   * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
 
 
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/sql-editor.png "Hue Editor")
@@ -33,7 +33,7 @@ cd hue
 make apps
 build/env/bin/hue runserver
 ```
-Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
+Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is [desktop/conf/pseudo-distributed.ini](desktop/conf/pseudo-distributed.ini).
 
 Read more in the [installation documentation](http://cloudera.github.io/hue/latest/admin-manual/manual.html#installation).
 
