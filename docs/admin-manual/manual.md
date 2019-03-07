@@ -180,7 +180,7 @@ that user's home directory, or in a directory within `/usr/share`.
 
 ## Docker
 
-Alternatively to building Hue, a [http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/](Hue Docker image) is available.
+Alternatively to building Hue into an image, the [Hue Docker Guide](https://github.com/cloudera/hue/tree/testing/tools/docker/hue) is available.
 
 ## Troubleshooting the tarball Installation
 
