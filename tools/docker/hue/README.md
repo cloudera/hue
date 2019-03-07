@@ -3,7 +3,7 @@
 
 ## Get the docker image
 
-Just pull the latest from the Internet or build it yourself from the Hue repository.
+Just pull the latest from the Internet or build it yourself from the Hue repository via the [Dockerfile](Dockerfile).
 
 
 ### Pull the image from Docker Hub
