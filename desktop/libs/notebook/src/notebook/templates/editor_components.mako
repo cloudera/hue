@@ -1492,18 +1492,20 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </th>
         </tr>
         <tr data-bind="visible: result.isMetaFilterVisible">
-          <td colspan="3" class="context-popover-inline-autocomplete">
-            <!-- ko component: {
-              name: 'inline-autocomplete',
-              params: {
-                placeHolder: '${ _ko('Filter columns...') }',
-                querySpec: result.metaFilter,
-                facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
-                knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
-                autocompleteFromEntries: result.autocompleteFromEntries
-              }
-            } --><!-- /ko -->
-            ##<input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" style="width: 257px" />
+          <td colspan="3">
+            <div class="context-popover-inline-autocomplete" style="display: block;">
+              <!-- ko component: {
+                name: 'inline-autocomplete',
+                params: {
+                  placeHolder: '${ _ko('Filter columns...') }',
+                  querySpec: result.metaFilter,
+                  facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
+                  knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
+                  autocompleteFromEntries: result.autocompleteFromEntries
+                }
+              } --><!-- /ko -->
+              ##<input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" style="width: 257px" />
+            </div>
           </td>
         </tr>
       </thead>
