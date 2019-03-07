@@ -794,7 +794,8 @@ def rerun_oozie_job(request, job_id, app_path=None):
                    'rerun_form': rerun_form,
                    'params_form': params_form,
                    'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': app_path}),
-                   'return_json': return_json
+                   'return_json': return_json,
+                   'is_mini': request.GET.get('is_mini', False),
                  }, force_template=True).content
 
   return JsonResponse(popup, safe=False)
@@ -858,6 +859,7 @@ def rerun_oozie_coordinator(request, job_id, app_path=None):
                    'params_form': params_form,
                    'action': reverse('oozie:rerun_oozie_coord', kwargs={'job_id': job_id, 'app_path': app_path}),
                    'return_json': return_json,
+                   'is_mini': request.GET.get('is_mini', False),
                  }, force_template=True).content
 
   return JsonResponse(popup, safe=False)
