@@ -19,10 +19,14 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%
+  SUFFIX = is_mini and "-mini" or ""
+%>
+
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-<form action="${ action }" method="POST" id="submit-rerun-form">
+<form action="${ action }" method="POST" id="submit-rerun-form${ SUFFIX }">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
@@ -98,13 +102,13 @@
       });
 
       % if return_json:
-        $('#submit-rerun-form').submit(function (e) {
+        $('#submit-rerun-form${ SUFFIX }').submit(function (e) {
           $.ajax({
             type: "POST",
             url: '${ action }',
-            data: $('#submit-rerun-form').serialize(),
+            data: $('#submit-rerun-form${ SUFFIX }').serialize(),
             success: function (data) {
-              huePubSub.publish('submit.rerun.popup.return', data);
+              huePubSub.publish('submit.rerun.popup.return${ SUFFIX }', data);
             }
           });
           e.preventDefault();
