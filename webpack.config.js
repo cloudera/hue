@@ -23,7 +23,7 @@ module.exports = {
   },
   entry: {
     hue: ['./desktop/core/src/desktop/js/hue.js'],
-    notebook: ['./desktop/core/src/desktop/js/apps/notebook/notebook.js']
+    notebook: ['./desktop/core/src/desktop/js/apps/notebook/app.js']
   },
   optimization: {
     minimize: true,

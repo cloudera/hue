@@ -30,6 +30,8 @@
 (function () {
   window.AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
+  window.BANNER_TOP_HTML = '${ conf.CUSTOM.BANNER_TOP_HTML.get() }';
+
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
     optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
@@ -162,6 +164,12 @@
       browsers: '${ _('Browsers') }',
       documents: '${ _('Documents') }',
       editor: '${ _('Editor') }',
+    },
+    notebook: {
+      dropEditorHoverText: '${_('Drop a SQL file here')}',
+      dropNotebookHoverText: '${_('Drop iPython/Zeppelin notebooks here')}',
+      noResults: '${_('No results found.')}',
+      of: '${_('of')}'
     },
     selectize: {
       choose: "${ _('Choose...') }",

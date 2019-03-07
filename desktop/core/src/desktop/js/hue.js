@@ -54,7 +54,7 @@ import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
-import EditorViewModel from 'apps/notebook/notebook.ko'; // In history, indexer, importer, editor etc.
+import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, indexer, importer, editor etc.
 import globalSearchParser from 'parse/globalSearchParser'; // ko inline autocomp
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import solrFormulaParser from 'parse/solrFormulaParser'; // simple ace editor
