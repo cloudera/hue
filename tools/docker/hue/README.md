@@ -52,11 +52,12 @@ Hue should then be up and running on your default Docker IP on the port 8888, so
 
 #### Configuration
 
-By default the Hue container is using 
-[``tools/docker/hue/conf/z-defaults.ini``](/tools/docker/hue/conf/z-defaults.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini)
-which assumes localhost for all the data services and uses and embedded sqlite database that often errors.
+By default the Hue container is using
+[``tools/docker/hue/conf/z-defaults.ini``](/tools/docker/hue/conf/z-defaults.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that often errors.
 
-In order to point to external services, use the simplified ini [``hue.ini``](/tools/docker/hue/hue.ini), edit the values before starting it via:
+The default ini is used for configuration at the image build time (e.g. which apps to always disable or certain settings like [banner customization](http://gethue.com/add-a-top-banner-to-hue/)).
+
+In order to configure Hue at runtime and for example point to external services, use the simplified ini [``hue.ini``](/tools/docker/hue/hue.ini), edit the values before starting it via:
 
 ```
 docker run -it -p 8888:8888 -v $PWD/tools/docker/hue/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue
