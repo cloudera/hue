@@ -51,6 +51,12 @@ except NameError:
 
 py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
 
+print('==================== python version check ====>: %s' % py_version)
+print('==================== python version check ====>: %s' % py_version)
+print('==================== python version check ====>: %s' % py_version)
+print('==================== python version check ====>: %s' % py_version)
+print('==================== python version check ====>: %s' % py_version)
+
 is_jython = sys.platform.startswith('java')
 is_pypy = hasattr(sys, 'pypy_version_info')
 is_win = (sys.platform == 'win32')
