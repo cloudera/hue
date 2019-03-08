@@ -70,5 +70,4 @@ HTTP LoadBalancer. This avoids creating global static ips.
 
 ## Images
 
-All the images can currently can be built via the [services](services).
-
+All the images can currently can be built via [Docker](tools/docker).
