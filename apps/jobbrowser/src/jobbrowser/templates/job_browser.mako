@@ -595,7 +595,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-yarn-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'Oozie Launcher' || type() == 'TEZ' -->
+  <!-- ko if: type() == 'Oozie Launcher' -->
     <div data-bind="template: { name: 'job-oozie-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
@@ -610,8 +610,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko if: type() == 'SPARK_EXECUTOR' -->
     <div data-bind="template: { name: 'job-spark-executor-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
-
 </script>
+
 
 <script type="text/html" id="job-yarn-page${ SUFFIX }">
   <div class="row-fluid">
@@ -889,10 +889,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
             <li class="nav-header">${ _('Elapsed time') }</li>
             <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
-            <!-- ko if: diagnostics -->
-              <li class="nav-header">${ _('Diagnostics') }</li>
-              <li><span data-bind="text: diagnostics, attr: { title: diagnostics }"></span>%</li>
-            <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </ul>
@@ -909,7 +905,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" id="job-oozie-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
-          % for name in ['stdout', 'stderr', 'syslog']:
+          % for name in ['stdout', 'stderr']:
             <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
@@ -931,7 +927,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['attempts']()['task_list']">
-              <tr class="pointer" data-bind="click: function() { $root.job().id(appAttemptId); $root.job().fetchJob(); }">
+              <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
                 <td data-bind="text: containerId"></td>
                 <td data-bind="text: nodeId"></td>
                 <td data-bind="text: id"></td>
@@ -956,23 +952,30 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
           <!-- ko with: properties -->
-          <li class="nav-header">${ _('Attempt Id') }</li>
-          <li class="break-word"><span data-bind="text: appAttemptId"></span></li>
           <li class="nav-header">${ _('State') }</li>
           <li><span data-bind="text: state"></span></li>
           <!-- ko if: !$root.isMini() -->
-          <li class="nav-header">${ _('Start time') }</li>
-          <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
-          <li class="nav-header">${ _('Node Http Address') }</li>
-          <li><span data-bind="text: nodeHttpAddress"></span></li>
-          <li class="nav-header">${ _('Elapsed time') }</li>
-          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
+          <li class="nav-header">${ _('Finish time') }</li>
+          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
+          <li class="nav-header">${ _('Assigned Container ID') }</li>
+          <li><span data-bind="text: assignedContainerId"></span></li>
+          <li class="nav-header">${ _('Host') }</li>
+          <li><span data-bind="text: host"></span></li>
+          <li class="nav-header">${ _('RPC Port') }</li>
+          <li><span data-bind="text: rpcPort"></span></li>
+          <li class="nav-header">${ _('Diagnostics Info') }</li>
+          <li><span data-bind="text: diagnosticsInfo"></span></li>
           <!-- /ko -->
           <!-- /ko -->
         </ul>
       </div>
     </div>
+
     <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
     </div>
   </div>
@@ -2450,7 +2453,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'Oozie Launcher'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
@@ -2504,9 +2507,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
           if (data.status == 0) {
-            if (data.app) {
-              huePubSub.publish('jobbrowser.data', [data.app]);
-            }
             if (callback) {
               callback(data);
             };
@@ -3017,9 +3017,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
           if (data.status == 0) {
-            if (data.apps && data.apps.length) {
-              huePubSub.publish('jobbrowser.data', data.apps);
-            }
             if (callback) {
               callback(data);
             };
