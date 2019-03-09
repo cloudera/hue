@@ -1030,7 +1030,15 @@ make css
 
 ### SQL Autocomplete
 
-Install jison from branch https://github.com/JohanAhlen/jison and run "npm install -g". Then:
+Install a patched jison:
+
+```
+git clone https://github.com/JohanAhlen/jison
+cd jison
+npm install -g .
+```
+
+Then run:
 
 ```
 make sql-all-parsers
