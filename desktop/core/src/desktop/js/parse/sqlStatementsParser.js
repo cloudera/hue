@@ -250,7 +250,6 @@ parse: function parse(input) {
                     token: this.terminals_[symbol] || symbol,
                     line: lexer.yylineno,
                     loc: lexer.yylloc,
-                    ruleId: stack.slice(stack.length - 2, stack.length).join('_'),
                     expected: expected
                 });
             }
