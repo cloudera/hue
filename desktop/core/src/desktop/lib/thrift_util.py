@@ -528,15 +528,18 @@ def _unpack_guid_secret_in_handle(str_args):
 
     if secret and guid:
       try:
-        encoded_secret = eval(secret.group(1))
+        encoded_secret = eval(secret.group(1)) # Does not take null bytes, but don't know how to fix.
         encoded_guid = eval(guid.group(1))
 
-        str_args = str_args.replace(secret.group(1), "%x:%x" % struct.unpack(b"QQ", encoded_secret))
-        str_args = str_args.replace(guid.group(1), "%x:%x" % struct.unpack(b"QQ", encoded_guid))
+        str_args = str_args.replace(secret.group(1), unpack_guid(encoded_secret))
+        str_args = str_args.replace(guid.group(1), unpack_guid(encoded_guid))
       except Exception, e:
         logging.warn("Unable to unpack the secret and guid in Thrift Handle: %s" % e)
 
   return str_args
+
+def unpack_guid(guid):
+  return "%016x:%016x" % struct.unpack(b"QQ", guid)
 
 def simpler_string(thrift_obj):
   """
