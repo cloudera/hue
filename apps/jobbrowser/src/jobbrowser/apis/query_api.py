@@ -219,7 +219,7 @@ class QueryApi(Api):
         'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
         'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
         'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'svg': 'hi-copy' } },
-        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'hi-table' } },
+        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'svg': 'hi-table' } },
         'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
         'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
         'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'fn': get_sigma_icon } },
