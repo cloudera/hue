@@ -45,6 +45,7 @@ def query_error_handler(func):
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
       else:
+        LOG.exception('Query Error')
         raise QueryError(message)
   return decorator
 
@@ -111,7 +112,7 @@ class SqlAlchemyApi(Api):
     }
 
   def _assign_types(self, results, meta):
-    result = results[0]
+    result = results and results[0]
     if result:
       for index, col in enumerate(result):
         if isinstance(col, int):
