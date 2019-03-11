@@ -52,10 +52,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/d3.v5.js') }"></script>
 
 % if ENABLE_QUERY_BROWSER.get():
-<script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
 <script src="${ static('desktop/ext/js/dagre-d3-min.js') }"></script>
 <script src="${ static('jobbrowser/js/impala_dagre.js') }"></script>
 % endif

@@ -39,8 +39,6 @@ from desktop import conf
   <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
-  <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
-  <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.js') }"></script>
   <script src="${ static('desktop/ext/js/topojson.v1.min.js') }"></script>
   <script src="${ static('desktop/ext/js/topo/world.topo.js') }"></script>
@@ -66,7 +64,6 @@ from desktop import conf
   <script src="${ static('desktop/js/nv.d3.growingMultiBarChart.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.growingPie.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.growingPieChart.js') }"></script>
-  <script src="${ static('desktop/js/ko.charts.js') }"></script>
   <script src="${ static('desktop/js/ko.charts.leaflet.js') }"></script>
   %endif
 

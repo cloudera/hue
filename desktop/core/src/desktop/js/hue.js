@@ -14,10 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import _ from 'lodash';
 import 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
 import 'ext/bootstrap-editable.1.5.1.min';
-import _ from 'lodash';
+
+import * as d3 from 'd3';
+import d3v3 from 'd3v3';
+import 'utils/d3Extensions';
+
 import Dropzone from 'dropzone';
 import filesize from 'filesize';
 import qq from 'ext/fileuploader.custom';
@@ -70,6 +75,8 @@ window.apiHelper = apiHelper;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
 window.dataCatalog = dataCatalog;
+window.d3 = d3;
+window.d3v3 = d3v3;
 window.Dropzone = Dropzone;
 window.EditorViewModel = EditorViewModel;
 window.filesize = filesize;

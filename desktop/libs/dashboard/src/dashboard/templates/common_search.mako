@@ -868,10 +868,10 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="grid-chart-settings">
 <!-- ko if: $parent.widgetType() === 'resultset-widget' || $parent.widgetType() === 'document-widget' -->
-  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: [ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART].indexOf(chartSettings.chartType()) >= 0">
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: [window.HUE_CHARTS.TYPES.TIMELINECHART, window.HUE_CHARTS.TYPES.BARCHART].indexOf(chartSettings.chartType()) >= 0">
     <li class="nav-header">${_('Chart Type')}</li>
   </ul>
-  <div data-bind="visible: [ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART].indexOf(chartSettings.chartType()) >= 0">
+  <div data-bind="visible: [window.HUE_CHARTS.TYPES.TIMELINECHART, window.HUE_CHARTS.TYPES.BARCHART].indexOf(chartSettings.chartType()) >= 0">
     <select class="input-medium" data-bind="options: $root.timelineChartTypes,
                  optionsText: 'label',
                  optionsValue: 'value',
@@ -879,42 +879,42 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </select>
   </div>
   <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != ''">
-    <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartSettings.chartType()) == -1" class="nav-header">${_('x-axis')}</li>
-    <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
-    <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
-    <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
+    <li data-bind="visible: [window.HUE_CHARTS.TYPES.MAP, window.HUE_CHARTS.TYPES.GRADIENTMAP, window.HUE_CHARTS.TYPES.PIECHART].indexOf(chartSettings.chartType()) == -1" class="nav-header">${_('x-axis')}</li>
+    <li data-bind="visible: chartSettings.chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
+    <li data-bind="visible: chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
+    <li data-bind="visible: chartSettings.chartType() == window.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
   </ul>
   <div data-bind="visible: chartSettings.chartType() != ''">
-    <select data-bind="options: [ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.PIECHART, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.MAP].indexOf(chartSettings.chartType()) >= 0 ? cleanedMeta : chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART ? cleanedDateTimeMeta : cleanedNumericMeta, value: chartSettings.chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartX}" class="input-medium"></select>
+    <select data-bind="options: [window.HUE_CHARTS.TYPES.BARCHART, window.HUE_CHARTS.TYPES.PIECHART, window.HUE_CHARTS.TYPES.GRADIENTMAP, window.HUE_CHARTS.TYPES.MAP].indexOf(chartSettings.chartType()) >= 0 ? cleanedMeta : chartSettings.chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART ? cleanedDateTimeMeta : cleanedNumericMeta, value: chartSettings.chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartX}" class="input-medium"></select>
   </div>
 
   <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != ''">
-    <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, , ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartSettings.chartType()) == -1" class="nav-header">${_('y-axis')}</li>
-    <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
-    <li data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
+    <li data-bind="visible: [window.HUE_CHARTS.TYPES.MAP, , window.HUE_CHARTS.TYPES.PIECHART].indexOf(chartSettings.chartType()) == -1" class="nav-header">${_('y-axis')}</li>
+    <li data-bind="visible: chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
+    <li data-bind="visible: chartSettings.chartType() == window.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
   </ul>
 
-  <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartSettings.chartType() != '' && ([ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.LINECHART].indexOf(chartSettings.chartType()) >= 0 )">
+  <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartSettings.chartType() != '' && ([window.HUE_CHARTS.TYPES.TIMELINECHART, window.HUE_CHARTS.TYPES.BARCHART, window.HUE_CHARTS.TYPES.LINECHART].indexOf(chartSettings.chartType()) >= 0 )">
     <ul class="unstyled" data-bind="foreach: cleanedNumericMeta">
       <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartSettings.chartYMulti" /> <span data-bind="text: name"></span></li>
     </ul>
   </div>
-  <div data-bind="visible: [ko.HUE_CHARTS.TYPES.PIECHART, ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) >= 0">
+  <div data-bind="visible: [window.HUE_CHARTS.TYPES.PIECHART, window.HUE_CHARTS.TYPES.MAP, window.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) >= 0">
     <select data-bind="options: cleanedNumericMeta, value: chartSettings.chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartYSingle}" class="input-medium"></select>
   </div>
 
-  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP && ko.HUE_CHARTS.TYPES.GRADIENTMAP">
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP && window.HUE_CHARTS.TYPES.GRADIENTMAP">
     <li class="nav-header">${_('label')}</li>
   </ul>
-  <div data-bind="visible: chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP">
+  <div data-bind="visible: chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP">
     <select data-bind="options: cleanedMeta, value: chartSettings.chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartSettings.chartMapLabel}" class="input-medium"></select>
   </div>
 
 
-  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) < 0">
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartSettings.chartType() != '' && [window.HUE_CHARTS.TYPES.MAP, window.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) < 0">
     <li class="nav-header">${_('sorting')}</li>
   </ul>
-  <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartSettings.chartType() != '' && [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) < 0">
+  <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartSettings.chartType() != '' && [window.HUE_CHARTS.TYPES.MAP, window.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartSettings.chartType()) < 0">
     <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSettings.chartSorting() == 'none'}, click: function(){ chartSettings.chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
     <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSettings.chartSorting() == 'asc'}, click: function(){ chartSettings.chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
     <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSettings.chartSorting() == 'desc'}, click: function(){ chartSettings.chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
@@ -1391,14 +1391,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
              data-bind="css: {'active': template.showChart() }, click: function(collection, event){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate'); }">
             % if HAS_REPORT_ENABLED.get():
-            <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
-            <i class="fa fa-sort-amount-asc fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT"></i>
+            <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.COUNTER"></i>
+            <i class="fa fa-sort-amount-asc fa-fw" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.TEXTSELECT"></i>
             % endif
-            <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-            <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
-            <i class="fa fa-fw fa-line-chart" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" style="display: none;"></i>
-            <i class="hcha hcha-map-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" style="display: none;"></i>
-            <i class="fa fa-fw fa-map-marker" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" style="display: none;"></i>
+            <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
+            <i class="fa fa-fw fa-line-chart" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART" style="display: none;"></i>
+            <i class="hcha hcha-map-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP" style="display: none;"></i>
+            <i class="fa fa-fw fa-map-marker" data-bind="visible: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP" style="display: none;"></i>
           </a>
           <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
              href="javascript: void(0)" data-bind="css: {'active': template.showChart()}">
@@ -1408,47 +1408,47 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <ul class="dropdown-menu">
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.COUNTER); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.COUNTER}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.COUNTER); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TEXTSELECT}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TEXTSELECT); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.TEXTSELECT}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.TEXTSELECT); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.BARCHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.PIECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.PIECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
               </a>
             </li>
             ##<!-- ko if: widgetType() != 'resultset-widget' -->
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TIMELINECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.TIMELINECHART); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.GRADIENTMAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
+                 data-bind="css: {'active': template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP}, click: function(collection, event){ template.showChart(true); template.chartSettings.chartType(window.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridster.clean.grid.whitespace', { event: event, lookFor: '.grid-results-chart' }); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
               </a>
             </li>
@@ -1741,28 +1741,28 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'document-widget' -->
-          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
+          <!-- ko if: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.PIECHART -->
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle}, field: template.chartSettings.chartX, fqs: $root.query.fqs,
                 transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container'}" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
+          <!-- ko if: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.BARCHART -->
           <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
                 transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: template.chartSettings.chartSelectorType},  stacked: true, showLegend: true" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
+          <!-- ko if: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.LINECHART -->
           <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: false,
                 transformer: multiSerieDataTransformerGrid, showControls: false}" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
+          <!-- ko if: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle, chartZ: template.chartSettings.chartMapLabel},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, forceRedraw: true,
                 showMoveCheckbox: false, moveCheckboxLabel: '${ _ko('Search as I move the map') }'}" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
+          <!-- ko if: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART -->
           <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $parent.results(), sorting: template.chartSettings.chartSorting(), snippet: $data, chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYMulti, widget_id: $parent.id()}, field: template.chartSettings.chartX, fqs: $root.query.fqs, hideSelection: true, enableSelection: false, hideStacked: template.chartSettings.hideStacked,
                 transformer: multiSerieDataTransformerGrid, showControls: false}" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
+          <!-- ko if: template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP -->
           <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $parent.results(), scope: template.chartSettings.chartScope(), snippet: $data, widget_id: $parent.id(), chartX: template.chartSettings.chartX, chartY: template.chartSettings.chartYSingle},
               transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}" />
           <!-- /ko -->
@@ -1770,27 +1770,27 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'resultset-widget' -->
-          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.PIECHART -->
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                 transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.BARCHART -->
           <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
                 transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: $root.collection.template.chartSettings.chartSelectorType},  stacked: true, showLegend: true" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.LINECHART -->
           <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: multiSerieDataTransformerGrid, showControls: false }" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, forceRedraw: true}" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART -->
           <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: $root.collection.template.chartSettings.hideStacked,
                 transformer: multiSerieDataTransformerGrid, showControls: false }" class="chart"></div>
           <!-- /ko -->
-          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP -->
           <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $root.results(), scope: $root.collection.template.chartSettings.chartScope(), snippet: $data},
               transformer: gradientMapChartDataTransformerGrid, maxWidth: 750, isScale: true}" />
           <div class="clearfix"></div>

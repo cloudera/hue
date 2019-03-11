@@ -1813,7 +1813,7 @@ function generateGraph(graphType) {
   $("#chart .alert").addClass("hide");
   if (graphType != "") {
     $("#blueprint").attr("class", "").attr("style", "").empty();
-    if (graphType == ko.HUE_CHARTS.TYPES.MAP) {
+    if (graphType == window.HUE_CHARTS.TYPES.MAP) {
       if ($("#blueprintLat").val() != "-1" && $("#blueprintLng").val() != "-1") {
         var _latCol = $("#blueprintLat").val() * 1;
         var _lngCol = $("#blueprintLng").val() * 1;
@@ -1882,16 +1882,16 @@ function generateGraph(graphType) {
 function getGraphType() {
   var _type = "";
   if ($("#blueprintBars").hasClass("active")) {
-    _type = ko.HUE_CHARTS.TYPES.BARCHART;
+    _type = window.HUE_CHARTS.TYPES.BARCHART;
   }
   if ($("#blueprintLines").hasClass("active")) {
-    _type = ko.HUE_CHARTS.TYPES.LINECHART;
+    _type = window.HUE_CHARTS.TYPES.LINECHART;
   }
   if ($("#blueprintMap").hasClass("active")) {
-    _type = ko.HUE_CHARTS.TYPES.MAP;
+    _type = window.HUE_CHARTS.TYPES.MAP;
   }
   if ($("#blueprintPie").hasClass("active")) {
-    _type = ko.HUE_CHARTS.TYPES.PIECHART;
+    _type = window.HUE_CHARTS.TYPES.PIECHART;
   }
   viewModel.chartType(_type);
   return _type;
@@ -1963,26 +1963,26 @@ $(document).ready(function () {
   $("#blueprintBars").on("click", function () {
     $("#blueprintAxis").removeClass("hide");
     $("#blueprintLatLng").addClass("hide");
-    viewModel.chartType(ko.HUE_CHARTS.TYPES.BARCHART);
-    generateGraph(ko.HUE_CHARTS.TYPES.BARCHART)
+    viewModel.chartType(window.HUE_CHARTS.TYPES.BARCHART);
+    generateGraph(window.HUE_CHARTS.TYPES.BARCHART)
   });
   $("#blueprintLines").on("click", function () {
     $("#blueprintAxis").removeClass("hide");
     $("#blueprintLatLng").addClass("hide");
-    viewModel.chartType(ko.HUE_CHARTS.TYPES.LINECHART);
-    generateGraph(ko.HUE_CHARTS.TYPES.LINECHART)
+    viewModel.chartType(window.HUE_CHARTS.TYPES.LINECHART);
+    generateGraph(window.HUE_CHARTS.TYPES.LINECHART)
   });
   $("#blueprintPie").on("click", function () {
     $("#blueprintAxis").removeClass("hide");
     $("#blueprintLatLng").addClass("hide");
-    viewModel.chartType(ko.HUE_CHARTS.TYPES.PIECHART);
-    generateGraph(ko.HUE_CHARTS.TYPES.PIECHART)
+    viewModel.chartType(window.HUE_CHARTS.TYPES.PIECHART);
+    generateGraph(window.HUE_CHARTS.TYPES.PIECHART)
   });
   $("#blueprintMap").on("click", function () {
     $("#blueprintAxis").addClass("hide");
     $("#blueprintLatLng").removeClass("hide");
-    viewModel.chartType(ko.HUE_CHARTS.TYPES.MAP);
-    generateGraph(ko.HUE_CHARTS.TYPES.MAP)
+    viewModel.chartType(window.HUE_CHARTS.TYPES.MAP);
+    generateGraph(window.HUE_CHARTS.TYPES.MAP)
   });
 
   $("#blueprintNoSort").on("click", function () {

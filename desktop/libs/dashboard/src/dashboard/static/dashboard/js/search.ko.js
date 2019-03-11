@@ -121,7 +121,7 @@ var EmptyGridsterWidget = function (vm) {
 
   self.isAdding = ko.observable(true);
   self.fieldName = ko.observable();
-  self.fieldViz = ko.observable(ko.HUE_CHARTS.TYPES.BARCHART);
+  self.fieldViz = ko.observable(window.HUE_CHARTS.TYPES.BARCHART);
   self.fieldSort = ko.observable('desc');
   self.fieldOperation = ko.observable();
   self.fieldOperations = ko.pureComputed(function () {
@@ -1404,12 +1404,12 @@ var Collection = function (vm, collection) {
   self.template.hasDataForChart = ko.computed(function () {
     var hasData = false;
 
-    if ([ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.LINECHART, ko.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(self.template.chartSettings.chartType()) >= 0) {
+    if ([window.HUE_CHARTS.TYPES.BARCHART, window.HUE_CHARTS.TYPES.LINECHART, window.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(self.template.chartSettings.chartType()) >= 0) {
       hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && self.template.chartSettings.chartYMulti().length > 0;
     }
     else {
       hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && typeof self.template.chartSettings.chartYSingle() != "undefined" && self.template.chartSettings.chartYSingle() != null
-        || self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER;
+        || self.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.COUNTER;
     }
     if (!hasData && self.template.showChart()){
       self.template.showFieldList(true);
