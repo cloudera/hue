@@ -35,6 +35,7 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.rest.http_client import RestException
+from desktop.lib.thrift_util import unpack_guid
 from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
@@ -194,7 +195,7 @@ class HS2Api(Api):
 
     try:
       decoded_guid = session.get_handle().sessionId.guid
-      response['session_id'] = "%x:%x" % struct.unpack(b"QQ", decoded_guid)
+      response['session_id'] = unpack_guid(decoded_guid)
     except Exception, e:
       LOG.warn('Failed to decode session handle: %s' % e)
 
@@ -214,7 +215,7 @@ class HS2Api(Api):
     if not session_id:
       session = Session.objects.get_session(self.user, application=app_name)
       decoded_guid = session.get_handle().sessionId.guid
-      session_decoded_id = "%x:%x" % struct.unpack(b"QQ", decoded_guid)
+      session_decoded_id = unpack_guid(decoded_guid)
       if source_method == "dt_logout":
         LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
 
@@ -441,7 +442,7 @@ class HS2Api(Api):
         'finished': job.get('finished', False)
       } for job in jobs_with_state]
     elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
-      query_id = "%x:%x" % struct.unpack(b"QQ", snippet['result']['handle']['guid'])
+      query_id = unpack_guid(snippet['result']['handle']['guid'])
       progress = min(self.progress(snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
         'name': query_id,
@@ -876,8 +877,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     guid = None
     if 'result' in snippet and 'handle' in snippet['result'] and 'guid' in snippet['result']['handle']:
       try:
-        decoded_guid = base64.decodestring(snippet['result']['handle']['guid'])
-        guid = "%x:%x" % struct.unpack(b"QQ", decoded_guid)
+        guid = unpack_guid(base64.decodestring(snippet['result']['handle']['guid']))
       except Exception, e:
         LOG.warn('Failed to decode operation handle guid: %s' % e)
     else:

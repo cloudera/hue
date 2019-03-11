@@ -225,6 +225,10 @@ class ThriftUtilTest(unittest.TestCase):
     impala_handle = """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), tableName=u\'customers\', tableTypes=None, catalogName=None),)"""
     self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)), tableName=u\'customers\', tableTypes=None, catalogName=None),)""")
 
+    # Following should be added to test, but fails because eval doesn't handle null bytes
+    #impala_handle = """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xd23\xfa\x150\xf5D\x91\x00\x00\x00\x00\xd7\xef\x91\x00\')), tableName=u\'customers\', tableTypes=None, catalogName=None),)"""
+    #self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=9144f53015fa33d2:0091efd700000000)), tableName=u\'customers\', tableTypes=None, catalogName=None),)""")
+
 class TestJsonable2Thrift(unittest.TestCase):
   """
   Tests a handful of permutations of jsonable2thrift.
