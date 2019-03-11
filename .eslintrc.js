@@ -11,12 +11,12 @@ const hueGlobals = [
   'USER_HOME_DIR', 'WorkerGlobalScope',
 
   // other misc
-  'ace', 'Autocompleter', 'CodeMirror', 'd3v3', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role',
-  'sqlStatementsParser', 'trackOnGA',
+  'ace', 'Autocompleter', 'CodeMirror', 'Datamap', 'd3v3', 'HueGeo', 'impalaDagre', 'less', 'MediumEditor', 'moment',
+  'nv', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA',
 
   // jasmine
-  'afterAll', 'afterEach', 'beforeAll', 'beforeEach', 'describe', 'expect', 'fail', 'fit', 'it', 'jasmine', 'spyOn',
-  'xdescribe', 'xit'
+  'afterAll', 'afterEach', 'beforeAll', 'beforeEach', 'describe', 'expect', 'fail', 'fdescribe', 'fit', 'it', 'jasmine',
+  'spyOn', 'xdescribe', 'xit'
 ];
 
 const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {

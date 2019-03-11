@@ -239,55 +239,55 @@
                   <div class="dropdown inline-block">
                     <a class="dropdown-toggle" href="javascript: void(0)" data-toggle="dropdown" title="${ _('Change widget visualization') }">
                       <!-- ko switch: fieldViz -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.COUNTER --><i class="fa fa-superscript fa-fw"></i> ${_('Counter')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.GRADIENTMAP --><i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.MAP --><i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.COUNTER --><i class="fa fa-superscript fa-fw"></i> ${_('Counter')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.GRADIENTMAP --><i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.MAP --><i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
                       <!-- /ko -->
                     </a>
                     <ul class="dropdown-menu">
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.COUNTER); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.COUNTER); }">
                           <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TEXTSELECT); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.TEXTSELECT); }">
                           <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.BARCHART); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.BARCHART); }">
                           <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.PIECHART); }">
                           <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TIMELINECHART); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.TIMELINECHART); }">
                           <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.GRADIENTMAP); }">
                           <i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.MAP); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.MAP); }">
                           <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
                         </a>
                       </li>
