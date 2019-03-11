@@ -367,8 +367,7 @@ function impalaDagre(id) {
   }
 
   function getExecutionTimelineData(key) {
-    // Temporarely remove CodeGen, until we can present it in a better way.
-    /*var timeline = getCPUTimelineData(key)
+    var timeline = getCPUTimelineData(key)
     if (!timeline) {
       return timeline;
     }
@@ -376,8 +375,7 @@ function impalaDagre(id) {
     if (!initTime) {
       return timeline;
     }
-    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);*/
-    return getCPUTimelineData(key);
+    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);
   }
 
   function getHealthData(key, startTime) {
