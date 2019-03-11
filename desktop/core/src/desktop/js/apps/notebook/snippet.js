@@ -1057,7 +1057,7 @@ class Snippet {
       const type = self.chartType();
       hueAnalytics.log('notebook', 'chart/' + type);
 
-      if (type === ko.HUE_CHARTS.TYPES.MAP && self.result.cleanedNumericMeta().length >= 2) {
+      if (type === window.HUE_CHARTS.TYPES.MAP && self.result.cleanedNumericMeta().length >= 2) {
         if (self.chartX() === null || typeof self.chartX() === 'undefined') {
           let name = self.result.cleanedNumericMeta()[0].name;
           self.result.cleanedNumericMeta().forEach(fld => {
@@ -1087,9 +1087,9 @@ class Snippet {
 
       if (
         (self.chartX() === null || typeof self.chartX() === 'undefined') &&
-        (type == ko.HUE_CHARTS.TYPES.BARCHART ||
-          type == ko.HUE_CHARTS.TYPES.PIECHART ||
-          type == ko.HUE_CHARTS.TYPES.GRADIENTMAP) &&
+        (type == window.HUE_CHARTS.TYPES.BARCHART ||
+          type == window.HUE_CHARTS.TYPES.PIECHART ||
+          type == window.HUE_CHARTS.TYPES.GRADIENTMAP) &&
         self.result.cleanedStringMeta().length >= 1
       ) {
         self.chartX(self.result.cleanedStringMeta()[0].name);
@@ -1098,7 +1098,7 @@ class Snippet {
       if (self.result.cleanedNumericMeta().length > 0) {
         if (
           self.chartYMulti().length === 0 &&
-          (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)
+          (type === window.HUE_CHARTS.TYPES.BARCHART || type === window.HUE_CHARTS.TYPES.LINECHART)
         ) {
           self.chartYMulti.push(
             self.result.cleanedNumericMeta()[
@@ -1107,11 +1107,11 @@ class Snippet {
           );
         } else if (
           (self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') &&
-          (type === ko.HUE_CHARTS.TYPES.PIECHART ||
-            type === ko.HUE_CHARTS.TYPES.MAP ||
-            type === ko.HUE_CHARTS.TYPES.GRADIENTMAP ||
-            type === ko.HUE_CHARTS.TYPES.SCATTERCHART ||
-            (type === ko.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))
+          (type === window.HUE_CHARTS.TYPES.PIECHART ||
+            type === window.HUE_CHARTS.TYPES.MAP ||
+            type === window.HUE_CHARTS.TYPES.GRADIENTMAP ||
+            type === window.HUE_CHARTS.TYPES.SCATTERCHART ||
+            (type === window.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))
         ) {
           if (self.chartYMulti().length === 0) {
             self.chartYSingle(
@@ -1166,7 +1166,7 @@ class Snippet {
     self.chartType = ko.observable(
       typeof snippet.chartType != 'undefined' && snippet.chartType != null
         ? snippet.chartType
-        : ko.HUE_CHARTS.TYPES.BARCHART
+        : window.HUE_CHARTS.TYPES.BARCHART
     );
     self.chartType.subscribe(prepopulateChart);
     self.chartSorting = ko.observable(
@@ -1246,9 +1246,9 @@ class Snippet {
 
     self.hasDataForChart = ko.computed(() => {
       if (
-        self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART ||
-        self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART ||
-        self.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART
+        self.chartType() == window.HUE_CHARTS.TYPES.BARCHART ||
+        self.chartType() == window.HUE_CHARTS.TYPES.LINECHART ||
+        self.chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART
       ) {
         return (
           typeof self.chartX() != 'undefined' &&

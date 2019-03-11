@@ -140,8 +140,6 @@ if USE_NEW_EDITOR.get():
     ${ render_bundle('hue') | n,unicode }
   % endif
 
-  <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
-  <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
