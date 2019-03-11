@@ -152,7 +152,7 @@ ENABLE_BATCH_EXECUTE = Config(
   key="enable_batch_execute",
   help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),
   type=coerce_bool,
-  dynamic_default=is_oozie_enabled
+  default=False
 )
 
 ENABLE_SQL_INDEXER = Config(
