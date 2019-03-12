@@ -1,0 +1,10 @@
+include MANIFEST.in Makefile CHANGES INSTALL LICENCE README TODO
+include tox.ini .coveragerc
+include Modules/*.c Modules/*.h
+recursive-include Build *.cfg*
+recursive-include Lib *.py
+recursive-include Demo *.py
+recursive-include Tests *.py *.ldif
+recursive-include Lib/slapdtest *.pem *.key *.conf *.sh README
+recursive-include Doc *.rst *.py spelling_wordlist.txt Makefile
+prune Doc/.build
