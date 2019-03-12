@@ -40,22 +40,19 @@ certain development libraries be installed on your system. To install from the
 tarball, you'll need these library development packages and tools installed on your system:
 
 * Python 2.7
+* Python 3 (not available yet [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * [MySQL InnoDB or PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
+* Java (but only for the JDBC proxy, should be removed when [SQL Alchemy](https://issues.cloudera.org/browse/HUE-8740) is mature)
 
 ### Ubuntu
 
     sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev nodejs npm
 
-#### Install Oracle JDK
+**Install Oracle JDK**
 
     sudo add-apt-repository ppa:webupd8team/java
     sudo apt-get update
     sudo apt-get install oracle-java8-installer
-
-#### If you want to run the unit tests
-
-    sudo apt-get install libtidy-0.99-0
-
 
 ### CentOS/RHEL
 
@@ -66,30 +63,11 @@ tarball, you'll need these library development packages and tools installed on y
 * libtidy (for unit tests only)
 * openssl-devel (for version 7+)
 
-
-### MacOS
-
-* Xcode command line tools
-* [Homebrew](https://brew.sh)
-* [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
-
-#### Install Dependencies via Homebrew
-
-    brew install mysql maven gmp openssl libffi && brew cask install java8
-
-#### Install Xcode command line tools
-    sudo xcode-select --install
-
-#### Fix openssl errors
-Required for MacOS 10.11+
-
-    export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
-
-### Centos/Oracle/RedHat 6.x
+#### Centos/Oracle/RedHat 6.x
 
 Installing Python 2.7:
 
-#### CentOS 6.8/6.9 OS
+##### CentOS 6.8/6.9 OS
 
 Check your OS Version:
 
@@ -101,7 +79,7 @@ Make sure "/etc/redhat-release" contains "CentOS 6.8 or 6.9" version. These inst
     yum install -y scl-utils
     yum install -y python27
 
-#### RedHat 6.8/6.9 OS
+##### RedHat 6.8/6.9 OS
 
 Check your OS Version
 
@@ -114,7 +92,7 @@ Make sure `/etc/redhat-release` contains "RedHat 6.8 or 6.9" version. These inst
     yum install -y scl-utils
     yum install -y python27
 
-#### Oracle 6.8/6.9 OS
+##### Oracle 6.8/6.9 OS
 
 Check your OS Version
 
@@ -138,8 +116,24 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
     yum install -y scl-utils
     yum install -y python27
 
+### MacOS
 
-#### Install Oracle Instant Client
+* Xcode command line tools
+* [Homebrew](https://brew.sh)
+* [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
+
+1. Install Dependencies via Homebrew
+    brew install mysql maven gmp openssl libffi && brew cask install java8
+
+2. Install Xcode command line tools
+    sudo xcode-select --install
+
+3. Fix openssl errors
+Required for MacOS 10.11+
+    export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+
+### Oracle Client lib
 
 Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add
 
@@ -166,7 +160,7 @@ and finally
     unzip ottclasses.zip
 
 
-## Build
+## Install
 
 Configure `$PREFIX` with the path where you want to install Hue by running:
 
@@ -180,29 +174,7 @@ that user's home directory, or in a directory within `/usr/share`.
 
 ## Docker
 
-Alternatively to building Hue into an image, the [Hue Docker Guide](https://github.com/cloudera/hue/tree/testing/tools/docker/hue) is available.
-
-## Troubleshooting the tarball Installation
-
-.Q: I moved my Hue installation from one directory to another and now Hue no
-longer functions correctly.
-
-A: Due to the use of absolute paths by some Python packages, you must run a
-series of commands if you move your Hue installation. In the new location, run:
-
-    rm app.reg
-    rm -r build
-    make apps
-
-
-.Q: Why does "make install" compile other pieces of software?
-
-A: In order to ensure that Hue is stable on a variety of distributions and
-architectures, it installs a Python virtual environment which includes its
-dependencies. This ensures that the software can depend on specific versions
-of various Python libraries and you don't have to be concerned about missing
-software components.
-
+Alternatively to building Hue into an image, the [Hue Docker Guide](https://github.com/cloudera/hue/tree/testing/tools/docker) is available.
 
 ## Starting the server
 
@@ -214,19 +186,392 @@ your Hue Server by running:
 This will start several subprocesses, corresponding to the different Hue
 components. Your Hue installation is now running.
 
+## Configuration for connecting to external services
+
+These configuration variables are under the `[hadoop]` section in
+the `hue.ini` configuration file.
+
+### Hue configuration
+
+The source of truth sits in the main [hue.ini](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini).
+It consists in several [ini sections](https://en.wikipedia.org/wiki/INI_file#Sections). Lines needs to be uncommented to be active.
+
+Hue is using Hadoop `impersonation` to be able to communicate properly with certain services. This is describe in the following [Service Configuration]("#services-pre-configurations).
+
+#### Impala
+
+In the `[impala]` section of the configuration file, you can
+_optionally_ specify the following:
+
+    server_host:
+      The hostname or IP that the Impala Server should bind to. By
+      default it binds to `localhost`, and therefore only serves local
+      IPC clients.
+
+[LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
+](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/).
+
+#### Hive
+
+In the `[beeswax]` section of the configuration file, you can
+_optionally_ specify the following:
+
+    beeswax_server_host:
+      The hostname or IP that the Hive Server should bind to. By
+      default it binds to `localhost`, and therefore only serves local
+      IPC clients.
+
+    hive_conf_dir:
+      The directory containing your `hive-site.xml` Hive
+      configuration file.
+
+#### JDBC
+
+Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
+
+Note, the JDBC proxy should be removed when [SQL Alchemy](https://issues.cloudera.org/browse/HUE-8740) is mature.
+
+
+#### Files and Object Store
+
+##### HDFS
+
+Hue supports one HDFS cluster. That cluster should be defined
+under the `[[[default]]]` sub-section.
+
+    fs_defaultfs::
+      This is the equivalence of `fs.defaultFS` (aka `fs.default.name`) in
+      Hadoop configuration.
+
+    webhdfs_url::
+      You can also set this to be the HttpFS url. The default value is the HTTP
+      port on the NameNode.
+
+    hadoop_conf_dir::
+      This is the configuration directory of the HDFS, typically
+      `/etc/hadoop/conf`.
+
+##### S3
+
+Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
+
+Read more about it in the [S3 User Documentation](../user-guide/user-guide.html#s3).
+
+In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
+
+These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
+
+
+    [aws]
+    [[aws_accounts]]
+    [[[default]]]
+    access_key_id_script=/path/to/access_key_script
+    secret_access_key_script= /path/to/secret_key_script
+    allow_environment_credentials=false
+    region=us-east-1
+
+
+Alternatively (but not recommended for production or secure environments), you can set the access_key_id and secret_access_key values to the plain-text values of your keys:
+
+    [aws]
+    [[aws_accounts]]
+    [[[default]]]
+    access_key_id=s3accesskeyid
+    secret_access_key=s3secretaccesskey
+    allow_environment_credentials=false
+    region=us-east-1
+
+The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to 'us-east-1'.
+
+
+**Using Ceph**
+New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
+
+
+##### ADLS
+
+Hue's file browser can now allow users to explore, manage, and upload data in an ADLS, in addition to HDFS and S3.
+
+Read more about it in the [ADLS User Documentation](../user-guide/user-guide.html#adls).
+
+In order to add an ADLS account to Hue, you'll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
+These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
+
+<pre>
+[adls]
+[[azure_accounts]]
+[[[default]]]
+client_id_script=/path/to/client_id_script.sh
+client_secret_script=/path/to/client_secret_script.sh
+tenant_id_script=/path/to/tenant_id_script.sh
+
+[[adls_clusters]]
+[[[default]]]
+fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+webhdfs_url=https://<account_name>.azuredatalakestore.net
+</pre>
+
+Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
+
+<pre>
+[adls]
+[[azure_account]]
+[[[default]]]
+client_id=adlsclientid
+client_secret=adlsclientsecret
+tenant_id=adlstenantid
+
+[[adls_clusters]]
+[[[default]]]
+fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+webhdfs_url=https://<account_name>.azuredatalakestore.net
+</pre>
+
+#### Yarn (MR2) Cluster
+
+Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the `[[[default]]]` and `[[[ha]]]` sub-sections.
+
+    resourcemanager_host:
+      The host running the ResourceManager.
+
+    resourcemanager_port:
+      The port for the ResourceManager REST service.
+
+    logical_name:
+      NameNode logical name.
+
+    submit_to:
+      To enable the section, set to True.
+
+#### Oozie
+
+In the `[liboozie]` section of the configuration file, you should
+specify:
+
+    oozie_url:
+      The URL of the Oozie service. It is the same as the `OOZIE_URL`
+      environment variable for Oozie.
+
+
+#### Solr
+
+In the `[search]` section of the configuration file, you should
+specify:
+
+    solr_url:
+      The URL of the Solr service.
+
+
+#### HBase
+
+In the `[hbase]` section of the configuration file, you should
+specify:
+
+    hbase_clusters:
+      Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
+
+### Services pre-configuration
+
+#### Hive SQL
+
+Hue's Hive SQL Editor application helps you use Hive to query your data.
+It depends on a Hive Server 2 running in the cluster. Please read
+this section to ensure a proper integration.
+
+Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
+(or any path you specify as `hive.metastore.warehouse.dir` in your
+`hive-site.xml`).  Make sure this location exists and is writable by
+the users whom you expect to be creating tables.  `/tmp` (on the local file
+system) must be world-writable (1777), as Hive makes extensive use of it.
+
+<div class="note">
+  In `hue.ini`, modify `hive_conf_dir` to point to the
+  directory containing `hive-site.xml`.
+</div>
+
+#### Hive and Impala High Availability (HA)
+
+HiveServer2 and Impala support High Availability through a “load balancer”.
+One caveat is that Hue's underlying Thrift libraries reuse TCP connections in a
+pool, a single user session may not have the same Impala or Hive TCP connection.
+If a TCP connection is balanced away from the previously selected  HiveServer2
+or Impalad instance, the user session and its queries can be lost and trigger
+the “Results have expired” or “Invalid session Id” errors.
+
+To prevent sessions from being lost, you need configure the load balancer with
+“source” algorithm to ensure each Hue instance sends all traffic to a single
+HiveServer2/Impalad instance. Yes, this is not true load balancing, but a
+configuration for failover High Availability. HiveSever2 or Impala coordinators
+already distribute the work across the cluster so this is not an issue.
+
+To enable an optimal load distribution that works for everybody, you can create
+multiple profiles in our load balancer, per port for Hue clients and non-Hue
+clients like Hive or Impala. You can configure non-Hue clients to distribute loads
+with “roundrobin” or “leastconn” and configure Hue clients with “source”
+(source IP Persistence) on dedicated ports, for example, 10015 for Hive beeline
+commands, 10016 for Hue, 21051 for Hue-Impala interactions while 25003 for Impala shell.
+
+You can configure the HaProxy to have two different ports associated with
+different load balancing algorithms. Here is a sample configuration (haproxy.cfg)
+for Hive and Impala HA on a secure cluster.
+
+<pre>
+frontend hiveserver2_front
+bind *:10015 ssl crt /path/to/cert_key.pem
+mode tcp
+option tcplog
+default_backend hiveserver2
+backend hiveserver2
+    balance                     roundrobin
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+
+frontend  hivejdbc_front
+    bind                        *:10016 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             hivejdbc
+backend hivejdbc
+    balance                     source
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+</pre>
+And here is an example for impala HA configuration on a secure cluster.
+<pre>
+frontend  impala_front
+    bind                        *:25003 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    default_backend             impala
+backend impala
+    balance                     leastconn
+    mode                        tcp
+    server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
+
+frontend  impalajdbc_front
+    bind                        *:21051 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             impalajdbc
+backend impalajdbc
+    balance                     source
+    mode                        tcp
+    server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
+</pre>
+
+Note: “check” is required at end of each line to ensure HaProxy can detect any
+unreachable Impalad/HiveServer2 server, so HA failover can be successful. Without
+ TCP check, you may hit the “TSocket reads 0 byte” error when the
+Impalad/HiveServer2 server Hue tries to connect is down.
+
+After editing the /etc/haproxy/haproxy.cfg file, run following commands to
+restart HaProxy service and check the service restarts successfully.
+
+<pre>
+service haproxy restart
+service haproxy status
+</pre>
+
+Also we need add following blocks into hue.ini.
+<pre>
+[impala]
+server_port=21051
+
+[beeswax]
+hive_server_port=10016
+</pre>
+
+Read more about it in the [How to optimally configure your Analytic Database for
+High Availability with Hue and other SQL clients](http://gethue.com/how-to-opti
+mally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients) post.
+
+#### Hadoop HDFS
+
+You need to enable WebHdfs or run an HttpFS server. To turn on WebHDFS,
+add this to your `hdfs-site.xml` and *restart* your HDFS cluster.
+Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
+
+    <property>
+      <name>dfs.webhdfs.enabled</name>
+      <value>true</value>
+    </property>
+
+You also need to add this to `core-site.xml`.
+
+    <property>
+      <name>hadoop.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
+If you place your Hue Server outside the Hadoop cluster, you can run
+an HttpFS server to provide Hue access to HDFS. The HttpFS service requires
+only one port to be opened to the cluster.
+
+Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
+
+    <property>
+      <name>httpfs.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>httpfs.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
+
+#### Oozie
+
+Hue submits MapReduce jobs to Oozie as the logged in user. You need to
+configure Oozie to accept the `hue` user to be a proxyuser. Specify this in
+your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
+
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
+        <value>*</value>
+    </property>
+
+#### Firewall
+
+Hue currently requires that the machines within your cluster can connect to
+each other freely over TCP. The machines outside your cluster must be able to
+open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
+to interact with the system.
 
 # Configuration
 
 ## Reference Architecture
-* 3 Hues and 1 Load Balancer
-* Databases: MySQL InnoDB, PostgreSQL, Oracle
-* LDAP
-* Monitoring
-* Impala HA
-* HiveServer2 HA
-* Downloads
 
-[Read more about it here](http://gethue.com/performance-tuning/).
+A recommended setup consists in:
+
+* 2 Hues and 1 Load Balancer
+* Databases: MySQL InnoDB, PostgreSQL, Oracle
+* Authentication: [LDAP or Username/Passord](#user-management)
+
+### Monitoring
+
+Performing a `GET /desktop/debug/is_alive` will return a 200 response if running.
+
 
 ### Load Balancers
 
@@ -234,59 +579,53 @@ Hue is often run with:
 
 * Cherrypy with Httpd
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
-* [NGINX](Using NGINX to speed up Hue)
+* [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 
 ### Task Server
 
+The task server is currently a work in progress to outsource all the blocking or resource intensive operations
+outside of the API server. Follow (HUE-8738)[https://issues.cloudera.org/browse/HUE-8738) for more information
+on when first usable task will be released.
+
+Until then, here is how to try the task server service.
+
 Make sure you have Rabbit MQ installed and running.
 
-```
-sudo apt-get install rabbitmq-server -y
-```
+    sudo apt-get install rabbitmq-server -y
+
 
 In hue.ini, telling the API server that the Task Server is available:
 
-```
-[desktop]
-[[task_server]]
-enabled=true
-```
+    [desktop]
+    [[task_server]]
+    enabled=true
 
 Starting the  Task server:
 
-```
-./build/env/bin/celery worker -l info -A desktop
-```
+    ./build/env/bin/celery worker -l info -A desktop
 
 Running a test tasks:
 
-```
-./build/env/bin/hue shell
+    ./build/env/bin/hue shell
 
-from desktop.celery import debug_task
+    from desktop.celery import debug_task
 
-debug_task.delay()
-debug_task.delay().get() # Works if result backend is setup and task_server is true in the hue.ini
-
-```
+    debug_task.delay()
+    debug_task.delay().get() # Works if result backend is setup and task_server is true in the hue.ini
 
 Starting the Task Scheduler server:
 
-```
-./build/env/bin/celery -A core beat -l info
-```
+    ./build/env/bin/celery -A core beat -l info
 
 or when Django Celery Beat is enabled:
 
-```
-./build/env/bin/celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-```
+    ./build/env/bin/celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
 ### Proxy
 
 A Web proxy lets you centralize all the access to a certain URL and prettify the address (e.g. ec2-54-247-321-151.compute-1.amazonaws.com --> demo.gethue.com).
 
-[Here is one way to do it](http://gethue.com/i-put-a-proxy-on-hue/).
+Here is one way to do it with [Apache](http://gethue.com/i-put-a-proxy-on-hue/).
 
 ## Quick Start Wizard
 
@@ -304,9 +643,6 @@ Next in each screen:
 3.  **Users** contains a link to the User Admin application to create or
     import users and a checkbox to enable and disable collection of
     usage information.
-4.  **Go!** - displays the Hue home screen, which contains links to the
-    different categories of applications supported by Hue: Query,
-    Hadoop, and Workflow.
 
 ## Configuration
 
@@ -365,6 +701,8 @@ The default setting is port 8888 on all configured IP addresses.
     http_host=0.0.0.0
     http_port=8888
 
+[Gunicorn](https://gunicorn.org/) support is planned to come in via [HUE-8739](https://issues.cloudera.org/browse/HUE-8739).
+
 ### Specifying the Secret Key
 
 For security, you should also specify the secret key that is used for secure
@@ -396,8 +734,7 @@ username and password and becomes an administrator automatically.  This
 user can create other user and administrator accounts. User information is
 stored in the Django database in the Django backend.
 
-The authentication system is pluggable. For more information, see the
-[Hue SDK Documentation](sdk/sdk.html).
+The authentication system is pluggable. For more information, see the [SDK Documentation](../sdk/sdk.html).
 
 List of some of the possible authentications:
 #### Username / Password
@@ -587,7 +924,7 @@ There is also the possibility to change the logo for further personalization.
     # e.g. <image xlink:href="/static/desktop/art/hue-logo-mini-white.png" x="0" y="0" height="40" width="160" />
     logo_svg=
 
-You can go crazy and write there any SVG code you want. Please keep in mind your SVG should be designed to fit in a 160×40 pixels space. To have the same ‘hearts logo’ you can see above, you can type this code
+You can go crazy and write there any SVG code you want. Please keep in mind your SVG should be designed to fit in a 160×40 pixels space. To have the same ‘hearts logo' you can see above, you can type this code
 
     [desktop]
     [[custom]]
@@ -619,390 +956,6 @@ When idle_session_timeout is set, users will automatically be logged out after N
 ### Auditing
 
 Read more about [Auditing User Administration Operations with Hue and Cloudera Navigator](http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/).
-
-
-## Configuration for external services
-
-These configuration variables are under the `[hadoop]` section in
-the `hue.ini` configuration file.
-
-### Hadoop and other services
-
-Depending on which apps you need, you need to make sure that some Hadoop services
-are already setup (that way Hue can talk to them).
-
-<pre>
-|-------------|--------------------------------------------------------|
-|  Component  | Applications                                           |
-|-------------|--------------------------------------------------------|
-|  Editor     | SQL (Hive, Impala, any database...), Pig, Spark...     |
-|  Browsers   | YARN, Oozie, Impala, HBase, Livy                       |
-|  Scheduler  | Oozie                                                  |
-|  Dashboard  | Solr, SQL (Impala, Hive...)                            |
-|-------------|--------------------------------------------------------|
-</pre>
-
-##### Hadoop Configuration
-
-You need to enable WebHdfs or run an HttpFS server. To turn on WebHDFS,
-add this to your `hdfs-site.xml` and *restart* your HDFS cluster.
-Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
-
-    <property>
-      <name>dfs.webhdfs.enabled</name>
-      <value>true</value>
-    </property>
-
-You also need to add this to `core-site.xml`.
-
-    <property>
-      <name>hadoop.proxyuser.hue.hosts</name>
-      <value>*</value>
-    </property>
-    <property>
-      <name>hadoop.proxyuser.hue.groups</name>
-      <value>*</value>
-    </property>
-
-If you place your Hue Server outside the Hadoop cluster, you can run
-an HttpFS server to provide Hue access to HDFS. The HttpFS service requires
-only one port to be opened to the cluster.
-
-Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
-
-    <property>
-      <name>httpfs.proxyuser.hue.hosts</name>
-      <value>*</value>
-    </property>
-    <property>
-      <name>httpfs.proxyuser.hue.groups</name>
-      <value>*</value>
-    </property>
-
-
-#### Configure Oozie
-
-Hue submits MapReduce jobs to Oozie as the logged in user. You need to
-configure Oozie to accept the `hue` user to be a proxyuser. Specify this in
-your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
-
-    <property>
-        <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
-        <value>*</value>
-    </property>
-    <property>
-        <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
-        <value>*</value>
-    </property>
-
-
-#### Hive Configuration
-
-Hue's Hive SQL Editor application helps you use Hive to query your data.
-It depends on a Hive Server 2 running in the cluster. Please read
-this section to ensure a proper integration.
-
-Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
-(or any path you specify as `hive.metastore.warehouse.dir` in your
-`hive-site.xml`).  Make sure this location exists and is writable by
-the users whom you expect to be creating tables.  `/tmp` (on the local file
-system) must be world-writable (1777), as Hive makes extensive use of it.
-
-<div class="note">
-  In `hue.ini`, modify `hive_conf_dir` to point to the
-  directory containing `hive-site.xml`.
-</div>
-
-
-#### Hive and Impala High Availability (HA)
-
-HiveServer2 and Impala support High Availability through a “load balancer”.
-One caveat is that Hue’s underlying Thrift libraries reuse TCP connections in a
-pool, a single user session may not have the same Impala or Hive TCP connection.
-If a TCP connection is balanced away from the previously selected  HiveServer2
-or Impalad instance, the user session and its queries can be lost and trigger
-the “Results have expired” or “Invalid session Id” errors.
-
-To prevent sessions from being lost, you need configure the load balancer with
-“source” algorithm to ensure each Hue instance sends all traffic to a single
-HiveServer2/Impalad instance. Yes, this is not true load balancing, but a
-configuration for failover High Availability. HiveSever2 or Impala coordinators
-already distribute the work across the cluster so this is not an issue.
-
-To enable an optimal load distribution that works for everybody, you can create
-multiple profiles in our load balancer, per port for Hue clients and non-Hue
-clients like Hive or Impala. You can configure non-Hue clients to distribute loads
-with “roundrobin” or “leastconn” and configure Hue clients with “source”
-(source IP Persistence) on dedicated ports, for example, 10015 for Hive beeline
-commands, 10016 for Hue, 21051 for Hue-Impala interactions while 25003 for Impala shell.
-
-You can configure the HaProxy to have two different ports associated with
-different load balancing algorithms. Here is a sample configuration (haproxy.cfg)
-for Hive and Impala HA on a secure cluster.
-
-<pre>
-frontend hiveserver2_front
-bind *:10015 ssl crt /path/to/cert_key.pem
-mode tcp
-option tcplog
-default_backend hiveserver2
-backend hiveserver2
-    balance                     roundrobin
-    mode                        tcp
-    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
-
-frontend  hivejdbc_front
-    bind                        *:10016 ssl crt /path/to/cert_key.pem
-    mode                        tcp
-    option                      tcplog
-    stick                       match src
-    stick-table type ip size 200k expire 30m
-    default_backend             hivejdbc
-backend hivejdbc
-    balance                     source
-    mode                        tcp
-    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
-</pre>
-And here is an example for impala HA configuration on a secure cluster.
-<pre>
-frontend  impala_front
-    bind                        *:25003 ssl crt /path/to/cert_key.pem
-    mode                        tcp
-    option                      tcplog
-    default_backend             impala
-backend impala
-    balance                     leastconn
-    mode                        tcp
-    server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
-    server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
-    server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
-
-frontend  impalajdbc_front
-    bind                        *:21051 ssl crt /path/to/cert_key.pem
-    mode                        tcp
-    option                      tcplog
-    stick                       match src
-    stick-table type ip size 200k expire 30m
-    default_backend             impalajdbc
-backend impalajdbc
-    balance                     source
-    mode                        tcp
-    server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
-    server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
-    server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
-</pre>
-
-Note: “check” is required at end of each line to ensure HaProxy can detect any
-unreachable Impalad/HiveServer2 server, so HA failover can be successful. Without
- TCP check, you may hit the “TSocket reads 0 byte” error when the
-Impalad/HiveServer2 server Hue tries to connect is down.
-
-After editing the /etc/haproxy/haproxy.cfg file, run following commands to
-restart HaProxy service and check the service restarts successfully.
-
-<pre>
-service haproxy restart
-service haproxy status
-</pre>
-
-Also we need add following blocks into hue.ini.
-<pre>
-[impala]
-server_port=21051
-
-[beeswax]
-hive_server_port=10016
-</pre>
-Read more about it in the [How to optimally configure your Analytic Database for
-High Availability with Hue and other SQL clients](http://gethue.com/how-to-opti
-mally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients) post.
-
-
-### Firewall
-
-Hue currently requires that the machines within your cluster can connect to
-each other freely over TCP. The machines outside your cluster must be able to
-open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
-to interact with the system.
-
-### Files and Object Store
-#### HDFS Cluster
-
-Hue supports one HDFS cluster. That cluster should be defined
-under the `[[[default]]]` sub-section.
-
-fs_defaultfs::
-  This is the equivalence of `fs.defaultFS` (aka `fs.default.name`) in
-  Hadoop configuration.
-
-webhdfs_url::
-  You can also set this to be the HttpFS url. The default value is the HTTP
-  port on the NameNode.
-
-hadoop_conf_dir::
-  This is the configuration directory of the HDFS, typically
-  `/etc/hadoop/conf`.
-
-#### S3
-
-Hue’s filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
-
-Read more about it in the [S3 User Documentation](../user-guide/user-guide.html#s3).
-
-In order to add an S3 account to Hue, you’ll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
-
-These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
-
-<pre>
-[aws]
-[[aws_accounts]]
-[[[default]]]
-access_key_id_script=/path/to/access_key_script
-secret_access_key_script= /path/to/secret_key_script
-allow_environment_credentials=false
-region=us-east-1
-</pre>
-
-Alternatively (but not recommended for production or secure environments), you can set the access_key_id and secret_access_key values to the plain-text values of your keys:
-
-<pre>
-[aws]
-[[aws_accounts]]
-[[[default]]]
-access_key_id=s3accesskeyid
-secret_access_key=s3secretaccesskey
-allow_environment_credentials=false
-region=us-east-1
-</pre>
-
-The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to ‘us-east-1’.
-
-
-<div class="note">
-Using Ceph
-
-New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
-</div>
-
-
-#### ADLS
-
-Hue’s file browser can now allow users to explore, manage, and upload data in an ADLS, in addition to HDFS and S3.
-
-Read more about it in the [ADLS User Documentation](../user-guide/user-guide.html#adls).
-
-In order to add an ADLS account to Hue, you’ll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
-These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
-
-<pre>
-[adls]
-[[azure_accounts]]
-[[[default]]]
-client_id_script=/path/to/client_id_script.sh
-client_secret_script=/path/to/client_secret_script.sh
-tenant_id_script=/path/to/tenant_id_script.sh
-
-[[adls_clusters]]
-[[[default]]]
-fs_defaultfs=adl://<account_name>.azuredatalakestore.net
-webhdfs_url=https://<account_name>.azuredatalakestore.net
-</pre>
-
-Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
-
-<pre>
-[adls]
-[[azure_account]]
-[[[default]]]
-client_id=adlsclientid
-client_secret=adlsclientsecret
-tenant_id=adlstenantid
-
-[[adls_clusters]]
-[[[default]]]
-fs_defaultfs=adl://<account_name>.azuredatalakestore.net
-webhdfs_url=https://<account_name>.azuredatalakestore.net
-</pre>
-
-### Yarn (MR2) Cluster
-
-Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
-under the `[[[default]]]` and `[[[ha]]]` sub-sections.
-
-resourcemanager_host::
-  The host running the ResourceManager.
-
-resourcemanager_port::
-  The port for the ResourceManager REST service.
-
-logical_name::
-  NameNode logical name.
-
-submit_to::
-   To enable the section, set to True.
-
-
-### Impala Configuration
-
-In the `[impala]` section of the configuration file, you can
-_optionally_ specify the following:
-
-server_host::
-  The hostname or IP that the Impala Server should bind to. By
-  default it binds to `localhost`, and therefore only serves local
-  IPC clients.
-
-[LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
-](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/).
-
-### Hive Configuration
-
-In the `[beeswax]` section of the configuration file, you can
-_optionally_ specify the following:
-
-beeswax_server_host::
-  The hostname or IP that the Hive Server should bind to. By
-  default it binds to `localhost`, and therefore only serves local
-  IPC clients.
-
-hive_conf_dir::
-  The directory containing your `hive-site.xml` Hive
-  configuration file.
-
-### JDBC
-
-Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
-
-### Oozie Configuration
-
-In the `[liboozie]` section of the configuration file, you should
-specify:
-
-oozie_url::
-  The URL of the Oozie service. It is the same as the `OOZIE_URL`
-  environment variable for Oozie.
-
-
-### Solr Configuration
-
-In the `[search]` section of the configuration file, you should
-specify:
-
-solr_url::
-  The URL of the Solr service.
-
-
-### HBase Configuration
-
-In the `[hbase]` section of the configuration file, you should
-specify:
-
-hbase_clusters::
-  Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
 
 
 # Administration
@@ -1084,7 +1037,7 @@ superusers and users.
     -   Change a user into a superuser
     -   Import users and groups from an LDAP server
 
--   Users — can change their name, e-mail address, and password and log
+-   Users can change their name, e-mail address, and password and log
     in to Hue and run Hue applications, subject to the permissions
     provided by the Hue groups to which they belong.
 
@@ -1150,7 +1103,7 @@ superusers and users.
 
 #### Importing Users from an LDAP Directory
 
-![image](images/note.jpg) **Note**:
+**Note**:
 
 Importing users from an LDAP directory does not import any password
 information. You must add passwords manually in order for a user to log
@@ -1327,13 +1280,13 @@ instrumentation=true
 </pre>
  If `django_debug_mode` is enabled, instrumentation is automatically enabled. This flag appends the response time and the total peak memory used since Hue started for every logged request.
 
-##### Instrumentation enabled:
+### Instrumentation enabled
 
 <pre>
 [17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
 </pre>
 
-##### Instrumentation not enabled:
+### Instrumentation not enabled
 
 <pre>
 [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
@@ -1397,10 +1350,12 @@ To configure Hue to store data in MySQL:
 1. Create a new database in MySQL and grant privileges to a Hue user to manage
    this database.
 
+    <pre>
     mysql> create database hue;
     Query OK, 1 row affected (0.01 sec)
     mysql> grant all on hue.* to 'hue'@'localhost' identified by 'secretpassword';
     Query OK, 0 rows affected (0.00 sec)
+    </pre>
 
 2. Shut down Hue if it is running.
 
@@ -1408,34 +1363,39 @@ To configure Hue to store data in MySQL:
    existing database data to a text file. Note that using the ".json" extension
    is required.
 
+    <pre>
     /usr/share/hue/build/env/bin/hue dumpdata > $some-temporary-file.json
+    </pre>
 
 4. Open the `hue.ini` file in a text editor. Directly below the
    `[[database]]` line, add the following options (and modify accordingly for
    your MySQL setup):
 
+    <pre>
     host=localhost
     port=3306
     engine=mysql
     user=hue
     password=secretpassword
     name=hue
+    </pre>
 
 5. As the Hue user, configure Hue to load the existing data and create the
    necessary database tables:
 
+    <pre>
     /usr/share/hue/build/env/bin/hue syncdb --noinput
     mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
     /usr/share/hue/build/env/bin/hue loaddata $temporary-file-containing-dumped-data.json
+    </pre>
 
 Your system is now configured and you can start the Hue server as normal.
-
 
 # Using Hue
 
 After installation, you can use Hue by navigating to `http://myserver:8888/`.
 
-The link:user-guide/index.html[user guide] will help users go through the various installed applications.
+The [user guide](../user-guide/user-guide.html) will help users go through the various installed applications.
 
 ## Supported Browsers
 
@@ -1445,6 +1405,28 @@ The two latest LTS versions of each browsers:
 * Safari
 * Chrome
 * Firefox
+
+## Troubleshooting the tarball Installation
+
+Q: I moved my Hue installation from one directory to another and now Hue no
+longer functions correctly.
+
+A: Due to the use of absolute paths by some Python packages, you must run a
+series of commands if you move your Hue installation. In the new location, run:
+
+    rm app.reg
+    rm -r build
+    make apps
+
+
+Q: Why does "make install" compile other pieces of software?
+
+A: In order to ensure that Hue is stable on a variety of distributions and
+architectures, it installs a Python virtual environment which includes its
+dependencies. This ensures that the software can depend on specific versions
+of various Python libraries and you don't have to be concerned about missing
+software components.
+
 
 ## Feedback
 
@@ -1464,7 +1446,7 @@ your bug reports.
 
 
 <div class="row-fluid footer">
-  Documentation improvements? <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">Feel free to edit this page on GitHub and send a pull request!</a>
+  Documentation improvements? Feel free to <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">edit this page on GitHub </a> and send a pull request!
 </div>
 
 
