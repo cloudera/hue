@@ -825,9 +825,12 @@ alert("XSS")
     f.write(sdf_string)
     f.close()
 
-    response = self.c.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=True)
-    assert_equal(200, response.status_code)
-    assert_equal('attachment', response['Content-Disposition'])
+    response = self.c.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=False) # The client does not support redirecting to another host. follow=False
+    if response.status_code == 302: # Redirects to webhdfs
+      assert_true(response.url.find('webhdfs') >= 0)
+    else:
+      assert_equal(200, response.status_code)
+      assert_equal('attachment', response['Content-Disposition'])
 
     # Download fails and displays exception because of missing permissions
     self.cluster.fs.chmod(prefix + '/xss', 0700)
