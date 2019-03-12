@@ -1,0 +1,26 @@
+[run]
+branch = True
+source =
+    Lib/
+omit =
+    Lib/slapdtest.py
+
+[paths]
+source =
+    Lib/
+    .tox/*/lib/python*/site-packages/
+
+[report]
+ignore_errors = False
+precision = 1
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    if PY2
+    if not PY2
+
+[html]
+directory = build/htmlcov
+title = python-ldap coverage report
