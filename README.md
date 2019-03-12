@@ -52,6 +52,7 @@ configuration is available in the template directory.
 
 Community
 -----------
+   * How to [contribute](docs/CONTRIBUTING.md)
    * User group: http://groups.google.com/a/cloudera.org/group/hue-user
    * Jira: https://issues.cloudera.org/browse/HUE
    * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
