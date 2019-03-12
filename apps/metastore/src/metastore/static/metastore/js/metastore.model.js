@@ -307,7 +307,7 @@ var MetastoreNamespace = (function () {
       if (foundDatabases.length === 1) {
         self.setDatabase(foundDatabases[0], callback);
       } else if (clearCacheOnMissing) {
-        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).then(function () {
           self.loadDatabases().done(function () {
             whenLoaded(false)
           })
