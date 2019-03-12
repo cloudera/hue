@@ -220,7 +220,7 @@ var MetastoreViewModel = (function () {
           if (foundTables.length === 1) {
             self.source().namespace().database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
-            self.source().namespace().database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+            self.source().namespace().database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).then(function () {
               self.source().namespace().database().load(function () {
                 setTableAfterLoad(false);
               });
