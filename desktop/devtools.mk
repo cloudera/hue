@@ -25,9 +25,9 @@ DEVTOOLS += \
 	coverage[4.5.2] \
 	nosetty[0.4] \
 	werkzeug[0.14.1] \
-    astroid[2.2.5] \
-    isort[4.2.5] \
-    six[1.12.0]
+        astroid[2.2.5] \
+        isort[4.2.5] \
+        six[1.12.0]
 
 PYPI_MIRROR ?= https://pypi.python.org/simple/
 
