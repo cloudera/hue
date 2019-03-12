@@ -59,7 +59,7 @@ Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/
 
 
 ### SQL Alchemy
-SQL Alchemy supports comes with [HUE-7621](https://issues.cloudera.org/browse/HUE-7621)
+SQL Alchemy supports comes with [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
 
 ### Solr SQL
 [Solr connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/solr.py)
