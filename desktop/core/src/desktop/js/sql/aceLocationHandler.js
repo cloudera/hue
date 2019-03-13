@@ -20,6 +20,7 @@ import AssistStorageEntry from 'assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 import SqlParseSupport from 'parse/sqlParseSupport';
 import sqlUtils from 'sql/sqlUtils';
 
@@ -224,13 +225,10 @@ class AceLocationHandler {
                 let tooltipText;
                 if (token.syntaxError.expected.length > 0) {
                   tooltipText =
-                    window.HUE_I18n.syntaxChecker.didYouMean +
-                    ' "' +
-                    token.syntaxError.expected[0].text +
-                    '"?';
+                    I18n('Did you mean') + ' "' + token.syntaxError.expected[0].text + '"?';
                 } else {
                   tooltipText =
-                    window.HUE_I18n.syntaxChecker.couldNotFind +
+                    I18n('Could not find') +
                     ' "' +
                     (token.qualifiedIdentifier || token.value) +
                     '"';
@@ -252,12 +250,9 @@ class AceLocationHandler {
                 let tooltipText;
                 if (token.syntaxError.expected.length > 0) {
                   tooltipText =
-                    window.HUE_I18n.syntaxChecker.didYouMean +
-                    ' "' +
-                    token.syntaxError.expected[0].text +
-                    '"?';
+                    I18n('Did you mean') + ' "' + token.syntaxError.expected[0].text + '"?';
                 } else if (token.syntaxError.expectedStatementEnd) {
-                  tooltipText = window.HUE_I18n.syntaxChecker.expectedStatementEnd;
+                  tooltipText = I18n('Expected end of statement');
                 }
                 if (tooltipText) {
                   const endCoordinates = self.editor.renderer.textToScreenCoordinates(

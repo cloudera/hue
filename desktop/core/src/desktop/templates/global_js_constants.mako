@@ -67,152 +67,113 @@
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
   window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
 
+  // TODO: Replace with json import
   window.HUE_I18n = {
-    autocomplete: {
-      category: {
-        all: '${ _('All') }',
-        column: '${ _('Columns') }',
-        cte: '${ _('CTEs') }',
-        database: '${ _('Databases') }',
-        field: '${ _('Field') }',
-        'function': '${ _('Functions') }',
-        identifier: '${ _('Identifiers') }',
-        keyword: '${ _('Keywords') }',
-        popular: '${ _('Popular') }',
-        sample: '${ _('Samples') }',
-        table: '${ _('Tables') }',
-        udf: '${ _('UDFs') }',
-        option: '${ _('Options') }',
-        variable: '${ _('Variables') }'
-      },
-      meta: {
-        aggregateFunction: '${ _('aggregate') }',
-        alias: '${ _('alias') }',
-        commonTableExpression: '${ _('cte') }',
-        database: '${ _('database') }',
-        filter: '${ _('filter') }',
-        groupBy: '${ _('group by') }',
-        join: '${ _('join') }',
-        joinCondition: '${ _('condition') }',
-        keyword: '${ _('keyword') }',
-        orderBy: '${ _('order by') }',
-        table: '${ _('table') }',
-        sample: '${ _('sample') }',
-        variable: '${ _('variable') }',
-        view: '${ _('view') }',
-        virtual: '${ _('virtual') }'
-      }
-    },
-    copyToClipboard: {
-      error: "${ _('Error while copying results.') }",
-      success: "${ _('result(s) copied to the clipboard') }",
-    },
-    documentType: {
-      'all': '${_('All')}',
-      'directory': '${ _('Directory') }',
-      'link-pigscript': '${_('Pig Design')}',
-      'link-workflow': '${_('Job Design')}',
-      'notebook': '${_('Notebook')}',
-      'oozie-bundle2': '${_('Oozie Bundle')}',
-      'oozie-coordinator2': '${_('Oozie Schedule')}',
-      'oozie-workflow2': '${_('Oozie Workflow')}',
-      'query-hive': '${_('Hive Query')}',
-      'query-impala': '${_('Impala Query')}',
-      'search-dashboard': '${_('Search Dashboard')}',
-      'query-mapreduce': '${_('MapReduce Job')}',
-      'query-sqoop1': '${_('Import Job')}',
-      'query-spark2': '${_('Spark Job')}',
-      'query-java': '${_('Java Job')}',
-      'query-pig': '${_('Pig Script')}',
-      'query-shell': '${_('Shell Script')}',
-      'query-distcp': '${_('DistCp Job')}'
-    },
-    dropzone: {
-      cancelUpload: '${ _('Cancel upload') }',
-      uploadCanceled: '${ _('The upload has been canceled') }',
-      uploadSucceeded: '${ _('uploaded successfully') }'
-    },
-    jHueHdfsTree: {
-      GO_TO_COLUMN: '${_('Go to column:')}',
-      PLACEHOLDER: '${_('column name...')}',
-      LOCK: '${_('Lock this row')}',
-      UNLOCK: '${_('Unlock this row')}',
-      ROW_DETAILS: '${_('Show row details')}'
-    },
-    jHueFileChooser: {
-      BACK: '${_('Back')}',
-      SELECT_FOLDER: '${_('Select this folder')}',
-      CREATE_FOLDER: '${_('Create folder')}',
-      FOLDER_NAME: '${_('Folder name')}',
-      CANCEL: '${_('Cancel')}',
-      FILE_NOT_FOUND: '${_('The file has not been found')}',
-      UPLOAD_FILE: '${_('Upload a file')}',
-      FAILED: '${_('Failed')}'
-    },
-    jHueTableExtender: {
-      GO_TO_COLUMN: '${_('Go to column:')}',
-      PLACEHOLDER: '${_('column name...')}',
-      LOCK: '${_('Lock this row')}',
-      UNLOCK: '${_('Unlock this row')}',
-      ROW_DETAILS: '${_('Show row details')}'
-    },
-    metastore: {
-      errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}'
-    },
-    nav: {
-      apps: '${ _('Apps') }',
-      browsers: '${ _('Browsers') }',
-      documents: '${ _('Documents') }',
-      editor: '${ _('Editor') }',
-    },
-    notebook: {
-      dropEditorHoverText: '${_('Drop a SQL file here')}',
-      dropNotebookHoverText: '${_('Drop iPython/Zeppelin notebooks here')}',
-      noResults: '${_('No results found.')}',
-      of: '${_('of')}'
-    },
-    selectize: {
-      choose: "${ _('Choose...') }",
-      editTags: "${ _('Edit tags') }"
-    },
-    syntaxChecker: {
-      didYouMean: '${_('Did you mean')}',
-      expectedStatementEnd: '${_('Expected end of statement')}',
-      suppressError: '${_('Ignore this type of error')}',
-      couldNotFind: '${_('Could not find')}'
-    },
-    queryBuilder: {
-      insertValueHere: "${ _('Insert value here') }",
-      queryRequire: "${ _('Query requires a select or aggregate.') }"
-    },
-    chart: {
-      noData: "${ _('No Data Available.') }",
-      missingLegend: "${ _('Missing legend configuration.') }",
-      missingValue: "${ _('Missing value configuration.') }",
-      missingX: "${ _('Missing x axis configuration.') }",
-      missingY: "${ _('Missing y axis configuration.') }",
-      missingLatitude: "${ _('Missing latitude configuration.') }",
-      missingLongitude: "${ _('Missing longitude configuration.') }",
-      missingLabel: "${ _('Missing label configuration.') }",
-      missingRegion: "${ _('Missing region configuration.') }",
-    },
-    profile: {
-      timeline: "${ _('Timeline') }",
-      metrics: "${ _('Metrics') }",
-      cpu: "${ _('CPU') }",
-      io: "${ _('IO') }",
-      execution: "${ _('Execution') }",
-      codegen: "${ _('CodeGen') }",
-      overview: "${ _('Overview') }",
-      topnodes: "${ _('Top Nodes') }",
-      compilation: "${ _('Compilation') }",
-      planning: "${ _('Planning') }",
-      risks: "${ _('Risks') }"
-    },
-    general: {
-      addMore: '${ _('Add more...') }',
-      offlineOrError: '${ _('It looks like you are offline or an unknown error happened. Please refresh the page.') }'
-    }
+    'Add more...': '${ _('Add more...') }',
+    'aggregate': '${ _('aggregate') }',
+    'alias': '${ _('alias') }',
+    'All': '${_('All')}',
+    'An error occurred refreshing the table stats. Please try again.': '${_('An error occurred refreshing the table stats. Please try again.')}',
+    'Apps': '${ _('Apps') }',
+    'Back': '${_('Back')}',
+    'Browsers': '${ _('Browsers') }',
+    'Cancel upload': '${ _('Cancel upload') }',
+    'Cancel': '${_('Cancel')}',
+    'Choose...': '${ _('Choose...') }',
+    'CodeGen': '${ _('CodeGen') }',
+    'column name...': '${_('column name...')}',
+    'Columns': '${ _('Columns') }',
+    'Compilation': '${ _('Compilation') }',
+    'condition': '${ _('condition') }',
+    'Could not find': '${_('Could not find')}',
+    'CPU': '${ _('CPU') }',
+    'Create folder': '${_('Create folder')}',
+    'cte': '${ _('cte') }',
+    'CTEs': '${ _('CTEs') }',
+    'database': '${ _('database') }',
+    'Databases': '${ _('Databases') }',
+    'Did you mean': '${_('Did you mean')}',
+    'dir': '${ _('dir') }',
+    'Directory': '${ _('Directory') }',
+    'DistCp Job': '${_('DistCp Job')}',
+    'Documents': '${ _('Documents') }',
+    'Drop a SQL file here': '${_('Drop a SQL file here')}',
+    'Drop iPython/Zeppelin notebooks here': '${_('Drop iPython/Zeppelin notebooks here')}',
+    'Edit tags': '${ _('Edit tags') }',
+    'Editor': '${ _('Editor') }',
+    'Error while copying results.': '${ _('Error while copying results.') }',
+    'Execution': '${ _('Execution') }',
+    'Expected end of statement': '${_('Expected end of statement')}',
+    'Failed': '${_('Failed')}',
+    'Fields': '${ _('Fields') }',
+    'Files': '${ _('Files') }',
+    'filter': '${ _('filter') }',
+    'Folder name': '${_('Folder name')}',
+    'Functions': '${ _('Functions') }',
+    'Go to column:': '${_('Go to column:')}',
+    'group by': '${ _('group by') }',
+    'Hive Query': '${_('Hive Query')}',
+    'Identifiers': '${ _('Identifiers') }',
+    'Ignore this type of error': '${_('Ignore this type of error')}',
+    'Impala Query': '${_('Impala Query')}',
+    'Import Job': '${_('Import Job')}',
+    'Insert value here': '${ _('Insert value here') }',
+    'IO': '${ _('IO') }',
+    'It looks like you are offline or an unknown error happened. Please refresh the page.': '${ _('It looks like you are offline or an unknown error happened. Please refresh the page.') }',
+    'Java Job': '${_('Java Job')}',
+    'Job Design': '${_('Job Design')}',
+    'join': '${ _('join') }',
+    'keyword': '${ _('keyword') }',
+    'Keywords': '${ _('Keywords') }',
+    'Lock this row': '${_('Lock this row')}',
+    'MapReduce Job': '${_('MapReduce Job')}',
+    'Metrics': '${ _('Metrics') }',
+    'Missing label configuration.': '${ _('Missing label configuration.') }',
+    'Missing latitude configuration.': '${ _('Missing latitude configuration.') }',
+    'Missing legend configuration.': '${ _('Missing legend configuration.') }',
+    'Missing longitude configuration.': '${ _('Missing longitude configuration.') }',
+    'Missing region configuration.': '${ _('Missing region configuration.') }',
+    'Missing value configuration.': '${ _('Missing value configuration.') }',
+    'Missing x axis configuration.': '${ _('Missing x axis configuration.') }',
+    'Missing y axis configuration.': '${ _('Missing y axis configuration.') }',
+    'No Data Available.': '${ _('No Data Available.') }',
+    'No results found.': '${_('No results found.')}',
+    'Notebook': '${_('Notebook')}',
+    'of': '${_('of')}',
+    'Oozie Bundle': '${_('Oozie Bundle')}',
+    'Oozie Schedule': '${_('Oozie Schedule')}',
+    'Oozie Workflow': '${_('Oozie Workflow')}',
+    'Options': '${ _('Options') }',
+    'order by': '${ _('order by') }',
+    'Overview': '${ _('Overview') }',
+    'Pig Design': '${_('Pig Design')}',
+    'Pig Script': '${_('Pig Script')}',
+    'Planning': '${ _('Planning') }',
+    'Popular': '${ _('Popular') }',
+    'Query requires a select or aggregate.': '${ _('Query requires a select or aggregate.') }',
+    'result(s) copied to the clipboard' : '${ _('result(s) copied to the clipboard') }',
+    'Risks': '${ _('Risks') }',
+    'sample': '${ _('sample') }',
+    'Samples': '${ _('Samples') }',
+    'Search Dashboard': '${_('Search Dashboard')}',
+    'Select this folder': '${_('Select this folder')}',
+    'Shell Script': '${_('Shell Script')}',
+    'Show row details': '${_('Show row details')}',
+    'Spark Job': '${_('Spark Job')}',
+    'table': '${ _('table') }',
+    'Tables': '${ _('Tables') }',
+    'The file has not been found': '${_('The file has not been found')}',
+    'The upload has been canceled': '${ _('The upload has been canceled') }',
+    'Timeline': '${ _('Timeline') }',
+    'Top Nodes': '${ _('Top Nodes') }',
+    'UDFs': '${ _('UDFs') }',
+    'Unlock this row': '${_('Unlock this row')}',
+    'Upload a file': '${_('Upload a file')}',
+    'uploaded successfully': '${ _('uploaded successfully') }',
+    'variable': '${ _('variable') }',
+    'Variables': '${ _('Variables') }',
+    'view': '${ _('view') }',
+    'virtual': '${ _('virtual') }'
   };
 
   window.HUE_VERSION = '${ hue_version() }';
@@ -225,15 +186,7 @@
 
   window.IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
 
-  var docTypes = [];
-  Object.keys(window.HUE_I18n.documentType).forEach(function (key) {
-    if (key !== 'all') {
-      docTypes.push({ type: key, label: window.HUE_I18n.documentType[key] });
-    }
-  })
-  docTypes.sort(function (a, b) { return a.label.localeCompare(b.label); });
-  docTypes.unshift({ type: 'all', label: window.HUE_I18n.documentType['all'] });
-  window.DOCUMENT_TYPES = docTypes;
+
 
   window.LEAFLET_DEFAULTS = {
     layer: '${ leaflet['layer'] |n,unicode }',

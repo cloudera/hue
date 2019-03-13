@@ -23,6 +23,7 @@ import 'jquery/plugins/jquery.hdfstree';
 
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import I18n from 'utils/i18n';
 
 window.Clipboard = Clipboard;
 
@@ -69,11 +70,11 @@ const hideHoverMsg = vm => {
   if (vm.editorMode()) {
     $(window.EDITOR_BINDABLE_ELEMENT)
       .find('.hoverText')
-      .html(window.HUE_I18n.notebook.dropEditorHoverText);
+      .html(I18n('Drop a SQL file here'));
   } else {
     $(window.EDITOR_BINDABLE_ELEMENT)
       .find('.hoverText')
-      .html(window.HUE_I18n.notebook.dropNotebookHoverText);
+      .html(I18n('Drop iPython/Zeppelin notebooks here'));
   }
   $(window.EDITOR_BINDABLE_ELEMENT)
     .find('.hoverMsg')
@@ -89,8 +90,8 @@ const createHueDatatable = (el, snippet, vm) => {
   }
   const _dt = $(el).hueDataTable({
     i18n: {
-      NO_RESULTS: window.HUE_I18n.notebook.noResults,
-      OF: window.HUE_I18n.notebook.of
+      NO_RESULTS: I18n('No results found.'),
+      OF: I18n('of')
     },
     fnDrawCallback: function(oSettings) {
       if (vm.editorMode()) {

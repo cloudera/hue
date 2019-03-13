@@ -20,6 +20,7 @@ import ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import I18n from 'utils/i18n';
 
 ko.bindingHandlers.pieChart = {
   init: function(element, valueAccessor) {
@@ -70,7 +71,7 @@ ko.bindingHandlers.pieChart = {
               .tooltipContent((key, y) => {
                 return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>';
               });
-            _chart.noData(_data.message || window.HUE_I18n.chart.noData);
+            _chart.noData(_data.message || I18n('No Data Available.'));
             const _d3 =
               $(element).find('svg').length > 0
                 ? d3v3.select($(element).find('svg')[0])
@@ -139,7 +140,7 @@ ko.bindingHandlers.pieChart = {
               $(element).find('svg').length > 0
                 ? d3v3.select($(element).find('svg')[0])
                 : d3v3.select($(element)[0]).append('svg');
-            _d3.selectAll('.nv-slice').on('click', (d) => {
+            _d3.selectAll('.nv-slice').on('click', d => {
               if (typeof _options.onClick != 'undefined') {
                 huePubSub.publish('charts.state', { updating: true });
                 _options.onClick(d);
@@ -155,7 +156,7 @@ ko.bindingHandlers.pieChart = {
     const _data = _options.transformer(_options.data);
     const _chart = $(element).data('chart');
     if (_chart) {
-      _chart.noData(_data.message || window.HUE_I18n.chart.noData);
+      _chart.noData(_data.message || I18n('No Data Available.'));
       const _d3 = d3v3.select($(element).find('svg')[0]);
       _d3
         .datum(_data)

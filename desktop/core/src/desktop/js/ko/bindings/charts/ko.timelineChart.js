@@ -18,6 +18,8 @@ import $ from 'jquery';
 import d3v3 from 'd3v3';
 import ko from 'knockout';
 
+import I18n from 'utils/i18n';
+
 import {
   barChartBuilder,
   handleSelection,
@@ -63,7 +65,7 @@ ko.bindingHandlers.timelineChart = {
     const _chart = $(element).data('chart');
     if (_chart) {
       window.setTimeout(() => {
-        _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
+        _chart.noData(_datum.message || I18n('No Data Available.'));
         if (_chart.multibar) {
           _chart.multibar.stacked(
             typeof _options.stacked != 'undefined' ? _options.stacked : false
