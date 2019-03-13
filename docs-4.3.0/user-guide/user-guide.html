@@ -365,7 +365,7 @@ server.</p>
 <p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: Under the logs panel, you can view any
 MapReduce or <a href="#impala-queries">Impala jobs</a> that the query generated.</p>
 <h3 id="downloading-and-exporting-query-results">Downloading and Exporting Query Results</h3>
-<p>To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query. </p>
+<p>To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query.</p>
 <p><img alt="image" src="images/note.jpg" /> Two of them offer great scalability:
 1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
 2.  Export to a table. You can choose an already existing table or a new one. In the export icon, choose Export and then Table.</p>
@@ -507,32 +507,7 @@ select * from boolean_table where boolean_column = ${boolean_column}
 <h2 id="sql">SQL</h2>
 <p>Use the query editor with any <a href="http://gethue.com/custom-sql-query-editors/">JDBC</a> or Django-compatible database.</p>
 <h3 id="hive">Hive</h3>
-<p><strong>Tez</strong></p>
-<p>An external contribution provided support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:</p>
-<pre><code>[beeswax]
-max_number_of_sessions=10
-</code></pre>
 <h3 id="impala">Impala</h3>
-<p>The Hive Editor enables you to perform queries on Apache Hive, a
-data warehousing system designed to work with Hadoop. For information
-about Hive. You can
-create Hive databases, tables and partitions, load data, create, run,
-and manage queries, and download the results in a Microsoft Office Excel
-worksheet file or a comma-separated values file.</p>
-<p>Hive Editor is installed and configured as part of Hue. For information
-about installing and configuring Hue, see the Hue Installation
-manual.</p>
-<p>Hive Editor assumes an existing Hive installation. The Hue installation
-instructions include the configuration necessary for hive to access
-Hive. You can view the current Hive configuration from the <strong>Settings</strong>
-tab in the Hive Editor.</p>
-<p>By default, a Hive Editor user can see the saved queries for all users -
-both his/her own queries and those of other Hive Editor users. To restrict
-viewing saved queries to the query owner and Hue administrators, set the
-share_saved_queries property under the [beeswax] section in the Hue
-configuration file to false.</p>
-<p><img alt="image" src="images/note.jpg" /> <strong>Note</strong>: The Hive Editor used to be known as Beeswax.
-<img alt="image" src="images/note.jpg" /> <strong>Note</strong>: The <a href="#impala-queries">Job Browser</a> integrates nicely with the Impala Query Editor.</p>
 <h3 id="mysql">MySQL</h3>
 <h3 id="oracle">Oracle</h3>
 <h3 id="ksql-kafka-sql">KSQL / Kafka SQL</h3>
@@ -547,6 +522,8 @@ configuration file to false.</p>
 </ul>
 <p>which prevents a SQL UX experience comparable to the standard other databases (but we track it in <a href="https://issues.cloudera.org/browse/HUE-3686">HUE-3686</a>).</p>
 <h3 id="presto">Presto</h3>
+<p>Presto is a high performance, distributed SQL query engine for big data.</p>
+<p><a href="https://prestosql.io/">Read more about it here</a></p>
 <h3 id="postgresql">PostgreSQL</h3>
 <h3 id="redshift">Redshift</h3>
 <h3 id="bigquery">BigQuery</h3>
@@ -1353,6 +1330,10 @@ and specify the correct hostnames and ports:</p>
 <p>A basic read only version is done <a href="https://issues.cloudera.org/browse/HUE-951">HUE-951</a>.</p>
 <p></div>
 </div></p>
+<div class="row-fluid footer">
+  Documentation improvements? <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">Feel free to edit this page on GitHub and send a pull request!</a>
+</div>
+
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.treed.js"></script>
 <script src="../js/jquery.highlight.js"></script>

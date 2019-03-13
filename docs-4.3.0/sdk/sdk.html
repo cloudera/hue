@@ -15,9 +15,9 @@
 <li><a href="#editor-notebook">Editor / Notebook</a><ul>
 <li><a href="#sql">SQL</a><ul>
 <li><a href="#hiveserver2-api">HiveServer2 API</a></li>
+<li><a href="#sql-alchemy">SQL Alchemy</a></li>
 <li><a href="#python-connectors">Python Connectors</a></li>
 <li><a href="#jdbc">JDBC</a></li>
-<li><a href="#sql-alchemy">SQL Alchemy</a></li>
 <li><a href="#solr-sql">Solr SQL</a></li>
 <li><a href="#others">Others</a></li>
 </ul>
@@ -55,7 +55,7 @@
 </ul>
 </li>
 <li><a href="#pre-requisites">Pre-requisites</a><ul>
-<li><a href="#software">Software</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
 <li><a href="#recommended-reading-important-technologies">Recommended Reading / Important Technologies</a></li>
 </ul>
 </li>
@@ -64,11 +64,6 @@
 <li><a href="#run-create_desktop_app-to-set-up-a-new-source-tree">Run "create_desktop_app" to Set up a New Source Tree</a></li>
 <li><a href="#install-sdk-application">Install SDK Application</a></li>
 <li><a href="#customizing-views-and-templates">Customizing Views and Templates</a></li>
-</ul>
-</li>
-<li><a href="#a-look-at-some-existing-apps">A Look at some Existing Apps</a><ul>
-<li><a href="#job-browser">Job Browser</a></li>
-<li><a href="#adls-browser">ADLS Browser</a></li>
 </ul>
 </li>
 <li><a href="#backend-development">Backend Development</a><ul>
@@ -108,7 +103,13 @@
 <li><a href="#debugging-tips-and-tricks">Debugging Tips and Tricks</a></li>
 <li><a href="#building">Building</a><ul>
 <li><a href="#documentation">Documentation</a></li>
+<li><a href="#javascript">Javascript</a><ul>
+<li><a href="#for-changes-to-the-files-under-srcdesktopjs-the-following-applies">For changes to the files under src/desktop/js the following applies:</a></li>
+</ul>
+</li>
 <li><a href="#css-less">CSS / LESS</a></li>
+<li><a href="#sql-autocomplete">SQL Autocomplete</a></li>
+<li><a href="#ace-editor">Ace Editor</a></li>
 <li><a href="#internationalization">Internationalization</a></li>
 </ul>
 </li>
@@ -136,7 +137,7 @@
 <li><a href="#the-short-story">The short story</a></li>
 <li><a href="#longer-story">Longer story</a><ul>
 <li><a href="#helpful-command-line-tricks">Helpful command-line tricks</a></li>
-<li><a href="#run-the-jasmine-tests">Run the Jasmine tests</a></li>
+<li><a href="#create-and-run-the-jasmine-tests">Create and run the Jasmine tests</a></li>
 <li><a href="#special-environment-variables">Special environment variables</a></li>
 <li><a href="#writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</a></li>
 <li><a href="#jenkins-configuration">Jenkins Configuration</a></li>
@@ -170,13 +171,13 @@ In addition, whole new apps can also be created in order to provide end user sol
 autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.</p>
 <h3 id="hiveserver2-api">HiveServer2 API</h3>
 <p>Hive, Impala, SparkSQL</p>
+<h3 id="sql-alchemy">SQL Alchemy</h3>
+<p>SQL Alchemy supports comes with <a href="https://issues.cloudera.org/browse/HUE-8740">HUE-8740</a>.</p>
 <h3 id="python-connectors">Python Connectors</h3>
 <p>MySQL, Oracle, PostgreSQL, Phoenix, Presto, Kylin, Redshift, BigQuery, Drill</p>
 <h3 id="jdbc">JDBC</h3>
 <p>Use the query editor with any <a href="http://gethue.com/custom-sql-query-editors/">JDBC</a> or Django-compatible database.
-<a href="https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py">JDBC connector</a></p>
-<h3 id="sql-alchemy">SQL Alchemy</h3>
-<p>SQL Alchemy supports comes with <a href="https://issues.cloudera.org/browse/HUE-7621">HUE-7621</a></p>
+View the <a href="https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py">JDBC connector</a>.</p>
 <h3 id="solr-sql">Solr SQL</h3>
 <p><a href="https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/solr.py">Solr connector</a></p>
 <h3 id="others">Others</h3>
@@ -199,6 +200,8 @@ autocomplete extremly powerful. Other languages defaults to a generic SQL gramma
 <li><a href="https://github.com/cloudera/hue/blob/master/apps/impala/src/impala/dashboard_api.py">Impala API</a></li>
 <li><a href="https://github.com/cloudera/hue/blob/master/apps/beeswax/src/beeswax/dashboard_api.py">Hive API</a></li>
 </ul>
+<p>When HS2, RDBMS, and JDBC Are Not Enough</p>
+<p>If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app: <a href="https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors">Notebook Connectors</a>. Each connector API subclasses the <a href="https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py">Base API</a> and must implement the methods defined within; refer to the <a href="https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py">JdbcApi</a> or <a href="https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py">RdbmsApi</a> for representative examples.</p>
 <h2 id="search">Search</h2>
 <h3 id="solr">Solr</h3>
 <p><a href="https://github.com/cloudera/hue/blob/master/apps/search/src/search/dashboard_api.py">Solr Dashboard API</a></p>
@@ -311,11 +314,15 @@ directory.</p>
 which will be automatically rooted at <code>/yourappname/</code> in the global
 namespace. See <code>apps/about/src/about/urls.py</code> for an example.</p>
 <h2 id="pre-requisites">Pre-requisites</h2>
-<h3 id="software">Software</h3>
-<p>Developing for the Hue SDK has similar requirements to running
-Hue itself.  We require Python 2.7, Django (1.11 included
-with our distribution), Hadoop (Apache Hadoop 2+), Java (Java 1.8),
-and a browser (latest Chrome, Firefox or IE11+).</p>
+<h3 id="dependencies">Dependencies</h3>
+<ul>
+<li>The OS specific dependencies listed <a href="http://cloudera.github.io/hue/latest/admin-manual/manual.html">here</a></li>
+<li>Python 2.7</li>
+<li>Django (1.11 included with our distribution)</li>
+<li>Hadoop (Apache Hadoop 2+)</li>
+<li>Java (Java 1.8)</li>
+<li>npm (6.4+)</li>
+</ul>
 <h3 id="recommended-reading-important-technologies">Recommended Reading / Important Technologies</h3>
 <p>The following are core technologies used inside of Hue.</p>
 <ul>
@@ -497,13 +504,7 @@ def index(request):
     'is_embeddable': request.GET.get('is_embeddable', False),
   })
 </code></pre>
-<p>You can now go and try the calculator.  If you set everything up right, you
-should see something like:</p>
-<img src="calculator_working.jpg">
-
-<h2 id="a-look-at-some-existing-apps">A Look at some Existing Apps</h2>
-<h3 id="job-browser">Job Browser</h3>
-<h3 id="adls-browser">ADLS Browser</h3>
+<p>You can now go and try the calculator.</p>
 <h2 id="backend-development">Backend Development</h2>
 <p>This section goes into greater detail on useful features within
 the Hue environment.</p>
@@ -613,10 +614,7 @@ function in your <code>conf.py</code>:</p>
 </div>
 
 <h4 id="running-helper-processes">Running "Helper Processes"</h4>
-<p>Some Hue applications need to run separate daemon processes on the side.
-For example, <code>BeeswaxServer</code> is responsible for managing Hive query states.
-The Hue "views" communicate with it through Thrift and shared states in the
-Django database.</p>
+<p>Some Hue applications need to run separate daemon processes on the side.</p>
 <p>Suppose your application needs a helper <code>my_daemon.py</code>. You need to register it by:</p>
 <ul>
 <li>
@@ -928,20 +926,55 @@ JavaScript.</p>
 </ul>
 <h2 id="building">Building</h2>
 <h3 id="documentation">Documentation</h3>
-<p>Building with
-<code>make docs</code></p>
+<p>Building with</p>
+<pre><code>make docs
+</code></pre>
+<h3 id="javascript">Javascript</h3>
+<p>The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js</p>
+<h4 id="for-changes-to-the-files-under-srcdesktopjs-the-following-applies">For changes to the files under src/desktop/js the following applies:</h4>
+<p>First make sure all third-party dependencies defined in package.json are installed into node_modules/</p>
+<pre><code>npm install
+</code></pre>
+<p>Also run this after making changes to package.json, adding new third-party dependencies etc.</p>
+<p>To generate the js bundles run:</p>
+<pre><code>npm run webpack
+npm run webpack-workers
+npm run webpack-login
+</code></pre>
+<p>During development the bundles can be autogenerated when it detects changes to the .js files, for this run:</p>
+<pre><code>npm run dev
+</code></pre>
+<p>Before sending a review with changes to the bundles run:</p>
+<pre><code>npm run lint-fix
+</code></pre>
+<p>and possibly fix any issues it might report.</p>
 <h3 id="css-less">CSS / LESS</h3>
-<p>After changing the CSS in a .less file, rebuilding with:
-<code>make css</code></p>
+<p>After changing the CSS in a .less file, rebuilding with:</p>
+<pre><code>make css
+</code></pre>
+<h3 id="sql-autocomplete">SQL Autocomplete</h3>
+<p>Install a patched jison:</p>
+<pre><code>git clone https://github.com/JohanAhlen/jison
+cd jison
+npm install -g .
+</code></pre>
+<p>Then run:</p>
+<pre><code>make sql-all-parsers
+</code></pre>
+<h3 id="ace-editor">Ace Editor</h3>
+<p>After modifying files under tools/ace-editor run the following to build ace.js</p>
+<pre><code>npm install
+make ace
+</code></pre>
 <h3 id="internationalization">Internationalization</h3>
-<p>How to update all the messages and compile them::</p>
+<p>How to update all the messages and compile them:</p>
 <pre><code>make locales
 </code></pre>
-<p>How to update and compile the messages of one app::</p>
+<p>How to update and compile the messages of one app:</p>
 <pre><code>cd apps/beeswax
 make compile-locale
 </code></pre>
-<p>How to create a new locale for an app::</p>
+<p>How to create a new locale for an app:</p>
 <pre><code>cd $APP_ROOT/src/$APP_NAME/locale
 $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 </code></pre>
@@ -954,139 +987,115 @@ $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 <li>dummy</li>
 </ul>
 <h3 id="searching-for-entities">Searching for entities</h3>
-<pre>
-     $.post("/metadata/api/catalog/search_entities_interactive/", {
-        query_s: ko.mapping.toJSON("*sample"),
-        sources: ko.mapping.toJSON(["sql", "hdfs", "s3"]),
-        field_facets: ko.mapping.toJSON([]),
-        limit: 10
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/search_entities_interactive/", {
+    query_s: ko.mapping.toJSON("*sample"),
+    sources: ko.mapping.toJSON(["sql", "hdfs", "s3"]),
+    field_facets: ko.mapping.toJSON([]),
+    limit: 10
+}, function(data) {
+    console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="searching-for-entities-with-the-dummy-backend">Searching for entities with the dummy backend</h3>
-<pre>
-     $.post("/metadata/api/catalog/search_entities_interactive/", {
-        query_s: ko.mapping.toJSON("*sample"),
-        interface: "dummy"
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/search_entities_interactive/", {
+    query_s: ko.mapping.toJSON("*sample"),
+    interface: "dummy"
+}, function(data) {
+    console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="finding-an-entity-in-order-to-get-its-id">Finding an entity in order to get its id</h3>
-<pre>
-     $.get("/metadata/api/navigator/find_entity", {
-        type: "table",
-        database: "default",
-        name: "sample_07",
-        interface: "dummy"
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.get("/metadata/api/navigator/find_entity", {
+    type: "table",
+    database: "default",
+    name: "sample_07",
+    interface: "dummy"
+}, function(data) {
+    console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="addingupdating-a-comment-with-the-dummy-backend">Adding/updating a comment with the dummy backend</h3>
-<pre>
-     $.post("/metadata/api/catalog/update_properties/", {
-        id: "22",
-        properties: ko.mapping.toJSON({"description":"Adding a description"}),
-        interface: "dummy"
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/update_properties/", {
+    id: "22",
+    properties: ko.mapping.toJSON({"description":"Adding a description"}),
+    interface: "dummy"
+}, function(data) {
+    console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="adding-a-tag-with-the-dummy-backend">Adding a tag with the dummy backend</h3>
-<pre>
-     $.post("/metadata/api/catalog/add_tags/", {
-        id: "22",
-        tags: ko.mapping.toJSON(["usage"]),
-        interface: "dummy"
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/add_tags/", {
+  id: "22",
+  tags: ko.mapping.toJSON(["usage"]),
+  interface: "dummy"
+}, function(data) {
+    console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="deleting-a-keyvalue-property">Deleting a key/value property</h3>
-<pre>
-     $.post("/metadata/api/catalog/delete_metadata_properties/", {
-        "id": "32",
-        "keys": ko.mapping.toJSON(["project", "steward"])
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/delete_metadata_properties/", {
+   "id": "32",
+   "keys": ko.mapping.toJSON(["project", "steward"])
+}, function(data) {
+   console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="deleting-a-keyvalue-property_1">Deleting a key/value property</h3>
-<pre>
-     $.post("/metadata/api/catalog/delete_metadata_properties/", {
-        "id": "32",
-        "keys": ko.mapping.toJSON(["project", "steward"])
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/delete_metadata_properties/", {
+  "id": "32",
+  "keys": ko.mapping.toJSON(["project", "steward"])
+}, function(data) {
+  console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="getting-the-model-mapping-of-custom-metadata">Getting the model mapping of custom metadata</h3>
-<pre>
-     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
+  console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="getting-a-namespace">Getting a namespace</h3>
-<pre>
-     $.post("/metadata/api/catalog/namespace/", {
-        namespace: 'huecatalog'
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/namespace/", {
+  namespace: 'huecatalog'
+}, function(data) {
+  console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="creating-a-namespace">Creating a namespace</h3>
-<pre>
-     $.post("/metadata/api/catalog/namespace/create/", {
-        "namespace": "huecatalog",
-        "description": "my desc"
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/namespace/create/", {
+  "namespace": "huecatalog",
+  "description": "my desc"
+}, function(data) {
+  console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="creating-a-namespace-property">Creating a namespace property</h3>
-<pre>
-     $.post("/metadata/api/catalog/namespace/property/create/", {
-        "namespace": "huecatalog",
-        "properties": ko.mapping.toJSON({
-          "name" : "relatedEntities2",
-          "displayName" : "Related objects",
-          "description" : "My desc",
-          "multiValued" : true,
-          "maxLength" : 50,
-          "pattern" : ".*",
-          "enumValues" : null,
-          "type" : "TEXT"
-        })
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/namespace/property/create/", {
+  "namespace": "huecatalog",
+  "properties": ko.mapping.toJSON({
+    "name" : "relatedEntities2",
+    "displayName" : "Related objects",
+    "description" : "My desc",
+    "multiValued" : true,
+    "maxLength" : 50,
+    "pattern" : ".*",
+    "enumValues" : null,
+    "type" : "TEXT"
+  })
+}, function(data) {
+  console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h3 id="map-a-namespace-property-to-a-class-entity">Map a namespace property to a class entity</h3>
-<pre>
-     $.post("/metadata/api/catalog/namespace/property/map/", {
-        "class": "hv_view",
-        "properties": ko.mapping.toJSON([{
-           namespace: "huecatalog",
-           name: "relatedQueries"
-        }])
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+<pre><code>$.post("/metadata/api/catalog/namespace/property/map/", {
+  "class": "hv_view",
+  "properties": ko.mapping.toJSON([{
+      namespace: "huecatalog",
+      name: "relatedQueries"
+  }])
+}, function(data) {
+  console.log(ko.mapping.toJSON(data));
+});
+</code></pre>
 <h1 id="testing">Testing</h1>
 <h2 id="the-short-story">The short story</h2>
 <p>Install the mini cluster (only once):</p>
@@ -1100,8 +1109,9 @@ $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 build/env/bin/hue test specific impala.tests:TestMockedImpala
 build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 </code></pre>
-<p>Jasmine tests (from your browser):</p>
-<p><a href="http://localhost:8000/jasmine">http://localhost:8000/jasmine</a></p>
+<p>Jasmine tests:</p>
+<pre><code>npm run test
+</code></pre>
 <h2 id="longer-story">Longer story</h2>
 <p>The <code>test</code> management command prepares the arguments (test app names)
 and passes them to nose (django_nose.nose_runner). Nose will then magically
@@ -1134,30 +1144,45 @@ See apps/hello/src/hello/hello_test.py for an example.</p>
 <p>Point to an Impalad and trigger the Impala tests:</p>
 <pre><code>build/env/bin/hue test impala impalad-01.gethue.com
 </code></pre>
-<h3 id="run-the-jasmine-tests">Run the Jasmine tests</h3>
-<ul>
-<li>NodeJS (https://nodejs.org/)</li>
-<li>PhantomJS (npm install -g phantomjs-prebuilt)</li>
-</ul>
+<h3 id="create-and-run-the-jasmine-tests">Create and run the Jasmine tests</h3>
+<p>Add them in a "spec" subfolder relative to the file under test and the filename of the test has to end with "Spec.js".</p>
+<pre><code>someFile.js              &lt;- File under test
+├── spec/
+│   ├── someFileSpec.js  &lt;- File containing tests
+</code></pre>
+<p>Run all the tests once with:</p>
+<pre><code>npm run test
+</code></pre>
+<p>Optionally to use Karma and headless chrome for the tests you can run</p>
+<pre><code>npm run test-karma
+</code></pre>
+<p>See <code>desktop/core/src/desktop/js/spec/karma.config.js</code> for various options</p>
 <h3 id="special-environment-variables">Special environment variables</h3>
-<p>DESKTOP_LOGLEVEL=<level>
-  level can be DEBUG, INFO, WARN, ERROR, or CRITICAL</p>
-<p>When specified, the console logger is set to the given log level. A console
-  logger is created if one is not defined.</p>
-<p>DESKTOP_DEBUG
+<pre><code>DESKTOP_LOGLEVEL=&lt;level&gt;
+  level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
+
+  When specified, the console logger is set to the given log level. A console
+  logger is created if one is not defined.
+
+DESKTOP_DEBUG
   A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
-  validation.</p>
-<p>DESKTOP_PROFILE
+  validation.
+
+DESKTOP_PROFILE
   Turn on Python profiling. The profile data is saved in a file. See the
-  console output for the location of the file.</p>
-<p>DESKTOP_LOG_DIR=$dir
-  Specify the HUE log directory. Defaults to ./log.</p>
-<p>DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
+  console output for the location of the file.
+
+DESKTOP_LOG_DIR=$dir
+  Specify the HUE log directory. Defaults to ./log.
+
+DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
   Specify alternate DB connection parameters for HUE to use. Useful for
   testing your changes against, for example, MySQL instead of sqlite. String
-  is a colon-delimited list.</p>
-<p>TEST_IMPALAD_HOST=impalad-01.gethue.com
-  Point to an Impalad and trigger the Impala tests.</p>
+  is a colon-delimited list.
+
+TEST_IMPALAD_HOST=impalad-01.gethue.com
+  Point to an Impalad and trigger the Impala tests.
+</code></pre>
 <h3 id="writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</h3>
 <p>Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follows:</p>
 <pre><code>from nose.plugins.attrib import attr
@@ -1171,8 +1196,15 @@ def your_test():
 separated the Jenkins builds into "fast" and "slow".  Both are run
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.</p>
-<p></div>
+<p><br/>
+   <br/>
+   </div>
 </div></p>
+<div class="row-fluid footer">
+  Documentation improvements? Feel free to <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">edit this page on GitHu
+  </a> and send a pull request!
+</div>
+
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.treed.js"></script>
 <script src="../js/jquery.highlight.js"></script>
