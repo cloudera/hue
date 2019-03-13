@@ -71,7 +71,12 @@ MapReduce, Pig, Java, Shell, Sqoop, DistCp [Oozie connector](https://github.com/
 
 ### Spark / Livy
 
+Based on the [Livy REST API](https://livy.incubator.apache.org/docs/latest/rest-api.html)
+
 * [Notebook connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/spark_shell.py)
+  * PySpark
+  * Scala
+  * Spark SQL
 * [Batch connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/spark_batch.py)
 
 # Dashboard

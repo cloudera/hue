@@ -310,6 +310,20 @@ Same as Presto.
 
 ### Spark SQL
 
+Via [Apache Livy](https://livy.incubator.apache.org/) (recommended):
+
+    [[[sparksql]]]
+      name=SparkSql
+      interface=livy
+
+    ...
+
+    [spark]
+      # The Livy Server URL.
+      livy_server_url=http://localhost:8998
+
+Via native HiveServer2 API:
+
     [[[sparksql]]]
       name=SparkSql
       interface=hiveserver2
@@ -466,11 +480,14 @@ Before adding your interpreter’s JDBC configurations to hue.ini, verify that t
 You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.
 
 
-
 ### Spark
 
     [[[pyspark]]]
       name=PySpark
+      interface=livy
+
+    [[[sparksql]]]
+      name=SparkSql
       interface=livy
 
     [[[spark]]]
@@ -480,6 +497,12 @@ You can leave out the username and password in the JDBC options, and Hue will in
     [[[r]]]
         name=R
         interface=livy
+
+    ...
+
+    [spark]
+      # The Livy Server URL.
+      livy_server_url=http://localhost:8998
 
 ### Pig
 
