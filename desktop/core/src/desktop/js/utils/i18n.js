@@ -14,14 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const globalVars = {
-  LOGGED_USERNAME: 'foo',
-  CACHEABLE_TTL: 1,
-  HAS_OPTIMIZER: false,
-  AUTOCOMPLETE_TIMEOUT: 1
-};
+const I18n = identifier => HUE_I18n[identifier] || identifier;
 
-Object.keys(globalVars).forEach(key => {
-  global[key] = globalVars[key];
-  global.window[key] = globalVars[key];
-});
+export default I18n;

@@ -15,9 +15,11 @@
 // limitations under the License.
 
 import $ from 'jquery';
+
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 
 class TopNavViewModel {
   constructor(onePageViewModel) {
@@ -98,7 +100,7 @@ class TopNavViewModel {
 
           if (window.SHOW_ADD_MORE_EDITORS && app.name === 'editor') {
             interpreters.push({
-              displayName: window.HUE_I18n.general.addMore,
+              displayName: I18n('Add more...'),
               dividerAbove: true,
               href: 'http://gethue.com/sql-editor/'
             });

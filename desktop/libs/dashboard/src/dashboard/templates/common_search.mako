@@ -3425,10 +3425,10 @@ function pieChartDataTransformerGrid(data) {
     chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
   } // else we just take value as is
   if (!chartX) {
-    _data.message = window.HUE_I18n.chart.missingLegend;
+    _data.message = window.I18n('Missing legend configuration.');
     return _data;
   } else if (!chartY) {
-    _data.message = window.HUE_I18n.chart.missingValue;
+    _data.message = window.I18n('Missing value configuration.');
     return _data;
   }
 
@@ -3814,10 +3814,10 @@ function gradientMapChartDataTransformerGrid(data) {
   } // else we just take value as is
   var _data = [];
   if (!chartX) {
-    _data.message = window.HUE_I18n.chart.missingRegion;
+    _data.message = window.I18n('Missing region configuration.');
     return _data;
   } else if (!chartY) {
-    _data.message = window.HUE_I18n.chart.missingY;
+    _data.message = window.I18n('Missing y axis configuration.');
     return _data;
   }
   $(data.counts).each(function (cnt, item) {
@@ -3897,13 +3897,13 @@ function leafletMapChartDataTransformerGrid(data) {
   }
 
   if (!chartX) {
-    _data.message = window.HUE_I18n.chart.missingLatitude;
+    _data.message = window.I18n('Missing latitude configuration.');
     return _data;
   } else if (!chartY) {
-    _data.message = window.HUE_I18n.chart.missingLongitude;
+    _data.message = window.I18n('Missing longitude configuration.');
     return _data;
   } else if (!chartMapLabel) {
-    _data.message = window.HUE_I18n.chart.missingLabel;
+    _data.message = window.I18n('Missing label configuration.');
     return _data;
   }
 
@@ -3988,10 +3988,10 @@ function multiSerieDataTransformerGrid(rawDatum, isTimeline) {
   } // else we just take value as is
 
   if (!chartX) {
-    _datum.message = window.HUE_I18n.chart.missingX;
+    _datum.message = window.I18n('Missing x axis configuration.');
     return _datum;
   } else if (!chartY || !chartY.length) {
-    _datum.message = window.HUE_I18n.chart.missingY;
+    _datum.message = window.I18n('Missing y axis configuration.');
     return _datum;
   }
 

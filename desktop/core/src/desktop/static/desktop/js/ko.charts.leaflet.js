@@ -30,7 +30,7 @@
           $(element).hide();
           if ((_data.message || (_options.visible != null && _options.visible)) && !_options.isLoading) {
             $(element).siblings(".leaflet-nodata").remove();
-            $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text(_data.message || window.HUE_I18n.chart.noData));
+            $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text(_data.message || window.I18n('No Data Available.')));
           }
         }
       }

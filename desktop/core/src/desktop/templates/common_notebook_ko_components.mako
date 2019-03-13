@@ -413,13 +413,13 @@ except ImportError, e:
               });
               return result;
             } else {
-              return HUE_I18n.copyToClipboard.error;
+              return window.I18n('Error while copying results.');
             }
           }
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info(self.snippet.result.data().length + ' ' + HUE_I18n.copyToClipboard.success);
+          $.jHueNotify.info(self.snippet.result.data().length + ' ' + window.I18n('result(s) copied to the clipboard'));
           e.clearSelection();
         });
 

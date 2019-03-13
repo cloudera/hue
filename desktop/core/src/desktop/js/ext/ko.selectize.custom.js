@@ -19,6 +19,8 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
+import I18n from 'utils/i18n';
+
 var inject_binding = function (allBindings, key, value) {
   //https://github.com/knockout/knockout/pull/932#issuecomment-26547528
   return {
@@ -47,7 +49,7 @@ ko.bindingHandlers.browserAwareSelectize = {
 ko.bindingHandlers.selectize = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     if (typeof allBindingsAccessor.get('optionsCaption') == 'undefined')
-      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', window.HUE_I18n.selectize.choose);
+      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', I18n('Choose...'));
 
     ko.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 

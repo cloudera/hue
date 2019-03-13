@@ -18,6 +18,7 @@ import $ from 'jquery';
 import qq from 'ext/fileuploader.custom';
 
 import huePubSub from '../../utils/huePubSub';
+import I18n from 'utils/i18n';
 
 /*
  * jHue fileChooser plugin
@@ -116,17 +117,23 @@ const pluginName = 'jHueFileChooser',
   },
   STORAGE_PREFIX = 'hueFileBrowserLastPathForUser_';
 
+const DEFAULT_I18n = {
+  BACK: I18n('Back'),
+  SELECT_FOLDER: I18n('Select this folder'),
+  CREATE_FOLDER: I18n('Create folder'),
+  FOLDER_NAME: I18n('Folder name'),
+  CANCEL: I18n('Cancel'),
+  FILE_NOT_FOUND: I18n('The file has not been found'),
+  UPLOAD_FILE: I18n('Upload a file'),
+  FAILED: I18n('Failed')
+};
+
 function Plugin(element, options) {
   this.element = element;
   $(element).data('jHueFileChooser', this);
 
   this.options = $.extend({}, defaults, { user: window.LOGGED_USERNAME }, options);
-  this.options.labels = $.extend(
-    {},
-    defaults.labels,
-    window.HUE_I18n.jHueFileChooser,
-    options ? options.labels : {}
-  );
+  this.options.labels = $.extend({}, defaults.labels, DEFAULT_I18n, options ? options.labels : {});
   this._defaults = defaults;
   this._name = pluginName;
   this.previousPath = '';
@@ -136,12 +143,7 @@ function Plugin(element, options) {
 Plugin.prototype.setOptions = function(options) {
   const self = this;
   self.options = $.extend({}, defaults, { user: window.LOGGED_USERNAME }, options);
-  self.options.labels = $.extend(
-    {},
-    defaults.labels,
-    window.HUE_I18n.jHueFileChooser,
-    options ? options.labels : {}
-  );
+  self.options.labels = $.extend({}, defaults.labels, DEFAULT_I18n, options ? options.labels : {});
   const initialPath = $.trim(self.options.initialPath);
   const scheme = initialPath && initialPath.substring(0, initialPath.indexOf(':'));
   if (scheme && scheme.length) {

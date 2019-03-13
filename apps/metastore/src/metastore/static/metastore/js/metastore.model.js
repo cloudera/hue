@@ -773,7 +773,7 @@ var MetastoreTable = (function () {
         self.fetchDetails();
       }).fail(function () {
         self.refreshingTableStats(false);
-        $.jHueNotify.error(HUE_I18n.metastore.errorRefreshingTableStats);
+        $.jHueNotify.error(window.I18n('An error occurred refreshing the table stats. Please try again.'));
         console.error('apiHelper.refreshTableStats error');
         console.error(data);
       });
