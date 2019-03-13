@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import I18n from 'utils/i18n';
 
 const PLUGIN_NAME = 'jHueTableExtender2';
 
@@ -220,7 +221,13 @@ Plugin.prototype.setOptions = function(options) {
   this.options.labels = $.extend(
     {},
     DEFAULT_OPTIONS.labels,
-    window.HUE_I18n.jHueTableExtender,
+    {
+      GO_TO_COLUMN: I18n('Go to column:'),
+      PLACEHOLDER: I18n('column name...'),
+      LOCK: I18n('Lock this row'),
+      UNLOCK: I18n('Unlock this row'),
+      ROW_DETAILS: I18n('Show row details')
+    },
     options ? options.labels : {}
   );
 };

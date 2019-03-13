@@ -18,6 +18,8 @@ import Dropzone from 'dropzone';
 import $ from 'jquery';
 import ko from 'knockout';
 
+import I18n from 'utils/i18n';
+
 // TODO: Depends on Dropzone
 
 ko.bindingHandlers.dropzone = {
@@ -36,7 +38,7 @@ ko.bindingHandlers.dropzone = {
         '<div class="pull-right">' +
         '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
         '<span data-dz-remove><a href="javascript:undefined;" title="' +
-        window.HUE_I18n.dropzone.cancelUpload +
+        I18n('Cancel upload') +
         '"><i class="fa fa-fw fa-times"></i></a></span>' +
         '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
         '</div>' +
@@ -73,7 +75,7 @@ ko.bindingHandlers.dropzone = {
         $('#progressStatusBar div').width(progress.toFixed() + '%');
       },
       canceled: function() {
-        $.jHueNotify.info(window.HUE_I18n.dropzone.uploadCanceled);
+        $.jHueNotify.info(I18n('The upload has been canceled'));
       },
       complete: function(file) {
         if (file.xhr.response !== '') {
@@ -85,10 +87,7 @@ ko.bindingHandlers.dropzone = {
                 value.onError(file.name);
               }
             } else {
-              $(document).trigger(
-                'info',
-                response.path + ' ' + window.HUE_I18n.dropzone.uploadSucceeded
-              );
+              $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
               if (value.onComplete) {
                 value.onComplete(response.path);
               }

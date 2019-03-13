@@ -14,10 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import _ from 'lodash';
+import page from 'page';
+
 import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
-import page from 'page';
-import _ from 'lodash';
+import I18n from 'utils/i18n';
 
 class OnePageViewModel {
   constructor() {
@@ -395,7 +397,11 @@ class OnePageViewModel {
             } else if (app !== '500') {
               self.loadApp('500');
             } else {
-              $.jHueNotify.error(window.HUE_I18n.general.offlineOrError);
+              $.jHueNotify.error(
+                I18n(
+                  'It looks like you are offline or an unknown error happened. Please refresh the page.'
+                )
+              );
             }
           }
         });

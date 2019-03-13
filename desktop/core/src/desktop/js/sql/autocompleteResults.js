@@ -22,6 +22,7 @@ import dataCatalog from 'catalog/dataCatalog';
 import HueColors from 'utils/hueColors';
 import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 
@@ -39,151 +40,174 @@ const COLORS = {
   HDFS: normalizedColors['red'][2]
 };
 
+const META_I18n = {
+  aggregateFunction: I18n('aggregate'),
+  alias: I18n('alias'),
+  commonTableExpression: I18n('cte'),
+  database: I18n('database'),
+  dir: I18n('dir'),
+  filter: I18n('filter'),
+  groupBy: I18n('group by'),
+  join: I18n('join'),
+  joinCondition: I18n('condition'),
+  keyword: I18n('keyword'),
+  orderBy: I18n('order by'),
+  sample: I18n('sample'),
+  table: I18n('table'),
+  variable: I18n('variable'),
+  view: I18n('view'),
+  virtual: I18n('virtual')
+};
+
 const CATEGORIES = {
-  ALL: { id: 'all', color: HueColors.BLUE, label: window.HUE_I18n.autocomplete.category.all },
+  ALL: {
+    id: 'all',
+    color: HueColors.BLUE,
+    label: I18n('All')
+  },
   POPULAR: {
     id: 'popular',
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular
+    label: I18n('Popular')
   },
   POPULAR_AGGREGATE: {
     id: 'popularAggregate',
     weight: 1500,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'agg-udf'
   },
   POPULAR_GROUP_BY: {
     id: 'popularGroupBy',
     weight: 1300,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'group-by'
   },
   POPULAR_ORDER_BY: {
     id: 'popularOrderBy',
     weight: 1200,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'order-by'
   },
   POPULAR_FILTER: {
     id: 'popularFilter',
     weight: 1400,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'filter'
   },
   POPULAR_ACTIVE_JOIN: {
     id: 'popularActiveJoin',
     weight: 1500,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'join'
   },
   POPULAR_JOIN_CONDITION: {
     id: 'popularJoinCondition',
     weight: 1500,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'join-condition'
   },
   COLUMN: {
     id: 'column',
     weight: 1000,
     color: COLORS.COLUMN,
-    label: window.HUE_I18n.autocomplete.category.column,
+    label: I18n('Columns'),
     detailsTemplate: 'column'
   },
   SAMPLE: {
     id: 'sample',
     weight: 900,
     color: COLORS.SAMPLE,
-    label: window.HUE_I18n.autocomplete.category.sample,
+    label: I18n('Samples'),
     detailsTemplate: 'value'
   },
   IDENTIFIER: {
     id: 'identifier',
     weight: 800,
     color: COLORS.IDENT_CTE_VAR,
-    label: window.HUE_I18n.autocomplete.category.identifier,
+    label: I18n('Identifiers'),
     detailsTemplate: 'identifier'
   },
   CTE: {
     id: 'cte',
     weight: 700,
     color: COLORS.IDENT_CTE_VAR,
-    label: window.HUE_I18n.autocomplete.category.cte,
+    label: I18n('CTEs'),
     detailsTemplate: 'cte'
   },
   TABLE: {
     id: 'table',
     weight: 600,
     color: COLORS.TABLE,
-    label: window.HUE_I18n.autocomplete.category.table,
+    label: I18n('Tables'),
     detailsTemplate: 'table'
   },
   DATABASE: {
     id: 'database',
     weight: 500,
     color: COLORS.DATABASE,
-    label: window.HUE_I18n.autocomplete.category.database,
+    label: I18n('Databases'),
     detailsTemplate: 'database'
   },
   UDF: {
     id: 'udf',
     weight: 400,
     color: COLORS.UDF,
-    label: window.HUE_I18n.autocomplete.category.udf,
+    label: I18n('UDFs'),
     detailsTemplate: 'udf'
   },
   OPTION: {
     id: 'option',
     weight: 400,
     color: COLORS.UDF,
-    label: window.HUE_I18n.autocomplete.category.option,
+    label: I18n('Options'),
     detailsTemplate: 'option'
   },
   HDFS: {
     id: 'hdfs',
     weight: 300,
     color: COLORS.HDFS,
-    label: window.HUE_I18n.autocomplete.category.hdfs,
+    label: I18n('Files'),
     detailsTemplate: 'hdfs'
   },
   VIRTUAL_COLUMN: {
     id: 'virtualColumn',
     weight: 200,
     color: COLORS.COLUMN,
-    label: window.HUE_I18n.autocomplete.category.column,
+    label: I18n('Columns'),
     detailsTemplate: 'column'
   },
   COLREF_KEYWORD: {
     id: 'colrefKeyword',
     weight: 100,
     color: COLORS.KEYWORD,
-    label: window.HUE_I18n.autocomplete.category.keyword,
+    label: I18n('Keywords'),
     detailsTemplate: 'keyword'
   },
   VARIABLE: {
     id: 'variable',
     weight: 50,
     color: COLORS.IDENT_CTE_VAR,
-    label: window.HUE_I18n.autocomplete.category.variable,
+    label: I18n('Variables'),
     detailsTemplate: 'variable'
   },
   KEYWORD: {
     id: 'keyword',
     weight: 0,
     color: COLORS.KEYWORD,
-    label: window.HUE_I18n.autocomplete.category.keyword,
+    label: I18n('Keywords'),
     detailsTemplate: 'keyword'
   },
   POPULAR_JOIN: {
     id: 'popularJoin',
     weight: 1500,
     color: COLORS.POPULAR,
-    label: window.HUE_I18n.autocomplete.category.popular,
+    label: I18n('Popular'),
     detailsTemplate: 'join'
   }
 };
@@ -547,7 +571,7 @@ class AutocompleteResults {
       const keywordSuggestions = $.map(self.parseResult.suggestKeywords, keyword => {
         return {
           value: self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
-          meta: window.HUE_I18n.autocomplete.meta.keyword,
+          meta: META_I18n.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: keyword.weight,
           popular: ko.observable(false),
@@ -573,7 +597,7 @@ class AutocompleteResults {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(keyword => {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
-                meta: window.HUE_I18n.autocomplete.meta.keyword,
+                meta: META_I18n.keyword,
                 category: CATEGORIES.COLREF_KEYWORD,
                 popular: ko.observable(false),
                 details: {
@@ -615,7 +639,7 @@ class AutocompleteResults {
         if (type === 'COLREF') {
           columnAliasSuggestions.push({
             value: columnAlias.name,
-            meta: window.HUE_I18n.autocomplete.meta.alias,
+            meta: META_I18n.alias,
             category: CATEGORIES.COLUMN,
             popular: ko.observable(false),
             details: columnAlias
@@ -646,7 +670,7 @@ class AutocompleteResults {
         commonTableExpressionSuggestions.push({
           value: prefix + expression.name,
           filterValue: expression.name,
-          meta: window.HUE_I18n.autocomplete.meta.commonTableExpression,
+          meta: META_I18n.commonTableExpression,
           category: CATEGORIES.CTE,
           popular: ko.observable(false),
           details: null
@@ -752,7 +776,7 @@ class AutocompleteResults {
               sqlUtils.backTickIfNeeded(self.snippet.type(), dbEntry.name) +
               (suggestDatabases.appendDot ? '.' : ''),
             filterValue: dbEntry.name,
-            meta: window.HUE_I18n.autocomplete.meta.database,
+            meta: META_I18n.database,
             category: CATEGORIES.DATABASE,
             popular: ko.observable(false),
             hasCatalogEntry: true,
@@ -811,7 +835,7 @@ class AutocompleteResults {
                         prefix + sqlUtils.backTickIfNeeded(self.snippet.type(), tableEntry.name),
                       filterValue: tableEntry.name,
                       tableName: tableEntry.name,
-                      meta: window.HUE_I18n.autocomplete.meta[tableEntry.getType().toLowerCase()],
+                      meta: META_I18n[tableEntry.getType().toLowerCase()],
                       category: CATEGORIES.TABLE,
                       popular: ko.observable(false),
                       hasCatalogEntry: true,
@@ -889,14 +913,14 @@ class AutocompleteResults {
             ) {
               columnSuggestions.push({
                 value: 'BLOCK__OFFSET__INSIDE__FILE',
-                meta: window.HUE_I18n.autocomplete.meta.virtual,
+                meta: META_I18n.virtual,
                 category: CATEGORIES.VIRTUAL_COLUMN,
                 popular: ko.observable(false),
                 details: { name: 'BLOCK__OFFSET__INSIDE__FILE' }
               });
               columnSuggestions.push({
                 value: 'INPUT__FILE__NAME',
-                meta: window.HUE_I18n.autocomplete.meta.virtual,
+                meta: META_I18n.virtual,
                 category: CATEGORIES.VIRTUAL_COLUMN,
                 popular: ko.observable(false),
                 details: { name: 'INPUT__FILE__NAME' }
@@ -1218,7 +1242,7 @@ class AutocompleteResults {
               self.parseResult.colRef.identifierChain.length - 1
             ].name +
             '}',
-          meta: window.HUE_I18n.autocomplete.meta.variable,
+          meta: META_I18n.variable,
           category: CATEGORIES.VARIABLE,
           popular: ko.observable(false),
           details: null
@@ -1236,7 +1260,7 @@ class AutocompleteResults {
           colRef.sample.forEach(sample => {
             valueSuggestions.push({
               value: isString ? startQuote + sample + endQuote : new String(sample),
-              meta: window.HUE_I18n.autocomplete.meta.sample,
+              meta: META_I18n.sample,
               category: CATEGORIES.SAMPLE,
               popular: ko.observable(false),
               details: null
@@ -1262,7 +1286,7 @@ class AutocompleteResults {
         self.appendEntries([
           {
             value: 'adl://',
-            meta: window.HUE_I18n.autocomplete.meta.keyword,
+            meta: META_I18n.keyword,
             category: CATEGORIES.KEYWORD,
             weightAdjust: 0,
             popular: ko.observable(false),
@@ -1270,7 +1294,7 @@ class AutocompleteResults {
           },
           {
             value: 's3a://',
-            meta: window.HUE_I18n.autocomplete.meta.keyword,
+            meta: META_I18n.keyword,
             category: CATEGORIES.KEYWORD,
             weightAdjust: 0,
             popular: ko.observable(false),
@@ -1278,7 +1302,7 @@ class AutocompleteResults {
           },
           {
             value: 'hdfs://',
-            meta: window.HUE_I18n.autocomplete.meta.keyword,
+            meta: META_I18n.keyword,
             category: CATEGORIES.KEYWORD,
             weightAdjust: 0,
             popular: ko.observable(false),
@@ -1286,7 +1310,7 @@ class AutocompleteResults {
           },
           {
             value: '/',
-            meta: 'dir',
+            meta: META_I18n.dir,
             category: CATEGORIES.HDFS,
             popular: ko.observable(false),
             details: null
@@ -1453,7 +1477,7 @@ class AutocompleteResults {
                         totalCount += value.totalQueryCount;
                         joinSuggestions.push({
                           value: suggestionString,
-                          meta: window.HUE_I18n.autocomplete.meta.join,
+                          meta: META_I18n.join,
                           category: suggestJoins.prependJoin
                             ? CATEGORIES.POPULAR_JOIN
                             : CATEGORIES.POPULAR_ACTIVE_JOIN,
@@ -1537,7 +1561,7 @@ class AutocompleteResults {
                         totalCount += value.totalQueryCount;
                         joinConditionSuggestions.push({
                           value: suggestionString,
-                          meta: window.HUE_I18n.autocomplete.meta.joinCondition,
+                          meta: META_I18n.joinCondition,
                           category: CATEGORIES.POPULAR_JOIN_CONDITION,
                           popular: ko.observable(true),
                           details: value
@@ -1736,10 +1760,7 @@ class AutocompleteResults {
               suggestions.push({
                 value: prefix + filterValue,
                 filterValue: filterValue,
-                meta:
-                  navOptAttribute === 'groupByColumn'
-                    ? window.HUE_I18n.autocomplete.meta.groupBy
-                    : window.HUE_I18n.autocomplete.meta.orderBy,
+                meta: navOptAttribute === 'groupByColumn' ? META_I18n.groupBy : META_I18n.orderBy,
                 category:
                   navOptAttribute === 'groupByColumn'
                     ? CATEGORIES.POPULAR_GROUP_BY
@@ -1858,7 +1879,7 @@ class AutocompleteResults {
                               totalCount += popularValue.count;
                               filterSuggestions.push({
                                 value: compVal,
-                                meta: window.HUE_I18n.autocomplete.meta.filter,
+                                meta: META_I18n.filter,
                                 category: CATEGORIES.POPULAR_FILTER,
                                 popular: ko.observable(true),
                                 details: popularValue

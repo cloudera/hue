@@ -17,6 +17,7 @@
 import jQuery from 'jquery';
 
 import hueUtils from '../../utils/hueUtils';
+import I18n from 'utils/i18n';
 
 // TODO: don't create multiple jquery instances from chunks
 const $ = window.$ || jQuery;
@@ -57,7 +58,13 @@ function Plugin(element, options) {
   this.options.labels = $.extend(
     {},
     defaults.labels,
-    window.HUE_I18n.jHueHdfsTree,
+    {
+      GO_TO_COLUMN: I18n('Go to column:'),
+      PLACEHOLDER: I18n('column name...'),
+      LOCK: I18n('Lock this row'),
+      UNLOCK: I18n('Unlock this row'),
+      ROW_DETAILS: I18n('Show row details')
+    },
     options ? options.labels : {}
   );
   this._defaults = defaults;

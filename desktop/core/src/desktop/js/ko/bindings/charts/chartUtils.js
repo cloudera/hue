@@ -16,7 +16,9 @@
 
 import $ from 'jquery';
 import d3v3 from 'd3v3';
+
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 
 const MS = 1;
 const SECOND_MS = 1000 * MS;
@@ -74,7 +76,7 @@ const barChartBuilder = (element, options, isTimeline) => {
         .empty();
     }
     const _chart = nv.models.multiBarWithBrushChart();
-    _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
+    _chart.noData(_datum.message || I18n('No Data Available.'));
     if (_datum.length > 0) {
       $(element).data('chart_type', 'multibar_brush');
     }
@@ -339,7 +341,7 @@ const lineChartBuilder = (element, options, isTimeline) => {
   if ($(element).is(':visible')) {
     nv.addGraph(() => {
       const _chart = nv.models.lineWithBrushChart();
-      _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
+      _chart.noData(_datum.message || I18n('No Data Available.'));
       $(element).data('chart', _chart);
       _chart.transitionDuration(0);
       _chart.convert = function(d) {

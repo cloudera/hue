@@ -7,6 +7,21 @@ data_stream_target attribute.
 Copied from https://github.com/apache/incubator-impala/blob/master/www/query_plan.tmpl
 */
 function impalaDagre(id) {
+
+  var PROFILE_I18n = {
+    timeline: window.I18n('Timeline'),
+    metrics: window.I18n('Metrics'),
+    cpu: window.I18n('CPU'),
+    io: window.I18n('IO'),
+    execution: window.I18n('Execution'),
+    codegen: window.I18n('CodeGen'),
+    overview: window.I18n('Overview'),
+    topnodes: window.I18n('Top Nodes'),
+    compilation: window.I18n('Compilation'),
+    planning: window.I18n('Planning'),
+    risks: window.I18n('Risks')
+  }
+
   var d3 = window.d3v3;
   var dagreD3 = window.dagreD3;
   var g = new dagreD3.graphlib.Graph().setGraph({rankDir: "BT"});
@@ -362,7 +377,7 @@ function impalaDagre(id) {
   function _timelineAfter(start_time, timeline) {
     var total = 0;
     return timeline.map(function (event, index) {
-      return $.extend({}, event, { start_time: start_time + total, duration: event.value, value: start_time + (total += event.value), name: window.HUE_I18n.profile[event.clazz]});
+      return $.extend({}, event, { start_time: start_time + total, duration: event.value, value: start_time + (total += event.value), name: PROFILE_I18n[event.clazz]});
     });
   }
 
@@ -375,7 +390,7 @@ function impalaDagre(id) {
     if (!initTime) {
       return timeline;
     }
-    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);
+    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.I18n('CodeGen'), color: colors[2] })].concat(timeline);
   }
 
   function getHealthData(key, startTime) {
@@ -471,7 +486,7 @@ function impalaDagre(id) {
   function showDetailGlobal() {
     var details = d3.select('#' + id + '.query-plan .details');
     var key = getKey(id);
-    details.html('<header class="metric-title">' + getIcon({ svg: 'hi-sitemap' }) + '<h4>' + window.HUE_I18n.profile.overview + '</h4></div>')
+    details.html('<header class="metric-title">' + getIcon({ svg: 'hi-sitemap' }) + '<h4>' + window.I18n('Overview') + '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
     var topNodes = getTopNodes();
     if (topNodes && topNodes.length) {
@@ -479,7 +494,7 @@ function impalaDagre(id) {
       var cpuTimelineTitle = cpuTimelineSection.append('header');
       cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-filter');
       var metricsMax = getMetricsMax() ? ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')' : '';
-      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.topnodes + metricsMax);
+      cpuTimelineTitle.append('h5').text(window.I18n('Top Nodes') + metricsMax);
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable', true);
       var cpuTimelineSectionTableRows = cpuTimelineSectionTable.selectAll('tr').data(topNodes).enter().append('tr').on('click', function (node) {
         select(getId(node.key));
@@ -489,8 +504,8 @@ function impalaDagre(id) {
       cpuTimelineSectionTableRows.append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
-    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), window.HUE_I18n.profile.planning, '#hi-access-time');
-    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.HUE_I18n.profile.execution, '#hi-access-time');
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), window.I18n('Planning'), '#hi-access-time');
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.I18n('Execution' ), '#hi-access-time');
 
     d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
@@ -524,12 +539,12 @@ function impalaDagre(id) {
     d3.select('#' + id + '.query-plan').classed('open', true);
     var details = d3.select('#' + id + '.query-plan .details');
     var key = getKey(key);
-    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
+    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>');
     var detailsContent = details.append('div').classed('details-content', true);
 
     var cpuTimelineData = getCPUTimelineData(key);
-    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.HUE_I18n.profile.execution, '#hi-microchip', getMetricsMax());
-    appendTimelineAndLegend(detailsContent, getHealthData(key, cpuTimelineData[0] && cpuTimelineData[0].start_time), window.HUE_I18n.profile.risks, '#hi-heart', getMetricsMax());
+    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.I18n('Execution'), '#hi-microchip', getMetricsMax());
+    appendTimelineAndLegend(detailsContent, getHealthData(key, cpuTimelineData[0] && cpuTimelineData[0].start_time), window.I18n('Risks'), '#hi-heart', getMetricsMax());
 
     var timelineData = getTimelineData(key);
     var timeline = renderTimeline(timelineData, getMetricsMax());
@@ -538,7 +553,7 @@ function impalaDagre(id) {
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
       timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
-      timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline + ' (' + ko.bindingHandlers.numberFormat.human(timelineSum, 5) + ')');
+      timelineTitle.append('h5').text(window.I18n('Timeline') + ' (' + ko.bindingHandlers.numberFormat.human(timelineSum, 5) + ')');
       timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var timelineSectionTable = timelineSection.append('table').classed('column', true);
@@ -556,7 +571,7 @@ function impalaDagre(id) {
 
     var metricsTitle = metricsSection.append('header');
     metricsTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-bar-chart');
-    metricsTitle.append('h5').text(window.HUE_I18n.profile.metrics);
+    metricsTitle.append('h5').text(window.I18n('Metrics'));
 
     var metricsContent = metricsSection.append('table').classed('column metrics', true);
     var metricsHosts = Object.keys(data.properties.hosts).sort().map(function (key) { return data.properties.hosts[key]; });

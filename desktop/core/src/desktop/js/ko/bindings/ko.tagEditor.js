@@ -17,6 +17,8 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
+import I18n from 'utils/i18n';
+
 ko.bindingHandlers.tagEditor = {
   init: function(element, valueAccessor) {
     let options = valueAccessor();
@@ -168,7 +170,7 @@ ko.bindingHandlers.tagEditor = {
       if (!options.readOnly && !options.hasErrors()) {
         $('<i>')
           .addClass('fa fa-pencil selectize-edit pointer')
-          .attr('title', window.HUE_I18n.selectize.editTags)
+          .attr('title', I18n('Edit tags'))
           .appendTo($readOnlyInner);
         $readOnlyInner.click(() => {
           showEdit();
@@ -243,7 +245,7 @@ ko.bindingHandlers.tagEditor = {
         if (!options.readOnly && !options.hasErrors()) {
           $('<i>')
             .addClass('fa fa-pencil selectize-edit pointer')
-            .attr('title', window.HUE_I18n.selectize.editTags)
+            .attr('title', I18n('Edit tags'))
             .appendTo($readOnlyInner);
           $readOnlyInner.click(() => {
             showEdit();

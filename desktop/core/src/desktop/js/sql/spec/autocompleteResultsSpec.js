@@ -20,6 +20,7 @@ import 'jasmine-ajax';
 import AutocompleteResults from '../autocompleteResults';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 import LOTS_OF_PARSE_RESULTS from './lotsOfParseResults';
 
 describe('AutocompleteResults.js', () => {
@@ -345,9 +346,9 @@ describe('AutocompleteResults.js', () => {
     });
     expect(subject.filtered().length).toBe(2);
     // Sorted by weight, case adjusted
-    expect(subject.filtered()[0].meta).toBe(window.HUE_I18n.autocomplete.meta.keyword);
+    expect(subject.filtered()[0].meta).toBe(I18n('keyword'));
     expect(subject.filtered()[0].value).toBe('foo');
-    expect(subject.filtered()[1].meta).toBe(window.HUE_I18n.autocomplete.meta.keyword);
+    expect(subject.filtered()[1].meta).toBe(I18n('keyword'));
     expect(subject.filtered()[1].value).toBe('bar');
   });
 

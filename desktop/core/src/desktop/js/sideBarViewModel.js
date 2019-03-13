@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 
 class SideBarViewModel {
   constructor(onePageViewModel, topNavViewModel) {
@@ -57,7 +58,7 @@ class SideBarViewModel {
 
           if (editor) {
             appsItems.push({
-              displayName: window.HUE_I18n.nav.editor,
+              displayName: I18n('Editor'),
               url: editor['page'],
               icon: 'editor'
             });
@@ -81,14 +82,14 @@ class SideBarViewModel {
         if (appsItems.length > 0) {
           items.push({
             isCategory: true,
-            displayName: window.HUE_I18n.nav.apps,
+            displayName: I18n('Apps'),
             children: appsItems
           });
         }
 
         const browserItems = [];
         browserItems.push({
-          displayName: window.HUE_I18n.nav.documents,
+          displayName: I18n('Documents'),
           url: '/home/',
           icon: 'documents'
         });
@@ -104,7 +105,7 @@ class SideBarViewModel {
         if (browserItems.length > 0) {
           items.push({
             isCategory: true,
-            displayName: window.HUE_I18n.nav.browsers,
+            displayName: I18n('Browsers'),
             children: browserItems
           });
         }

@@ -18,6 +18,8 @@ import $ from 'jquery';
 import d3v3 from 'd3v3';
 import ko from 'knockout';
 
+import I18n from 'utils/i18n';
+
 import { insertLinebreaks, lineChartBuilder } from 'ko/bindings/charts/chartUtils';
 import huePubSub from 'utils/huePubSub';
 
@@ -33,7 +35,7 @@ ko.bindingHandlers.lineChart = {
     const _chart = $(element).data('chart');
     if (_chart) {
       window.setTimeout(() => {
-        _chart.noData(_datum.message || window.HUE_I18n.chart.noData);
+        _chart.noData(_datum.message || I18n('No Data Available.'));
         const _d3 = d3v3.select($(element).find('svg')[0]);
         if (
           _datum.length > 0 &&

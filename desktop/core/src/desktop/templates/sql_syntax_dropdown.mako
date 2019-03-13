@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
             });
           }
           expected.push({
-            label: HUE_I18n.syntaxChecker.suppressError,
+            label: window.I18n('Ignore this type of error'),
             suppressRule: params.data.ruleId.toString() + params.data.text.toLowerCase()
           });
         }
