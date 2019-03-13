@@ -186,55 +186,310 @@ your Hue Server by running:
 This will start several subprocesses, corresponding to the different Hue
 components. Your Hue installation is now running.
 
-## Configuration for connecting to external services
 
-These configuration variables are under the `[hadoop]` section in
-the `hue.ini` configuration file.
-
-### Hue configuration
+# Connectors
 
 The source of truth sits in the main [hue.ini](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini).
 It consists in several [ini sections](https://en.wikipedia.org/wiki/INI_file#Sections). Lines needs to be uncommented to be active.
 
-Hue is using Hadoop `impersonation` to be able to communicate properly with certain services. This is describe in the following [Service Configuration]("#services-pre-configurations).
+Hue is using Hadoop `impersonation` to be able to communicate properly with certain services. This is described in the following [Service Configuration]("#services-pre-configurations).
 
-#### Impala
+## Editor
 
-In the `[impala]` section of the configuration file, you can
-_optionally_ specify the following:
+The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
 
-    server_host:
-      The hostname or IP that the Impala Server should bind to. By
-      default it binds to `localhost`, and therefore only serves local
-      IPC clients.
+It is available in Editor or Notebook mode and focuses on SQL. Dialects can be added to the main `[notebook]` section like this:
+
+    [notebook]
+
+      [[interpreters]]
+
+        [[[hive]]]
+          # The name of the snippet.
+          name=Hive
+          # The backend connection to use to communicate with the server.
+          interface=hiveserver2
+
+        [[[mysqlalche]]]
+          name = MySQL alchemy
+          interface=sqlalchemy
+          options='{"url": "mysql://root:root@localhost:3306/hue"}'
+
+### Impala
+
+    [impala]
+      # Host of the Impala Server (one of the Impalad)
+      ## server_host=localhost
+
+      # Port of the Impala Server
+      ## server_port=21050
 
 [LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
 ](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/).
 
-#### Hive
+### Hive
 
-In the `[beeswax]` section of the configuration file, you can
-_optionally_ specify the following:
+    [beeswax]
 
-    beeswax_server_host:
-      The hostname or IP that the Hive Server should bind to. By
-      default it binds to `localhost`, and therefore only serves local
-      IPC clients.
+      # Host where HiveServer2 is running.
+      # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
+      ## hive_server_host=localhost
 
-    hive_conf_dir:
-      The directory containing your `hive-site.xml` Hive
-      configuration file.
+      # Port where HiveServer2 Thrift server runs on.
+      ## hive_server_port=10000
 
-#### JDBC
+**Tez**
 
-Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
+Requires support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:
 
-Note, the JDBC proxy should be removed when [SQL Alchemy](https://issues.cloudera.org/browse/HUE-8740) is mature.
+    [beeswax]
+    max_number_of_sessions=10
+
+### MySQL
+
+Recommended way:
+
+    [[[mysql]]]
+       name = MySQL Alchemy
+       interface=sqlalchemy
+       ## https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine
+       ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
+       options='{"url": "mysql://root:root@localhost:3306/hue"}'
+
+Alternative:
+
+    [[[mysqljdbc]]]
+       name=MySql JDBC
+      interface=jdbc
+       ## Specific options for connecting to the server.
+       ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
+       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+       options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
+       ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
+
+### Presto
+
+Direct interface:
+
+    [[[presto]]]
+      name=Presto SQL
+      interface=presto
+      ## Specific options for connecting to the Presto server.
+      ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
+      ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+      options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+
+The Presto JDBC client driver is maintained by the Presto Team and can be downloaded here: https://prestodb.io/docs/current/installation/jdbc.html
+
+    [[[presto]]]
+    name=Presto JDBC
+    interface=jdbc
+    options='{"url": "jdbc:presto://localhost:8080/", "driver": "com.facebook.presto.jdbc.PrestoDriver"}'
+
+### Oracle
+
+### PostgreSQL
+
+### AWS Athena
+
+Same as Presto.
+
+### Teradata
+
+    [[[teradata]]]
+      name=Teradata JDBC
+      interface=jdbc
+      options='{"url": "jdbc:teradata://sqoop-teradata-1400.sjc.cloudera.com/sqoop", "driver": "com.teradata.jdbc.TeraDriver", "user": "sqoop", "password": "sqoop"}'
+
+### DB2
+
+    [[[db2]]]
+      name=DB2 JDBC
+      interface=jdbc
+      options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
+
+### Spark SQL
+
+    [[[sparksql]]]
+      name=SparkSql
+      interface=hiveserver2
+
+### Kafka SQL
+
+    [[[kafkasql]]]
+      name=Kafka SQL
+      interface=kafka
+
+### SQLServer
+
+Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: [Microsoft JDBC Driver](https://msdn.microsoft.com/en-us/sqlserver/aa937724.aspx)
+
+    [[[sqlserver]]]
+    name=SQLServer JDBC
+    interface=jdbc
+    options='{"url": "jdbc:microsoft:sqlserver://localhost:1433", "driver": "com.microsoft.jdbc.sqlserver.SQLServerDriver", "user": "admin": "password": "pass"}'
+
+### Vertica
+
+Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](https://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+
+    [[[vertica]]]
+    name=Vertica JDBC
+    interface=jdbc
+    options='{"url": "jdbc:vertica://localhost:5433/example", "driver": "com.vertica.jdbc.Driver", "user": "admin", "password": "pass"}'
+
+### Phoenix
+
+The Phoenix JDBC client driver is bundled with the Phoenix binary and source release artifacts, which can be downloaded here: [Apache Phoenix Downloads](https://phoenix.apache.org/download.html). Be sure to use the Phoenix client driver that is compatible with your Phoenix server version.
+
+    [[[phoenix]]]
+    name=Phoenix JDBC
+    interface=jdbc
+    options='{"url": "jdbc:phoenix:localhost:2181/hbase", "driver": "org.apache.phoenix.jdbc.PhoenixDriver", "user": "", "password": ""}'
+
+**Note**: Currently, the Phoenix JDBC connector for Hue only supports read-only operations (SELECT and EXPLAIN statements).
+
+### Redshift
+
+### BigQuery
+
+### Drill
+
+The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html) can be used.
+
+    [[[drill]]]
+      name=Drill JDBC
+      interface=jdbc
+      ## Specific options for connecting to the server.
+      ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
+      ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+      options='{"url": "<drill-jdbc-url>", "driver": "org.apache.drill.jdbc.Driver", "user": "admin", "password": "admin"}'</code>
+
+### Solr SQL
+
+    [[[solr]]]
+      name = Solr SQL
+      interface=solr
+      ## Name of the collection handler
+      # options='{"collection": "default"}'
+
+### Kylin
+
+    [[[kylin]]]
+     name=kylin JDBC
+     interface=jdbc
+     options='{"url": "jdbc:kylin://172.17.0.2:7070/learn_kylin", "driver": "org.apache.kylin.jdbc.Driver", "user": "ADMIN", "password": "KYLIN"}'
+
+### Clickhouse
+
+    [[[clickhouse]]]
+      name=ClickHouse
+      interface=jdbc
+      ## Specific options for connecting to the ClickHouse server.
+      ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
+      options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
+
+### SQL Alchemy
+SQL Alchemy is a robust [connector](https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine) that supports
+many [SQL dialects](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
+
+    [[[mysql]]]
+       name = MySQL Alchemy
+       interface=sqlalchemy
+       options='{"url": "mysql://root:root@localhost:3306/hue"}'
+
+### Django DB Connectors
+Those rely on the `[dbms]` lib an dedicated Python libs.
+
+Note, SQL Alchemy should be prefered.
+
+Hue’s query editor can easily be configured to work with any database backend that [Django](https://docs.djangoproject.com/en/1.9/topics/install/#database-installation) supports, including PostgreSQL, MySQL, Oracle and SQLite. Some of you may note that these are the same backends supported by Hue’s DBQuery app and in fact, adding a new query editor for these databases starts with the same configuration step.
+
+First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
+
+    [librdbms]
+      [[databases]]
+        [[[postgresql]]]
+        nice_name=PostgreSQL
+        name=music
+        engine=postgresql_psycopg2
+        port=5432
+        user=hue
+        password=hue
+        options={}
+
+Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
+
+    [notebook]
+      [[interpreters]]
+        [[[postgresql]]]
+        name=PostgreSQL
+        interface=rdbms
+
+After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:
+
+### JDBC
+Use the query editor with any JDBC database.
+
+Note, SQL Alchemy should be prefered.
+
+The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle, but for other JDBC-compatible databases Hue now finally supports a “jdbc” interface to integrate such databases with the new query editor!
+
+Integrating an external JDBC database involves a 3-step process:
+
+Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site; for example, the MySQL JDBC connector for Mac OSX can be found here: https://dev.mysql.com/downloads/connector/j/. (NOTE: In the case of MySQL, the JDBC driver is platform independent, but some drivers are specific to certain OSes and versions so be sure to verify compatibility.)
+Add the path to the driver JAR file to your Java CLASSPATH. Here, we set the CLASSPATH environment variable in our `.bash_profile` script.
+
+    # MySQL
+    export MYSQL_HOME=/Users/hue/Dev/mysql
+    export CLASSPATH=$MYSQL_HOME/mysql-connector-java-5.1.38-bin.jar:$CLASSPATH
+
+Add a new interpreter to the notebook app and supply the “name”, set “interface” to jdbc, and set “options” to a JSON object that contains the JDBC connection information. For example, we can connect a local MySQL database named “hue” running on `localhost` and port `8080` via JDBC with the following configuration:
+
+    [notebook]
+      [[interpreters]]
+        [[[mysql]]]
+        name=MySQL JDBC
+        interface=jdbc
+        options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": ""}'
+
+Technically the JDBC is connecting to the database to query via a Java Proxy powered with Py4j. It will automatically
+be started if any interpreter is using it.
+
+    ## Main flag to override the automatic starting of the DBProxy server.
+    enable_dbproxy_server=true
+
+**Tip**: Testing JDBC Configurations
+Before adding your interpreter’s JDBC configurations to hue.ini, verify that the JDBC driver and connection settings work in a SQL client like SQuirrel SQL.
+
+**Tip**: Prompt for JDBC authentication
+You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.
 
 
-#### Files and Object Store
 
-##### HDFS
+### Spark
+
+    [[[pyspark]]]
+      name=PySpark
+      interface=livy
+
+    [[[spark]]]
+      name=Scala
+      interface=livy
+
+    [[[r]]]
+        name=R
+        interface=livy
+
+### Pig
+
+    [[[pig]]]
+      name=Pig
+      interface=oozie
+
+## Files and Object Store
+
+### HDFS
 
 Hue supports one HDFS cluster. That cluster should be defined
 under the `[[[default]]]` sub-section.
@@ -251,7 +506,7 @@ under the `[[[default]]]` sub-section.
       This is the configuration directory of the HDFS, typically
       `/etc/hadoop/conf`.
 
-##### S3
+### S3
 
 Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
 
@@ -288,7 +543,7 @@ The region should be set to the AWS region corresponding to the S3 account. By d
 New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
 
 
-##### ADLS
+### ADLS
 
 Hue's file browser can now allow users to explore, manage, and upload data in an ADLS, in addition to HDFS and S3.
 
@@ -297,37 +552,34 @@ Read more about it in the [ADLS User Documentation](../user-guide/user-guide.htm
 In order to add an ADLS account to Hue, you'll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 
-<pre>
-[adls]
-[[azure_accounts]]
-[[[default]]]
-client_id_script=/path/to/client_id_script.sh
-client_secret_script=/path/to/client_secret_script.sh
-tenant_id_script=/path/to/tenant_id_script.sh
+    [adls]
+    [[azure_accounts]]
+    [[[default]]]
+    client_id_script=/path/to/client_id_script.sh
+    client_secret_script=/path/to/client_secret_script.sh
+    tenant_id_script=/path/to/tenant_id_script.sh
 
-[[adls_clusters]]
-[[[default]]]
-fs_defaultfs=adl://<account_name>.azuredatalakestore.net
-webhdfs_url=https://<account_name>.azuredatalakestore.net
-</pre>
+    [[adls_clusters]]
+    [[[default]]]
+    fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+    webhdfs_url=https://<account_name>.azuredatalakestore.net
 
 Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
 
-<pre>
-[adls]
-[[azure_account]]
-[[[default]]]
-client_id=adlsclientid
-client_secret=adlsclientsecret
-tenant_id=adlstenantid
+    [adls]
+    [[azure_account]]
+    [[[default]]]
+    client_id=adlsclientid
+    client_secret=adlsclientsecret
+    tenant_id=adlstenantid
 
-[[adls_clusters]]
-[[[default]]]
-fs_defaultfs=adl://<account_name>.azuredatalakestore.net
-webhdfs_url=https://<account_name>.azuredatalakestore.net
-</pre>
+    [[adls_clusters]]
+    [[[default]]]
+    fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+    webhdfs_url=https://<account_name>.azuredatalakestore.net
 
-#### Yarn (MR2) Cluster
+
+## YARN Cluster
 
 Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
 under the `[[[default]]]` and `[[[ha]]]` sub-sections.
@@ -344,7 +596,7 @@ under the `[[[default]]]` and `[[[ha]]]` sub-sections.
     submit_to:
       To enable the section, set to True.
 
-#### Oozie
+## Oozie
 
 In the `[liboozie]` section of the configuration file, you should
 specify:
@@ -354,7 +606,7 @@ specify:
       environment variable for Oozie.
 
 
-#### Solr
+## Solr
 
 In the `[search]` section of the configuration file, you should
 specify:
@@ -363,7 +615,7 @@ specify:
       The URL of the Solr service.
 
 
-#### HBase
+## HBase
 
 In the `[hbase]` section of the configuration file, you should
 specify:
@@ -371,9 +623,9 @@ specify:
     hbase_clusters:
       Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
 
-### Services pre-configuration
+# Services pre-configuration
 
-#### Hive SQL
+## Hive SQL
 
 Hue's Hive SQL Editor application helps you use Hive to query your data.
 It depends on a Hive Server 2 running in the cluster. Please read
@@ -390,7 +642,7 @@ system) must be world-writable (1777), as Hive makes extensive use of it.
   directory containing `hive-site.xml`.
 </div>
 
-#### Hive and Impala High Availability (HA)
+## Hive and Impala High Availability (HA)
 
 HiveServer2 and Impala support High Availability through a “load balancer”.
 One caveat is that Hue's underlying Thrift libraries reuse TCP connections in a
@@ -416,61 +668,59 @@ You can configure the HaProxy to have two different ports associated with
 different load balancing algorithms. Here is a sample configuration (haproxy.cfg)
 for Hive and Impala HA on a secure cluster.
 
-<pre>
-frontend hiveserver2_front
-bind *:10015 ssl crt /path/to/cert_key.pem
-mode tcp
-option tcplog
-default_backend hiveserver2
-backend hiveserver2
-    balance                     roundrobin
-    mode                        tcp
-    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+    frontend hiveserver2_front
+    bind *:10015 ssl crt /path/to/cert_key.pem
+    mode tcp
+    option tcplog
+    default_backend hiveserver2
+    backend hiveserver2
+        balance                     roundrobin
+        mode                        tcp
+        server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+        server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+        server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
 
-frontend  hivejdbc_front
-    bind                        *:10016 ssl crt /path/to/cert_key.pem
-    mode                        tcp
-    option                      tcplog
-    stick                       match src
-    stick-table type ip size 200k expire 30m
-    default_backend             hivejdbc
-backend hivejdbc
-    balance                     source
-    mode                        tcp
-    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
-    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
-</pre>
+    frontend  hivejdbc_front
+        bind                        *:10016 ssl crt /path/to/cert_key.pem
+        mode                        tcp
+        option                      tcplog
+        stick                       match src
+        stick-table type ip size 200k expire 30m
+        default_backend             hivejdbc
+    backend hivejdbc
+        balance                     source
+        mode                        tcp
+        server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+        server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+        server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+
 And here is an example for impala HA configuration on a secure cluster.
-<pre>
-frontend  impala_front
-    bind                        *:25003 ssl crt /path/to/cert_key.pem
-    mode                        tcp
-    option                      tcplog
-    default_backend             impala
-backend impala
-    balance                     leastconn
-    mode                        tcp
-    server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
-    server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
-    server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
 
-frontend  impalajdbc_front
-    bind                        *:21051 ssl crt /path/to/cert_key.pem
-    mode                        tcp
-    option                      tcplog
-    stick                       match src
-    stick-table type ip size 200k expire 30m
-    default_backend             impalajdbc
-backend impalajdbc
-    balance                     source
-    mode                        tcp
-    server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
-    server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
-    server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
-</pre>
+    frontend  impala_front
+        bind                        *:25003 ssl crt /path/to/cert_key.pem
+        mode                        tcp
+        option                      tcplog
+        default_backend             impala
+    backend impala
+        balance                     leastconn
+        mode                        tcp
+        server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
+        server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
+        server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
+
+    frontend  impalajdbc_front
+        bind                        *:21051 ssl crt /path/to/cert_key.pem
+        mode                        tcp
+        option                      tcplog
+        stick                       match src
+        stick-table type ip size 200k expire 30m
+        default_backend             impalajdbc
+    backend impalajdbc
+        balance                     source
+        mode                        tcp
+        server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
+        server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
+        server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
 
 Note: “check” is required at end of each line to ensure HaProxy can detect any
 unreachable Impalad/HiveServer2 server, so HA failover can be successful. Without
@@ -480,25 +730,22 @@ Impalad/HiveServer2 server Hue tries to connect is down.
 After editing the /etc/haproxy/haproxy.cfg file, run following commands to
 restart HaProxy service and check the service restarts successfully.
 
-<pre>
-service haproxy restart
-service haproxy status
-</pre>
+    service haproxy restart
+    service haproxy status
 
 Also we need add following blocks into hue.ini.
-<pre>
-[impala]
-server_port=21051
 
-[beeswax]
-hive_server_port=10016
-</pre>
+    [impala]
+    server_port=21051
+
+    [beeswax]
+    hive_server_port=10016
 
 Read more about it in the [How to optimally configure your Analytic Database for
 High Availability with Hue and other SQL clients](http://gethue.com/how-to-opti
 mally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients) post.
 
-#### Hadoop HDFS
+## Hadoop HDFS
 
 You need to enable WebHdfs or run an HttpFS server. To turn on WebHDFS,
 add this to your `hdfs-site.xml` and *restart* your HDFS cluster.
@@ -536,7 +783,7 @@ Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
     </property>
 
 
-#### Oozie
+## Oozie
 
 Hue submits MapReduce jobs to Oozie as the logged in user. You need to
 configure Oozie to accept the `hue` user to be a proxyuser. Specify this in
@@ -551,7 +798,7 @@ your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
         <value>*</value>
     </property>
 
-#### Firewall
+## Firewall
 
 Hue currently requires that the machines within your cluster can connect to
 each other freely over TCP. The machines outside your cluster must be able to

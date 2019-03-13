@@ -49,23 +49,20 @@ autocomplete extremly powerful. Other languages defaults to a generic SQL gramma
 ### HiveServer2 API
 Hive, Impala, SparkSQL
 
+### SQL Alchemy
+SQL Alchemy supports comes with [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
+
 ### Python Connectors
 MySQL, Oracle, PostgreSQL, Phoenix, Presto, Kylin, Redshift, BigQuery, Drill
 
 ### JDBC
-
 Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
-[JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py)
-
-
-### SQL Alchemy
-SQL Alchemy supports comes with [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
+View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py).
 
 ### Solr SQL
 [Solr connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/solr.py)
 
 ### Others
-
 
 ## Jobs
 
@@ -94,6 +91,9 @@ Implementations:
 * [Impala API](https://github.com/cloudera/hue/blob/master/apps/impala/src/impala/dashboard_api.py)
 * [Hive API](https://github.com/cloudera/hue/blob/master/apps/beeswax/src/beeswax/dashboard_api.py)
 
+When HS2, RDBMS, and JDBC Are Not Enough
+
+If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app: [Notebook Connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors). Each connector API subclasses the [Base API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py) and must implement the methods defined within; refer to the [JdbcApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py) or [RdbmsApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py) for representative examples.
 
 ## Search
 
@@ -466,17 +466,7 @@ Let's edit `calculator/src/calculator/views.py` to simply render the page:
       })
 
 
-You can now go and try the calculator.  If you set everything up right, you
-should see something like:
-
-<img src="calculator_working.jpg">
-
-
-## A Look at some Existing Apps
-
-### Job Browser
-
-### ADLS Browser
+You can now go and try the calculator.
 
 
 ## Backend Development
@@ -599,9 +589,6 @@ function in your `conf.py`:
 #### Running "Helper Processes"
 
 Some Hue applications need to run separate daemon processes on the side.
-For example, `BeeswaxServer` is responsible for managing Hive query states.
-The Hue "views" communicate with it through Thrift and shared states in the
-Django database.
 
 Suppose your application needs a helper `my_daemon.py`. You need to register it by:
 
@@ -1022,7 +1009,6 @@ Install a patched jison:
     cd jison
     npm install -g .
 
-
 Then run:
 
     make sql-all-parsers
@@ -1063,159 +1049,130 @@ The backends is pluggable by providing alternative [client interfaces](https://g
 
 ### Searching for entities
 
-<pre>
-     $.post("/metadata/api/catalog/search_entities_interactive/", {
+    $.post("/metadata/api/catalog/search_entities_interactive/", {
         query_s: ko.mapping.toJSON("*sample"),
         sources: ko.mapping.toJSON(["sql", "hdfs", "s3"]),
         field_facets: ko.mapping.toJSON([]),
         limit: 10
-      }, function(data) {
+    }, function(data) {
         console.log(ko.mapping.toJSON(data));
-      });
-</pre>
+    });
 
 
 ### Searching for entities with the dummy backend
 
-<pre>
-     $.post("/metadata/api/catalog/search_entities_interactive/", {
+    $.post("/metadata/api/catalog/search_entities_interactive/", {
         query_s: ko.mapping.toJSON("*sample"),
         interface: "dummy"
-      }, function(data) {
+    }, function(data) {
         console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+    });
 
 ### Finding an entity in order to get its id
 
-<pre>
-     $.get("/metadata/api/navigator/find_entity", {
+    $.get("/metadata/api/navigator/find_entity", {
         type: "table",
         database: "default",
         name: "sample_07",
         interface: "dummy"
-      }, function(data) {
+    }, function(data) {
         console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+    });
 
 ### Adding/updating a comment with the dummy backend
 
-<pre>
-     $.post("/metadata/api/catalog/update_properties/", {
+    $.post("/metadata/api/catalog/update_properties/", {
         id: "22",
         properties: ko.mapping.toJSON({"description":"Adding a description"}),
         interface: "dummy"
-      }, function(data) {
+    }, function(data) {
         console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+    });
 
 ### Adding a tag with the dummy backend
 
-<pre>
-     $.post("/metadata/api/catalog/add_tags/", {
-        id: "22",
-        tags: ko.mapping.toJSON(["usage"]),
-        interface: "dummy"
-      }, function(data) {
+    $.post("/metadata/api/catalog/add_tags/", {
+      id: "22",
+      tags: ko.mapping.toJSON(["usage"]),
+      interface: "dummy"
+    }, function(data) {
         console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+    });
 
 ### Deleting a key/value property
 
-<pre>
-     $.post("/metadata/api/catalog/delete_metadata_properties/", {
-        "id": "32",
-        "keys": ko.mapping.toJSON(["project", "steward"])
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+    $.post("/metadata/api/catalog/delete_metadata_properties/", {
+       "id": "32",
+       "keys": ko.mapping.toJSON(["project", "steward"])
+    }, function(data) {
+       console.log(ko.mapping.toJSON(data));
+    });
 
 ### Deleting a key/value property
 
-<pre>
-     $.post("/metadata/api/catalog/delete_metadata_properties/", {
-        "id": "32",
-        "keys": ko.mapping.toJSON(["project", "steward"])
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
+    $.post("/metadata/api/catalog/delete_metadata_properties/", {
+      "id": "32",
+      "keys": ko.mapping.toJSON(["project", "steward"])
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
 
 
 ### Getting the model mapping of custom metadata
 
-<pre>
-     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
+    $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
 
 
 ### Getting a namespace
 
-<pre>
-     $.post("/metadata/api/catalog/namespace/", {
-        namespace: 'huecatalog'
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
-
+    $.post("/metadata/api/catalog/namespace/", {
+      namespace: 'huecatalog'
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
 
 ### Creating a namespace
 
-<pre>
-     $.post("/metadata/api/catalog/namespace/create/", {
-        "namespace": "huecatalog",
-        "description": "my desc"
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
+    $.post("/metadata/api/catalog/namespace/create/", {
+      "namespace": "huecatalog",
+      "description": "my desc"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
 
 
 ### Creating a namespace property
 
-<pre>
-     $.post("/metadata/api/catalog/namespace/property/create/", {
-        "namespace": "huecatalog",
-        "properties": ko.mapping.toJSON({
-          "name" : "relatedEntities2",
-          "displayName" : "Related objects",
-          "description" : "My desc",
-          "multiValued" : true,
-          "maxLength" : 50,
-          "pattern" : ".*",
-          "enumValues" : null,
-          "type" : "TEXT"
-        })
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
+    $.post("/metadata/api/catalog/namespace/property/create/", {
+      "namespace": "huecatalog",
+      "properties": ko.mapping.toJSON({
+        "name" : "relatedEntities2",
+        "displayName" : "Related objects",
+        "description" : "My desc",
+        "multiValued" : true,
+        "maxLength" : 50,
+        "pattern" : ".*",
+        "enumValues" : null,
+        "type" : "TEXT"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
 
 ### Map a namespace property to a class entity
 
-<pre>
-     $.post("/metadata/api/catalog/namespace/property/map/", {
-        "class": "hv_view",
-        "properties": ko.mapping.toJSON([{
-           namespace: "huecatalog",
-           name: "relatedQueries"
-        }])
-      }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-      });
-</pre>
+    $.post("/metadata/api/catalog/namespace/property/map/", {
+      "class": "hv_view",
+      "properties": ko.mapping.toJSON([{
+          namespace: "huecatalog",
+          name: "relatedQueries"
+      }])
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
 
 # Testing
 
@@ -1307,30 +1264,30 @@ See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
 
 ### Special environment variables
 
-DESKTOP_LOGLEVEL=<level>
-  level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
+    DESKTOP_LOGLEVEL=<level>
+      level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
 
-  When specified, the console logger is set to the given log level. A console
-  logger is created if one is not defined.
+      When specified, the console logger is set to the given log level. A console
+      logger is created if one is not defined.
 
-DESKTOP_DEBUG
-  A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
-  validation.
+    DESKTOP_DEBUG
+      A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
+      validation.
 
-DESKTOP_PROFILE
-  Turn on Python profiling. The profile data is saved in a file. See the
-  console output for the location of the file.
+    DESKTOP_PROFILE
+      Turn on Python profiling. The profile data is saved in a file. See the
+      console output for the location of the file.
 
-DESKTOP_LOG_DIR=$dir
-  Specify the HUE log directory. Defaults to ./log.
+    DESKTOP_LOG_DIR=$dir
+      Specify the HUE log directory. Defaults to ./log.
 
-DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
-  Specify alternate DB connection parameters for HUE to use. Useful for
-  testing your changes against, for example, MySQL instead of sqlite. String
-  is a colon-delimited list.
+    DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
+      Specify alternate DB connection parameters for HUE to use. Useful for
+      testing your changes against, for example, MySQL instead of sqlite. String
+      is a colon-delimited list.
 
-TEST_IMPALAD_HOST=impalad-01.gethue.com
-  Point to an Impalad and trigger the Impala tests.
+    TEST_IMPALAD_HOST=impalad-01.gethue.com
+      Point to an Impalad and trigger the Impala tests.
 
 
 ### Writing tests that depend on Hadoop
@@ -1351,13 +1308,15 @@ separated the Jenkins builds into "fast" and "slow".  Both are run
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.
 
-
+   <br/>
+   <br/>
    </div>
 </div>
 
 
 <div class="row-fluid footer">
-  Documentation improvements? <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">Feel free to edit this page on GitHub and send a pull request!</a>
+  Documentation improvements? Feel free to <a href="https://github.com/cloudera/hue/blob/master/docs/user-guide/user-guide.md">edit this page on GitHu
+  </a> and send a pull request!
 </div>
 
 

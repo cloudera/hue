@@ -436,42 +436,7 @@ Turns a list of semi-colon separated queries into an interactive presentation. I
 Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
 
 ### Hive
-
-**Tez**
-
-An external contribution provided support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:
-
-    [beeswax]
-    max_number_of_sessions=10
-
 ### Impala
-
-The Hive Editor enables you to perform queries on Apache Hive, a
-data warehousing system designed to work with Hadoop. For information
-about Hive. You can
-create Hive databases, tables and partitions, load data, create, run,
-and manage queries, and download the results in a Microsoft Office Excel
-worksheet file or a comma-separated values file.
-
-
-Hive Editor is installed and configured as part of Hue. For information
-about installing and configuring Hue, see the Hue Installation
-manual.
-
-Hive Editor assumes an existing Hive installation. The Hue installation
-instructions include the configuration necessary for hive to access
-Hive. You can view the current Hive configuration from the **Settings**
-tab in the Hive Editor.
-
-By default, a Hive Editor user can see the saved queries for all users -
-both his/her own queries and those of other Hive Editor users. To restrict
-viewing saved queries to the query owner and Hue administrators, set the
-share\_saved\_queries property under the [beeswax] section in the Hue
-configuration file to false.
-
-![image](images/note.jpg) **Note**: The Hive Editor used to be known as Beeswax.
-![image](images/note.jpg) **Note**: The [Job Browser](#impala-queries) integrates nicely with the Impala Query Editor.
-
 ### MySQL
 ### Oracle
 ### KSQL / Kafka SQL
@@ -1512,4 +1477,3 @@ A basic read only version is done [HUE-951](https://issues.cloudera.org/browse/H
 
   gtag('config', 'UA-37637545-1');
 </script>
-

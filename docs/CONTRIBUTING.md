@@ -1,4 +1,5 @@
-image:images/hue_logo.png[Hue Logo]
+![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
+
 
 The Hue project gladly welcomes any patches or [pull requests](https://github.com/cloudera/hue/pulls)!
 

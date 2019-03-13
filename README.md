@@ -21,7 +21,7 @@ It features:
 
 Who is using Hue
 ----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying in order to make smarter decisions. Just at Cloudera, Hue is heavily used by hundreds of customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop and is compatible with the other distributions.
+Thousands of companies and organizations use Hue to open-up their data and provide self service querying in order to make smarter decisions. Just at Cloudera, Hue is heavily used by thousand of customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop and is compatible with the other distributions.
 
 
 Getting Started
