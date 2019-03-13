@@ -14,7 +14,7 @@ High Level Roadmap
 * [ ] Result caching
 * [ ] SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
 * [ ] Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
-* [*] [NGINX] (http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
+* [x] Web Server [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 * [ ] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
 * [ ] Documentation Refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
 * [ ] Public REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
