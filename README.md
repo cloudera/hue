@@ -8,7 +8,7 @@ Hue is an open source SQL Workbench for browsing, querying and visualizing data 
 
 It features:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL and submit jobs
+   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](http://cloudera.github.io/hue/latest/admin-manual/manual.html#connectors) and submit jobs
    * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
    * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
    * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
@@ -53,6 +53,7 @@ configuration is available in the template directory.
 Community
 -----------
    * How to [contribute](docs/CONTRIBUTING.md)
+   * High level [roadmap](docs/ROADMAP.md)
    * User group: http://groups.google.com/a/cloudera.org/group/hue-user
    * Jira: https://issues.cloudera.org/browse/HUE
    * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
