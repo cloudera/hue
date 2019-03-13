@@ -215,6 +215,34 @@ It is available in Editor or Notebook mode and focuses on SQL. Dialects can be a
           interface=sqlalchemy
           options='{"url": "mysql://root:root@localhost:3306/hue"}'
 
+
+Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+
+<pre>
+  [beeswax]
+  # A limit to the number of rows that can be downloaded from a query before it is truncated.
+  # A value of -1 means there will be no limit.
+  download_row_limit=-1
+
+  # A limit to the number of bytes that can be downloaded from a query before it is truncated.
+  # A value of -1 means there will be no limit.
+  download_bytes_limit=-1
+</pre>
+
+In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
+<pre>
+  [desktop]
+  # Global setting to allow or disable end user downloads in all Hue.
+  # e.g. Query result in Editors and Dashboards, file in File Browser...
+  enable_download=false
+</pre>
+
+The download feature in the file browser can be disabled separately with the following options in your hue.ini:
+<pre>
+[filebrowser]
+show_download_button=false
+</pre>
+
 ### Impala
 
     [impala]
@@ -244,6 +272,7 @@ Requires support for sending multiple queries when using Tez (instead of a maxim
 
     [beeswax]
     max_number_of_sessions=10
+
 
 ### MySQL
 
@@ -289,6 +318,27 @@ The Presto JDBC client driver is maintained by the Presto Team and can be downlo
 ### Oracle
 
 ### PostgreSQL
+
+First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
+
+    [librdbms]
+      [[databases]]
+        [[[postgresql]]]
+        nice_name=PostgreSQL
+        name=music
+        engine=postgresql_psycopg2
+        port=5432
+        user=hue
+        password=hue
+        options={}
+
+Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
+
+    [notebook]
+      [[interpreters]]
+        [[[postgresql]]]
+        name=PostgreSQL
+        interface=rdbms
 
 ### AWS Athena
 
@@ -1451,11 +1501,9 @@ import groups from an LDAP directory.
 
 #### Limit users can login only if they are belong to one of listed LDAP groups
 
-<pre>
-  [desktop]
-  [[ldap]]
-  login_groups=ldap_grp1,ldap_grp2,ldap_grp3
-</pre>
+    [desktop]
+    [[ldap]]
+    login_groups=ldap_grp1,ldap_grp2,ldap_grp3
 
 #### Importing Groups from an LDAP Directory
 
