@@ -19,25 +19,24 @@
 
 # Concept
 
-Hue is generic and let's you integrate with other analytics systems so that for example
-your users can explore data with other databases.
-In addition, whole new apps can also be created in order to provide end user solutions.
+Hue service integration is generic and lets you integrate with other analytics systems. Here is a list of the main APIs:
+
+* Connect or create SQL connectors to any Database
+* List any files from any filesytem
+* List any job or query list
+* Integrate with a Data Catalog
+
+REST APIs are not all public yet but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
+Upcoming APIs: how to add new vizualizations, new SQL grammar and highlighting, workflow systems.
+In addition, whole new apps can also be created in order to provide end to end solutions.
 
 # Editor / Notebook
 
-The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
+They provide SQL integration with any database via several connectors (native, JDBC, SQL Alchemy...).
 
-It is available in Editor or Notebook mode and will be integrated with the Dashboard soon. The Editor focuses on Apache Hive and Apache Impala but is also compatible with:
+Other modes like MapReduce, Java, Shell, Sqoop are also available. Here is a list of the [existing connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors).
 
-* Any SQL databases: MySQL, SparkSQL, Oracle, Apache Phoenix, Apache Presto, Apache Drill, Apache Kylin, PostgreSQL, Redshift, BigQuery…
-* MapReduce
-* Spark
-* Pig
-* Solr SQL
-
-Other modes like MapReduce, Java, Shell, Sqoop are also available. Here is a list of the [https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors](existing connectors).
-
-Connectors are pluggable and can new engines can be supported. Feel free to comment on the [https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user](Hue list) of [https://github.com/cloudera/hue/issues](github) about it.
+Connectors are pluggable and can new engines can be supported. Feel free to comment on the [Hue list](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user) of [github](https://github.com/cloudera/hue/issues) about it.
 
 ## SQL
 
@@ -867,18 +866,11 @@ Django, running on the WSGI container/web server (typically CherryPy), manages
 the url dispatch, executes application logic code, and puts together the views
 from their templates.  Django uses a database (typically sqlite)
 to manage session data, and Hue applications can use it as well
-for their "models".  (For example, the JobDesigner application stores
-job designs in the database.)
+for their "models".  (For example, the saved Editor stores
+saved queries in the database.)
 
 In addition to the web server, some Hue applications run
-daemon processes "on the side".  For example, Spark runs a daemon
-("livy_server") that keeps track of the Spark shells of the user. Running
-a separate process for applications is the preferred
-way to manage long-running tasks that you may wish
-to co-exist with web page rendering.  The web "views"
-typically communicate with these side daemons
-by using Thrift (e.g., for Hive query execution) or by exchanging state
-through the database.
+daemon processes "on the side". Some examples are the `Celery Task Server`, `Celery Beat`.
 
 ### Interacting with Hadoop
 
