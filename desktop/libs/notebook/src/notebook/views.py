@@ -24,7 +24,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
+from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR, TASK_SERVER
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -34,15 +34,33 @@ from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
-from notebook.connectors.base import Notebook, get_api, _get_snippet_name
+from notebook.connectors.base import Notebook, get_api as _get_api, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
 
-
 LOG = logging.getLogger(__name__)
 
+if TASK_SERVER.ENABLED.get():
+  import notebook.tasks as ntasks
+
+class ApiWrapper(object):
+  def __init__(self, request, snippet):
+    self.request = request
+    self.snippet = snippet
+  def __getattr__(self, name):
+    if TASK_SERVER.ENABLED.get() and hasattr(ntasks, name):
+      attr = object.__getattribute__(ntasks, name)
+      def _method(*args, **kwargs):
+        return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
+      return _method
+    else:
+      api = _get_api(self.request, self.snippet)
+      return object.__getattribute__(api, name)
+
+def get_api(request, snippet):
+  return ApiWrapper(request, snippet)
 
 def notebooks(request):
   editor_type = request.GET.get('type', 'notebook')
@@ -311,7 +329,6 @@ def copy(request):
 
   return JsonResponse(response)
 
-
 @check_document_access_permission()
 def download(request):
   if not ENABLE_DOWNLOAD.get():
@@ -321,7 +338,7 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  response = get_api(request, snippet).download(notebook, snippet, file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
+  response = get_api(request, snippet).download(notebook, snippet, file_format=file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
 
   if response:
     request.audit = {

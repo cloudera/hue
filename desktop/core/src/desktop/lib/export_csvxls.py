@@ -36,7 +36,7 @@ from desktop.lib import i18n
 LOG = logging.getLogger(__name__)
 
 ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
-
+FORMAT_TO_CONTENT_TYPE = {'csv': 'application/csv', 'xls': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'json': 'application/json'}
 
 def nullify(cell):
   return cell if cell is not None else "NULL"
@@ -120,20 +120,16 @@ def make_response(generator, format, name, encoding=None, user_agent=None):
   @param name Base name for output file
   @param encoding Unicode encoding for data
   """
+  content_type = FORMAT_TO_CONTENT_TYPE.get(format, 'application/octet-stream')
   if format == 'csv':
-    content_type = 'application/csv'
     resp = StreamingHttpResponse(generator, content_type=content_type)
     try:
       del resp['Content-Length']
     except KeyError:
       pass
   elif format == 'xls':
-    format = 'xlsx'
-    content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     resp = HttpResponse(next(generator), content_type=content_type)
-
   elif format == 'json':
-    content_type = 'application/json'
     resp = HttpResponse(generator, content_type=content_type)
   else:
     raise Exception("Unknown format: %s" % format)

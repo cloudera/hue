@@ -117,7 +117,7 @@ class RdbmsApi(Api):
 
 
   @query_error_handler
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     return {'status': -1}
 
 

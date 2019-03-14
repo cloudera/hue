@@ -361,7 +361,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     if snippet['type'] == 'impala':
       from impala import conf as impala_conf
 
@@ -382,7 +382,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format, user_agent=None):
+  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
     try:
       db = self._get_db(snippet, cluster=self.cluster)
       handle = self._get_handle(snippet)
@@ -391,7 +391,7 @@ class HS2Api(Api):
 
       file_name = _get_snippet_name(notebook)
 
-      return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name, user_agent=user_agent)
+      return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name, user_agent=user_agent, max_rows=max_rows, store_data_type_in_header=store_data_type_in_header)
     except Exception, e:
       title = 'The query result cannot be downloaded.'
       LOG.exception(title)
