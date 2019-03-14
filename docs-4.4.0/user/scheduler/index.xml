@@ -2,13 +2,13 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Scheduler on Hue Documentation</title>
-    <link>http://localhost:1313/user/scheduler/</link>
+    <link>http://localhost:1313/hue/docs-4.4.0/user/scheduler/</link>
     <description>Recent content in Scheduler on Hue Documentation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 13 Mar 2019 18:28:09 -0700</lastBuildDate>
     
-	<atom:link href="http://localhost:1313/user/scheduler/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://localhost:1313/hue/docs-4.4.0/user/scheduler/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
