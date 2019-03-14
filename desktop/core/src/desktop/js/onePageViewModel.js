@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import _ from 'lodash';
+import ko from 'knockout';
 import page from 'page';
 
 import hueUtils from 'utils/hueUtils';

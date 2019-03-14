@@ -2371,7 +2371,7 @@ from desktop.views import _ko
           return self.loadDeferred.promise();
         }
         self.loading(true);
-        window.apiHelper.simpleGet(IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
+        window.apiHelper.simpleGet(window.IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
           self.body(doc.body);
         }).always(function () {
           self.loading(false);
@@ -2384,7 +2384,7 @@ from desktop.views import _ko
         var self = this;
         self.disposals = [];
         self.topics = [];
-        IMPALA_DOC_TOP_LEVEL.forEach(function (topLevelItem) {
+        window.IMPALA_DOC_TOP_LEVEL.forEach(function (topLevelItem) {
           self.topics.push(new LanguageReferenceTopic(topLevelItem));
         });
 

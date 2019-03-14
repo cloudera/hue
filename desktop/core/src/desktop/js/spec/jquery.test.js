@@ -20,3 +20,5 @@ global.$ = $;
 global.jQuery = $;
 global.window.$ = $;
 global.window.jQuery = $;
+
+export default $;

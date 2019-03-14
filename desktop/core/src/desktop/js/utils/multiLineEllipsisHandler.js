@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ko from 'knockout';
 
 import hueUtils from 'utils/hueUtils';
 
