@@ -32,7 +32,6 @@
   from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
-<%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
@@ -491,8 +490,6 @@ ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }
-
-${ koComponents.all() }
 
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 

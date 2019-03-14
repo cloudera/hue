@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'spec/jquery.test';
+import $ from 'spec/jquery.test';
 import 'spec/jquery.plugins';
-
 import ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';

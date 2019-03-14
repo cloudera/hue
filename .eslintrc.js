@@ -1,7 +1,6 @@
 
-const normalGlobals = [
-  'ko', 'jQuery', '$', '_', 'Promise'
-];
+const normalGlobals = [];
+
 const hueGlobals = [
   // global_js_constants.mako
   'AUTOCOMPLETE_TIMEOUT', 'CACHEABLE_TTL', 'CSRF_TOKEN', 'DOCUMENT_TYPES', 'DROPZONE_HOME_DIR',
@@ -11,7 +10,7 @@ const hueGlobals = [
   'USER_HOME_DIR', 'WorkerGlobalScope',
 
   // other misc
-  'ace', 'Autocompleter', 'CodeMirror', 'Datamap', 'd3v3', 'HueGeo', 'impalaDagre', 'less', 'MediumEditor', 'moment',
+  'ace', 'Autocompleter', 'CodeMirror', 'Datamap',  'HueGeo', 'impalaDagre', 'less', 'MediumEditor', 'moment',
   'nv', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA',
 
   // jasmine

@@ -21,6 +21,8 @@ import hueUtils from '../../utils/hueUtils';
 
 const isNotNullForCharts = val => val !== 'NULL' && val !== null;
 
+const jQuery = $;
+
 const pieChartTransformer = function(rawDatum) {
   let _data = [];
 
