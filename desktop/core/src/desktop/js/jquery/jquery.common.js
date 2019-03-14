@@ -53,3 +53,5 @@ import 'jquery/plugins/jquery.titleupdater';
 
 window.$ = $;
 window.jQuery = $;
+
+export default $;

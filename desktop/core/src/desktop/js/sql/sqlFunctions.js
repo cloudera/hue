@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ko from 'knockout';
+
 const PigFunctions = (function() {
   const EVAL_FUNCTIONS = {
     avg: { signature: 'AVG(%VAR%)', draggable: 'AVG()' },

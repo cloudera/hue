@@ -123,6 +123,30 @@ import 'ko/bindings/ko.typeahead';
 import 'ko/bindings/ko.verticalSlide';
 import 'ko/bindings/ko.visibleOnHover';
 
+import 'ko/components/contextPopover/ko.contextPopover';
+import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
+import 'ko/components/ko.appSwitcher';
+import 'ko/components/ko.catalogEntriesList';
+import 'ko/components/ko.contextSelector';
+import 'ko/components/ko.createDirectoryModal';
+import 'ko/components/ko.deleteDocModal';
+import 'ko/components/ko.dropDown';
+import 'ko/components/ko.dwSidebar';
+import 'ko/components/ko.executionAnalysis';
+import 'ko/components/ko.favoriteApp';
+import 'ko/components/ko.fieldSamples';
+import 'ko/components/ko.globalSearch';
+import 'ko/components/ko.historyPanel';
+import 'ko/components/ko.inlineAutocomplete';
+import 'ko/components/ko.jobBrowserLinks';
+import 'ko/components/ko.multiClusterSidebar';
+import 'ko/components/ko.navProperties';
+import 'ko/components/ko.navTags';
+import 'ko/components/ko.performanceGraph';
+import 'ko/components/ko.pollingCatalogEntriesList';
+import 'ko/components/ko.sentryPrivileges';
+import 'ko/components/ko.sqlColumnsTable';
+
 import 'ko/extenders/ko.maxLength';
 import 'ko/extenders/ko.numeric';
 import 'ko/extenders/ko.toJson';
@@ -132,3 +156,5 @@ import 'ko/observables/ko.observableDefault';
 
 window.ko = ko;
 window.ko.mapping = komapping;
+
+export default ko;

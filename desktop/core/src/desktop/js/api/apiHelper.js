@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ko from 'knockout';
 
 import apiQueueManager from 'api/apiQueueManager';
 import CancellablePromise from 'api/cancellablePromise';
@@ -153,7 +154,7 @@ class QueryResult {
   constructor(sourceType, compute, response) {
     const self = this;
     self.id = hueUtils.UUID();
-    self.type = response.result.type || sourceType;
+    self.type = response.result && response.result.type ? response.result.type : sourceType;
     self.compute = compute;
     self.status = response.status || 'running';
     self.result = response.result || {};

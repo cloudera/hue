@@ -15,6 +15,8 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ko from 'knockout';
+
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';

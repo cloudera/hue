@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import _ from 'lodash';
-import 'jquery/jquery.common';
+import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
 import 'ext/bootstrap-editable.1.5.1.min';
 
@@ -30,7 +30,7 @@ import page from 'page';
 import localforage from 'localforage';
 import sprintf from 'sprintf-js';
 
-import 'ko/ko.all';
+import ko from 'ko/ko.all';
 
 import 'utils/customIntervals';
 import 'utils/json.bigDataParse';
@@ -48,8 +48,6 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
-import AceLocationHandler from 'sql/aceLocationHandler';
-import SqlParseSupport from 'parse/sqlParseSupport';
 import sqlUtils from 'sql/sqlUtils';
 import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
@@ -62,17 +60,13 @@ import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
 import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, indexer, importer, editor etc.
-import globalSearchParser from 'parse/globalSearchParser'; // ko inline autocomp
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
-import solrFormulaParser from 'parse/solrFormulaParser'; // simple ace editor
-import solrQueryParser from 'parse/solrQueryParser'; // simple ace editor
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 
 // TODO: Migrate away
 window._ = _;
-window.AceLocationHandler = AceLocationHandler;
 window.apiHelper = apiHelper;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
@@ -84,7 +78,6 @@ window.DOCUMENT_TYPE_I18n = DOCUMENT_TYPE_I18n;
 window.DOCUMENT_TYPES = DOCUMENT_TYPES;
 window.EditorViewModel = EditorViewModel;
 window.filesize = filesize;
-window.globalSearchParser = globalSearchParser;
 window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
@@ -98,13 +91,10 @@ window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.page = page;
 window.PigFunctions = PigFunctions;
 window.qq = qq;
-window.solrFormulaParser = solrFormulaParser;
-window.solrQueryParser = solrQueryParser;
 window.sprintf = sprintf;
 window.SqlAutocompleter = SqlAutocompleter;
 window.sqlAutocompleteParser = sqlAutocompleteParser;
 window.SqlFunctions = SqlFunctions;
-window.SqlParseSupport = SqlParseSupport;
 window.SqlSetOptions = SqlSetOptions;
 window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
