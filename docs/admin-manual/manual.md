@@ -218,30 +218,27 @@ It is available in Editor or Notebook mode and focuses on SQL. Dialects can be a
 
 Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
 
-<pre>
-  [beeswax]
-  # A limit to the number of rows that can be downloaded from a query before it is truncated.
-  # A value of -1 means there will be no limit.
-  download_row_limit=-1
+        [beeswax]
+        # A limit to the number of rows that can be downloaded from a query before it is truncated.
+        # A value of -1 means there will be no limit.
+        download_row_limit=-1
 
-  # A limit to the number of bytes that can be downloaded from a query before it is truncated.
-  # A value of -1 means there will be no limit.
-  download_bytes_limit=-1
-</pre>
+        # A limit to the number of bytes that can be downloaded from a query before it is truncated.
+        # A value of -1 means there will be no limit.
+        download_bytes_limit=-1
 
 In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
-<pre>
-  [desktop]
-  # Global setting to allow or disable end user downloads in all Hue.
-  # e.g. Query result in Editors and Dashboards, file in File Browser...
-  enable_download=false
-</pre>
+
+        [desktop]
+        # Global setting to allow or disable end user downloads in all Hue.
+        # e.g. Query result in Editors and Dashboards, file in File Browser...
+        enable_download=false
 
 The download feature in the file browser can be disabled separately with the following options in your hue.ini:
-<pre>
-[filebrowser]
-show_download_button=false
-</pre>
+
+        [filebrowser]
+        show_download_button=false
+
 
 ### Impala
 
