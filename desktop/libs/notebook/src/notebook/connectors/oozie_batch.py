@@ -164,7 +164,7 @@ class OozieApi(Api):
     return jobs
 
 
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     pass
 
 

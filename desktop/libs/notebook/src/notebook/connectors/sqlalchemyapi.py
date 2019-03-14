@@ -230,7 +230,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     result = {'status': -1}
 
     try:

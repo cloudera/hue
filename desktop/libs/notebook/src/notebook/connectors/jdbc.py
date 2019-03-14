@@ -131,7 +131,7 @@ class JdbcApi(Api):
     return 50
 
   @query_error_handler
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     return {'status': -1}
 
   @query_error_handler

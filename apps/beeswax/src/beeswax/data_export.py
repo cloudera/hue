@@ -33,7 +33,7 @@ FETCH_SIZE = 1000
 DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
 
-def download(handle, format, db, id=None, file_name='query_result', user_agent=None, callback=None):
+def download(handle, format, db, id=None, file_name='query_result', user_agent=None, callback=None, max_rows=None, store_data_type_in_header=False):
   """
   download(query_model, format) -> HttpResponse
 
@@ -43,10 +43,10 @@ def download(handle, format, db, id=None, file_name='query_result', user_agent=N
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
-  max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
+  max_rows = max_rows if max_rows else conf.DOWNLOAD_ROW_LIMIT.get()
+  max_bytes = -1 if max_rows else conf.DOWNLOAD_BYTES_LIMIT.get()
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes, callback=callback)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes, callback=callback, store_data_type_in_header=store_data_type_in_header)
   generator = export_csvxls.create_generator(content_generator, format)
 
   resp = export_csvxls.make_response(generator, format, file_name, user_agent=user_agent)
@@ -83,7 +83,7 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
 
 class HS2DataAdapter:
 
-  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None):
+  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None, store_data_type_in_header=False):
     self.handle = handle
     self.db = db
     self.max_rows = max_rows
@@ -97,10 +97,11 @@ class HS2DataAdapter:
     self.first_fetched = True
     self.headers = None
     self.num_cols = None
-    self.row_counter = 1
+    self.row_counter = 0
     self.bytes_counter = 0
     self.is_truncated = False
     self.has_more = True
+    self.store_data_type_in_header = store_data_type_in_header
 
   def __iter__(self):
     return self
@@ -141,6 +142,8 @@ class HS2DataAdapter:
       self.start_over = False
       self.headers = results.cols()
       self.num_cols = len(self.headers)
+      if self.store_data_type_in_header:
+        self.headers = [column['name'] + '|' + column['type'] for column in results.full_cols()]
       if self.limit_bytes:
         self.bytes_counter += max(self.num_cols - 1, 0)
         for header in self.headers:

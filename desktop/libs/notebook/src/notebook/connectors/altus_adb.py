@@ -57,7 +57,7 @@ class AltusAdbApi(Api):
     return HueQuery(self.user, cluster_crn=self.cluster_name).do_fetch_result(handle)
 
 
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     return {'status': -1}
 
 

@@ -54,6 +54,7 @@ class OperationNotSupported(Exception):
 
 class QueryError(Exception):
   def __init__(self, message, handle=None):
+    super(QueryError, self).__init__(message)
     self.message = message or _('No error message, please check the logs.')
     self.handle = handle
     self.extra = {}
