@@ -1,0 +1,2861 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>2.2.0 :: Hue Documentation</title>
+
+    
+    <link href="/css/nucleus.css?1552590434" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1552590434" rel="stylesheet">
+    <link href="/css/hybrid.css?1552590434" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1552590434" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1552590434" rel="stylesheet">
+    <link href="/css/auto-complete.css?1552590434" rel="stylesheet">
+    <link href="/css/theme.css?1552590434" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1552590434" rel="stylesheet">
+    
+      <link href="/css/theme-hue.css?1552590434" rel="stylesheet">
+    
+
+    <script src="/js/jquery-2.x.min.js?1552590434"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/releases/release-notes-2.2.0/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <img src="/images/hue_logo.png" alt="alt text" title="Hue Logo">
+
+    </div>
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/" title="Administrator" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/administrator/installation/docker/" title="Docker" class="dd-item ">
+        <a href="/administrator/installation/docker/">
+        Docker
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/administrator/installation/starting/" title="Starting the server" class="dd-item ">
+        <a href="/administrator/installation/starting/">
+        Starting the server
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/connectors/" title="Connectors" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/connectors/">
+          Connectors
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/connectors/editor/" title="SQL" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/connectors/editor/">
+          SQL
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/connectors/files/" title="Files and Object Store" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/connectors/files/">
+          Files and Object Store
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/configuration/hue/" title="Hue" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/configuration/hue/">
+          Hue
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/configuration/external/" title="External services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/configuration/external/">
+          External services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/administration/">
+          Administration
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/browsers/" title="Browser" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/browsers/">
+          Browser
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/browsers/" title="File / Job Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/browsers/">
+          File / Job Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/releases/" title="Releases" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item active">
+        <a href="/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-github'></i> Github</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-camera'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-bookmark'></i> Gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn"><i class="fas fa-heart"></i></a> from <a href="http://getgrav.org">Grav</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/releases/release-notes-2.2.0.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                 
+                 
+                    
+          
+          
+            
+            
+          
+          
+            
+            
+          
+          
+            <a href='/'>Hue Guide</a> > <a href='/releases/'>Releases</a> > 2.2.0
+          
+         
+          
+         
+          
+        
+                 
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#hue-v2-2-0-released-february-25th-2013">Hue v2.2.0, released February 25th, 2013</a></li>
+</ul></li>
+<li><a href="#notable-features">Notable Features</a></li>
+<li><a href="#notable-fixes">Notable Fixes</a></li>
+<li><a href="#compatibility">Compatibility</a></li>
+<li><a href="#list-of-304-commits">List of 304 Commits</a></li>
+<li><a href="#contributors">Contributors</a></li>
+</ul></li>
+</ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+
+        
+        <div id="body-inner">
+          
+            <h1>2.2.0</h1>
+          
+
+        
+
+
+
+
+<h3 id="hue-v2-2-0-released-february-25th-2013">Hue v2.2.0, released February 25th, 2013</h3>
+
+<p>Hue 2.2.0 is compatible with CDH4.2 (Cloudera&rsquo;s Distribution Including Apache
+Hadoop 4.2).</p>
+
+<p>Website: <a href="http://cloudera.github.com/hue">http://cloudera.github.com/hue</a></p>
+
+<h2 id="notable-features">Notable Features</h2>
+
+<ul>
+<li>The Oozie application has been restyled completely and now supports Ajax refreshes</li>
+<li>A Cloudera Impala app was added</li>
+<li>Beeswax/Hive editor is more user friendly</li>
+<li>FileBrowser was restyled and now includes bulk and recursive operations (e.g. multiple deletes)</li>
+<li>JobBrowser is compatible with YARN and job logs can be accessed in one click</li>
+<li>UserAdmin was restyled and LDAP integration was improved</li>
+<li>MySql InnoDB and PostgreSQL are officially supported</li>
+</ul>
+
+<h2 id="notable-fixes">Notable Fixes</h2>
+
+<ul>
+<li>HUE-535 [beeswax] Support multiple databases</li>
+<li>HUE-833 [oozie] Add all Oozie actions</li>
+<li>HUE-873 [jb] Direct access to task logs</li>
+<li>HUE-775 [fb] Upload zip file through filebrowser.</li>
+<li>HUE-867 [desktop] Ensure first user home directory is created</li>
+<li>HUE-851 [oozie] Rerun, suspend, resume a workflow or Coordinator</li>
+<li>HUE-820 [oozie] Display any workflow as a graph</li>
+<li>HUE-730 [core] Database greenlet support for MySQL</li>
+<li>HUE-882 [core] Add stack trace and logs link to 500 and PopUpExceptions pages</li>
+</ul>
+
+<h2 id="compatibility">Compatibility</h2>
+
+<p>Hue 2.2.0 runs on CentOS versions 5 to 6, and Ubuntu 10.04 to 12.10.</p>
+
+<p>Hue 2.2.0 is compatible with CDH4.2. Specifically:</p>
+
+<ul>
+<li>File Browser depends on Hadoop 0.20 (for WebHDFS/HttpFS).</li>
+<li>Beeswax is tested against Hive 0.10.0.</li>
+<li>Job Designer depends on Oozie 3.3, using the Oozie web service API.</li>
+</ul>
+
+<h2 id="list-of-304-commits">List of 304 Commits</h2>
+
+<ul>
+<li>39f8c75 [doc] Last update</li>
+<li>8c7f3b7 [help] Update the help for Hue 2.2</li>
+<li>53854d4 [build] Make Oozie setup independant of release or snapshot tarball versions</li>
+<li>90f21f0 HUE-1046 [oozie] Support Coordinator job properties</li>
+<li>8b63e2f HUE-1040 [oozie] Can&rsquo;t use prepare field in a scheduled workflow</li>
+<li>735c7fd [shell] Update path to Sqoop2 binary</li>
+<li>3fee41c [beeswax] Sample user ID</li>
+<li>1d99305 HUEE-1037. Beeswax fails to connect secure remote metastore</li>
+<li>9cbd025 HUE-1038 [jobsub] Sample user created with wrong id</li>
+<li>df4fd45 HUE-1034 [oozie] Streaming action should not have a job_xml</li>
+<li>4e512ff [beeswax] Visual feedback on install samples</li>
+<li>00cefa7 HUE-1032 [oozie] Dual representation of files attribute</li>
+<li>b9941cc HUE-1030 [oozie] Java Tasks with both arguments and java options generate incorrect workflow xml</li>
+<li>b27530b [oozie] Critical UX improvements</li>
+<li>14d2121 [oozie] Import jobsub action fix</li>
+<li>e55166c [core] Sasl fixes</li>
+<li>2733240 [core] Last drop of localized messages for 2.2</li>
+<li>c5d30b6 [impala] Saved queries page should only list Impala queries</li>
+<li>20219d4 [beeswax] Support migration of query history</li>
+<li>9bf1fc3 [beeswax] Metastore client supports SASL</li>
+<li>b6f71aa [oozie] Simplify hive action example</li>
+<li>37e7ed8 HUE-1023 [fb] Access content of directories with conflicting URL names</li>
+<li>1a21529 HUE-991 [beeswax] Clicking on &lsquo;collapse&rsquo; on result page misalign the table and its button</li>
+<li>74a96a4 HUE-976 [fb] Number of pagination items are reset when looking at a file</li>
+<li>1c8b114 HUE-818 [oozie] Resubmit a coordinator from a certain day</li>
+<li>6b2d4bf [oozie] Fix import FS workflow test case</li>
+<li>e9d6376 HUE-1016 [oozie] Import FS delete action bug fix</li>
+<li>438a645 HUE-1020 [fb] On Chrome the permissions in the Change Permissions screen do not display the existing permissions</li>
+<li>85e5d93 HUE-1019 [fb] The &lsquo;New&rsquo; button is misaligned on certain browsers with a non-standard zoom applied</li>
+<li>0a629f0 Revert &ldquo;HUE-1010 [oozie] Dashboard should have a Suspended filter&rdquo;</li>
+<li>1f2c56e HUE-1018 [oozie] Add tooltip to workflow Suspend button</li>
+<li>1dcab39 [oozie] Remove debug statement from previous commit</li>
+<li>dc398c2 HUE-1017 [oozie] Workflow and coordinator editor should have a consistent navigation bar</li>
+<li>cdf3c07 HUE-946 [oozie] Fix property name autocomplete on the edit workflow page</li>
+<li>4fd11e8 HUE-944 [oozie] Fix edit workflow for IE8</li>
+<li>d931467 [core] Update translation files</li>
+<li>e748e7a [oozie] Import workflow improvements</li>
+<li>4e00f77 HUE-1009 [core] LDAP backend user creation configurable</li>
+<li>c581d19 HUE-1007 [oozie] Modal module captures escape key events</li>
+<li>11b77e8 HUE-1007 [oozie] Add loading spinner to edit workflow page</li>
+<li>fd0ccba HUE-981 [fb] Fetch next block should be dynamic</li>
+<li>4206c72 HUE-902 [core] Include modified pyOpenSSL 0.13 version</li>
+<li>42a279f HUE-902 [core] Include pyOpenSSL 0.13 version</li>
+<li>c79573a HUE-1011 [oozie] Coordinator dashboard Actions tab should have live link for External Id</li>
+<li>48eefbd HUE-1010 [oozie] Dashboard should have a Suspended filter</li>
+<li>840f250 HUE-902 [core] Remove pyOpenSSL from dependencies</li>
+<li>6c7c86b HUE-1008 [oozie] Action bar of the workflow editor looses its default position</li>
+<li>f07a5d2 HUE-922 [fb] Rename a directory to one that already exists moves the directory under the one that exists</li>
+<li>d1bce9f HUE-999 [oozie] Ajax refresh of the coordinator detail page</li>
+<li>74d00a5 HUE-960 [oozie] Redesign workflow page</li>
+<li>c09a7aa HUE-960 [oozie] Redesign workflow page</li>
+<li>47adfdc HUE-999 [oozie] Ajax refresh of the coordinator detail page</li>
+<li>cfee9cc HUE-889 [oozie] Smarter file chooser in Workflow editor</li>
+<li>97d83bb [shell] Add Sqoop2 user permission</li>
+<li>4259fc8 [core] Backward compatibility for upgrades to Hue 2.2</li>
+<li>280cf46 [oozie] Fix oozie tests</li>
+<li>10fcdee HUE-988 [oozie] Fix node drop onto decision node</li>
+<li>aa17a2a HUE-960 [oozie] Redesign workflow page</li>
+<li>4ba7520 [oozie] Fix OozieApiMock for testing</li>
+<li>1178545 [oozie] Fix several inconsistencies</li>
+<li>fa8a7c3 [oozie] Rerun, suspend, resume a workflow</li>
+<li>102666a [oozie] Token propagation warning when using Java action in secured mode</li>
+<li>680b66f [core] Make thrift generated files python2.4 compliant</li>
+<li>2b00734 [beeswax] Migrate to Hive 0.10 and Thrift 0.9</li>
+<li>427035a [oozie] Editable names for fork and decision</li>
+<li>ca9c494 HUE-870 [oozie] Use universal action bar</li>
+<li>1b89554 HUE-993 [impala] Support download of result</li>
+<li>6e2227f [fb] Change archive to zip and add download button</li>
+<li>64a2df6 [oozie] Drag a node onto workflow editor.</li>
+<li>89cf843 [oozie] Drag a node onto workflow editor.</li>
+<li>9663116 HUE-997 [oozie] Notification internationalization in workflow editor.</li>
+<li>1ab1d80 HUE-991 [beeswax] Clicking on &lsquo;collapse&rsquo; on result page misalign the table and its button</li>
+<li>d3a3e21 HUE-998 [useradmin] Turn off form autocompletion when adding/editing a user or group</li>
+<li>ee46c03 HUE-807 [oozie] Ajax refresh of a running job</li>
+<li>609be3d HUE-934 [oozie] Edit action in bigger popup or within the page</li>
+<li>e381d0b HUE-974 [oozie] Readonly support</li>
+<li>b119671 HUE-990 [oozie] Only show the datasets belonging to the coordinator</li>
+<li>b4130ae [core] Order of configuration dumps and help links follows the order of the app icons</li>
+<li>517c6e6 [oozie] Location of is_shared property in workflow properties should be consistent</li>
+<li>17c031b HUE-988 [oozie] Fix saving</li>
+<li>8c849af [shell] Update Sqoop2 command</li>
+<li>a56da26 HUE-989 [oozie] Action management is broken</li>
+<li>42aa60d HUE-871 [beeswax] Expired queries should have a better user experience</li>
+<li>6bc9dc6 [core] Second drop of localization</li>
+<li>dea826a [oozie] Import workflow with Subworkflow action and rudimentary support for all oozie schema version</li>
+<li>4b9e291 HUE-982 [oozie] Coordinator should prepopulate namenode address if needed</li>
+<li>8f29678 HUE-436 [beeswax] Server with embedded metastore prints inaccurate log messages</li>
+<li>fd3a4ef [oozie] Import workflow with Generic action</li>
+<li>517312b HUE-820 [oozie] Display any workflow as a graph</li>
+<li>ec560e6 [impala] Impala header columns are wrong</li>
+<li>cfd3a5c [core] Fix some XSS vulnerabilities</li>
+<li>dfe5071 [oozie] Import workflow with Email action</li>
+<li>a5fe7eb [oozie] Import workflow with FS action</li>
+<li>763f4b9 HUE-979 [oozie] Redesign workflow graph look</li>
+<li>999891e HUE-984 [oozie] min-height for completed job tables</li>
+<li>bee3ac6 HUE-935 [oozie] Better node edition experience</li>
+<li>85edfd0 HUE-935 [oozie] Better node edition experience</li>
+<li>8fbc54e HUE-984 [oozie] min-height for completed job tables</li>
+<li>04be852 HUE-969 [oozie] Automatically infer schema version when importing workflow</li>
+<li>dfb13cd HUE-973 [oozie] XML syntax highlighting</li>
+<li>85cd772 [core] Show that postgresql_psycopg2 is supported</li>
+<li>c7a287d HUE-969 [oozie] Import java args should be space separated, not JSON list.</li>
+<li>5d07522 [core] Update doc to point hue.ini in /etc/hue or desktop/conf</li>
+<li>14a32a1 HUE-978 [useradmin] Base DN needs to to have components capitalized when comparing with searcn DN.</li>
+<li>dbb61b5 HUE-978 [useradmin] Add LDAP user/group with DN</li>
+<li>ffcb0bf HUE-940 [oozie] Fix oozie test case for import jobsub workflow</li>
+<li>22369d5 HUE-983 [oozie] Coordinator could support previous dates</li>
+<li>36ffc42 HUE-697 [jobbrowser] Ability to browse MR2 jobs</li>
+<li>e43c3c4 HUE-940 [oozie] Revamp import JobDesigner action</li>
+<li>8609eb6 HUE-985 [core] i18n of datatable plugin</li>
+<li>3c02468 HUE-577 [fb] Snappy compression support</li>
+<li>ebed8c5 [useradmin] LDAP group search merge issue fix</li>
+<li>896fa20 [useradmin] Add n users that match wild card expression in LDAP import</li>
+<li>21f222c [useradmin] Import any group name from LDAP</li>
+<li>aab1f48 [oozie] Bump version to 3.3.0</li>
+<li>aefcbf7 [oozie] Use timezone when making HTTP calls to oozie</li>
+<li>46dc8d5 [core] Little i18n fix</li>
+<li>10877d1 [oozie] Import decision node with DecisionEnd nodes</li>
+<li>0338318 [useradmin] Missing parenthesis</li>
+<li>e115ccc [oozie] Add decision end node</li>
+<li>4f3f838 [useradmin] Add LDAP exception details</li>
+<li>0b8148b [useradmin] LDAP errors caught and logged</li>
+<li>69ff61d HUE-937 [oozie] JS Test cases for loading and saving a workflow</li>
+<li>c1a33c6 [useradmin] LDAP search wildcards.</li>
+<li>bd36c45 HUE-937 [useradmin] New JS tests for dynamic workflow editor</li>
+<li>c87bb68 [useradmin] Add non-existing LDAP user fails</li>
+<li>c108594 [beeswax] Sanitize configuration settings tab</li>
+<li>0178560 [core] Using Hue blue logo on about and login page</li>
+<li>27c912a HUE-980 [shell] Shell stops working after first timeout</li>
+<li>ebf6fca [core] First pass of localization for 2.2</li>
+<li>3ab9d4c HUE-851 [oozie] Simplify Coordinator page</li>
+<li>354ee28 HUE-851 [oozie] Simplify Coordinator page</li>
+<li>aaafb8c HUE-730 [core] Database greenlet support for MySQL</li>
+<li>4f5ca03 HUE-851 [oozie] Simplify Coordinator page</li>
+<li>3a69395 HUE-851 [oozie] Simplify Coordinator page</li>
+<li>eb38948 [fb] Upload to federated cluster</li>
+<li>0316b2d [jobbrowser] Fix flakey test</li>
+<li>9cadaff HUE-938 [oozie] Fix order of operations in node editing from decision node and added EL help</li>
+<li>33ee9ef HUE-938 [oozie] Add reference to action names in decision node</li>
+<li>7f4fbb5 HUE-972 [core] Build failure beacause of asm.jar dependency change</li>
+<li>f7e9f4f [core] UnboundLocalError in kt_renewer.py hides permissions issues</li>
+<li>10c9cf2 [core] Fix various problems of i18n extraction</li>
+<li>9cae8df HUE-933 [oozie] Fix clone node and unsaved ribbon</li>
+<li>ae66169 HUE-958 [jobsub] chmod in TestJobsubWithHadoop doesn&rsquo;t always complete</li>
+<li>ee92c4f HUE-883 [oozie] Add Generic action</li>
+<li>4c36f23 HUE-970 [oozie] In Workflow properties, Job XML field chooser should choose file, not folder</li>
+<li>81f6feb HUE-833 Add Subworkflow action</li>
+<li>335d7df [desktop] Fix test_error_handling_failure test case</li>
+<li>c0f6257 HUE-833 [oozie] Add Email action</li>
+<li>eb3576f HUE-408 [desktop] User creation form usage when first creating a user</li>
+<li>fd6ec82 HUE-833 [oozie] Add Fs action</li>
+<li>e91dcd2 HUE-968 [oozie] Create new action fixes</li>
+<li>c750938 [beeswax] It looks like Hue installation is missing hive-default.xml</li>
+<li>fba123b HUE-971 [oozie] Fix empty workflow</li>
+<li>09b9594 HUE-770 [beeswax] Improve secured cluster configuration experience</li>
+<li>e70648a [fb] Fix home dir test</li>
+<li>2803e69 HUE-958 [fb,oozie] Fix flakey tests</li>
+<li>b3939a6 HUE-958 [liboozie] Copy Oozie sharelib in the home of Oozie user</li>
+<li>ab5cee9 HUE-964 [core] 500 errors should go to default debugger if we cannot render custom 500</li>
+<li>0d7b1c7 HUE-967 [useradmin] Useradmin shouldn&rsquo;t depend on the existence of other apps</li>
+<li>d138867 HUE-958 [liboozie] Activate  Oozie share lib for Distcp test</li>
+<li>6377958 HUE-958 [liboozie] Copy Oozie share lib for tests</li>
+<li>6bb1287 HUE-933 [oozie] Ribbon and confirmation popup are triggered when new action creation is cancelled</li>
+<li>1ac2119 HUE-958 [jobbrowser,jobsub,ooxie] Fix flakey tests</li>
+<li>b3b4094 HUE-965 [useradmin] Improve user experience</li>
+<li>3492325 HUE-547 [core] Files erroneously say &ldquo;Licensed to the Apache Software Foundation&rdquo;</li>
+<li>b02cf1b HUE-954 [oozie] Support boolean fields</li>
+<li>2f7feb9 HUE-963 [core] Hue in a Kerberos enabled environment cannot use HttpFS</li>
+<li>3c883a1 HUE-961 [fb] Upload archive with root directory containing only directories</li>
+<li>a5ad934 HUE-933 [oozie] Cancel button when editing a node</li>
+<li>9ab1333 HUE-931 [oozie] Validate action before exiting edit modal</li>
+<li>c55558b HUE-898 [oozie] &lsquo;definition&rsquo; not in file error fix</li>
+<li>b9efaa4 HUE-933 [oozie] Confirmation popup when leaving a workflow with unsaved modifications</li>
+<li>ed20709 [impala] Mock calls to Beeswax in the tests</li>
+<li>34030b6 [core] i18n Update of the po files and fix or compilation errors</li>
+<li>9f284af HUE-535 [beeswax] Support multiple databases</li>
+<li>a5a3aa0 HUE-898 [oozie] Upload a workflow definition file</li>
+<li>68cc5f3 HUE-955 [core] Remove circular reference to exceptions</li>
+<li>d08df91 HUE-899 [oozie] Smarter file chooser in Workflow editor</li>
+<li>a052b14 HUE-294 [beeswax] Query editor should have line numbers</li>
+<li>ef8c1f4 HUE-939 [oozie] Clean up workflow editor</li>
+<li>f3caa3f HUE-929 [oozie] Support change of deployment directory</li>
+<li>e251bc2 HUE-407 Document what minimum versions of Firefox, Chrome, Safari and IE Hue supports.</li>
+<li>59e2e0d [useradmin] Improve transaction handling in update_app_permissions signal handler.</li>
+<li>2797e0d HUE-898 [oozie] Fix linkages in xslts</li>
+<li>d07ce83 HUE-943 [fb] Fix subdirectory pagination</li>
+<li>ffd5776 HUE-898 [oozie] Import workflow definition</li>
+<li>a673177 HUE-952 [oozie] job-xml field is not generated in some actions</li>
+<li>d40d62f HUE-947 [oozie] Sorting by modification date in Editor is wrong</li>
+<li>6cec9d7 [build] Set Hue version to 2.2.0</li>
+<li>efc0bd4 [core] Sort alphabetically apps in dump config</li>
+<li>e5ad97a [oozie] Move capture-output to bottom in Shell action</li>
+<li>a56b7f3 HUE-942 [beeswax] Make Query Textbox higher by default</li>
+<li>cf1b2f1 HUE-949 [impala] Change icon</li>
+<li>ffb076c HUE-945 [oozie] Actions fields are not loaded or saved</li>
+<li>c56e4b7 [beeswax] Increase number or rows fetched during download</li>
+<li>fbfc123 HUE-944 [oozie] Fix edit workflow for IE8</li>
+<li>ca28110 HUE-936 [oozie] Add back help when editing an action</li>
+<li>70b67b1 HUE-932 [oozie] Show &lsquo;saving&rsquo; status when editing a workflow</li>
+<li>9b70e33 HUE-933 [oozie] Confirmation popup when leaving a workflow with unsaved modifications</li>
+<li>abe9be5 [impala] Fix test looking for Impala icon</li>
+<li>47025bf [impala] Adding icon</li>
+<li>171726c [impala] Adding locales</li>
+<li>1561dd7 [impala] Adding Impala app</li>
+<li>e299da3 [impala] Initial commit</li>
+<li>d4a1eca HUE-933 [oozie] Confirmation popup when leaving a workflow with unsaved modifications</li>
+<li>2cf1662 HUE-930 [jb] Have consistent job and task names across the whole app</li>
+<li>fe930e9 [core] Remove pyexcelerator</li>
+<li>865b35f HUE-589 [beeswax] Support TIMESTAMP datatype</li>
+<li>d9e103f [beeswax] Adding datanucleus as repository</li>
+<li>6a90fd6 [oozie] Fix capture-output in Shell action</li>
+<li>03ed87c [oozie] Fix Ssh/Shell actions in new UI</li>
+<li>9e7b616 HUE-925 [shell] Use secure temporary files for kerberos ticket management</li>
+<li>3de7ffc HUE-822 [oozie] Fix tests</li>
+<li>25d5234 [beeswax] Add &lsquo;Column&rsquo; tabs on the result page</li>
+<li>dc7f032 HUE-822 [oozie] Prepare statements should follow fs action convention</li>
+<li>ab3bbba HUE-924 [beeswax] Improve UX on Save table</li>
+<li>c0d6d71 HUE-907 [beeswax] Create table manually can not remove column</li>
+<li>68b120b [core] Fix English mistakes and text consistency</li>
+<li>edf64d5 HUE-221 [shell] Sqoop2 shell</li>
+<li>98b6940 HUE-824 [oozie] Support local paths in workflow path variables</li>
+<li>4b58bf4 [beeswax] Fix failing tests</li>
+<li>9545e7c HUE-817 [oozie] Resubmit a workflow from a certain step</li>
+<li>8a8f225 [doc] Shell app setuid utility should be owned by root</li>
+<li>e3e7fd8 HUE-923 [beeswax] On create table manually the external location file chooser doesn&rsquo;t let you choose a folder</li>
+<li>1c898f0 HUE-923 [beeswax] On create table manually the external location file chooser doesn&rsquo;t let you choose a folder</li>
+<li>5962e9c HUE-920 [fb] Support for files and folders with special characters</li>
+<li>ec9c8ca [oozie] Add specific error message when Oozie is not running</li>
+<li>01fa6a3 [core] Update tests to use latest builds of dependencies</li>
+<li>e0994eb HUE-720 [core] Test when failure to create first user home directory</li>
+<li>2f6c518 [core] Error creating the home directory for first user should not stop user creation</li>
+<li>3abac7c HUE-588 [beeswax] Scrolling in job logs is broken while the job runs</li>
+<li>dd03d3c HUE-916 [core] Save and Cancel buttons are sometimes reversed in position</li>
+<li>43f8ba8 HUE-918 [help] Anchor links scroll to a shifted anchor position</li>
+<li>3d45edb HUE-915 [core] Uniform modal dialogs</li>
+<li>3d09714 HUE-734 Job designer link to job browser</li>
+<li>8b13b4f HUE-878 [desktop] Add a remote user backend</li>
+<li>b085489 HUE-888 [oozie] New oozie front end</li>
+<li>a85eaeb [beeswax] Integration of Hive Server 2</li>
+<li>4a52276 [jobsub] Fix running job status flaky test</li>
+<li>6990cd1 [oozie] Coordinator support for HOUR</li>
+<li>ce6d541 HUE-913 [core] Convert new jump to column to jQuery plugin and test it</li>
+<li>ac4429c HUE-914 [core] Fix form margin in Bootstrap dialogs</li>
+<li>2ec658e HUE-674 [desktop] Add tests for dump_config stability</li>
+<li>0b2f8b0 [core] i18n of the desktop libs</li>
+<li>08eb267 HUE-899 [beeswax] Query results page should have horizontal scroll bar</li>
+<li>4dd8c24 [oozie] Examples owned by wrong user</li>
+<li>5507de3 HUE-909 [oozie] Protect from invalid external action id</li>
+<li>b9fbce2 [core] Add notification to the admin when Oozie is not in good status</li>
+<li>429100d HUE-867 [desktop] Fix fast tests</li>
+<li>4fcb48b HUE-911 [jobbrowser] Can not see our own jobs when sharing is disabled</li>
+<li>73a7db7 HUE-874 [oozie] Direct access to MR logs</li>
+<li>2732b43 [doc] Adding missing package dependencies</li>
+<li>85de749 HUE-867 [desktop] Ensure first user home directory is created</li>
+<li>daea7e2 HUE-873 [jb] Direct access to task logs</li>
+<li>424cf6e HUE-873 [jb] Direct access to task logs</li>
+<li>6e1e8c6 HUE-892 [desktop] Add a SPNEGO backend so that Hue can handle Kerberos authentication</li>
+<li>d26ce2b HUE-790 [jobsub] Remove old files from Hue1</li>
+<li>80c9000 HUE-905 [beeswax] Result page rows should not have new lines</li>
+<li>d77516c HUE-903 [beeswax] Save results in an HDFS directory is broken</li>
+<li>012fa17 HUE-902 [core] Add pyOpenSSL 0.11 to build</li>
+<li>bbdd9dc HUE-902 [core] Include pyOpenSSL in install automatically</li>
+<li>7e0e01b HUE-802 [fb] Remove unused code</li>
+<li>d597232 [core] Fix postgresql regression.</li>
+<li>9ec8b62 HUE-900 [oozie] File chooser missing when editing a node for &lsquo;jar path&rsquo;</li>
+<li>b4cf5b5 HUE-894 [core] Log search</li>
+<li>1e2d1a3 HUE-890 [jobsub] Unit test the frontend</li>
+<li>cbba991 HUE-890 [jobsub] Unit test the frontend</li>
+<li>fb4d8dc HUE-893 [fb] Fix the move dialog</li>
+<li>9f0a8b8 HUE-753 [jobbrowser] Re-enable unit tests for job browser</li>
+<li>1bc3e17 HUE-753 [jb] Re-enable unit tests for job browser</li>
+<li>8c3abcd HUE-889 [oozie] Smarter file chooser in Workflow editor</li>
+<li>6d5418f HUE-882 [core] Add stack trace and logs link to 500 and PopUpExceptions pages</li>
+<li>032e841 HUE-885 [core] Update knockout.js to 2.1.0</li>
+<li>0dfb9a0 [jobsub] Fix test_job_design_cycle test</li>
+<li>a388dee HUE-887 [useradmin] Fix missing hue permissions</li>
+<li>cb312c2 HUE-865 [jobsub] Bulk operations</li>
+<li>4e7b2fe HUE-839 [core] Javascript test framework</li>
+<li>8246208 HUE-887 [oozie] Fielbrowser doesn&rsquo;t understand path</li>
+<li>026b31e HUE-887 Fix fileuploader popup across website</li>
+<li>13ace6b [jb] Fix alignment of the Upload button dropdown</li>
+<li>2a23098 HUE-881 [useradmin] Case insensitive search boxes on add/edit group page</li>
+<li>f67f808 HUE-884 [fb] Invalid select all for bulk operation</li>
+<li>3f8bcd3 HUE-883 [useradmin] Extended DB support</li>
+<li>fcbb211 Hue-883 [core] Improved support for transactional databases</li>
+<li>233395c HUE-872 [useradmin] Default group has access to all apps initially</li>
+<li>2ea4dc1 HUE-876 [oozie] Setup Oozie Shared Lib for tests</li>
+<li>bb60a98 HUE-717 [core] Repetitive HTTP requests on each page</li>
+<li>bd3782c HUE-876 [oozie] Add a warning if oozie share lib is not installed</li>
+<li>c832574 HUE-835 [fb] Bulk operations</li>
+<li>c522e30 HUE-877 [oozie] Workflow examples require Oozie Share Lib activation</li>
+<li>a7a9313 HUE-879 [core] 500 error can be displayed in Hue Server Logs page</li>
+<li>ae0e8ba HUE-838 [jb] Create new file button</li>
+<li>8b4a015 HUE-864 [oozie] Allow a read only user on the dashboard</li>
+<li>fb7e1c6 HUE-775 [fb] New temp directory for upload</li>
+<li>cff40ec HUE-775 [fb] Remove useless underscore from previous commit</li>
+<li>be9f646 HUE-775 [fb] Upload zip file through filebrowser.</li>
+<li>21a6f2a HUE-866 [beeswax] Next/Previous buttons are half hidden</li>
+<li>127e099 HUE-833 [oozie] Add DistCp action</li>
+<li>dfad82c [oozie] Fix load Oozie examples</li>
+<li>2e79e3e HUE-789 [core] Remove old files from Hue 1</li>
+<li>c5a540f [beeswax] Execute the create table SQL automatically instead of showing it</li>
+<li>b482cbb [beeswax] Convert template to Python 2.4</li>
+<li>cdc3127 [oozie] Bumping submission test timeouts to 15 minutes</li>
+</ul>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>This Hue release is made possible thanks to the contribution from:</p>
+
+<ul>
+<li>Aaron Newton</li>
+<li>Aaron T. Myers</li>
+<li>Abraham Elmahrek</li>
+<li>Aditya Acharya</li>
+<li>Alex Newman</li>
+<li>Andrew Bayer</li>
+<li>Andrew Yao</li>
+<li>Ann McCown</li>
+<li>bc Wong</li>
+<li>Ben Bishop</li>
+<li>Bruce Mitchener</li>
+<li>Bruno Mahé</li>
+<li>Eli Collins</li>
+<li>Enrico Berti</li>
+<li>Eric Wong</li>
+<li>Harsh J</li>
+<li>Henry Robinson</li>
+<li>Jon Natkins</li>
+<li>Lars Francke</li>
+<li>Loren Siebert</li>
+<li>Marcus McLaughlin</li>
+<li>Mike Cotton</li>
+<li>Paul Battaglia</li>
+<li>Philip Zeyliger</li>
+<li>Romain Rigaux</li>
+<li>Roman Shaposhnik</li>
+<li>Shawn Van Ittersum</li>
+<li>Shrijeet Paliwal</li>
+<li>Thomas Aylott</li>
+<li>Todd Lipcon</li>
+<li>Vinithra Varadharajan</li>
+</ul>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="/releases/release-notes-2.3.0/" title="2.3.0"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="/releases/release-notes-2.1.0/" title="2.1.0" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1552590434"></script>
+    <script src="/js/perfect-scrollbar.min.js?1552590434"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1552590434"></script>
+    <script src="/js/jquery.sticky.js?1552590434"></script>
+    <script src="/js/featherlight.min.js?1552590434"></script>
+    <script src="/js/html5shiv-printshiv.min.js?1552590434"></script>
+    <script src="/js/highlight.pack.js?1552590434"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom.71422.js?1552590434"></script>
+    <script src="/js/learn.js?1552590434"></script>
+    <script src="/js/hugo-learn.js?1552590434"></script>
+
+    <link href="/mermaid/mermaid.css?1552590434" type="text/css" rel="stylesheet" />
+    <script src="/mermaid/mermaid.js?1552590434"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+
+  <script data-no-instant>document.write('<script src="/livereload.js?port=1313&mindelay=10"></' + 'script>')</script></body>
+</html>
+

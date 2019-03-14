@@ -1,0 +1,3077 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>Development :: Hue Documentation</title>
+
+    
+    <link href="/css/nucleus.css?1552590434" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1552590434" rel="stylesheet">
+    <link href="/css/hybrid.css?1552590434" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1552590434" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1552590434" rel="stylesheet">
+    <link href="/css/auto-complete.css?1552590434" rel="stylesheet">
+    <link href="/css/theme.css?1552590434" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1552590434" rel="stylesheet">
+    
+      <link href="/css/theme-hue.css?1552590434" rel="stylesheet">
+    
+
+    <script src="/js/jquery-2.x.min.js?1552590434"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/developer/development/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <img src="/images/hue_logo.png" alt="alt text" title="Hue Logo">
+
+    </div>
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/" title="Administrator" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/administrator/installation/docker/" title="Docker" class="dd-item ">
+        <a href="/administrator/installation/docker/">
+        Docker
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/administrator/installation/starting/" title="Starting the server" class="dd-item ">
+        <a href="/administrator/installation/starting/">
+        Starting the server
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/connectors/" title="Connectors" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/connectors/">
+          Connectors
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/connectors/editor/" title="SQL" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/connectors/editor/">
+          SQL
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/connectors/files/" title="Files and Object Store" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/connectors/files/">
+          Files and Object Store
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/configuration/hue/" title="Hue" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/configuration/hue/">
+          Hue
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/configuration/external/" title="External services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/configuration/external/">
+          External services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/administrator/administration/">
+          Administration
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/browsers/" title="Browser" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/browsers/">
+          Browser
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/" title="Developer" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/development/" title="Development" class="dd-item 
+        parent
+        active
+        
+        ">
+      <a href="/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/browsers/" title="File / Job Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/browsers/">
+          File / Job Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/releases/" title="Releases" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-github'></i> Github</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-camera'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-bookmark'></i> Gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn"><i class="fas fa-heart"></i></a> from <a href="http://getgrav.org">Grav</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/developer/development/_index.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                 
+                 
+                    
+          
+          
+            
+            
+          
+          
+            
+            
+          
+          
+            <a href='/'>Hue Guide</a> > <a href='/developer/'>Developer</a> > Development
+          
+         
+          
+         
+          
+        
+                 
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#user-management">User Management</a></li>
+<li><a href="#configuration">Configuration</a>
+<ul>
+<li><a href="#configuration-file">Configuration File</a></li>
+<li><a href="#configuration-variables">Configuration Variables</a></li>
+<li><a href="#running-helper-processes">Running &ldquo;Helper Processes&rdquo;</a></li>
+</ul></li>
+<li><a href="#walk-through-of-a-django-view">Walk-through of a Django View</a></li>
+<li><a href="#templates-django-and-mako">Templates: Django and Mako</a></li>
+<li><a href="#django-models">Django Models</a></li>
+<li><a href="#accessing-hadoop">Accessing Hadoop</a></li>
+<li><a href="#making-your-views-thread-safe">Making Your Views Thread-safe</a></li>
+<li><a href="#authentication-backends">Authentication Backends</a></li>
+<li><a href="#authorization">Authorization</a></li>
+<li><a href="#using-and-installing-thrift">Using and Installing Thrift</a></li>
+<li><a href="#profiling-hue-apps">Profiling Hue Apps</a></li>
+<li><a href="#django-models-1">Django Models</a></li>
+<li><a href="#rest">REST</a></li>
+<li><a href="#upgrade-path">Upgrade path</a></li>
+</ul></li>
+<li><a href="#front-end-development">Front-end Development</a>
+<ul>
+<li><a href="#css-styles">CSS Styles</a></li>
+<li><a href="#defining-styles-for-your-application">Defining Styles for Your Application</a></li>
+<li><a href="#icons">Icons</a></li>
+<li><a href="#static-files">Static files</a></li>
+<li><a href="#adding-interactive-elements-to-your-ui">Adding Interactive Elements to Your UI</a></li>
+<li><a href="#debugging-tips-and-tricks">Debugging Tips and Tricks</a></li>
+<li><a href="#building">Building</a>
+<ul>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#javascript">Javascript</a>
+<ul>
+<li><a href="#for-changes-to-the-files-under-src-desktop-js-the-following-applies">For changes to the files under src/desktop/js the following applies:</a></li>
+</ul></li>
+<li><a href="#css-less">CSS / LESS</a></li>
+<li><a href="#sql-autocomplete">SQL Autocomplete</a></li>
+<li><a href="#ace-editor">Ace Editor</a></li>
+<li><a href="#internationalization">Internationalization</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+
+        
+        <div id="body-inner">
+          
+            <h1>Development</h1>
+          
+
+        
+
+
+
+
+<p>This section goes into greater detail on useful features within
+the Hue environment.</p>
+
+<h2 id="user-management">User Management</h2>
+
+<p>Except for static content, <code>request.user</code> is always populated.  It is a
+standard Django <code>models.User</code> object.  If you were to set a breakpoint at the
+<code>index()</code> function in our calculator app, you will find:</p>
+
+<pre><code>&gt;&gt;&gt; request.user
+&lt;User: test&gt;
+</code></pre>
+
+<div class="note">
+  "Under the covers:" Django uses a notion called
+  <a href="https://docs.djangoproject.com/en/1.2/topics/http/middleware/">middleware</a>
+  that's called in between the request coming in and the view being executed.
+  That's how <code>request.user</code> gets populated.  There's also a
+  middleware for Hue that makes sure that no pages are displayed unless the
+  user is authenticated.
+</div>
+
+<h2 id="configuration">Configuration</h2>
+
+<h3 id="configuration-file">Configuration File</h3>
+
+<p>Hue uses a typed configuration system that reads configuration files (in an
+ini-style format).  By default, Hue loads all <code>*.ini</code> files in the <code>build/desktop/conf</code>
+directory.  The configuration files have the following format:</p>
+
+<pre><code># This is a comment
+[ app_name ]          # Same as your app's name
+app_property = &quot;Pink Floyd&quot;
+
+[[ section_a ]]         # The double brackets start a section under [ app_name ]
+a_weight = 80         # that is useful for grouping
+a_height = 180
+
+[[ filesystems ]]       # Sections are also useful for making a list
+[[[ cluster_1 ]]]       # All list members are sub-sections of the same type
+namenode_host = localhost
+# User may define more:
+# [[[ cluster_2 ]]]
+# namenode_host = 10.0.0.1
+</code></pre>
+
+<h3 id="configuration-variables">Configuration Variables</h3>
+
+<p>Your application&rsquo;s <code>conf.py</code> is special. It provides access to the configuration file (and even
+default configurations not specified in the file). Using the above example, your <code>conf.py</code> should
+define the following:</p>
+
+<ul>
+<li><p>A <code>desktop.lib.conf.Config</code> object for <code>app_property</code>, such as:
+<pre>
+MY_PROPERTY = Config(key=&lsquo;app_property&rsquo;, default=&lsquo;Beatles&rsquo;, help=&lsquo;blah&rsquo;)
+</pre>
+You can access its value by <code>MY_PROPERTY.get()</code>.</p></li>
+
+<li><p>A <code>desktop.lib.conf.ConfigSection</code> object for <code>section_a</code>, such as:
+<pre>
+SECTION_A = ConfigSection(key=&lsquo;section_a&rsquo;,
+    help=&lsquo;blah&rsquo;,
+    members=dict(
+      AWEIGHT=Config(key=&lsquo;a_weight&rsquo;, type=int, default=0),
+      AHEIGHT=Config(key=&lsquo;a_height&rsquo;, type=int, default=0)))
+</pre>
+You can access the values by <code>SECTION_A.AWEIGHT.get()</code>.</p></li>
+
+<li><p>A <code>desktop.lib.conf.UnspecifiedConfigSection</code> object for <code>filesystems</code>, such as:
+<pre>
+FS = UnspecifiedConfigSection(
+  key=&lsquo;filesystems&rsquo;,
+  each=ConfigSection(members=dict(
+      nn_host=Config(key=&lsquo;namenode_host&rsquo;, required=True))
+</pre>
+An <code>UnspecifiedConfigSection</code> is useful when the children of the section are not known.
+When Hue loads your application&rsquo;s configuration, it binds all sub-sections. You can
+access the values by:
+<pre>
+cluster1_val = FS[&lsquo;cluster_1&rsquo;].nn_host.get()
+all_clusters = FS.keys()
+for cluster in all_clusters:
+  val = FS[cluster].nn_host.get()
+</pre></p></li>
+</ul>
+
+<p>Your Hue application can automatically detect configuration problems and alert
+the admin. To take advantage of this feature, create a <code>config_validator</code>
+function in your <code>conf.py</code>:</p>
+
+<pre>
+  def config_validator(user):
+    """
+    config_validator(user) -> [(config_variable, error_msg)] or None
+    Called by core check_config() view.
+    """
+    res = [ ]
+    if not REQUIRED_PROPERTY.get():
+      res.append((REQUIRED_PROPERTY, "This variable must be set"))
+    if MY_INT_PROPERTY.get() < 0:
+      res.append((MY_INT_PROPERTY, "This must be a non-negative number"))
+    return res
+</pre>
+
+<div class="note">
+  You should specify the <code>help="..."</code> argument to all configuration
+  related objects in your <code>conf.py</code>. The examples omit some for the
+  sake of space. But you and your application's users can view all the
+  configuration variables by doing:
+  <pre>
+    $ build/env/bin/hue config_help
+  </pre>
+</div>
+
+<h3 id="running-helper-processes">Running &ldquo;Helper Processes&rdquo;</h3>
+
+<p>Some Hue applications need to run separate daemon processes on the side.</p>
+
+<p>Suppose your application needs a helper <code>my_daemon.py</code>. You need to register it by:</p>
+
+<ul>
+<li><p>In <code>setup.py</code>, add to <code>entry_points</code>:
+<pre>
+entry_points = {
+  &lsquo;desktop.sdk.application&rsquo;: &lsquo;my_app = my_app&rsquo;,
+  &lsquo;desktop.supervisor.specs&rsquo;: [ &lsquo;my_daemon = my_app:SUPERVISOR_SPEC&rsquo; ] }
+</pre></p></li>
+
+<li><p>In <code>src/my_app/__init__.py</code>, tell Hue what to run by adding:
+<pre>
+SUPERVISOR_SPEC = dict(django_command=&ldquo;my_daemon&rdquo;)
+</pre></p></li>
+
+<li><p>Then in <code>src/my_app/management/commands</code>, create <code>__init__.py</code> and <code>my_daemon.py</code>. Your
+daemon program has only one requirement: it must define a class called <code>Command</code> that
+extends <code>django.core.management.base.BaseCommand</code>. Please see <code>kt_renewer.py</code> for an example.</p></li>
+</ul>
+
+<p>The next time Hue restarts, your <code>my_daemon</code> will start automatically.
+If your daemon program dies (exits with a non-zero exit code), Hue will
+restart it.</p>
+
+<p>&ldquo;Under the covers:&rdquo; Threading.  Hue, by default, runs CherryPy web server.
+If Hue is configured (and it may be, in the future)
+to use mod_wsgi under Apache httpd, then there would be multiple python
+processes serving the backend.  This means that your Django application
+code should avoid depending on shared process state.  Instead, place
+the stored state in a database or run a separate server.</p>
+
+<h2 id="walk-through-of-a-django-view">Walk-through of a Django View</h2>
+
+<p><img src="django_request.png" alt="Django Flow" /></p>
+
+<p>Django is an MVC framework, except that the controller is called a
+&ldquo;<a href="https://docs.djangoproject.com/en/1.11/#the-view-layer">view</a>&rdquo; and
+the &ldquo;view&rdquo; is called a &ldquo;template&rdquo;.  For an application developer, the essential
+flow to understand is how the &ldquo;urls.py&rdquo; file provides a mapping between URLs (expressed as a
+regular expression, optionally with captured parameters) and view functions.
+These view functions typically use their arguments (for example, the captured parameters) and
+their request object (which has, for example, the POST and GET parameters) to
+prepare dynamic content to be rendered using a template.</p>
+
+<h2 id="templates-django-and-mako">Templates: Django and Mako</h2>
+
+<p>In Hue, the typical pattern for rendering data through a template
+is:</p>
+
+<pre><code>from desktop.lib.django_util import render
+
+def view_function(request):
+  return render('view_function.mako', request, dict(greeting=&quot;hello&quot;))
+</code></pre>
+
+<p>The <code>render()</code> function chooses a template engine (either Django or Mako) based on the
+extension of the template file (&ldquo;.html&rdquo; or &ldquo;.mako&rdquo;). Mako templates are more powerful,
+in that they allow you to run arbitrary code blocks quite easily, and are more strict (some
+would say finicky); Django templates are simpler, but are less expressive.</p>
+
+<h2 id="django-models">Django Models</h2>
+
+<p><a href="https://docs.djangoproject.com/en/1.11/#the-model-layer">Django Models</a>
+are Django&rsquo;s Object-Relational Mapping framework. If your application
+needs to store data (history, for example), models are a good way to do it.</p>
+
+<p>From an abstraction perspective, it&rsquo;s common to imagine external services
+as &ldquo;models&rdquo;.  For example, the Job Browser treats the Hadoop JobTracker
+as a &ldquo;model&rdquo;, even though there&rsquo;s no database involved.</p>
+
+<h2 id="accessing-hadoop">Accessing Hadoop</h2>
+
+<p>It is common for applications to need to access the underlying HDFS.
+The <code>request.fs</code> object is a &ldquo;file system&rdquo; object that exposes
+operations that manipulate HDFS.  It is pre-configured to access
+HDFS as the user that&rsquo;s currently logged in.  Operations available
+on <code>request.fs</code> are similar to the file operations typically
+available in python.  See <code>webhdfs.py</code> for details; the list
+of functions available is as follows:
+<code>chmod</code>,
+<code>chown</code>,
+<code>exists</code>,
+<code>isdir</code>,
+<code>isfile</code>,
+<code>listdir</code> (and <code>listdir_stats</code>),
+<code>mkdir</code>,
+<code>open</code> (which exposes a file-like object with <code>read()</code>, <code>write()</code>, <code>seek()</code>, and <code>tell()</code> methods),
+<code>remove</code>,
+<code>rmdir</code>,
+<code>rmtree</code>, and
+<code>stats</code>.</p>
+
+<h2 id="making-your-views-thread-safe">Making Your Views Thread-safe</h2>
+
+<p>Hue works in any WSGI-compliant container web server.
+The current recommended deployment server is the built-in CherryPy server.
+The CherryPy server, which is multi-threaded, is invoked by <code>runcpserver</code>
+and is configured to start when Hue&rsquo;s <code>supervisor</code> script is used.
+Meanwhile, <code>runserver</code> start a single-threaded
+testing server.</p>
+
+<p>Because multiple threads may be accessing your views
+concurrently, your views should not use shared state.
+An exception is that it is acceptable to initialize
+some state when the module is first imported.
+If you must use shared state, use Python&rsquo;s <code>threading.Lock</code>.</p>
+
+<p>Note that any module initialization may happen multiple times.
+Some WSGI containers (namely, Apache), will start multiple
+Unix processes, each with multiple threads. So, while
+you have to use locks to protect state within the process,
+there still may be multiple copies of this state.</p>
+
+<p>For persistent global state, it is common to place the state
+in the database or on the Browser local storage.</p>
+
+<h2 id="authentication-backends">Authentication Backends</h2>
+
+<p>Hue exposes a configuration flag (&ldquo;auth&rdquo;) to configure
+a custom authentication backend.  See
+See <a href="http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend">http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend</a>
+for writing such a backend.</p>
+
+<p>In addition to that, backends may support a <code>manages_passwords_externally()</code> method, returning
+True or False, to tell the user manager application whether or not changing
+passwords within Hue is possible.</p>
+
+<h2 id="authorization">Authorization</h2>
+
+<p>Applications may define permission sets for different actions. Administrators
+can assign permissions to user groups in the UserAdmin application. To define
+custom permission sets, modify your app&rsquo;s <code>settings.py</code> to create a list of
+<code>(identifier, description)</code> tuples:</p>
+
+<pre><code>PERMISSION_ACTIONS = [
+  (&quot;delete&quot;, &quot;Delete really important data&quot;),
+  (&quot;email&quot;, &quot;Send email to the entire company&quot;),
+  (&quot;identifier&quot;, &quot;Description of the permission&quot;)
+]
+</code></pre>
+
+<p>Then you can use this decorator on your view functions to enforce permission:</p>
+
+<pre><code>@desktop.decorators.hue_permission_required(&quot;delete&quot;, &quot;my_app_name&quot;)
+def delete_financial_report(request):
+  ...
+</code></pre>
+
+<h2 id="using-and-installing-thrift">Using and Installing Thrift</h2>
+
+<p>Right now, we check in the generated thrift code.
+To generate the code, you&rsquo;ll need the thrift binary version 0.9.0.
+Please download from <a href="http://thrift.apache.org/">http://thrift.apache.org/</a>.</p>
+
+<p>The modules using <code>Thrift</code> have some helper scripts like <code>regenerate_thrift.sh</code>
+for regenerating the code from the interfaces.</p>
+
+<h2 id="profiling-hue-apps">Profiling Hue Apps</h2>
+
+<p>Hue has a profiling system built in, which can be used to analyze server-side
+performance of applications.  To enable profiling::</p>
+
+<pre><code>build/env/bin/hue runprofileserver
+</code></pre>
+
+<p>Then, access the page that you want to profile.  This will create files like
+/tmp/useradmin.users.000072ms.2011-02-21T13:03:39.745851.prof.  The format for
+the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.</p>
+
+<p>Hue uses the hotshot profiling library for instrumentation.  The documentation
+for this library is located at: <a href="http://docs.python.org/library/hotshot.html">http://docs.python.org/library/hotshot.html</a>.</p>
+
+<p>You can use kcachegrind to view the profiled data graphically::</p>
+
+<pre><code>$ hotshot2calltree /tmp/xyz.prof &gt; /tmp/xyz.trace
+$ kcachegrind /tmp/xyz.trace
+</code></pre>
+
+<p>More generally, you can programmatically inspect a trace::</p>
+
+<pre><code>#!/usr/bin/python
+import hotshot.stats
+import sys
+
+stats = hotshot.stats.load(sys.argv[1])
+stats.sort_stats('cumulative', 'calls')
+stats.print_stats(100)
+</code></pre>
+
+<p>This script takes in a .prof file, and orders function calls by the cumulative
+time spent in that function, followed by the number of times the function was
+called, and then prints out the top 100 time-wasters.  For information on the
+other stats available, take a look at this website:
+<a href="http://docs.python.org/library/profile.html#pstats.Stats">http://docs.python.org/library/profile.html#pstats.Stats</a></p>
+
+<h2 id="django-models-1">Django Models</h2>
+
+<p>Each app used to have its own model to store its data (e.g. a SQL query, a workflow). In Hue 3
+a unification of all the models happened and any app now uses a single Document2 model:
+<code>desktop/core/src/desktop/models.py</code>. This enables to avoid simply re-use document
+creation, sharing, saving etc&hellip;</p>
+
+<h2 id="rest">REST</h2>
+
+<p>Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow,
+list some S3 files, export a document&hellip;). Currently this API is private and subject to change but
+can be easily reused. You would need to GET <code>/accounts/login</code> to get the CSRF token
+and POST it back along <code>username</code> and <code>password</code> and reuse the <code>sessionid</code> cookie in next
+communication calls.</p>
+
+<p>** With Python Request **</p>
+
+<p>Hue is based on the Django Web Framework. Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. HUE uses stock auth form which uses “username” and “password” and “csrftoken” form variables to authenticate.</p>
+
+<p>In this code snippet, we will use well-known python “requests” library. we will first acquire “csrftoken” by GET “login_url”. We will create python dictionary of form data which contains “username”, “password” and “csrftoken” and the “next_url” and another python dictionary for header which contains the “Referer” url and empty python dictionary for the cookies. After POST request to “login_url” we will get status. Check the r.status_code. If r.status_code!=200 then you have problem in username and/or password.</p>
+
+<p>Once the request is successful then capture headers and cookies for subsequent requests. Subsequent request.session calls can be made by providing cookies=session.cookies and headers=session.headers.</p>
+
+<pre>
+import requests
+
+def login_djangosite():
+ next_url = "/"
+ login_url = "http://localhost:8888/accounts/login?next=/"
+
+ session = requests.Session()
+ r = session.get(login_url)
+ form_data = dict(username="[your hue username]",password="[your hue password]",
+                  csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
+ r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
+
+ # check if request executed successfully?
+ print r.status_code
+
+ cookies = session.cookies
+ headers = session.headers
+
+ r=session.get('http://localhost:8888/metastore/databases/default/metadata',
+ cookies=session.cookies, headers=session.headers)
+ print r.status_code
+
+ # check metadata output
+ print r.text
+</pre>
+
+<p><a href="http://gethue.com/login-into-hue-using-the-python-request-library/">Read more about it here</a>.</p>
+
+<div class="note">
+  http://issues.cloudera.org/browse/HUE-1450 is tracking a more official public API.
+</div>
+
+<h2 id="upgrade-path">Upgrade path</h2>
+
+<p>After upgrading the version of Hue, running these two commands will make sure the
+database has the correct tables and fields.</p>
+
+<pre><code>./build/env/bin/hue syncdb
+./build/env/bin/hue migrate
+</code></pre>
+
+<h1 id="front-end-development">Front-end Development</h1>
+
+<p>Developing applications for Hue requires a minimal amount of CSS
+(and potentially JavaScript) to use existing functionality. As covered above,
+creating an application for the Hue is a matter of creating a standard HTML
+application.</p>
+
+<p>In a nutshell, front-end development in Hue is using
+<a href="http://twitter.github.com/bootstrap/">Bootstrap</a> and
+<a href="http://knockoutjs.com/">Knockout js</a> to layout your app and script the custom
+interactions.</p>
+
+<h2 id="css-styles">CSS Styles</h2>
+
+<p>Hue uses <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> version 2.0 CSS
+styles and layouts. They are highly reusable and flexible. Your app doesn&rsquo;t
+have to use these styles, but if you do, it&rsquo;ll save you some time and make your
+app look at home in Hue.</p>
+
+<p>On top of the standard Bootstrap styles, Hue defines a small set of custom
+styles in <em>desktop/core/static/css/jhue.css</em>.</p>
+
+<h2 id="defining-styles-for-your-application">Defining Styles for Your Application</h2>
+
+<p>When you create your application it will provision a CSS file for you in the
+<em>static/css</em> directory. For organization purposes, your styles should go here
+(and any images you have should go in <em>static/art</em>). Your app&rsquo;s name will be a
+class that is assigned to the root of your app in the DOM. So if you created an
+app called &ldquo;calculator&rdquo; then every window you create for your app will have the
+class &ldquo;calculator&rdquo;.  Every style you define should be prefixed with this to
+prevent you from accidentally colliding with the framework style. Examples:</p>
+
+<pre><code>/* the right way: */
+.calculator p {
+  /* all my paragraphs should have a margin of 8px */
+  margin: 8px;
+  /* and a background from my art directory */
+  background: url(../art/paragraph.gif);
+}
+/* the wrong way: */
+p {
+  /* woops; we're styling all the paragraphs on the page, affecting
+     the common header! */
+  margin: 8px;
+  background: url(../art/paragraph.gif);
+}
+</code></pre>
+
+<h2 id="icons">Icons</h2>
+
+<p>You should create an icon for your application that is a transparent png sized
+24px by 24px. Your <code>settings.py</code> file should point to your icon via the <code>ICON</code>
+variable. The <code>create_desktop_app</code> command creates a default icon for you.</p>
+
+<div class="note">
+  If you do not define an application icon, your application will not show up
+  in the navigation bar.
+</div>
+
+<p>Hue ships with Twitter Bootstrap and Font Awesome 3 (<a href="http://fortawesome.github.io/Font-Awesome/">http://fortawesome.github.io/Font-Awesome/</a>)
+so you have plenty of scalable icons to choose from. You can style your elements to use them
+like this (in your mako template):</p>
+
+<pre><code>&lt;!-- show a trash icon in a link --&gt;
+&lt;a href=&quot;#something&quot;&gt;&lt;i class=&quot;icon-trash&quot;&gt;&lt;/i&gt; Trash&lt;/a&gt;
+</code></pre>
+
+<h2 id="static-files">Static files</h2>
+
+<p>For better performances, Hue uses the Django staticfiles app. If in production mode, if you edit
+some static files, you would need to run this command or <code>make apps</code>. No actions are needed in
+development mode.</p>
+
+<pre><code>./build/env/bin/hue collectstatic
+</code></pre>
+
+<h2 id="adding-interactive-elements-to-your-ui">Adding Interactive Elements to Your UI</h2>
+
+<p>Hue by default loads these JavaScript components:</p>
+
+<ul>
+<li>Ko js</li>
+<li>jQuery</li>
+<li>Bootstrap</li>
+</ul>
+
+<p>These are used by some Hue applications, but not loaded by default:</p>
+
+<ul>
+<li>Knockout js (<code>desktop/core/static/ext/js/knockout-min.js</code>)</li>
+<li>jQuery UI (<code>desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js</code>)</li>
+</ul>
+
+<p>These standard components have their own online documentation, which we will
+not repeat here. They let you write interactive behaviors with little or no
+JavaScript.</p>
+
+<h2 id="debugging-tips-and-tricks">Debugging Tips and Tricks</h2>
+
+<ul>
+<li>Set <code>DESKTOP_DEBUG=1</code> as an environment variable if you want logs to go to stderr
+as well as to the respective log files.</li>
+<li>Use runserver.  If you want to set a CLI breakpoint, just insert
+<code>__import__(&quot;ipdb&quot;).set_trace()</code>
+into your code.</li>
+<li>Django tends to restart its server whenever it notices a file changes.  For
+certain things (like configuration changes), this is not sufficient.  Restart
+the server whole-heartedly.</li>
+<li>We recommend developing with the Chrome console.</li>
+</ul>
+
+<h2 id="building">Building</h2>
+
+<h3 id="documentation">Documentation</h3>
+
+<p>Building with</p>
+
+<pre><code>make docs
+</code></pre>
+
+<h3 id="javascript">Javascript</h3>
+
+<p>The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js</p>
+
+<h4 id="for-changes-to-the-files-under-src-desktop-js-the-following-applies">For changes to the files under src/desktop/js the following applies:</h4>
+
+<p>First make sure all third-party dependencies defined in package.json are installed into node_modules/</p>
+
+<pre><code>npm install
+</code></pre>
+
+<p>Also run this after making changes to package.json, adding new third-party dependencies etc.</p>
+
+<p>To generate the js bundles run:</p>
+
+<pre><code>npm run webpack
+npm run webpack-workers
+npm run webpack-login
+</code></pre>
+
+<p>During development the bundles can be autogenerated when it detects changes to the .js files, for this run:</p>
+
+<pre><code>npm run dev
+</code></pre>
+
+<p>Before sending a review with changes to the bundles run:</p>
+
+<pre><code>npm run lint-fix
+</code></pre>
+
+<p>and possibly fix any issues it might report.</p>
+
+<h3 id="css-less">CSS / LESS</h3>
+
+<p>After changing the CSS in a .less file, rebuilding with:</p>
+
+<pre><code>make css
+</code></pre>
+
+<h3 id="sql-autocomplete">SQL Autocomplete</h3>
+
+<p>Install a patched jison:</p>
+
+<pre><code>git clone https://github.com/JohanAhlen/jison
+cd jison
+npm install -g .
+</code></pre>
+
+<p>Then run:</p>
+
+<pre><code>make sql-all-parsers
+</code></pre>
+
+<h3 id="ace-editor">Ace Editor</h3>
+
+<p>After modifying files under tools/ace-editor run the following to build ace.js</p>
+
+<pre><code>npm install
+make ace
+</code></pre>
+
+<h3 id="internationalization">Internationalization</h3>
+
+<p>How to update all the messages and compile them:</p>
+
+<pre><code>make locales
+</code></pre>
+
+<p>How to update and compile the messages of one app:</p>
+
+<pre><code>cd apps/beeswax
+make compile-locale
+</code></pre>
+
+<p>How to create a new locale for an app:</p>
+
+<pre><code>cd $APP_ROOT/src/$APP_NAME/locale
+$HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
+</code></pre>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="/developer/api/" title="APIs"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="/developer/browsers/" title="File / Job Browsers" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1552590434"></script>
+    <script src="/js/perfect-scrollbar.min.js?1552590434"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1552590434"></script>
+    <script src="/js/jquery.sticky.js?1552590434"></script>
+    <script src="/js/featherlight.min.js?1552590434"></script>
+    <script src="/js/html5shiv-printshiv.min.js?1552590434"></script>
+    <script src="/js/highlight.pack.js?1552590434"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom.71422.js?1552590434"></script>
+    <script src="/js/learn.js?1552590434"></script>
+    <script src="/js/hugo-learn.js?1552590434"></script>
+
+    <link href="/mermaid/mermaid.css?1552590434" type="text/css" rel="stylesheet" />
+    <script src="/mermaid/mermaid.js?1552590434"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+
+  <script data-no-instant>document.write('<script src="/livereload.js?port=1313&mindelay=10"></' + 'script>')</script></body>
+</html>
