@@ -133,7 +133,7 @@ class DataEngApi(Api):
     ]
 
 
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     pass
 
 

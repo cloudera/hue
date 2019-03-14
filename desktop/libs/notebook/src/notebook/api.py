@@ -27,24 +27,23 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.api2 import __paginate
-from desktop.conf import IS_K8S_ONLY
+from desktop.conf import IS_K8S_ONLY, TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
+from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
 from notebook.connectors.dataeng import DataEngApi
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
-from notebook.views import upgrade_session_properties
+from notebook.views import upgrade_session_properties, get_api
 
 
 LOG = logging.getLogger(__name__)
-
 
 DEFAULT_HISTORY_NAME = ''
 
@@ -536,7 +535,7 @@ def close_notebook(request):
   for snippet in [_s for _s in notebook['snippets'] if _s['type'] in ('hive', 'impala')]:
     try:
       if snippet['status'] != 'running':
-        response['result'].append(get_api(request, snippet).close_statement(snippet))
+        response['result'].append(get_api(request, snippet).close_statement(notebook, snippet))
       else:
         LOG.info('Not closing SQL snippet as still running.')
     except QueryExpired:
@@ -560,7 +559,7 @@ def close_statement(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['result'] = get_api(request, snippet).close_statement(snippet)
+    response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
   except QueryExpired:
     pass
 

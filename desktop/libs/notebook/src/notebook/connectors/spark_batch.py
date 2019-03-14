@@ -78,7 +78,7 @@ class SparkBatchApi(Api):
 
     return api.get_batch_log(snippet['result']['handle']['id'], startFrom=startFrom, size=size)
 
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     api = get_spark_api(self.user)
 
     session_id = snippet['result']['handle']['id']

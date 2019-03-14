@@ -351,7 +351,7 @@ class SQLDashboardApi(DashboardApi):
           status = api.check_status(mock_notebook, snippet)
           if status['status'] == 'available':
             result = api.fetch_result(mock_notebook, snippet, rows=10, start_over=True)
-            api.close_statement(snippet)
+            api.close_statement(mock_notebook, snippet)
             break
           time.sleep(sleep_interval)
           curr = time.time()
@@ -361,7 +361,7 @@ class SQLDashboardApi(DashboardApi):
             api.cancel_operation(snippet)
           except Exception, e:
             LOG.warning("Failed to cancel query: %s" % e)
-            api.close_statement(snippet)
+            api.close_statement(mock_notebook, snippet)
           raise OperationTimeout(e)
 
     return result
