@@ -18,7 +18,6 @@ from __future__ import absolute_import, unicode_literals
 
 import csv
 import os
-import django
 import json
 import logging
 import tempfile
@@ -47,8 +46,9 @@ STATE_MAP = {
   states.PENDING: 'waiting',
   states.STARTED: 'running',
   states.RETRY: 'running',
-  states.SUCCESS: 'available',
   'PROGRESS': 'running',
+  'AVAILABLE': 'available',
+  states.SUCCESS: 'available',
   states.FAILURE: 'failure',
   states.REVOKED: 'canceled',
   states.REJECTED: 'rejected',
@@ -57,6 +57,7 @@ STATE_MAP = {
 
 #TODO: Add periodic cleanup task
 #TODO: move file paths to a file like API so we can change implementation
+#TODO: UI should be able to close a query that is available, but not expired
 @app.task()
 def download_to_file(notebook, snippet, file_format='csv', user_agent=None, postdict=None, user_id=None, create=False, store_data_type_in_header=False):
   download_to_file.update_state(task_id=notebook['uuid'], state='STARTED', meta={})
@@ -72,7 +73,7 @@ def download_to_file(notebook, snippet, file_format='csv', user_agent=None, post
   f_progress, path_progress = tempfile.mkstemp()
   try:
     os.write(f_progress, '0')
-    meta = {'row_counter': 0, 'file_path': path, 'handle': handle, 'log_path': path_log, 'progress_path': path_progress, 'status': 'running', 'truncated': False}
+    meta = {'row_counter': 0, 'file_path': path, 'handle': handle, 'log_path': path_log, 'progress_path': path_progress, 'status': 'running', 'truncated': False} #TODO: Truncated
     download_to_file.update_state(task_id=notebook['uuid'], state='PROGRESS', meta=meta)
     _until_available(notebook, snippet, api, f_log, handle, meta)
 
@@ -85,7 +86,7 @@ def download_to_file(notebook, snippet, file_format='csv', user_agent=None, post
       os.write(f, chunk)
       row_count += chunk.count('\n')
       meta['row_counter'] = row_count - 1
-      download_to_file.update_state(task_id=notebook['uuid'], state='PROGRESS', meta=meta)
+      download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
     api.close_statement(notebook, snippet)
   finally:
@@ -117,7 +118,8 @@ def _until_available(notebook, snippet, api, f, handle, meta):
     log = api.get_log(notebook, snippet, startFrom=count)
     os.write(f, log)
     count += log.count('\n')
-    if response['status'] == 'available':
+
+    if response['status'] not in ['waiting', 'running', 'submitted']:
       break
     check_status_count += 1
     if check_status_count > 5:
@@ -238,26 +240,23 @@ def get_jobs(notebook, snippet, logs, **kwargs): #Re implement to fetch updated 
 def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+  data = []
+  cols = []
+  results = {
+      'has_more': False,
+      'data': data,
+      'meta': cols,
+      'type': 'table'
+    }
   if state == states.PENDING:
     raise QueryExpired()
-  elif state == 'SUBMITTED' or states.state(result.state) < states.state('PROGRESS'):
-    return {
-      'has_more': False,
-      'data': [],
-      'meta': [],
-      'type': 'table'
-    }
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
-    return {
-      'has_more': False,
-      'data': [],
-      'meta': [],
-      'type': 'table'
-    }
+    return results
+  elif state not in [states.SUCCESS, 'AVAILABLE']:
+    return results
 
   info = result.info
-  data = []
   skip = 0
   if not start_over:
     with open(info.get('progress_path'), 'r') as f:
@@ -267,7 +266,9 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   with open(info.get('file_path'), 'r') as f:
     csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
     first = next(csv_reader)
-    cols = map(lambda x: {'name': x.split('|')[0], 'type': x.split('|')[1], 'comment': None}, first)
+    for col in first:
+      split = col.split('|')
+      cols.append({'name': split[0], 'type': split[1], 'comment': None})
     count = 0
     for row in csv_reader:
       count += 1
@@ -280,14 +281,9 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   with open(info.get('progress_path'), 'w') as f:
     f.write(str(count))
 
-  has_more = count < info.get('row_counter') or state == states.state('PROGRESS')
+  results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
 
-  return {
-      'has_more': has_more,
-      'data': data,
-      'meta': cols,
-      'type': 'table'
-  }
+  return results
 
 def fetch_result_size(*args, **kwargs):
   notebook = args[0]
