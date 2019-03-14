@@ -12,12 +12,18 @@ High Level Roadmap
 * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
 * [ ] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 * [ ] Result caching
+* [ ] Editor v2
 * [ ] SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
 * [ ] Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
 * [x] Web Server [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 * [ ] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
-* [ ] Documentation Refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
+* [ ] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
 * [ ] Public REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
 * [ ] Git integration [HUE-951](https://issues.cloudera.org/browse/HUE-951)
+
+
+[Open Tasks](https://issues.cloudera.org/projects/HUE/issues)
+[Easy Tasks](https://issues.cloudera.org/browse/HUE-8745?filter=10431)
+
 
 How to [contribute](CONTRIBUTING.md).
