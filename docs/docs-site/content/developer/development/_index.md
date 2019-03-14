@@ -487,7 +487,30 @@ JavaScript.
 
 ### Documentation
 
-Building with
+New website:
+
+* Install https://gohugo.io/getting-started/quick-start/
+* Make sure the base URL is correct:
+
+    cd docs/docs-site
+    vim config.toml
+    baseURL='http://cloudera.github.io/hue/docs-4.4.0/'
+
+* Build the doc website: 
+
+    hugo server -wDs . -d ~/tmp/docs-4.4.0
+
+* Add it to the github page and push:
+
+    git checkout gh-pages
+    cp ~/tmp/docs-4.4.0 .
+    rm latest
+    ln -s docs-4.4.0 latest
+
+    git push origin HEAD:gh-pages
+
+
+Old documentation:
 
     make docs
 
