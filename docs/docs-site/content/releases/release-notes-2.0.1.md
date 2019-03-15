@@ -3,6 +3,7 @@ title: "2.0.1"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -2001
+tags: ['skipIndexing']
 ---
 
 ### Hue v2.0.1, aka Hue 2, released June 4, 2012

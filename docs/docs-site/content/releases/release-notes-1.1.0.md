@@ -3,6 +3,7 @@ title: "1.1.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -1010
+tags: ['skipIndexing']
 ---
 
 ### Hue v1.1.0, released Oct 11, 2010
