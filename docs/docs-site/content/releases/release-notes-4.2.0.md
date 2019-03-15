@@ -3,6 +3,7 @@ title: "4.2.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -4020
+tags: ['skipIndexing']
 ---
 
 ### Hue v4.2.0, released April 4th 2018

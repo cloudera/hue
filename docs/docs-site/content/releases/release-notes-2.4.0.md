@@ -3,6 +3,7 @@ title: "2.4.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -2040
+tags: ['skipIndexing']
 ---
 
 ### Hue v2.4.0, released June 12th, 2013

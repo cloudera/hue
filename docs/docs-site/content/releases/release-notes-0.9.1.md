@@ -3,10 +3,11 @@ title: "0.9.1"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -91
+tags: ['skipIndexing']
 ---
 
-HUE v0.9.1, released July 21, 2010
-==================================
+### HUE v0.9.1, released July 21, 2010
+
 
 HUE 0.9.1 is mainly a bug-fix release. Most notably:
 

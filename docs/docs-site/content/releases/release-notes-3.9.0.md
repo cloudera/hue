@@ -3,6 +3,7 @@ title: "3.9.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -3090
+tags: ['skipIndexing']
 ---
 
 ### Hue v3.9.0, released August 7th 2015

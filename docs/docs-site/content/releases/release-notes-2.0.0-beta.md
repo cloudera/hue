@@ -3,6 +3,7 @@ title: "2.0.0-beta"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -1999
+tags: ['skipIndexing']
 ---
 
 ### Hue v2.0.0-beta, released Apr 10, 2012

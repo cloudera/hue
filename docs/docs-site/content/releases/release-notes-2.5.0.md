@@ -3,6 +3,7 @@ title: "2.5.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -2050
+tags: ['skipIndexing']
 ---
 
 ### Hue v2.5.0, released Monday 15th, July 2013
