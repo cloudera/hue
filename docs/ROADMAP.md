@@ -13,6 +13,9 @@ High Level Roadmap
 * [ ] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 * [ ] Result caching
 * [ ] Editor v2
+* [ ] [core] Integrate with Apache Ranger [HUE-8748](https://issues.cloudera.org/browse/HUE-8748)
+* [ ] [core] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)
+* [ ] [core] Integrate with Apache Knox [HUE-8750](https://issues.cloudera.org/browse/HUE-8750)
 * [ ] SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
 * [ ] Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
 * [x] Web Server [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
