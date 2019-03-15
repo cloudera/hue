@@ -3,6 +3,7 @@ title: "0.3.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -30
+tags: ['skipIndexing']
 ---
 
 ### v0.3.0, released November 23rd, 2009

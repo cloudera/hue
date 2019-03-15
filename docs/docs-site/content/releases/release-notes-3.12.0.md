@@ -3,6 +3,7 @@ title: "3.12.0"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: -3120
+tags: ['skipIndexing']
 ---
 
 ### Hue v3.12.0, released Feb 6th 2017
