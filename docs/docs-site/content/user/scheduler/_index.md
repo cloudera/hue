@@ -42,21 +42,21 @@ actions themselves and the areas above and below the actions. If you
 drop an action on an existing action, a fork and join is added to the
 workflow.
 
--   Add actions to the workflow by clicking an action
-    ![image](images/action.png) button and drop the action on the
+-   Add actions to the workflow by clicking the action
+    button and drop the action on the
     workflow. The Edit Node screen displays.
     1.  Set the action properties and click **Done**. Each action in a
         workflow must have a unique name.
 
--   Copy an action by clicking the ![image](images/copy.png) **Copy**
+-   Copy an action by clicking the **Copy**
     button.
 
 1.  The action is opened in the Edit Node screen.
 2.  Edit the action properties and click **Done**. The action is added
     to the end of the workflow.
 
--   Delete an action by clicking the ![image](images/trash.png) button.
--   Edit an action by clicking the ![image](images/edit.png) button.
+-   Delete an action by clicking the Trash button.
+-   Edit an action by clicking the Edit button.
 -   Change the position of an action by left-clicking and dragging an
     action to a new location.
 
@@ -67,14 +67,14 @@ workflow.
 -   Remove a fork and join by dragging a forked action and dropping it
     above the fork.
 -   Convert a fork to a decision by clicking the
-    ![image](images/convert.png) button.
+    Fork button.
 -   To edit a decision:
-    1.  Click the ![image](images/edit.png) button.
+    1.  Click the Edit button.
     2.  Fill in the predicates that determine which action to perform
         and select the default action from the drop-down list.
     3.  Click **Done**.
 
-![image](images/note.jpg) **Note**: worfklows.xml and their job.properties
+**Note**: worfklows.xml and their job.properties
 cab also directly be selected and executed via the File Browser.
 
 ## Schedules

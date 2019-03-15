@@ -29,7 +29,7 @@ and will walk you through adding a new application using the SDK.
 
 ### From 30,000 feet
 
-![From up on high](/images/from30kfeet.png)
+![From up on high]({{% param baseURL %}}images/from30kfeet.png)
 
 Hue, as a "container" web application, sits in between your Hadoop installation
 and the browser.  It hosts all the Hue Apps, including the built-in ones, and
@@ -37,7 +37,7 @@ ones that you may write yourself.
 
 ### The Hue Server
 
-![Web Back-end](/images/webbackend.png)
+![Web Back-end]({{% param baseURL %}}images/webbackend.png)
 
 Hue is a web application built on the Django python web framework.
 Django, running on the WSGI container/web server (typically CherryPy), manages
@@ -52,7 +52,7 @@ daemon processes "on the side". Some examples are the `Celery Task Server`, `Cel
 
 ### Interacting with Hadoop
 
-![Interacting with Hadoop](/images/interactingwithhadoop.png)
+![Interacting with Hadoop]({{% param baseURL %}}images/interactingwithhadoop.png)
 
 Hue provides some APIs for interacting with Hadoop.
 Most noticeably, there are python file-object-like APIs for
@@ -69,7 +69,7 @@ Hue provides a front-end framework based on
 
 ### An Architectural View
 
-![Architecture](/images/architecture.png)
+![Architecture]({{% param baseURL %}}images/architecture.png)
 
 A Hue application may span three tiers: (1) the UI
 and user interaction in the client's browser, (2) the

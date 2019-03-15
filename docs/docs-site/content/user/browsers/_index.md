@@ -210,13 +210,13 @@ must have the proper permissions to manipulate other user's files.
 
 -   Click the directory name or parent directory dots in the **File
     Browser** window.
--   Click the ![image](images/edit.png) icon, type a directory name, and
+-   Click the Edit icon, type a directory name, and
     press **Enter**.
 
 To change to your home directory, click **Home** in the path field at
 the top of the **File Browser** window.
 
-![image](images/note.jpg) **Note**:
+**Note**:
 
 The **Home** button is disabled if you do not have a home directory. Ask
 a Hue administrator to create a home directory for you.
@@ -265,12 +265,12 @@ in the folder have the full path of the deleted files (in order to be
 able to restore them if needed) and checkpoints. The length of time a
 file or directory stays in the trash depends on HDFS properties.
 
-In the **File Browser** window, click ![image](images/fbtrash.png).
+In the **File Browser** window, click the Trash icon.
 
 
 ### Changing Owner, Group, or Permissions
 
-![image](images/note.jpg) **Note**:
+**Note**:
 
 Only the Hadoop superuser can change a file's or directory's owner,
 group, or permissions. The user who starts Hadoop is the Hadoop
@@ -375,8 +375,8 @@ If there are jobs running, then the Job Browser list appears.
 
 ### Viewing Job Information
 
-![image](images/note.jpg) **Note**: At any level you can view the log
-for an object by clicking the ![image](images/log.png) icon in the Logs
+**Note**: At any level you can view the log
+for an object by clicking the Log icon in the Logs
 column.
 
 **To view job information for an individual job:**
