@@ -36,7 +36,7 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
 ## Concepts
 ### Running Queries
 
-![image](images/note.jpg) **Note**: To run a query, you must be logged
+**Note**: To run a query, you must be logged
 in to Hue as a user that also has a Unix user account on the remote
 server.
 
@@ -59,20 +59,20 @@ server.
 
 When you have multiple statements it's enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
 
-![image](images/note.jpg) **Note**: Use CTRL/Cmd + ENTER to execute queries.
+**Note**: Use CTRL/Cmd + ENTER to execute queries.
 
-![image](images/note.jpg) **Note**: Under the logs panel, you can view any
+**Note**: Under the logs panel, you can view any
 MapReduce or [Impala jobs](#impala-queries) that the query generated.
 
 ### Downloading and Exporting Query Results
 
 To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query.
 
-![image](images/note.jpg) Two of them offer great scalability:
+Two of them offer great scalability:
 1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
 2.  Export to a table. You can choose an already existing table or a new one. In the export icon, choose Export and then Table.
 
-![image](images/note.jpg) Two of them offer limited scalability:
+Two of them offer limited scalability:
 1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
 2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.
 
@@ -119,11 +119,10 @@ added files to all machines in the cluster at query execution time.
         cache. Typically, this might be a transform script (or similar)
         to be executed.
 
-<li>   For Path, enter the path to the file or click
-    ![image](images/browse.png) to browse and select the file.
+<li>   For Path, enter the path to the file or click browse and select the file.
 </ol>
 
-![image](images/note.jpg) Note: It is not necessary to specify files
+Note: It is not necessary to specify files
 used in a transform script if the files are available in the same path
 on all machines in the Hadoop cluster.</td></tr>
 <tr><td>USER-DEFINED FUNCTIONS</td><td>Specify user-defined functions. Click Add to configure a new
