@@ -298,7 +298,14 @@
   </url>
   
   <url>
+    <loc>http://localhost:1313/hue/docs-4.4.0/tags/skipindexing/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://localhost:1313/hue/docs-4.4.0/tags/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
     <priority>0</priority>
   </url>
   

@@ -6,9 +6,19 @@
     <description>Recent content in Tags on Hue Documentation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Wed, 13 Mar 2019 18:28:08 -0700</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/hue/docs-4.4.0/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Skipindexing</title>
+      <link>http://localhost:1313/hue/docs-4.4.0/tags/skipindexing/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
+      
+      <guid>http://localhost:1313/hue/docs-4.4.0/tags/skipindexing/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

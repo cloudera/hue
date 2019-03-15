@@ -7,25 +7,25 @@
     <meta name="description" content="">
 
 
-    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/hue/images/favicon.ico" type="image/x-icon" />
 
 
     <title>APIs :: Hue Documentation</title>
 
     
-    <link href="/hue/docs-4.4.0/css/nucleus.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/fontawesome-all.min.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/hybrid.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/featherlight.min.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/perfect-scrollbar.min.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/auto-complete.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/theme.css?1552591998" rel="stylesheet">
-    <link href="/hue/docs-4.4.0/css/hugo-theme.css?1552591998" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/nucleus.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/fontawesome-all.min.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/hybrid.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/featherlight.min.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/perfect-scrollbar.min.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/auto-complete.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/theme.css?1552616510" rel="stylesheet">
+    <link href="/hue/docs-4.4.0/css/hugo-theme.css?1552616510" rel="stylesheet">
     
-      <link href="/hue/docs-4.4.0/css/theme-hue.css?1552591998" rel="stylesheet">
+      <link href="/hue/docs-4.4.0/css/theme-hue.css?1552616510" rel="stylesheet">
     
 
-    <script src="/hue/docs-4.4.0/js/jquery-2.x.min.js?1552591998"></script>
+    <script src="/hue/docs-4.4.0/js/jquery-2.x.min.js?1552616510"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -42,9 +42,26 @@
 
   <div id="header-wrapper">
     <div id="header">
-      <img src="/hue/docs-4.4.0/images/hue_logo.png" alt="alt text" title="Hue Logo">
+      <img src="/hue/images/hue_logo.png" alt="alt text" title="Hue Logo">
 
     </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/docs-4.4.0/js/lunr.min.js?1552616510"></script>
+<script type="text/javascript" src="/hue/docs-4.4.0/js/auto-complete.js?1552616510"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/localhost:1313\/hue\/docs-4.4.0\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/docs-4.4.0/js/search.js?1552616510"></script>
+
     
   </div>
 
@@ -1357,7 +1374,8 @@
 
     
     <section id="footer">
-      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn"><i class="fas fa-heart"></i></a> from <a href="http://getgrav.org">Grav</a> and <a href="http://gohugo.io/">Hugo</a></p>
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn"><i class="fas fa-heart"></i></a> with <a href="http://gohugo.io/">Hugo</a></p>
+
 
     </section>
   </div>
@@ -1378,7 +1396,7 @@
                   
                   
                   <div id="top-github-link">
-                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/developer/api/_index.md" target="blank">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/developer/api/_index.md" target="blank">
                       <i class="fas fa-code-branch"></i>
                       <span id="top-github-link-text">Edit this page</span>
                     </a>
@@ -2609,24 +2627,31 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/docs-4.4.0/js/clipboard.min.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/perfect-scrollbar.min.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/perfect-scrollbar.jquery.min.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/jquery.sticky.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/featherlight.min.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/html5shiv-printshiv.min.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/highlight.pack.js?1552591998"></script>
+    <script src="/hue/docs-4.4.0/js/clipboard.min.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/perfect-scrollbar.min.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/perfect-scrollbar.jquery.min.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/jquery.sticky.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/featherlight.min.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/html5shiv-printshiv.min.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/highlight.pack.js?1552616510"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/docs-4.4.0/js/modernizr.custom.71422.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/learn.js?1552591998"></script>
-    <script src="/hue/docs-4.4.0/js/hugo-learn.js?1552591998"></script>
+    <script src="/hue/docs-4.4.0/js/modernizr.custom.71422.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/learn.js?1552616510"></script>
+    <script src="/hue/docs-4.4.0/js/hugo-learn.js?1552616510"></script>
 
-    <link href="/hue/docs-4.4.0/mermaid/mermaid.css?1552591998" type="text/css" rel="stylesheet" />
-    <script src="/hue/docs-4.4.0/mermaid/mermaid.js?1552591998"></script>
+    <link href="/hue/docs-4.4.0/mermaid/mermaid.css?1552616510" type="text/css" rel="stylesheet" />
+    <script src="/hue/docs-4.4.0/mermaid/mermaid.js?1552616510"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
     
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'UA-37637545-1');
+</script>
   <script data-no-instant>document.write('<script src="/livereload.js?port=1313&mindelay=10"></' + 'script>')</script></body>
 </html>
