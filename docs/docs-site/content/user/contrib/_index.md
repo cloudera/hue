@@ -24,7 +24,7 @@ Prerequisites before using the app:
 to point to your Thrift IP/Port
 
 
-![image](images/note.jpg) **Note**: With just a few changes in the [Python API](https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py),
+**Note**: With just a few changes in the [Python API](https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py),
 the HBase browser could be compatible with Apache Kudu.
 
 

@@ -1,4 +1,4 @@
-baseURL='http://cloudera.github.io/hue/docs-4.4.0/'
+baseURL = 'http://cloudera.github.io/hue/docs-4.4.0/' # Note: also in params
 
 languageCode = "en-us"
 title = "Hue Documentation"
@@ -11,9 +11,11 @@ theme = "hugo-theme-learn"
 home = [ "HTML", "RSS", "JSON"]
 
 [params]
-  # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page. 
+  # For logo and favicon partials
+  baseURL = 'http://cloudera.github.io/hue/docs-4.4.0/'
+
+  # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.
-  # See the config.toml file from this documentation site to have an example.
   editURL = "https://github.com/cloudera/hue/blob/master/docs/docs-site/content/"
   # Author of the site, will be used in meta information
   author = ""
@@ -23,12 +25,12 @@ home = [ "HTML", "RSS", "JSON"]
   showVisitedLinks = false
   # Disable search function. It will hide search bar
   disableSearch = false
-  # Javascript and CSS cache are automatically busted when new version of site is generated. 
+  # Javascript and CSS cache are automatically busted when new version of site is generated.
   # Set this to true to disable this behavior (some proxies don't handle well this optimization)
   disableAssetsBusting = false
   # Set this to true to disable copy-to-clipboard button for inline code.
   disableInlineCopyToClipBoard = false
-  # A title for shortcuts in menu is set by default. Set this to true to disable it. 
+  # A title for shortcuts in menu is set by default. Set this to true to disable it.
   disableShortcutsTitle = false
   # When using mulitlingual website, disable the switch language button.
   disableLanguageSwitchingButton = false
@@ -41,7 +43,7 @@ home = [ "HTML", "RSS", "JSON"]
   # Change default color scheme with a variant one. Can be "red", "blue", "green".
   themeVariant = "hue"
 
-[[menu.shortcuts]] 
+[[menu.shortcuts]]
 name = "<i class='fab fa-github'></i> Github"
 identifier = "ds"
 url = "https://github.com/cloudera/hue"
