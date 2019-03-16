@@ -24,12 +24,12 @@ Make sure the base URL is correct:
 
 Build the doc website:
 
-    hugo server -wDs . -d ~/tmp/docs-4.4.0
+    hugo
 
 Add it to the github page and push:
 
     git checkout gh-pages
-    cp ~/tmp/docs-4.4.0 .
+    cp ~/docs/docs-site/public docs-4.4.0 -r
     rm latest
     ln -s docs-4.4.0 latest
 
