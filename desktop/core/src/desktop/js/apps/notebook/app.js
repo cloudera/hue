@@ -25,6 +25,7 @@ import 'jquery/plugins/jquery.hdfstree';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
+import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 window.Clipboard = Clipboard;
 
@@ -565,7 +566,7 @@ $(document).ready(() => {
   ko.applyBindings(viewModel, $(window.EDITOR_BINDABLE_ELEMENT)[0]);
   viewModel.init();
 
-  window.sqlWorkerHandler.registerWorkers();
+  sqlWorkerHandler.registerWorkers();
 
   viewModel.selectedNotebook.subscribe(newVal => {
     huePubSub.publish('selected.notebook.changed', newVal);
