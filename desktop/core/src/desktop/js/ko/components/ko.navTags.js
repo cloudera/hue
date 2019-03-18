@@ -37,9 +37,7 @@ const TEMPLATE = `
       overflowEllipsis: overflowEllipsis,
       onSave: saveTags.bind($data),
       validRegExp: '^[a-zA-z0-9_\-]{1,50}$',
-      invalidMessage: '${ I18n(
-        'Tags can only contain 1 to 50 alphanumeric characters, _ or -.'
-      ) }',
+      invalidMessage: '${I18n('Tags can only contain 1 to 50 alphanumeric characters, _ or -.')}',
       load: getSelectizeTags
     }"></textarea>
    <div class="selectize-error" style="display: none;"><i class="fa fa-exclamation-triangle"></i> <span class="message"></span></div>

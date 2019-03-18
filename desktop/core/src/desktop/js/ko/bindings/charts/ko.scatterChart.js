@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import d3v3 from 'd3v3';
 import ko from 'knockout';
+import nv from 'ext/nv.d3.1.1.15b.custom';
 
 ko.bindingHandlers.scatterChart = {
   update: function(element, valueAccessor) {

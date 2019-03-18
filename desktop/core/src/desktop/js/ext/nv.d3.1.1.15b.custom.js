@@ -1,7 +1,8 @@
-(function(){
+import d3v3 from 'd3v3';
+
+import HueColors from 'utils/hueColors';
 
 var nv = window.nv || {};
-
 
 nv.version = '1.1.15b';
 nv.dev = false //set false when in production
@@ -14367,5 +14368,6 @@ nv.models.stackedAreaChart = function() {
   //============================================================
 
   return chart;
-}
-})();
+};
+
+export default nv;

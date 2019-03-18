@@ -22,6 +22,7 @@ import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import SqlParseSupport from 'parse/sqlParseSupport';
+import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
 
 // TODO: depends on Ace, sqlStatementsParser

@@ -24,9 +24,9 @@ import 'knockout.validation';
 import 'ext/ko.editable.custom';
 import 'ext/ko.selectize.custom';
 
+import 'ko/bindings/charts/mapchart/ko.mapChart';
 import 'ko/bindings/charts/ko.barChart';
 import 'ko/bindings/charts/ko.lineChart';
-import 'ko/bindings/charts/ko.mapChart';
 import 'ko/bindings/charts/ko.partitionChart';
 import 'ko/bindings/charts/ko.pieChart';
 import 'ko/bindings/charts/ko.scatterChart';

@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import d3v3 from 'd3v3';
+import nv from 'ext/nv.d3.1.1.15b.custom';
 
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
