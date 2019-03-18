@@ -35,7 +35,6 @@ if USE_NEW_EDITOR.get():
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
-<%namespace name="koComponents" file="/ko_components.mako" />
 
 <!DOCTYPE html>
 <%def name="is_selected(selected)">
