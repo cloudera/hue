@@ -115,6 +115,8 @@ dynamic_patterns += [
   # JS that needs to be mako
   url(r'^desktop/globalJsConstants.js', desktop_views.global_js_constants),
 
+  url(r'^desktop/topo/(?P<location>\w+)', desktop_views.topo),
+
   # Web workers
   url(r'^desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
   url(r'^desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),

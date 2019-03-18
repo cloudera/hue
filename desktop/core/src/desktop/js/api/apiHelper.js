@@ -40,6 +40,7 @@ const SOLR_FIELDS_API = '/indexer/api/index/list/';
 const DASHBOARD_TERMS_API = '/dashboard/get_terms';
 const DASHBOARD_STATS_API = '/dashboard/get_stats';
 const FORMAT_SQL_API = '/notebook/api/format';
+const TOPO_URL = '/desktop/topo/';
 
 const SEARCH_API = '/desktop/api/search/entities';
 const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
@@ -509,6 +510,17 @@ class ApiHelper {
       .fail(response => {
         options.errorCallback(response);
       });
+  }
+
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.location
+   * @param {boolean} [options.silenceErrors]
+   */
+  fetchTopo(options) {
+    const url = TOPO_URL + options.location;
+    return this.simpleGet(url, undefined, options);
   }
 
   /**

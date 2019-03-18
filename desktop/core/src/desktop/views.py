@@ -29,8 +29,10 @@ import zipfile
 import validate
 
 from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.http.response import StreamingHttpResponse
 from django.urls import reverse
 from wsgiref.util import FileWrapper
 from django.shortcuts import redirect
@@ -756,3 +758,10 @@ def _ko(str=""):
 def antixss(value):
   xss_regex = re.compile(r'<[^>]+>')
   return xss_regex.sub('', value)
+
+
+def topo(request, location='world'):
+  file_path = os.path.join('desktop', 'ext', 'topo', location + '.topo.json')
+  response = StreamingHttpResponse(streaming_content=staticfiles_storage.open(file_path))
+  #//return settings.STATIC_URL + path
+  return response
