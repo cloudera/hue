@@ -1,4 +1,5 @@
 /desktop/core/src/desktop/js/ext/**
+/desktop/core/src/desktop/js/ko/bindings/charts/mapchart/topo/**
 /desktop/core/src/desktop/js/parse/globalSearchParser.js
 /desktop/core/src/desktop/js/parse/solrFormulaParser.js
 /desktop/core/src/desktop/js/parse/solrQueryParser.js

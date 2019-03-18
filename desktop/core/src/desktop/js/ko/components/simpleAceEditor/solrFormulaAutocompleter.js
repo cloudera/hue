@@ -595,11 +595,11 @@ class SolrFormulaAutocompleter {
       self.editor.getTextAfterCursor()
     );
     self.suggestions.update(parseResult);
-  };
+  }
 
   parse(value) {
     return solrFormulaParser.parseSolrFormula(value);
-  };
+  }
 }
 
 export default SolrFormulaAutocompleter;

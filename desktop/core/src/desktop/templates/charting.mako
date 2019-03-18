@@ -39,22 +39,6 @@ from desktop import conf
   <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
-  <script src="${ static('desktop/js/nv.d3.js') }"></script>
-  <script src="${ static('desktop/ext/js/topojson.v1.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/world.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/usa.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/chn.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/bra.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/can.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/ind.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/gbr.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/ita.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/fra.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/deu.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/jpn.topo.js') }"></script>
-  <script src="${ static('desktop/ext/js/topo/aus.topo.js') }"></script>
-
-  <script src="${ static('desktop/js/nv.d3.datamaps.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.legend.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.multiBarWithBrushChart.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.lineWithBrushChart.js') }"></script>

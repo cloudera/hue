@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import ko from 'knockout';
 import komapping from 'knockout.mapping';
+import { markdown } from 'markdown';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
@@ -24,10 +25,9 @@ import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import { markdown } from 'markdown';
-
-import Session from 'apps/notebook/session';
 import Result from 'apps/notebook/result';
+import Session from 'apps/notebook/session';
+import sqlStatementsParser from 'parse/sqlStatementsParser';
 
 const NOTEBOOK_MAPPING = {
   ignore: [

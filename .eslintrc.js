@@ -10,8 +10,7 @@ const hueGlobals = [
   'USER_HOME_DIR', 'WorkerGlobalScope',
 
   // other misc
-  'ace', 'Autocompleter', 'CodeMirror', 'Datamap',  'HueGeo', 'impalaDagre', 'less', 'MediumEditor', 'moment',
-  'nv', 'Plotly', 'Role', 'sqlStatementsParser', 'trackOnGA',
+  'ace', 'CodeMirror', 'HueGeo', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Plotly', 'Role', 'trackOnGA',
 
   // jasmine
   'afterAll', 'afterEach', 'beforeAll', 'beforeEach', 'describe', 'expect', 'fail', 'fdescribe', 'fit', 'it', 'jasmine',
