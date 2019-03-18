@@ -15,7 +15,14 @@ the Hue environment.
 
 New website:
 
-Install https://gohugo.io/getting-started/quick-start/
+Install https://gohugo.io/getting-started/quick-start/.
+
+Develop:
+
+    hugo serve
+
+Release:
+
 Make sure the base URL is correct:
 
     cd docs/docs-site
