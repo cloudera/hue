@@ -87,6 +87,7 @@ window.huePubSub = huePubSub;
 window.hueUtils = hueUtils;
 window.I18n = I18n;
 window.localforage = localforage;
+window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.nv = nv;
 window.page = page;
 window.PigFunctions = PigFunctions;
