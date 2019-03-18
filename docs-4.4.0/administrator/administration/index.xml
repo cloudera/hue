@@ -11,5 +11,46 @@
 	<atom:link href="http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/index.xml" rel="self" type="application/rss+xml" />
     
     
+    <item>
+      <title>Reference Architecture</title>
+      <link>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/reference/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:09 -0700</pubDate>
+      
+      <guid>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/reference/</guid>
+      <description>A recommended setup consists in:
+ 2 Hues and 1 Load Balancer Databases: MySQL InnoDB, PostgreSQL, Oracle Authentication: LDAP or Username/Passord  Monitoring Performing a GET /desktop/debug/is_alive will return a 200 response if running.
+Load Balancers Hue is often run with:
+ Cherrypy with Httpd Apache mod Python NGINX  Task Server The task server is currently a work in progress to outsource all the blocking or resource intensive operations outside of the API server.</description>
+    </item>
+    
+    <item>
+      <title>Operations</title>
+      <link>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/operations/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:09 -0700</pubDate>
+      
+      <guid>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/operations/</guid>
+      <description>Quick Start Wizard The Quick Start wizard allows you to perform the following Hue setup operations by clicking the tab of each step or sequentially by clicking Next in each screen:
+ Check Configuration validates your Hue configuration. It will note any potential misconfiguration and provide hints as to how to fix them. You can edit the configuration file described in the next section or use Cloudera Manager, if installed, to manage your changes.</description>
+    </item>
+    
+    <item>
+      <title>User Management</title>
+      <link>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/user-management/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:09 -0700</pubDate>
+      
+      <guid>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/user-management/</guid>
+      <description>The User Admin application lets a superuser add, delete, and manage Hue users and groups, and configure group permissions. Superusers can add users and groups individually, or import them from an LDAP directory. Group permissions define the Hue applications visible to group members when they log into Hue and the application features available to them.
+Click the Hue Administration icon in the top right navigation bar under your username.</description>
+    </item>
+    
+    <item>
+      <title>Database</title>
+      <link>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/database/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:09 -0700</pubDate>
+      
+      <guid>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/database/</guid>
+      <description>Hue requires a SQL database to store small amounts of data, including user account information as well as history of job submissions and Hive queries. By default, Hue is configured to use the embedded database SQLite for this purpose, and should require no configuration or management by the administrator. However, MySQL is the recommended database to use. This section contains instructions for configuring Hue to access MySQL and other databases.</description>
+    </item>
+    
   </channel>
 </rss>

@@ -173,6 +173,11 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/reference/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/docs-4.4.0/administrator/connectors/editor/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
@@ -218,6 +223,11 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/operations/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/docs-4.4.0/user/editor/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
@@ -248,6 +258,11 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/user-management/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/docs-4.4.0/administrator/installation/docker/</loc>
     <lastmod>2019-03-13T18:28:08-07:00</lastmod>
   </url>
@@ -264,6 +279,11 @@
   
   <url>
     <loc>http://cloudera.github.io/hue/docs-4.4.0/user/browsers/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://cloudera.github.io/hue/docs-4.4.0/administrator/administration/database/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   
