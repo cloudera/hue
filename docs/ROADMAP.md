@@ -20,7 +20,7 @@ High Level Roadmap
 * [ ] Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
 * [x] Web Server [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 * [ ] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
-* [ ] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
+* [x] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
 * [ ] Public REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
 * [ ] Git integration [HUE-951](https://issues.cloudera.org/browse/HUE-951)
 
