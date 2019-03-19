@@ -104,21 +104,21 @@ class JobBrowserPanel {
 
     let lastYarnBrowserRequest = null;
     const checkYarnBrowserStatus = function() {
-      return $.post(
-        '/jobbrowser/jobs/',
-        {
-          format: 'json',
-          state: 'running',
-          user: window.LOGGED_USERNAME
-        },
-        data => {
+      return $.post('/jobbrowser/jobs/', {
+        format: 'json',
+        state: 'running',
+        user: window.LOGGED_USERNAME
+      })
+        .done(data => {
           if (data != null && data.jobs != null) {
             huePubSub.publish('jobbrowser.data', data.jobs);
             self.jobCounts()['yarn'] = data.jobs.length;
             self.jobCounts.valueHasMutated();
           }
-        }
-      );
+        })
+        .fail(response => {
+          console.log(response);
+        });
     };
     let lastScheduleBrowserRequest = undefined;
     const checkScheduleBrowserStatus = function() {

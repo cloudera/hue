@@ -37,7 +37,11 @@ class OnePageViewModel {
     self.getActiveAppViewModel = function(callback) {
       const checkInterval = window.setInterval(() => {
         const $koElement = $('#' + self.currentApp() + 'Components');
-        if ($koElement.length > 0 && ko.dataFor($koElement[0])) {
+        if (
+          $koElement.length > 0 &&
+          ko.dataFor($koElement[0]) &&
+          !(ko.dataFor($koElement[0]) instanceof OnePageViewModel)
+        ) {
           window.clearInterval(checkInterval);
           callback(ko.dataFor($koElement[0]));
         }
@@ -157,16 +161,6 @@ class OnePageViewModel {
     });
 
     const loadScript = function(scriptUrl) {
-      if (scriptUrl.indexOf('-bundle') !== -1) {
-        const s = document.createElement('script');
-        s.src = scriptUrl;
-        s.type = 'text/javascript';
-        s.async = false;
-        document.getElementsByTagName('head')[0].appendChild(s);
-        return $.Deferred()
-          .resolve({ url: scriptUrl, head: true })
-          .promise();
-      }
       const deferred = $.Deferred();
       $.ajax({
         url: scriptUrl,
