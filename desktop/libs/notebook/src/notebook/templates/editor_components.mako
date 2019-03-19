@@ -133,7 +133,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       <div class="nav-collapse">
         <ul class="nav editor-nav">
-          <li class="app-header">
+          <li class="app-header" style="display:none" data-bind="visible: true">
             <!-- ko if: editorMode -->
               % if IS_EMBEDDED.get():
                 <span>
