@@ -370,7 +370,7 @@ class EditorViewModel {
 
     self.availableSnippets = komapping.fromJS(options.languages);
 
-    self.editorMode = ko.observable(options.mode == 'editor');
+    self.editorMode = ko.observable(options.mode === 'editor');
 
     self.getSnippetViewSettings = function(snippetType) {
       if (options.snippetViewSettings[snippetType]) {
