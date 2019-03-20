@@ -62,12 +62,12 @@ def has_workload_analytics():
   return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
 
 
-def get_navigator_url():
+def get_catalog_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
 def has_catalog(user):
   from desktop.auth.backend import is_admin
-  return bool(get_navigator_url() and get_navigator_auth_password()) \
+  return bool(get_catalog_url() and get_navigator_auth_password()) \
       and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
