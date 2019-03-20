@@ -264,7 +264,7 @@ def get_navigator_saml_password():
   return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
 
 
-def has_navigator_file_search(user):
+def has_catalog_file_search(user):
   return has_navigator(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
 
 
