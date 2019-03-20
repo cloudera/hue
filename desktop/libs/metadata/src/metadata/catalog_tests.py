@@ -31,7 +31,7 @@ from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from metadata import conf
-from metadata.conf import has_navigator, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
+from metadata.conf import has_catalog, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.catalog_api import _augment_highlighting
 from metadata.catalog.navigator_client import NavigatorApi
 
@@ -49,7 +49,7 @@ class TestNavigator(object):
     add_to_group('test')
     grant_access("test", "test", "metadata")
 
-    if not is_live_cluster() or not has_navigator(cls.user):
+    if not is_live_cluster() or not has_catalog(cls.user):
       raise SkipTest
 
     cls.api = NavigatorApi(cls.user)
