@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext as _
 
 from filebrowser.conf import SHOW_UPLOAD_BUTTON
-from metadata.conf import has_navigator, OPTIMIZER
+from metadata.conf import has_catalog, OPTIMIZER
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
 

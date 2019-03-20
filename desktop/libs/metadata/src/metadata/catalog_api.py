@@ -32,7 +32,7 @@ from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.catalog.base import get_api
 from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
-from metadata.conf import has_navigator, NAVIGATOR, has_catalog_file_search
+from metadata.conf import has_catalog, NAVIGATOR, has_catalog_file_search
 
 
 LOG = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ def error_handler(view_fn):
     }
 
     try:
-      if has_navigator(args[0].user):
+      if has_catalog(args[0].user):
         return view_fn(*args, **kwargs)
       else:
         raise MetadataApiException('Navigator API is not configured.')

@@ -65,7 +65,7 @@ def has_workload_analytics():
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
-def has_navigator(user):
+def has_catalog(user):
   from desktop.auth.backend import is_admin
   return bool(get_navigator_url() and get_navigator_auth_password()) \
       and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
@@ -265,7 +265,7 @@ def get_navigator_saml_password():
 
 
 def has_catalog_file_search(user):
-  return has_navigator(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
+  return has_catalog(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
 
 
 NAVIGATOR = ConfigSection(
