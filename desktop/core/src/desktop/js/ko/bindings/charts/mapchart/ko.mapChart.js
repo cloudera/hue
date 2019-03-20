@@ -21,6 +21,7 @@ import nv from 'ext/nv.d3.1.1.15b.custom';
 import Datamap from './datamap';
 import huePubSub from 'utils/huePubSub';
 import HueColors from 'utils/hueColors';
+import HueGeo from 'utils/hueGeo';
 
 ko.bindingHandlers.mapChart = {
   render: function(element, valueAccessor) {
@@ -217,7 +218,6 @@ ko.bindingHandlers.mapChart = {
       let _map = null;
 
       function createDatamap(element, options, fills, mapData, nonCountries, mapHovers) {
-        console.log('createDatamap');
         _map = new Datamap({
           element: element,
           fills: fills,
@@ -327,11 +327,9 @@ ko.bindingHandlers.mapChart = {
     $element.data('drawThrottle', timeout);
   },
   init: function(element, valueAccessor) {
-    console.log('init');
     ko.bindingHandlers.mapChart.render(element, valueAccessor);
   },
   update: function(element, valueAccessor, allBindingsAccessor) {
-    console.log('update');
     if (typeof allBindingsAccessor().mapChart.visible != 'undefined') {
       if (
         (typeof allBindingsAccessor().mapChart.visible == 'boolean' &&

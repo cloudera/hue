@@ -24,7 +24,6 @@
 %>
 
 <%namespace name="assist" file="/assist.mako" />
-<%namespace name="charting" file="/charting.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
@@ -1121,11 +1120,8 @@ ${ assist.assistPanel() }
 </style>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
-
-${ charting.import_charts() }
 
 <script type="text/javascript">
 

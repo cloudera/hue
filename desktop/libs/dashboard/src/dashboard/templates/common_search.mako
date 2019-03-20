@@ -3063,7 +3063,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <link rel="stylesheet" href="${ static('dashboard/css/search_mobile.css') }">
 %endif
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.gridster.min.css') }">
 
 ${ dashboard.import_layout(True) }

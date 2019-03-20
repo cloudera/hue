@@ -31,7 +31,6 @@ if USE_NEW_EDITOR.get():
   home_url = url('desktop_views_home2')
 %>
 
-<%namespace name="charting" file="/charting.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
@@ -161,7 +160,6 @@ if USE_NEW_EDITOR.get():
 
   <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
-  ${ charting.import_charts() }
   ${ koComponents.all() }
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif

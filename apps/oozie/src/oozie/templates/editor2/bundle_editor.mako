@@ -258,7 +258,6 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/coordinator-editor.css') }">
 

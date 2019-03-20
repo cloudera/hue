@@ -126,9 +126,6 @@ if USE_NEW_EDITOR.get():
     ace.config.set("basePath", "/static/desktop/js/ace");
   </script>
 
-  <%namespace name="charting" file="/charting.mako" />
-  ${ charting.import_charts() }
-
   <script type="text/javascript">
 
     moment.locale(window.navigator.userLanguage || window.navigator.language);
