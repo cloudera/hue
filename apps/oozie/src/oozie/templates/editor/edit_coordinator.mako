@@ -522,7 +522,7 @@ ${ layout.menubar(section='coordinators') }
       % endif
 
       $("#datasets-btn").click(function () {
-        $('[href=#datasets]').tab('show');
+        $('[href=\'#datasets\']').tab('show');
       });
 
       $('#add-dataset-btn').click(function () {
@@ -720,7 +720,7 @@ ${ layout.menubar(section='coordinators') }
           $("#nextBtn").addClass("disabled");
         }
         $("a.step").parent().removeClass("active");
-        $("a.step[href=#" + step + "]").parent().addClass("active");
+        $("a.step[href='#" + step + "']").parent().addClass("active");
         $(".stepDetails").hide();
         $("#" + step).show();
       }

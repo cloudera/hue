@@ -1521,20 +1521,20 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
           $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
-          $("select[name=user]").val(self.selectedFile().stats.user);
+          $("select[name='user']").val(self.selectedFile().stats.user);
 
           $("#chownForm input[name='group_other']").removeClass("fieldError");
           $("#chownForm input[name='user_other']").removeClass("fieldError");
           $("#chownRequired").hide();
 
-          if ($("select[name=group] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
-            $("select[name=group]").val(self.selectedFile().stats.group);
+          if ($("select[name='group'] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
+            $("select[name='group']").val(self.selectedFile().stats.group);
           } else {
-            $("select[name=group]").val("__other__");
-            $("input[name=group_other]").val(self.selectedFile().stats.group);
+            $("select[name='group']").val("__other__");
+            $("input[name='group_other']").val(self.selectedFile().stats.group);
           }
 
-          $("select[name=group]").change();
+          $("select[name='group']").change();
 
           $("#changeOwnerModal").modal({
             keyboard: true,
@@ -1599,9 +1599,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
           for (var i = 0; i < permissions.length; i++) {
             if (mode & 1) {
-              $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", true);
+              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", true);
             } else {
-              $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
+              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", false);
             }
             mode >>>= 1;
           }
