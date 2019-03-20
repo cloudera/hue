@@ -495,12 +495,12 @@ function impalaDagre(id) {
       cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-filter');
       var metricsMax = getMetricsMax() ? ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')' : '';
       cpuTimelineTitle.append('h5').text(window.I18n('Top Nodes') + metricsMax);
-      var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable', true);
+      var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable ncolumn', true);
       var cpuTimelineSectionTableRows = cpuTimelineSectionTable.selectAll('tr').data(topNodes).enter().append('tr').on('click', function (node) {
         select(getId(node.key));
         zoomToNode(node.key);
       });
-      cpuTimelineSectionTableRows.append('td').html(function (time) { return '' + getIcon(time.icon) + '<div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTableRows.append('td').html(function (time) { return '' + getIcon(time.icon) + '<span class="metric-name" title="' + time.name + '">' + time.name + '</span>'; });
       cpuTimelineSectionTableRows.append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
@@ -523,7 +523,7 @@ function impalaDagre(id) {
       cpuTimelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('column', true);
-      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><div class="metric-name" title="' + time.name + (time.message ? ': ' + time.message : '') + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><span class="metric-name" title="' + time.name + (time.message ? ': ' + time.message : '') + '">' + time.name + '</span>'; });
       cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
   }
@@ -562,7 +562,7 @@ function impalaDagre(id) {
       var timelineHosts = Object.keys(node.timeline.hosts).sort().map(function (host) { return node.timeline.hosts[host]; });
       var timelineSectionTableCols = timelineSectionTableBody.selectAll('tr').data(timelineHosts);
       var timelineSectionTableCol0 = timelineSectionTableBody.selectAll('tr').data(timelineHosts.slice(0,1));
-      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time, index) { return '<div class="legend-icon" style="background-color:' + colors[index % colors.length]+' "></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time, index) { return '<div class="legend-icon" style="background-color:' + colors[index % colors.length]+' "></div><span class="metric-name" title="' + time.name + '">' + time.name + '</span>'; });
       timelineSectionTableCols.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
@@ -674,9 +674,9 @@ function impalaDagre(id) {
       // Build the label for the node from the name and the detail
       var html = "<div attr-id='" + state.name + "'>";
       html += getIcon(state.icon);
-      html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
+      html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span>";
       var aboveAverageClass = state.max_time_val > avgStates ? 'above-average' : '';
-      html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
+      html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span><br/>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
       if (state.predicates) {
         html += "<span class='detail'>" + state.predicates + "</span><br/>";

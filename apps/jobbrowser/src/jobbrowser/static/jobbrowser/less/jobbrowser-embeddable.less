@@ -99,9 +99,7 @@
       font-weight: normal;
     }
     .metric {
-      position: absolute;
-      top: 0;
-      right: 0;
+      float: right;
     }
     .name {
       text-transform: capitalize;
@@ -213,9 +211,6 @@
       fill: @cui-gray-800;
       font-size: inherit;
     }
-    foreignObject > div {
-      position: relative;
-    }
     .above-average {
       font-weight: bold;
     }
@@ -311,7 +306,6 @@
         display: inline-block;
       }
       .metric-name {
-        display: inline-block;
         padding-left: 2px;
       }
       .details-section .timeline {
@@ -321,7 +315,7 @@
         cursor: pointer;
       }
       table.clickable tr:hover {
-        background-color: @cui-purple-gray-050;
+        background-color: @cui-purple-gray-050 !important;
       }
       table tr td {
         color: @cui-gray-800;
@@ -334,7 +328,7 @@
       table thead tr:nth-child(odd) {
         background-color:@cui-white;
       }
-      table tr:nth-child(odd) {
+      table.ncolumn tr:nth-child(odd) {
         background-color: @cui-gray-050;
       }
       table.column {
