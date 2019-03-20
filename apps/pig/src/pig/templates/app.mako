@@ -1089,8 +1089,8 @@ ${ commonshare() | n,unicode }
     });
 
     $(document).on("updateTooltips", function () {
-      $("a[rel=tooltip]").tooltip("destroy");
-      $("a[rel=tooltip]").tooltip();
+      $("a[rel='tooltip']").tooltip("destroy");
+      $("a[rel='tooltip']").tooltip();
     });
 
     $(document).on("saving", function () {
