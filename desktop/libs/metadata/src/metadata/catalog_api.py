@@ -366,7 +366,7 @@ def delete_tags(request):
   }
 
   if not is_allowed:
-    raise Exception("The user does not have proper Hue permissions to delete %s tags." %  % interface.title())
+    raise Exception("The user does not have proper Hue permissions to delete %s tags." % interface.title())
   if not entity_id:
     raise Exception("Missing required parameter 'id' in delete_tags API.")
   if not tags:
