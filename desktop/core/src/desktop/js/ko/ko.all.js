@@ -24,8 +24,10 @@ import 'knockout.validation';
 import 'ext/ko.editable.custom';
 import 'ext/ko.selectize.custom';
 
+// import 'ko/bindings/charts/plotly/ko.plotly'; // The Plotly chart replacement
 import 'ko/bindings/charts/mapchart/ko.mapChart';
 import 'ko/bindings/charts/ko.barChart';
+import 'ko/bindings/charts/ko.leafletMapChart';
 import 'ko/bindings/charts/ko.lineChart';
 import 'ko/bindings/charts/ko.partitionChart';
 import 'ko/bindings/charts/ko.pieChart';
@@ -94,7 +96,6 @@ import 'ko/bindings/ko.numericTextInput';
 import 'ko/bindings/ko.onClickOutside';
 import 'ko/bindings/ko.oneClickSelect';
 import 'ko/bindings/ko.parseArguments';
-import 'ko/bindings/ko.plotly';
 import 'ko/bindings/ko.publish';
 import 'ko/bindings/ko.readOnlyAce';
 import 'ko/bindings/ko.resizable';
