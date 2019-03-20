@@ -20,10 +20,7 @@ import json
 import logging
 import re
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+from collections import OrderedDict
 
 from django.http import Http404
 from django.utils.html import escape
@@ -35,7 +32,7 @@ from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.catalog.base import get_api
 from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
-from metadata.conf import has_navigator, NAVIGATOR, has_navigator_file_search
+from metadata.conf import has_navigator, NAVIGATOR, has_catalog_file_search
 
 
 LOG = logging.getLogger(__name__)
@@ -94,7 +91,7 @@ def search_entities_interactive(request):
 
   api = get_api(request=request, interface=interface)
 
-  if sources and not has_navigator_file_search(request.user):
+  if sources and not has_catalog_file_search(request.user):
     sources = ['sql']
 
   response = api.search_entities_interactive(
@@ -140,7 +137,7 @@ def search_entities(request):
   limit = int(request.POST.get('limit', 100))
   raw_query = request.POST.get('raw_query', False)
   sources = json.loads(request.POST.get('sources') or '[]')
-  if sources and not has_navigator_file_search(request.user):
+  if sources and not has_catalog_file_search(request.user):
     sources = ['sql']
 
   query_s = query_s.strip() or '*'
