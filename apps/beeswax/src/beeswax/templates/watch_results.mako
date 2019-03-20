@@ -71,8 +71,6 @@ ${layout.menubar(section='query')}
     height: 400px;
   }
 </style>
-<link href="${ static('desktop/ext/css/leaflet.css') }" rel="stylesheet">
-<link href="${ static('desktop/ext/css/leaflet.markercluster.css') }" rel="stylesheet">
 
 <div class="container-fluid">
   <div id="expand"><i class="fa fa-chevron-right" style="color: #FFFFFF"></i></div>

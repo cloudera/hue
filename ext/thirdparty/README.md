@@ -174,8 +174,9 @@ Frontend third party dependencies (some checked in and some via npm)
 |Knockout Validation|2.0.3|MIT|https://github.com/Knockout-Contrib/Knockout-Validation|
 |KnockoutJS|3.4.2|MIT|https://github.com/knockout/knockout|
 |Leaflet|0.7.2|BSD|https://github.com/Leaflet/Leaflet|
-|Leaflet Heat|?|BSD|https://github.com/mourner/simpleheat|
-|Leaflet ZoomBox|?|ISC|https://github.com/consbio/Leaflet.ZoomBox|
+|Leaflet Heat|0.2.0|BSD|https://github.com/mourner/simpleheat|
+|Leaflet Marker cluster|0.5.0|MIT|https://github.com/Leaflet/Leaflet.markercluster|
+|Leaflet ZoomBox|0.5.1|ISC|https://github.com/consbio/Leaflet.ZoomBox|
 |LESS|3.9.0|Apache|https://github.com/less/less.js/|
 |Load Grunt Tasks|4.0.0|MIT|https://www.npmjs.com/package/load-grunt-tasks|
 |LocalForage|1.7.3|Apache|https://github.com/localForage/localForage|

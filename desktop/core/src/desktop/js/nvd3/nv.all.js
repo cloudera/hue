@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import nv from 'ext/nv.d3.1.1.15b.custom';
+import 'nvd3/nv.d3.growingDiscreteBar';
+import 'nvd3/nv.d3.growingDiscreteBarChart';
+import 'nvd3/nv.d3.growingMultiBar';
+import 'nvd3/nv.d3.growingMultiBarChart';
+import 'nvd3/nv.d3.growingPie';
+import 'nvd3/nv.d3.growingPieChart';
+import 'nvd3/nv.d3.legend';
+import 'nvd3/nv.d3.lineWithBrushChart';
+import 'nvd3/nv.d3.multiBarWithBrushChart';
 
-// TODO: Depends on Plotly
-
-ko.bindingHandlers.plotly = {
-  init: function(element, valueAccessor) {
-    const options = valueAccessor() || {};
-    if (typeof Plotly !== 'undefined') {
-      Plotly.plot(element, options.data || [], options.layout || {}, { displaylogo: false });
-    }
-  }
-};
+export default nv;
