@@ -53,7 +53,7 @@ def error_handler(view_fn):
       if has_catalog(args[0].user):
         return view_fn(*args, **kwargs)
       else:
-        raise MetadataApiException('Navigator API is not configured.')
+        raise MetadataApiException('Catalog API is not configured.')
     except Http404, e:
       raise e
     except CatalogEntityDoesNotExistException, e:
@@ -334,16 +334,16 @@ def add_tags(request):
 
   request.audit = {
     'allowed': is_allowed,
-    'operation': 'NAVIGATOR_ADD_TAG',
+    'operation': '%s_ADD_TAG' % interface.upper(),
     'operationText': 'Adding tags %s to entity %s' % (tags, entity_id)
   }
 
   if not is_allowed:
-    raise Exception("The user does not have proper Hue permissions to add Navigator tags.")
+    raise Exception("The user does not have proper Hue permissions to add %s tags." % interface.title())
   if not entity_id:
-    raise Exception("Missing required parameter 'id' for the Hue add_tags API.")
+    raise Exception("Missing required parameter 'id' in add_tags API.")
   if not tags:
-    raise Exception("Missing required parameter 'tags' for the Hue add_tags API.")
+    raise Exception("Missing required parameter 'tags' in add_tags API.")
 
   return JsonResponse(api.add_tags(entity_id, tags))
 
@@ -361,16 +361,16 @@ def delete_tags(request):
 
   request.audit = {
     'allowed': is_allowed,
-    'operation': 'NAVIGATOR_DELETE_TAG',
+    'operation': '%s_DELETE_TAG' % interface.upper(),
     'operationText': 'Removing tags %s to entity %s' % (tags, entity_id)
   }
 
   if not is_allowed:
-    raise Exception("The user does not have proper Hue permissions to delete Navigator tags.")
+    raise Exception("The user does not have proper Hue permissions to delete %s tags." %  % interface.title())
   if not entity_id:
-    raise Exception("Missing required parameter 'id' for the Hue delete_tags API.")
+    raise Exception("Missing required parameter 'id' in delete_tags API.")
   if not tags:
-    raise Exception("Missing required parameter 'tags' for the Hue delete_tags API.")
+    raise Exception("Missing required parameter 'tags' in delete_tags API.")
 
   return JsonResponse(api.delete_tags(entity_id, tags))
 
@@ -390,18 +390,18 @@ def update_properties(request):
 
   request.audit = {
     'allowed': is_allowed,
-    'operation': 'NAVIGATOR_UPDATE_PROPERTIES',
+    'operation': '%s_UPDATE_PROPERTIES' % interface.upper(),
     'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (modified_custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
   }
 
   if not entity_id:
     # TODO: raise HueApiException(message="Missing required parameter 'id' for update_properties", source="Hue")
     # source so the user knows which service that failed right away, in UI: "[source] responded with error: [message]"
-    raise Exception("Missing required parameter 'id' for the Hue update_properties API.")
+    raise Exception("Missing required parameter 'id' in update_properties API.")
 
   if not is_allowed:
     # TODO: HueAuthException?
-    raise Exception("The user does not have proper Hue permissions to update Navigator properties.")
+    raise Exception("The user does not have proper Hue permissions to update %s properties." % interface.title())
 
   return JsonResponse(api.update_properties(entity_id, properties, modified_custom_metadata, deleted_custom_metadata_keys))
 
@@ -421,7 +421,7 @@ def delete_metadata_properties(request):
 
   request.audit = {
     'allowed': is_allowed,
-    'operation': 'NAVIGATOR_DELETE_METADATA_PROPERTIES',
+    'operation': '%s_DELETE_METADATA_PROPERTIES' % interface.upper(),
     'operationText': 'Deleting metadata %s of entity %s' % (keys, entity_id)
   }
 
@@ -478,7 +478,7 @@ def create_namespace(request):
 
   request.audit = {
     'allowed': request.user.has_hue_permission(action='write', app='metadata'),
-    'operation': 'NAVIGATOR_CREATE_NAMESPACE',
+    'operation': '%s_CREATE_NAMESPACE' % interface.upper(),
     'operationText': 'Creating namespace %s' % namespace
   }
 
