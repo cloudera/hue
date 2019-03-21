@@ -118,7 +118,7 @@ class Notebook(object):
         p1 = match.group(1)
         p2 = match.group(2)
         variable = variables[p2]
-        value = variable['value']
+        value = str(variable['value'])
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
 
       return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
