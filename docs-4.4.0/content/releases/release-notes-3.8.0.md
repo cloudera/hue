@@ -1,0 +1,1352 @@
+---
+title: "3.8.0"
+date: 2019-03-13T18:28:08-07:00
+draft: false
+weight: -3080
+tags: ['skipIndexing']
+---
+
+### Hue v3.8.0, released April 24th 2015
+
+
+Hue, http://gethue.com, is an open source Web UI for easily doing Big Data analysis with Hadoop.
+
+Its mainly features:
+
+* Editors for Hive, Impala, Spark and Pig
+* Search Dashboards for querying, exploring, visualizing data and with Solr
+* Hadoop File, Job and HBase Browsers
+
+On top of that, a SDK is available for creating new apps integrated with Hadoop.
+
+More user and developer documentation is available at http://gethue.com.
+
+
+Latest Notable Features
+-----------------------
+
+The complete list and video demos are on [Hue 3.8 with an Oozie Editor revamp, better performances & improved Spark UI is out!
+](http://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/).
+
+Note
+
+If you built custom apps, follow the [upgrade guide](http://gethue.com/developer-guide-on-upgrading-apps-for-django-1-6/)!
+
+Oozie Editor
+
+* New look and less knowledge of Oozie required
+* Importing / exporting workflows is easier
+* Workflows supports tens of new functionalities
+* Support of the new HiveServer2 and Spark Action
+* Coordinator user experience is simpler
+
+Oozie Dashboard
+
+* Easy way to differentiate workflows submitted manually or by coordinators
+* Sub-workflow links to corresponding workflows and logs
+* Update end time of coordinator
+* Hive jobs ids are visible
+
+Spark Notebook (Beta)
+
+* New REST Spark Job Server
+* Notebook Web UI
+* Scala
+* Python
+* SQL
+* YARN cluster
+
+Stability/performance
+
+* Hue HA
+* Static files caching
+* Hive 1.1 support
+* Major upgrade of Django 1.6
+* Run with Apache Server
+* Fixed a number of deadlocks
+* Fixed some non-standard Oracle DB issues
+
+Search
+
+* Regular users can now also create dashboards
+* Range & Up facet
+* 2D maps
+* Multiple widgets using the same fields
+* Enable only the Search app
+* Export and import dashboard
+
+Security
+
+* Sensitive data redaction in logs and SQL editors (PCI)
+* HTTPS/SSL configuration
+* Use Impala/Hive with LDAP authentication and SSL
+* HCatalog with Pig Editor and security
+* SAML 2.0 support
+
+HBase
+
+* Impersonation with or without Kerberos
+
+
+
+Compatibility
+-------------
+
+Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL 5 and 6), and Ubuntu 10.04, 12.04 and 14.04.
+
+Tested with CDH5. Specifically:
+
+- Hadoop 0.20 / 2.6.0
+- Hive 1.1
+- Oozie 4.1
+- HBase 1.0
+- Pig 0.12
+- Impala 2.2
+- Solr 4.10
+- Sqoop2 1.99.5
+
+These minimum versions should work (not tested):
+
+- Hadoop 0.20 / 1.2.0 / 2.0.0
+- Hive 0.12.0
+- Oozie 3.2
+- HBase 0.92
+- Pig 0.8
+- Impala 1.0
+- Solr 3.6
+- Sqoop2 1.99.3
+
+Supported Browsers:
+
+* Windows: Chrome, Firefox 17+, Internet Explorer 9+, Safari 5+
+* Linux : Chrome, Firefox 17+
+* Mac: Chrome, Firefox 17+, Safari 5+
+
+
+Runs with Python 2.6.5+
+
+Note: CentOS 5 and RHEL 5 requires EPEL python 2.6 package.
+
+
+List of 1121 Commits
+-------------------
+
+* d4c48e9 [doc] 3.8 release notes
+* 5eb812c [core] Bump version to 3.8
+* 7289d49 HUE-2654: Update virtualenv: BIGTOP-1635
+* 747c924 [spark] Bumping Spark create session timeout to 2 minutes
+* 040d52a [spark] Send all the snippet to close when leaving the notebook
+* bc4d33d [jb] Support killing Spark jobs
+* 822afd4 [hadoop] Handle when the standby YARN RM fails back to the master RM
+* ed44419 [hadoop] Make sure to use LOG.exception when handling exceptions
+* 0ea1a0e HUE-2638 [livy] Fix running spark commands by setting spark.repl.class.uri
+* 41722d2 [oozie] UX fixes for Firefox and IE on workflow editor
+* 518e67b [oozie] Do not show sub-workflow main properties when expanding node
+* 3e29581 [oozie] Warning about using HBase credentials
+* f0126c7 [oozie] Fix workflow actions with files
+* 2672423 [oozie] Add credentials default to the examples
+* 6fe5081 Remove executable permissions for static files
+* 0ad436f [fb] Fix appending to existing file if upload is interrupted
+* f1abd63 [spark] Open notebooks directly from the homepage
+* b5451ca HUE-2640 [spark] Notebooks are slowed down by unnecessary jsonifies
+* cfda484 HUE-2639 [spark] Only propose changing snippet type in edit mode
+* 8587786 [livy] Automatically import the spark context as "sc"
+* 5b811bd [hadoop] Follow ssl_cert_ca_verify for HDFS uploads
+* c028749 [core] Bump number of cherrypy threads to 40
+* fbfca95 [spark] Update Scala notebook example
+* 48cd324 [core] Remove the install all examples button
+* 9376f14 [desktop] Protect against get_default_mrcluster() returning None
+* 7800cd5 [tools] Add hue-review script for submitting code reviews
+* 8d89569 [hadoop] Default to always verifying certificates are signed.
+* 019f926 [oozie] Add config option ssl_cert_ca_verify
+* bd47eee [oozie] Log the full exceptions thrown from communicating with oozie
+* 833d962 [about, metastore, and desktop] Add blank config files
+* c254fc1 [desktop] Fix infinite loop in requests-kerberos when receiving 401
+* c72b524 [desktop] Upgrade requests to 2.6.0.
+* cbf4094 [oozie] Generate Workflow credentials properties
+* 9ab5054 [fb] Support viewing files with tabs
+* f8b5939 HUE-2630 [fb] Support filenames with spaces and parenthesis
+* 77f8408 [impala] Silence error messages due out of sync invalidate metadata
+* 852a1b4 [filebrowser] Show the last 10 paths in history
+* 4dcc95d [oozie] Generate Coordinator SLAs
+* 29146e1 [oozie] Generate Workflow SLAs
+* 19beda7 [oozie] Display and select available workflow credentials
+* a59392d [search] Remove unused argument in pairwise2 utils
+* 86d2ec5 [spark] Disable functionality of action buttons when no notebooks are selected
+* 87ca9ff [spark] Bulk copy and delete notebooks
+* a243de0 [hadoop] Make WebHdfs SSL certification verification configurable
+* 8494a15 [livy] Add server thread session spec
+* c9a5ecc [livy] Fix reporting spark exceptions
+* f4e975f [spark] Support for change snippet type on edit mode
+* 5aa9718 [hbase] Do not close transport when flushing as it resets the headers
+* dd5e278 [oozie] Open coordinator input paths in a new tab
+* e13d963 [spark] Added description editing to the UI
+* b4f14e7 [oozie] Preview HDFS links with the correct UTC start time
+* dca8124 [spark] Avoid result duplication on window resize
+* 2b8bb40 [spark] Add description field to the notebook
+* ebe3623 [livy] Ignore the dependency-reduced-pom.xml
+* e9629ba [spark] Make notebook name editable
+* 2ee3562 [spark] Reset results from sample notebook
+* cabd476 HUE-2595 [spark] Lighter POST calls without all the notebook data
+* 14cb2e8 [oozie] Space evenly the workflow parameters in the coordinator editor
+* ab7c87e [spark] Add an Notebook example with Python, Scala and SQL
+* 6a04452 [spark] Add permission checking for notebooks
+* 60111a7 [spark] Add example command infrastructure
+* b52de42 [oozie] Restyled workflow editor page
+* a6f3d4c [oozie] Restyled bundle editor page
+* 2016c4e [oozie] Restyled coordinator editor page
+* 5a66d31 [oozie] Add smart switching between editor and dashboard
+* a4d6c1d [oozie] Support / and space as separators for the coordinator dataset typeahead
+* 3c8f635 [oozie] Fix coordinator start and end time Z
+* 4259cc8 [oozie] Hide overflow of the wf, coord and bundle description
+* 351379d [oozie] Improve reliability of dropdown menu
+* 8c62255 [spark] Automatically run `hadoop classpath` and append to livy classpath
+* ec9b89b HUE-2562 [pig] Make example work with non admin
+* 35dedef [oozie] Provide Hive2 action HiveServer2 URL at runtime by default
+* 677f7c4 [oozie] Spark jar example was not added because of git ignore
+* 8de4cc5 [doc] Help command to fix setup for tarball install
+* 6927e00 [livy] Relocate jetty so it does not conflict with spark's jetty
+* 16784c7 HUE-2625 [oozie] Workflow dashboard completed table is being refreshed for nothing
+* 3c784c9 [oozie] Remove seconds from Coordinator from/to and add Z at the end
+* 5a4eb4f [oozie] Hide deployment dir on filechooser
+* a81b432 [oozie] Skip hdfsAutocomplete keydown handler
+* c18dd66 [oozie] Fix month rendering on parameters and input focus to the last char
+* f65e7d5 [jb] Provide a generic page for YARN apps other than Spark or MR
+* cd0e578 [oozie] Support editing description of workflows, coordinators, bundles
+* d100bb6 [security] Add LOG.exception to log any ignored sentry exceptions
+* f5e416f HUE-2623 [oozie] Add externalId link to the details tab in sub workflow action page
+* 2519e8a [search] Bump the max value of demo range facet to include all records
+* 2fa2a9d [search] Do not miss out values above the rounded max value of a range
+* 423b76a [search] Make corrrect the counts of an esc range facet
+* c02b2f5 [search] Display the name of the 2d dimension in map if non edit mode
+* ec5c3af [search] Update Apache log demo with latest widgets
+* da76d9a [search] Update Yelp dashboard with latest widgets
+* 7179a26 [search] Support numbers as 2nd dimension of gradient map
+* c14b4c2 [search] Remove Job collection and prettify Twitter dashboard
+* 10c8a7f [oozie] Adding new properties to the Oozie mini cluster
+* 1cefd92 [spark] Add an experimental config option to launch livy
+* 93455b8 [livy] Update spark version to 1.3.0-cdh5.5.0-SNAPSHOT
+* 92cef00 [spark] Make the livy-assembly.jar not include the maven version
+* de699c6 [oozie] Switch workflow integration tests to the new editor
+* 5c1a734 [oozie] Add a Fork Example with Pig and Sub-workflow
+* 3992bf3 [oozie] Adding a Bundle example to the New Editor
+* 5b5ce3d [oozie] Add an example of Coordinator to the New Editor
+* 2f84ea1 [oozie] Do not prompt for variables filled by coordinator datasets
+* 877c946 [oozie] Prefill HiveServer2 action with the real HiveServer2 address
+* 084eb56 [oozie] Add HiveServer2 example for the New Editor
+* cf45917 [core] Turn off database logging by default
+* 17c7863 [impala] Close invalidate metadata statements when installing the examples
+* 8c91ec7 [oozie] Add Spark Example for new Editor
+* 04ec871 [core] Sync imported workflow from the new Oozie Editor
+* f429cb8 [oozie] Fix workflow dashboard LastModified and Submission columns
+* e63dec6 [load-balancer] Don't expose the staticfile dirs by default
+* b776889 [load-balancer] Add example SSL configuration to nginx config
+* b22e3ab [load-balancer] Add static file caching to nginx config
+* 198e250 [desktop] ATOMIC_REQUESTS is a setting on the database config
+* d131f42 [search] Inline download results buttons
+* 9d7011b [oozie] Hide logs icon if logs are empty
+* 0d43b1e [desktop] Fix migrations for postgresql
+* 947eda8 [oozie] Make sure a subworklow gets its graph in the dashboard
+* 4ea0da8 [desktop and beeswax] Avoid race on Template.render
+* e10c758 [desktop] Allow Document2.uuid to be 36 characters long
+* 38dd834 [desktop] Django-1.6 deprecated TEMPLATE_DIRS not being a tuple
+* ceba427 [oozie] Disable current workflow as subworkflow from the workflow editor
+* 03858ab [oozie] Fix definition codemirror back button problem
+* 474f802 [oozie] Add Spark action XML template
+* feeb4a0 [oozie] Fixed minor UI glitches on the workflow editor
+* 6ced93d [oozie] Fix datepicker values on the submit coordinator popup
+* a0e09eb [oozie] Move the logs icon to every specific action
+* da6a84a [core] First pass of locatization for 3.8
+* 0f63a7f [oozie] manual filter bug fix for running table on workflow dashboard
+* 16125c7 [spark] Remove multi notebooks tabs for now
+* 3ab5853 [liboozie] Add tests to check for workflow action external id links
+* 920dd51 [core] Bumping Java Hadoop libs to 2.6
+* ccc9776 [desktop] Replace Python 2.7 subprocess.check_output with a 2.6-safe code
+* 0ba97c6 [desktop] Stop nose from trying to run tests from an abstract base class
+* 1df4c56 [livy] Handle the Error and NotStarted session states
+* c852455 [desktop] Add support SSL certificate passwords
+* c1ba9c4 [search] Updated empty dashboard colors
+* e7a7a15 [oozie] Hide graph from workflows with unavailable graph data
+* c621540 [oozie] Fixed action buttons with non selected items and bundle submission
+* 62c17ed [oozie] Support deploying the workflow of a subworkflow
+* bbd9fd6 [libsentry] Handle HA exception more properly
+* 1c0e1e3 [sentry] Do not error out when the group does not exist in Sentry
+* 36d7109 [oozie] Importing workflow with credentials
+* 002592e HUE-2281 [oozie] Dive into logs for Sub-Workflow action
+* 167df25 [oozie] Submit jobs from older version
+* e8da678 [oozie] Import the workspace of copied workflow
+* 6931e2d HUE-2499 [desktop] Allow passwords to be produced by a script
+* 46f8bc4 HUE-2392 [search] Allow multiple independent range facet on the same field
+* 7672b6d [search] Do not show +1 facet in Bar and Pie charts
+* b54ad6d HUE-2392 [search] Allow multiple independent field facet on the same field
+* 2ff30a6 [hbase] Adding back missing reset import
+* 8113609 [hbase] Examples installed from the UI should use the current user credentials
+* d7e4aaf [oozie] Updating Oozie tests with credentials
+* 5c852c0 [hbase] Decorating Thrift calls to set the doAs header
+* 0d1620e HUE-2603 [sqoop] Change labeling of jobs and links
+* 5c5c171 HUE-2412 [desktop] Work around Oracle not supporting `SELECT DISTINCT` with CLOBs
+* 9dd4e4e HUE-2597 [oozie] Link subworkflows from workflow inside a workflow
+* 0322f43 [hbase] Thrift util is using Thrift Socket when the transport mode is 'socket'
+* a04cd6e [desktop] Convert to the latest log redaction file format and add more tests
+* 687b09e [oozie] Enable saving an old workflow to the new format
+* a251576 [core] Removing the History documents from the home page
+* 57e5060 [oozie] Fix unit tests for TestEditor and TestCredentials
+* 082d63a HUE-2371 [sentry] Move privilege select2 to normal dropdown
+* f040261 [sentry] Merge two bindings for allowing of editing of a privilege
+* 65de378 [oozie] Fix workflow editor in non-viewer mode
+* f54f376 HUE-1899 [oozie] Also generate job.properties
+* f4e4c9a [oozie] Dashboard support for Bundle version 2
+* 5b9f4f4 [oozie] Support $ parameters in the job name in the editor
+* 08e9868 [core] Ignore case when searching or creating LDAP users
+* dd4bcba [hadoop] Read umask mode directly from the hdfs-site.xml
+* c82be3b [oozie] Live updates on the V2 dashboard
+* 253b955 [desktop] Remove the redundant database_logging option
+* e1195c6 [jobbrowser] Include info about the node each task ran on in task attempt page
+* abe5a7a [oozie] Update hive credentials to display correct principal when HS2 and HMS are on different hosts
+* 7c3b1a2 HUE-2579 [sqoop] Support new REST API attributes without breaking
+* 31d5d13 HUE-2596 [oozie] Adjust column width on dashboard
+* d18207d HUE-2596 [oozie] Restyled and simplified parent column on dashboard
+* e289d3d HUE-2596 [oozie] Add parent column on dashboard
+* e4555b0 [livy] Capture stdout in scala, add tests for scala and python
+* f46ee77 [livy] Simplify creating a scala/spark interpreter
+* d2568b0 [livy] Stop the python repl crashing hanging the livy-repl
+* c501318 [livy] Clean up some dead code
+* 8ec9dd0 HUE-2577 [search] Range setting widget does not update the model
+* c2e9d87 [search] Added legend to the discrete map chart
+* a797854 [search] Restyle automatic grid layout icon
+* c1947bf [search] Restyled dashboard previews
+* f209ea5 [search] Add filter bar in the magic layout template
+* 505be54 [hadoop] Turn on SSL certificate verification by default
+* af0c507 [beeswax] Connection to Hive/Beeswax does not need client certificates
+* 0f1e3ee [desktop] Return a broken path if we can't find a file
+* 07c455b [spark] Fix the Makefile to remove a circular dependency
+* 560f393 [oozie] Support for logs link on widgets
+* 8019ed0 [search] Improve discrete map color grouping and coding
+* 71b5e84 [oozie] Hide arrows on tab change on workflow dashboard
+* d4d5b3b HUE-2534 [hbase] Automatically detect configuration based on hbase-site.xml
+* a483647 HUE-2534 [hbase] Install the examples with the doas
+* b3cebec HUE-2534 [core] HTTP Thrift transport implementation
+* 108856a [sentry] Flip to use our version of Kazoo with Kerberos support
+* a1afc18 [zookeeper] Adding parameter for specifying zookeeper principal name
+* 1e49a50 [libsentry] Automatic failover to any available Sentry Server
+* 0ba8f30 [sentry] Do not spin endlessy when server cannot be contacted
+* 544857d [libsentry] HA support with Kazoo
+* 0491ffd [desktop] Update kazoo with with SASL
+* 6dac09c [desktop] Import kazoo-2.0 into ext-py
+* 5ffbe62 [oozie] Adding the Spark Action
+* cbf941c [search] Moved scope to properties
+* 3a64d10 [search] Improved scope dropdown CSS
+* 2d11028 [search] Restyle scope dropdown and alignment of the selected dimension
+* 7e99e58 [search] Show a default of 5 items on the 2d map widget
+* a790446 [search] Introduce discrete map for pivot data
+* de50e79 [search] Migrate map widget to use pivot facets
+* 24cbaca [search] Make examples visible with the new dashboard permissions
+* 485b43a HUE-1353 [search] Support for Collection Aliases
+* b74007f HUE-1987 [search] Dashboard level access for non admin
+* e5e30da [oozie] Move isSaving(false) to .always in the AJAX calls
+* 8f54840 [search] Fix Leaflet map z-index and edit form
+* f42ce43 [oozie] Disable save button while saving
+* db33754 HUE-2102 [oozie] Workflow with credentials can't be used with Coordinator
+* a9366b6 [oozie] Update workflow icons to work with static files
+* d0dfafa [desktop] Fix create_desktop_app for staticfiles
+* 6d8855c HUE-2417 [desktop] Move staticfiles into build/static
+* 3ba0690 HUE-2417 [tools] Integrate staticfiles into app_reg
+* df12969 HUE-2417 [desktop] Switch to CachedStaticFilesStorage, which appends a hash to the filenames
+* 46049b5 HUE-2417 [desktop] Fix help app to look in the right place for staticfiles
+* 1e7ba6e HUE-2417 [desktop] Convert a relative path to pngs to an absolute path
+* fae7e60 HUE-2417 [desktop] Fix Debug=False
+* 62a6cac HUE-2417 [all] Switch the python libraries to use settings.STATIC_URL
+* bac9d57 HUE-2417 [all] Switch mako scripts to use `static` function
+* a68c488 HUE-2417 [all] Switch the static files to use the new /static prefix
+* 743b3e8 HUE-2417 [desktop] Expose staticfiles.static to the mako templates
+* 32dca45 HUE-2417 [desktop] Switch to using django.contrib.staticfiles
+* 4a905ef HUE-2417 [all] Move files to prep for django.contrib.staticfiles
+* db17d17 HUE-2583 [core] DOM Based XSS
+* 8433938 [security] Solves Json error of Django 1.6 upgrade
+* 7361436 HUE-2585 [impala] Display further errors when no line is specified in the error message
+* c495df4 [spark] Code formatting of static files
+* eb5f8ce [oozie] Code formatting of static files
+* db5709c [oozie] Preliminary work for new dashboard graph
+* c1f874f [jobbrowser] Additional log info for debugging
+* 2f933b7 [livy] Wait until the session is ready before we notify the server we're idle
+* 46d1038 [indexer] Properly throw an exception if we can't find solrctl
+* b1476da HUE-2198 [core] Reduce noise such as "Mutual authentication unavailable on 200 response"
+* 7c32ddb [oozie] Improved submit modal autosizing
+* 365fec6 [oozie] Unified and extracted change tracker, made common submit modal code
+* 0b2664a [oozie] Make workflows dashboard buttons responsive
+* 27b2788 HUE-2546 [hive] Localized date format for Hive/Impala
+* 6f87b9b [oozie] Fix Fs action
+* 5e6b8e7 [oozie] Use default HDFS permissions for the workspace
+* 860ee4c HUE-828 [oozie] Differentiate workflows submitted by a coordinator from ones submitted manually
+* e281ddc [spark] Fix polling the livy session status
+* fcde243 [pig] Compatibility with Django 1.6 upgrade
+* 83e7db0 [spark] Fixed js error after adding a Text snippet
+* 3ab7bc5 [spark] Hide and not load Assist if Beeswax is blacklisted
+* 552ea1a HUE-2540 [search] Pagination result number labels are not always accurate
+* e6c266c HUE-1350 [search] Introduce value and up facet
+* af74306 HUE-2156 [search] Range facet with single gap unit should display only start value
+* 9975618 HUE-2575 [home] Fix sharing color and modal dialog for already shared documents
+* 66b5dbc [spark] Check for running status of a new session
+* ac5d732 HUE-2367 [yarn] Ensure checking of SSL certificates is on or off
+* fe821ca [desktop] Upgrade pytz to 2014.10
+* a86f78b [desktop] Upgrade requests-kerberos to 0.6.1
+* bf22469 [desktop] Upgrade requests to 2.5.1
+* 187142c [desktop] Upgrade MySQL-python to 1.2.5
+* 620db48 [docs] Fix header declaration
+* 188f20b [livy] Remove some of the hardcoded versions
+* a23f977 [livy] Clean up some unnecessary comments
+* 092dd66 [spark] Add livy configuration options to hue.ini
+* dee851d [livy] Mark source as UTF-8
+* 007fc7e [livy] Process sessions should use spark-submit
+* 879bcec [spark] Swap tabs for spaces and whitespace cleanup
+* 550b2c2 [livy] Allow the livy assembly to be found on yarn
+* be173e3 [livy] Rearchitect livy to use shaded jar and the system spark
+* bcaed64 [livy] Remove unnecessary repositories and dead code from the pom.xml
+* 75a2b1e [livy] Add a thread session
+* 71eeefb [livy] Clean up session code
+* 7250081 [impala] Add an environment variable to point tests to a read impalad
+* 542167a [hadoop] Simplify a little copyfile
+* e9fc26a [oozie] Cleaned up unused CSS
+* 11bc1df [impala] Add an impala test command that runs against a real Impalad
+* 192670d [hive] Remove old Spark menu
+* 71b1531 HUE-2323 [oozie] Update endtime of running coordinator
+* 1dda3c1 HUE-2653 [indexer] Selected checkboxes are not visually checked
+* 82e8667 [fb] Remove unused deprecated md5 import
+* 171dc66 [oozie] Added support for coordinator dataset multi typeahead
+* e17631e [jb] List jobs from new Json format
+* 46c1ff1 [oozie] Make submit popup work with Django 1.6
+* 2644776 [oozie] Empty state messages
+* fbc70e6 [oozie] Unified button sizes
+* 7069d7c [oozie] Fixes coordinator load problem
+* 991447f [oozie] Preparation for the workflow running dashboard
+* 029274e [docs] Update to support Hue SDK installed via CDH/CM
+* 2076e40 HUE-2571 [core] django_auth_ldap module DEBUG logging
+* 629b8ff [oozie] Reset dirtiness on bundle save
+* 391f3ab [oozie] Offer link to coordinator when adding one in a bundle
+* 79a7aee [oozie] Renaming HttpResponse to JsonReponse
+* c8f9f78 HUE-2569 [home] Delete project is broken
+* b5df830 [oozie] Added isDirty to bundle editor
+* 420e1e9 [oozie] Restyled old-editor messages to fit better any size of the screen
+* 4387082 [core] Introduce ALLOWED_HOSTS configuration for Hue
+* c58adc1 HUE-2563 [search] Copy/delete buttons are not disabled on dashboard page when nothing is selected
+* 101be27 HUE-1078 [useradmin] LDAP debug logging
+* 09f3765 [oozie] Support submitting old format directly from the editor list
+* 61052f0 [oozie] Make list of jobs work after Django 1.6 upgrade
+* 8343d55 HUE-1663 [core] Option to either follow or not LDAP referrals for auth
+* 4518874 [search] Update dashboard page for Django 1.6
+* d201109 HUE-2257 [impala] Quicker detection of non null values in a column
+* 40e3268 HUE-2257 [hive] Support NULL values in column level format
+* e797245 [hive] Support fetching logs with column level format
+* c96d057 [hive] Detect correctly the end of a resultset with Hive 1.0
+* e21cbec [hive] Fix another test query that does not trigger MR jobs anymore
+* 0c0588d [hive] Perform fetch metadata call only when start_over is true
+* 2f06c75 HUE-2257 [hive] Add a workaround for missing hasMoreRows in the API
+* d30132f HUE-2257 [hive] Supporting new column format and old row format
+* bc0a8dc HUE-2257 [hive] Adding Hive 0.13 Thrift
+* a29753a HUE-2436 [desktop] Upgrade django-nose to 1.3
+* 02721e6 HUE-2436 [desktop] Upgrade South to 1.0.2
+* 45d5510 HUE-2436 [ext] Update the external dependency documentation
+* 6e77edd HUE-2436 [beeswax] Django-1.6: fix export tests to work with StreamingHttpResponse
+* 7c2abee HUE-2436 [pig] Pig hadoop tests require a superuser account
+* 89fb3a3 HUE-2436 [oozie and pig] Don't cache the oozie api, this can break the tests
+* 32993e2 HUE-2436 [oozie and jobsub] Django-1.6: Change oozie autocomplete to return a dict
+* bde70cc HUE-2436 [oozie] Django-1.6 doesn't allow form exclusion to be a string
+* f7802b7 HUE-2436 [oozie] Django-1.6: Change massaged_oozie_jobs_for_json to return dict
+* ac28607 HUE-2436 [jobbrowser] Django-1.6: Return json objects
+* 1012e75 HUE-2436 [filebrowser] Remove a debug message
+* dd25ae6 HUE-2436 [filebrowser] Django-1.6: Fix test, make sure to always close avro file reader
+* 481eaa7 HUE-2436 [filebrowser] Django-1.6: Don't quote urlpaths
+* 9b3e535 HUE-2436 [search] Django-1.6: Fix search tests to work with StreamingHttpResponse
+* 92fb581 HUE-2436 [useradmin] Django-1.6: Pass in groups when updating user
+* e965d3e HUE-2436 [useradmin] Django-1.6: Stop caching the user in the session
+* 41db158 HUE-2436 [useradmin] Add ModelForms now require a Meta.model
+* 7797743 HUE-2436 [useradmin] Django-1.6: We no longer need to quote uses of `reverse` (which is used by `url)`
+* fc20566 HUE-2436 [desktop] Protect tests from falling into an infinite loop
+* 63df3f3 HUE-2436 [desktop] Remove dead code that made Hue compatible with Python 2.4 and 2.5
+* 9332b5a HUE-2436 [desktop] creating a test user should make sure to update is_superuser
+* 86f55d9 HUE-2436 [desktop] Wrap getting and releasing the test oozie lock in a try-finally
+* 5e6a0c6 HUE-2436 [desktop] Fix ldap login test, which was using an invalid username
+* 4b9d569 HUE-2436 [desktop] Make sure to reset the mako test wrapper
+* c346195 HUE-2436 [desktop] Django-1.6: fix export tests to work with StreamingHttpResponse
+* 206edd5 HUE-2436 [desktop] Fix EnsureSafeRedirectURLMiddleware to work with https
+* b04171a HUE-2436 [desktop] Django-1.6: Revert to django's ConditionalGetMiddleware
+* 88aaedf HUE-2436 [desktop] Django-1.6: response.template was renamed to response.templates
+* 8a10654 HUE-2436 [desktop] Django-1.6: We no longer need to quote uses of `reverse` (which is used by `url)`
+* d440464 HUE-2436 [desktop] Django-1.6: Monkey-patch User validator to work with our username regex
+* c11f107 HUE-2436 [desktop] Django-1.6: Cast csrf to unicode
+* 5199436 HUE-2436 [desktop] Django-1.6: TransactionMiddleware has been deprecated
+* 78b99a0 HUE-2436 [desktop] Django-1.6: We now need a SECRET_KEY set or django won't start
+* 7db42e2 HUE-2436 [desktop] Remove reference to deprecated django.views.generic.simple.redirect_to
+* a77b3d0 HUE-2436 [all] Django-1.6: Django deprecated use of simplejson
+* 590011a HUE-2436 [all] Django-1.6: django deprecated mimetype, backported JsonResponse from 1.7
+* 6787c1d HUE-2436 [all] Django 1.6 -> django.conf.urls.defaults -> django.conf.urls
+* 91c8661 HUE-2436 [desktop] Fix running ./build/env/bin/hue commands
+* cc7d187 HUE-2436 [desktop] Upgrade to Django 1.6.10
+* fb0bee0 HUE-2436 [desktop] Django-1.6: Add the six library for django-extensions
+* 6cc50f6 HUE-2436 [desktop] Django-1.6: Upgrade django-extensions to 1.5.0
+* e94eed8 HUE-2436 [desktop and filebrowser] Whitespace cleanup
+* a474603 [sqoop] Upgrade to Sqoop 1.99.4 API
+* 9f1b32c [livy] Use the hadoop versions specified in the hue-parent maven pom.xml
+* c603f1e [livy] Fix spark creating a spark context
+* b417522 [desktop and beeswax] Fix the beeswax redaction tests
+* 82dfce0 HUE-2257 [hive] Keep the list of MR jobs when using the new GetLog() API
+* 8953e50 [hive] Switch to Hive 1.0 new way to fetch job logs
+* 9bd0877 [oozie] Support fetching parameters from Coordinator in Bundle editor
+* 858ae0e [oozie] Support edit and non edit mode in Bundle editor
+* d669208 [oozie] Make the dashboard views compatible with Oozie v1
+* 195e6ec [core] Adding link to contributing guidelines on github
+* 1b43b18 HUE-2556 [core] Cannot update project tags of a document
+* 947afca [oozie] Show coordinator dataset link with YEAR, MONTH... variables
+* 89f000f [oozie] Fix coordinator submit dialog CSS
+* 3f091d6 [oozie] Support for coordinator.isDirty
+* 6c50d52 [oozie] UX update for Bundle editor
+* 9ef57ee [spark] Improve performances of snippet re-ordering
+* 655ed94 [spark] Restyled notebooks page
+* 1ef8bee [spark] Fix run all/clear snippets css
+* c4f3aa3 [oozie] Dataset can support same tz, start date and frequency as coordinator
+* bde837e [oozie] Present the non filled parameters of a workflow in coord submit popup
+* 203a97d [oozie] Integrate new coordinator with their dashboard
+* c8b64ee [oozie] Add a link for scheduling a workflow from the editor page
+* a05db1c [oozie] Move new Editor templates to a separate directory
+* c636b90 [desktop] Update redaction rules to match the new JSON scheme
+* 629530e [oozie] Integrate workflow dashboard with the new editor
+* e36f379 [spark] Restyled add snippet
+* 59b0866 [oozie] Fixed submit workflow popup
+* 47827fd [spark] Restyle create session spinner
+* 07ccff4 [spark] Unified tooltip for discrete bar chart and numeric bar chart
+* 551ce40 [livy] Don't bake in a path to fake_shell.py, pass along SPARK_HOME, set SPARK_CONF_DIR
+* 3c37ed9 [livy] Add tests, move spark interpreter into a classloader, fix shutdown
+* 092109f [livy] Pass the MASTER environment variable through a YARN app
+* a537735 [livy] Change the name of the submitted yarn applications
+* 7c7d6a2 [jb] Add application type to the mocked apps in the tests
+* 75c645e [spark] Correct z-index of play/stop buttons
+* 203011e [spark] Show toggle left panel just on hover of chart or grid
+* 7ca5e33 [spark] Basic printing CSS
+* 0ffbd18 [spark] Restyle medium toolbar and make text widgets always editable
+* c6b94f6 [spark] Fixed discrete bar chart re-draw
+* 02785d1 [spark] Fixes chart mixup on window resize
+* 0910b55 [spark] Collapse snippets on sortable
+* bc402e9 [spark] Also hide charts when clearing all snippets
+* 5a3dd2a [spark] Automatically retry the snippet when the session expired
+* 2b49af6 [spark] Do not hide and show charts when re-executing a query
+* 22cc1b7 [spark] Do not blink the cancel button of an Impala query when closing it
+* 2c557a7 [spark] Smoother UX transitions when displaying results
+* 10a13e8 [livy] Fix spark sessions
+* bb63031 [spark] Added double click handler to assist
+* ef13146 [spark] Restyle go button
+* abd287d [spark] i18n medium editor and style fixes
+* 0c7855e [spark] Add only one new notebook link to menu
+* 7bfe03c [spark] Set to failed status when session creation failed
+* d1633b0 [spark] Try to keep the graph legends when re-rerunning a snippet
+* 87ffc80 [spark] Add a clear all result snippets button
+* 69503d6 [jb] Support killing generic YARN apps
+* 47f3eb8 [spark] Basic download of table data
+* 8ce2995 [spark] Show text result as text and not a table
+* b9b0246 [spark] Show grid and chart buttons for table result
+* 7782f7b [livy] Setup maven for running tests
+* f317630 [livy] Scripts should cd into the LIVY_HOME directory
+* 42218ce [livy] Add pyspark support
+* a7d6a5b [livy] Hack python session to allow the last line of a cell to be a magic fn
+* 6fb0bd1 [livy] Handle %table type conversions better
+* e7140c7 [livy] Allow multiline python cells
+* a774da1 [livy] Add type detection to the %table magic
+* 62113c3 [spark] Disable ctrl-enter on loading widget
+* 4782e12 [spark] Formatted duration of query
+* 8469b5e [spark] Offer graphing to Spark snippets
+* 1df588b [spark] Switch to medium editor
+* 5ecb923 [livy] Add %table magic to python sessions, fix passing python exceptions
+* 3136cb6 [livy] Add explicit type
+* 33a94fa [livy] Fix reporting internal errors to users
+* bf7f210 [livy] Fix yarn sessions
+* 4cf28a0 [livy] Migrate fake_shell.py into a resource
+* 6562c61 [spark] Print the execution time of a snippet
+* bf26325 [spark] Fix showing spinner on Codemirror for > key
+* d9de4d9 [spark] Styled more progress bar
+* 7b76317 [spark] Hooked up render data error for expired queries
+* 64437b1 [spark] Fix preview sample data icon position
+* e13d998 [spark] Resize handle for Codemirror
+* 1565f28 [spark] Handler for render data error
+* 992824b [spark] Fix assist force loading and display of long tables
+* c91c016 [spark] Added split group to switch between grid and chart results
+* 7e60f9b [spark] Fixed width and resize for the gradient map
+* f3ea100 [spark] Fix Assist async and force calls settings
+* 8a3d70d [spark] Provide a list of job names and links
+* 8f77564 [spark] Ask for first snippet language in new notebooks
+* 6f48849 [spark] Potentially close snippets when leaving the page
+* 2486ba5 [spark] Try to close the previous snippet when re-executing it
+* a8da13a [spark] More explicit legend for the Pie chart
+* 2806879 [livy] Add support for python to livy-server
+* aec6f9a [livy] Use Seq instead of List
+* 3b4e111 [livy] Fix AsyncResult exceptions being silently ignored
+* 169ea33 [livy] Clean up maven files
+* d4f3888 [spark] Re-introduced assist filter
+* 55889e1 [spark] Hide refresh and collapse Assist icons by default
+* 0b1495c [spark] Codemirror default placeholder disappears on focus and reappears on blur if empty
+* 6ec9837 [spark] Fix group by autocomplete
+* fd4ea28 [spark] Add customized snippet placeholder
+* 1029a08 [spark] Added Gradient Map support
+* 09890d8 [spark] Adding new style to the notebook list page
+* 0d85195 [spark] Change scatter plot grouping logic
+* 0eee7ab [spark] Fixed download form UX
+* 8dc25a0 [spark] Support for Scatter Plot chart
+* 0e27dc4 [spark] Fix loading state of second created snippet
+* 638d5f1 [spark] Integrate status of snippet with its buttons
+* 1ceaf09 [spark] Fix retry of re-creation of an expired session
+* 8bc5dea [spark] Display Spark resultset when available
+* af9f09f [spark] Setting process as default mode for the server
+* 4a2a9de [spark] Make the spark server command available
+* cb40547 [spark] Update check_status to work with livy (not quite working yet)
+* 0e978cd [livy] Change session/statement creation to return a 201 CREATED
+* d92f137 [livy] Turn statements into a class, clean up output
+* ece0313 [livy] Cache the session results in livy-server
+* 0868573 [livy] Fix parsing lines with no trailing '\n'
+* 02db858 [livy] Clean up session state transitions, expose interruption support
+* adf608d [livy] Don't start the spark-shell in debug mode
+* c0d825f [livy] Fix fetching statements
+* 2779c89 [livy] Work around scalatra AsyncResults not erroring out properly
+* e4c00dc [livy] Move the spark-shell script
+* 7d56a97 [livy] Fix a null pointer
+* 898f85c [livy] Rename the startup command to livy_server
+* 01c22e6 [livy] Catch JSON parse/extraction errors
+* 34dbb3e [spark] Fix connecting to livy, starting a session
+* a344448 [spark] Fix running `hue spark-server`
+* 9821fff [spark] Allow session backend to be picked on the cli
+* 4df0913 [spark] Initial progress on a SparkYarnSession
+* 486f652 [spark] Factor the spark web session into it's own class
+* 5831d85 [spark] Cleanup livy-server
+* f2c2240 [spark] Get livy-server to work with livy-repl
+* 4d70af9 [spark] Clean up imports, use the right SparkProcessSession
+* d961bc7 [spark] Rewrite livy-server in scala
+* 7ea0a05 [spark] Remove an unused servlet
+* 03f22e8 [spark] Capture access logs
+* 066f9fd [spark] Get everything to compile
+* 66b99dc [spark] Switch to logback
+* a57d2af [spark] Minor code cleanup
+* 683a72a [spark] Cleanup dead code
+* 8038077 [spark] Add livy-core, cleanup launching livy-repl
+* 224f7b1 [livy] livy-repl doesn't need an assembly
+* 14f30a6 [spark] We are not quasiquoting
+* 7d03aae [spark] Get the spark repl to run inside yarn (!)
+* 42af9ca [spark] Working server running on yarn
+* ad958fd [spark] Fix some more renames
+* 827e04f [spark] More work getting yarn to run
+* 908cc72 [spark] Wire the repl into the yarn app master
+* 9a923e1 [spark] Rename Sparker to Livy since we're going to be more than Spark
+* a79eeee [spark] Initial version of sparker-yarn working
+* deeedda [spark] Update YARN clients
+* 46257a6 [spark] Initial progress on the AM
+* b76108f [spark] Route the output of statement execution to /statement
+* f25d613 [spark] cleaning up the code
+* ed2c280 [spark] Initial web server working
+* 2b4b2ef [spark] Fix the sparker-shell
+* 12ec268 [spark] Bump garbage collecting sessions to an hour
+* f992dc3 [spark] start mocking out spark-repl webapp
+* f28277d [spark] Don't actually do the interruption
+* 966d062 [spark] Start factoring out the request code
+* 933d7f3 [spark] Stub out interruption support
+* 6304ca8 [spark] Rename cell to statement
+* aeeaa4d [spark] Keep 5 spark sessions precached to speed up start time
+* d25b2dc [spark] Up the gc of sessions to 10 minutes.
+* 9186687 [spark] Fix the creation methods
+* 7d5ab00 [spark] Don't print out the ready line for now
+* b48a093 [spark] Protect against races on the SparkSession, add CellResource
+* 80ff2c7 [spark] Add a constructor to the ExecuteStatementRequest
+* 25f6dc1 [spark] Remove dead code
+* 4cc3aae [spark] Reorganize the code
+* 72661d8 [spark] Cleaned up the session api
+* 7bd6ddf [spark] Make sparker-shell speak json requests and responses
+* 925f35c [spark] Produce json strings for the ui
+* 947ee44 [spark] Make sparker-shell cwd independent
+* 6e9a03c [spark] More logging tweaks
+* ac9a823 [spark] Add logging, also log stderr
+* cf99285 [spark] Don't suspend the server
+* 4356fd3 [spark] Ability to multiplex between 2 sessions with different implementations
+* 5ce5958 [spark] Get sparker-shell integerated into SparkServer
+* f05bb22 [spark] Minor cleanup
+* a890eaa [spark] Print out json lines
+* a20a7ba [spark] Refactor and add initial repl that captures the input/output of spark
+* 35664a7 [spark] Split sparker into independent jars
+* c73cebb [spark] Adding Session DELETE command
+* 17b6fe3 [spark] Incorperate sean's patches
+* 5f9c6cd [spark] Initial integration of the spark job server
+* d95c8f3 [spark] Update statement on codemirror in ctrl-enter
+* cef42a5 [spark] Migrated from Chosen to Select2 and filtered out chart columns
+* 47fdd22 [spark] Download buttons are now using links
+* a42ade8 [spark] Restyled collapse left colum
+* 2f388cb [spark] Show assist preview icon on hover
+* 7d7191b [spark] Configure the list of available languages
+* ff4668e [spark] Remove snipped forces redraw of table headers
+* 027c1b9 [spark] Reload assist and show error when Hive is not there
+* 11ae4ef [spark] Cleanup the Hive snippet
+* a23c1fe [spark] Show specific results when there is no datasets
+* f5d43bc [spark] Resize assist on window resize
+* d14bff0 [spark] Added empty message
+* 3a1c5fd [spark] Styled logs
+* abdf745 [spark] Moved and grouped buttons
+* ed5a56d [spark] Fix problem with minimum height for results
+* fd8dac8 [spark] Restyled add snippet
+* f330e68 [spark] Redraws the chart on query refresh
+* 6daa4e2 [spark] Removed fixed height for results
+* bc3e800 [spark] Fix infinite scroll for queries that don't have more results
+* bfce7b7 [spark] Improved performances of Codemirror
+* 334b1ba [spark] Adds body scrolling on table scrollup
+* 844e705 [spark] Fixes horizontal scrolling
+* c621099 [spark] Toggle left panel
+* a737114 [spark] Enabled db assist table preview
+* 61d4327 [spark] Toggle db assist
+* 712e6ed [spark] Fixed scrolling for Firefox
+* 9eecb00 [spark] Added infinite scroll to the results
+* e7e361a [spark] Show errors when coming from fetch status
+* 6b5a73c [spark] Redraw table headers on results change
+* 6545f0d [spark] Fix table scrolling for all the tables
+* 4d6af5c [spark] Download snippet results
+* a64e320 [spark] Editors autoexpand to maximum 20 lines
+* c087815 [spark] Fixes loading of the editor lines and content
+* 74bb7cc [spark] Wysiwyg editor
+* f98cb5e [spark] Support for leaflet chart
+* 8270a0a [spark] Unify all the exception handling
+* 44d158f [spark] Fixed multibar chart and pie chart
+* 9a5c5f0 [spark] Support fetching incomplete results from resultset
+* 671bc65 [spark] Unified exception handling in the API
+* 7bb0be2 [spark] start_over support when fetching results
+* fe6f477 [spark] Load back saved results
+* d8882e1 [spark] Datatables supports multiple results fetching
+* 09d4fe9 [spark] Bigger progress bar
+* 0bd62dd [spark] Fixed result height
+* c8f64a9 [spark] Split see logs from the other buttons
+* 16c110a [spark] Correct progress report when loading back a page
+* 62f6943 [spark] Subtle progress bar
+* 1e75866 [spark] Get dummy Scala logs
+* e6056f5 [spark] Switch to Impala API for Impala snippets
+* a25a5fd [spark] Fetch log and compute progress
+* 625e026 [spark] Initial version of fetch metadata from a resulset
+* 7d5abb2 [spark] First results column should always be small
+* 20e6c95 [spark] Support for running new queries in the same snipper and row numbers
+* fb21549 [spark] Added * to autocomplete, basic restyle of the results area
+* 6f76476 [spark] Fetch next rows of a result set
+* ab34145 [spark] Scroll to column
+* 958e0c4 [spark] Basic assist.js error notification
+* a896919 [spark] Toggle result columns
+* 6d53dcf [spark] Fetch again status of runnin queries on page refresh
+* ac72bff [spark] Impala support
+* 5043099 [spark] Cancel a statement
+* 74c2444 [spark] Enable load on refresh of a just saved notebook
+* 2f435fe [spark] Fixed styles for assist
+* 145fa36 [spark] Hive and Impala autocomplete
+* 01499a0 [spark] Support Text snippet
+* ed32f15 [spark] Support $variables in the editor
+* e4b4ed9 [spark] Initial support for Assist
+* 5689608 [spark] Restart a Spark session when it has expired
+* 5a6f3ea [spark] Load back the results of snippets
+* f7c9698 [spark] Added dashboard functionality to the notebooks
+* d9d302a [spark] Save and load a Notebook
+* 0e3fb8b [spark] Restructure top bar
+* 938d6b9 [spark] Cleanup of old Spark Job Server files
+* a950f6c [spark] Basic support for on the fly autocomplete change
+* 5ef84f8 [spark] Support for Spark server API
+* b024468 [oozie] Check snippet job status correctly
+* c3709d3 [spark] Basic restyle of the page
+* d8da307 [spark] Initial support for wysiwyg
+* eedff01 [spark] Core of the notebook model
+* 2f40e42 [spark] Initial support for Markdown
+* 834fadf [oozie] Various UX consistencies fixes and appending Z to dates
+* 35366b8 [oozie] Provide the list of older bundles
+* 0b4cff6 [oozie] Provide the list of older coordinators
+* e119a58 HUE-2539 [beeswax] Alert the user when a query was redacted
+* 6f68ff7 HUE-2243 [metastore] Listing tables can be very slow
+* ff8660e [oozie] Lock "save" button during workflow saving
+* fd63bc1 HUE-2553 [beeswax] Add test checking for NaN and infinite numbers in json
+* afb9755 [oozie] Remove "cred" attribute from action when it is empty
+* 9050f1b [filebrowser] Fix archive upload directory issue
+* 7445268 [oozie] Fix mixed labels for 'nocleanup' and 'refresh' form options
+* 9fc5add [beeswax] Support NaN and Infinity values from HiveServer2 API
+* 99d5de3 [doc] Add SSL package reference for RHEL7
+* cef9bc9 HUE-2552 [metastore] Show error when removing header of file missing permissions
+* 4b9c214 [beeswax] Truncate database design name to 64 characters to avoid overflow
+* d6cc802 [fb] Do not show Sentry warning when selecting files in a Sentry directory
+* 9e0eb37 [metastore] Replace 'None' with 'NULL' in table sample
+* b4bf797 [desktop] Python-2.6's logging.Handler is an old-style class
+* 2c7eb81 [oozie] Convert datetimes to strings when generating XML
+* 6b7837d [oozie] Adding a series of autocompletes to the coordinator editor
+* 75286ce [oozie] Hide default parameters in submission popups
+* d482340 [desktop] nose on Python 2.6 does not support assert_is
+* 0e37608 [oozie] Modify coordinator start and end date parameters directly
+* 49663e1 [beeswax] handle create database description with accented characters
+* f3c43fc HUE-2538 [beeswax] Redact the QueryHistory query if redaction is enabled
+* 2251316 HUE-2538 [desktop] Add support for log redaction
+* e956712 [beeswax] Minor whitespace cleanup
+* 650035f [desktop] Fix logging test creating files named "<open file..."
+* eea98ea HUE-2493 [beeswax] Change QueryHistory.server_port to be a PositiveIntegerField
+* 56c9bb3 [oozie] Put example conditions in the decision node branches
+* 29498b9 [oozie] Enable deleting old workflows from new editor
+* 2ad70db [oozie] Add message warning about using the old editor
+* a6be69d [oozie] Import content of old workflow nodes
+* c9a25ed HUE-2549 [core] Update checkbox check jQuery methods on jHueSelector
+* 2b586a2 HUE-2548 [metastore] Create table then load data does redirect to the table page
+* 1f14101 HUE-2547 [core] Reset MapReduce API cache after YARN RM switch
+* 210c2d2 [oozie] Try to load and convert older workflows on the fly
+* a8e3083 HUE-2545 [fb] Move popup could have a home quick link
+* e6e27bc HUE-2411 [useradmin] Lazy load user and group list in permission sharing popup
+* 83d5abe [oozie] Fix isDirty bug for non-observable parameter values
+* 4a2367e [oozie] Hide move/copy icons just on the new action
+* 971b5da [oozie] Simpler naming for the cron tab
+* 95243e0 [tools] Add load balancer example
+* 6404e36 [oozie] Add name of job in submission popup
+* ddd0cb4 [oozie] Better decision node UX
+* d8be58d HUE-2528 [beeswax] Partitions limit gets capped to 1000 despite configuration
+* 2fc9956 [oozie] Styled advanced parameter configuration
+* 521aedb [indexer] Provide more information when not detecting Solr Cloud mode
+* 7c0d2d5 [oozie] Added now, calendar and filechooser to submit modal
+* b73646c [oozie] Migrated coordinator variables to Select2
+* 64e4ec6 [oozie] Split datepicker and timepicker for coordinator start and end
+* 6e57b90 [oozie] Use parameters by default for coordinator start and end times
+* 6ddbfa2 [oozie] Second step styling of Coordinator editor
+* 239677c [useradmin] Update LDAP groupanme_pattern test case
+* a75e6a8 [oozie] Pre-fill the parameters of the workflow of a coordinator with its variables
+* 38fa2cf [oozie] Update Oozie Editor 2 tests with latest API
+* b6ecfd6 [oozie] Use Oozie 1 workspace style until we switch to 2
+* 9adaef6 [oozie] Add jcron for picking coordinator frequency
+* f2d1d55 [sentry] Do not show edit actions on a granted privilege
+* ea80dbb HUE-2537 [search] Timeline interval is not used
+* 8b47918 [oozie] Fix new bundle link
+* 6fdfe6d [oozie] Re-enable all side drops after move
+* ec11326 [oozie] Fixed section hightlighting for coordinator and bundles list
+* 708f88e [oozie] Shortcut links to workflows in the coordinator editor
+* d3da396 [oozie] List bundle editor page with copy, delete and share actions
+* 13b68d4 [oozie] List coordinator page with copy, delete and share actions
+* 13e4141 [oozie] Support creating Fork of Fork
+* 6641c62 [oozie] Protect against XSS in the editor
+* 687abd0 [oozie] Add share button directly on the list of workflows page
+* 4487805 [oozie] Refresh page when deleting or copying workflows
+* 75223ad [oozie] Wire Hue checkboxes to the ko-ified workflow list
+* 2912da0 [oozie] ko-ify the editor list of workflows
+* 0a8b2de HUE-2491 [indexer] Add option to show only collections
+* 3094025 HUE-2535 [oozie] Running jobs filter does not show jobs in dashboard
+* a998b67 HUE-2536 [jb] Failed filter shows other statuses
+* a78c797 [useradmin] remove old password requirement when superuser tries to change password for another user
+* f307c6e [oozie] Declutter arrows and fix widget clicking problem on IE
+* be785d7 [oozie] Fix expanded widget status
+* 7ce2cbb HUE-2532 [search] Fix share URL on Internet Explorer
+* 1c22b91 [oozie] Restyled editor workflow list page
+* 50a0605 [oozie] Reset workflow node expansion on toggle edit
+* f4f0ab5 [oozie] Remove some non unicode characters from the templates
+* a57befe HUE-2531 [impala] Autogrow missing result list
+* 684a95e [oozie] Added parameter and file content to the isDirty observables
+* 5f5d085 [pig] Skip dependency on the external autocomplete js
+* f6b6499 [pig] Give empty autocomplete URL when Hive app is not installed
+* a9a9eb5 [pig] Exclude HCat autocomplete if autocomplete URL is empty
+* 4550c63 [oozie] Introduced unsaved message for dirty workflows
+* 89284c5 [oozie] Improve dragging visual hints on workflow editor
+* b18278c [oozie] Ask for a hive-site.xml when creating a Hive action
+* 0e1e53f HUE-2529 [useradmin] Bump up LDAP Sync group name character limit to 256
+* a961245 [oozie] Flag to enable Editor v2
+* e6e3390 [oozie] Adding new editor to the menu
+* d46c14f [oozie] Check read and write permissions for bundles
+* 0acedac [oozie] Check read and write permissions for coordinators
+* beadb15 [oozie] Check read and write permissions for workflows
+* 0c33b94 [oozie] Moving nodes should not lose any properties
+* 714727c [oozie] Copying a node also copies its properties
+* f22b9ed [oozie] Persist show arrow toggling
+* 5bba798 [oozie] Add un-expand icon to global kill node
+* 1e4a2c8 [core] Avoid double leading slash on hdfs autocomplete paths
+* 541f3c6 [oozie] Display just the name of the file on common-fs-link
+* 89f337f [oozie] Disable page scroll on Filechooser modal
+* 883d94b [core] Added file filter to jHueFileChooser
+* 45265b0 [core] Delegate keydown event to the HDFS autocomplete element instead of window
+* f66a90d [oozie] Enable picker for every parameter
+* 1382853 [oozie] Parse variables from Hive scripts
+* 841ff70 [oozie] Fix all the advanced properties of the actions
+* 650b04a [oozie] Also add FileBrowser shortcuts to parameters values
+* a645b6c [oozie] Friendler UX for action with a script with parameters
+* f91a827 [oozie] Bump version of Oozie workflows to 0.5
+* 13ebaf2 [oozie] Added coordinator picker to bundle page
+* 8eea907 [oozie] Added workflow picker to coordinator page
+* 640b8bf [oozie] Added scroll up plugin
+* 6ce7b42 [oozie] Enable filechooser for all the parameters with '='
+* 3b4cb98 [oozie] Added filechooser binding for parameters named input or output
+* fb8d12d [oozie] Added parameters typeahead for Pig
+* 616a477 [oozie] Fix arrow drawing on toggle properties
+* a25d130 [oozie] Added upload file and create folder options
+* 7d3c001 [oozie] Added HDFS autocomplete on filechooser inputs
+* e04c3fd [oozie] Improved wrapping of small widgets
+* 75789ee [oozie] Added Workspace button to filechooser
+* 8e8ca06 [oozie] Click to expand widget maintains bubbling order now
+* 403b527 [oozie] Update add button status after key press
+* aae3998 [oozie] Scroll to new added action
+* e5c5c3d [oozie] Improved readability on inline forms
+* 3ed6a4d [oozie] Improved inline popup for widgets
+* 6c1f12a [oozie] Improve look of idle drop targets
+* e950607 [oozie] Restore backdrop on settings modal
+* 5c8e649 [oozie] Passthrough arrows click
+* c7541a4 [oozie] Require all fields on the add action modal before adding
+* b9f69b1 [oozie] Fixed all the input with missing type
+* bfc13e0 [oozie] Streaming action UX
+* f8e4c15 [oozie] Streaming action UX
+* c65d1f0 [oozie] Email action UX
+* b8842d9 [oozie] Fs action UX
+* 888a292 [oozie] UX of Ssh action
+* 2adbb74 [oozie] UX of Shell action
+* 79a3d52 [oozie] Better UX for MapReduce action
+* 3673704 [oozie] UX of Java action
+* 196527e [oozie] Better UX for Hive actions
+* a370310 [oozie] Adding links to selected subworkflows
+* 8660e83 [oozie] Cleaning up the UI
+* 048f807 [oozie] Resized input for new actions
+* ad60eff [oozie] Moved Oozie specific code from common-dashboard
+* ff21fe3 [oozie] Fixed filechooser on new action binding
+* 2552022 [oozie] Also get list of subworkflows at loading of the editor
+* 2d82ed3 [oozie] Add properties of Subworkflow action
+* 6eeb35a [oozie] Add some filechoosers for the field pointing to HDFS
+* b47f84d [oozie] Integrate document sharing in workflow editor
+* 36123e6 [oozie] Move Kill node text message to advanced properties
+* 9b4af10 [oozie] New filechooser options to show just the last bit of the path
+* ea86b90 [oozie] Bundle name as x-editable
+* 7fcace1 [oozie] Coordinator name as x-editable
+* 166a7e0 [oozie] Workflow name and description as x-editable
+* a49d5d9 [oozie] Improved spacing with readonly workflow editor
+* 6299119 [oozie] Fix JS error on overlay remove
+* 0c07788 [oozie] Move expand of the widget to the widget body
+* f115cfc [oozie] Generate a valid XML Oozie name for jobs
+* 63325c0 [oozie] Pull Pig parameters from Pig action script
+* d0644c4 [oozie] Support a customizable pattern for workflow workspace path
+* 8c4f312 [oozie] Link Document2 to Document for 3.x compatibility
+* 31455ec [oozie] Updating icons, bundle dependencies, link to pig script
+* 92d0544 [oozie] Generate XML and submit Bundles
+* d4d6edb [oozie] Improved drag to add UX
+* 06c8079 [oozie] Support for expansion of widgets
+* 857a793 [oozie] Remove autoscroll
+* 69b9c79 [oozie] Toggle arrows
+* 855e508 [oozie] Bundle skeleton page
+* 0c4cc40 [oozie] Get Coordinator variables
+* e07c150 [oozie] Pull workflow variables to fill up in the coordinator editor
+* 3c4e811 [oozie] Look for parameters in Workflows
+* 8ba5b76 [oozie] Add all the field of a Coordinator in the UI
+* b57c5c7 [oozie] Fix remove kill node
+* e0a24eb [oozie] Restyled decision and initial support for large scrolling workflows
+* a6909b8 [oozie] Started coord restyle
+* fbea788 [oozie] Submit a Coordinator
+* c5f4b15 [oozie] Generate XML of Coordinator with range datasets
+* 77ae36a [oozie] Generate XML of Coordinator with datasets
+* e3fdc4e [oozie] Generate XML of Coordinator with workflow properties
+* e09a962 [oozie] Restyled properties tab
+* e979010 [oozie] Generate basic XML of Coordinator
+* ac835d5 [oozie] Reorganized CSS
+* 9c4bf2e [oozie] Toggle SLA form
+* e7486e2 [oozie] Model of the Coordinator editor
+* 19076af [oozie] Coordinator editor skeleton page
+* 06871a8 [oozie] Started to restyle settings dialog
+* 0bbcd46 [oozie] Added filechooser binding to files
+* a46b824 [oozie] Added generic kill node
+* 5b3e75a [oozie] Fixed get relatives bugs and improved UI
+* c5d58b8 [oozie] Removed id from widgets
+* 5b5e277 [oozie] Restyled common sections
+* 73ba03d [oozie] Removed unused inputs on widgets
+* 59554be [oozie] Started to restyle widgets
+* 4ee18cf [oozie] Cleaned up non-editing UI
+* 4a0b650 [oozie] Improved display of edit mode
+* 0aa3ba2 [oozie] DistCp action
+* e3eb91c [oozie] Edit in place does not open a popup now
+* fe4f9a5 [oozie] Streamin action
+* 8a35028 [oozie] Email action
+* 30b67a2 [oozie] Adding the Ssh action
+* b9ce600 [oozie] Adding Fs action
+* 67634f3 [oozie] Better helper for clone and move
+* 921f122 [oozie] Introduced expanded state for editing the widgets
+* 379abba [oozie] Adding the Shell action
+* db875c8 [oozie] Add MapReduce action to editor
+* b524941 [oozie] Add Sqoop 1 action
+* 9da2932 [oozie] HiveServer2 Action support in workflow editor
+* 013941b [oozie] Reduced margins for the dashboard
+* 61d7d17 [oozie] Enable copy to the same row
+* 6eade6b [oozie] Disable drop zones for forks with two nodes
+* e4f4925 [oozie] Disable creation of forks next to a decision node
+* 9b65982 [oozie] A decision node can be deleted only when it has 0 or 1 child
+* 888448b [oozie] Enable drag to copy of nodes
+* b03314c [oozie] Import an old wofklow with a Fork
+* 14fa64e [oozie] Workflow layout converter from Hue 3.7 format
+* ecc165b [oozie] Fix action linking by not removing the Kill node from the list
+* ce5fc77 [oozie] Add End node to the end in order to submit workflow
+* 9e24a39 [oozie] Use select box to list the OK and KO transitions
+* eca5bf2 [oozie] Add link to HDFS workspace
+* fe3cc0d [oozie] Generate XML of Decision node
+* 28e623e [oozie] Support for basic Decision node
+* 16b39c4 [oozie] Join widget should not be movable
+* 99a7a5b [oozie] Kill widget should not be movable
+* eed039a [oozie] Disabled drop after decision node
+* a84efed [oozie] Convert to decision removes the join node
+* b5e16e8 [oozie] Support for loading N-nested forks
+* d85e3bb [oozie] Just regular nodes can be moved
+* ee7be67 [oozie] Disable drop targets around widget
+* 9392d97 [oozie] Delete an action below a Join
+* 5ce3540 [oozie] Smarter move a node
+* b351ea7 [oozie] Smarter delete action
+* b9f8734 [oozie] Disable drop on sides of the same widget row
+* 6e50935 [oozie] Moving to a fork doesn't create a new node
+* 31e7863 [oozie] Support sequential move of nodes
+* 4c03402 [oozie] Support for sub workflows
+* 7b72776 [oozie] Initial support for fork/decision conversion
+* 89e2804 [oozie] Support for node move
+* 4800f43 [oozie] Refactored redundant code
+* 1336db4 [oozie] Adding Kill droppable Kill node
+* de5fc1f [oozie] Fork of Fork support
+* 93da84a [oozie] Templating logic for Hive, Pig and Java actions
+* e015ec7 [oozie] Fix widget predecessor and successor
+* 1333d15 [oozie] Swapped sortable for droppables
+* c93a081 [oozie] Fixed side drop zone height change
+* 8a0eca8 [oozie] Enable drop on the side of a fork and disable it on the side of joins
+* 2f92334 [oozie] Add a node on top of Fork
+* da1da1f [oozie] Add a node below a Join
+* 9585783 [oozie] Add a node on top of node in a Fork
+* 3eb1ed1 [oozie] Hide extra dropping target right after fork and before join
+* ed4c998 [oozie] Delete from more than 3 nodes in a Fork
+* f5bef09 [oozie] Fix bug in Node.set_link
+* 526b85e [oozie] Add 3rd node to a fork
+* 210949f [oozie] Redraw arrows on window resize
+* 4875eea [oozie] Improved arrows display
+* fdbd14b [oozie] Side drops have now 100% height
+* 80e565b [oozie] Refresh after save reloads the same workflow
+* 8dc0603 [oozie] Refactor getWidgetSuccessor and getWidgetPredecessor
+* 2dde136 [oozie] Support for widget successor
+* 8658040 [core] Updated font-family on Bootplus and enabled compression
+* d8b5a7d [oozie] Support create a fork or add a new node to a fork
+* a2671c6 [oozie] Arrow drawing on model change
+* b736f5a [oozie] Fix for a getPredecessor bug before forks
+* 6cbc3bc [oozie] Disable slide up and down on drop
+* 019aff2 [oozie] Drop on existing fork does not create a new fork anymore
+* 5c0f580 [oozie] Add row in between rows
+* a739e9e [oozie] Delete any node in a fork
+* 24d6335 [oozie] Add computed linkMapping to workflow
+* 56a4ff8 [oozie] Initial support for arrow linking
+* 9ad2509 [oozie] Delete a node from a fork
+* f22bcd5 [oozie] Change ok link to to link for action nodes
+* 20bdafd [oozie] Lateral drop targets are minimized in non editing mode
+* de6d292 [oozie] Remove a node below a regular action
+* cf91b7b [oozie] Delete a single action node
+* c08d575 [oozie] Link fork and Join nodes to their widgets
+* 5426538 [oozie] Start, end, fork and join nodes cannot be manually removed
+* 3c7a518 [oozie] Delete a widget can delete forks and joins too
+* 8ba8cdb [oozie] Support creating a fork
+* 70fdef1 [oozie] Initial support for fork and join and fixed predecessor
+* a42e939 [oozie] Support sequential actions
+* 4bea516 [oozie] Removed isNested reference from template and other dashboards
+* 1f53602 [oozie] Generate random ids for the action sections
+* 237787a [oozie] Better delete logic for widgets
+* 7a551d6 [oozie] Add set_link() and get_link() to a Node
+* d0c3669 [oozie] Get widget predecessor
+* ec92593 [oozie] Basic structure for getting the parents of columns, rows and widgets
+* 1bc6ba5 [oozie] Support for drag and drop on the sides of widgets
+* 08ea05f [oozie] Removed layout change buttons and styled side dropzones
+* a196d2b [oozie] Restore common_dashboard.mako
+* 7412922 [oozie] Support for start and end node outside the workflow editor
+* 5fbbaa1 [oozie] Initial support for nested dashboards
+* 5d3e881 [oozie] Adding SLA to Workflow properties
+* f943ed9 [oozie] Adding workflow Hadoop properties settings
+* c362fe5 [oozie] Factorize common action properties into a template
+* 90533d3 [oozie] Credentials support
+* 05bc667 [oozie] Add SLA to action
+* cdaaa07 [oozie] Add archives to action
+* 4da321c [oozie] Add properties to action
+* 179c1a6 [oozie] Support for Job XML in action
+* e4ec10f [oozie] Support prepare in action
+* 5d75444 [oozie] Generate valid name for action node
+* 0035898 [oozie] Add file to Pig action
+* e49c122 [oozie] Refactor adding new widget
+* 50376ef [oozie] Add more properties for Pig action
+* fdb9424 [oozie] Add custom action properties
+* 7669d08 [oozie] Generate workspace and create it at save time
+* 4fc7e66 [oozie] Adding workflow settings modal and parameters
+* 53463ba [oozie] Add sharelib by default to workflow
+* 43ea2de [oozie] Submit a workflow
+* f40f14f [oozie] Add semi modal asking for main action properties
+* 43917d3 [oozie] Generate XML workflow
+* 722785d [oozie] List workflow editor page
+* 1aeef12 [oozie] Save a workflow
+* 44b085d [oozie] Create a new workflow
+* 6523907 [oozie] Skeleton of new workflow editor
+* b1b10ce [impala] Save or update a dashboard into a document
+* 22416bc [core] Set document natural keys as composite
+* 74b5d72 [core] Backport Django #16317 Self-referencing model with natural key
+* e787c0a [impala] Save dashboard into new document model table
+* decf9d2 [core] New Document format
+* 0174747 [impala] Save dashboard
+* 699b35d [impala] Fix facet toggling
+* 706a447 [impala] Add range facet
+* 7819e3c [impala] Move dashboards to own module
+* 626a88c HUE-2498 [oozie] Sharing workflows requires HDFS admin privileges
+* 1205bce [core] Fix home page when Beeswax app is blacklisted
+* 48d4a45 [useradmin] Disable password update for LDAP users
+* cba7cf4 HUE-2520 [pig] Enable a user to save an unsaved pig script after execution
+* c86f67c HUE-2514 [oozie] Add more reducers when running terasort on larger cluster
+* 6ca6ee0 HUE-2515 [beeswax] Fix MySQL transaction problem in test_parallel_queries unit test
+* 0ff5c60 HUE-2525 [core] Fix manual install of samples
+* 539541b HUE-2526 [desktop] Avoid a deadlock in the thrift connection pool
+* 50120ca HUE-2518 [pig] Fix typo in logging error: Change "demo" to "job"
+* 0cd3f9b HUE-2524 [impala] Sort numerically recent queries tab
+* 8a95384 HUE-2513 [fb] File list column sorting is broken
+* c7cd3a2 HUE-1241 [pig] Support macros with several or no spaces before the name
+* ffab977 [hive] Missing import of _ for internationalization
+* 8d9da44 HUE-2511 [impala] Infinite scroll keeps fetching results even if finished
+* 3d514dc HUE-2512 [impala] Fix installing Impala examples when tables already exist
+* 9a8df9a HUE-2505 [fb] Top row is not the current directory
+* fb37853 HUE-2510 [pig] Ensure that CSRF cookie is loaded in the editor
+* 4e93e36 HUE-2506 [search] Marker map does not display with HTML widget
+* fdc5fe4 HUE-2504 [beeswax] Skip loading of sample data if table already exists
+* 695fda0 HUE-2495 [oozie] Improve dashboards sorting mechanism
+* 1bab576 [core] ConditionalGetMiddleware should import `parse_http_date_safe`
+* 753a4ac [beeswax] Rename TestHiveServer2API test to test_parsing_partition_values
+* 878fd24 [beeswax] Remove dead comments
+* 5c799cc [beeswax] Fix parsing complex PartitionKey types
+* d211512 HUE-2503 [jb] Better handling of expired YARN jobs
+* 52d57d8 [desktop] Fix pseudo_hdfs4 starting up a yarn nodemanager
+* 68fb193 [tools] Fix tools/jenkins/build-functions so the hadoop tests run on OS X
+* e3cda67 HUE-2454 [useradmin] Use correct 'search_bind_authentication' in multidomain-style LDAP
+* 26de2fb [search] Add newline at the end of the file
+* f93ef1e [desktop] Backport Django 1.5's ConditionalGetMiddleware to fix streaming bug
+* a7262e5 HUE-2501 [metastore] Creating a table with header files bigger than 64MB truncates it
+* b1572f1 HUE-2485 [core] Add strict redirection in EnsureSafeRedirectURLMiddleware
+* da9725a [core] Display all possible errors when installing all the examples
+* f435f9e HUE-2481 [oozie] handle escaped = in jo.properties when submitting from hdfs
+* 4310671 [jobsub] Filter out designs without a document. Empty documents will break the editor.
+* 5bb859c HUE-2478 [pig] ignore variables with escape character before $
+* 864cd85 [core] Remove trailing whitespace
+* f79e4d4 [core] Add ConditionalGetMiddleware
+* f971351 [doc] Update Hue screenshot
+* 28be8c8 [oozie] Order coordinator actions on the Oozie side
+* 24200e7 HUE-2494 [search] Timeline remove doesn't delete the chart
+* 9afc8da [search] Make timeline support timestamps with milliseconds
+* 9419cbc [beeswax] Support Spark SQL table metadata format
+* 648908f HUE-2492 [impala] Avoid imports for deleted app
+* f829594 HUE-2484 [beeswax] Configure support for Hive Server2 LDAP authentication
+* 0db0435 [oozie] Support exporting workflows with credentials
+* 2c17370 HUE-2391 [beeswax] install example exception handling correction
+* 653ea10 [beeswax] Handle case where a PartitionKey includes extra ','s or ':'s
+* 964c5a3 [beeswax] Add a test case for ',' and ':' in a partition key comments
+* c195f0e [beeswax] Clean up test_partition_values
+* c081dd6 [beeswax] Cleanup the table properties test
+* e8ab4e1 [beeswax] Replace tabs with spaces
+* 0d8fd54 HUE-2102 [oozie] Workflow with credentials can't be used with Coordinator
+* 5be7a0c "[fb] Make archive upload case insensitive"
+* dbe2b3a HUE-2152 [pig] Credentials support for HCat in editor
+* cabed17 HUE-2479 [fb] Cancel moving a file with drag and drop
+* b2a78ae [core] Add wsgi.py script to simplify deployment to Apache
+* 6edcd4f [hbase] Tell user when HBase kerberos principal is missing from hbase-site.xml in secure mode
+* 41cd7ae HUE-2472 [impala] Hide Show more results in certain cases
+* 5ce916f HUE-2366 [jb] Message explaining when no Resource Manager is available
+* 1b68f38 HUE-2471 [beeswax] Fix display ellipsis on fields longer than 20 characters
+* 9b22320 HUE-2486 [beeswax] Fix saving result to a new Hive table and to a HDFS directory
+* 70d15bf [fb] Support upload of tar.gz archive
+* 5d13ff8 [desktop] UTF8 decode byte strings before printing
+* 20402cc HUE-2467 [sentry] Disallow admin operations on parent page of prefixed directories
+* 3880be1 [core] Add config check to validate MySql storage engine
+* af5b28a [desktop] Remove /desktop/debug/who_am_i
+* ff19460 HUE-2476 [oozie] Import workflow with ssh action ignores <args> tag
+* 504fdb9 [sqoop] Upgrade for Sqoop for 1.99.4 API: main first cut
+* 33f88c0 HUE-2472 [impala] Stabilize result retrieval
+* 5fd5fcd HUE-2471 [beeswax] Truncate field type in assist to 20 characters
+* 94d7717 HUE-2467 [sentry] Check NN plugin prefixes for exact match of subpath
+* 9e10347 [jb] Reverting the job header name to job id
+* c62fdaf HUE-2446 [oozie] Add a no-op migration script to help upgrade from CDH4.7 to 5.x
+* 450f686 [core] replace some tabs with spaces
+* b4b3712 HUE-2467 [fb] Hide change owner link when the folder is Sentry managed
+* d3f2a58 HUE-2470 [beeswax] DB Assist should load different Impala and Hive tables without hitting refresh
+* 5c81fd8 [build] Allow building with JDK8
+* 2ace338 HUE-2467 [fb] Sentry NameNode plugin integration
+* 0336f74 HUE-2462 [beeswax] Escape HTML when printing field schema
+* d4acb8d HUE-2424 [search] Removed commented lines
+* 44eefc5 HUE-2424 [search] Bar/line widgets should not update their start/end/gap values
+* 9811087 [search] Support double in bar and line widgets
+* c97ce22 HUE-2450 [search] Pagination Should Reset When Facet Changes
+* e6afc20 HUE-2458 [core] fix an import bug
+* 326eccd HUE-2458 [core] don't rely on saml2 being installed in the libsaml config
+* 4d5d078 HUE-2458 [core] make libsaml backwards compatible with abec's saml2 forks
+* 65118b5 HUE-2467 [fb] Sentry NameNode plugin integration
+* fd4d197 HUE-2460 [impala] Update syntax highlighting to include 2.0 analytic functions
+* adc26f9 HUE-2468 [core] Updated docs manual for ubuntu 14.04
+* 932d568 Use the PATH to find the xmlsec1 binary
+* b3e2e70 HUE-2458 [core] simplify finding xmlsec binary
+* bf3f009 HUE-2458 [core] Fix the import order
+* 7c2d997 HUE-2458 [core] make SAML2 urls backwards compatible
+* 9367478 HUE-2458 [core] Expose a POST logout URL
+* 4d9e719 HUE-2458 [core] Add support for configuring the SAML2 name id
+* 6a068fe HUE-2458 [core] except libsaml.views.acs from csrf
+* 8d87b75 [core] whitespace cleanup
+* cb53728 [core] try to find xmlsec1 in the path
+* 3e2d50b [search] Support selecting a text facet with non range dates
+* 10430d1 [beeswax] Now Hive leaves some temporary files when doing a CTAS
+* 47d5351 HUE-2456 [oozie] Coordinator filter checkbox should filter by character regardless of case
+* 1a10b06 HUE-2428 Missing CSRF Tokens
+* e9be887 HUE-2453 [beeswax] Add an order by id for the query_history
+* 3ec3ff7 HUE-2449 [oozie] Raise an exception if oozie frequency is invalid
+* e2d9933 HUE-2449 [oozie] Remove redundant delete
+* 0ecb0b7 HUE-2155 [search] Field names autocomplete
+* abbbb1d [core] Update tests to use latest Hadoop versions
+* f508f1e HUE-2346: Compile hue-JT-thrift-plugin against hadoop2.4 with backward compatibility
+* d24ab97 HUE-2430 [pig] Progress bars of running scripts not updated on Dashboard
+* ceadc79 [core] Check Oracle client only when Oracle is installed
+* 566478f HUE-2447 [core]: ignore if document tables already exist
+* bab8602 HUE-2448 [oozie]: fix a unicode exception
+* cc3b624 HUE-2444 [search] Remove showDetails:false from the grid result dump
+* d1c94cd HUE-2445. kt_renewer should explicitly ask for renewable tickets
+* 0060abf HUE-2438 [core] Disable SSLv3 for Poodle vulnerability
+* 1b64d0c [core] HUE-2334. Make cx_Oracle compilation optional
+* c6f0ffa [core] HUE-2334. Add cx_Oracle to external dependency
+* 94d5bb1 HUE-2433 [oozie] Coordinator rerun filters should only check boxes
+* bdbc98a [oozie] Fix rerun tests and hide manage section accordingly
+* 444ff15 [search] Timeline is broken with group by facet
+* 9857b96 HUE-2437 [indexer] Trim field names in the backend
+* 37b8f9d HUE-2360 [sentry] Sometimes Groups are not loaded we see the input box instead
+* ce4fb2a HUE-2435 [oozie] ensure consistency of coordinator rerun actions bar with other dashboards in oozie
+* c112e4b [pig] Fix typo in filter list
+* 2ca67a8 HUE-2434 [oozie] coordinator rerun items that are killed should not display MANAGE section
+* 426a631 HUE-2430 [pig] Fix exception when fetching logs of action on dashboard
+* 269732e HUE-2342 [impala] SSL encryption
+* eef6fc8 HUE-2426 [pig] Dashboard gives a 500 error
+* 871583c HUE-2131 [core] Add sharing to pig, hive, rdbms
+* 7a956e1 HUE-2131 [core] Modularize the sharing permission modal
+* adbe263 HUE-2415 [core] Expose a 'is_alive' route a load balancer can poll
+* 325e327 HUE-2412 [core] partially optimize the desktop home view
+* b18ed0f Wrap some lines to 80 characters
+* b920656 HUE-2340 [hbase] Deleting a table deletes it but does not refresh the UI
+* bc6965d [search] Speedup widget retrieval
+* 1493a70 HUE-2397 [beeswax] Can see the logs when opening a running query
+* fa2dfbe HUE-2423 [jobsub] Broken symbolic link jobsubd
+* 9500cd2 HUE-2403 [oozie] More intuitive rerun of coordinator actions
+* b3e25b2 HUE-2418 [search] Automatically resize sibling widgets on drop
+* c8b0ce8 HUE-2210 [search] Improve reliability of the timeline start/date fields
+* 02e07d9 HUE-2419 [core] Revert back progress bar color change
+* 75f1aeb HUE-2402 [fb] Prettify uploading snippet
+* cf609c2 HUE-2347 [fb] Drag and drop to move files
+* e008de0 HUE-2414 [search] Timeline chart breaks when there's no extraSeries defined
+* 0c1454b [HUE-2411] limit fetching autocomplete users and groups to 2000
+* b48d635 HUE-2410 [core] Upgrade to font-awesome 4.2
+* f18e382 HUE-2409 [fb] Context menu not displayed in Firefox
+* 0cc14e0 [jb] failsafe in cases where applicationType may not be available
+* bb08159 HUE-2405 [useradmin] Add enhanced user password policy
+* d1edb10 [sentry] Support None authentication
+* 11c7ef6 HUE-2094 [jb] Add more metadata when viewing Spark application details
+* 72f2774 HUE-2094 [jb] Spark jobs will now be visible in the job browser instead of erroring
+* 6ebd600 HUE-2407 [beeswax] Enable chart X axis ordering
+* dc5db15 HUE-2348 [search] Highlight terms inplace in the field
+* 24d786c [core] Cache permission list and remove unused middlewares
+* c52f886 HUE-2406 [search] New dashboard page has a margin problem
+* 22a1a3b HUE-2404 [oozie] CSRF token missing in rerun popups
+* d947503 [beeswax] Prevents 'save' overriding a query when only a portion of it is selected
+* 83c7e36 HUE-2373 [search] Heatmap can break
+* 287661d HUE-2401 [search] Visually report selected and excluded values for ranges too
+* a8bfb0c HUE-2395 [search] Broken widget in Solr Apache logs example
+* 7c9e0de HUE-2400 [core] The CSRF protection breaks some apps
+* db91c54 HUE-2398 [fb] Drag and Drop hover message should not appear when elements originating in DOM are dragged
+* 98c71f2 HUE-2396 [beeswax] Fix Cross-site scripting(XSS) vulnerbility
+* 6a02467 HUE-2387 [beeswax] Support getting logs using FetchResults() api
+* 37c80cb HUE-2369 [search] Download query should not included non selected headers
+* 1f54b8b [core] Add csrf token in non-jQuery requests
+* 339e68a [core] Add CSRF protection to all requests
+* 504b5ad [oozie] Adding version from metrics as it is unrelated to Oozie
+* cdbae5b [core] Bump Hadoop MR1 plugin to 2.5.0
+* 5a63476 HUE-2372 [search] Move 'add a dimension' to the left
+* c2d0d19 [jb] Verify certificate in secure when talking to RM over rest https (ssl)
+* ed8695c [imapala] Example doesn't fail with already installed message
+* ca76305 HUE-2389 [impala] Expand results table after the results are added to datatables
+* 4d865a4 HUE-2371 [sentry] Sentry URI should be created only with a ALL permission
+* 2b02474 [fb] Better error message when can't connect to HTTPFS
+* 9c5880a HUE-2210 [search] Add a initial_gap in sync with gap for new facets or saved collection
+* f078e13 [fb] Opening an empty file should not create a js error
+* e7ff38a [core] Fix test name typo in database setup
+
+
+Contributors
+------------
+
+This Hue release is made possible thanks to the contribution from:
+
+- Aaron Newton
+- Aaron T. Myers
+- abec
+- Abraham Elmahrek
+- Aditya Acharya
+- Alex Breshears
+- Alex Newman
+- Alex (posi) Newman
+- alheio
+- Ambreen Kazi
+- Andrei Savu
+- Andrew Bayer
+- Andrew Yao
+- Ann McCown
+- Ashu Pachauri
+- Atupal
+- bcwalrus
+- bc Wong
+- Ben Bishop
+- Ben Gooley
+- Ben White
+- Bhargava Kalathuru
+- Bruce Mitchener
+- Bruno Mahé
+- Christopher Conner
+- Christopher McConnell
+- Christopherwq Conner
+- cwalet
+- dbeech
+- Derek Chen-Becker
+- Dominik Gehl
+- Eli Collins
+- Enrico Berti
+- Erick Tryzelaar
+- gdgt
+- Gilad Wolff
+- grundprinzip
+- Harsh
+- Harsh J
+- Henry Robinson
+- Igor Wiedler
+- Ilkka Turunen
+- Istvan
+- Ivan Orlov
+- Jakub Kukul
+- Jarcek
+- Joey Echeverria
+- Jon Natkins
+- Karissa McKelvey
+- Kevin Wang
+- krish
+- Lars Francke
+- Linden Hillenbrand
+- Luca Natali
+- Marcus McLaughlin
+- Mariusz Strzelecki
+- Michalis Kongtongk
+- mrmrs
+- Nicolas Fouché
+- Olaf Flebbe
+- Pala M Muthaia Chettiar
+- Patricia Sz
+- Patrycja Szabłowska
+- Paul Battaglia
+- Paul McCaughtry
+- Peter Slawski
+- Philip Zeyliger
+- Piotr Ackermann
+- Prasad Mujumdar
+- raphi
+- Ricky Saltzer
+- Romain Rigaux
+- Roman Shaposhnik
+- Rui Pereira
+- Sai Chirravuri
+- Sean Mackrory
+- Shawn Van Ittersum
+- Shrijeet
+- Shrijeet Paliwal
+- Shuo Diao
+- Stephanie Bodoff
+- Suhas Satish
+- Tatsuo Kawasaki
+- thinker0
+- Thomas Aylott
+- Todd Lipcon
+- vinithra
+- vybs
+- William Bourque
+- Word
+- Zhihai Xu
