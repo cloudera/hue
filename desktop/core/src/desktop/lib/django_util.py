@@ -222,6 +222,7 @@ def render(template, request, data, json=None, template_lib=None, force_template
     else:
       return render_json(data, request.GET.get("callback"), status=status)
   else:
+    data.update({'user': request.user})
     return _render_to_response(template,
                                request,
                                RequestContext(request, data),
