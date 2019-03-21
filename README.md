@@ -33,9 +33,9 @@ cd hue
 make apps
 build/env/bin/hue runserver
 ```
-Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is [desktop/conf/pseudo-distributed.ini](desktop/conf/pseudo-distributed.ini).
+Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is `desktop/conf/pseudo-distributed.ini`.
 
-Read more in the [installation documentation](http://cloudera.github.io/hue/latest/admin-manual/manual.html#installation).
+Read more in the [installation documentation](http://cloudera.github.io/hue/latest/administrator/installation/).
 
 
 Docker

@@ -153,7 +153,7 @@ Hue can be setup to read and write to a configured S3 account, and users get aut
 
 [Read more about it](http://gethue.com/introducing-s3-support-in-hue/).
 
-** Create Hive Tables Directly From S3**
+**Create Hive Tables Directly From S3**
 Hue's Metastore Import Data Wizard can create external Hive tables directly from data directories in S3. This allows S3 data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse.
 
 To create an external Hive table from S3, navigate to the Metastore app, select the desired database and then click the “Create a new table from a file” icon in the upper right.
@@ -167,9 +167,9 @@ Choose your input files' delimiter and column definition options and finally cli
 Now that we have created external Hive tables created from our S3 data, we can jump into either the Hive or Impala editor and start querying the data directly from S3 seamlessly. These queries can join tables and objects that are backed either by S3, HDFS, or both. Query results can then easily be saved back to S3.
 
 
-** S3 Configuration **
+**S3 Configuration**
 
-[Hue S3 Documentation](../admin-manual/manual.html#s3).
+[Hue S3 Documentation](/administrator/connectors/files/#s3).
 
 
 #### ADLS
@@ -178,19 +178,19 @@ Learn more about it on the [ADLS integration post](http://gethue.com/browsing-ad
 
  Users gets autocomplete capabilities and more:
 
-** Exploring ADLS in Hue's file browser **
+**Exploring ADLS in Hue's file browser**
 Once Hue is successfully configured to connect to ADLS, we can view all accessible folders within the account by clicking on the ADLS root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to ADLS.
 
-** Create Hive Tables Directly From ADLS **
+**Create Hive Tables Directly From ADLS**
 Hue's table browser import wizard can create external Hive tables directly from files in ADLS. This allows ADLS data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse. To create an external Hive table from ADLS, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on ADLS.
 
-** Save Query Results to ADLS **
+**Save Query Results to ADLS**
 Now that we have created external Hive tables created from our ADLS data, we can jump into either the Hive or Impala editor and start querying the data directly from ADLS seamlessly. These queries can join tables and objects that are backed either by ADLS, HDFS, or both. Query results can then easily be saved back to ADLS.
 
 
-** ADLS Configuration **
+**ADLS Configuration**
 
-[Hue ADLS Documentation](../admin-manual/manual.html#adls).
+[Hue ADLS Documentation](/administrator/connectors/files/#adls).
 
 <a id="fileAndDirectories"></a>
 ### Files and Directories
