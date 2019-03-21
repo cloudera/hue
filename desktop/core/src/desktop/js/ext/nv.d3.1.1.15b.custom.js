@@ -53,28 +53,33 @@ nv.log = function() {
 
 
 nv.render = function render(step) {
-  step = step || 1; // number of graphs to generate in each timeout loop
+  step = step || 1;
 
   nv.render.active = true;
   nv.dispatch.render_start();
 
-  setTimeout(function() {
-    var chart, graph;
+  const renderLoop = function() {
+    let chart, graph;
 
-    for (var i = 0; i < step && (graph = nv.render.queue[i]); i++) {
+    for (let i = 0; i < step && (graph = nv.render.queue[i]); i++) {
       chart = graph.generate();
-      if (typeof graph.callback == typeof(Function)) graph.callback(chart);
+      if (typeof graph.callback === 'function') {
+        graph.callback(chart);
+      }
       nv.graphs.push(chart);
     }
 
     nv.render.queue.splice(0, i);
 
-    if (nv.render.queue.length) setTimeout(arguments.callee, 0);
-    else {
+    if (nv.render.queue.length) {
+      setTimeout(renderLoop, 0);
+    } else {
       nv.dispatch.render_end();
       nv.render.active = false;
     }
-  }, 0);
+  };
+
+  setTimeout(renderLoop,0);
 };
 
 nv.render.active = false;
@@ -11194,8 +11199,8 @@ nv.models.scatter = function() {
           pointPaths.exit().remove();
           pointPaths
               .attr('d', function(d) {
-                if (d.data.length === 0)
-                    return 'M 0 0'
+                if (!d || !d.data || d.data.length === 0)
+                    return 'M 0 0';
                 else
                     return 'M' + d.data.join('L') + 'Z';
               });
