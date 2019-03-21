@@ -96,9 +96,24 @@ function impalaDagre(id) {
       });
       return button;
     });
+
+    $parent = $("#"+id);
+    d3.select("#"+id)
+    .append('div')
+      .classed('resizer', true);
     d3.select("#"+id)
     .append('div')
       .classed('details', true);
+
+    $( '#'+id + ' .resizer' ).draggable({
+      axis: 'x',
+      containment: 'parent',
+      scroll: false,
+      cursor: 'col-resize',
+      drag: function(e, ui) {
+        updateDetailsPosition(ui.position.left);
+      }
+    });
   }
 
   // Set up zoom support
@@ -510,6 +525,20 @@ function impalaDagre(id) {
     d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
+    updateDetailsPosition();
+  }
+
+  function updateDetailsPosition(resizerX) {
+    if (!d3.select('#' + id + '.query-plan').classed('open')) {
+      return;
+    }
+    if (resizerX == null || resizerX == undefined) {
+      resizerX = $('#'+id + ' .resizer').css('left').slice(0, -2);
+    }
+    var right = $('#'+id).width() - resizerX - 4;
+    $('#'+id + ' .details').css('width', right + 'px')
+    $('#'+id + ' .details table tr:nth-child(1)').css('max-width', (right - 83) + 'px');
+    $('#'+id + ' .buttons').css('left', (resizerX - 4 - 32) + 'px');
   }
 
   function appendTimelineAndLegend(detailsContent, data, title, icon, max) {
@@ -594,6 +623,8 @@ function impalaDagre(id) {
     d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
+
+    updateDetailsPosition();
   }
 
   function hideDetail(id) {
@@ -634,6 +665,9 @@ function impalaDagre(id) {
   function toggleDetails() {
     var queryPlan = d3.select('#' + id + '.query-plan');
     queryPlan.classed('open', !queryPlan.classed('open'));
+    $("#"+id + ' .details').width('200px');
+    $("#"+id + ' .resizer').css({'left': 'auto'});
+    $("#"+id + ' .buttons').css({'left': 'auto'});
   }
 
   function renderGraph() {
