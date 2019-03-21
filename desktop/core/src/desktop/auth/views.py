@@ -191,7 +191,8 @@ def dt_login(request, from_modal=False):
     'first_login_ever': is_first_login_ever,
     'login_errors': request.method == 'POST',
     'backend_names': backend_names,
-    'active_directory': is_active_directory
+    'active_directory': is_active_directory,
+    'user': request.user
   })
 
   if not request.user.is_authenticated():
