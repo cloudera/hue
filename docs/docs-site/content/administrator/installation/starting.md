@@ -1,12 +1,11 @@
 ---
-title: "Starting the server"
+title: "Running"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: 4
 ---
 
-After your cluster is running with the plugins enabled, you can start Hue on
-your Hue Server by running:
+After the installation, you can start Hue on your Hue Server by doing:
 
     build/env/bin/supervisor
 
@@ -15,10 +14,11 @@ components. Your Hue installation is now running.
 
 After installation, you can use Hue by navigating to `http://myserver:8888/`.
 
-The [user guide](/user/index.html) will help users go through the various installed applications.
+Next step is to [configure](/configuration/index.html) Hue to point to the external services.
+Then, the [user guide](/user/index.html) will help users go through the various installed applications.
 
 
-Supported Browsers
+**Supported Browsers**
 
 The two latest LTS versions of each browsers:
 

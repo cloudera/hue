@@ -56,8 +56,6 @@ superusers and users.
     username. For superusers, the user and group are username and
     supergroup.</td></tr></table>
 
-
-
 3.  Click **Add User** to save the information you specified and close
     the **Add User** wizard or click **Next**.
 4.  In the **Names and Groups** screen, add optional information.

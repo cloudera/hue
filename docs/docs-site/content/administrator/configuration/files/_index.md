@@ -1,28 +1,28 @@
 ---
-title: "Files and Object Store"
+title: "Files and Stores"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 2
+weight: 3
 ---
 
-### HDFS
+## HDFS
 
 Hue supports one HDFS cluster. That cluster should be defined
 under the `[[[default]]]` sub-section.
 
-    fs_defaultfs::
-      This is the equivalence of `fs.defaultFS` (aka `fs.default.name`) in
-      Hadoop configuration.
+    [hadoop]
 
-    webhdfs_url::
-      You can also set this to be the HttpFS url. The default value is the HTTP
-      port on the NameNode.
+      # Configuration for HDFS NameNode
+      # ------------------------------------------------------------------------
+      [[hdfs_clusters]]
 
-    hadoop_conf_dir::
-      This is the configuration directory of the HDFS, typically
-      `/etc/hadoop/conf`.
+        [[[default]]]
+          fs_defaultfs=hdfs://hdfs-name-node.com:8020
+          webhdfs_url=http://hdfs-name-node.com:20101/webhdfs/v1
 
-### S3
+HA is supported by pointing to the HttpFs service instead of the NameNode.
+
+## S3
 
 Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
 
@@ -59,7 +59,7 @@ The region should be set to the AWS region corresponding to the S3 account. By d
 New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
 
 
-### ADLS
+## ADLS
 
 Hue's file browser can now allow users to explore, manage, and upload data in an ADLS, in addition to HDFS and S3.
 
@@ -93,42 +93,6 @@ Alternatively (but not recommended for production or secure environments), you c
     [[[default]]]
     fs_defaultfs=adl://<account_name>.azuredatalakestore.net
     webhdfs_url=https://<account_name>.azuredatalakestore.net
-
-
-## YARN Cluster
-
-Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
-under the `[[[default]]]` and `[[[ha]]]` sub-sections.
-
-    resourcemanager_host:
-      The host running the ResourceManager.
-
-    resourcemanager_port:
-      The port for the ResourceManager REST service.
-
-    logical_name:
-      NameNode logical name.
-
-    submit_to:
-      To enable the section, set to True.
-
-## Oozie
-
-In the `[liboozie]` section of the configuration file, you should
-specify:
-
-    oozie_url:
-      The URL of the Oozie service. It is the same as the `OOZIE_URL`
-      environment variable for Oozie.
-
-
-## Solr
-
-In the `[search]` section of the configuration file, you should
-specify:
-
-    solr_url:
-      The URL of the Solr service.
 
 
 ## HBase
