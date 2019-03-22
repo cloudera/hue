@@ -8,8 +8,6 @@ pre = "<b>1. </b>"
 
 # Documentation
 
-![Hue Logo](images/hue_logo.png)
-
 The manual to install, use and develop Hue.
 
 Hue is an open source workbench for self-service operation and development of SQL applications
