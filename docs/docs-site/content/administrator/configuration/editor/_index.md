@@ -130,6 +130,23 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
 
 Same as Presto.
 
+### Apache Druid
+
+First, make sure that Hue can talk to Druid via the pydruid SqlAlchemy connector. Either make sure it is in the global Python environment or install it in the Hue virtual environment.
+
+      ./build/env/bin/pip install pydruid
+
+**Note** Make sure the version is equal or more to 0.4.1 if not you will get a "Can't load plugin: sqlalchemy.dialects:druid".
+
+In the hue.ini configuration file, now let's add the interpreter. Here 'druid-host.com' would be the machine where Druid is running.
+
+      [notebook]
+      [[interpreters]]
+      [[[druid]]]
+      name = Druid
+      interface=sqlalchemy
+      options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
+
 ### Teradata
 
     [[[teradata]]]
@@ -203,7 +220,7 @@ The Phoenix JDBC client driver is bundled with the Phoenix binary and source rel
 
 ### BigQuery
 
-### Drill
+### Apache Drill
 
 The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html) can be used.
 
