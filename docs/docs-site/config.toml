@@ -1,4 +1,4 @@
-baseURL = 'http://cloudera.github.io/hue/docs-4.4.0/' # Note: also in [params]
+baseURL = 'http://cloudera.github.io/hue/latest/' # Note: also in [params]
 
 languageCode = "en-us"
 title = "Hue Documentation"
@@ -12,7 +12,7 @@ home = [ "HTML", "RSS", "JSON"]
 
 [params]
   # For logo and favicon partials
-  baseURL = 'http://cloudera.github.io/hue/docs-4.4.0/'
+  baseURL = 'http://cloudera.github.io/hue/latest/'
 
   # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.

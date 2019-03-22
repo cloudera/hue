@@ -217,12 +217,12 @@ Turns a list of semi-colon separated queries into an interactive presentation. I
 
 Use the query editor with any database.
 
-### Hive
-### Impala
+### Apache Hive
+### Apache Impala
 ### MySQL
 ### Oracle
-### KSQL / Kafka SQL
-### Solr SQL
+### KSQL / Apache Kafka SQL
+### Apache Solr SQL
 
 With Solr 5+, query collections like we would query a regular Hive or Impala table.
 
@@ -236,7 +236,7 @@ As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support
 
 which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
 
-### Presto
+### Apache Presto
 
 Presto is a high performance, distributed SQL query engine for big data.
 
@@ -247,8 +247,12 @@ Presto is a high performance, distributed SQL query engine for big data.
 ### BigQuery
 ### AWS Athena
 ### Spark SQL
-### Phoenix
-### Kylin
+### Apache Phoenix
+### Apache Druid
+
+Apache Druid is an ["OLAP style"](http://druid.io/) database.
+
+### Apache Kylin
 Apache Kylin is an open-source online analytical processing (OLAP) engine.
 See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
 
@@ -307,28 +311,15 @@ A Java job design consists of a main class written in Java.
 
 ### Pig
 
-A Pig job design consists of a Pig script.
-
-<table>
-<tr><td>Script name</td><td>Script name or path to the Pig script.</td></tr>
-</table>
+Type [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
 
 ### Sqoop
 
-A Sqoop job design consists of a Sqoop command.
-
-<table>
-<tr><td>Command</td><td>The Sqoop command.</td></tr>
-</table>
+Run an SQL import from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
 
 ### Shell
 
-A Shell job design consists of a shell command.
-
-<table>
-<tr><td>Command</td><td>The shell command.</td></tr>
-<tr><td>Capture output</td><td>Indicate whether to capture the output of the command.</td></tr>
-</table>
+Type or specify a path to a regular shell script.
 
 [Read more about it here](http://gethue.com/use-the-shell-action-in-oozie/).
 
