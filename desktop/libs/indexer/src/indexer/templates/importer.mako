@@ -2260,7 +2260,9 @@ ${ assist.assistPanel() }
         }
       });
       wizard.prefill.target_type.subscribe(function(newValue) {
-        self.outputFormat(newValue || 'table');
+        setTimeout(function() { // target_type gets updated by the router (onePageViewModelModel.js) and delaying allow the notification to go through
+          self.outputFormat(newValue || 'table');
+        },0);
         if (newValue === 'database') {
           vm.currentStep(2);
         } else {
