@@ -1,5 +1,45 @@
 /* Insert here special css for hugo theme, on top of any other imported css */
 
+.hueAnchor {
+  color: #FFF;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  position: fixed;
+  z-index: 2147483647;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  background-color: #aaaaaa;
+  padding: 10px;
+  padding-left: 14px;
+  padding-right: 14px;
+  min-height: 22px;
+}
+
+a.hueAnchor:after {
+    display: none !important;
+}
+
+.hueAnchor:hover,
+.hueAnchor:focus {
+  text-decoration: none;
+  opacity: 0.85;
+  color: #FFF;
+  filter: alpha(opacity=85);
+}
+
+.hueAnchor input {
+  min-height: 10px !important;
+  height: 10px !important;
+  margin: 0;
+}
+
+#jHueScrollUpAnchor {
+  bottom: 20px;
+  right: 40px;
+  display: none;
+}
+
 
 /* Table of contents */
 
