@@ -44,18 +44,18 @@ home = [ "HTML", "RSS", "JSON"]
   themeVariant = "hue"
 
 [[menu.shortcuts]]
-name = "<i class='fab fa-github'></i> Github"
+name = "<i class='fab fa-fw fa-github'></i> GitHub"
 identifier = "ds"
 url = "https://github.com/cloudera/hue"
 weight = 10
 
 [[menu.shortcuts]]
-name = "<i class='fas fa-camera'></i> Demo"
+name = "<i class='fas fa-fw fa-camera'></i> Demo"
 url = "http://demo.gethue.com"
 weight = 11
 
 [[menu.shortcuts]]
-name = "<i class='fas fa-bookmark'></i> Gethue.com"
+name = "<i class='fas fa-fw fa-bookmark'></i> Gethue.com"
 identifier = "hugodoc"
 url = "http://gethue.com"
 weight = 20

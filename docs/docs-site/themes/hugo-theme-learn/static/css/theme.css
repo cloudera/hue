@@ -101,7 +101,7 @@ textarea:focus, input[type="email"]:focus, input[type="number"]:focus, input[typ
     background: #8451a1;
     color: #fff;
     text-align: center;
-    border-bottom: 4px solid #9c6fb6;
+    /*border-bottom: 1px solid #9c6fb6;*/
     padding: 1rem;
 }
 #header a {
@@ -373,11 +373,12 @@ textarea:focus, input[type="email"]:focus, input[type="number"]:focus, input[typ
     top: 0;
     bottom: 0;
     width: 4rem;
-    font-size: 50px;
+    font-size: 25px;
     height: 100%;
     cursor: pointer;
     display: table;
     text-align: center;
+    opacity: 0.4;
 }
 #body .nav > i {
     display: table-cell;
@@ -401,6 +402,7 @@ textarea:focus, input[type="email"]:focus, input[type="number"]:focus, input[typ
 }
 #body .nav:hover {
     background: #F6F6F6;
+    opacity: 1;
 }
 #body .nav.nav-pref {
     left: 0;
