@@ -1,13 +1,14 @@
 ---
-title: "SQL"
+title: "SQL Connectors"
 date: 2019-03-13T18:28:09-07:00
 draft: false
 weight: 1
 ---
 
 The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
+It has one of the best SQL autocomplete and many [more features](/user/editor/).
 
-It is available in Editor or Notebook mode and focuses on SQL. Dialects can be added to the main `[notebook]` section like this:
+It is available in Editor or Notebook. Dialects can be added to the main `[notebook]` section like this:
 
     [notebook]
 
@@ -19,35 +20,14 @@ It is available in Editor or Notebook mode and focuses on SQL. Dialects can be a
           # The backend connection to use to communicate with the server.
           interface=hiveserver2
 
-        [[[mysqlalche]]]
-          name = MySQL alchemy
+        [[[mysql]]]
+          name = MySQL
           interface=sqlalchemy
           options='{"url": "mysql://root:root@localhost:3306/hue"}'
 
+## Connectors
 
-Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
-
-        [beeswax]
-        # A limit to the number of rows that can be downloaded from a query before it is truncated.
-        # A value of -1 means there will be no limit.
-        download_row_limit=-1
-
-        # A limit to the number of bytes that can be downloaded from a query before it is truncated.
-        # A value of -1 means there will be no limit.
-        download_bytes_limit=-1
-
-In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
-
-        [desktop]
-        # Global setting to allow or disable end user downloads in all Hue.
-        # e.g. Query result in Editors and Dashboards, file in File Browser...
-        enable_download=false
-
-The download feature in the file browser can be disabled separately with the following options in your hue.ini:
-
-        [filebrowser]
-        show_download_button=false
-
+Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered.
 
 ### Impala
 
@@ -365,3 +345,28 @@ You can leave out the username and password in the JDBC options, and Hue will in
     [[[pig]]]
       name=Pig
       interface=oozie
+
+## Editor
+
+Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+
+        [beeswax]
+        # A limit to the number of rows that can be downloaded from a query before it is truncated.
+        # A value of -1 means there will be no limit.
+        download_row_limit=-1
+
+        # A limit to the number of bytes that can be downloaded from a query before it is truncated.
+        # A value of -1 means there will be no limit.
+        download_bytes_limit=-1
+
+In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
+
+        [desktop]
+        # Global setting to allow or disable end user downloads in all Hue.
+        # e.g. Query result in Editors and Dashboards, file in File Browser...
+        enable_download=false
+
+The download feature in the file browser can be disabled separately with the following options in your hue.ini:
+
+        [filebrowser]
+        show_download_button=false

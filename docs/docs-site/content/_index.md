@@ -10,11 +10,11 @@ pre = "<b>1. </b>"
 
 The manual to install, use and develop Hue.
 
-Hue is an open source workbench for self-service operation and development of SQL applications
+Hue is a mature open source workbench for self-service operation and development of SQL applications
 in a Data Warehouse: [gethue.com](http://gethue.com).
 
 Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily
-used by hundreds of Cloudera customers executing millions of queries daily.
+used by hundreds of Cloudera customers and community users executing millions of queries daily.
 
 
 Administrate

@@ -2,12 +2,11 @@
 title: "Development"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 2
+weight: 1
 ---
 
 
-This section goes into greater detail on useful features within
-the Hue environment.
+This section goes into greater detail on how to build and reuse the components of Hue.
 
 ## Building
 

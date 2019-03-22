@@ -50,12 +50,12 @@ url = "https://github.com/cloudera/hue"
 weight = 10
 
 [[menu.shortcuts]]
-name = "<i class='fas fa-fw fa-camera'></i> Demo"
+name = "<i class='fas fa-fw fa-play'></i> Demo"
 url = "http://demo.gethue.com"
 weight = 11
 
 [[menu.shortcuts]]
-name = "<i class='fas fa-fw fa-bookmark'></i> Gethue.com"
+name = "<i class='fas fa-fw fa-bookmark'></i> gethue.com"
 identifier = "hugodoc"
 url = "http://gethue.com"
 weight = 20
