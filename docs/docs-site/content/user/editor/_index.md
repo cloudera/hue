@@ -9,29 +9,9 @@ The goal of Hue's Editor is to make data querying easy and productive.
 
 It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
 
-The [custom SQL Editor page](http://gethue.com/custom-sql-query-editors/) also describes the configuration steps. Any editor can be `starred`
-next to its name so that it becomes the default editor and the landing page when logging in.
+Any editor can be `starred` next to its name so that it becomes the default editor and the landing page when logging in.
 
-First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
-
-    [librdbms]
-      [[databases]]
-        [[[postgresql]]]
-        nice_name=PostgreSQL
-        name=music
-        engine=postgresql_psycopg2
-        port=5432
-        user=hue
-        password=hue
-        options={}
-
-Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
-
-    [notebook]
-      [[interpreters]]
-        [[[postgresql]]]
-        name=PostgreSQL
-        interface=rdbms
+Configuration of the connectors is currently done by the [Administrator](/administrator/configuration/editor/).
 
 ## Concepts
 ### Running Queries

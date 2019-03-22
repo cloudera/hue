@@ -2,7 +2,7 @@
 title: "APIs"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 2
+weight: 3
 ---
 
 Hue can be accessed directly via a Django Python Shell or by its REST API (recommended).
@@ -44,7 +44,7 @@ And finally launch the shell by:
 
 Then use the Python code to access a certain user information:
 
-    Python 2.7.6 (default, Oct 26 2016, 20:30:19) 
+    Python 2.7.6 (default, Oct 26 2016, 20:30:19)
     Type "copyright", "credits" or "license" for more information.
 
     IPython 5.2.0 -- An enhanced Interactive Python.
@@ -90,7 +90,7 @@ Then use the Python code to access a certain user information:
 
 ## REST
 
-The API is being made public via [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
+REST APIs are not all public yet but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
 
 ### Metadata Catalog
 

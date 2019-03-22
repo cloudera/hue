@@ -9,7 +9,7 @@ A recommended setup consists in:
 
 * 2 Hues and 1 Load Balancer
 * Databases: MySQL InnoDB, PostgreSQL, Oracle
-* Authentication: [LDAP or Username/Passord](#user-management)
+* Authentication: [LDAP or Username/Password](../user-management/)
 
 ### Monitoring
 
@@ -20,14 +20,14 @@ Performing a `GET /desktop/debug/is_alive` will return a 200 response if running
 
 Hue is often run with:
 
-* Cherrypy with Httpd
+* Cherrypy with HTTPD (built-in when using Cloudera Manager)
+* [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) (recommended)
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
-* [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 
 ### Task Server
 
 The task server is currently a work in progress to outsource all the blocking or resource intensive operations
-outside of the API server. Follow (HUE-8738)[https://issues.cloudera.org/browse/HUE-8738) for more information
+outside of the API server. Follow [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) for more information
 on when first usable task will be released.
 
 Until then, here is how to try the task server service.
@@ -68,4 +68,4 @@ or when Django Celery Beat is enabled:
 
 A Web proxy lets you centralize all the access to a certain URL and prettify the address (e.g. ec2-54-247-321-151.compute-1.amazonaws.com --> demo.gethue.com).
 
-Here is one way to do it with [Apache](http://gethue.com/i-put-a-proxy-on-hue/).
+Here is one way to do it with [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) or [Apache](http://gethue.com/i-put-a-proxy-on-hue/).

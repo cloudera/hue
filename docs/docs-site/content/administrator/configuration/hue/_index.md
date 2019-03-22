@@ -5,7 +5,7 @@ draft: false
 weight: 1
 ---
 
-
+This section is about configuring the Hue server itself.
 These configuration variables are under the `[desktop]` section in
 the `hue.ini` configuration file.
 
@@ -218,4 +218,3 @@ When idle_session_timeout is set, users will automatically be logged out after N
 ## Auditing
 
 Read more about [Auditing User Administration Operations with Hue and Cloudera Navigator](http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/).
-

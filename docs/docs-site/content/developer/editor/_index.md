@@ -1,8 +1,8 @@
 ---
-title: "SQL Editor / Notebook"
+title: "Editor / Notebook"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 1
+weight: 2
 ---
 
 They provide SQL integration with any database via several connectors (native, JDBC, SQL Alchemy...).
@@ -13,23 +13,26 @@ Connectors are pluggable and can new engines can be supported. Feel free to comm
 
 ## SQL
 
-The [SQL Editor page](http://gethue.com/custom-sql-query-editors/) also describes the configuration steps.
+The [Editor Configuration](/administrator/configuration/editor/) also describes the configuration steps.
 
-Close to 100% of [Hive and Impala grammar](desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the
-autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
+Close to 100% of [Hive and Impala grammar](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
+
+**Coming Soon**
+How to write your own SQL parser.
 
 ### HiveServer2 API
 Hive, Impala, SparkSQL
 
 ### SQL Alchemy
-SQL Alchemy supports comes with [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
+SQL Alchemy is the prefered way if the HiveServer2 API is not supported by the database. More enterprise support will come with [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
 
 ### Python Connectors
 MySQL, Oracle, PostgreSQL, Phoenix, Presto, Kylin, Redshift, BigQuery, Drill
 
 ### JDBC
-Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
-View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py).
+Use the query editor with any JDBC compatible database. View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py).
+
+**Note** Going forward, SQL Alchemy is prefered as more "Python native".
 
 ### Solr SQL
 [Solr connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/solr.py)
@@ -37,6 +40,8 @@ View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/li
 ### Others
 
 ## Jobs
+
+The Job Browser is generic and can list any type of jobs, queries and provide bulk operations like kill, pause, delete... and access to logs and recommendations.
 
 ### Oozie
 MapReduce, Pig, Java, Shell, Sqoop, DistCp [Oozie connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/oozie_batch.py)
@@ -59,7 +64,7 @@ The API was influenced by Solr but is now generic:
 
 [Dashboard API](https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/dashboard_api.py)
 
-## SQL
+### SQL
 
 [SQL API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/dashboard_api.py)
 
@@ -72,12 +77,10 @@ When HS2, RDBMS, and JDBC Are Not Enough
 
 If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app: [Notebook Connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors). Each connector API subclasses the [Base API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py) and must implement the methods defined within; refer to the [JdbcApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py) or [RdbmsApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py) for representative examples.
 
-## Search
-
 ### Solr
 
 [Solr Dashboard API](https://github.com/cloudera/hue/blob/master/apps/search/src/search/dashboard_api.py)
 
 ### Elastic Search
 
-A similar backend to Solr would need to be developed: [HUE-7828](https://issues.cloudera.org/browse/HUE-7828)
+A connector similar to Solr or SQL Alchemy binding would need to be developed [HUE-7828](https://issues.cloudera.org/browse/HUE-7828)

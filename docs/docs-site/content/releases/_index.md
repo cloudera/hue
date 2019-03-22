@@ -6,4 +6,4 @@ chapter = false
 pre = "<b>4. </b>"
 +++
 
-List of all the product releases.
+Hue is a mature product continuously evolving that is more than 10 years old. Here is the list of all the product releases.

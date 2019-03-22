@@ -13,11 +13,12 @@ High Level Roadmap
 * [ ] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 * [ ] Result caching
 * [ ] Editor v2
-* [ ] [core] Integrate with Apache Ranger [HUE-8748](https://issues.cloudera.org/browse/HUE-8748)
-* [ ] [core] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)
-* [ ] [core] Integrate with Apache Knox [HUE-8750](https://issues.cloudera.org/browse/HUE-8750)
+* [ ] Integrate with Apache Ranger [HUE-8748](https://issues.cloudera.org/browse/HUE-8748)
+* [ ] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)
+* [ ] Integrate with Apache Knox [HUE-8750](https://issues.cloudera.org/browse/HUE-8750)
 * [ ] SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
 * [ ] Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
+* [ ] Configuration of connectors via the interface [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
 * [x] Web Server [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 * [ ] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
 * [x] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
