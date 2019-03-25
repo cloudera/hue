@@ -7,8 +7,7 @@ weight: 4
 
 ## HDFS
 
-Hue supports one HDFS cluster. That cluster should be defined
-under the `[[[default]]]` sub-section.
+Hue supports one HDFS cluster. That cluster should be defined under the `[[[default]]]` sub-section.
 
     [hadoop]
 
@@ -22,6 +21,53 @@ under the `[[[default]]]` sub-section.
 
 HA is supported by pointing to the HttpFs service instead of the NameNode.
 
+
+Make sure the HDFS service has in it `hdfs-site.xml`:
+
+    <property>
+    <name>dfs.webhdfs.enable</name>
+    <value>true</value>
+    </property>
+
+Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user:
+
+WebHDFS: Add to core-site.xml:
+
+        <!-- Hue WebHDFS proxy user setting -->
+        <property>
+        <name>hadoop.proxyuser.hue.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>hadoop.proxyuser.hue.groups</name>
+        <value>*</value>
+        </property>
+
+HttpFS: Verify that /etc/hadoop-httpfs/conf/httpfs-site.xml has the following configuration:
+
+        <!-- Hue HttpFS proxy user setting -->
+        <property>
+        <name>httpfs.proxyuser.hue.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>httpfs.proxyuser.hue.groups</name>
+        <value>*</value>
+        </property>
+
+If the configuration is not present, add it to /etc/hadoop-httpfs/conf/httpfs-site.xml and restart the HttpFS daemon.
+Verify that core-site.xml has the following configuration:
+
+        <property>
+        <name>hadoop.proxyuser.httpfs.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>hadoop.proxyuser.httpfs.groups</name>
+        <value>*</value>
+        </property>
+
+If the configuration is not present, add it to /etc/hadoop/conf/core-site.xml and restart Hadoop.
 ## S3
 
 Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
