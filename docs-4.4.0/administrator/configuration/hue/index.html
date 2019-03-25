@@ -12,19 +12,19 @@
     <title>Hue :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553516578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553516578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553516578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553516578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
 
     
   </div>
@@ -270,13 +270,37 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Connectors" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Connectors
+          SQL Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard &amp; Query Builder
           
       </a>
       
@@ -567,13 +591,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/browsers/" title="Browser" class="dd-item 
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/browsers/">
-          Browser
+          Data Catalog
           
       </a>
       
@@ -1504,9 +1528,12 @@
 <li><a href="#authentication">Authentication</a>
 <ul>
 <li><a href="#username-password">Username / Password</a></li>
+<li><a href="#allow-all">Allow All</a></li>
 <li><a href="#ldap">LDAP</a></li>
 <li><a href="#saml">SAML</a></li>
-<li><a href="#openid-connect">OpenId Connect</a></li>
+<li><a href="#spnego">Spnego</a></li>
+<li><a href="#pam">PAM</a></li>
+<li><a href="#oauth-connect">OAuth Connect</a></li>
 <li><a href="#multiple-authentication-backends">Multiple Authentication Backends</a></li>
 </ul></li>
 <li><a href="#change-your-maps-look-and-feel">Change your maps look and feel</a></li>
@@ -1520,6 +1547,7 @@
 <li><a href="#storing-passwords-in-file-script">Storing passwords in file script</a></li>
 <li><a href="#idle-session-timeout">Idle session timeout</a></li>
 <li><a href="#auditing">Auditing</a></li>
+<li><a href="#source-version-control">Source Version Control</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -1544,7 +1572,7 @@
 
 <p>This section is about configuring the Hue server itself.
 These configuration variables are under the <code>[desktop]</code> section in
-the <code>hue.ini</code> configuration file.</p>
+the <code>conf/hue.ini</code> configuration file.</p>
 
 <h2 id="specifying-the-http-port">Specifying the HTTP port</h2>
 
@@ -1586,34 +1614,72 @@ app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hb
 
 <h2 id="authentication">Authentication</h2>
 
-<p>By default, the first user who logs in to Hue can choose any
-username and password and becomes an administrator automatically.  This
+<p>By default (<code>AllowFirstUserDjangoBackend</code>), the first user who logs in to Hue can choose any
+username and password and becomes an administrator automatically. This
 user can create other user and administrator accounts. User information is
 stored in the Django database in the Django backend.</p>
 
-<p>The authentication system is pluggable. For more information, see the <a href="../sdk/sdk.html">SDK Documentation</a>.</p>
-
-<p>List of some of the possible authentications:</p>
+<p>The authentication system is pluggable. Here is a list of some of the possible authentications:</p>
 
 <h3 id="username-password">Username / Password</h3>
 
+<p>This is the default Hue backend. It creates the first user that logs in as the super user. After this, it relies on Django and the user manager to authenticate users.</p>
+
+<pre><code>desktop.auth.backend.AllowFirstUserDjangoBackend
+</code></pre>
+
+<h3 id="allow-all">Allow All</h3>
+
+<p>This backend does not require a password for users to log in. All users are automatically authenticated and the username is set to what is provided.</p>
+
+<pre><code>desktop.auth.backend.AllowAllBackend
+</code></pre>
+
 <h3 id="ldap">LDAP</h3>
+
+<p>Authenticates users against an LDAP service.</p>
+
+<pre><code>desktop.auth.backend.LdapBackend
+</code></pre>
 
 <h3 id="saml">SAML</h3>
 
+<p>Secure Assertion Markup Language (SAML) single sign-on (SSO) backend. Delegates authentication to the configured Identity Provider. See Configuring Hue for SAML for more details.</p>
+
+<pre><code>libsaml.backend.SAML2Backend
+</code></pre>
+
 <p><a href="http://gethue.com/updated-saml-2-0-support/">Read more about it</a>.</p>
 
-<h3 id="openid-connect">OpenId Connect</h3>
+<h3 id="spnego">Spnego</h3>
+
+<p>SPNEGO is an authentication mechanism negotiation protocol. Authentication can be delegated to an authentication server, such as a Kerberos KDC, depending on the mechanism negotiated.</p>
+
+<pre><code>desktop.auth.backend.SpnegoDjangoBackend
+</code></pre>
+
+<h3 id="pam">PAM</h3>
+
+<p>Authenticates users with PAM (pluggable authentication module). The authentication mode depends on the PAM module used.</p>
+
+<pre><code>desktop.auth.backend.PamBackend
+</code></pre>
+
+<h3 id="oauth-connect">OAuth Connect</h3>
+
+<p>Delegates authentication to a third-party OAuth server.</p>
+
+<pre><code>desktop.auth.backend.OAuthBackend
+</code></pre>
 
 <h3 id="multiple-authentication-backends">Multiple Authentication Backends</h3>
 
 <p>For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or Hue safety valve in Cloudera Manager with a list containing first the LdapBackend followed by either the ModelBackend or custom AllowFirstUserDjangoBackend (permits first login and relies on user model for all subsequent authentication):</p>
 
-<pre>
-[desktop]
+<pre><code>[desktop]
   [[auth]]
   backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
-</pre>
+</code></pre>
 
 <p>This tells Hue to first check against the configured LDAP directory service, and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.</p>
 
@@ -1623,11 +1689,10 @@ stored in the Django database in the Django backend.</p>
 
 <p>The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:</p>
 
-<pre>
-[desktop]
+<pre><code>[desktop]
 leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-</pre>
+leaflet_tile_layer_attribution='Tiles &amp;copy; Esri &amp;mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+</code></pre>
 
 <p><a href="http://gethue.com/change-your-maps-look-and-feel/">Read more about it here</a>.</p>
 
@@ -1681,11 +1746,11 @@ work.
 <p>Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers
 having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.</p>
 
-<p>DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:
-<pre>
-  [desktop]
-  ssl_cipher_list=DEFAULT:!DES:!3DES
-</pre></p>
+<p>DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:</p>
+
+<pre><code>[desktop]
+ssl_cipher_list=DEFAULT:!DES:!3DES
+</code></pre>
 
 <h2 id="sasl">SASL</h2>
 
@@ -1768,6 +1833,51 @@ idle_session_timeout=600
 <h2 id="auditing">Auditing</h2>
 
 <p>Read more about <a href="http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/">Auditing User Administration Operations with Hue and Cloudera Navigator</a>.</p>
+
+<h2 id="source-version-control">Source Version Control</h2>
+
+<p>By default Hue stores the <a href="/user/concept/#documents">saved documents</a> in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket&hellip; to open and save queries.</p>
+
+<p><strong>Note</strong> This feature is experiemental and tracked in <a href="https://issues.cloudera.org/browse/HUE-951">HUE-951</a>.</p>
+
+<pre><code>[desktop]
+
+[[vcs]]
+
+## [[[git-read-only]]]
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
+
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+## [[[github]]]
+
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
+
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
+
+    ## Client Secret for Authorized Application
+    # client_secret=
+## [[[svn]]
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
+
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
+
+    ## Client Secret for Authorized Application
+    # client_secret=
+</code></pre>
 
 
 <footer class=" footline" >
@@ -1941,6 +2051,22 @@ idle_session_timeout=600
                     
                         
                         
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
                     
                 
                 
@@ -2791,7 +2917,7 @@ idle_session_timeout=600
 			<a class="nav nav-prev" href="/hue/latest/administrator/configuration/" title="Configuration"> <i class="fa fa-chevron-left"></i></a>
 		
 		
-			<a class="nav nav-next" href="/hue/latest/administrator/configuration/editor/" title="SQL Connectors" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+			<a class="nav nav-next" href="/hue/latest/administrator/configuration/editor/" title="SQL Editor" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
 		
 	
     </div>
@@ -2801,20 +2927,20 @@ idle_session_timeout=600
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553516578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553516578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553516578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553516578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553516578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553516578"></script>
-    <script src="/hue/latest/js/learn.js?1553516578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553516578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
+    <script src="/hue/latest/js/learn.js?1553555578"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553516578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553516578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

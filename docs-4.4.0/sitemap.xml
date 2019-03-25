@@ -243,7 +243,7 @@
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/administrator/configuration/files/</loc>
+    <loc>http://cloudera.github.io/hue/latest/administrator/configuration/dashboard/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   
@@ -278,7 +278,7 @@
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/administrator/configuration/external/</loc>
+    <loc>http://cloudera.github.io/hue/latest/administrator/configuration/files/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   
@@ -294,6 +294,11 @@
   
   <url>
     <loc>http://cloudera.github.io/hue/latest/developer/application/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://cloudera.github.io/hue/latest/administrator/configuration/external/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   

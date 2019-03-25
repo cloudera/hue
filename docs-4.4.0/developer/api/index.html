@@ -12,19 +12,19 @@
     <title>APIs :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553516578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553516578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553516578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553516578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
 
     
   </div>
@@ -270,13 +270,37 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Connectors" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Connectors
+          SQL Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard &amp; Query Builder
           
       </a>
       
@@ -567,13 +591,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/browsers/" title="Browser" class="dd-item 
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/browsers/">
-          Browser
+          Data Catalog
           
       </a>
       
@@ -1492,13 +1516,10 @@
 <ul>
 <li>
 <ul>
-<li><a href="#python">Python</a>
-<ul>
-<li><a href="#how-to-count-documents-of-a-user">How to count documents of a user</a></li>
-</ul></li>
 <li><a href="#rest">REST</a>
 <ul>
-<li><a href="#metadata-catalog">Metadata Catalog</a>
+<li><a href="#quickstart">Quickstart</a></li>
+<li><a href="#data-catalog">Data Catalog</a>
 <ul>
 <li><a href="#searching-for-entities">Searching for entities</a></li>
 <li><a href="#searching-for-entities-with-the-dummy-backend">Searching for entities with the dummy backend</a></li>
@@ -1513,6 +1534,10 @@
 <li><a href="#creating-a-namespace-property">Creating a namespace property</a></li>
 <li><a href="#map-a-namespace-property-to-a-class-entity">Map a namespace property to a class entity</a></li>
 </ul></li>
+</ul></li>
+<li><a href="#python">Python</a>
+<ul>
+<li><a href="#how-to-count-documents-of-a-user">How to count documents of a user</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1536,109 +1561,62 @@
 
 
 
-<p>Hue can be accessed directly via a Django Python Shell or by its REST API (recommended).</p>
-
-<h2 id="python">Python</h2>
-
-<ul>
-<li><a href="http://gethue.com/hue-api-execute-some-builtin-commands/">Hue API: Execute some builtin or shell commands</a>.</li>
-<li><a href="http://gethue.com/how-to-manage-the-hue-database-with-the-shell/">How to manage the Hue database with the shell</a>.</li>
-</ul>
-
-<h3 id="how-to-count-documents-of-a-user">How to count documents of a user</h3>
-
-<p>On the command line:</p>
-
-<pre><code>./build/env/bin/hue shell
-</code></pre>
-
-<p>If using Cloudera Manager, as a <code>root</code> user launch the shell.</p>
-
-<p>Export the configuration directory:</p>
-
-<pre><code>export HUE_CONF_DIR=&quot;/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE_SERVER | tail -1 | awk '{print $9}'`&quot;
-echo $HUE_CONF_DIR
-&gt; /var/run/cloudera-scm-agent/process/2061-hue-HUE_SERVER
-</code></pre>
-
-<p>Get the process id:</p>
-
-<pre><code>lsof -i :8888|grep -m1 hue|awk '{ print $2 }'
-&gt; 14850
-</code></pre>
-
-<p>In order to export all Hue&rsquo;s env variables:</p>
-
-<pre><code>for line in `strings /proc/$(lsof -i :8888|grep -m1 hue|awk '{ print $2 }')/environ|egrep -v &quot;^HOME=|^TERM=|^PWD=&quot;`;do export $line;done
-</code></pre>
-
-<p>And finally launch the shell by:</p>
-
-<pre><code>HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue shell
-&gt; ALERT: This appears to be a CM Managed environment
-&gt; ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
-&gt; ALERT: Please run 'hue &lt;command&gt; --cm-managed'
-</code></pre>
-
-<p>Then use the Python code to access a certain user information:</p>
-
-<pre><code>Python 2.7.6 (default, Oct 26 2016, 20:30:19)
-Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
-
-IPython 5.2.0 -- An enhanced Interactive Python.
-?         -&gt; Introduction and overview of IPython's features.
-%quickref -&gt; Quick reference.
-help      -&gt; Python's own help system.
-object?   -&gt; Details about 'object', use 'object??' for extra details.
-
-from django.contrib.auth.models import User
-from desktop.models import Document2
-
-user = User.objects.get(username='demo')
-Document2.objects.documents(user=user).count()
-
-In [8]: Document2.objects.documents(user=user).count()
-Out[8]: 1167
-
-In [10]: Document2.objects.documents(user=user, perms='own').count()
-Out[10]: 1166
-
-In [11]: Document2.objects.documents(user=user, perms='own', include_history=True).count()
-Out[11]: 7125
-
-In [12]: Document2.objects.documents(user=user, perms='own', include_history=True, include_trashed=True).count()
-Out[12]: 7638
-
-In [13]: Document2.objects.documents(user=user, perms='own', include_history=True, include_trashed=True, include_managed=True).count()
-Out[13]: 31408
-
-Out[14]:
-(85667L,
-{u'desktop.Document': 18524L,
-  u'desktop.Document2': 31409L,
-  u'desktop.Document2Permission': 556L,
-  u'desktop.Document2Permission_groups': 277L,
-  u'desktop.Document2Permission_users': 0L,
-  u'desktop.Document2_dependencies': 15087L,
-  u'desktop.DocumentPermission': 1290L,
-  u'desktop.DocumentPermission_groups': 0L,
-  u'desktop.DocumentPermission_users': 0L,
-  u'desktop.Document_tags': 18524L})
-</code></pre>
+<p>Hue can be accessed directly via a Django Python Shell or by its REST API.</p>
 
 <h2 id="rest">REST</h2>
 
 <p>REST APIs are not all public yet but this is work in progress in <a href="https://issues.cloudera.org/browse/HUE-1450">HUE-1450</a>.</p>
 
-<h3 id="metadata-catalog">Metadata Catalog</h3>
+<p>Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow,
+list some S3 files, export a document&hellip;). Currently this API is private and subject to change but
+can be easily reused. You would need to GET <em>/accounts/login</em> to get the CSRF token
+and POST it back along <em>username</em> and <em>password</em> and reuse the <em>sessionid</em> cookie in next
+communication calls.</p>
+
+<h3 id="quickstart">Quickstart</h3>
+
+<p>Hue is based on the Django Web Framework. Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses <em>username</em> and <em>password</em> and <em>csrftoken</em> form variables to authenticate.</p>
+
+<p>In this code snippet, we will use well-known python <em>requests</em> library. We will first acquire <em>csrftoken</em> by GET <em>login_url</em> and then create a dictionary of form data which contains <em>username</em>, <em>password</em> and <em>csrftoken</em> and the <em>next_url</em> and another dictionary for header which contains the <em>Referer</em> url and an empty dictionary for the cookies. After the POST request to <em>login_url</em> we will check the reponse code, which should be <em>r.status_code == 200</em>.</p>
+
+<p>Once the request is successful then capture headers and cookies for subsequent requests. Subsequent <em>request.session</em> calls can be made by providing <em>cookies=session.cookies</em> and <em>headers=session.headers</em>.</p>
+
+<pre><code>import requests
+
+def login_djangosite():
+next_url = &quot;/&quot;
+login_url = &quot;http://localhost:8888/accounts/login?next=/&quot;
+
+session = requests.Session()
+r = session.get(login_url)
+form_data = dict(username=&quot;[your hue username]&quot;,password=&quot;[your hue password]&quot;,
+                  csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
+r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
+
+# check if request executed successfully?
+print r.status_code
+
+cookies = session.cookies
+headers = session.headers
+
+r=session.get('http://localhost:8888/metastore/databases/default/metadata',
+cookies=session.cookies, headers=session.headers)
+print r.status_code
+
+# check metadata output
+print r.text
+</code></pre>
+
+<h3 id="data-catalog">Data Catalog</h3>
 
 <p>The <a href="https://github.com/cloudera/hue/tree/master/desktop/libs/metadata">metadata API</a> is powering <a href="http://gethue.com/improved-sql-exploration-in-hue-4-3/">Search and Tagging here</a> and the <a href="http://gethue.com/hue-4-sql-editor-improvements/">Query Assistant with Navigator Optimizer Integration</a>.</p>
 
 <p>The backends is pluggable by providing alternative <a href="https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/catalog">client interfaces</a>:</p>
 
 <ul>
-<li>navigator (default)</li>
-<li>dummy</li>
+<li>Cloudera Navigator (default)</li>
+<li>Apache Atlas (<a href="https://issues.cloudera.org/browse/HUE-8749">HUE-8749</a>)</li>
+<li>Dummy (skeleton for integrating new catalogs)</li>
 </ul>
 
 <h4 id="searching-for-entities">Searching for entities</h4>
@@ -1773,6 +1751,94 @@ Out[14]:
 }, function(data) {
   console.log(ko.mapping.toJSON(data));
 });
+</code></pre>
+
+<h2 id="python">Python</h2>
+
+<ul>
+<li><a href="http://gethue.com/hue-api-execute-some-builtin-commands/">Hue API: Execute some builtin or shell commands</a>.</li>
+<li><a href="http://gethue.com/how-to-manage-the-hue-database-with-the-shell/">How to manage the Hue database with the shell</a>.</li>
+</ul>
+
+<h3 id="how-to-count-documents-of-a-user">How to count documents of a user</h3>
+
+<p>On the command line:</p>
+
+<pre><code>./build/env/bin/hue shell
+</code></pre>
+
+<p>If using Cloudera Manager, as a <em>root</em> user launch the shell.</p>
+
+<p>Export the configuration directory:</p>
+
+<pre><code>export HUE_CONF_DIR=&quot;/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE_SERVER | tail -1 | awk '{print $9}'`&quot;
+echo $HUE_CONF_DIR
+&gt; /var/run/cloudera-scm-agent/process/2061-hue-HUE_SERVER
+</code></pre>
+
+<p>Get the process id:</p>
+
+<pre><code>lsof -i :8888|grep -m1 hue|awk '{ print $2 }'
+&gt; 14850
+</code></pre>
+
+<p>In order to export all Hue&rsquo;s env variables:</p>
+
+<pre><code>for line in `strings /proc/$(lsof -i :8888|grep -m1 hue|awk '{ print $2 }')/environ|egrep -v &quot;^HOME=|^TERM=|^PWD=&quot;`;do export $line;done
+</code></pre>
+
+<p>And finally launch the shell by:</p>
+
+<pre><code>HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue shell
+&gt; ALERT: This appears to be a CM Managed environment
+&gt; ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
+&gt; ALERT: Please run 'hue &lt;command&gt; --cm-managed'
+</code></pre>
+
+<p>Then use the Python code to access a certain user information:</p>
+
+<pre><code>Python 2.7.6 (default, Oct 26 2016, 20:30:19)
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+
+IPython 5.2.0 -- An enhanced Interactive Python.
+?         -&gt; Introduction and overview of IPython's features.
+%quickref -&gt; Quick reference.
+help      -&gt; Python's own help system.
+object?   -&gt; Details about 'object', use 'object??' for extra details.
+
+from django.contrib.auth.models import User
+from desktop.models import Document2
+
+user = User.objects.get(username='demo')
+Document2.objects.documents(user=user).count()
+
+In [8]: Document2.objects.documents(user=user).count()
+Out[8]: 1167
+
+In [10]: Document2.objects.documents(user=user, perms='own').count()
+Out[10]: 1166
+
+In [11]: Document2.objects.documents(user=user, perms='own', include_history=True).count()
+Out[11]: 7125
+
+In [12]: Document2.objects.documents(user=user, perms='own', include_history=True, include_trashed=True).count()
+Out[12]: 7638
+
+In [13]: Document2.objects.documents(user=user, perms='own', include_history=True, include_trashed=True, include_managed=True).count()
+Out[13]: 31408
+
+Out[14]:
+(85667L,
+{u'desktop.Document': 18524L,
+  u'desktop.Document2': 31409L,
+  u'desktop.Document2Permission': 556L,
+  u'desktop.Document2Permission_groups': 277L,
+  u'desktop.Document2Permission_users': 0L,
+  u'desktop.Document2_dependencies': 15087L,
+  u'desktop.DocumentPermission': 1290L,
+  u'desktop.DocumentPermission_groups': 0L,
+  u'desktop.DocumentPermission_users': 0L,
+  u'desktop.Document_tags': 18524L})
 </code></pre>
 
 
@@ -1920,6 +1986,22 @@ Out[14]:
                     
                     
 
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
                     
                         
             
@@ -2809,20 +2891,20 @@ Out[14]:
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553516578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553516578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553516578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553516578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553516578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553516578"></script>
-    <script src="/hue/latest/js/learn.js?1553516578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553516578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
+    <script src="/hue/latest/js/learn.js?1553555578"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553516578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553516578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

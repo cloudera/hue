@@ -12,19 +12,19 @@
     <title>SQL Editor / Notebook :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553516578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553516578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553516578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553516578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
 
     
   </div>
@@ -270,13 +270,37 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Connectors" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Connectors
+          SQL Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard &amp; Query Builder
           
       </a>
       
@@ -567,13 +591,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/browsers/" title="Browser" class="dd-item 
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/browsers/">
-          Browser
+          Data Catalog
           
       </a>
       
@@ -1495,14 +1519,16 @@
 <li><a href="#concepts">Concepts</a>
 <ul>
 <li><a href="#running-queries">Running Queries</a></li>
-<li><a href="#downloading-and-exporting-query-results">Downloading and Exporting Query Results</a></li>
-<li><a href="#advanced-query-settings">Advanced Query Settings</a></li>
+<li><a href="#downloading-and-exporting-results">Downloading and Exporting Results</a></li>
 <li><a href="#autocomplete">Autocomplete</a></li>
 <li><a href="#variables">Variables</a></li>
-<li><a href="#syntax-checker">Syntax checker</a></li>
-<li><a href="#query-assist">Query Assist</a></li>
 <li><a href="#charting">Charting</a></li>
-<li><a href="#risk-alerts">Risk Alerts</a></li>
+<li><a href="#self-service-troubleshooting">Self service troubleshooting</a>
+<ul>
+<li><a href="#pre-query-execution">Pre-query execution</a></li>
+<li><a href="#during-execution">During execution</a></li>
+<li><a href="#post-query-execution">Post-query execution</a></li>
+</ul></li>
 <li><a href="#presentation-mode">Presentation Mode</a></li>
 </ul></li>
 <li><a href="#sql-databases">SQL Databases</a>
@@ -1526,17 +1552,17 @@
 </ul></li>
 <li><a href="#jobs">Jobs</a>
 <ul>
-<li><a href="#mapreduce">MapReduce</a></li>
-<li><a href="#java">Java</a></li>
 <li><a href="#pig">Pig</a></li>
 <li><a href="#sqoop">Sqoop</a></li>
 <li><a href="#shell">Shell</a></li>
-<li><a href="#distcp">DistCp</a></li>
+<li><a href="#java">Java</a></li>
 <li><a href="#spark">Spark</a>
 <ul>
 <li><a href="#batch">Batch</a></li>
 <li><a href="#interactive">Interactive</a></li>
 </ul></li>
+<li><a href="#mapreduce">MapReduce</a></li>
+<li><a href="#distcp">DistCp</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1562,7 +1588,7 @@
 
 <p>The goal of Hue&rsquo;s Editor is to make data querying easy and productive.</p>
 
-<p>It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search &amp; tagging of data and query assistance.</p>
+<p>It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, <a href="http://gethue.com/hue-4-sql-editor-improvements/">risk alerts and self service troubleshooting</a> and query assistance.</p>
 
 <p>Any editor can be <code>starred</code> next to its name so that it becomes the default editor and the landing page when logging in.</p>
 
@@ -1572,24 +1598,18 @@
 
 <h3 id="running-queries">Running Queries</h3>
 
-<p><strong>Note</strong>: To run a query, you must be logged
-in to Hue as a user that also has a Unix user account on the remote
-server.</p>
-
 <ol>
-<li>To execute a portion of the query, highlight one or more query
+<li>The currently selected statement has a left blue order. To execute a portion of a query, highlight one or more query
 statements.</li>
 
-<li><p>Click <strong>Execute</strong>. The Query Results window appears with the results
-of your query.</p>
+<li><p>Click <strong>Execute</strong>. The Query Results window appears.</p>
 
 <ul>
-<li>To view a log of the query execution, toggle the <strong>Log</strong> caret on the
-left of the progress bar. You can use the information in this tab
-to debug your query.</li>
+<li>There is a <strong>Log</strong> caret on the left of the progress bar.</li>
 <li>To view the columns of the query, expand the <strong>Columns</strong> icon. Clicking
 on the column label will scroll to the column. Names and types can be filtered.</li>
-<li>To expand a row, double click on it or click on the row number.</li>
+<li>Select the chart icon to plot the results</li>
+<li>To expand a row, click on the row number.</li>
 <li>To lock a row, click on the lock icon in the row number column.</li>
 <li>Search either by clicking on the magnifier icon on the results tab, or pressing Ctrl/Cmd + F</li>
 <li><a href="http://gethue.com/new-features-in-the-sql-results-grid-in-hive-and-impala/">See more how to refine your results</a>.</li>
@@ -1606,7 +1626,18 @@ Multi-statement query pane to execute the remaining statements.</p></li>
 <p><strong>Note</strong>: Under the logs panel, you can view any
 MapReduce or <a href="#impala-queries">Impala jobs</a> that the query generated.</p>
 
-<h3 id="downloading-and-exporting-query-results">Downloading and Exporting Query Results</h3>
+<p><strong>Advanced Query Settings</strong></p>
+
+<p>The pane to the top of the Editor lets you specify the following
+options:</p>
+
+<ul>
+<li>Settings: depends on the query engines. For information about <a href="http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration">Hive configuration variables</a>.</li>
+<li>Files: load a jar of files to use as UDF</li>
+<li>UDFs: register a custom function</li>
+</ul>
+
+<h3 id="downloading-and-exporting-results">Downloading and Exporting Results</h3>
 
 <p>To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query.</p>
 
@@ -1618,72 +1649,9 @@ MapReduce or <a href="#impala-queries">Impala jobs</a> that the query generated.
 1.  Export to a file on your cluster&rsquo;s file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
 2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.</p>
 
-<p><a id="advancedQuerySettings"></a></p>
-
-<h3 id="advanced-query-settings">Advanced Query Settings</h3>
-
-<p>The pane to the top of the Editor lets you specify the following
-options:</p>
-
-<table>
-<tr><td>DATABASE</td><td>The database containing the table definitions.</td></tr>
-<tr><td>SETTINGS</td><td>Override the Hive and Hadoop default settings. To configure a new
-setting:
-
-<ol>
-<li> Click Add.
-<li> For Key, enter a Hive or Hadoop configuration variable name.
-<li> For Value, enter the value you want to use for the variable.
-
-For example, to override the directory where structured Hive query logs
-are created, you would enter hive.querylog.location for Key, and a
-path for Value.
-</ol>
-
-To view the default settings, click the Settings tab at the top of
-the page. For information about Hive configuration variables, see:
-[http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
-For information about Hadoop configuration variables, see:
-[http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml](http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml).</td></tr>
-<tr><td>FILE RESOURCES</td><td>Make files locally accessible at query execution time available on the
-Hadoop cluster. Hive uses the Hadoop Distributed Cache to distribute the
-added files to all machines in the cluster at query execution time.
-
-<ol>
-<li>  Click Add to configure a new setting.
-<li>   From the Type drop-down menu, choose one of the following:
-<ul>
-   <li>jar - Adds the specified resources to the Java classpath.
-   <li>archive - Unarchives the specified resources when
-        distributing them.
-    <li>file - Adds the specified resources to the distributed
-        cache. Typically, this might be a transform script (or similar)
-        to be executed.
-
-<li>   For Path, enter the path to the file or click browse and select the file.
-</ol>
-
-Note: It is not necessary to specify files
-used in a transform script if the files are available in the same path
-on all machines in the Hadoop cluster.</td></tr>
-<tr><td>USER-DEFINED FUNCTIONS</td><td>Specify user-defined functions. Click Add to configure a new
-setting. Specify the function name in the Name field, and specify
-the class name for Classname.
-
-You *must* specify a JAR file for the user-defined functions in FILE RESOURCES.
-
-To include a user-defined function in a query, add a $ (dollar sign)
-before the function name in the query. For example, if MyTable is a
-user-defined function name in the query, you would type: SELECT $MyTable
-</td></tr>
-<tr><td>PARAMETERIZATION</td><td>Indicate that a dialog box should display to enter parameter values when
-a query containing the string $parametername is executed. Enabled by
-default.</td></tr>
-</table>
-
 <h3 id="autocomplete">Autocomplete</h3>
 
-<p>To make your SQL editing experience better we&rsquo;ve created a  new autocompleter for Hue 3.11. The old one had some limitations and was only aware of parts of the statement being edited. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.</p>
+<p>To make your SQL editing experience, Hue comes with one of the best SQL autocomplete on the planet. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.</p>
 
 <p>The result is improved completion throughout. We now have completion for more than just SELECT statements, it will help you with the other DDL and DML statements too, INSERT, CREATE, ALTER, DROP etc.</p>
 
@@ -1693,7 +1661,7 @@ default.</td></tr>
 
 <p><strong>Smart keyword completion</strong></p>
 
-<p>The new autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.</p>
+<p>The autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.</p>
 
 <p><strong>UDFs</strong></p>
 
@@ -1703,49 +1671,48 @@ default.</td></tr>
 
 <p>When editing subqueries it will only make suggestions within the scope of the subquery. For correlated subqueries the outside tables are also taken into account.</p>
 
-<p><strong>All about quality</strong></p>
+<p><strong>Context popup</strong></p>
 
-<p>We&rsquo;ve fine-tuned the live autocompletion for a better experience and we&rsquo;ve introduced some options under the editor settings where you can turn off live autocompletion or disable the autocompleter altogether (if you&rsquo;re adventurous). To access these settings open the editor and focus on the code area, press CTRL + , (or on Mac CMD + ,) and the settings will appear.</p>
+<p>Right click on any fragement of the queries (e.g. a table name) to gets all its metadata information. This is a handy shortcut to get more description or check what types of values are contained in the table or columns.</p>
 
-<p>The autocompleter talks to the backend to get data for tables and databases etc. by default it will timeout after 5 seconds but once it has been fetched it&rsquo;s cached for the next time around. The timeout can be adjusted in the Hue server configuration.</p>
-
-<p>We&rsquo;ve got an extensive test suite but not every possible statement is covered, if the autocompleter can&rsquo;t interpret a statement it will be silent and no drop-down will appear. If you encounter a case where you think it should suggest something but doesn&rsquo;t or if it gives incorrect suggestions then please let us know.</p>
-
-<p>Learn more about it in <a href="http://gethue.com/brand-new-autocompleter-for-hive-and-impala/">Autocompleter for Hive and Impala</a>.</p>
-
-<h3 id="variables">Variables</h3>
-
-<p>Variables are used to easily configure parameters in a query. They can be of two types:</p>
-
-<p><b>Single Valued</b>
-<pre>
-select * from web_logs where country_code = &ldquo;${country_code}&rdquo;
-</pre>
-The variable can have a default value.
-<pre>
-select * from web_logs where country_code = &ldquo;${country_code=US}&rdquo;
-</pre>
-<b>Multi Valued</b>
-<pre>
-select * from web_logs where country_code = &ldquo;${country_code=CA, FR, US}&rdquo;
-</pre>
-In addition, the displayed text for multi valued variables can be changed.
-<pre>
-select * from web_logs where country_code = &ldquo;${country_code=CA(Canada), FR(France), US(United States)}&rdquo;
-</pre>
-For values that are not textual, omit the quotes.
-<pre>
-select * from boolean_table where boolean_column = ${boolean_column}
-</pre></p>
-
-<h3 id="syntax-checker">Syntax checker</h3>
+<p><strong>Syntax checker</strong></p>
 
 <p>A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.</p>
 
-<h3 id="query-assist">Query Assist</h3>
+<p><strong>All about quality</strong></p>
 
-<p>Read more about the <a href="https://blog.cloudera.com/blog/2017/08/new-in-cloudera-enterprise-5-12-hue-4-interface-and-query-assistant/">Query Assistant with Navigator Optimizer Integration
-</a>.</p>
+<p>The live autocompletion is fine-tuned for a better experience advanced settings an be accessed via CTRL + , (or on Mac CMD + ,) or clicking on the &lsquo;?&rsquo; icon.</p>
+
+<p>The autocompleter talks to the backend to get data for tables and databases etc and caches it to keep it quick. Clicking on the refresh icon in the left assist will clear the cache. This can be useful if a new table was created outside of Hue and is not yet showing-up (Hue will regularly clear his cache to automatically pick-up metadata changes done outside of Hue).</p>
+
+<h3 id="variables">Variables</h3>
+
+<p>Variables are used to easily configure parameters in a query. They are ideal for saving reports that can be shared or executed repetitively:</p>
+
+<p><strong>Single Valued</strong></p>
+
+<pre><code>select * from web_logs where country_code = &quot;${country_code}&quot;
+</code></pre>
+
+<p><strong>The variable can have a default value</strong></p>
+
+<pre><code>select * from web_logs where country_code = &quot;${country_code=US}&quot;
+</code></pre>
+
+<p><strong>Multi Valued</strong></p>
+
+<pre><code>select * from web_logs where country_code = &quot;${country_code=CA, FR, US}&quot;
+</code></pre>
+
+<p><strong>In addition, the displayed text for multi valued variables can be changed</strong></p>
+
+<pre><code>select * from web_logs where country_code = &quot;${country_code=CA(Canada), FR(France), US(United States)}&quot;
+</code></pre>
+
+<p><strong>For values that are not textual, omit the quotes.</strong></p>
+
+<pre><code>select * from boolean_table where boolean_column = ${boolean_column}
+</code></pre>
 
 <h3 id="charting">Charting</h3>
 
@@ -1759,15 +1726,31 @@ select * from boolean_table where boolean_column = ${boolean_column}
 <li>Maps (Marker and Gradient)</li>
 </ul>
 
-<p>Read more about extending <a href="../sdk/sdk.html">charts</a>.</p>
+<p>Read more about extending <a href="../../developer/">charts</a>.</p>
 
-<h3 id="risk-alerts">Risk Alerts</h3>
+<h3 id="self-service-troubleshooting">Self service troubleshooting</h3>
+
+<h4 id="pre-query-execution">Pre-query execution</h4>
+
+<p><strong>Popular values</strong></p>
 
 <p>The autocompleter will suggest popular tables, columns, filters, joins, group by, order by etc. based on metadata from Navigator Optimizer. A new “Popular” tab has been added to the autocomplete result dropdown which will be shown when there are popular suggestions available.</p>
 
-<p><strong>Risk and suggestions</strong></p>
+<p>This is particularly useful for doing joins on unknown datasets or getting the most interesting columns of tables with hundreds of them.</p>
+
+<p><strong>Risk alerts</strong></p>
 
 <p>While editing, Hue will run your queries through Navigator Optimizer in the background to identify potential risks that could affect the performance of your query. If a risk is identified an exclamation mark is shown above the query editor and suggestions on how to improve it is displayed in the lower part of the right assistant panel.</p>
+
+<p>See a video on  <a href="http://gethue.com/hue-4-sql-editor-improvements/">Self service troubleshooting</a>.</p>
+
+<h4 id="during-execution">During execution</h4>
+
+<p>The Query Profile visualizer details the plan of the query and the bottle necks. When detected, &ldquo;Health&rdquo; risks are listed with suggestions on how to fix them.</p>
+
+<h4 id="post-query-execution">Post-query execution</h4>
+
+<p>A new experimental panel when enabled can offer post risk analysis and recommendation on how to tweak the query for better speed.</p>
 
 <h3 id="presentation-mode">Presentation Mode</h3>
 
@@ -1775,7 +1758,7 @@ select * from boolean_table where boolean_column = ${boolean_column}
 
 <h2 id="sql-databases">SQL Databases</h2>
 
-<p>Use the query editor with any database.</p>
+<p>Use the query editor with any database. Those databases need to be configured by the <a href="/administrator/configuration/editor/">administratior</a></p>
 
 <h3 id="apache-hive">Apache Hive</h3>
 
@@ -1832,57 +1815,11 @@ See how to configure the <a href="http://gethue.com/using-hue-to-interact-with-a
 
 <h3 id="others">Others</h3>
 
-<p>Extend with SQL Alchemy, JDBC or build your own <a href="../sdk/sdk.html#sql">connectors</a>.</p>
+<p>Extend with SQL Alchemy, JDBC or build your own <a href="../../developer/">connectors</a>.</p>
 
 <h2 id="jobs">Jobs</h2>
 
-<p>The Editor application enables you to create and submit jobs to
-the cluster. You can include variables with your jobs to enable
-you and other users to enter values for the variables when they run your
-job.</p>
-
-<p>All job design settings except Name and Description support the use of
-variables of the form $variable_name. When you run the job, a dialog
-box will appear to enable you to specify the values of the variables.</p>
-
-<table>
-<tr><td>Name</td><td>Identifies the job and its collection of properties and parameters.</td></tr>
-<tr><td>Description</td><td>A description of the job. The description is displayed in the dialog box
-that appears if you specify variables for the job.</td></tr>
-<tr><td>Advanced</td><td>Advanced settings:<ul><li>Is shared- Indicate whether to share the action with all users.<li>Oozie parameters - parameters to pass to Oozie</td></tr>
-<tr><td>Prepare</td><td>Specifies paths to create or delete before starting the workflow job.</td></tr>
-<tr><td>Params</td><td>Parameters to pass to a script or command. The parameters are expressed
-using the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr152/">JSP 2.0 Specification (JSP.2.3) Expression
-Language</a>,
-allowing variables, functions, and complex expressions as parameters.</td></tr>
-<tr><td>Job Properties</td><td>Job properties. To set a property value, click <b>Add Property</b>.<ol><li>Property name -  a configuration property name. This field provides autocompletion, so you can type the first few characters of a property name and then select the one you want from the drop-down
-    list.<li>Valuethe property value.</td></tr>
-<tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
-<tr><td>Archives</td><td>Files to pass to the job. Archives to pass to the job. Equivalent to the Hadoop -archives option.</td></tr></table>
-
-<h3 id="mapreduce">MapReduce</h3>
-
-<p>A MapReduce job design consists of MapReduce functions written in Java.
-You can create a MapReduce job design from existing mapper and reducer
-classes without having to write a main Java class. You must specify the
-mapper and reducer classes as well as other MapReduce properties in the
-Job Properties setting.</p>
-
-<table>
-<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the classes that
-implement the Mapper and Reducer functions.</td></tr>
-</table>
-
-<h3 id="java">Java</h3>
-
-<p>A Java job design consists of a main class written in Java.</p>
-
-<table>
-<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
-<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
-<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
-<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
-</table>
+<p>In addition to SQL queries, the Editor application enables you to create and submit batch jobs to the cluster.</p>
 
 <h3 id="pig">Pig</h3>
 
@@ -1898,9 +1835,16 @@ implement the Mapper and Reducer functions.</td></tr>
 
 <p><a href="http://gethue.com/use-the-shell-action-in-oozie/">Read more about it here</a>.</p>
 
-<h3 id="distcp">DistCp</h3>
+<h3 id="java">Java</h3>
 
-<p>A DistCp job design consists of a DistCp command.</p>
+<p>A Java job design consists of a main class written in Java.</p>
+
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
+<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
+<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
+<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
+</table>
 
 <h3 id="spark">Spark</h3>
 
@@ -1930,15 +1874,14 @@ And how to use the <a href="http://gethue.com/use-the-spark-action-in-oozie/">Sp
 
 <p>Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is up and running:</p>
 
-<pre>
-[spark]
+<pre><code>[spark]
   # Host address of the Livy Server.
   livy_server_host=localhost
 
 [notebook]
 
- ## Show the notebook menu or not
- show_notebooks=true
+## Show the notebook menu or not
+show_notebooks=true
 
 [[interpreters]]
     # Define the name and how to connect and execute the language.
@@ -1949,14 +1892,26 @@ And how to use the <a href="http://gethue.com/use-the-spark-action-in-oozie/">Sp
       # The backend connection to use to communicate with the server.
       interface=hiveserver2
 
-   [[[spark]]]
-     name=Scala
-     interface=livy
+  [[[spark]]]
+    name=Scala
+    interface=livy
 
     [[[pyspark]]]
       name=PySpark
       interface=livy
-</pre>
+</code></pre>
+
+<h3 id="mapreduce">MapReduce</h3>
+
+<p>A MapReduce job design consists of MapReduce functions written in Java.
+You can create a MapReduce job design from existing mapper and reducer
+classes without having to write a main Java class. You must specify the
+mapper and reducer classes as well as other MapReduce properties in the
+Job Properties setting.</p>
+
+<h3 id="distcp">DistCp</h3>
+
+<p>A DistCp job design consists of a DistCp command.</p>
 
 
 <footer class=" footline" >
@@ -2103,6 +2058,22 @@ And how to use the <a href="http://gethue.com/use-the-spark-action-in-oozie/">Sp
                     
                     
 
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
                     
                         
             
@@ -2992,20 +2963,20 @@ And how to use the <a href="http://gethue.com/use-the-spark-action-in-oozie/">Sp
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553516578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553516578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553516578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553516578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553516578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553516578"></script>
-    <script src="/hue/latest/js/learn.js?1553516578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553516578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
+    <script src="/hue/latest/js/learn.js?1553555578"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553516578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553516578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

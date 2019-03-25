@@ -12,19 +12,19 @@
     <title>Applications :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553516578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553516578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553516578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553516578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
 
     
   </div>
@@ -270,13 +270,37 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Connectors" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Connectors
+          SQL Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard &amp; Query Builder
           
       </a>
       
@@ -567,13 +591,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/browsers/" title="Browser" class="dd-item 
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/browsers/">
-          Browser
+          Data Catalog
           
       </a>
       
@@ -1492,38 +1516,13 @@
 <ul>
 <li>
 <ul>
-<li><a href="#introduction-and-overview">Introduction and Overview</a>
-<ul>
-<li><a href="#from-30-000-feet">From 30,000 feet</a></li>
-<li><a href="#the-hue-server">The Hue Server</a></li>
-<li><a href="#interacting-with-hadoop">Interacting with Hadoop</a></li>
-<li><a href="#on-the-front-end">On the Front-End</a></li>
-<li><a href="#an-architectural-view">An Architectural View</a></li>
-<li><a href="#file-layout">File Layout</a></li>
-</ul></li>
-<li><a href="#pre-requisites">Pre-requisites</a>
-<ul>
-<li><a href="#dependencies">Dependencies</a></li>
-<li><a href="#recommended-reading-important-technologies">Recommended Reading / Important Technologies</a></li>
-</ul></li>
+<li><a href="#introduction-and-overview">Introduction and Overview</a></li>
 <li><a href="#fast-guide-to-creating-a-new-hue-application">Fast-Guide to Creating a New Hue Application</a>
 <ul>
 <li><a href="#download-unpack-build-distro">Download, Unpack, Build Distro</a></li>
 <li><a href="#run-create-desktop-app-to-set-up-a-new-source-tree">Run &ldquo;create_desktop_app&rdquo; to Set up a New Source Tree</a></li>
 <li><a href="#install-sdk-application">Install SDK Application</a></li>
 <li><a href="#customizing-views-and-templates">Customizing Views and Templates</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#testing">Testing</a>
-<ul>
-<li><a href="#the-short-story">The short story</a></li>
-<li><a href="#longer-story">Longer story</a>
-<ul>
-<li><a href="#helpful-command-line-tricks">Helpful command-line tricks</a></li>
-<li><a href="#create-and-run-the-jasmine-tests">Create and run the Jasmine tests</a></li>
-<li><a href="#special-environment-variables">Special environment variables</a></li>
-<li><a href="#writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</a></li>
-<li><a href="#jenkins-configuration">Jenkins Configuration</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1549,6 +1548,8 @@
 
 <p>Building a brand new application is more work but is ideal for creating a custom solution.</p>
 
+<p><strong>Note</strong> It is now more recommended to integrate external services (e.g. integrate a new SQL Datatase with the Editor, add a new visualization&hellip;) to the core Hue APIs instead of building brand new application. This page gives good content in both cases. Feel free to contact the community for advice.</p>
+
 <h2 id="introduction-and-overview">Introduction and Overview</h2>
 
 <p>Hue leverages the browser to provide users with an environment for exploring
@@ -1569,125 +1570,6 @@ Hadoop and the other Hue services.</p>
 
 <p>This document will orient you with the general structure of Hue
 and will walk you through adding a new application using the SDK.</p>
-
-<h3 id="from-30-000-feet">From 30,000 feet</h3>
-
-<p><img src="http://cloudera.github.io/hue/latest/images/from30kfeet.png" alt="From up on high" /></p>
-
-<p>Hue, as a &ldquo;container&rdquo; web application, sits in between your Hadoop installation
-and the browser.  It hosts all the Hue Apps, including the built-in ones, and
-ones that you may write yourself.</p>
-
-<h3 id="the-hue-server">The Hue Server</h3>
-
-<p><img src="http://cloudera.github.io/hue/latest/images/webbackend.png" alt="Web Back-end" /></p>
-
-<p>Hue is a web application built on the Django python web framework.
-Django, running on the WSGI container/web server (typically CherryPy), manages
-the url dispatch, executes application logic code, and puts together the views
-from their templates.  Django uses a database (typically sqlite)
-to manage session data, and Hue applications can use it as well
-for their &ldquo;models&rdquo;.  (For example, the saved Editor stores
-saved queries in the database.)</p>
-
-<p>In addition to the web server, some Hue applications run
-daemon processes &ldquo;on the side&rdquo;. Some examples are the <code>Celery Task Server</code>, <code>Celery Beat</code>.</p>
-
-<h3 id="interacting-with-hadoop">Interacting with Hadoop</h3>
-
-<p><img src="http://cloudera.github.io/hue/latest/images/interactingwithhadoop.png" alt="Interacting with Hadoop" /></p>
-
-<p>Hue provides some APIs for interacting with Hadoop.
-Most noticeably, there are python file-object-like APIs for
-interacting with HDFS.  These APIs work by making REST API or Thrift calls
-the Hadoop daemons. The Hadoop administrator must enable these interfaces from
-Hadoop.</p>
-
-<h3 id="on-the-front-end">On the Front-End</h3>
-
-<p>Hue provides a front-end framework based on
-<a href="http://twitter.github.com/bootstrap/">Bootstrap</a> and
-<a href="http://knockoutjs.com/">Knockout js</a>.</p>
-
-<h3 id="an-architectural-view">An Architectural View</h3>
-
-<p><img src="http://cloudera.github.io/hue/latest/images/architecture.png" alt="Architecture" /></p>
-
-<p>A Hue application may span three tiers: (1) the UI
-and user interaction in the client&rsquo;s browser, (2) the
-core application logic in the Hue web
-server, and (3) external services with which applications
-may interact.</p>
-
-<p>The absolute minimum that you must implement (besides
-boilerplate), is a
-&ldquo;Django <a href="https://docs.djangoproject.com/en/1.11/#the-view-layer/">view</a>&ldquo;
-function that processes the request and the associated template
-to render the response into HTML.</p>
-
-<p>Many apps will evolve to have a bit of custom JavaScript and
-CSS styles. Apps that need to talk to an external service
-will pull in the code necessary to talk to that service.</p>
-
-<h3 id="file-layout">File Layout</h3>
-
-<p>The Hue &ldquo;framework&rdquo; is in <code>desktop/core/</code> and contains the Web components.
-<code>desktop/libs/</code> is the API for talking to various Hadoop services.
-The installable apps live in <code>apps/</code>.  Please place third-party dependencies in the app&rsquo;s ext-py/
-directory.</p>
-
-<p>The typical directory structure for inside an application includes:</p>
-
-<pre><code>  src/
-    for Python/Django code
-      models.py
-      urls.py
-      views.py
-      forms.py
-      settings.py
-
-  conf/
-    for configuration (``.ini``) files to be installed
-
-  static/
-    for static HTML/js resources and help doc
-
-  templates/
-    for data to be put through a template engine
-
-  locales/
-    for localizations in multiple languages
-</code></pre>
-
-<p>For the URLs within your application, you should make your own <code>urls.py</code>
-which will be automatically rooted at <code>/yourappname/</code> in the global
-namespace. See <code>apps/about/src/about/urls.py</code> for an example.</p>
-
-<h2 id="pre-requisites">Pre-requisites</h2>
-
-<h3 id="dependencies">Dependencies</h3>
-
-<ul>
-<li>The OS specific dependencies listed <a href="http://cloudera.github.io/hue/latest/admin-manual/manual.html">here</a></li>
-<li>Python 2.7</li>
-<li>Django (1.11 included with our distribution)</li>
-<li>Hadoop (Apache Hadoop 2+)</li>
-<li>Java (Java 1.8)</li>
-<li>npm (6.4+)</li>
-</ul>
-
-<h3 id="recommended-reading-important-technologies">Recommended Reading / Important Technologies</h3>
-
-<p>The following are core technologies used inside of Hue.</p>
-
-<ul>
-<li>Python.  <a href="http://diveintopython.net/">Dive Into Python</a> is one of
-several excellent books on python.</li>
-<li>Django.  Start with <a href="https://docs.djangoproject.com/en/1.11/intro/">The Django Tutorial</a>.</li>
-<li><a href="http://incubator.apache.org/thrift/">Thrift</a> is used for communication
-between daemons.</li>
-<li><a href="http://www.makotemplates.org/">Mako</a> is the preferred templating language.</li>
-</ul>
 
 <h2 id="fast-guide-to-creating-a-new-hue-application">Fast-Guide to Creating a New Hue Application</h2>
 
@@ -1883,149 +1765,6 @@ def index(request):
 
 <p>You can now go and try the calculator.</p>
 
-<h1 id="testing">Testing</h1>
-
-<h2 id="the-short-story">The short story</h2>
-
-<p>Install the mini cluster (only once):</p>
-
-<pre><code>./tools/jenkins/jenkins.sh slow
-</code></pre>
-
-<p>Run all the tests:</p>
-
-<pre><code>build/env/bin/hue test all
-</code></pre>
-
-<p>Or just some parts of the tests, e.g.:</p>
-
-<pre><code>build/env/bin/hue test specific impala
-build/env/bin/hue test specific impala.tests:TestMockedImpala
-build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
-</code></pre>
-
-<p>Jasmine tests:</p>
-
-<pre><code>npm run test
-</code></pre>
-
-<h2 id="longer-story">Longer story</h2>
-
-<p>The <code>test</code> management command prepares the arguments (test app names)
-and passes them to nose (django_nose.nose_runner). Nose will then magically
-find all the tests to run.</p>
-
-<p>Tests themselves should be named *_test.py.  These will be found
-as long as they&rsquo;re in packages covered by django.  You can use the
-unittest frameworks, or you can just name your method with
-the word &ldquo;test&rdquo; at a word boundary, and nose will find it.
-See apps/hello/src/hello/hello_test.py for an example.</p>
-
-<h3 id="helpful-command-line-tricks">Helpful command-line tricks</h3>
-
-<p>To run tests that do not depend on Hadoop, use:</p>
-
-<pre><code>build/env/bin/hue test fast
-</code></pre>
-
-<p>To run all tests, use:</p>
-
-<pre><code>build/env/bin/hue test all
-</code></pre>
-
-<p>To run only tests of a particular app, use:</p>
-
-<pre><code>build/env/bin/hue test specific &lt;app&gt;
-</code></pre>
-
-<p>E.g.
-  build/env/bin/hue test specific filebrowser</p>
-
-<p>To run a specific test, use:</p>
-
-<pre><code>build/env/bin/hue test specific &lt;test_func&gt;
-</code></pre>
-
-<p>E.g.
-  build/env/bin/hue test specific useradmin.tests:test_user_admin</p>
-
-<p>Start up pdb on test failures:</p>
-
-<pre><code>build/env/bin/hue test &lt;args&gt; --pdb --pdb-failure -s
-</code></pre>
-
-<p>Point to an Impalad and trigger the Impala tests:</p>
-
-<pre><code>build/env/bin/hue test impala impalad-01.gethue.com
-</code></pre>
-
-<h3 id="create-and-run-the-jasmine-tests">Create and run the Jasmine tests</h3>
-
-<p>Add them in a &ldquo;spec&rdquo; subfolder relative to the file under test and the filename of the test has to end with &ldquo;Spec.js&rdquo;.</p>
-
-<pre><code>someFile.js              &lt;- File under test
-├── spec/
-│   ├── someFileSpec.js  &lt;- File containing tests
-</code></pre>
-
-<p>Run all the tests once with:</p>
-
-<pre><code>npm run test
-</code></pre>
-
-<p>Optionally to use Karma and headless chrome for the tests you can run</p>
-
-<pre><code>npm run test-karma
-</code></pre>
-
-<p>See <code>desktop/core/src/desktop/js/spec/karma.config.js</code> for various options</p>
-
-<h3 id="special-environment-variables">Special environment variables</h3>
-
-<pre><code>DESKTOP_LOGLEVEL=&lt;level&gt;
-  level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
-
-  When specified, the console logger is set to the given log level. A console
-  logger is created if one is not defined.
-
-DESKTOP_DEBUG
-  A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
-  validation.
-
-DESKTOP_PROFILE
-  Turn on Python profiling. The profile data is saved in a file. See the
-  console output for the location of the file.
-
-DESKTOP_LOG_DIR=$dir
-  Specify the HUE log directory. Defaults to ./log.
-
-DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
-  Specify alternate DB connection parameters for HUE to use. Useful for
-  testing your changes against, for example, MySQL instead of sqlite. String
-  is a colon-delimited list.
-
-TEST_IMPALAD_HOST=impalad-01.gethue.com
-  Point to an Impalad and trigger the Impala tests.
-</code></pre>
-
-<h3 id="writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</h3>
-
-<p>Use pseudo_hdfs4.py!  You should tag such tests with &ldquo;requires_hadoop&rdquo;, as follows:</p>
-
-<pre><code>from nose.plugins.attrib import attr
-
-@attr('requires_hadoop')
-def your_test():
-  ...
-</code></pre>
-
-<h3 id="jenkins-configuration">Jenkins Configuration</h3>
-
-<p>Because building Hadoop (for the tests that require it) is slow, we&rsquo;ve
-separated the Jenkins builds into &ldquo;fast&rdquo; and &ldquo;slow&rdquo;.  Both are run
-via scripts/jenkins.sh, which should be kept updated with the latest
-and greatest in build technologies.</p>
-
 
 <footer class=" footline" >
 	
@@ -2171,6 +1910,22 @@ and greatest in build technologies.</p>
                     
                     
 
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
                     
                         
             
@@ -3060,20 +2815,20 @@ and greatest in build technologies.</p>
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553516578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553516578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553516578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553516578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553516578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553516578"></script>
-    <script src="/hue/latest/js/learn.js?1553516578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553516578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
+    <script src="/hue/latest/js/learn.js?1553555578"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553516578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553516578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

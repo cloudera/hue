@@ -18,9 +18,8 @@
       
       <guid>http://cloudera.github.io/hue/latest/administrator/administration/reference/</guid>
       <description>A recommended setup consists in:
- 2 Hues and 1 Load Balancer Databases: MySQL InnoDB, PostgreSQL, Oracle Authentication: LDAP or Username/Password  Monitoring Performing a GET /desktop/debug/is_alive will return a 200 response if running.
-Load Balancers Hue is often run with:
- Cherrypy with HTTPD (built-in when using Cloudera Manager) NGINX (recommended) Apache mod Python  Task Server The task server is currently a work in progress to outsource all the blocking or resource intensive operations outside of the API server.</description>
+ 2 Hues and 1 Load Balancer Databases: MySQL InnoDB, PostgreSQL, Oracle Authentication: LDAP or Username/Password  Load Balancers Hue is often run with:
+ Cherrypy with NGINX (recommended) Cherrypy with HTTPD (built-in when using Cloudera Manager) Gunicorn is coming soon with HUE-8739 Apache mod Python  Task Server The task server is currently a work in progress to outsource all the blocking or resource intensive operations outside of the API server.</description>
     </item>
     
     <item>

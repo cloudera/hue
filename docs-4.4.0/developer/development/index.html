@@ -12,19 +12,19 @@
     <title>Development :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553516578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553516578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553516578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553516578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553516578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553516578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
 
     
   </div>
@@ -270,13 +270,37 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Connectors" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Connectors
+          SQL Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard &amp; Query Builder
           
       </a>
       
@@ -567,13 +591,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/browsers/" title="Browser" class="dd-item 
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/browsers/">
-          Browser
+          Data Catalog
           
       </a>
       
@@ -1492,6 +1516,7 @@
 <ul>
 <li>
 <ul>
+<li><a href="#dependencies">Dependencies</a></li>
 <li><a href="#building">Building</a>
 <ul>
 <li><a href="#documentation">Documentation</a></li>
@@ -1501,34 +1526,46 @@
 <li><a href="#ace-editor">Ace Editor</a></li>
 <li><a href="#internationalization">Internationalization</a></li>
 </ul></li>
-<li><a href="#user-management">User Management</a></li>
-<li><a href="#configuration">Configuration</a>
+<li><a href="#webapp-api">Webapp API</a>
 <ul>
+<li><a href="#from-30-000-feet">From 30,000 feet</a></li>
+<li><a href="#the-hue-server">The Hue Server</a></li>
+<li><a href="#interacting-with-external-services">Interacting with external services</a></li>
+<li><a href="#an-architectural-view">An Architectural View</a></li>
+<li><a href="#file-layout">File Layout</a></li>
 <li><a href="#configuration-file">Configuration File</a></li>
 <li><a href="#configuration-variables">Configuration Variables</a></li>
 <li><a href="#running-helper-processes">Running &ldquo;Helper Processes&rdquo;</a></li>
-</ul></li>
+<li><a href="#saving-documents">Saving documents</a></li>
+<li><a href="#managing-users">Managing users</a></li>
 <li><a href="#walk-through-of-a-django-view">Walk-through of a Django View</a></li>
 <li><a href="#templates-django-and-mako">Templates: Django and Mako</a></li>
-<li><a href="#django-models">Django Models</a></li>
-<li><a href="#accessing-hadoop">Accessing Hadoop</a></li>
-<li><a href="#making-your-views-thread-safe">Making Your Views Thread-safe</a></li>
 <li><a href="#authentication-backends">Authentication Backends</a></li>
 <li><a href="#authorization">Authorization</a></li>
 <li><a href="#using-and-installing-thrift">Using and Installing Thrift</a></li>
 <li><a href="#profiling-hue-apps">Profiling Hue Apps</a></li>
-<li><a href="#django-models-1">Django Models</a></li>
-<li><a href="#rest">REST</a></li>
-<li><a href="#upgrade-path">Upgrade path</a></li>
+<li><a href="#upgrades">Upgrades</a></li>
+<li><a href="#debugging-tips-and-tricks">Debugging Tips and Tricks</a></li>
 </ul></li>
-<li><a href="#front-end-development">Front-end Development</a>
+<li><a href="#web-interface">Web interface</a>
 <ul>
 <li><a href="#css-styles">CSS Styles</a></li>
 <li><a href="#defining-styles-for-your-application">Defining Styles for Your Application</a></li>
 <li><a href="#icons">Icons</a></li>
 <li><a href="#static-files">Static files</a></li>
-<li><a href="#adding-interactive-elements-to-your-ui">Adding Interactive Elements to Your UI</a></li>
-<li><a href="#debugging-tips-and-tricks">Debugging Tips and Tricks</a></li>
+</ul></li>
+<li><a href="#testing">Testing</a>
+<ul>
+<li><a href="#the-short-story">The short story</a></li>
+<li><a href="#longer-story">Longer story</a>
+<ul>
+<li><a href="#helpful-command-line-tricks">Helpful command-line tricks</a></li>
+<li><a href="#create-and-run-the-jasmine-tests">Create and run the Jasmine tests</a></li>
+<li><a href="#special-environment-variables">Special environment variables</a></li>
+<li><a href="#writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</a></li>
+<li><a href="#jenkins-configuration">Jenkins Configuration</a></li>
+</ul></li>
+</ul></li>
 </ul></li>
 </ul>
 </nav>
@@ -1552,6 +1589,19 @@
 
 
 <p>This section goes into greater detail on how to build and reuse the components of Hue.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<ul>
+<li>The OS specific dependencies are listed <a href="/administrator/installation/dependencies/">here</a></li>
+<li>Python 2.7+ (Python 3 support tracked in <a href="https://issues.cloudera.org/browse/HUE-8737">HUE-8737</a>)</li>
+<li>Django (1.11 already included in the distribution)</li>
+<li>Java (Java 1.8) (should go away after <a href="https://issues.cloudera.org/browse/HUE-8740">HUE-8740</a>)</li>
+<li>npm (6.4+)</li>
+<li><a href="http://www.makotemplates.org/">Mako</a> is the templating language</li>
+<li><a href="http://twitter.github.com/bootstrap/">Bootstrap</a></li>
+<li><a href="http://knockoutjs.com/">Knockout js</a></li>
+</ul>
 
 <h2 id="building">Building</h2>
 
@@ -1675,26 +1725,93 @@ make compile-locale
 $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 </code></pre>
 
-<h2 id="user-management">User Management</h2>
+<h2 id="webapp-api">Webapp API</h2>
 
-<p>Except for static content, <code>request.user</code> is always populated.  It is a
-standard Django <code>models.User</code> object.  If you were to set a breakpoint at the
-<code>index()</code> function in our calculator app, you will find:</p>
+<h3 id="from-30-000-feet">From 30,000 feet</h3>
 
-<pre><code>&gt;&gt;&gt; request.user
-&lt;User: test&gt;
+<p><img src="http://cloudera.github.io/hue/latest/images/from30kfeet.png" alt="From up on high" /></p>
+
+<p>Hue, as a &ldquo;container&rdquo; web application, sits in between your Hadoop installation
+and the browser.  It hosts all the Hue Apps, including the built-in ones, and
+ones that you may write yourself.</p>
+
+<h3 id="the-hue-server">The Hue Server</h3>
+
+<p><img src="http://cloudera.github.io/hue/latest/images/webbackend.png" alt="Web Back-end" /></p>
+
+<p>Hue is a web application built on the Django python web framework.
+Django, running on the WSGI container/web server (typically CherryPy), manages
+the url dispatch, executes application logic code, and puts together the views
+from their templates.  Django uses a database (typically sqlite)
+to manage session data, and Hue applications can use it as well
+for their &ldquo;models&rdquo;.  (For example, the saved Editor stores
+saved queries in the database.)</p>
+
+<p>In addition to the web server, some Hue applications run
+daemon processes &ldquo;on the side&rdquo;. Some examples are the <code>Celery Task Server</code>, <code>Celery Beat</code>.</p>
+
+<h3 id="interacting-with-external-services">Interacting with external services</h3>
+
+<p><img src="http://cloudera.github.io/hue/latest/images/interactingwithhadoop.png" alt="Interacting with Hadoop" /></p>
+
+<p>Hue provides some APIs for interacting with Hadoop.
+Most noticeably, there are python file-object-like APIs for
+interacting with HDFS.  These APIs work by making REST API or Thrift calls
+the Hadoop daemons.</p>
+
+<h3 id="an-architectural-view">An Architectural View</h3>
+
+<p><img src="http://cloudera.github.io/hue/latest/images/architecture.png" alt="Architecture" /></p>
+
+<p>A Hue application may span three tiers: (1) the UI
+and user interaction in the client&rsquo;s browser, (2) the
+core application logic in the Hue web
+server, and (3) external services with which applications
+may interact.</p>
+
+<p>The absolute minimum that you must implement (besides
+boilerplate), is a
+&ldquo;Django <a href="https://docs.djangoproject.com/en/1.11/#the-view-layer/">view</a>&ldquo;
+function that processes the request and the associated template
+to render the response into HTML.</p>
+
+<p>Many apps will evolve to have a bit of custom JavaScript and
+CSS styles. Apps that need to talk to an external service
+will pull in the code necessary to talk to that service.</p>
+
+<h3 id="file-layout">File Layout</h3>
+
+<p>The Hue &ldquo;framework&rdquo; is in <code>desktop/core/</code> and contains the Web components.
+<code>desktop/libs/</code> is the API for talking to various Hadoop services.
+The installable apps live in <code>apps/</code>.  Please place third-party dependencies in the app&rsquo;s ext-py/
+directory.</p>
+
+<p>The typical directory structure for inside an application includes:</p>
+
+<pre><code>  src/
+    for Python/Django code
+      models.py
+      urls.py
+      views.py
+      forms.py
+      settings.py
+
+  conf/
+    for configuration (``.ini``) files to be installed
+
+  static/
+    for static HTML/js resources and help doc
+
+  templates/
+    for data to be put through a template engine
+
+  locales/
+    for localizations in multiple languages
 </code></pre>
 
-<div class="note">
-  "Under the covers:" Django uses a notion called
-  <a href="https://docs.djangoproject.com/en/1.2/topics/http/middleware/">middleware</a>
-  that's called in between the request coming in and the view being executed.
-  That's how <code>request.user</code> gets populated.  There's also a
-  middleware for Hue that makes sure that no pages are displayed unless the
-  user is authenticated.
-</div>
-
-<h2 id="configuration">Configuration</h2>
+<p>For the URLs within your application, you should make your own <code>urls.py</code>
+which will be automatically rooted at <code>/yourappname/</code> in the global
+namespace. See <code>apps/about/src/about/urls.py</code> for an example.</p>
 
 <h3 id="configuration-file">Configuration File</h3>
 
@@ -1822,7 +1939,37 @@ processes serving the backend.  This means that your Django application
 code should avoid depending on shared process state.  Instead, place
 the stored state in a database or run a separate server.</p>
 
-<h2 id="walk-through-of-a-django-view">Walk-through of a Django View</h2>
+<h3 id="saving-documents">Saving documents</h3>
+
+<p>Each app used to have its own model to store its data (e.g. a saving a SQL query, query history&hellip;). All the models have been unified into a single Document2 model in the desktop app:</p>
+
+<p><code>desktop/core/src/desktop/models.py</code>.</p>
+
+<p>The <code>Document2</code> model provides automatically creation, sharing and saving. It persists the document data into a json field, which limits the need ot database migrations and simplifies the interaction with the frontend.</p>
+
+<p><code>Document2</code> is based on <a href="https://docs.djangoproject.com/en/1.11/#the-model-layer">Django Models</a>
+are Django&rsquo;s Object-Relational Mapping framework.</p>
+
+<h3 id="managing-users">Managing users</h3>
+
+<p>Except for static content, <code>request.user</code> is always populated.  It is a
+standard Django <code>models.User</code> object.  If you were to set a breakpoint at the
+<code>index()</code> function in our calculator app, you will find:</p>
+
+<pre><code>&gt;&gt;&gt; request.user
+&lt;User: test&gt;
+</code></pre>
+
+<div class="note">
+  "Under the covers:" Django uses a notion called
+  <a href="https://docs.djangoproject.com/en/1.2/topics/http/middleware/">middleware</a>
+  that's called in between the request coming in and the view being executed.
+  That's how <code>request.user</code> gets populated.  There's also a
+  middleware for Hue that makes sure that no pages are displayed unless the
+  user is authenticated.
+</div>
+
+<h3 id="walk-through-of-a-django-view">Walk-through of a Django View</h3>
 
 <p><img src="django_request.png" alt="Django Flow" /></p>
 
@@ -1835,7 +1982,7 @@ These view functions typically use their arguments (for example, the captured pa
 their request object (which has, for example, the POST and GET parameters) to
 prepare dynamic content to be rendered using a template.</p>
 
-<h2 id="templates-django-and-mako">Templates: Django and Mako</h2>
+<h3 id="templates-django-and-mako">Templates: Django and Mako</h3>
 
 <p>In Hue, the typical pattern for rendering data through a template
 is:</p>
@@ -1851,66 +1998,10 @@ extension of the template file (&ldquo;.html&rdquo; or &ldquo;.mako&rdquo;). Mak
 in that they allow you to run arbitrary code blocks quite easily, and are more strict (some
 would say finicky); Django templates are simpler, but are less expressive.</p>
 
-<h2 id="django-models">Django Models</h2>
-
-<p><a href="https://docs.djangoproject.com/en/1.11/#the-model-layer">Django Models</a>
-are Django&rsquo;s Object-Relational Mapping framework. If your application
-needs to store data (history, for example), models are a good way to do it.</p>
-
-<p>From an abstraction perspective, it&rsquo;s common to imagine external services
-as &ldquo;models&rdquo;.  For example, the Job Browser treats the Hadoop JobTracker
-as a &ldquo;model&rdquo;, even though there&rsquo;s no database involved.</p>
-
-<h2 id="accessing-hadoop">Accessing Hadoop</h2>
-
-<p>It is common for applications to need to access the underlying HDFS.
-The <code>request.fs</code> object is a &ldquo;file system&rdquo; object that exposes
-operations that manipulate HDFS.  It is pre-configured to access
-HDFS as the user that&rsquo;s currently logged in.  Operations available
-on <code>request.fs</code> are similar to the file operations typically
-available in python.  See <code>webhdfs.py</code> for details; the list
-of functions available is as follows:
-<code>chmod</code>,
-<code>chown</code>,
-<code>exists</code>,
-<code>isdir</code>,
-<code>isfile</code>,
-<code>listdir</code> (and <code>listdir_stats</code>),
-<code>mkdir</code>,
-<code>open</code> (which exposes a file-like object with <code>read()</code>, <code>write()</code>, <code>seek()</code>, and <code>tell()</code> methods),
-<code>remove</code>,
-<code>rmdir</code>,
-<code>rmtree</code>, and
-<code>stats</code>.</p>
-
-<h2 id="making-your-views-thread-safe">Making Your Views Thread-safe</h2>
-
-<p>Hue works in any WSGI-compliant container web server.
-The current recommended deployment server is the built-in CherryPy server.
-The CherryPy server, which is multi-threaded, is invoked by <code>runcpserver</code>
-and is configured to start when Hue&rsquo;s <code>supervisor</code> script is used.
-Meanwhile, <code>runserver</code> start a single-threaded
-testing server.</p>
-
-<p>Because multiple threads may be accessing your views
-concurrently, your views should not use shared state.
-An exception is that it is acceptable to initialize
-some state when the module is first imported.
-If you must use shared state, use Python&rsquo;s <code>threading.Lock</code>.</p>
-
-<p>Note that any module initialization may happen multiple times.
-Some WSGI containers (namely, Apache), will start multiple
-Unix processes, each with multiple threads. So, while
-you have to use locks to protect state within the process,
-there still may be multiple copies of this state.</p>
-
-<p>For persistent global state, it is common to place the state
-in the database or on the Browser local storage.</p>
-
-<h2 id="authentication-backends">Authentication Backends</h2>
+<h3 id="authentication-backends">Authentication Backends</h3>
 
 <p>Hue exposes a configuration flag (&ldquo;auth&rdquo;) to configure
-a custom authentication backend.  See
+a custom authentication backend.
 See <a href="http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend">http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend</a>
 for writing such a backend.</p>
 
@@ -1918,7 +2009,7 @@ for writing such a backend.</p>
 True or False, to tell the user manager application whether or not changing
 passwords within Hue is possible.</p>
 
-<h2 id="authorization">Authorization</h2>
+<h3 id="authorization">Authorization</h3>
 
 <p>Applications may define permission sets for different actions. Administrators
 can assign permissions to user groups in the UserAdmin application. To define
@@ -1939,7 +2030,7 @@ def delete_financial_report(request):
   ...
 </code></pre>
 
-<h2 id="using-and-installing-thrift">Using and Installing Thrift</h2>
+<h3 id="using-and-installing-thrift">Using and Installing Thrift</h3>
 
 <p>Right now, we check in the generated thrift code.
 To generate the code, you&rsquo;ll need the thrift binary version 0.9.0.
@@ -1948,7 +2039,7 @@ Please download from <a href="http://thrift.apache.org/">http://thrift.apache.or
 <p>The modules using <code>Thrift</code> have some helper scripts like <code>regenerate_thrift.sh</code>
 for regenerating the code from the interfaces.</p>
 
-<h2 id="profiling-hue-apps">Profiling Hue Apps</h2>
+<h3 id="profiling-hue-apps">Profiling Hue Apps</h3>
 
 <p>Hue has a profiling system built in, which can be used to analyze server-side
 performance of applications.  To enable profiling::</p>
@@ -1986,63 +2077,7 @@ called, and then prints out the top 100 time-wasters.  For information on the
 other stats available, take a look at this website:
 <a href="http://docs.python.org/library/profile.html#pstats.Stats">http://docs.python.org/library/profile.html#pstats.Stats</a></p>
 
-<h2 id="django-models-1">Django Models</h2>
-
-<p>Each app used to have its own model to store its data (e.g. a SQL query, a workflow). In Hue 3
-a unification of all the models happened and any app now uses a single Document2 model:
-<code>desktop/core/src/desktop/models.py</code>. This enables to avoid simply re-use document
-creation, sharing, saving etc&hellip;</p>
-
-<h2 id="rest">REST</h2>
-
-<p>Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow,
-list some S3 files, export a document&hellip;). Currently this API is private and subject to change but
-can be easily reused. You would need to GET <code>/accounts/login</code> to get the CSRF token
-and POST it back along <code>username</code> and <code>password</code> and reuse the <code>sessionid</code> cookie in next
-communication calls.</p>
-
-<p>** With Python Request **</p>
-
-<p>Hue is based on the Django Web Framework. Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. HUE uses stock auth form which uses “username” and “password” and “csrftoken” form variables to authenticate.</p>
-
-<p>In this code snippet, we will use well-known python “requests” library. we will first acquire “csrftoken” by GET “login_url”. We will create python dictionary of form data which contains “username”, “password” and “csrftoken” and the “next_url” and another python dictionary for header which contains the “Referer” url and empty python dictionary for the cookies. After POST request to “login_url” we will get status. Check the r.status_code. If r.status_code!=200 then you have problem in username and/or password.</p>
-
-<p>Once the request is successful then capture headers and cookies for subsequent requests. Subsequent request.session calls can be made by providing cookies=session.cookies and headers=session.headers.</p>
-
-<pre>
-import requests
-
-def login_djangosite():
- next_url = "/"
- login_url = "http://localhost:8888/accounts/login?next=/"
-
- session = requests.Session()
- r = session.get(login_url)
- form_data = dict(username="[your hue username]",password="[your hue password]",
-                  csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
- r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
-
- # check if request executed successfully?
- print r.status_code
-
- cookies = session.cookies
- headers = session.headers
-
- r=session.get('http://localhost:8888/metastore/databases/default/metadata',
- cookies=session.cookies, headers=session.headers)
- print r.status_code
-
- # check metadata output
- print r.text
-</pre>
-
-<p><a href="http://gethue.com/login-into-hue-using-the-python-request-library/">Read more about it here</a>.</p>
-
-<div class="note">
-  http://issues.cloudera.org/browse/HUE-1450 is tracking a more official public API.
-</div>
-
-<h2 id="upgrade-path">Upgrade path</h2>
+<h3 id="upgrades">Upgrades</h3>
 
 <p>After upgrading the version of Hue, running these two commands will make sure the
 database has the correct tables and fields.</p>
@@ -2051,19 +2086,31 @@ database has the correct tables and fields.</p>
 ./build/env/bin/hue migrate
 </code></pre>
 
-<h1 id="front-end-development">Front-end Development</h1>
+<h3 id="debugging-tips-and-tricks">Debugging Tips and Tricks</h3>
+
+<ul>
+<li>Set <code>DESKTOP_DEBUG=1</code> as an environment variable if you want logs to go to stderr
+as well as to the respective log files.</li>
+<li>Use runserver.  If you want to set a CLI breakpoint, just insert
+<code>__import__(&quot;ipdb&quot;).set_trace()</code>
+into your code.</li>
+<li>Django tends to restart its server whenever it notices a file changes.  For
+certain things (like configuration changes), this is not sufficient.  Restart
+the server whole-heartedly.</li>
+<li>We recommend developing with the Chrome console.</li>
+</ul>
+
+<h2 id="web-interface">Web interface</h2>
 
 <p>Developing applications for Hue requires a minimal amount of CSS
-(and potentially JavaScript) to use existing functionality. As covered above,
-creating an application for the Hue is a matter of creating a standard HTML
-application.</p>
+(and potentially JavaScript) to use existing functionality.</p>
 
 <p>In a nutshell, front-end development in Hue is using
 <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> and
 <a href="http://knockoutjs.com/">Knockout js</a> to layout your app and script the custom
 interactions.</p>
 
-<h2 id="css-styles">CSS Styles</h2>
+<h3 id="css-styles">CSS Styles</h3>
 
 <p>Hue uses <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> version 2.0 CSS
 styles and layouts. They are highly reusable and flexible. Your app doesn&rsquo;t
@@ -2073,7 +2120,7 @@ app look at home in Hue.</p>
 <p>On top of the standard Bootstrap styles, Hue defines a small set of custom
 styles in <em>desktop/core/static/css/jhue.css</em>.</p>
 
-<h2 id="defining-styles-for-your-application">Defining Styles for Your Application</h2>
+<h3 id="defining-styles-for-your-application">Defining Styles for Your Application</h3>
 
 <p>When you create your application it will provision a CSS file for you in the
 <em>static/css</em> directory. For organization purposes, your styles should go here
@@ -2099,7 +2146,7 @@ p {
 }
 </code></pre>
 
-<h2 id="icons">Icons</h2>
+<h3 id="icons">Icons</h3>
 
 <p>You should create an icon for your application that is a transparent png sized
 24px by 24px. Your <code>settings.py</code> file should point to your icon via the <code>ICON</code>
@@ -2118,7 +2165,7 @@ like this (in your mako template):</p>
 &lt;a href=&quot;#something&quot;&gt;&lt;i class=&quot;icon-trash&quot;&gt;&lt;/i&gt; Trash&lt;/a&gt;
 </code></pre>
 
-<h2 id="static-files">Static files</h2>
+<h3 id="static-files">Static files</h3>
 
 <p>For better performances, Hue uses the Django staticfiles app. If in production mode, if you edit
 some static files, you would need to run this command or <code>make apps</code>. No actions are needed in
@@ -2127,40 +2174,148 @@ development mode.</p>
 <pre><code>./build/env/bin/hue collectstatic
 </code></pre>
 
-<h2 id="adding-interactive-elements-to-your-ui">Adding Interactive Elements to Your UI</h2>
+<h2 id="testing">Testing</h2>
 
-<p>Hue by default loads these JavaScript components:</p>
+<h3 id="the-short-story">The short story</h3>
 
-<ul>
-<li>Ko js</li>
-<li>jQuery</li>
-<li>Bootstrap</li>
-</ul>
+<p>Install the mini cluster (only once):</p>
 
-<p>These are used by some Hue applications, but not loaded by default:</p>
+<pre><code>./tools/jenkins/jenkins.sh slow
+</code></pre>
 
-<ul>
-<li>Knockout js (<code>desktop/core/static/ext/js/knockout-min.js</code>)</li>
-<li>jQuery UI (<code>desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js</code>)</li>
-</ul>
+<p>Run all the tests:</p>
 
-<p>These standard components have their own online documentation, which we will
-not repeat here. They let you write interactive behaviors with little or no
-JavaScript.</p>
+<pre><code>build/env/bin/hue test all
+</code></pre>
 
-<h2 id="debugging-tips-and-tricks">Debugging Tips and Tricks</h2>
+<p>Or just some parts of the tests, e.g.:</p>
 
-<ul>
-<li>Set <code>DESKTOP_DEBUG=1</code> as an environment variable if you want logs to go to stderr
-as well as to the respective log files.</li>
-<li>Use runserver.  If you want to set a CLI breakpoint, just insert
-<code>__import__(&quot;ipdb&quot;).set_trace()</code>
-into your code.</li>
-<li>Django tends to restart its server whenever it notices a file changes.  For
-certain things (like configuration changes), this is not sufficient.  Restart
-the server whole-heartedly.</li>
-<li>We recommend developing with the Chrome console.</li>
-</ul>
+<pre><code>build/env/bin/hue test specific impala
+build/env/bin/hue test specific impala.tests:TestMockedImpala
+build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
+</code></pre>
+
+<p>Jasmine tests:</p>
+
+<pre><code>npm run test
+</code></pre>
+
+<h3 id="longer-story">Longer story</h3>
+
+<p>The <code>test</code> management command prepares the arguments (test app names)
+and passes them to nose (django_nose.nose_runner). Nose will then magically
+find all the tests to run.</p>
+
+<p>Tests themselves should be named *_test.py.  These will be found
+as long as they&rsquo;re in packages covered by django.  You can use the
+unittest frameworks, or you can just name your method with
+the word &ldquo;test&rdquo; at a word boundary, and nose will find it.
+See apps/hello/src/hello/hello_test.py for an example.</p>
+
+<h4 id="helpful-command-line-tricks">Helpful command-line tricks</h4>
+
+<p>To run tests that do not depend on Hadoop, use:</p>
+
+<pre><code>build/env/bin/hue test fast
+</code></pre>
+
+<p>To run all tests, use:</p>
+
+<pre><code>build/env/bin/hue test all
+</code></pre>
+
+<p>To run only tests of a particular app, use:</p>
+
+<pre><code>build/env/bin/hue test specific &lt;app&gt;
+</code></pre>
+
+<p>E.g.
+  build/env/bin/hue test specific filebrowser</p>
+
+<p>To run a specific test, use:</p>
+
+<pre><code>build/env/bin/hue test specific &lt;test_func&gt;
+</code></pre>
+
+<p>E.g.
+  build/env/bin/hue test specific useradmin.tests:test_user_admin</p>
+
+<p>Start up pdb on test failures:</p>
+
+<pre><code>build/env/bin/hue test &lt;args&gt; --pdb --pdb-failure -s
+</code></pre>
+
+<p>Point to an Impalad and trigger the Impala tests:</p>
+
+<pre><code>build/env/bin/hue test impala impalad-01.gethue.com
+</code></pre>
+
+<h4 id="create-and-run-the-jasmine-tests">Create and run the Jasmine tests</h4>
+
+<p>Add them in a &ldquo;spec&rdquo; subfolder relative to the file under test and the filename of the test has to end with &ldquo;Spec.js&rdquo;.</p>
+
+<pre><code>someFile.js              &lt;- File under test
+├── spec/
+│   ├── someFileSpec.js  &lt;- File containing tests
+</code></pre>
+
+<p>Run all the tests once with:</p>
+
+<pre><code>npm run test
+</code></pre>
+
+<p>Optionally to use Karma and headless chrome for the tests you can run</p>
+
+<pre><code>npm run test-karma
+</code></pre>
+
+<p>See <code>desktop/core/src/desktop/js/spec/karma.config.js</code> for various options</p>
+
+<h4 id="special-environment-variables">Special environment variables</h4>
+
+<pre><code>DESKTOP_LOGLEVEL=&lt;level&gt;
+  level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
+
+  When specified, the console logger is set to the given log level. A console
+  logger is created if one is not defined.
+
+DESKTOP_DEBUG
+  A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
+  validation.
+
+DESKTOP_PROFILE
+  Turn on Python profiling. The profile data is saved in a file. See the
+  console output for the location of the file.
+
+DESKTOP_LOG_DIR=$dir
+  Specify the HUE log directory. Defaults to ./log.
+
+DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
+  Specify alternate DB connection parameters for HUE to use. Useful for
+  testing your changes against, for example, MySQL instead of sqlite. String
+  is a colon-delimited list.
+
+TEST_IMPALAD_HOST=impalad-01.gethue.com
+  Point to an Impalad and trigger the Impala tests.
+</code></pre>
+
+<h4 id="writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</h4>
+
+<p>Use pseudo_hdfs4.py!  You should tag such tests with &ldquo;requires_hadoop&rdquo;, as follows:</p>
+
+<pre><code>from nose.plugins.attrib import attr
+
+@attr('requires_hadoop')
+def your_test():
+  ...
+</code></pre>
+
+<h4 id="jenkins-configuration">Jenkins Configuration</h4>
+
+<p>Because building Hadoop (for the tests that require it) is slow, we&rsquo;ve
+separated the Jenkins builds into &ldquo;fast&rdquo; and &ldquo;slow&rdquo;.  Both are run
+via scripts/jenkins.sh, which should be kept updated with the latest
+and greatest in build technologies.</p>
 
 
 <footer class=" footline" >
@@ -2307,6 +2462,22 @@ the server whole-heartedly.</li>
                     
                     
 
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
                     
                         
             
@@ -3193,20 +3364,20 @@ the server whole-heartedly.</li>
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553516578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553516578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553516578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553516578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553516578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553516578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553516578"></script>
-    <script src="/hue/latest/js/learn.js?1553516578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553516578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
+    <script src="/hue/latest/js/learn.js?1553555578"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553516578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553516578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
