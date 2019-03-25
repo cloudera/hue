@@ -7,7 +7,7 @@ weight: 1
 
 This section is about configuring the Hue server itself.
 These configuration variables are under the `[desktop]` section in
-the `hue.ini` configuration file.
+the `conf/hue.ini` configuration file.
 
 ## Specifying the HTTP port
 
@@ -47,30 +47,64 @@ app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hb
 
 ## Authentication
 
-By default, the first user who logs in to Hue can choose any
-username and password and becomes an administrator automatically.  This
+By default (`AllowFirstUserDjangoBackend`), the first user who logs in to Hue can choose any
+username and password and becomes an administrator automatically. This
 user can create other user and administrator accounts. User information is
 stored in the Django database in the Django backend.
 
-The authentication system is pluggable. For more information, see the [SDK Documentation](../sdk/sdk.html).
+The authentication system is pluggable. Here is a list of some of the possible authentications:
 
-List of some of the possible authentications:
 ### Username / Password
+
+This is the default Hue backend. It creates the first user that logs in as the super user. After this, it relies on Django and the user manager to authenticate users.
+
+    desktop.auth.backend.AllowFirstUserDjangoBackend
+
+### Allow All
+
+This backend does not require a password for users to log in. All users are automatically authenticated and the username is set to what is provided.
+
+    desktop.auth.backend.AllowAllBackend
+
 ### LDAP
+
+Authenticates users against an LDAP service.
+
+    desktop.auth.backend.LdapBackend
+
 ### SAML
+
+Secure Assertion Markup Language (SAML) single sign-on (SSO) backend. Delegates authentication to the configured Identity Provider. See Configuring Hue for SAML for more details.
+
+    libsaml.backend.SAML2Backend
 
 [Read more about it](http://gethue.com/updated-saml-2-0-support/).
 
-### OpenId Connect
+### Spnego
+
+SPNEGO is an authentication mechanism negotiation protocol. Authentication can be delegated to an authentication server, such as a Kerberos KDC, depending on the mechanism negotiated.
+
+    desktop.auth.backend.SpnegoDjangoBackend
+
+### PAM
+
+Authenticates users with PAM (pluggable authentication module). The authentication mode depends on the PAM module used.
+
+    desktop.auth.backend.PamBackend
+
+### OAuth Connect
+
+Delegates authentication to a third-party OAuth server.
+
+    desktop.auth.backend.OAuthBackend
+
 ### Multiple Authentication Backends
 
 For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or Hue safety valve in Cloudera Manager with a list containing first the LdapBackend followed by either the ModelBackend or custom AllowFirstUserDjangoBackend (permits first login and relies on user model for all subsequent authentication):
 
-<pre>
-[desktop]
-  [[auth]]
-  backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
-</pre>
+    [desktop]
+      [[auth]]
+      backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
 
 This tells Hue to first check against the configured LDAP directory service, and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.
 
@@ -81,11 +115,9 @@ This tells Hue to first check against the configured LDAP directory service, and
 
 The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:
 
-<pre>
-[desktop]
-leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-</pre>
+    [desktop]
+    leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+    leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 
 [Read more about it here](http://gethue.com/change-your-maps-look-and-feel/).
 
@@ -137,10 +169,9 @@ Note: The security vulnerability SWEET32 is also called Birthday attacks against
 having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.
 
 DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:
-<pre>
-  [desktop]
-  ssl_cipher_list=DEFAULT:!DES:!3DES
-</pre>
+
+    [desktop]
+    ssl_cipher_list=DEFAULT:!DES:!3DES
 
 ## SASL
 
