@@ -11,17 +11,13 @@ A recommended setup consists in:
 * Databases: MySQL InnoDB, PostgreSQL, Oracle
 * Authentication: [LDAP or Username/Password](../user-management/)
 
-### Monitoring
-
-Performing a `GET /desktop/debug/is_alive` will return a 200 response if running.
-
-
 ### Load Balancers
 
 Hue is often run with:
 
+* Cherrypy with [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) (recommended)
 * Cherrypy with HTTPD (built-in when using Cloudera Manager)
-* [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) (recommended)
+* Gunicorn is coming soon with [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
 
 ### Task Server
@@ -35,7 +31,6 @@ Until then, here is how to try the task server service.
 Make sure you have Rabbit MQ installed and running.
 
     sudo apt-get install rabbitmq-server -y
-
 
 In hue.ini, telling the API server that the Task Server is available:
 
@@ -63,6 +58,10 @@ Starting the Task Scheduler server:
 or when Django Celery Beat is enabled:
 
     ./build/env/bin/celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+### Monitoring
+
+Performing a `GET /desktop/debug/is_alive` will return a 200 response if running.
 
 ### Proxy
 
