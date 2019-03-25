@@ -9,20 +9,12 @@ Those modules are not active enough to be officially maintained in the core Hue 
 are pretty functional and should still fit your needs. Any [contribution](https://github.com/cloudera/hue/blob/master/docs/CONTRIBUTING.md) is welcomed!
 
 ## SDK
+
 Check the [Developer guide](/developer/index.html) or contact the community about how to build your own custom app.
 
 ## HBase Browser
 
-We'll take a look at the new [HBase Browser App](http://gethue.com/the-web-ui-for-hbase-hbase-browser).
-
-Prerequisites before using the app:
-
-\1. Have HBase and Thrift Service 1 initiated (Thrift can be configured)
-
-\2. Configure your list of HBase Clusters in
-[hue.ini](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L467)
-to point to your Thrift IP/Port
-
+We'll take a look at the [HBase Browser App](http://gethue.com/the-web-ui-for-hbase-hbase-browser).
 
 **Note**: With just a few changes in the [Python API](https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py),
 the HBase browser could be compatible with Apache Kudu.
