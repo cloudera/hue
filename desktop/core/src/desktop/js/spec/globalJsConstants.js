@@ -18,7 +18,8 @@ const globalVars = {
   LOGGED_USERNAME: 'foo',
   CACHEABLE_TTL: 1,
   HAS_OPTIMIZER: false,
-  AUTOCOMPLETE_TIMEOUT: 1
+  AUTOCOMPLETE_TIMEOUT: 1,
+  HUE_I18n: {}
 };
 
 Object.keys(globalVars).forEach(key => {

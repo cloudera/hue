@@ -2170,6 +2170,33 @@ const initSqlParser = function(parser) {
     return loc;
   };
 
+  parser.addNewDatabaseLocation = function (location, identifierChain) {
+    parser.yy.definitions.push({
+      type: 'database',
+      location: adjustLocationForCursor(location),
+      identifierChain: identifierChain
+    })
+  };
+
+  parser.addNewTableLocation = function (location, identifierChain, colSpec) {
+    var columns = [];
+    if (colSpec) {
+      colSpec.forEach(function (col) {
+        columns.push({
+          identifierChain: [ col.identifier ], // TODO: Complex
+          type: col.type,
+          location: adjustLocationForCursor(col.location)
+        })
+      })
+    }
+    parser.yy.definitions.push({
+      type: 'table',
+      location: adjustLocationForCursor(location),
+      identifierChain: identifierChain,
+      columns: columns
+    });
+  };
+
   parser.addColRefToVariableIfExists = function(left, right) {
     if (
       left &&
@@ -2269,6 +2296,7 @@ const initSqlParser = function(parser) {
     parser.yy.result = { locations: [] };
     parser.yy.lowerCase = false;
     parser.yy.locations = [];
+    parser.yy.definitions = [];
     parser.yy.allLocations = [];
     parser.yy.subQueries = [];
     parser.yy.errors = [];
@@ -2388,6 +2416,7 @@ const initSqlParser = function(parser) {
       return b.type.localeCompare(a.type);
     });
     parser.yy.result.locations = parser.yy.allLocations;
+    parser.yy.result.definitions = parser.yy.definitions;
 
     parser.yy.result.locations.forEach(location => {
       delete location.linked;
@@ -2452,62 +2481,64 @@ const initSqlParser = function(parser) {
 };
 
 const SYNTAX_PARSER_NOOP_FUNCTIONS = [
-  'prepareNewStatement',
-  'addCommonTableExpressions',
-  'pushQueryState',
-  'popQueryState',
-  'suggestSelectListAliases',
-  'suggestValueExpressionKeywords',
-  'getSelectListKeywords',
-  'getValueExpressionKeywords',
+  'addAsteriskLocation',
+  'addClauseLocation',
   'addColRefIfExists',
-  'selectListNoTableSuggest',
-  'suggestJoinConditions',
-  'suggestJoins',
-  'valueExpressionSuggest',
-  'applyTypeToSuggestions',
-  'applyArgumentTypesToSuggestions',
-  'commitLocations',
-  'identifyPartials',
-  'getSubQuery',
+  'addColRefToVariableIfExists',
+  'addColumnAliasLocation',
+  'addColumnLocation',
+  'addCommonTableExpressions',
+  'addCteAliasLocation',
+  'addDatabaseLocation',
+  'addFileLocation',
+  'addFunctionLocation',
+  'addNewDatabaseLocation',
+  'addNewTableLocation',
+  'addStatementLocation',
+  'addStatementTypeLocation',
+  'addSubqueryAliasLocation',
+  'addTableAliasLocation',
+  'addTableLocation',
   'addTablePrimary',
-  'suggestFileFormats',
-  'suggestDdlAndDmlKeywords',
-  'checkForSelectListKeywords',
+  'addUnknownLocation',
+  'addVariableLocation',
+  'applyArgumentTypesToSuggestions',
+  'applyTypeToSuggestions',
   'checkForKeywords',
-  'suggestKeywords',
-  'suggestColRefKeywords',
-  'suggestTablesOrColumns',
-  'suggestFunctions',
+  'checkForSelectListKeywords',
+  'commitLocations',
+  'firstDefined',
+  'getSelectListKeywords',
+  'getSubQuery',
+  'getValueExpressionKeywords',
+  'identifyPartials',
+  'popQueryState',
+  'prepareNewStatement',
+  'pushQueryState',
+  'selectListNoTableSuggest',
   'suggestAggregateFunctions',
   'suggestAnalyticFunctions',
+  'suggestColRefKeywords',
   'suggestColumns',
-  'suggestGroupBys',
-  'suggestIdentifiers',
-  'suggestOrderBys',
-  'suggestFilters',
-  'suggestKeyValues',
-  'suggestTables',
-  'addFunctionLocation',
-  'addStatementLocation',
-  'firstDefined',
-  'addClauseLocation',
-  'addStatementTypeLocation',
-  'addFileLocation',
-  'addDatabaseLocation',
-  'addColumnAliasLocation',
-  'addTableAliasLocation',
-  'addSubqueryAliasLocation',
-  'addTableLocation',
-  'addAsteriskLocation',
-  'addVariableLocation',
-  'addColumnLocation',
-  'addCteAliasLocation',
-  'addUnknownLocation',
-  'addColRefToVariableIfExists',
   'suggestDatabases',
+  'suggestDdlAndDmlKeywords',
+  'suggestFileFormats',
+  'suggestFilters',
+  'suggestFunctions',
+  'suggestGroupBys',
   'suggestHdfs',
-  'suggestValues'
+  'suggestIdentifiers',
+  'suggestJoinConditions',
+  'suggestJoins',
+  'suggestKeyValues',
+  'suggestKeywords',
+  'suggestOrderBys',
+  'suggestSelectListAliases',
+  'suggestTables',
+  'suggestTablesOrColumns',
+  'suggestValueExpressionKeywords',
+  'suggestValues',
+  'valueExpressionSuggest'
 ];
 
 const SYNTAX_PARSER_NOOP = function() {};

@@ -60,6 +60,9 @@ CreateStatement_EDIT
 DatabaseDefinition
  : AnyCreate DatabaseOrSchema OptionalIfNotExists
  | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
+   {
+     parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
+   }
  ;
 
 DatabaseDefinition_EDIT
@@ -75,9 +78,16 @@ DatabaseDefinition_EDIT
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
+     parser.addNewDatabaseLocation(@5, [{ name: $5 }]);
    }
  | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT RegularIdentifier
+   {
+     parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
+   }
  | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals 'CURSOR'
+   {
+     parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
+   }
  ;
 
 DatabaseDefinitionOptionals
@@ -303,7 +313,11 @@ TableDefinitionRightPart_EDIT
  ;
 
 TableIdentifierAndOptionalColumnSpecification
- : SchemaQualifiedIdentifier OptionalColumnSpecificationsOrLike  -> $2
+ : SchemaQualifiedIdentifier OptionalColumnSpecificationsOrLike
+   {
+     parser.addNewTableLocation(@1, $1, $2);
+     $$ = $2;
+   }
  ;
 
 TableIdentifierAndOptionalColumnSpecification_EDIT
@@ -314,8 +328,8 @@ TableIdentifierAndOptionalColumnSpecification_EDIT
 OptionalColumnSpecificationsOrLike
  :
  | ParenthesizedColumnSpecificationList
- | '<impala>LIKE_PARQUET' HdfsPath
- | 'LIKE' SchemaQualifiedTableIdentifier
+ | '<impala>LIKE_PARQUET' HdfsPath          -> []
+ | 'LIKE' SchemaQualifiedTableIdentifier    -> []
  ;
 
 OptionalColumnSpecificationsOrLike_EDIT
@@ -333,8 +347,8 @@ OptionalColumnSpecificationsOrLike_EDIT
  ;
 
 ParenthesizedColumnSpecificationList
- : '(' ColumnSpecificationList ')'
- | '(' ColumnSpecificationList ',' ConstraintSpecification ')'
+ : '(' ColumnSpecificationList ')'                              -> $2
+ | '(' ColumnSpecificationList ',' ConstraintSpecification ')'  -> $2
  ;
 
 ParenthesizedColumnSpecificationList_EDIT
@@ -351,8 +365,8 @@ ParenthesizedColumnSpecificationList_EDIT
  ;
 
 ColumnSpecificationList
- : ColumnSpecification
- | ColumnSpecificationList ',' ColumnSpecification                                        -> $3
+ : ColumnSpecification                              -> [$1]
+ | ColumnSpecificationList ',' ColumnSpecification  -> $1.concat($3)
  ;
 
 ColumnSpecificationList_EDIT
@@ -382,6 +396,7 @@ ColumnSpecification
  : ColumnIdentifier ColumnDataType OptionalColumnOptions
    {
      $$ = $1;
+     $$.type = $2;
      var keywords = [];
      if (parser.isImpala()) {
        if (!$3['primary']) {

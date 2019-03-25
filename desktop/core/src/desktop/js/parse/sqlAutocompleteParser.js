@@ -165,7 +165,7 @@ case 736:
      }
    
 break;
-case 809: case 812: case 917: case 958: case 1050: case 1292: case 1475: case 1587: case 1645: case 2826: case 2828: case 3329:
+case 809: case 812: case 917: case 958: case 1050: case 1292: case 1475: case 1587: case 1645: case 2375: case 2826: case 2828: case 3329:
 this.$ = $$[$0-1];
 break;
 case 810: case 813: case 959:
@@ -256,7 +256,7 @@ case 913:
      parser.suggestTables({ identifierChain: [{ name: $$[$0-3] }, { name: $$[$0-1] }].concat($$[$0]) });
    
 break;
-case 914: case 1092:
+case 914: case 1092: case 2380:
 this.$ = [$$[$0]];
 break;
 case 915:
@@ -264,7 +264,7 @@ case 915:
      $$[$0-1].push($$[$0]);
    
 break;
-case 916: case 919:
+case 916: case 919: case 2369: case 2370:
 this.$ = [];
 break;
 case 918: case 1052: case 1477:
@@ -272,6 +272,12 @@ this.$ = $$[$0-2];
 break;
 case 920:
 this.$ = { name: $$[$0] };
+break;
+case 922:
+this.$ = [{ name: $$[$0] }];
+break;
+case 923:
+this.$ = [{ name: $$[$0-2] }, { name: $$[$0-1] }];
 break;
 case 924: case 1995: case 2228:
 
@@ -701,7 +707,7 @@ case 1086:
      parser.selectListNoTableSuggest($$[$0-1], $$[$0-3]);
    
 break;
-case 1090: case 1166: case 1197: case 1210: case 1214: case 1252: case 1256: case 1284: case 1310: case 1311: case 1392: case 1394: case 1462: case 1472: case 1479: case 1491: case 1673: case 1873: case 1874: case 1899: case 1900: case 1901: case 2189: case 2364: case 2381: case 3349: case 3663:
+case 1090: case 1166: case 1197: case 1210: case 1214: case 1252: case 1256: case 1284: case 1310: case 1311: case 1392: case 1394: case 1462: case 1472: case 1479: case 1491: case 1673: case 1873: case 1874: case 1899: case 1900: case 1901: case 2189: case 3349: case 3663:
 this.$ = $$[$0];
 break;
 case 1093:
@@ -2979,6 +2985,17 @@ case 1913:
      if (!$$[$0-2]) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
+     parser.addNewDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
+   
+break;
+case 1914:
+
+     parser.addNewDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
+   
+break;
+case 1915:
+
+     parser.addNewDatabaseLocation(_$[$0-2], [{ name: $$[$0-2] }]);
    
 break;
 case 1930:
@@ -3644,6 +3661,11 @@ case 2316:
      }
    
 break;
+case 2318:
+
+     parser.addNewDatabaseLocation(_$[$0-1], [{ name: $$[$0-1] }]);
+   
+break;
 case 2319:
 
      var keywords = [];
@@ -3734,6 +3756,12 @@ case 2363:
      }
    
 break;
+case 2364:
+
+     this.$ = $$[$0];
+     parser.addNewTableLocation(_$[$0-1], $$[$0-1], $$[$0]);
+   
+break;
 case 2373:
 
      parser.suggestTables();
@@ -3743,6 +3771,9 @@ case 2373:
      }
    
 break;
+case 2376: case 2827: case 2829:
+this.$ = $$[$0-3];
+break;
 case 2379:
 
      if (parser.isImpala()) {
@@ -3751,6 +3782,9 @@ case 2379:
        parser.suggestKeywords([{ value: 'PRIMARY KEY', weight: 2 }, { value: 'CONSTRAINT', weight: 1 }]);
      }
    
+break;
+case 2381:
+this.$ = $$[$0-2].concat($$[$0]);
 break;
 case 2386: case 2388: case 2598:
 
@@ -3765,6 +3799,7 @@ break;
 case 2390:
 
      this.$ = $$[$0-2];
+     this.$.type = $$[$0-1];
      var keywords = [];
      if (parser.isImpala()) {
        if (!$$[$0]['primary']) {
@@ -4192,9 +4227,6 @@ case 2823:
        parser.suggestKeywords(['COMMENT']);
      }
    
-break;
-case 2827: case 2829:
-this.$ = $$[$0-3];
 break;
 case 2835:
 
