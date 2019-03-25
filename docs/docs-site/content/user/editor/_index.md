@@ -7,7 +7,7 @@ weight: 2
 
 The goal of Hue's Editor is to make data querying easy and productive.
 
-It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
+It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, [risk alerts and self service troubleshooting](http://gethue.com/hue-4-sql-editor-improvements/) and query assistance.
 
 Any editor can be `starred` next to its name so that it becomes the default editor and the landing page when logging in.
 
@@ -38,7 +38,16 @@ When you have multiple statements it's enough to put the cursor in the statement
 **Note**: Under the logs panel, you can view any
 MapReduce or [Impala jobs](#impala-queries) that the query generated.
 
-### Downloading and Exporting Query Results
+**Advanced Query Settings**
+
+The pane to the top of the Editor lets you specify the following
+options:
+
+* Settings: depends on the query engines. For information about [Hive configuration variables](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
+* Files: load a jar of files to use as UDF
+* UDFs: register a custom function
+
+### Downloading and Exporting Results
 
 To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query.
 
@@ -50,14 +59,6 @@ Two of them offer limited scalability:
 1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
 2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.
 
-### Advanced Query Settings
-
-The pane to the top of the Editor lets you specify the following
-options:
-
-* Settings: depends on the query engines. For information about [Hive configuration variables](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
-* Files: load a jar of files to use as UDF
-* UDFs: register a custom function
 
 ### Autocomplete
 
@@ -69,20 +70,25 @@ The result is improved completion throughout. We now have completion for more th
 
 If multiple tables appear in the FROM clause, including derived and joined tables, it will merge the columns from all the tables and add the proper prefixes where needed. It also knows about your aliases, lateral views and complex types and will include those. It will now automatically backtick any reserved words or exotic column names where needed to prevent any mistakes.
 
-
 **Smart keyword completion**
 
 The autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
-
 
 **UDFs**
 
 The improved autocompleter will now suggest functions, for each function suggestion an additional panel is added in the autocomplete dropdown showing the documentation and the signature of the function. The autocompleter know about the expected types for the arguments and will only suggest the columns or functions that match the argument at the cursor position in the argument list.
 
-
 **Sub-queries, correlated or not**
 
 When editing subqueries it will only make suggestions within the scope of the subquery. For correlated subqueries the outside tables are also taken into account.
+
+**Context popup**
+
+Right click on any fragement of the queries (e.g. a table name) to gets all its metadata information. This is a handy shortcut to get more description or check what types of values are contained in the table or columns.
+
+**Syntax checker**
+
+A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.
 
 **All about quality**
 
@@ -91,37 +97,27 @@ The live autocompletion is fine-tuned for a better experience advanced settings 
 The autocompleter talks to the backend to get data for tables and databases etc and caches it to keep it quick. Clicking on the refresh icon in the left assist will clear the cache. This can be useful if a new table was created outside of Hue and is not yet showing-up (Hue will regularly clear his cache to automatically pick-up metadata changes done outside of Hue).
 
 ### Variables
-Variables are used to easily configure parameters in a query. They can be of two types:
+Variables are used to easily configure parameters in a query. They are ideal for saving reports that can be shared or executed repetitively:
 
-<b>Single Valued</b>
-<pre>
-select * from web_logs where country_code = "${country_code}"
-</pre>
-The variable can have a default value.
-<pre>
-select * from web_logs where country_code = "${country_code=US}"
-</pre>
-<b>Multi Valued</b>
-<pre>
-select * from web_logs where country_code = "${country_code=CA, FR, US}"
-</pre>
-In addition, the displayed text for multi valued variables can be changed.
-<pre>
-select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
-</pre>
-For values that are not textual, omit the quotes.
-<pre>
-select * from boolean_table where boolean_column = ${boolean_column}
-</pre>
+**Single Valued**
 
-### Syntax checker
+    select * from web_logs where country_code = "${country_code}"
 
-A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.
+**The variable can have a default value**
 
-### Query Assist
+    select * from web_logs where country_code = "${country_code=US}"
 
-Read more about the [Query Assistant with Navigator Optimizer Integration
-](https://blog.cloudera.com/blog/2017/08/new-in-cloudera-enterprise-5-12-hue-4-interface-and-query-assistant/).
+**Multi Valued**
+
+    select * from web_logs where country_code = "${country_code=CA, FR, US}"
+
+**In addition, the displayed text for multi valued variables can be changed**
+
+    select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
+
+**For values that are not textual, omit the quotes.**
+
+    select * from boolean_table where boolean_column = ${boolean_column}
 
 ### Charting
 
@@ -135,13 +131,30 @@ These visualizations are convenient for plotting chronological data or when subs
 
 Read more about extending [charts](../../developer/).
 
-### Risk Alerts
+### Self service troubleshooting
+
+#### Pre-query execution
+
+**Popular values**
 
 The autocompleter will suggest popular tables, columns, filters, joins, group by, order by etc. based on metadata from Navigator Optimizer. A new “Popular” tab has been added to the autocomplete result dropdown which will be shown when there are popular suggestions available.
 
-**Risk and suggestions**
+This is particularly useful for doing joins on unknown datasets or getting the most interesting columns of tables with hundreds of them.
+
+**Risk alerts**
 
 While editing, Hue will run your queries through Navigator Optimizer in the background to identify potential risks that could affect the performance of your query. If a risk is identified an exclamation mark is shown above the query editor and suggestions on how to improve it is displayed in the lower part of the right assistant panel.
+
+See a video on  [Self service troubleshooting](http://gethue.com/hue-4-sql-editor-improvements/).
+
+#### During execution
+
+The Query Profile visualizer details the plan of the query and the bottle necks. When detected, "Health" risks are listed with suggestions on how to fix them.
+
+#### Post-query execution
+
+A new experimental panel when enabled can offer post risk analysis and recommendation on how to tweak the query for better speed.
+
 
 ### Presentation Mode
 

@@ -1,11 +1,13 @@
 ---
-title: "Catalog"
+title: "Data Catalog"
 date: 2019-03-13T18:28:09-07:00
 draft: false
 weight: 4
 ---
 
 Hue Browsers power the Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+
+The browsers can be "enriched" with [Search and Tagging](http://gethue.com/improved-sql-exploration-in-hue-4-3/) by metadata services.
 
 ## SQL Tables
 

@@ -5,6 +5,15 @@ draft: false
 weight: 5
 ---
 
+## Data Catalog
+
+In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsers/).
+
+
+## Query Optimization
+
+In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor](/user/editor/).
+
 ## YARN Cluster
 
 Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
@@ -22,13 +31,21 @@ under the `[[[default]]]` and `[[[ha]]]` sub-sections.
         resourcemanager_port=8032
         history_server_api_url=http://yarn-rhs-com:19888/
 
-## Oozie
 
-In the `[liboozie]` section of the configuration file, you should
-specify:
+## Spark
 
-    [liboozie]
-      oozie_url=http://oozie-server.com:11000/oozie
+The `[spark]` section details how to point to [Livy](https://livy.incubator.apache.org/) in order to execute interactive Spark snippets in Scala or Python.
+
+    [spark]
+      # Host address of the Livy Server.
+      ## livy_server_host=localhost
+
+      # Port of the Livy Server.
+      ## livy_server_port=8998
+
+## Kafka
+
+The configuration is in `[kafka]` but the service is still experiemental.
 
 
 ## Solr
@@ -40,25 +57,10 @@ specify:
       # URL of the Solr Server
       solr_url=http://solr-server.com:8983/solr/
 
-## Spark
+## Oozie
 
-The `[spark]` section details how to point to [https://livy.incubator.apache.org/](https://livy.incubator.apache.org/) in order to execute interactive Spark snippets in Scala or Python.
+In the `[liboozie]` section of the configuration file, you should
+specify:
 
-    [spark]
-      # Host address of the Livy Server.
-      ## livy_server_host=localhost
-
-      # Port of the Livy Server.
-      ## livy_server_port=8998
-
-## Catalog
-
-In the `[metadata]` section, Hue is supporting Cloudera Navigator data catalog and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)).
-
-## Query Optimization
-
-In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations.
-
-## Kafka
-
-The configuration is in `[kafka]` but the service is still experiemental.
+    [liboozie]
+      oozie_url=http://oozie-server.com:11000/oozie
