@@ -7,11 +7,14 @@ weight: 3
 
 ## Jobs
 
-Here is an example on how the Job Browser can list:
+Here are examples on how the Job Browser can list:
 
-* [Livy jobs and sessions](https://issues.cloudera.org/browse/HUE-6908)
 * [Impala queries](https://issues.cloudera.org/browse/HUE-7420)
+* [Livy jobs and sessions](https://issues.cloudera.org/browse/HUE-6908)
 
+By default, hooks to perform bulk operation like kill/pause/submit and retrieving details/logs are provided by the API.
 
 ## Files
-Here is an example on how the File Browser can list HDFS, S3 files and now [ADLS](https://issues.cloudera.org/browse/HUE-7248).
+Here is an example on how the File Browser can list HDFS, S3 files and [ADLS](https://issues.cloudera.org/browse/HUE-7248).
+
+**Note** Ceph can be used via the S3 browser.
