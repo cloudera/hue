@@ -16,20 +16,14 @@ Configuration of the connectors is currently done by the [Administrator](/admini
 ## Concepts
 ### Running Queries
 
-**Note**: To run a query, you must be logged
-in to Hue as a user that also has a Unix user account on the remote
-server.
-
-1.  To execute a portion of the query, highlight one or more query
+1.  The currently selected statement has a left blue order. To execute a portion of a query, highlight one or more query
     statements.
-2.  Click **Execute**. The Query Results window appears with the results
-    of your query.
-    -   To view a log of the query execution, toggle the **Log** caret on the
-        left of the progress bar. You can use the information in this tab
-        to debug your query.
+2.  Click **Execute**. The Query Results window appears.
+    -   There is a **Log** caret on the left of the progress bar.
     -   To view the columns of the query, expand the **Columns** icon. Clicking
         on the column label will scroll to the column. Names and types can be filtered.
-    -   To expand a row, double click on it or click on the row number.
+    -   Select the chart icon to plot the results
+    -   To expand a row, click on the row number.
     -   To lock a row, click on the lock icon in the row number column.
     -   Search either by clicking on the magnifier icon on the results tab, or pressing Ctrl/Cmd + F
     -   [See more how to refine your results](http://gethue.com/new-features-in-the-sql-results-grid-in-hive-and-impala/).
@@ -56,73 +50,18 @@ Two of them offer limited scalability:
 1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
 2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.
 
-
-<a id="advancedQuerySettings"></a>
 ### Advanced Query Settings
 
 The pane to the top of the Editor lets you specify the following
 options:
 
-
-<table>
-<tr><td>DATABASE</td><td>The database containing the table definitions.</td></tr>
-<tr><td>SETTINGS</td><td>Override the Hive and Hadoop default settings. To configure a new
-setting:
-
-<ol>
-<li> Click Add.
-<li> For Key, enter a Hive or Hadoop configuration variable name.
-<li> For Value, enter the value you want to use for the variable.
-
-For example, to override the directory where structured Hive query logs
-are created, you would enter hive.querylog.location for Key, and a
-path for Value.
-</ol>
-
-To view the default settings, click the Settings tab at the top of
-the page. For information about Hive configuration variables, see:
-[http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
-For information about Hadoop configuration variables, see:
-[http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml](http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml).</td></tr>
-<tr><td>FILE RESOURCES</td><td>Make files locally accessible at query execution time available on the
-Hadoop cluster. Hive uses the Hadoop Distributed Cache to distribute the
-added files to all machines in the cluster at query execution time.
-
-<ol>
-<li>  Click Add to configure a new setting.
-<li>   From the Type drop-down menu, choose one of the following:
-<ul>
-   <li>jar - Adds the specified resources to the Java classpath.
-   <li>archive - Unarchives the specified resources when
-        distributing them.
-    <li>file - Adds the specified resources to the distributed
-        cache. Typically, this might be a transform script (or similar)
-        to be executed.
-
-<li>   For Path, enter the path to the file or click browse and select the file.
-</ol>
-
-Note: It is not necessary to specify files
-used in a transform script if the files are available in the same path
-on all machines in the Hadoop cluster.</td></tr>
-<tr><td>USER-DEFINED FUNCTIONS</td><td>Specify user-defined functions. Click Add to configure a new
-setting. Specify the function name in the Name field, and specify
-the class name for Classname.
-
-You *must* specify a JAR file for the user-defined functions in FILE RESOURCES.
-
-To include a user-defined function in a query, add a $ (dollar sign)
-before the function name in the query. For example, if MyTable is a
-user-defined function name in the query, you would type: SELECT $MyTable
-</td></tr>
-<tr><td>PARAMETERIZATION</td><td>Indicate that a dialog box should display to enter parameter values when
-a query containing the string $parametername is executed. Enabled by
-default.</td></tr>
-</table>
+* Settings: depends on the query engines. For information about [Hive configuration variables](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
+* Files: load a jar of files to use as UDF
+* UDFs: register a custom function
 
 ### Autocomplete
 
-To make your SQL editing experience better we've created a  new autocompleter for Hue 3.11. The old one had some limitations and was only aware of parts of the statement being edited. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.
+To make your SQL editing experience, Hue comes with one of the best SQL autocomplete on the planet. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.
 
 The result is improved completion throughout. We now have completion for more than just SELECT statements, it will help you with the other DDL and DML statements too, INSERT, CREATE, ALTER, DROP etc.
 
@@ -133,7 +72,7 @@ If multiple tables appear in the FROM clause, including derived and joined table
 
 **Smart keyword completion**
 
-The new autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
+The autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
 
 
 **UDFs**
@@ -147,17 +86,12 @@ When editing subqueries it will only make suggestions within the scope of the su
 
 **All about quality**
 
-We've fine-tuned the live autocompletion for a better experience and we've introduced some options under the editor settings where you can turn off live autocompletion or disable the autocompleter altogether (if you're adventurous). To access these settings open the editor and focus on the code area, press CTRL + , (or on Mac CMD + ,) and the settings will appear.
+The live autocompletion is fine-tuned for a better experience advanced settings an be accessed via CTRL + , (or on Mac CMD + ,) or clicking on the '?' icon.
 
-The autocompleter talks to the backend to get data for tables and databases etc. by default it will timeout after 5 seconds but once it has been fetched it's cached for the next time around. The timeout can be adjusted in the Hue server configuration.
-
-We've got an extensive test suite but not every possible statement is covered, if the autocompleter can't interpret a statement it will be silent and no drop-down will appear. If you encounter a case where you think it should suggest something but doesn't or if it gives incorrect suggestions then please let us know.
-
-Learn more about it in [Autocompleter for Hive and Impala](http://gethue.com/brand-new-autocompleter-for-hive-and-impala/).
+The autocompleter talks to the backend to get data for tables and databases etc and caches it to keep it quick. Clicking on the refresh icon in the left assist will clear the cache. This can be useful if a new table was created outside of Hue and is not yet showing-up (Hue will regularly clear his cache to automatically pick-up metadata changes done outside of Hue).
 
 ### Variables
 Variables are used to easily configure parameters in a query. They can be of two types:
-
 
 <b>Single Valued</b>
 <pre>
@@ -215,7 +149,7 @@ Turns a list of semi-colon separated queries into an interactive presentation. I
 
 ## SQL Databases
 
-Use the query editor with any database.
+Use the query editor with any database. Those databases need to be configured by the [administratior](/administrator/configuration/editor/)
 
 ### Apache Hive
 ### Apache Impala
@@ -261,53 +195,7 @@ Extend with SQL Alchemy, JDBC or build your own [connectors](../../developer/).
 
 ## Jobs
 
-The Editor application enables you to create and submit jobs to
-the cluster. You can include variables with your jobs to enable
-you and other users to enter values for the variables when they run your
-job.
-
-All job design settings except Name and Description support the use of
-variables of the form $variable\_name. When you run the job, a dialog
-box will appear to enable you to specify the values of the variables.
-
-<table>
-<tr><td>Name</td><td>Identifies the job and its collection of properties and parameters.</td></tr>
-<tr><td>Description</td><td>A description of the job. The description is displayed in the dialog box
-that appears if you specify variables for the job.</td></tr>
-<tr><td>Advanced</td><td>Advanced settings:<ul><li>Is shared- Indicate whether to share the action with all users.<li>Oozie parameters - parameters to pass to Oozie</td></tr>
-<tr><td>Prepare</td><td>Specifies paths to create or delete before starting the workflow job.</td></tr>
-<tr><td>Params</td><td>Parameters to pass to a script or command. The parameters are expressed
-using the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr152/">JSP 2.0 Specification (JSP.2.3) Expression
-Language</a>,
-allowing variables, functions, and complex expressions as parameters.</td></tr>
-<tr><td>Job Properties</td><td>Job properties. To set a property value, click <b>Add Property</b>.<ol><li>Property name -  a configuration property name. This field provides autocompletion, so you can type the first few characters of a property name and then select the one you want from the drop-down
-    list.<li>Valuethe property value.</td></tr>
-<tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
-<tr><td>Archives</td><td>Files to pass to the job. Archives to pass to the job. Equivalent to the Hadoop -archives option.</td></tr></table>
-
-### MapReduce
-
-A MapReduce job design consists of MapReduce functions written in Java.
-You can create a MapReduce job design from existing mapper and reducer
-classes without having to write a main Java class. You must specify the
-mapper and reducer classes as well as other MapReduce properties in the
-Job Properties setting.
-
-<table>
-<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the classes that
-implement the Mapper and Reducer functions.</td></tr>
-</table>
-
-### Java
-
-A Java job design consists of a main class written in Java.
-
-<table>
-<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
-<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
-<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
-<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
-</table>
+In addition to SQL queries, the Editor application enables you to create and submit batch jobs to the cluster.
 
 ### Pig
 
@@ -323,10 +211,16 @@ Type or specify a path to a regular shell script.
 
 [Read more about it here](http://gethue.com/use-the-shell-action-in-oozie/).
 
-### DistCp
+### Java
 
-A DistCp job design consists of a DistCp command.
+A Java job design consists of a main class written in Java.
 
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
+<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
+<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
+<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
+</table>
 
 ### Spark
 
@@ -379,3 +273,15 @@ Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is
         [[[pyspark]]]
           name=PySpark
           interface=livy
+
+### MapReduce
+
+A MapReduce job design consists of MapReduce functions written in Java.
+You can create a MapReduce job design from existing mapper and reducer
+classes without having to write a main Java class. You must specify the
+mapper and reducer classes as well as other MapReduce properties in the
+Job Properties setting.
+
+### DistCp
+
+A DistCp job design consists of a DistCp command.
