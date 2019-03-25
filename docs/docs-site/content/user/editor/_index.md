@@ -199,7 +199,7 @@ These visualizations are convenient for plotting chronological data or when subs
 * Scattered plot
 * Maps (Marker and Gradient)
 
-Read more about extending [charts](../sdk/sdk.html).
+Read more about extending [charts](../../developer/).
 
 ### Risk Alerts
 
@@ -257,7 +257,7 @@ Apache Kylin is an open-source online analytical processing (OLAP) engine.
 See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
 
 ### Others
-Extend with SQL Alchemy, JDBC or build your own [connectors](../sdk/sdk.html#sql).
+Extend with SQL Alchemy, JDBC or build your own [connectors](../../developer/).
 
 ## Jobs
 
@@ -354,30 +354,28 @@ Read more about it:
 
 Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is up and running:
 
-<pre>
-[spark]
-  # Host address of the Livy Server.
-  livy_server_host=localhost
+    [spark]
+      # Host address of the Livy Server.
+      livy_server_host=localhost
 
-[notebook]
+    [notebook]
 
- ## Show the notebook menu or not
- show_notebooks=true
+    ## Show the notebook menu or not
+    show_notebooks=true
 
-[[interpreters]]
-    # Define the name and how to connect and execute the language.
+    [[interpreters]]
+        # Define the name and how to connect and execute the language.
 
-    [[[hive]]]
-      # The name of the snippet.
-      name=Hive
-      # The backend connection to use to communicate with the server.
-      interface=hiveserver2
+        [[[hive]]]
+          # The name of the snippet.
+          name=Hive
+          # The backend connection to use to communicate with the server.
+          interface=hiveserver2
 
-   [[[spark]]]
-     name=Scala
-     interface=livy
+      [[[spark]]]
+        name=Scala
+        interface=livy
 
-    [[[pyspark]]]
-      name=PySpark
-      interface=livy
-</pre>
+        [[[pyspark]]]
+          name=PySpark
+          interface=livy
