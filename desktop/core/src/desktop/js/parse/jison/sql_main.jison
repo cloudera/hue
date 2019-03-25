@@ -1347,8 +1347,8 @@ ImpalaField_EDIT
  ;
 
 SchemaQualifiedIdentifier
- : RegularOrBacktickedIdentifier
- | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
+ : RegularOrBacktickedIdentifier                                       -> [{ name: $1 }]
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier  -> [{ name: $1 }, { name: $2 }]
  ;
 
 SchemaQualifiedIdentifier_EDIT
