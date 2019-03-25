@@ -218,3 +218,47 @@ When idle_session_timeout is set, users will automatically be logged out after N
 ## Auditing
 
 Read more about [Auditing User Administration Operations with Hue and Cloudera Navigator](http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/).
+
+## Source Version Control
+
+By default Hue stores the [saved documents](/user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
+
+**Note** This feature is experiemental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
+
+    [desktop]
+
+    [[vcs]]
+
+    ## [[[git-read-only]]]
+        ## Base URL to Remote Server
+        # remote_url=https://github.com/cloudera/hue/tree/master
+
+        ## Base URL to Version Control API
+        # api_url=https://api.github.com
+    ## [[[github]]]
+
+        ## Base URL to Remote Server
+        # remote_url=https://github.com/cloudera/hue/tree/master
+
+        ## Base URL to Version Control API
+        # api_url=https://api.github.com
+
+        # These will be necessary when you want to write back to the repository.
+        ## Client ID for Authorized Application
+        # client_id=
+
+        ## Client Secret for Authorized Application
+        # client_secret=
+    ## [[[svn]]
+        ## Base URL to Remote Server
+        # remote_url=https://github.com/cloudera/hue/tree/master
+
+        ## Base URL to Version Control API
+        # api_url=https://api.github.com
+
+        # These will be necessary when you want to write back to the repository.
+        ## Client ID for Authorized Application
+        # client_id=
+
+        ## Client Secret for Authorized Application
+        # client_secret=
