@@ -6,8 +6,4 @@ chapter = false
 pre = "<b>2. </b>"
 +++
 
-Hue consists in 4 apps in a single page interface that allow the users to perform data
-analyses without losing any context. The goal is to promote self service and stay simple like Excel
-so that 80% of the user can find, explore and query data and become more data driven.
-
-Here are the main functionalities.
+This section describes the main functionalities from a end user point of view.

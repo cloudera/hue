@@ -38,10 +38,8 @@ The “More like This” feature lets you selected fields you would like to use 
 
 ### SQL
 
+Any configured SQL source can be queried via the dashboards.
+
 ## Reports
 
 This is work in progress but dashboards will soon offer a classic reporting option.
-
-## SDK
-Read more about extending [connectors](../developer/index.html).
-
