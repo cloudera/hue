@@ -25,7 +25,7 @@ When you found your data, the Editor's autocomplete is extremely powerful as the
 * Scheduler: The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
 
 
-Each app of Hue can be extended to support your own languages or apps as detailed in the [SDK](../sdk/sdk.html).
+Each app of Hue can be extended to support your own languages or apps as detailed in the [developer guide](../../developer/).
 
 ## Interface
 

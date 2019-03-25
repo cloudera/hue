@@ -25,32 +25,39 @@ It is available in Editor or Notebook. Dialects can be added to the main `[noteb
           interface=sqlalchemy
           options='{"url": "mysql://root:root@localhost:3306/hue"}'
 
+**Tip** Do not forget to uncomment the lines by removing the `#` and editing the sections at the correct levels.
+
 ## Connectors
 
-Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered.
+Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered. Read more about the [interfaces below](#interfaces).
 
 ### Impala
 
+Support is native via a dedicated section.
+
     [impala]
       # Host of the Impala Server (one of the Impalad)
-      ## server_host=localhost
+      server_host=localhost
 
       # Port of the Impala Server
-      ## server_port=21050
+      server_port=21050
 
-[LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
-](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/).
+Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../external/).
 
 ### Hive
+
+Support is native via a dedicated section.
 
     [beeswax]
 
       # Host where HiveServer2 is running.
       # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
-      ## hive_server_host=localhost
+      hive_server_host=localhost
 
       # Port where HiveServer2 Thrift server runs on.
-      ## hive_server_port=10000
+      hive_server_port=10000
+
+Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../external/).
 
 **Tez**
 
@@ -59,17 +66,23 @@ Requires support for sending multiple queries when using Tez (instead of a maxim
     [beeswax]
     max_number_of_sessions=10
 
+**Note** For historical reason, the name of the configuration section is `[beeswax]`.
+
 
 ### MySQL
 
-Recommended way:
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install mysqlclient
+
+Then give Hue the information about the database source:
 
     [[[mysql]]]
-       name = MySQL Alchemy
+       name = MySQL
        interface=sqlalchemy
-       ## https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine
-       ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
        options='{"url": "mysql://root:root@localhost:3306/hue"}'
+
+Query string options are documented in the [SqlAlchemy MySQL documentation](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
 
 Alternative:
 
@@ -84,6 +97,19 @@ Alternative:
 
 ### Presto
 
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pyhive
+
+Then give Hue the information about the database source:
+
+    [[[presto]]]
+       name = Presto
+       interface=sqlalchemy
+       options='{"url": "presto://..."}'
+
+Alternatives.
+
 Direct interface:
 
     [[[presto]]]
@@ -94,7 +120,9 @@ Direct interface:
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
 
-The Presto JDBC client driver is maintained by the Presto Team and can be downloaded here: https://prestodb.io/docs/current/installation/jdbc.html
+JDBC:
+
+The client driver is maintained by the Presto Team and can be downloaded here: https://prestodb.io/docs/current/installation/jdbc.html
 
     [[[presto]]]
     name=Presto JDBC
@@ -103,7 +131,31 @@ The Presto JDBC client driver is maintained by the Presto Team and can be downlo
 
 ### Oracle
 
-### PostgreSQL
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install cx_Oracle
+
+Then give Hue the information about the database source:
+
+    [[[oracle]]]
+       name = Oracle
+       interface=sqlalchemy
+       options='{"url": "oracle://..."}'
+
+### PostgreSql
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install psycopg2
+
+Then give Hue the information about the database source:
+
+    [[[postgresql]]]
+       name = PostgreSql
+       interface=sqlalchemy
+       options='{"url": "postgresql+psycopg2://..."}'
+
+Alternative:
 
 First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
 
@@ -128,7 +180,16 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
 
 ### AWS Athena
 
-Same as Presto.
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install PyAthena
+
+Then give Hue the information about the database source:
+
+    [[[athena]]]
+       name = AWS Athena
+       interface=sqlalchemy
+       options='{"url": "awsathena+rest://..."}'
 
 ### Apache Druid
 
@@ -149,6 +210,19 @@ In the hue.ini configuration file, now let's add the interpreter. Here 'druid-ho
 
 ### Teradata
 
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install sqlalchemy-teradata
+
+Then give Hue the information about the database source:
+
+    [[[teradata]]]
+       name = Teradata
+       interface=sqlalchemy
+       options='{"url": "teradata://..."}'
+
+Alternative:
+
     [[[teradata]]]
       name=Teradata JDBC
       interface=jdbc
@@ -163,7 +237,20 @@ In the hue.ini configuration file, now let's add the interpreter. Here 'druid-ho
 
 ### Spark SQL
 
-Via [Apache Livy](https://livy.incubator.apache.org/) (recommended):
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pyhive
+
+Then give Hue the information about the database source:
+
+    [[[sparksql]]]
+       name = SparkSql
+       interface=sqlalchemy
+       options='{"url": "jdbc+hive://..."}'
+
+Alternatives:
+
+Via [Apache Livy](https://livy.incubator.apache.org/):
 
     [[[sparksql]]]
       name=SparkSql
@@ -187,7 +274,20 @@ Via native HiveServer2 API:
       name=Kafka SQL
       interface=kafka
 
-### SQLServer
+### MS SQLServer
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pymssql
+
+Then give Hue the information about the database source:
+
+    [[[mssql]]]
+       name = SQL Server
+       interface=sqlalchemy
+       options='{"url": "mssql://..."}'
+
+Alternative:
 
 Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: [Microsoft JDBC Driver](https://msdn.microsoft.com/en-us/sqlserver/aa937724.aspx)
 
@@ -197,6 +297,19 @@ Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: 
     options='{"url": "jdbc:microsoft:sqlserver://localhost:1433", "driver": "com.microsoft.jdbc.sqlserver.SQLServerDriver", "user": "admin": "password": "pass"}'
 
 ### Vertica
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install sqlalchemy-vertica-python
+
+Then give Hue the information about the database source:
+
+    [[[vertica]]]
+       name = Vertica
+       interface=sqlalchemy
+       options='{"url": "vertica+vertica_python://..."}'
+
+Alternative:
 
 Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](https://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
 
@@ -216,9 +329,31 @@ The Phoenix JDBC client driver is bundled with the Phoenix binary and source rel
 
 **Note**: Currently, the Phoenix JDBC connector for Hue only supports read-only operations (SELECT and EXPLAIN statements).
 
-### Redshift
+### AWS Redshift
 
-### BigQuery
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install sqlalchemy-redshift
+
+Then give Hue the information about the database source:
+
+    [[[redshift]]]
+       name = Redshift
+       interface=sqlalchemy
+       options='{"url": "redshift+psycopg2://..."}'
+
+### Google BigQuery
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pybigquery
+
+Then give Hue the information about the database source:
+
+    [[[bigquery]]]
+       name = BigQuery
+       interface=sqlalchemy
+       options='{"url": "bigquery://..."}'
 
 ### Apache Drill
 
@@ -242,12 +377,38 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
 
 ### Kylin
 
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install kylinpy
+
+Then give Hue the information about the database source:
+
+    [[[kylin]]]
+       name = Kylin
+       interface=sqlalchemy
+       options='{"url": "kylin://..."}'
+
+Alternative:
+
     [[[kylin]]]
      name=kylin JDBC
      interface=jdbc
      options='{"url": "jdbc:kylin://172.17.0.2:7070/learn_kylin", "driver": "org.apache.kylin.jdbc.Driver", "user": "ADMIN", "password": "KYLIN"}'
 
 ### Clickhouse
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install sqlalchemy-clickhouse
+
+Then give Hue the information about the database source:
+
+    [[[clickhouse]]]
+       name = Clickhouse
+       interface=sqlalchemy
+       options='{"url": "clickhouse://..."}'
+
+Alternative:
 
     [[[clickhouse]]]
       name=ClickHouse
@@ -256,23 +417,133 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
       ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
       options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
-### SQL Alchemy
+### Spark
+
+This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
+
+In the `[[interpreters]]` section:
+
+      [[[pyspark]]]
+            name=PySpark
+            interface=livy
+
+      [[[sparksql]]]
+            name=SparkSql
+            interface=livy
+
+      [[[spark]]]
+            name=Scala
+            interface=livy
+
+      [[[r]]]
+            name=R
+            interface=livy
+
+In the `[spark]` section:
+
+    [spark]
+      # The Livy Server URL.
+      livy_server_url=http://localhost:8998
+
+### Pig
+
+Pig is native to Hue and depends on the [Oozie service](../external/) to be configured:
+
+    [[[pig]]]
+      name=Pig
+      interface=oozie
+
+### Snowflake
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install snowflake-sqlalchemy
+
+Then give Hue the information about the database source:
+
+    [[[snowflake]]]
+       name = Snowflake
+       interface=sqlalchemy
+       options='{"url": "snowflake://..."}'
+
+### Sqlite
+
+Just give Hue the information about the database source:
+
+    [[[sqlite]]]
+       name = Sqlite
+       interface=sqlalchemy
+       options='{"url": "sqlite://..."}'
+
+### Greenplum
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install psycopg2
+
+Then give Hue the information about the database source:
+
+    [[[greenplum]]]
+       name = Greenplum
+       interface=sqlalchemy
+       options='{"url": "postgresql+psycopg2://..."}'
+
+
+## Interfaces
+
+Several interfaces are possible and sometimes more than one works for a certain database. When available `HiveServer2` or `SqlAlchemy` are recommended as they are native.
+
+### Credentials
+
+When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser. These credentials are not saved in Hue at anytime.
+
+### Sql Alchemy
+
 SQL Alchemy is a robust [connector](https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine) that supports
-many [SQL dialects](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
+many [SQL dialects](https://docs.sqlalchemy.org/en/latest/dialects) natively. This is the recommended connector for most of the databases.
+
+1. The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install mysqlclient
+
+2. Then give Hue the information about the database source:
 
     [[[mysql]]]
-       name = MySQL Alchemy
+       name = MySQL
        interface=sqlalchemy
        options='{"url": "mysql://root:root@localhost:3306/hue"}'
+
+### HiveServer2
+
+This is the interface that was created for Apache Hive and Apache Impala. The main advantages are that they provide asynchronous executions and so:
+
+* non blocking submission
+* progress reports
+* non blocking result fetching
+
+For example to point to Hive, first configure the `[beeswax]` section.
+
+    [beeswax]
+      # Host where HiveServer2 is running.
+      hive_server_host=localhost
+
+      # Port where HiveServer2 Thrift server runs on.
+      hive_server_port=10000
+
+Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
+
+  [[interpreters]]
+
+    [[[hive]]]
+      name=Hive
+      interface=hiveserver2
 
 ### Django DB Connectors
 Those rely on the `[dbms]` lib an dedicated Python libs.
 
-Note, SQL Alchemy should be prefered.
+**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
 
-Hue’s query editor can easily be configured to work with any database backend that [Django](https://docs.djangoproject.com/en/1.9/topics/install/#database-installation) supports, including PostgreSQL, MySQL, Oracle and SQLite. Some of you may note that these are the same backends supported by Hue’s DBQuery app and in fact, adding a new query editor for these databases starts with the same configuration step.
-
-First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
+First, in your hue.ini file, add the relevant database connection information under the `[librdbms]` section:
 
     [librdbms]
       [[databases]]
@@ -285,7 +556,7 @@ First, in your hue.ini file, you will need to add the relevant database connecti
         password=hue
         options={}
 
-Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
+Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
 
     [notebook]
       [[interpreters]]
@@ -295,10 +566,14 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
 
 After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:
 
+### Native
+
+A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/editor/).
+
 ### JDBC
 Use the query editor with any JDBC database.
 
-Note, SQL Alchemy should be prefered.
+**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
 
 The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle, but for other JDBC-compatible databases Hue now finally supports a “jdbc” interface to integrate such databases with the new query editor!
 
@@ -333,37 +608,11 @@ Before adding your interpreter’s JDBC configurations to hue.ini, verify that t
 You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.
 
 
-### Spark
-
-    [[[pyspark]]]
-      name=PySpark
-      interface=livy
-
-    [[[sparksql]]]
-      name=SparkSql
-      interface=livy
-
-    [[[spark]]]
-      name=Scala
-      interface=livy
-
-    [[[r]]]
-        name=R
-        interface=livy
-
-    ...
-
-    [spark]
-      # The Livy Server URL.
-      livy_server_url=http://localhost:8998
-
-### Pig
-
-    [[[pig]]]
-      name=Pig
-      interface=oozie
-
 ## Editor
+
+The editor supports some global settings.
+
+### Downloads
 
 Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
 
@@ -387,3 +636,51 @@ The download feature in the file browser can be disabled separately with the fol
 
         [filebrowser]
         show_download_button=false
+
+### Notebook
+
+Enable the Notebook mode which supports multiple snippets of code.
+
+      [notebook]
+      show_notebooks=true
+
+### External statements
+
+Enable the selection of queries from files, saved queries into the editor or as snippet.
+
+      [notebook]
+      enable_external_statements=false
+
+### Batch querying
+
+This option currently only works with Hive and relies on Oozie until [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) gets done.
+
+      [notebook]
+      enable_batch_execute=true
+
+### Assist Query Builder
+
+Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](../dashboard).
+
+**Note** This feature is experimental.
+
+      [notebook]
+      enable_query_builder=true
+
+### Query Analysis
+
+Display an analysis panel post Impala queries executions with some hints and suggestions.
+
+**Note** This feature is experimental.
+
+      [notebook]
+      enable_query_analysis=true
+
+### One-click scheduling
+
+Enable the creation of a coordinator for the current SQL query.
+
+**Note** This feature is experimental until Task Server scheduler [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
+
+      [notebook]
+      enable_query_scheduling=true
