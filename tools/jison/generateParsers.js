@@ -123,7 +123,7 @@ const deleteFile = (path) => {
 const execCmd = (cmd) => new Promise((resolve, reject) => {
   exec(cmd, function(err, stdout, stderr) {
     if (err) {
-      reject();
+      reject(stderr);
     }
     resolve();
   });
@@ -217,7 +217,10 @@ const generateRecursive = () => {
     } else {
       console.log('Generating \'' + parserName + '\'...');
     }
-    generateParser(parserName).then(generateRecursive)
+    generateParser(parserName).then(generateRecursive).catch(error => {
+      console.log(error);
+      console.log('FAIL!');
+    })
   }
 };
 

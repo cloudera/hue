@@ -36,7 +36,8 @@ const resultEquals = function(a, b) {
     }
     return true;
   } else {
-    return jasmine.matchersUtil.equals(a, b);
+    // TODO: Jasmine version?
+    return jasmine.jasmine.matchersUtil.equals(a, b);
   }
 };
 
@@ -94,6 +95,31 @@ const testUtils = {
                 return location;
               }
             });
+          }
+
+          if (testDefinition.expectedDefinitions) {
+            if (!resultEquals(actualResponse.definitions, testDefinition.expectedDefinitions)) {
+              return {
+                pass: false,
+                message:
+                  '\n        Statement: ' +
+                  testDefinition.beforeCursor +
+                  '|' +
+                  testDefinition.afterCursor +
+                  '\n' +
+                  '          Dialect: ' +
+                  testDefinition.dialect +
+                  '\n' +
+                  'Expected definitions: ' +
+                  jsonStringToJsString(JSON.stringify(testDefinition.expectedDefinitions)) +
+                  '\n' +
+                  '  Parser definitions: ' +
+                  jsonStringToJsString(JSON.stringify(actualResponse.definitions)) +
+                  '\n'
+              };
+            }
+          } else {
+            delete actualResponse.definitions;
           }
 
           if (testDefinition.locationsOnly) {
