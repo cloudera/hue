@@ -148,9 +148,17 @@ var huePubSub = {
             link = $("#jHueScrollUpAnchor");
             $(document).off("click", "#jHueScrollUpAnchor");
         } else {
-            link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-up'></i>").appendTo('#body-inner');
+            link = $("<a/>").attr("id", "jHueScrollUpAnchor")
+              .hide()
+              .addClass("hueAnchor hueAnchorScroller")
+              .attr("href", "javascript:void(0)")
+              .html("<i class='fa fa-fw fa-chevron-up'></i>")
+              .appendTo('#body-inner');
         }
 
+        if ($(window).scrollTop() > _this.options.threshold) {
+            link.show();
+        }
         $(_this.element).attr("jHueScrollified", "true");
 
         if ($(_this.element).is("body")) {
@@ -183,8 +191,7 @@ var huePubSub = {
                         $("#jHueScrollUpAnchor").data("caller", scrollable);
                     }
                     $(_this.element).data("lastScrollTop", scrolled.scrollTop());
-                }
-                else {
+                } else {
                     checkForAllScrolls();
                 }
             });
@@ -201,12 +208,9 @@ var huePubSub = {
                         _allOk = false;
                         $("#jHueScrollUpAnchor").data("caller", $("body, html"));
                     }
-                }
-                else {
-                    if ($(item).scrollTop() > _this.options.threshold) {
-                        _allOk = false;
-                        $("#jHueScrollUpAnchor").data("caller", $(item));
-                    }
+                } else if ($(item).scrollTop() > _this.options.threshold) {
+                    _allOk = false;
+                    $("#jHueScrollUpAnchor").data("caller", $(item));
                 }
             });
             if (_allOk) {
@@ -217,7 +221,7 @@ var huePubSub = {
 
         $(document).on("click", "#jHueScrollUpAnchor", function (event) {
             if ($("#jHueScrollUpAnchor").data("caller") != null) {
-                $("#jHueScrollUpAnchor").data("caller").scrollTop(0);
+                $("html, body").animate({ scrollTop: 0 }, 200);
                 if ($(document).find("[jHueScrollified='true']").not($("#jHueScrollUpAnchor").data("caller")).is("body") && $(window).scrollTop() > _this.options.threshold) {
                     $("#jHueScrollUpAnchor").data("caller", $("body, html"));
                 } else {
@@ -232,7 +236,7 @@ var huePubSub = {
         return this.each(function () {
             $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
         });
-    }
+    };
 
     $[pluginName] = function (options) {
         new Plugin($("body"), options);
@@ -240,7 +244,7 @@ var huePubSub = {
 
 })(jQuery, window, document);
 
-$(document).jHueScrollUp();
+$('body').jHueScrollUp();
 
 function setMenuHeight() {
     $('#sidebar .highlightable').height($('#sidebar').innerHeight() - $('#header-wrapper').height() - 40);
