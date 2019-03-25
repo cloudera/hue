@@ -241,35 +241,35 @@ ace:
 # <<<< DEV ONLY
 .PHONY: global-search-parser
 global-search-parser:
-	@cd tools/jison && ./hue-global-search.sh
+	@node tools/jison/generateParsers.js globalSearchParser
 
 .PHONY: solr-all-parsers
 solr-all-parsers:
-	@cd tools/jison && ./hue-solr-query.sh && ./hue-solr-formula.sh
+	@node tools/jison/generateParsers.js solrQueryParser solrFormulaParser
 
 .PHONY: solr-query-parser
 solr-query-parser:
-	@cd tools/jison && ./hue-solr-query.sh
+	@node tools/jison/generateParsers.js solrQueryParser
 
 .PHONY: solr-formula-parser
 solr-formula-parser:
-	@cd tools/jison && ./hue-solr-formula.sh
+	@node tools/jison/generateParsers.js solrFormulaParser
 
 .PHONY: sql-all-parsers
 sql-all-parsers:
-	@cd tools/jison && ./hue-sql-autocomplete.sh && ./hue-sql-statement.sh && ./hue-sql-syntax.sh
+	@node tools/jison/generateParsers.js sqlAutocompleteParser sqlSyntaxParser sqlStatementsParser
 
 .PHONY: sql-autocomplete-parser
 sql-autocomplete-parser:
-	@cd tools/jison && ./hue-sql-autocomplete.sh
+	@node tools/jison/generateParsers.js sqlAutocompleteParser
 
 .PHONY: sql-statement-parser
 sql-statement-parser:
-	@cd tools/jison && ./hue-sql-statement.sh
+	@node tools/jison/generateParsers.js sqlStatementsParser
 
 .PHONY: sql-syntax-parser
 sql-syntax-parser:
-	@cd tools/jison && ./hue-sql-syntax.sh
+	@node tools/jison/generateParsers.js sqlSyntaxParser
 # END DEV ONLY >>>>
 
 ###################################
