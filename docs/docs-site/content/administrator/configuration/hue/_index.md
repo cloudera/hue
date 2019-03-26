@@ -293,3 +293,13 @@ By default Hue stores the [saved documents](/user/concept/#documents) in its dat
 
         ## Client Secret for Authorized Application
         # client_secret=
+
+## Concurrent User Session Limit
+
+If set, limits the number of concurrent user sessions. 1 represents 1 browser session per user. Default: 0 (unlimited sessions per user)
+
+    [desktop]
+    [[session]]
+    concurrent_user_session_limit=0
+
+[Read more about it here](http://gethue.com/restrict-number-of-concurrent-sessions-per-user/).
