@@ -160,7 +160,6 @@ if USE_NEW_EDITOR.get():
 
   <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
-  ${ koComponents.all() }
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif
 
