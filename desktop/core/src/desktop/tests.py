@@ -871,7 +871,9 @@ class TestStrictRedirection():
 
   def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
     self.client.get('/accounts/logout', **kwargs)
-    response = self.client.post('/hue/accounts/login/?next=' + redirection_url, self.user, **kwargs)
+    data = self.user.copy()
+    data['next'] = redirection_url
+    response = self.client.post('/hue/accounts/login/', data, **kwargs )
     assert_equal(expected_status_code, response.status_code)
     if expected_status_code == 403:
         error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'
