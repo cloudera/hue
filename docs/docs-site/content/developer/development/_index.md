@@ -699,3 +699,23 @@ Because building Hadoop (for the tests that require it) is slow, we've
 separated the Jenkins builds into "fast" and "slow".  Both are run
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.
+
+#### Debugging with PyCharm
+
+First step is to configure pycharm to use the Hue virtual environment at ./build/env/env
+![Pycharm virtualenv]({{% param baseURL %}}images/pycharm_virtualenv.png)
+Second step is to configure the debug configuration
+![Pycharm debug]({{% param baseURL %}}images/pycharm_debug.png)
+
+#### Debugging with Eclipse
+
+First step is to configure Eclipse to use the Hue virtual environment at ./build/env/env
+![Eclipse interpreter]({{% param baseURL %}}images/eclipse_interpreter.png)
+Second step is to configure the debug configuration
+![Eclipse debug]({{% param baseURL %}}images/eclipse_debug.png)
+![Eclipse debug arguments]({{% param baseURL %}}images/eclipse_debug_arguments.png)
+![Eclipse debug interpreter]({{% param baseURL %}}images/eclipse_debug_interpreter.png)
+
+
+
+
