@@ -12,19 +12,19 @@
     <title>Development :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553708490" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553708490" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553708490"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553708490"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553708490"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553708490"></script>
 
     
   </div>
@@ -1564,6 +1564,8 @@
 <li><a href="#special-environment-variables">Special environment variables</a></li>
 <li><a href="#writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</a></li>
 <li><a href="#jenkins-configuration">Jenkins Configuration</a></li>
+<li><a href="#debugging-with-pycharm">Debugging with PyCharm</a></li>
+<li><a href="#debugging-with-eclipse">Debugging with Eclipse</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
@@ -2316,6 +2318,22 @@ def your_test():
 separated the Jenkins builds into &ldquo;fast&rdquo; and &ldquo;slow&rdquo;.  Both are run
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.</p>
+
+<h4 id="debugging-with-pycharm">Debugging with PyCharm</h4>
+
+<p>First step is to configure pycharm to use the Hue virtual environment at ./build/env/env
+<img src="http://cloudera.github.io/hue/latest/images/pycharm_virtualenv.png" alt="Pycharm virtualenv" />
+Second step is to configure the debug configuration
+<img src="http://cloudera.github.io/hue/latest/images/pycharm_debug.png" alt="Pycharm debug" /></p>
+
+<h4 id="debugging-with-eclipse">Debugging with Eclipse</h4>
+
+<p>First step is to configure Eclipse to use the Hue virtual environment at ./build/env/env
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_interpreter.png" alt="Eclipse interpreter" />
+Second step is to configure the debug configuration
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug.png" alt="Eclipse debug" />
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug_arguments.png" alt="Eclipse debug arguments" />
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug_interpreter.png" alt="Eclipse debug interpreter" /></p>
 
 
 <footer class=" footline" >
@@ -3364,20 +3382,20 @@ and greatest in build technologies.</p>
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553708490"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553708490"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553708490"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553708490"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553708490"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553708490"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553708490"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
-    <script src="/hue/latest/js/learn.js?1553555578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553708490"></script>
+    <script src="/hue/latest/js/learn.js?1553708490"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553708490"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553708490" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553708490"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
