@@ -852,6 +852,13 @@
       name=Impala
       interface=hiveserver2
 
+    [[[mysql]]]
+      name = MySQL
+      interface=sqlalchemy
+      ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
+      ## options='{"url": "mysql://root:root@localhost:3306/hue"}'
+      ## options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+
     # [[[sparksql]]]
     #   name=SparkSql
     #   interface=hiveserver2
@@ -887,10 +894,6 @@
     [[[markdown]]]
       name=Markdown
       interface=text
-
-    [[[mysql]]]
-      name = MySQL
-      interface=rdbms
 
     [[[sqlite]]]
       name = SQLite
@@ -937,13 +940,6 @@
     [[[shell]]]
       name=Shell
       interface=oozie
-
-    # [[[mysql2]]]
-    #   name = MySQL Alchemy
-    #   interface=sqlalchemy
-    #   ## https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine
-    #   ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
-    #   options='{"url": "mysql://root:root@localhost:3306/hue"}'
 
     # [[[mysql]]]
     #   name=MySql JDBC

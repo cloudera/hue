@@ -27,6 +27,91 @@ It is available in Editor or Notebook. Dialects can be added to the main `[noteb
 
 **Tip** Do not forget to uncomment the lines by removing the `#` and editing the sections at the correct levels.
 
+## Editor
+
+The editor supports some global settings.
+
+### Downloads
+
+Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+
+        [beeswax]
+        # A limit to the number of rows that can be downloaded from a query before it is truncated.
+        # A value of -1 means there will be no limit.
+        download_row_limit=-1
+
+        # A limit to the number of bytes that can be downloaded from a query before it is truncated.
+        # A value of -1 means there will be no limit.
+        download_bytes_limit=-1
+
+In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
+
+        [desktop]
+        # Global setting to allow or disable end user downloads in all Hue.
+        # e.g. Query result in Editors and Dashboards, file in File Browser...
+        enable_download=false
+
+The download feature in the file browser can be disabled separately with the following options in your hue.ini:
+
+        [filebrowser]
+        show_download_button=false
+
+### Notebook
+
+Enable the Notebook mode which supports multiple snippets of code.
+
+      [notebook]
+      show_notebooks=true
+
+### External statements
+
+Enable the selection of queries from files, saved queries into the editor or as snippet.
+
+      [notebook]
+      enable_external_statements=false
+
+### Batch querying
+
+This option currently only works with Hive and relies on Oozie until [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) gets done.
+
+      [notebook]
+      enable_batch_execute=true
+
+### Assist Query Builder
+
+Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](../dashboard).
+
+**Note** This feature is experimental.
+
+      [notebook]
+      enable_query_builder=true
+
+### Query Analysis
+
+Display an analysis panel post Impala queries executions with some hints and suggestions.
+
+**Note** This feature is experimental.
+
+      [notebook]
+      enable_query_analysis=true
+
+### One-click scheduling
+
+Enable the creation of a coordinator for the current SQL query.
+
+**Note** This feature is experimental until Task Server scheduler [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
+
+      [notebook]
+      enable_query_scheduling=true
+
+### Credentials
+
+When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser.
+
+Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process. The clients serves these parameters
+each time a query is sent.
+
+
 ## Connectors
 
 Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered. Read more about the [interfaces below](#interfaces).
@@ -81,6 +166,7 @@ Then give Hue the information about the database source:
        name = MySQL
        interface=sqlalchemy
        options='{"url": "mysql://root:root@localhost:3306/hue"}'
+       ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
 
 Query string options are documented in the [SqlAlchemy MySQL documentation](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
 
@@ -506,25 +592,35 @@ Then give Hue the information about the database source:
 
 Several interfaces are possible and sometimes more than one works for a certain database. When available `HiveServer2` or `SqlAlchemy` are recommended as they are native.
 
-### Credentials
-
-When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser. These credentials are not saved in Hue at anytime.
 
 ### Sql Alchemy
 
 SQL Alchemy is a robust [connector](https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine) that supports
 many [SQL dialects](https://docs.sqlalchemy.org/en/latest/dialects) natively. This is the recommended connector for most of the databases.
 
-1. The dialect should be added to the Python system or Hue Python virtual environment:
+The dialect should be added to the Python system or Hue Python virtual environment. For example for MySQL:
 
       ./build/env/bin/pip install mysqlclient
 
-2. Then give Hue the information about the database source:
+Then give Hue the information about the database source:
 
     [[[mysql]]]
        name = MySQL
        interface=sqlalchemy
        options='{"url": "mysql://root:root@localhost:3306/hue"}'
+
+**Tip**
+
+To offer more self service capabilities, parts of the URL can be parameterized and the information will be asked to the user.
+
+Supported parameters are:
+
+* USER
+* PASSWORD
+
+e.g.
+
+      mysql://${USER}:${PASSWORD}@localhost:3306/hue
 
 ### HiveServer2
 
@@ -551,42 +647,15 @@ Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
       name=Hive
       interface=hiveserver2
 
-### Django DB Connectors
-Those rely on the `[dbms]` lib an dedicated Python libs.
-
-**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
-
-First, in your hue.ini file, add the relevant database connection information under the `[librdbms]` section:
-
-    [librdbms]
-      [[databases]]
-        [[[postgresql]]]
-        nice_name=PostgreSQL
-        name=music
-        engine=postgresql_psycopg2
-        port=5432
-        user=hue
-        password=hue
-        options={}
-
-Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
-
-    [notebook]
-      [[interpreters]]
-        [[[postgresql]]]
-        name=PostgreSQL
-        interface=rdbms
-
-After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:
-
-### Native
+### Custom
 
 A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/editor/).
 
 ### JDBC
-Use the query editor with any JDBC database.
 
 **Note** This is an historical connector, SQLAlchemy should be prefered at this time.
+
+Use the query editor with any JDBC database.
 
 The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle, but for other JDBC-compatible databases Hue now finally supports a “jdbc” interface to integrate such databases with the new query editor!
 
@@ -620,80 +689,31 @@ Before adding your interpreter’s JDBC configurations to hue.ini, verify that t
 **Tip**: Prompt for JDBC authentication
 You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.
 
+### Django DB Connectors
 
-## Editor
+**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
 
-The editor supports some global settings.
+Those rely on the `[dbms]` lib an dedicated Python libs.
 
-### Downloads
+First, in your hue.ini file, add the relevant database connection information under the `[librdbms]` section:
 
-Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+    [librdbms]
+      [[databases]]
+        [[[postgresql]]]
+        nice_name=PostgreSQL
+        name=music
+        engine=postgresql_psycopg2
+        port=5432
+        user=hue
+        password=hue
+        options={}
 
-        [beeswax]
-        # A limit to the number of rows that can be downloaded from a query before it is truncated.
-        # A value of -1 means there will be no limit.
-        download_row_limit=-1
+Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
 
-        # A limit to the number of bytes that can be downloaded from a query before it is truncated.
-        # A value of -1 means there will be no limit.
-        download_bytes_limit=-1
+    [notebook]
+      [[interpreters]]
+        [[[postgresql]]]
+        name=PostgreSQL
+        interface=rdbms
 
-In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
-
-        [desktop]
-        # Global setting to allow or disable end user downloads in all Hue.
-        # e.g. Query result in Editors and Dashboards, file in File Browser...
-        enable_download=false
-
-The download feature in the file browser can be disabled separately with the following options in your hue.ini:
-
-        [filebrowser]
-        show_download_button=false
-
-### Notebook
-
-Enable the Notebook mode which supports multiple snippets of code.
-
-      [notebook]
-      show_notebooks=true
-
-### External statements
-
-Enable the selection of queries from files, saved queries into the editor or as snippet.
-
-      [notebook]
-      enable_external_statements=false
-
-### Batch querying
-
-This option currently only works with Hive and relies on Oozie until [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) gets done.
-
-      [notebook]
-      enable_batch_execute=true
-
-### Assist Query Builder
-
-Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](../dashboard).
-
-**Note** This feature is experimental.
-
-      [notebook]
-      enable_query_builder=true
-
-### Query Analysis
-
-Display an analysis panel post Impala queries executions with some hints and suggestions.
-
-**Note** This feature is experimental.
-
-      [notebook]
-      enable_query_analysis=true
-
-### One-click scheduling
-
-Enable the creation of a coordinator for the current SQL query.
-
-**Note** This feature is experimental until Task Server scheduler [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
-
-      [notebook]
-      enable_query_scheduling=true
+After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:
