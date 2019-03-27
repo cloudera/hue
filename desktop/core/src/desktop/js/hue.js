@@ -61,6 +61,7 @@ import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
 import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, indexer, importer, editor etc.
+import EditorViewModel2 from 'apps/notebook2/editorViewModel'; // In history, indexer, importer, editor etc.
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
@@ -77,7 +78,11 @@ window.dataCatalog = dataCatalog;
 window.DOCUMENT_TYPE_I18n = DOCUMENT_TYPE_I18n;
 window.DOCUMENT_TYPES = DOCUMENT_TYPES;
 window.Dropzone = Dropzone;
-window.EditorViewModel = EditorViewModel;
+if (window.ENABLE_NOTEBOOK_2) {
+  window.EditorViewModel = EditorViewModel2;
+} else {
+  window.EditorViewModel = EditorViewModel;
+}
 window.filesize = filesize;
 window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;

@@ -25,7 +25,7 @@
   from dashboard.conf import HAS_SQL_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
-  from notebook.conf import ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING
+  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING
 %>
 
 <%namespace name="impalaDocIndex" file="/impala_doc_index.mako" />
@@ -55,6 +55,8 @@
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
 
   window.USER_HAS_METADATA_WRITE_PERM = '${ user.has_hue_permission(action="write", app="metadata") }' === 'True';
+
+  window.ENABLE_NOTEBOOK_2 = '${ ENABLE_NOTEBOOK_2.get() }' === 'True';
 
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
 
