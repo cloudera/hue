@@ -445,6 +445,19 @@ In the `[spark]` section:
       # The Livy Server URL.
       livy_server_url=http://localhost:8998
 
+
+**CSRF**
+
+Livy supports a configuration parameter in the Livy conf:
+
+      livy.server.csrf-protection.enabled
+
+...which is false by default. Upon trying to launch a Livy session from the notebook, Hue will pass along the connection error from Livy as a 400 response that the "Missing Required Header for CSRF protection". To enable it, add to the Hue config:
+
+      [spark]
+      # Whether Livy requires client to use csrf protection.
+      ## csrf_enabled=false
+
 ### Pig
 
 Pig is native to Hue and depends on the [Oozie service](../external/) to be configured:
