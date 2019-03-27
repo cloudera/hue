@@ -1572,7 +1572,7 @@ class Snippet {
       } else if (data.status == 401) {
         // Auth required
         self.status('expired');
-        $(document).trigger('showAuthModal', { type: self.type(), callback: self.execute });
+        $(document).trigger('showAuthModal', { type: self.type(), callback: self.execute, message: data.message });
       } else if (data.status == 1 || data.status == -1) {
         self.status('failed');
         const match = ERROR_REGEX.exec(data.message);
