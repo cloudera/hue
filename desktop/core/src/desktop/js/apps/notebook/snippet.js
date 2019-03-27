@@ -244,10 +244,6 @@ class Snippet {
       return vm.getSnippetViewSettings(self.type()).placeHolder;
     };
 
-    self.getApiHelper = function() {
-      return apiHelper;
-    };
-
     // namespace and compute might be initialized as empty object {}
     self.namespace = ko.observable(
       snippet.namespace && snippet.namespace.id ? snippet.namespace : undefined

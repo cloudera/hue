@@ -1861,34 +1861,38 @@ describe('sqlAutocompleteParser.js locations', () => {
   it('should report definitions for "CREATE DATABASE boo; |"', () => {
     assertLocations({
       dialect: 'impala',
-      beforeCursor: "CREATE DATABASE boo;",
+      beforeCursor: 'CREATE DATABASE boo;',
       expectedLocations: [
         {
           type: 'statement',
           location: { first_line: 1, last_line: 1, first_column: 1, last_column: 20 }
-        }, {
+        },
+        {
           type: 'statementType',
           location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 },
           identifier: 'CREATE DATABASE'
         }
       ],
-      expectedDefinitions: [{
-        type: 'database',
-        location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 },
-        identifierChain: [{ name: 'boo' }]
-      }]
+      expectedDefinitions: [
+        {
+          type: 'database',
+          location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 },
+          identifierChain: [{ name: 'boo' }]
+        }
+      ]
     });
   });
 
   it('should report definitions for "CREATE TABLE boo (id int, foo bigint, bar varchar); |"', () => {
     assertLocations({
       dialect: 'impala',
-      beforeCursor: "CREATE TABLE boo (id int, foo bigint, bar string);",
+      beforeCursor: 'CREATE TABLE boo (id int, foo bigint, bar string);',
       expectedLocations: [
         {
           type: 'statement',
           location: { first_line: 1, last_line: 1, first_column: 1, last_column: 50 }
-        }, {
+        },
+        {
           type: 'statementType',
           location: { first_line: 1, last_line: 1, first_column: 1, last_column: 7 },
           identifier: 'CREATE TABLE'
@@ -1899,19 +1903,23 @@ describe('sqlAutocompleteParser.js locations', () => {
           type: 'table',
           location: { first_line: 1, last_line: 1, first_column: 14, last_column: 17 },
           identifierChain: [{ name: 'boo' }],
-          columns: [{
-            identifierChain: [{ name: 'id' }],
-            type: 'int',
-            location: { first_line: 1, last_line: 1, first_column: 19, last_column: 21 }
-          }, {
-            identifierChain: [{ name: 'foo' }],
-            type: 'bigint',
-            location: { first_line: 1, last_line: 1, first_column: 27, last_column: 30 }
-          }, {
-            identifierChain: [{ name: 'bar' }],
-            type: 'string',
-            location: { first_line: 1, last_line: 1, first_column: 39, last_column: 42 }
-          }]
+          columns: [
+            {
+              identifierChain: [{ name: 'id' }],
+              type: 'int',
+              location: { first_line: 1, last_line: 1, first_column: 19, last_column: 21 }
+            },
+            {
+              identifierChain: [{ name: 'foo' }],
+              type: 'bigint',
+              location: { first_line: 1, last_line: 1, first_column: 27, last_column: 30 }
+            },
+            {
+              identifierChain: [{ name: 'bar' }],
+              type: 'string',
+              location: { first_line: 1, last_line: 1, first_column: 39, last_column: 42 }
+            }
+          ]
         }
       ]
     });
@@ -1966,11 +1974,13 @@ describe('sqlAutocompleteParser.js locations', () => {
             type: 'table',
             location: { first_line: 1, last_line: 1, first_column: 14, last_column: 17 },
             identifierChain: [{ name: 'bla' }],
-            columns: [{
-              identifierChain: [{ name: 'id' }],
-              type: 'INT',
-              location: { first_line: 1, last_line: 1, first_column: 19, last_column: 21 }
-            }]
+            columns: [
+              {
+                identifierChain: [{ name: 'id' }],
+                type: 'INT',
+                location: { first_line: 1, last_line: 1, first_column: 19, last_column: 21 }
+              }
+            ]
           }
         ]
       });

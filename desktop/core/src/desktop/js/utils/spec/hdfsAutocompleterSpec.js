@@ -18,7 +18,6 @@ import $ from 'spec/jquery.test';
 import 'spec/jquery.plugins';
 import ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import HdfsAutocompleter from '../hdfsAutocompleter';
 import SqlTestUtils from 'parse/spec/sqlTestUtils';
 
@@ -37,9 +36,6 @@ describe('hdfsAutocompleter.js', () => {
     },
     getContext: function() {
       return ko.mapping.fromJS(null);
-    },
-    getApiHelper: function() {
-      return apiHelper;
     }
   };
 
