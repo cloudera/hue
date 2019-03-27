@@ -673,3 +673,19 @@ Because building Hadoop (for the tests that require it) is slow, we've
 separated the Jenkins builds into "fast" and "slow".  Both are run
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.
+
+
+## Release
+
+How to count the number of commits since the last release and add them and the authors to the release notes:
+
+    git log --oneline --since=2018-01-01 | grep 'release'
+    git log --oneline --since=2018-01-01 | grep -n '6df64e3'
+    git log --oneline -1247 > scratch.txt
+
+    git log --pretty="%an" | sort | uniq > scratch.txt
+
+Tagging the release:
+
+    git tag -a release-4.3.0 -m "release-4.3.0"
+    git push origin release-4.3.0
