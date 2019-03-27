@@ -103,6 +103,8 @@ def api_error_handler(func):
         response['message'] = e.message
     except AuthenticationRequired, e:
       response['status'] = 401
+      if e.message and isinstance(e.message, basestring):
+        response['message'] = e.message
     except ValidationError, e:
       LOG.exception('Error validation %s' % func)
       response['status'] = -1
