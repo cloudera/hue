@@ -12,19 +12,19 @@
     <title>Hue :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553555578" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553555578" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553708490" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553555578" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553708490" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553555578"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553708490"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -51,15 +51,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553555578"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553708490"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553708490"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553555578"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553708490"></script>
 
     
   </div>
@@ -1548,6 +1548,7 @@
 <li><a href="#idle-session-timeout">Idle session timeout</a></li>
 <li><a href="#auditing">Auditing</a></li>
 <li><a href="#source-version-control">Source Version Control</a></li>
+<li><a href="#concurrent-user-session-limit">Concurrent User Session Limit</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -1878,6 +1879,17 @@ idle_session_timeout=600
     ## Client Secret for Authorized Application
     # client_secret=
 </code></pre>
+
+<h2 id="concurrent-user-session-limit">Concurrent User Session Limit</h2>
+
+<p>If set, limits the number of concurrent user sessions. 1 represents 1 browser session per user. Default: 0 (unlimited sessions per user)</p>
+
+<pre><code>[desktop]
+[[session]]
+concurrent_user_session_limit=0
+</code></pre>
+
+<p><a href="http://gethue.com/restrict-number-of-concurrent-sessions-per-user/">Read more about it here</a>.</p>
 
 
 <footer class=" footline" >
@@ -2927,20 +2939,20 @@ idle_session_timeout=600
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553555578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553555578"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553555578"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553555578"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553555578"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553555578"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553555578"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553708490"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553708490"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553708490"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553708490"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553708490"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553708490"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553708490"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553555578"></script>
-    <script src="/hue/latest/js/learn.js?1553555578"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553555578"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553708490"></script>
+    <script src="/hue/latest/js/learn.js?1553708490"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553708490"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553555578" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553555578"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553708490" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553708490"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
