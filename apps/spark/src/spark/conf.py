@@ -58,6 +58,12 @@ SECURITY_ENABLED = Config(
   default=False,
   type=coerce_bool)
 
+CSRF_ENABLED = Config(
+  key="csrf_enabled",
+  help=_t("Whether Livy requres client to have CSRF enabled."),
+  default=False,
+  type=coerce_bool)
+
 # Spark SQL
 SQL_SERVER_HOST = Config(
   key="sql_server_host",
