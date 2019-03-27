@@ -1168,9 +1168,6 @@ var editorViewModel = {
 var snippet = {
   type: ko.observable(snippetType),
   isSqlDialect: ko.observable(true),
-  getApiHelper: function() {
-    return apiHelper;
-  },
   database: ko.observable()
 };
 

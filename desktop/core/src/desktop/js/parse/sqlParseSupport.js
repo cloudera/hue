@@ -2170,24 +2170,24 @@ const initSqlParser = function(parser) {
     return loc;
   };
 
-  parser.addNewDatabaseLocation = function (location, identifierChain) {
+  parser.addNewDatabaseLocation = function(location, identifierChain) {
     parser.yy.definitions.push({
       type: 'database',
       location: adjustLocationForCursor(location),
       identifierChain: identifierChain
-    })
+    });
   };
 
-  parser.addNewTableLocation = function (location, identifierChain, colSpec) {
-    var columns = [];
+  parser.addNewTableLocation = function(location, identifierChain, colSpec) {
+    const columns = [];
     if (colSpec) {
-      colSpec.forEach(function (col) {
+      colSpec.forEach(col => {
         columns.push({
-          identifierChain: [ col.identifier ], // TODO: Complex
+          identifierChain: [col.identifier], // TODO: Complex
           type: col.type,
           location: adjustLocationForCursor(col.location)
-        })
-      })
+        });
+      });
     }
     parser.yy.definitions.push({
       type: 'table',

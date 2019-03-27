@@ -23,7 +23,7 @@ import ChartTransformers from 'apps/notebook/chartTransformers';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
-import Notebook from 'apps/notebook2/notebook';
+import { Notebook } from 'apps/notebook2/notebook';
 import Snippet from 'apps/notebook2/snippet';
 
 class EditorViewModel {

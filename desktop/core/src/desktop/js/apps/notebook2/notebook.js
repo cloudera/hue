@@ -29,6 +29,7 @@ import Snippet from 'apps/notebook2/snippet';
 const NOTEBOOK_MAPPING = {
   ignore: [
     'ace',
+    'aceEditor',
     'aceMode',
     'autocompleter',
     'availableDatabases',
@@ -45,6 +46,8 @@ const NOTEBOOK_MAPPING = {
     'history',
     'images',
     'inFocus',
+    'parentNotebook',
+    'parentVm',
     'queries',
     'saveResultsModalVisible',
     'selectedStatement',
@@ -949,4 +952,4 @@ class Notebook {
   }
 }
 
-export default Notebook;
+export { Notebook, NOTEBOOK_MAPPING };
