@@ -41,7 +41,9 @@ class QueryExpired(Exception):
     self.message = message
 
 class AuthenticationRequired(Exception):
-  pass
+  def __init__(self, message=None):
+    super(AuthenticationRequired, self).__init__()
+    self.message = message
 
 class OperationTimeout(Exception):
   pass
@@ -122,7 +124,7 @@ class Notebook(object):
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
 
       return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
-      
+
     return statement_raw
 
   def add_hive_snippet(self, database, sql):
@@ -334,6 +336,7 @@ def get_api(request, snippet):
     interface = 'dataeng'
 
   LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
+  snippet['interface'] = interface
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api

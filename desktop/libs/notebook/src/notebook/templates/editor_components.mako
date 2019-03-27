@@ -2037,6 +2037,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <h2 class="modal-title">${_('Connect to the data source')}</h2>
   </div>
   <div class="modal-body">
+    <!-- ko if: $root.authSessionMessage() -->
+      <div class="row-fluid">
+        <div class="alert-warning">
+          <span data-bind="text: authSessionMessage"></span>
+        </div>
+      </div>
+    <!-- /ko -->
     <div class="row-fluid">
       <div class="span6">
         <div class="input-prepend">

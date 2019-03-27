@@ -1373,6 +1373,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
     $(document).on('showAuthModal', (e, data) => {
       viewModel.authSessionUsername(window.LOGGED_USERNAME);
+      viewModel.authSessionMessage(data['message']);
       viewModel.authSessionPassword('');
       viewModel.authSessionType(data['type']);
       viewModel.authSessionCallback(data['callback']);
