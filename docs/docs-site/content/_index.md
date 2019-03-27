@@ -8,6 +8,8 @@ pre = "<b>1. </b>"
 
 # Documentation
 
+![Hue Logo Back-end]({{% param baseURL %}}images/hue_logo.png)
+
 The manual to install, use and develop Hue.
 
 Hue is a mature open source workbench for self-service operation and development of SQL applications

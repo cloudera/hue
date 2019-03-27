@@ -1,4 +1,5 @@
 baseURL = 'http://cloudera.github.io/hue/latest/' # Note: also in [params]
+#baseURL = '/' # Flip both to see images in developement mode
 
 languageCode = "en-us"
 title = "Hue Documentation"
@@ -13,6 +14,7 @@ home = [ "HTML", "RSS", "JSON"]
 [params]
   # For logo and favicon partials
   baseURL = 'http://cloudera.github.io/hue/latest/'
+  #baseURL = '/'
 
   # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.
@@ -37,7 +39,7 @@ home = [ "HTML", "RSS", "JSON"]
   # Hide breadcrumbs in the header and only show the current page title
   disableBreadcrumb = false
   # Hide Next and Previous page buttons normally displayed full height beside content
-  disableNextPrev = false
+  disableNextPrev = true
   # Order sections in menu by "weight" or "title". Default to "weight"
   ordersectionsby = "weight"
   # Change default color scheme with a variant one. Can be "red", "blue", "green".
