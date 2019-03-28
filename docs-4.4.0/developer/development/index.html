@@ -12,19 +12,19 @@
     <title>Development :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553787263" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553787263" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553791631" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553787263" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553791631" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553787263"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553791631"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -53,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553787263"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553787263"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553791631"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553791631"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553787263"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553791631"></script>
 
     
   </div>
@@ -2320,6 +2320,13 @@ and greatest in build technologies.</p>
 
 <h2 id="release">Release</h2>
 
+<p>Update the versions to the next release (current release +1):</p>
+
+<pre><code>:100644 100644 4db6d5f... f907d04... M  VERSION
+:100644 100644 9332f95... 45b28ad... M  desktop/libs/librdbms/java/pom.xml
+:100644 100644 551f62f... 694f021... M  maven/pom.xml
+</code></pre>
+
 <p>How to count the number of commits since the last release and add them and the authors to the release notes:</p>
 
 <pre><code>git log --oneline --since=2018-01-01 | grep 'release'
@@ -2331,7 +2338,7 @@ git log --pretty=&quot;%an&quot; | sort | uniq &gt; scratch.txt
 
 <p>Pushing the release branch:</p>
 
-<pre><code>git push origin HEAD:release-4.4.0
+<pre><code>git push origin HEAD:branch-4.4.0
 </code></pre>
 
 <p>Tagging the release:</p>
@@ -2339,6 +2346,33 @@ git log --pretty=&quot;%an&quot; | sort | uniq &gt; scratch.txt
 <pre><code>git tag -a release-4.4.0 -m &quot;release-4.4.0&quot;
 git push origin release-4.4.0
 </code></pre>
+
+<p>Building the tarball release:</p>
+
+<pre><code>make prod
+</code></pre>
+
+<p>Source of the release: <a href="https://github.com/cloudera/hue/archive/release-4.4.0.zip">https://github.com/cloudera/hue/archive/release-4.4.0.zip</a></p>
+
+<p>Other things to update:</p>
+
+<ul>
+<li>In Jira, setting the <a href="https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&amp;status=all">release as shipped</a> and moving all non finished jiras to another target. Also archiving old releases.</li>
+<li>Create the after next release tag in Jira and Blog</li>
+<li>Update <a href="http://gethue.com">http://gethue.com</a> &lsquo;Release&rsquo; menu</li>
+<li>Update <a href="http://demo.gethue.com/">http://demo.gethue.com/</a></li>
+
+<li><p>Update Docker image <a href="https://hub.docker.com/u/gethue/">https://hub.docker.com/u/gethue/</a></p>
+
+<p>docker build <a href="https://github.com/cloudera/hue.git#release-4.4.0">https://github.com/cloudera/hue.git#release-4.4.0</a> -t gethue/hue:4.4.0 -f tools/docker/hue/Dockerfile
+docker tag gethue/hue:4.4.0 gethue/latest
+docker images
+docker login
+docker push gethue/hue
+docker push gethue/hue:4.4.0</p></li>
+</ul>
+
+<p>Then send release notes to hue-user, <a href="https://twitter.com/gethue!">https://twitter.com/gethue!</a></p>
 
 
 <footer class=" footline" >
@@ -3396,20 +3430,20 @@ git push origin release-4.4.0
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553787263"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553787263"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553787263"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553787263"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553787263"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553787263"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553787263"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553791631"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553791631"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553791631"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553791631"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553791631"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553791631"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553791631"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553787263"></script>
-    <script src="/hue/latest/js/learn.js?1553787263"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553787263"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553791631"></script>
+    <script src="/hue/latest/js/learn.js?1553791631"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553791631"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553787263" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553787263"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553791631" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553791631"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
