@@ -192,7 +192,7 @@ Then give Hue the information about the database source:
     [[[presto]]]
        name = Presto
        interface=sqlalchemy
-       options='{"url": "presto://..."}'
+       options='{"url": "presto://localhost:8080/hive/default"}'
 
 Alternatives.
 
@@ -226,7 +226,7 @@ Then give Hue the information about the database source:
     [[[oracle]]]
        name = Oracle
        interface=sqlalchemy
-       options='{"url": "oracle://..."}'
+       options='{"url": "oracle://scott:tiger@dsn"}'
 
 ### PostgreSql
 
@@ -305,7 +305,7 @@ Then give Hue the information about the database source:
     [[[teradata]]]
        name = Teradata
        interface=sqlalchemy
-       options='{"url": "teradata://..."}'
+       options='{"url": "teradata://user:pw@host"}'
 
 Alternative:
 
@@ -315,6 +315,21 @@ Alternative:
       options='{"url": "jdbc:teradata://sqoop-teradata-1400.sjc.cloudera.com/sqoop", "driver": "com.teradata.jdbc.TeraDriver", "user": "sqoop", "password": "sqoop"}'
 
 ### DB2
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install ibm_db_sa
+
+(or via https://github.com/ibmdb/python-ibmdbsa/tree/master/ibm_db_sa)
+
+Then give Hue the information about the database source:
+
+    [[[db2]]]
+       name = DB2
+       interface=sqlalchemy
+       options='{"url": "db2+ibm_db://user:pass@host[:port]/database"}'
+
+Alternative:
 
     [[[db2]]]
       name=DB2 JDBC
@@ -332,7 +347,7 @@ Then give Hue the information about the database source:
     [[[sparksql]]]
        name = SparkSql
        interface=sqlalchemy
-       options='{"url": "jdbc+hive://..."}'
+       options='{"url": "hive://user:password@host:10000/database"}'
 
 Alternatives:
 
@@ -371,7 +386,7 @@ Then give Hue the information about the database source:
     [[[mssql]]]
        name = SQL Server
        interface=sqlalchemy
-       options='{"url": "mssql://..."}'
+       options='{"url": "mssql+pymssql://<username>:<password>@<freetds_name>/?charset=utf8"}'
 
 Alternative:
 
@@ -393,7 +408,7 @@ Then give Hue the information about the database source:
     [[[vertica]]]
        name = Vertica
        interface=sqlalchemy
-       options='{"url": "vertica+vertica_python://..."}'
+       options='{"url": "vertica+vertica_python://user:pwd@host:port/database"}'
 
 Alternative:
 
@@ -426,7 +441,7 @@ Then give Hue the information about the database source:
     [[[redshift]]]
        name = Redshift
        interface=sqlalchemy
-       options='{"url": "redshift+psycopg2://..."}'
+       options='{"url": "redshift+psycopg2://username@host.amazonaws.com:5439/database"}'
 
 ### Google BigQuery
 
@@ -434,14 +449,31 @@ The dialect should be added to the Python system or Hue Python virtual environme
 
       ./build/env/bin/pip install pybigquery
 
+From https://github.com/mxmzdlv/pybigquery.
+
 Then give Hue the information about the database source:
 
     [[[bigquery]]]
        name = BigQuery
        interface=sqlalchemy
-       options='{"url": "bigquery://..."}'
+       options='{"url": "bigquery://project"}'
 
 ### Apache Drill
+
+The dialect is available on https://github.com/JohnOmernik/sqlalchemy-drill
+
+Then give Hue the information about the database source:
+
+    [[[drill]]]
+       name = Drill
+       interface=sqlalchemy
+       options='{"url": "drill+sadrill://..."}'
+       ## To use Drill with SQLAlchemy you will need to craft a connection string in the format below:
+       # drill+sadrill://<username>:<password>@<host>:<port>/<storage_plugin>?use_ssl=True
+       ## To connect to Drill running on a local machine running in embedded mode you can use the following connection string.
+       # drill+sadrill://localhost:8047/dfs?use_ssl=False
+
+Alternative:
 
 The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html) can be used.
 
@@ -452,6 +484,35 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
       ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "<drill-jdbc-url>", "driver": "org.apache.drill.jdbc.Driver", "user": "admin", "password": "admin"}'</code>
+
+### Sybase
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install sqlalchemy-teradata
+
+Then give Hue the information about the database source:
+
+    [[[teradata]]]
+       name = Teradata
+       interface=sqlalchemy
+       options='{"url": "sybase+pysybase://<username>:<password>@<dsn>/[database name]"}'
+
+
+### Hana
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install sqlalchemy-hana
+
+(or via https://github.com/SAP/sqlalchemy-hana)
+
+Then give Hue the information about the database source:
+
+    [[[db2]]]
+       name = DB2
+       interface=sqlalchemy
+       options='{"url": "hana://username:password@example.de:30015"}'
 
 ### Solr SQL
 
