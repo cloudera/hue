@@ -2402,7 +2402,7 @@ List of 3215 Commits
 * d5d573d HUE-5403 [editor] Download results modal sometimes doesn't close on IE11 or Edge
 * f35944b HUE-5404 [editor] Nicescrollify log panel
 * 16f60ad HUE-5275 [libsentry] Avoid mutating original objects in privilege checker
-* a3c5943 HUE-5340 [search] Escape Solr field that have XSS injection (like <script>alert(1234)</script>)
+* a3c5943 HUE-5340 [search] Escape Solr field that have XSS injection
 * f28a06d HUE-5377 [assist] Don’t show the assist link in the context popover opened from the assist
 * a9c0bc0 HUE-5380 [assist] Fix right-click context menu in assist for Firefox
 * 6b3e775 HUE-5391 [assist] Don’t show query builder when it’s disabled
