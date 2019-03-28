@@ -123,7 +123,7 @@ ko.bindingHandlers.foreachVisible = {
     let visibleEntryCount = 0;
     let incrementLimit = 0; // The diff required to re-render, set to visibleCount below
     let elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
-
+    let endIndex = 0;
     const updateVisibleEntryCount = function() {
       // TODO: Drop the window innerHeight limitation.
       // Sometimes after resizeWrapper() is called the reported innerHeight of the $container is the same as
@@ -148,7 +148,7 @@ ko.bindingHandlers.foreachVisible = {
 
     // In case this element was rendered before use the last known indices
     let startIndex = Math.max($parentFVOwnerElement.data('startIndex') || 0, 0);
-    let endIndex = Math.min(
+    endIndex = Math.min(
       $parentFVOwnerElement.data('endIndex') || visibleEntryCount + elementIncrement,
       allEntries.length - 1
     );
