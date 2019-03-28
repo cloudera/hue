@@ -1331,7 +1331,7 @@ class Snippet {
       self.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
     }
 
-    self.previousChartOptions = self.parentVm._getPreviousChartOptions(self);
+    self.previousChartOptions = self.parentVm.getPreviousChartOptions(self);
     $(document).trigger('executeStarted', { vm: self.parentVm, snippet: self });
     self.lastExecuted(now);
     $('.jHueNotify').remove();
@@ -1437,7 +1437,7 @@ class Snippet {
               }
             } else {
               self.parentNotebook.history.unshift(
-                self.parentNotebook._makeHistoryRecord(
+                self.parentNotebook.makeHistoryRecord(
                   undefined,
                   data.handle.statement,
                   self.lastExecuted(),
@@ -2577,4 +2577,4 @@ class Snippet {
   }
 }
 
-export default Snippet;
+export { Snippet, STATUS };
