@@ -1,0 +1,10 @@
+include MANIFEST.in
+include *.txt
+recursive-include odpi *.c
+recursive-include odpi *.h
+prune odpi/test
+prune odpi/samples
+recursive-include src *.c
+recursive-include src *.h
+recursive-include samples *.py *.sql
+recursive-include test *.py *.sql
