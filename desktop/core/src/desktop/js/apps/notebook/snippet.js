@@ -1720,7 +1720,7 @@ class Snippet {
         self.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
       }
 
-      self.previousChartOptions = vm._getPreviousChartOptions(self);
+      self.previousChartOptions = vm.getPreviousChartOptions(self);
       $(document).trigger('executeStarted', { vm: vm, snippet: self });
       self.lastExecuted(now);
       $('.jHueNotify').remove();
@@ -1826,7 +1826,7 @@ class Snippet {
                 }
               } else {
                 notebook.history.unshift(
-                  notebook._makeHistoryRecord(
+                  notebook.makeHistoryRecord(
                     undefined,
                     data.handle.statement,
                     self.lastExecuted(),

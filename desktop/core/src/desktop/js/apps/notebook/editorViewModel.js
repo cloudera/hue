@@ -463,7 +463,7 @@ class EditorViewModel {
             snippet.result.statement_range.valueHasMutated();
           }
 
-          snippet.previousChartOptions = self._getPreviousChartOptions(snippet);
+          snippet.previousChartOptions = self.getPreviousChartOptions(snippet);
         });
 
         if (notebook.snippets()[0].result.data().length > 0) {
@@ -485,7 +485,7 @@ class EditorViewModel {
       huePubSub.publish('recalculate.name.description.width');
     };
 
-    self._getPreviousChartOptions = function(snippet) {
+    self.getPreviousChartOptions = function(snippet) {
       return {
         chartLimit:
           typeof snippet.chartLimit() !== 'undefined'

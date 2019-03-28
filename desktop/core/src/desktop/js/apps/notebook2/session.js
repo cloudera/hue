@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import ko from 'knockout';
 import komapping from 'knockout.mapping';
 
@@ -31,15 +30,12 @@ class Session {
       self.properties = ko.observableArray();
     }
 
-    self.availableNewProperties = ko.computed(() => {
+    self.availableNewProperties = ko.pureComputed(() => {
       const addedIndex = {};
-      $.each(self.properties(), (index, property) => {
+      self.properties().forEach(property => {
         addedIndex[property.key] = true;
       });
-      const result = $.grep(vm.availableSessionProperties(), property => {
-        return !addedIndex[property.name];
-      });
-      return result;
+      return vm.availableSessionProperties().filter(property => !addedIndex[property.name]);
     });
   }
 }
