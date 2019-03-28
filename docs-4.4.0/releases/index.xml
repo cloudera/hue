@@ -12,6 +12,18 @@
     
     
     <item>
+      <title>4.4.0</title>
+      <link>http://cloudera.github.io/hue/latest/releases/release-notes-4.4.0/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
+      
+      <guid>http://cloudera.github.io/hue/latest/releases/release-notes-4.4.0/</guid>
+      <description>Hue v4.4.0, released March 28th 2019 Hue, http://gethue.com, is Hue is an open source SQL Cloud Assistant for developing and accessing SQL/Data Apps.
+Its main features:
+ Editors to query with SQL any database and submit jobs Dashboards to dynamically interact and visualize data Scheduler of jobs and workflows Browsers for data and a Data Catalog  Read the complete list of improvements on Hue 4.4 is out!.
+Summary The focus of this release was to improve the self service SQL troubleshooting and stability.</description>
+    </item>
+    
+    <item>
       <title>4.3.0</title>
       <link>http://cloudera.github.io/hue/latest/releases/release-notes-4.3.0/</link>
       <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>

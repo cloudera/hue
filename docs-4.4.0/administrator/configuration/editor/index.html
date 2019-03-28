@@ -12,19 +12,19 @@
     <title>SQL Editor :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553786990" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553708490" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553786990" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553708490"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553786990"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -41,7 +41,9 @@
 
   <div id="header-wrapper">
     <div id="header">
-      <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
 
     </div>
     
@@ -51,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553708490"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553708490"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553786990"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553786990"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553708490"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553786990"></script>
 
     
   </div>
@@ -849,6 +851,25 @@
  
   
     
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
       <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
         <a href="/hue/latest/releases/release-notes-4.3.0/">
         4.3.0
@@ -1522,6 +1543,17 @@
 <ul>
 <li>
 <ul>
+<li><a href="#editor">Editor</a>
+<ul>
+<li><a href="#downloads">Downloads</a></li>
+<li><a href="#notebook">Notebook</a></li>
+<li><a href="#external-statements">External statements</a></li>
+<li><a href="#batch-querying">Batch querying</a></li>
+<li><a href="#assist-query-builder">Assist Query Builder</a></li>
+<li><a href="#query-analysis">Query Analysis</a></li>
+<li><a href="#one-click-scheduling">One-click scheduling</a></li>
+<li><a href="#credentials">Credentials</a></li>
+</ul></li>
 <li><a href="#connectors">Connectors</a>
 <ul>
 <li><a href="#impala">Impala</a></li>
@@ -1553,22 +1585,11 @@
 </ul></li>
 <li><a href="#interfaces">Interfaces</a>
 <ul>
-<li><a href="#credentials">Credentials</a></li>
 <li><a href="#sql-alchemy">Sql Alchemy</a></li>
 <li><a href="#hiveserver2">HiveServer2</a></li>
-<li><a href="#django-db-connectors">Django DB Connectors</a></li>
-<li><a href="#native">Native</a></li>
+<li><a href="#custom">Custom</a></li>
 <li><a href="#jdbc">JDBC</a></li>
-</ul></li>
-<li><a href="#editor">Editor</a>
-<ul>
-<li><a href="#downloads">Downloads</a></li>
-<li><a href="#notebook">Notebook</a></li>
-<li><a href="#external-statements">External statements</a></li>
-<li><a href="#batch-querying">Batch querying</a></li>
-<li><a href="#assist-query-builder">Assist Query Builder</a></li>
-<li><a href="#query-analysis">Query Analysis</a></li>
-<li><a href="#one-click-scheduling">One-click scheduling</a></li>
+<li><a href="#django-db-connectors">Django DB Connectors</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1614,6 +1635,99 @@ It has one of the best SQL autocomplete and many <a href="/user/editor/">more fe
 </code></pre>
 
 <p><strong>Tip</strong> Do not forget to uncomment the lines by removing the <code>#</code> and editing the sections at the correct levels.</p>
+
+<h2 id="editor">Editor</h2>
+
+<p>The editor supports some global settings.</p>
+
+<h3 id="downloads">Downloads</h3>
+
+<p>Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:</p>
+
+<pre><code>    [beeswax]
+    # A limit to the number of rows that can be downloaded from a query before it is truncated.
+    # A value of -1 means there will be no limit.
+    download_row_limit=-1
+
+    # A limit to the number of bytes that can be downloaded from a query before it is truncated.
+    # A value of -1 means there will be no limit.
+    download_bytes_limit=-1
+</code></pre>
+
+<p>In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:</p>
+
+<pre><code>    [desktop]
+    # Global setting to allow or disable end user downloads in all Hue.
+    # e.g. Query result in Editors and Dashboards, file in File Browser...
+    enable_download=false
+</code></pre>
+
+<p>The download feature in the file browser can be disabled separately with the following options in your hue.ini:</p>
+
+<pre><code>    [filebrowser]
+    show_download_button=false
+</code></pre>
+
+<h3 id="notebook">Notebook</h3>
+
+<p>Enable the Notebook mode which supports multiple snippets of code.</p>
+
+<pre><code>  [notebook]
+  show_notebooks=true
+</code></pre>
+
+<h3 id="external-statements">External statements</h3>
+
+<p>Enable the selection of queries from files, saved queries into the editor or as snippet.</p>
+
+<pre><code>  [notebook]
+  enable_external_statements=false
+</code></pre>
+
+<h3 id="batch-querying">Batch querying</h3>
+
+<p>This option currently only works with Hive and relies on Oozie until <a href="https://issues.cloudera.org/browse/HUE-8738">HUE-8738</a> gets done.</p>
+
+<pre><code>  [notebook]
+  enable_batch_execute=true
+</code></pre>
+
+<h3 id="assist-query-builder">Assist Query Builder</h3>
+
+<p>Flag to enable a lightweight SQL query builder where tables and columns can be dragged &amp; dropped from the left table assist. Not to be confused with the <a href="../dashboard">Query Builder</a>.</p>
+
+<p><strong>Note</strong> This feature is experimental.</p>
+
+<pre><code>  [notebook]
+  enable_query_builder=true
+</code></pre>
+
+<h3 id="query-analysis">Query Analysis</h3>
+
+<p>Display an analysis panel post Impala queries executions with some hints and suggestions.</p>
+
+<p><strong>Note</strong> This feature is experimental.</p>
+
+<pre><code>  [notebook]
+  enable_query_analysis=true
+</code></pre>
+
+<h3 id="one-click-scheduling">One-click scheduling</h3>
+
+<p>Enable the creation of a coordinator for the current SQL query.</p>
+
+<p><strong>Note</strong> This feature is experimental until Task Server scheduler <a href="https://issues.cloudera.org/browse/HUE-8740">HUE-8740</a>.</p>
+
+<pre><code>  [notebook]
+  enable_query_scheduling=true
+</code></pre>
+
+<h3 id="credentials">Credentials</h3>
+
+<p>When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser.</p>
+
+<p>Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process. The clients serves these parameters
+each time a query is sent.</p>
 
 <h2 id="connectors">Connectors</h2>
 
@@ -1672,6 +1786,7 @@ max_number_of_sessions=10
    name = MySQL
    interface=sqlalchemy
    options='{&quot;url&quot;: &quot;mysql://root:root@localhost:3306/hue&quot;}'
+   ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
 </code></pre>
 
 <p>Query string options are documented in the <a href="https://docs.sqlalchemy.org/en/latest/dialects/mysql.html">SqlAlchemy MySQL documentation</a>.</p>
@@ -2082,6 +2197,20 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
   livy_server_url=http://localhost:8998
 </code></pre>
 
+<p><strong>CSRF</strong></p>
+
+<p>Livy supports a configuration parameter in the Livy conf:</p>
+
+<pre><code>  livy.server.csrf-protection.enabled
+</code></pre>
+
+<p>&hellip;which is false by default. Upon trying to launch a Livy session from the notebook, Hue will pass along the connection error from Livy as a 400 response that the &ldquo;Missing Required Header for CSRF protection&rdquo;. To enable it, add to the Hue config:</p>
+
+<pre><code>  [spark]
+  # Whether Livy requires client to use csrf protection.
+  ## csrf_enabled=false
+</code></pre>
+
 <h3 id="pig">Pig</h3>
 
 <p>Pig is native to Hue and depends on the <a href="../external/">Oozie service</a> to be configured:</p>
@@ -2135,27 +2264,39 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
 
 <p>Several interfaces are possible and sometimes more than one works for a certain database. When available <code>HiveServer2</code> or <code>SqlAlchemy</code> are recommended as they are native.</p>
 
-<h3 id="credentials">Credentials</h3>
-
-<p>When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser. These credentials are not saved in Hue at anytime.</p>
-
 <h3 id="sql-alchemy">Sql Alchemy</h3>
 
 <p>SQL Alchemy is a robust <a href="https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine">connector</a> that supports
 many <a href="https://docs.sqlalchemy.org/en/latest/dialects">SQL dialects</a> natively. This is the recommended connector for most of the databases.</p>
 
-<ol>
-<li><p>The dialect should be added to the Python system or Hue Python virtual environment:</p>
+<p>The dialect should be added to the Python system or Hue Python virtual environment. For example for MySQL:</p>
 
-<p>./build/env/bin/pip install mysqlclient</p></li>
+<pre><code>  ./build/env/bin/pip install mysqlclient
+</code></pre>
 
-<li><p>Then give Hue the information about the database source:</p>
+<p>Then give Hue the information about the database source:</p>
 
-<p>[[[mysql]]]
+<pre><code>[[[mysql]]]
    name = MySQL
    interface=sqlalchemy
-   options=&lsquo;{&ldquo;url&rdquo;: &ldquo;mysql://root:root@localhost:3306/hue&rdquo;}&rsquo;</p></li>
-</ol>
+   options='{&quot;url&quot;: &quot;mysql://root:root@localhost:3306/hue&quot;}'
+</code></pre>
+
+<p><strong>Tip</strong></p>
+
+<p>To offer more self service capabilities, parts of the URL can be parameterized and the information will be asked to the user.</p>
+
+<p>Supported parameters are:</p>
+
+<ul>
+<li>USER</li>
+<li>PASSWORD</li>
+</ul>
+
+<p>e.g.</p>
+
+<pre><code>  mysql://${USER}:${PASSWORD}@localhost:3306/hue
+</code></pre>
 
 <h3 id="hiveserver2">HiveServer2</h3>
 
@@ -2186,46 +2327,15 @@ many <a href="https://docs.sqlalchemy.org/en/latest/dialects">SQL dialects</a> n
   interface=hiveserver2
 </code></pre>
 
-<h3 id="django-db-connectors">Django DB Connectors</h3>
-
-<p>Those rely on the <code>[dbms]</code> lib an dedicated Python libs.</p>
-
-<p><strong>Note</strong> This is an historical connector, SQLAlchemy should be prefered at this time.</p>
-
-<p>First, in your hue.ini file, add the relevant database connection information under the <code>[librdbms]</code> section:</p>
-
-<pre><code>[librdbms]
-  [[databases]]
-    [[[postgresql]]]
-    nice_name=PostgreSQL
-    name=music
-    engine=postgresql_psycopg2
-    port=5432
-    user=hue
-    password=hue
-    options={}
-</code></pre>
-
-<p>Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:</p>
-
-<pre><code>[notebook]
-  [[interpreters]]
-    [[[postgresql]]]
-    name=PostgreSQL
-    interface=rdbms
-</code></pre>
-
-<p>After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:</p>
-
-<h3 id="native">Native</h3>
+<h3 id="custom">Custom</h3>
 
 <p>A series of native connectors interacting with the editor have been developed and are listed in the <a href="/developer/editor/">developer section</a>.</p>
 
 <h3 id="jdbc">JDBC</h3>
 
-<p>Use the query editor with any JDBC database.</p>
-
 <p><strong>Note</strong> This is an historical connector, SQLAlchemy should be prefered at this time.</p>
+
+<p>Use the query editor with any JDBC database.</p>
 
 <p>The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle, but for other JDBC-compatible databases Hue now finally supports a “jdbc” interface to integrate such databases with the new query editor!</p>
 
@@ -2262,91 +2372,36 @@ Before adding your interpreter’s JDBC configurations to hue.ini, verify that t
 <p><strong>Tip</strong>: Prompt for JDBC authentication
 You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.</p>
 
-<h2 id="editor">Editor</h2>
+<h3 id="django-db-connectors">Django DB Connectors</h3>
 
-<p>The editor supports some global settings.</p>
+<p><strong>Note</strong> This is an historical connector, SQLAlchemy should be prefered at this time.</p>
 
-<h3 id="downloads">Downloads</h3>
+<p>Those rely on the <code>[dbms]</code> lib an dedicated Python libs.</p>
 
-<p>Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:</p>
+<p>First, in your hue.ini file, add the relevant database connection information under the <code>[librdbms]</code> section:</p>
 
-<pre><code>    [beeswax]
-    # A limit to the number of rows that can be downloaded from a query before it is truncated.
-    # A value of -1 means there will be no limit.
-    download_row_limit=-1
-
-    # A limit to the number of bytes that can be downloaded from a query before it is truncated.
-    # A value of -1 means there will be no limit.
-    download_bytes_limit=-1
+<pre><code>[librdbms]
+  [[databases]]
+    [[[postgresql]]]
+    nice_name=PostgreSQL
+    name=music
+    engine=postgresql_psycopg2
+    port=5432
+    user=hue
+    password=hue
+    options={}
 </code></pre>
 
-<p>In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:</p>
+<p>Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:</p>
 
-<pre><code>    [desktop]
-    # Global setting to allow or disable end user downloads in all Hue.
-    # e.g. Query result in Editors and Dashboards, file in File Browser...
-    enable_download=false
+<pre><code>[notebook]
+  [[interpreters]]
+    [[[postgresql]]]
+    name=PostgreSQL
+    interface=rdbms
 </code></pre>
 
-<p>The download feature in the file browser can be disabled separately with the following options in your hue.ini:</p>
-
-<pre><code>    [filebrowser]
-    show_download_button=false
-</code></pre>
-
-<h3 id="notebook">Notebook</h3>
-
-<p>Enable the Notebook mode which supports multiple snippets of code.</p>
-
-<pre><code>  [notebook]
-  show_notebooks=true
-</code></pre>
-
-<h3 id="external-statements">External statements</h3>
-
-<p>Enable the selection of queries from files, saved queries into the editor or as snippet.</p>
-
-<pre><code>  [notebook]
-  enable_external_statements=false
-</code></pre>
-
-<h3 id="batch-querying">Batch querying</h3>
-
-<p>This option currently only works with Hive and relies on Oozie until <a href="https://issues.cloudera.org/browse/HUE-8738">HUE-8738</a> gets done.</p>
-
-<pre><code>  [notebook]
-  enable_batch_execute=true
-</code></pre>
-
-<h3 id="assist-query-builder">Assist Query Builder</h3>
-
-<p>Flag to enable a lightweight SQL query builder where tables and columns can be dragged &amp; dropped from the left table assist. Not to be confused with the <a href="../dashboard">Query Builder</a>.</p>
-
-<p><strong>Note</strong> This feature is experimental.</p>
-
-<pre><code>  [notebook]
-  enable_query_builder=true
-</code></pre>
-
-<h3 id="query-analysis">Query Analysis</h3>
-
-<p>Display an analysis panel post Impala queries executions with some hints and suggestions.</p>
-
-<p><strong>Note</strong> This feature is experimental.</p>
-
-<pre><code>  [notebook]
-  enable_query_analysis=true
-</code></pre>
-
-<h3 id="one-click-scheduling">One-click scheduling</h3>
-
-<p>Enable the creation of a coordinator for the current SQL query.</p>
-
-<p><strong>Note</strong> This feature is experimental until Task Server scheduler <a href="https://issues.cloudera.org/browse/HUE-8740">HUE-8740</a>.</p>
-
-<pre><code>  [notebook]
-  enable_query_scheduling=true
-</code></pre>
+<p>After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:</p>
 
 
 <footer class=" footline" >
@@ -3374,6 +3429,22 @@ You can leave out the username and password in the JDBC options, and Hue will in
             
         
                     
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
             
         
                     
@@ -3385,13 +3456,6 @@ You can leave out the username and password in the JDBC options, and Hue will in
 
 	 
 	 
-		
-			<a class="nav nav-prev" href="/hue/latest/administrator/configuration/hue/" title="Hue"> <i class="fa fa-chevron-left"></i></a>
-		
-		
-			<a class="nav nav-next" href="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
-		
-	
     </div>
 
     </section>
@@ -3399,20 +3463,20 @@ You can leave out the username and password in the JDBC options, and Hue will in
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553708490"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553708490"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553708490"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553708490"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553708490"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553708490"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553708490"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553786990"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553786990"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553786990"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553786990"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553786990"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553786990"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553786990"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553708490"></script>
-    <script src="/hue/latest/js/learn.js?1553708490"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553708490"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553786990"></script>
+    <script src="/hue/latest/js/learn.js?1553786990"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553786990"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553708490" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553708490"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553786990" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553786990"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

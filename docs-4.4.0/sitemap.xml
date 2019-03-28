@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://cloudera.github.io/hue/latest/releases/release-notes-4.4.0/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/latest/releases/release-notes-4.3.0/</loc>
     <lastmod>2019-03-13T18:28:08-07:00</lastmod>
   </url>

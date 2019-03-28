@@ -12,19 +12,19 @@
     <title>Development :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553708490" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553708490" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553786990" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553786990" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553708490" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553786990" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553708490"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553786990"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -41,7 +41,9 @@
 
   <div id="header-wrapper">
     <div id="header">
-      <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
 
     </div>
     
@@ -51,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553708490"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553708490"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553786990"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553786990"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553708490"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553786990"></script>
 
     
   </div>
@@ -849,6 +851,25 @@
  
   
     
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
       <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
         <a href="/hue/latest/releases/release-notes-4.3.0/">
         4.3.0
@@ -1516,41 +1537,48 @@
 <ul>
 <li>
 <ul>
-<li><a href="#dependencies">Dependencies</a></li>
 <li><a href="#building">Building</a>
 <ul>
-<li><a href="#documentation">Documentation</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
 <li><a href="#javascript">Javascript</a></li>
+<li><a href="#documentation">Documentation</a></li>
 <li><a href="#css-less">CSS / LESS</a></li>
 <li><a href="#sql-autocomplete">SQL Autocomplete</a></li>
 <li><a href="#ace-editor">Ace Editor</a></li>
 <li><a href="#internationalization">Internationalization</a></li>
+<li><a href="#dev-environment">Dev environment</a>
+<ul>
+<li><a href="#debugging-with-pycharm">Debugging with PyCharm</a></li>
+<li><a href="#debugging-with-eclipse">Debugging with Eclipse</a></li>
 </ul></li>
-<li><a href="#webapp-api">Webapp API</a>
+</ul></li>
+<li><a href="#api-server">API Server</a>
 <ul>
 <li><a href="#from-30-000-feet">From 30,000 feet</a></li>
 <li><a href="#the-hue-server">The Hue Server</a></li>
 <li><a href="#interacting-with-external-services">Interacting with external services</a></li>
 <li><a href="#an-architectural-view">An Architectural View</a></li>
 <li><a href="#file-layout">File Layout</a></li>
-<li><a href="#configuration-file">Configuration File</a></li>
-<li><a href="#configuration-variables">Configuration Variables</a></li>
-<li><a href="#running-helper-processes">Running &ldquo;Helper Processes&rdquo;</a></li>
+<li><a href="#configurations">Configurations</a>
+<ul>
+<li><a href="#file">File</a></li>
+<li><a href="#variables">Variables</a></li>
+</ul></li>
 <li><a href="#saving-documents">Saving documents</a></li>
-<li><a href="#managing-users">Managing users</a></li>
 <li><a href="#walk-through-of-a-django-view">Walk-through of a Django View</a></li>
 <li><a href="#templates-django-and-mako">Templates: Django and Mako</a></li>
 <li><a href="#authentication-backends">Authentication Backends</a></li>
 <li><a href="#authorization">Authorization</a></li>
 <li><a href="#using-and-installing-thrift">Using and Installing Thrift</a></li>
-<li><a href="#profiling-hue-apps">Profiling Hue Apps</a></li>
+<li><a href="#profiling">Profiling</a></li>
 <li><a href="#upgrades">Upgrades</a></li>
 <li><a href="#debugging-tips-and-tricks">Debugging Tips and Tricks</a></li>
 </ul></li>
 <li><a href="#web-interface">Web interface</a>
 <ul>
+<li><a href="#node-js">Node.js</a></li>
 <li><a href="#css-styles">CSS Styles</a></li>
-<li><a href="#defining-styles-for-your-application">Defining Styles for Your Application</a></li>
+<li><a href="#defining-styles">Defining Styles</a></li>
 <li><a href="#icons">Icons</a></li>
 <li><a href="#static-files">Static files</a></li>
 </ul></li>
@@ -1564,10 +1592,9 @@
 <li><a href="#special-environment-variables">Special environment variables</a></li>
 <li><a href="#writing-tests-that-depend-on-hadoop">Writing tests that depend on Hadoop</a></li>
 <li><a href="#jenkins-configuration">Jenkins Configuration</a></li>
-<li><a href="#debugging-with-pycharm">Debugging with PyCharm</a></li>
-<li><a href="#debugging-with-eclipse">Debugging with Eclipse</a></li>
 </ul></li>
 </ul></li>
+<li><a href="#release">Release</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -1592,10 +1619,12 @@
 
 <p>This section goes into greater detail on how to build and reuse the components of Hue.</p>
 
-<h2 id="dependencies">Dependencies</h2>
+<h2 id="building">Building</h2>
+
+<h3 id="dependencies">Dependencies</h3>
 
 <ul>
-<li>The OS specific dependencies are listed <a href="/administrator/installation/dependencies/">here</a></li>
+<li>The OS specific install instructions are listed in the <a href="/administrator/installation/dependencies/">install guide</a></li>
 <li>Python 2.7+ (Python 3 support tracked in <a href="https://issues.cloudera.org/browse/HUE-8737">HUE-8737</a>)</li>
 <li>Django (1.11 already included in the distribution)</li>
 <li>Java (Java 1.8) (should go away after <a href="https://issues.cloudera.org/browse/HUE-8740">HUE-8740</a>)</li>
@@ -1605,7 +1634,37 @@
 <li><a href="http://knockoutjs.com/">Knockout js</a></li>
 </ul>
 
-<h2 id="building">Building</h2>
+<h3 id="javascript">Javascript</h3>
+
+<p>The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js</p>
+
+<p>For changes to the files under src/desktop/js the following applies:</p>
+
+<p>First make sure all third-party dependencies defined in package.json are installed into node_modules/</p>
+
+<pre><code>npm install
+</code></pre>
+
+<p>Also run this after making changes to package.json, adding new third-party dependencies etc.</p>
+
+<p>To generate the js bundles run:</p>
+
+<pre><code>npm run webpack
+npm run webpack-workers
+npm run webpack-login
+</code></pre>
+
+<p>During development the bundles can be autogenerated when it detects changes to the .js files, for this run:</p>
+
+<pre><code>npm run dev
+</code></pre>
+
+<p>Before sending a review with changes to the bundles run:</p>
+
+<pre><code>npm run lint-fix
+</code></pre>
+
+<p>and possibly fix any issues it might report.</p>
 
 <h3 id="documentation">Documentation</h3>
 
@@ -1646,38 +1705,6 @@ git push origin HEAD:gh-pages
 
 <pre><code>make docs
 </code></pre>
-
-<h3 id="javascript">Javascript</h3>
-
-<p>The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js</p>
-
-<p>For changes to the files under src/desktop/js the following applies:</p>
-
-<p>First make sure all third-party dependencies defined in package.json are installed into node_modules/</p>
-
-<pre><code>npm install
-</code></pre>
-
-<p>Also run this after making changes to package.json, adding new third-party dependencies etc.</p>
-
-<p>To generate the js bundles run:</p>
-
-<pre><code>npm run webpack
-npm run webpack-workers
-npm run webpack-login
-</code></pre>
-
-<p>During development the bundles can be autogenerated when it detects changes to the .js files, for this run:</p>
-
-<pre><code>npm run dev
-</code></pre>
-
-<p>Before sending a review with changes to the bundles run:</p>
-
-<pre><code>npm run lint-fix
-</code></pre>
-
-<p>and possibly fix any issues it might report.</p>
 
 <h3 id="css-less">CSS / LESS</h3>
 
@@ -1727,7 +1754,25 @@ make compile-locale
 $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 </code></pre>
 
-<h2 id="webapp-api">Webapp API</h2>
+<h3 id="dev-environment">Dev environment</h3>
+
+<h4 id="debugging-with-pycharm">Debugging with PyCharm</h4>
+
+<p>First step is to configure pycharm to use the Hue virtual environment at ./build/env/env
+<img src="http://cloudera.github.io/hue/latest/images/pycharm_virtualenv.png" alt="Pycharm virtualenv" />
+Second step is to configure the debug configuration
+<img src="http://cloudera.github.io/hue/latest/images/pycharm_debug.png" alt="Pycharm debug" /></p>
+
+<h4 id="debugging-with-eclipse">Debugging with Eclipse</h4>
+
+<p>First step is to configure Eclipse to use the Hue virtual environment at ./build/env/env
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_interpreter.png" alt="Eclipse interpreter" />
+Second step is to configure the debug configuration
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug.png" alt="Eclipse debug" />
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug_arguments.png" alt="Eclipse debug arguments" />
+<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug_interpreter.png" alt="Eclipse debug interpreter" /></p>
+
+<h2 id="api-server">API Server</h2>
 
 <h3 id="from-30-000-feet">From 30,000 feet</h3>
 
@@ -1756,9 +1801,8 @@ daemon processes &ldquo;on the side&rdquo;. Some examples are the <code>Celery T
 
 <p><img src="http://cloudera.github.io/hue/latest/images/interactingwithhadoop.png" alt="Interacting with Hadoop" /></p>
 
-<p>Hue provides some APIs for interacting with Hadoop.
-Most noticeably, there are python file-object-like APIs for
-interacting with HDFS.  These APIs work by making REST API or Thrift calls
+<p>Hue provides some APIs for interacting with external services like Databases of File storages.
+These APIs work by making REST API or Thrift calls
 the Hadoop daemons.</p>
 
 <h3 id="an-architectural-view">An Architectural View</h3>
@@ -1815,7 +1859,9 @@ directory.</p>
 which will be automatically rooted at <code>/yourappname/</code> in the global
 namespace. See <code>apps/about/src/about/urls.py</code> for an example.</p>
 
-<h3 id="configuration-file">Configuration File</h3>
+<h3 id="configurations">Configurations</h3>
+
+<h4 id="file">File</h4>
 
 <p>Hue uses a typed configuration system that reads configuration files (in an
 ini-style format).  By default, Hue loads all <code>*.ini</code> files in the <code>build/desktop/conf</code>
@@ -1837,64 +1883,64 @@ namenode_host = localhost
 # namenode_host = 10.0.0.1
 </code></pre>
 
-<h3 id="configuration-variables">Configuration Variables</h3>
+<h4 id="variables">Variables</h4>
 
 <p>Your application&rsquo;s <code>conf.py</code> is special. It provides access to the configuration file (and even
 default configurations not specified in the file). Using the above example, your <code>conf.py</code> should
 define the following:</p>
 
-<ul>
-<li><p>A <code>desktop.lib.conf.Config</code> object for <code>app_property</code>, such as:
-<pre>
-MY_PROPERTY = Config(key=&lsquo;app_property&rsquo;, default=&lsquo;Beatles&rsquo;, help=&lsquo;blah&rsquo;)
-</pre>
-You can access its value by <code>MY_PROPERTY.get()</code>.</p></li>
+<p>A <code>desktop.lib.conf.Config</code> object for <code>app_property</code>, such as:</p>
 
-<li><p>A <code>desktop.lib.conf.ConfigSection</code> object for <code>section_a</code>, such as:
-<pre>
-SECTION_A = ConfigSection(key=&lsquo;section_a&rsquo;,
-    help=&lsquo;blah&rsquo;,
-    members=dict(
-      AWEIGHT=Config(key=&lsquo;a_weight&rsquo;, type=int, default=0),
-      AHEIGHT=Config(key=&lsquo;a_height&rsquo;, type=int, default=0)))
-</pre>
-You can access the values by <code>SECTION_A.AWEIGHT.get()</code>.</p></li>
+<pre><code>MY_PROPERTY = Config(key='app_property', default='Beatles', help='blah')
+</code></pre>
 
-<li><p>A <code>desktop.lib.conf.UnspecifiedConfigSection</code> object for <code>filesystems</code>, such as:
-<pre>
-FS = UnspecifiedConfigSection(
-  key=&lsquo;filesystems&rsquo;,
-  each=ConfigSection(members=dict(
-      nn_host=Config(key=&lsquo;namenode_host&rsquo;, required=True))
-</pre>
-An <code>UnspecifiedConfigSection</code> is useful when the children of the section are not known.
+<p>You can access its value by <code>MY_PROPERTY.get()</code>.</p>
+
+<p>A <code>desktop.lib.conf.ConfigSection</code> object for <code>section_a</code>, such as:</p>
+
+<pre><code>SECTION_A = ConfigSection(key='section_a',
+      help='blah',
+      members=dict(
+        AWEIGHT=Config(key='a_weight', type=int, default=0),
+        AHEIGHT=Config(key='a_height', type=int, default=0)))
+</code></pre>
+
+<p>You can access the values by <code>SECTION_A.AWEIGHT.get()</code>.</p>
+
+<p>A <code>desktop.lib.conf.UnspecifiedConfigSection</code> object for <code>filesystems</code>, such as:</p>
+
+<pre><code>FS = UnspecifiedConfigSection(
+    key='filesystems',
+    each=ConfigSection(members=dict(
+        nn_host=Config(key='namenode_host', required=True))
+</code></pre>
+
+<p>An <code>UnspecifiedConfigSection</code> is useful when the children of the section are not known.
 When Hue loads your application&rsquo;s configuration, it binds all sub-sections. You can
-access the values by:
-<pre>
-cluster1_val = FS[&lsquo;cluster_1&rsquo;].nn_host.get()
+access the values by:</p>
+
+<pre><code>cluster1_val = FS['cluster_1'].nn_host.get()
 all_clusters = FS.keys()
 for cluster in all_clusters:
-  val = FS[cluster].nn_host.get()
-</pre></p></li>
-</ul>
+    val = FS[cluster].nn_host.get()
+</code></pre>
 
-<p>Your Hue application can automatically detect configuration problems and alert
+<p>Application can automatically detect configuration problems and alert
 the admin. To take advantage of this feature, create a <code>config_validator</code>
 function in your <code>conf.py</code>:</p>
 
-<pre>
-  def config_validator(user):
-    """
-    config_validator(user) -> [(config_variable, error_msg)] or None
-    Called by core check_config() view.
-    """
-    res = [ ]
-    if not REQUIRED_PROPERTY.get():
-      res.append((REQUIRED_PROPERTY, "This variable must be set"))
-    if MY_INT_PROPERTY.get() < 0:
-      res.append((MY_INT_PROPERTY, "This must be a non-negative number"))
-    return res
-</pre>
+<pre><code>def config_validator(user):
+  &quot;&quot;&quot;
+  config_validator(user) -&gt; [(config_variable, error_msg)] or None
+  Called by core check_config() view.
+  &quot;&quot;&quot;
+  res = [ ]
+  if not REQUIRED_PROPERTY.get():
+    res.append((REQUIRED_PROPERTY, &quot;This variable must be set&quot;))
+  if MY_INT_PROPERTY.get() &lt; 0:
+    res.append((MY_INT_PROPERTY, &quot;This must be a non-negative number&quot;))
+  return res
+</code></pre>
 
 <div class="note">
   You should specify the <code>help="..."</code> argument to all configuration
@@ -1905,41 +1951,6 @@ function in your <code>conf.py</code>:</p>
     $ build/env/bin/hue config_help
   </pre>
 </div>
-
-<h3 id="running-helper-processes">Running &ldquo;Helper Processes&rdquo;</h3>
-
-<p>Some Hue applications need to run separate daemon processes on the side.</p>
-
-<p>Suppose your application needs a helper <code>my_daemon.py</code>. You need to register it by:</p>
-
-<ul>
-<li><p>In <code>setup.py</code>, add to <code>entry_points</code>:
-<pre>
-entry_points = {
-  &lsquo;desktop.sdk.application&rsquo;: &lsquo;my_app = my_app&rsquo;,
-  &lsquo;desktop.supervisor.specs&rsquo;: [ &lsquo;my_daemon = my_app:SUPERVISOR_SPEC&rsquo; ] }
-</pre></p></li>
-
-<li><p>In <code>src/my_app/__init__.py</code>, tell Hue what to run by adding:
-<pre>
-SUPERVISOR_SPEC = dict(django_command=&ldquo;my_daemon&rdquo;)
-</pre></p></li>
-
-<li><p>Then in <code>src/my_app/management/commands</code>, create <code>__init__.py</code> and <code>my_daemon.py</code>. Your
-daemon program has only one requirement: it must define a class called <code>Command</code> that
-extends <code>django.core.management.base.BaseCommand</code>. Please see <code>kt_renewer.py</code> for an example.</p></li>
-</ul>
-
-<p>The next time Hue restarts, your <code>my_daemon</code> will start automatically.
-If your daemon program dies (exits with a non-zero exit code), Hue will
-restart it.</p>
-
-<p>&ldquo;Under the covers:&rdquo; Threading.  Hue, by default, runs CherryPy web server.
-If Hue is configured (and it may be, in the future)
-to use mod_wsgi under Apache httpd, then there would be multiple python
-processes serving the backend.  This means that your Django application
-code should avoid depending on shared process state.  Instead, place
-the stored state in a database or run a separate server.</p>
 
 <h3 id="saving-documents">Saving documents</h3>
 
@@ -1952,28 +1963,9 @@ the stored state in a database or run a separate server.</p>
 <p><code>Document2</code> is based on <a href="https://docs.djangoproject.com/en/1.11/#the-model-layer">Django Models</a>
 are Django&rsquo;s Object-Relational Mapping framework.</p>
 
-<h3 id="managing-users">Managing users</h3>
-
-<p>Except for static content, <code>request.user</code> is always populated.  It is a
-standard Django <code>models.User</code> object.  If you were to set a breakpoint at the
-<code>index()</code> function in our calculator app, you will find:</p>
-
-<pre><code>&gt;&gt;&gt; request.user
-&lt;User: test&gt;
-</code></pre>
-
-<div class="note">
-  "Under the covers:" Django uses a notion called
-  <a href="https://docs.djangoproject.com/en/1.2/topics/http/middleware/">middleware</a>
-  that's called in between the request coming in and the view being executed.
-  That's how <code>request.user</code> gets populated.  There's also a
-  middleware for Hue that makes sure that no pages are displayed unless the
-  user is authenticated.
-</div>
-
 <h3 id="walk-through-of-a-django-view">Walk-through of a Django View</h3>
 
-<p><img src="django_request.png" alt="Django Flow" /></p>
+<p><img src="http://cloudera.github.io/hue/latest/images/django_request.png" alt="Django Request" /></p>
 
 <p>Django is an MVC framework, except that the controller is called a
 &ldquo;<a href="https://docs.djangoproject.com/en/1.11/#the-view-layer">view</a>&rdquo; and
@@ -2041,10 +2033,10 @@ Please download from <a href="http://thrift.apache.org/">http://thrift.apache.or
 <p>The modules using <code>Thrift</code> have some helper scripts like <code>regenerate_thrift.sh</code>
 for regenerating the code from the interfaces.</p>
 
-<h3 id="profiling-hue-apps">Profiling Hue Apps</h3>
+<h3 id="profiling">Profiling</h3>
 
 <p>Hue has a profiling system built in, which can be used to analyze server-side
-performance of applications.  To enable profiling::</p>
+performance of applications.  To enable profiling:</p>
 
 <pre><code>build/env/bin/hue runprofileserver
 </code></pre>
@@ -2056,13 +2048,13 @@ the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.</p
 <p>Hue uses the hotshot profiling library for instrumentation.  The documentation
 for this library is located at: <a href="http://docs.python.org/library/hotshot.html">http://docs.python.org/library/hotshot.html</a>.</p>
 
-<p>You can use kcachegrind to view the profiled data graphically::</p>
+<p>You can use kcachegrind to view the profiled data graphically:</p>
 
-<pre><code>$ hotshot2calltree /tmp/xyz.prof &gt; /tmp/xyz.trace
-$ kcachegrind /tmp/xyz.trace
+<pre><code>hotshot2calltree /tmp/xyz.prof &gt; /tmp/xyz.trace
+kcachegrind /tmp/xyz.trace
 </code></pre>
 
-<p>More generally, you can programmatically inspect a trace::</p>
+<p>More generally, you can programmatically inspect a trace:</p>
 
 <pre><code>#!/usr/bin/python
 import hotshot.stats
@@ -2112,6 +2104,13 @@ the server whole-heartedly.</li>
 <a href="http://knockoutjs.com/">Knockout js</a> to layout your app and script the custom
 interactions.</p>
 
+<h3 id="node-js">Node.js</h3>
+
+<p>During development the bundles can be autogenerated when it detects changes to the .js files, for this run:</p>
+
+<pre><code>npm run dev
+</code></pre>
+
 <h3 id="css-styles">CSS Styles</h3>
 
 <p>Hue uses <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> version 2.0 CSS
@@ -2122,7 +2121,7 @@ app look at home in Hue.</p>
 <p>On top of the standard Bootstrap styles, Hue defines a small set of custom
 styles in <em>desktop/core/static/css/jhue.css</em>.</p>
 
-<h3 id="defining-styles-for-your-application">Defining Styles for Your Application</h3>
+<h3 id="defining-styles">Defining Styles</h3>
 
 <p>When you create your application it will provision a CSS file for you in the
 <em>static/css</em> directory. For organization purposes, your styles should go here
@@ -2319,21 +2318,27 @@ separated the Jenkins builds into &ldquo;fast&rdquo; and &ldquo;slow&rdquo;.  Bo
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.</p>
 
-<h4 id="debugging-with-pycharm">Debugging with PyCharm</h4>
+<h2 id="release">Release</h2>
 
-<p>First step is to configure pycharm to use the Hue virtual environment at ./build/env/env
-<img src="http://cloudera.github.io/hue/latest/images/pycharm_virtualenv.png" alt="Pycharm virtualenv" />
-Second step is to configure the debug configuration
-<img src="http://cloudera.github.io/hue/latest/images/pycharm_debug.png" alt="Pycharm debug" /></p>
+<p>How to count the number of commits since the last release and add them and the authors to the release notes:</p>
 
-<h4 id="debugging-with-eclipse">Debugging with Eclipse</h4>
+<pre><code>git log --oneline --since=2018-01-01 | grep 'release'
+git log --oneline --since=2018-01-01 | grep -n '6df64e3'
+git log --oneline -449 &gt; scratch.txt
 
-<p>First step is to configure Eclipse to use the Hue virtual environment at ./build/env/env
-<img src="http://cloudera.github.io/hue/latest/images/eclipse_interpreter.png" alt="Eclipse interpreter" />
-Second step is to configure the debug configuration
-<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug.png" alt="Eclipse debug" />
-<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug_arguments.png" alt="Eclipse debug arguments" />
-<img src="http://cloudera.github.io/hue/latest/images/eclipse_debug_interpreter.png" alt="Eclipse debug interpreter" /></p>
+git log --pretty=&quot;%an&quot; | sort | uniq &gt; scratch.txt
+</code></pre>
+
+<p>Pushing the release branch:</p>
+
+<pre><code>git push origin HEAD:release-4.4.0
+</code></pre>
+
+<p>Tagging the release:</p>
+
+<pre><code>git tag -a release-4.4.0 -m &quot;release-4.4.0&quot;
+git push origin release-4.4.0
+</code></pre>
 
 
 <footer class=" footline" >
@@ -3357,6 +3362,22 @@ Second step is to configure the debug configuration
             
         
                     
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
             
         
                     
@@ -3368,13 +3389,6 @@ Second step is to configure the debug configuration
 
 	 
 	 
-		
-			<a class="nav nav-prev" href="/hue/latest/developer/" title="Developer"> <i class="fa fa-chevron-left"></i></a>
-		
-		
-			<a class="nav nav-next" href="/hue/latest/developer/editor/" title="Editor / Notebook" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
-		
-	
     </div>
 
     </section>
@@ -3382,20 +3396,20 @@ Second step is to configure the debug configuration
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553708490"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553708490"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553708490"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553708490"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553708490"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553708490"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553708490"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553786990"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553786990"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553786990"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553786990"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553786990"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553786990"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553786990"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553708490"></script>
-    <script src="/hue/latest/js/learn.js?1553708490"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553708490"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553786990"></script>
+    <script src="/hue/latest/js/learn.js?1553786990"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553786990"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553708490" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553708490"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553786990" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553786990"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
