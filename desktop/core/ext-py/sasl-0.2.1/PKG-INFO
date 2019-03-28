@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: sasl
+Version: 0.2.1
+Summary: Cyrus-SASL bindings for Python
+Home-page: http://github.com/toddlipcon/python-sasl
+Author: Todd Lipcon
+Author-email: todd@cloudera.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
