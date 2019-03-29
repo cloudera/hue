@@ -863,7 +863,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Id') }</li>
           <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: type"></span></li>
+          <li><span data-bind="text: applicationType"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
@@ -881,10 +881,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
             <li class="nav-header">${ _('Elapsed time') }</li>
             <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
-            <!-- ko if: diagnostics -->
-              <li class="nav-header">${ _('Diagnostics') }</li>
-              <li><span data-bind="text: diagnostics, attr: { title: diagnostics }"></span>%</li>
-            <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </ul>
@@ -900,7 +896,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="job-yarnv2-page-logs${ SUFFIX }">
-          <ul class="nav nav-tabs" data-bind="foreach: logsList">
+          <ul class="nav nav-tabs scrollable" data-bind="foreach: logsList">
             <li data-bind="css: { 'active': $data == $parent.logActive() }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $parent.fetchLogs($data); $parent.logActive($data); }, text: $data"></a></li>
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
@@ -917,7 +913,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('Finish Time')}</th>
               <th>${_('Node Http Address')}</th>
               <th>${_('Blacklisted Nodes')}</th>
-              <th>${_('Nodes Blacklisted By System')}</th>
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['attempts']()['task_list']">
@@ -929,7 +924,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="moment: {data: finishedTime, format: 'LLL'}"></td>
                 <td data-bind="text: nodeHttpAddress"></td>
                 <td data-bind="text: blacklistedNodes"></td>
-                <td data-bind="text: nodesBlacklistedBySystem"></td>
               </tr>
             </tbody>
           </table>
@@ -2341,6 +2335,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.doc_url = ko.observableDefault(job.doc_url);
       self.name = ko.observableDefault(job.name || job.id);
       self.type = ko.observableDefault(job.type);
+      self.applicationType = ko.observableDefault(job.applicationType || '');
 
       self.status = ko.observableDefault(job.status);
       self.apiStatus = ko.observableDefault(job.apiStatus);
@@ -2358,7 +2353,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.logActive = ko.observable('default');
       self.logsByName = ko.observable({});
-      self.logsList = ko.observable(['default', 'stdout', 'stderr', 'syslog']);
+      self.logsListDefaults = ko.observable(['default', 'stdout', 'stderr', 'syslog']);
+      self.logsList = ko.observable(self.logsListDefaults());
       self.logs = ko.pureComputed(function() {
         return self.logsByName()[self.logActive()];
       });
@@ -2671,7 +2667,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             result[name] = data.logs.logs;
             self.logsByName(result);
             if (data.logs.logsList && data.logs.logsList.length) {
-              self.logsList(['default'].concat(data.logs.logsList));
+              var logsListDefaults = self.logsListDefaults();
+              self.logsList(logsListDefaults.concat(data.logs.logsList.filter(function(log) { return logsListDefaults.indexOf(log) < 0; })));
             }
             if ($('.jb-panel pre:visible').length > 0){
               $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 75));

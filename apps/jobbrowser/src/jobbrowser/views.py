@@ -196,6 +196,7 @@ def massage_job_for_json(job, request=None, user=None):
     'desiredMaps': job.desiredMaps,
     'desiredReduces': job.desiredReduces,
     'applicationType': hasattr(job, 'applicationType') and job.applicationType or None,
+    'type': hasattr(job, 'type') and job.type or None,
     'mapsPercentComplete': int(job.maps_percent_complete) if job.maps_percent_complete else '',
     'finishedMaps': job.finishedMaps,
     'finishedReduces': job.finishedReduces,
@@ -526,7 +527,9 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
 
   try:
     # Add a diagnostic log
-    if job_link.is_mr2:
+    if hasattr(task, 'job') and hasattr(task.job, 'diagnostics'):
+      diagnostic_log = task.job.diagnostics
+    elif job_link.is_mr2:
       diagnostic_log = attempt.diagnostics
     else:
       diagnostic_log =  ", ".join(task.diagnosticMap[attempt.attemptId])
