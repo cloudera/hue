@@ -12,19 +12,19 @@
     <title>SQL Editor :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1553791631" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1553791631" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css?1553869795" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css?1553869795" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1553791631" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css?1553869795" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1553791631"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js?1553869795"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -53,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553791631"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553791631"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1553869795"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1553869795"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1553791631"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js?1553869795"></script>
 
     
   </div>
@@ -1574,6 +1574,8 @@
 <li><a href="#aws-redshift">AWS Redshift</a></li>
 <li><a href="#google-bigquery">Google BigQuery</a></li>
 <li><a href="#apache-drill">Apache Drill</a></li>
+<li><a href="#sybase">Sybase</a></li>
+<li><a href="#hana">Hana</a></li>
 <li><a href="#solr-sql">Solr SQL</a></li>
 <li><a href="#kylin">Kylin</a></li>
 <li><a href="#clickhouse">Clickhouse</a></li>
@@ -1815,7 +1817,7 @@ max_number_of_sessions=10
 <pre><code>[[[presto]]]
    name = Presto
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;presto://...&quot;}'
+   options='{&quot;url&quot;: &quot;presto://localhost:8080/hive/default&quot;}'
 </code></pre>
 
 <p>Alternatives.</p>
@@ -1853,7 +1855,7 @@ options='{&quot;url&quot;: &quot;jdbc:presto://localhost:8080/&quot;, &quot;driv
 <pre><code>[[[oracle]]]
    name = Oracle
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;oracle://...&quot;}'
+   options='{&quot;url&quot;: &quot;oracle://scott:tiger@dsn&quot;}'
 </code></pre>
 
 <h3 id="postgresql">PostgreSql</h3>
@@ -1942,7 +1944,7 @@ options='{&quot;url&quot;: &quot;jdbc:presto://localhost:8080/&quot;, &quot;driv
 <pre><code>[[[teradata]]]
    name = Teradata
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;teradata://...&quot;}'
+   options='{&quot;url&quot;: &quot;teradata://user:pw@host&quot;}'
 </code></pre>
 
 <p>Alternative:</p>
@@ -1954,6 +1956,23 @@ options='{&quot;url&quot;: &quot;jdbc:presto://localhost:8080/&quot;, &quot;driv
 </code></pre>
 
 <h3 id="db2">DB2</h3>
+
+<p>The dialect should be added to the Python system or Hue Python virtual environment:</p>
+
+<pre><code>  ./build/env/bin/pip install ibm_db_sa
+</code></pre>
+
+<p>(or via <a href="https://github.com/ibmdb/python-ibmdbsa/tree/master/ibm_db_sa">https://github.com/ibmdb/python-ibmdbsa/tree/master/ibm_db_sa</a>)</p>
+
+<p>Then give Hue the information about the database source:</p>
+
+<pre><code>[[[db2]]]
+   name = DB2
+   interface=sqlalchemy
+   options='{&quot;url&quot;: &quot;db2+ibm_db://user:pass@host[:port]/database&quot;}'
+</code></pre>
+
+<p>Alternative:</p>
 
 <pre><code>[[[db2]]]
   name=DB2 JDBC
@@ -1973,7 +1992,7 @@ options='{&quot;url&quot;: &quot;jdbc:presto://localhost:8080/&quot;, &quot;driv
 <pre><code>[[[sparksql]]]
    name = SparkSql
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;jdbc+hive://...&quot;}'
+   options='{&quot;url&quot;: &quot;hive://user:password@host:10000/database&quot;}'
 </code></pre>
 
 <p>Alternatives:</p>
@@ -2017,7 +2036,7 @@ options='{&quot;url&quot;: &quot;jdbc:presto://localhost:8080/&quot;, &quot;driv
 <pre><code>[[[mssql]]]
    name = SQL Server
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;mssql://...&quot;}'
+   options='{&quot;url&quot;: &quot;mssql+pymssql://&lt;username&gt;:&lt;password&gt;@&lt;freetds_name&gt;/?charset=utf8&quot;}'
 </code></pre>
 
 <p>Alternative:</p>
@@ -2042,7 +2061,7 @@ options='{&quot;url&quot;: &quot;jdbc:microsoft:sqlserver://localhost:1433&quot;
 <pre><code>[[[vertica]]]
    name = Vertica
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;vertica+vertica_python://...&quot;}'
+   options='{&quot;url&quot;: &quot;vertica+vertica_python://user:pwd@host:port/database&quot;}'
 </code></pre>
 
 <p>Alternative:</p>
@@ -2079,7 +2098,7 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
 <pre><code>[[[redshift]]]
    name = Redshift
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;redshift+psycopg2://...&quot;}'
+   options='{&quot;url&quot;: &quot;redshift+psycopg2://username@host.amazonaws.com:5439/database&quot;}'
 </code></pre>
 
 <h3 id="google-bigquery">Google BigQuery</h3>
@@ -2089,15 +2108,33 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
 <pre><code>  ./build/env/bin/pip install pybigquery
 </code></pre>
 
+<p>From <a href="https://github.com/mxmzdlv/pybigquery">https://github.com/mxmzdlv/pybigquery</a>.</p>
+
 <p>Then give Hue the information about the database source:</p>
 
 <pre><code>[[[bigquery]]]
    name = BigQuery
    interface=sqlalchemy
-   options='{&quot;url&quot;: &quot;bigquery://...&quot;}'
+   options='{&quot;url&quot;: &quot;bigquery://project&quot;}'
 </code></pre>
 
 <h3 id="apache-drill">Apache Drill</h3>
+
+<p>The dialect is available on <a href="https://github.com/JohnOmernik/sqlalchemy-drill">https://github.com/JohnOmernik/sqlalchemy-drill</a></p>
+
+<p>Then give Hue the information about the database source:</p>
+
+<pre><code>[[[drill]]]
+   name = Drill
+   interface=sqlalchemy
+   options='{&quot;url&quot;: &quot;drill+sadrill://...&quot;}'
+   ## To use Drill with SQLAlchemy you will need to craft a connection string in the format below:
+   # drill+sadrill://&lt;username&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;storage_plugin&gt;?use_ssl=True
+   ## To connect to Drill running on a local machine running in embedded mode you can use the following connection string.
+   # drill+sadrill://localhost:8047/dfs?use_ssl=False
+</code></pre>
+
+<p>Alternative:</p>
 
 <p>The <a href="http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html">Drill JDBC driver</a> can be used.</p>
 
@@ -2108,6 +2145,38 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
   ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
   options='{&quot;url&quot;: &quot;&lt;drill-jdbc-url&gt;&quot;, &quot;driver&quot;: &quot;org.apache.drill.jdbc.Driver&quot;, &quot;user&quot;: &quot;admin&quot;, &quot;password&quot;: &quot;admin&quot;}'&lt;/code&gt;
+</code></pre>
+
+<h3 id="sybase">Sybase</h3>
+
+<p>The dialect should be added to the Python system or Hue Python virtual environment:</p>
+
+<pre><code>  ./build/env/bin/pip install sqlalchemy-teradata
+</code></pre>
+
+<p>Then give Hue the information about the database source:</p>
+
+<pre><code>[[[teradata]]]
+   name = Teradata
+   interface=sqlalchemy
+   options='{&quot;url&quot;: &quot;sybase+pysybase://&lt;username&gt;:&lt;password&gt;@&lt;dsn&gt;/[database name]&quot;}'
+</code></pre>
+
+<h3 id="hana">Hana</h3>
+
+<p>The dialect should be added to the Python system or Hue Python virtual environment:</p>
+
+<pre><code>  ./build/env/bin/pip install sqlalchemy-hana
+</code></pre>
+
+<p>(or via <a href="https://github.com/SAP/sqlalchemy-hana">https://github.com/SAP/sqlalchemy-hana</a>)</p>
+
+<p>Then give Hue the information about the database source:</p>
+
+<pre><code>[[[db2]]]
+   name = DB2
+   interface=sqlalchemy
+   options='{&quot;url&quot;: &quot;hana://username:password@example.de:30015&quot;}'
 </code></pre>
 
 <h3 id="solr-sql">Solr SQL</h3>
@@ -3463,20 +3532,20 @@ You can leave out the username and password in the JDBC options, and Hue will in
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1553791631"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553791631"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553791631"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1553791631"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1553791631"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553791631"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1553791631"></script>
+    <script src="/hue/latest/js/clipboard.min.js?1553869795"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js?1553869795"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1553869795"></script>
+    <script src="/hue/latest/js/jquery.sticky.js?1553869795"></script>
+    <script src="/hue/latest/js/featherlight.min.js?1553869795"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1553869795"></script>
+    <script src="/hue/latest/js/highlight.pack.js?1553869795"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1553791631"></script>
-    <script src="/hue/latest/js/learn.js?1553791631"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1553791631"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js?1553869795"></script>
+    <script src="/hue/latest/js/learn.js?1553869795"></script>
+    <script src="/hue/latest/js/hugo-learn.js?1553869795"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1553791631" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1553791631"></script>
+    <link href="/hue/latest/mermaid/mermaid.css?1553869795" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js?1553869795"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
