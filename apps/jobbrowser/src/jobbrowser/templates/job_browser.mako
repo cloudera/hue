@@ -3438,12 +3438,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return progress;
       };
 
-      var loaded = false;
       self.load = function() {
-        if (loaded) {
-          return;
-        }
-        loaded = true;
         var h = window.location.hash;
         % if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
