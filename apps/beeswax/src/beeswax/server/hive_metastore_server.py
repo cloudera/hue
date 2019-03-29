@@ -107,10 +107,7 @@ class HiveMetastoreClient:
 
 
   def get_databases(self, *args, **kwargs):
-    if self.query_server['server_name'] == 'impala':
-      return ['default']
-    else:
-      return self.meta_client.get_all_databases()
+    return self.meta_client.get_all_databases()
 
 
   def get_tables(self, *args, **kwargs):
@@ -238,14 +235,12 @@ class HiveMetastoreClient:
         self._encode_partition(new_part)
         return self._client.alter_partition(db_name, tbl_name, new_part)
 
-    # Use service name from kerberos principal set in hive-site.xml
-    _, host, port, metastore_kerberos_principal = hive_site.get_metastore()
-    use_sasl, kerberos_principal_short_name = HiveMetastoreClient.get_security()
-    kerberos_principal_short_name = metastore_kerberos_principal and metastore_kerberos_principal.split('/', 1)[0] or None
+    use_sasl, kerberos_principal_short_name = HiveMetastoreClient.get_security() # TODO Reuse from HiveServer2 lib
+
     client = thrift_util.get_client(
         ThriftHiveMetastore.Client,
-        host,
-        port,
+        host=self.query_server['server_host'],
+        port=self.query_server['server_port'],
         service_name="Hive Metastore Server",
         kerberos_principal=kerberos_principal_short_name,
         use_sasl=use_sasl,
