@@ -34,7 +34,6 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax.api import _autocomplete
-  from beeswax.models import HiveServerQueryHandle
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
 except ImportError, e:
@@ -67,6 +66,8 @@ class HiveMetastoreApi(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet, cluster=self.cluster)
     query = None
+
+    return db.get_databases()
 
     if snippet.get('query'):
       query = snippet.get('query')
