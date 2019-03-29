@@ -545,7 +545,7 @@ class Attempt:
     attempt = self.task.job.job_attempts['jobAttempt'][-1]
     log_link = attempt['logsLink']
     if not log_link:
-      return log_link
+      return log_link, None
 
     # Generate actual task log link from logsLink url
     if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING'):

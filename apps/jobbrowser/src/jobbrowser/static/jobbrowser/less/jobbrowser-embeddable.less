@@ -36,7 +36,6 @@
     padding-right: 10px;
   }
 }
-
 .jobbrowser-components {
   .hue-uncheck::before {
     padding-left: 2px;
@@ -385,5 +384,15 @@
   div[data-jobType="queries"] pre {
     overflow-x: auto;
     white-space: pre;
+  }
+  .nav.nav-tabs.scrollable {
+    height: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  .nav.nav-tabs > li {
+    display: inline-block;
+    float: initial;
   }
 }
