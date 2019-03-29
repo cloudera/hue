@@ -65,21 +65,8 @@ class HiveMetastoreApi(Api):
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet, cluster=self.cluster)
-    query = None
 
-    return db.get_databases()
-
-    if snippet.get('query'):
-      query = snippet.get('query')
-    elif snippet.get('source') == 'query':
-      document = Document2.objects.get(id=database)
-      document.can_read_or_exception(self.user)
-      notebook = Notebook(document=document).get_data()
-      snippet = notebook['snippets'][0]
-      query = self._get_current_statement(db, snippet)['statement']
-      database, table = '', ''
-
-    return _autocomplete(db, database, table, column, nested, query=query, cluster=self.cluster)
+    return _autocomplete(db, database, table, column, nested, query=None, cluster=self.cluster)
 
 
   @query_error_handler
