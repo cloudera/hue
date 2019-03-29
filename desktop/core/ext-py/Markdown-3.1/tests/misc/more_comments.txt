@@ -1,0 +1,11 @@
+<!asd@asdfd.com>
+
+Foo
+
+<asd!@asdfd.com>
+
+Bar
+
+<!--asd@asdfd.com>
+
+Still in unclosed comment
