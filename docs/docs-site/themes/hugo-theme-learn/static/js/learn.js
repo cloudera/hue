@@ -168,7 +168,7 @@ var huePubSub = {
         }
 
         huePubSub.subscribe('reposition.scroll.anchor.up', function(){
-            $('#jHueScrollUpAnchor').css('right', '70px');
+            $('#jHueScrollUpAnchor').css('right', '20px');
             if (!$(_this.element).is('body') && $(_this.element).is(':visible')) {
                 var adjustRight = $(window).width() - ($(_this.element).width() + $(_this.element).offset().left);
                 if (adjustRight > 0) {
