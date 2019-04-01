@@ -168,7 +168,7 @@ INSTALL_CORE_FILES = \
 	tools/virtual-bootstrap \
 	tools/enable-python27.sh \
 	tools/relocatable.sh \
-	VERS* LICENSE* README*
+	VERS* LICENSE* README* webpack-stats*.json
 
 .PHONY: install
 install: virtual-env install-check install-core-structure install-desktop install-apps install-env
