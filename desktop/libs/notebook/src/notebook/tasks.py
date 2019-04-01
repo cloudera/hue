@@ -88,6 +88,7 @@ def download_to_file(notebook, snippet, file_format='csv', user_agent=None, post
       meta['row_counter'] = row_count - 1
       download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
+    snippet['result']['handle'] = handle.copy()
     api.close_statement(notebook, snippet)
   finally:
     os.close(f)
@@ -195,7 +196,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
   state = result.state
   if state == states.PENDING:
     raise QueryExpired()
-  elif state == 'SUBMITTED' or states.state(result.state) < states.state('PROGRESS'):
+  elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return ''
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
@@ -221,14 +222,14 @@ def get_jobs(notebook, snippet, logs, **kwargs): #Re implement to fetch updated 
   state = result.state
   if state == states.PENDING:
     raise QueryExpired()
-  elif state == 'SUBMITTED' or states.state(result.state) < states.state('PROGRESS'):
+  elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return []
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
     return []
 
   info = result.info
-  snippet['result']['handle'] = info.get('handle', {})
+  snippet['result']['handle'] = info.get('handle', {}).copy()
 
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
@@ -291,7 +292,7 @@ def fetch_result_size(*args, **kwargs):
   state = result.state
   if state == states.PENDING:
     raise QueryExpired()
-  elif state == 'SUBMITTED' or states.state(result.state) < states.state('PROGRESS'):
+  elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return {'rows': 0}
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
@@ -307,14 +308,14 @@ def cancel(*args, **kwargs):
   state = result.state
   if state == states.PENDING:
     raise QueryExpired()
-  elif state == 'SUBMITTED' or states.state(result.state) < states.state('PROGRESS'):
+  elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return {'status': -1}
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
     return {'status': -1}
 
   info = result.info
-  snippet['result']['handle'] = info.get('handle', {})
+  snippet['result']['handle'] = info.get('handle', {}).copy()
   cancel_async.apply_async(args=args, kwargs=kwargs, task_id=_cancel_statement_async_id(notebook))
   result.forget()
   os.remove(info.get('file_path'))
@@ -329,14 +330,14 @@ def close_statement(*args, **kwargs):
   state = result.state
   if state == states.PENDING:
     raise QueryExpired()
-  elif state == 'SUBMITTED' or states.state(result.state) < states.state('PROGRESS'):
+  elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return {'status': -1}
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
     return {'status': -1}
 
   info = result.info
-  snippet['result']['handle'] = info.get('handle', {})
+  snippet['result']['handle'] = info.get('handle', {}).copy()
   close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook))
   result.forget()
   os.remove(info.get('file_path'))
