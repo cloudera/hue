@@ -129,7 +129,7 @@ def _execute_notebook(request, notebook, snippet):
         notebook = Notebook(document=history).get_data()
 
       interpreter = get_api(request, snippet)
-      if snippet['interface'] == 'sqlalchemy':
+      if snippet.get('interface') == 'sqlalchemy':
         interpreter.options['session'] = session
 
       response['handle'] = interpreter.execute(notebook, snippet)
