@@ -10,7 +10,7 @@ High Level Roadmap
 * [ ] Kubernetes [HUE-8744](https://issues.cloudera.org/browse/HUE-8744)
 * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
 * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
-* [ ] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
+* [x] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 * [ ] Result caching
 * [ ] Editor v2
 * [ ] Integrate with Apache Ranger [HUE-8748](https://issues.cloudera.org/browse/HUE-8748)
