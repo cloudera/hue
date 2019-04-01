@@ -714,6 +714,8 @@ Other things to update:
 * Update http://demo.gethue.com/
 * Update Docker image https://hub.docker.com/u/gethue/
 
+Instructions:
+
     docker build https://github.com/cloudera/hue.git#release-4.4.0 -t gethue/hue:4.4.0 -f tools/docker/hue/Dockerfile
     docker tag gethue/hue:4.4.0 gethue/latest
     docker images
