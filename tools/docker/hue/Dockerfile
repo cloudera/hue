@@ -54,12 +54,5 @@ RUN ./build/env/bin/pip install psycopg2-binary
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
 
-# Webpack not integrated into make install
-COPY package.json .
-COPY webpack.config.js .
-RUN npm install
-RUN npm run webpack
-RUN ./build/env/bin/hue collectstatic --noinput
-
 EXPOSE 8888
 CMD ["./startup.sh"]
