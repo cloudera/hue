@@ -1044,7 +1044,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: '${ not (hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get()) }' === 'True' }">
+    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, clickable: false, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: '${ not (hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get()) }' === 'True' }">
       <!-- ko if: availablePanels().length > 1 -->
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
