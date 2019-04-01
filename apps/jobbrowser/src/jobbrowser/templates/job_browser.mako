@@ -2612,6 +2612,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               vm.job().fetchProfile('properties');
               $('a[href="#workflow-page-metadata${ SUFFIX }"]').tab('show');
             }
+            $('#rerun-modal${ SUFFIX }').on('shown', function (e) {
+                // Replaces dark modal backdrop from the end of the body tag to the closer scope
+                // in order to activate z-index effect.
+                var rerunModalData = $(this).data('modal');
+                rerunModalData.$backdrop.appendTo("#jobbrowserMiniComponents");
+            });
             %endif
 
             vm.job().fetchLogs();
