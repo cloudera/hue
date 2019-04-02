@@ -1006,7 +1006,6 @@ def _get_service_url(hdfs_config):
   fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
   netloc = Hdfs.urlsplit(fs_defaultfs)[1]
   host = netloc.split(':')[0]
-  #port = hadoop.conf.DEFAULT_NN_HTTP_PORT
   return "{0}://{1}:{2}/webhdfs/v1".format(get_webhdfs_ssl()["protocol"], host, get_webhdfs_ssl()["port"])
 
 
