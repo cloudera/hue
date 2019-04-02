@@ -70,16 +70,6 @@ def has_workload_analytics():
   return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
 
 
-def get_catalog_url():
-  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')[:-3]) or \
-      (NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3])
-
-def has_catalog(user):
-  from desktop.auth.backend import is_admin
-  return bool(get_catalog_url() and get_navigator_auth_password()) \
-      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
-
-
 def get_security_default():
   '''Get if Sentry is available so that we filter the objects or not'''
   from libsentry.conf import is_enabled
@@ -230,6 +220,16 @@ DEFAULT_PUBLIC_KEY = Config(
 
 # Data Catalog
 
+def get_catalog_url():
+  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')[:-3]) or \
+      (NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3])
+
+def has_catalog(user):
+  from desktop.auth.backend import is_admin
+  return bool(get_catalog_url() and get_navigator_auth_password()) \
+      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+
+
 def get_catalog_auth_type():
   return CATALOG.AUTH_TYPE.get().lower()
 
@@ -279,6 +279,10 @@ CATALOG = ConfigSection(
   key='catalog',
   help=_t("""Configuration options for Catalog API"""),
   members=dict(
+    interface=Config(
+      key='interface',
+      help=_t('Type of Catalog to connect to, e.g. Apache Atlas, Navigator...'),
+      default='atlas'),
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Catalog API.'),
@@ -369,6 +373,7 @@ CATALOG = ConfigSection(
   )
 )
 
+# Navigator is deprecated over generic Catalog above
 
 def get_navigator_auth_type():
   return NAVIGATOR.AUTH_TYPE.get().lower()
