@@ -326,7 +326,7 @@ class SparkApi(Api):
 
       raise QueryError(msg)
 
-  def download(self, notebook, snippet, format, user_agent=None):
+  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
     try:
       api = get_spark_api(self.user)
       session = _get_snippet_session(notebook, snippet)

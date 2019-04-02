@@ -269,7 +269,10 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
     first = next(csv_reader)
     for col in first:
       split = col.split('|')
-      cols.append({'name': split[0], 'type': split[1], 'comment': None})
+      if len(split) > 1:
+        cols.append({'name': split[0], 'type': split[1], 'comment': None})
+      else:
+        cols.append({'name': split[0], 'type': 'STRING_TYPE', 'comment': None})
     count = 0
     for row in csv_reader:
       count += 1

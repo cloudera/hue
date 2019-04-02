@@ -207,7 +207,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format, user_agent=None):
+  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
     file_name = _get_snippet_name(notebook)
     guid = uuid.uuid4().hex
 

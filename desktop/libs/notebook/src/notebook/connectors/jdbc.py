@@ -124,7 +124,7 @@ class JdbcApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  def download(self, notebook, snippet, format, user_agent=None):
+  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
     raise PopupException('Downloading is not supported yet')
 
   def progress(self, snippet, logs):
