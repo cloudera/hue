@@ -21,7 +21,7 @@ import os.path
 
 import conf
 import confparse
-import hadoop.conf
+from hadoop.conf import DEFAULT_NN_HTTP_PORT
 
 LOG = logging.getLogger(__name__)
 
