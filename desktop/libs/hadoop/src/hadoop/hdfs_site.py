@@ -53,10 +53,10 @@ def get_umask_mode():
   return int(umask, 8)
 
 def get_webhdfs_ssl():
-  settings = {"protocol": "http", "port": hadoop.conf.DEFAULT_NN_HTTP_PORT}
+  settings = {"protocol": "http", "port": DEFAULT_NN_HTTP_PORT}
   if get_conf().get(_CNF_HTTP_POLICY, 'http') == "HTTPS_ONLY":
     settings["protocol"] = 'https'
-    settings["port"] = get_conf().get(_CNF_WEBHDFS_HTTPS_PORT, hadoop.conf.DEFAULT_NN_HTTP_PORT)
+    settings["port"] = get_conf().get(_CNF_WEBHDFS_HTTPS_PORT, DEFAULT_NN_HTTP_PORT)
   return settings
 
 def get_nn_sentry_prefixes():
