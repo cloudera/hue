@@ -67,7 +67,6 @@ Learn more on the [Tagging](https://blog.cloudera.com/blog/2017/05/new-in-cloude
 
 In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
 
-
 ## Left assist
 
 Data where you need it when you need it.

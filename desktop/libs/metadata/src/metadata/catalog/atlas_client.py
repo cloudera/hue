@@ -227,91 +227,69 @@ class AtlasApi(Api):
 
       data = json.dumps(body)
       LOG.info(data)
-      # ?typeName=hive_db
-      # /search/dsl?query=hive_db%20where%20name='default'
-      return self._root.post('/search/basic?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+
+      response = self._root.get('/search/basic?typeName=hbase_table') #?limit=%(limit)s&offset=%(offset)s' % pagination)
+      response['results'] = [self._massage_entity(entity) for entity in response.pop('entities')]
+
+      return response
     except RestException, e:
+      print(e)
       LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
 
-
+  def _massage_entity(self, entity):
+    return {
+        "name": entity['attributes'].get('name', entity['attributes'].get('qualifiedName')),
+        "description": entity['attributes'].get('description'),
+         "owner": entity.get('owner'),
+         "sourceType": entity['typeName'],
+         "partColNames":[
+            # "date"
+         ],
+         "type": "TABLE", # TODO
+         "internalType": entity['typeName'],
+         "status": entity['status'], # Specific to Atlas
+         "tags": entity['classificationNames'],
+         "classificationNames": entity['classificationNames'], # Specific to Atlas
+         "meaningNames": entity['meaningNames'], # Specific to Atlas
+         "meanings": entity['meanings'], # [{"displayText":"Stock","confidence":0, "termGuid":"32892437-931b-43d3-9aad-400f7f8d2a73","relationGuid":"e8856c09-a3a1-4a85-b841-709b30f93923"}] # Specific to Atlas
+         "originalDescription": None,
+         "customProperties": None,
+         "properties":{
+         },
+         "identity": entity['guid'],
+         "created": entity['attributes']['createTime'], #"2019-03-28T19:30:30.000Z",
+         "parentPath": "/default",
+         "originalName": entity['attributes']['qualifiedName'],
+        #  "lastAccessed":"1970-01-01T00:00:00.000Z"
+        #  "clusteredByColNames":null,
+        #  "outputFormat":"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
+        #  "firstClassParentId":null,
+        #  "extractorRunId":"7##1",
+        #  "sourceId":"7",
+        #  "lastModified":null,
+        #  "packageName":"nav",
+        #  "compressed":false,
+        #  "metaClassName":"hv_table"
+        #  "deleted":false,
+        #  "technicalProperties":null,
+        #  "userEntity":false,
+        #  "serdeProps":null,
+        #  "serdeLibName":"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+        #  "lastModifiedBy":null,
+        #  "selectionName":"web_logs",
+        #  "sortByColNames":null,
+        #  "inputFormat":"org.apache.hadoop.mapred.TextInputFormat",
+        #  "serdeName":null,
+        #  "deleteTime":null,
+        #  "fileSystemPath":"hdfs://self-service-dw-1.gce.cloudera.com:8020/user/hive/warehouse/web_logs",
+      }
 
   def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
-    """
-    Solr edismax query parser syntax.
-
-    :param query_s: a query string of search terms (e.g. - sales quarterly);
-      Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist of search_fields.
-    """
-    sources = filters.get('sources', [])
-    default_entity_types, entity_types = self._get_types_from_sources(sources)
-
-    try:
-      params = self.__params
-      if not raw_query:
-        query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
-
-        search_terms = [term for term in query_s.strip().split()]
-
-        query_clauses = []
-        user_filters = []
-        source_type_filter = []
-
-        for term in search_terms:
-          if ':' not in term:
-            if ('sql' in sources or 'hive' in sources or 'impala' in sources):
-              if '.' in term:
-                parent, term = term.rsplit('.', 1)
-                user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
-            query_clauses.append(self._get_boosted_term(term))
-          else:
-            name, val = term.split(':')
-            if val:
-              if name == 'type':
-                term = '%s:%s' % (name, val.upper().strip('*'))
-                default_entity_types = entity_types # Make sure type value still makes sense for the source
-              user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
-
-        filter_query = '*'
-
-        if query_clauses:
-          filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
-
-        user_filter_clause = 'AND '.join(['(%s)' % f for f in user_filters]) or '*'
-        source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
-
-        if 's3' in sources:
-          source_type_filter.append('sourceType:s3')
-        elif 'sql' in sources or 'hive' in sources or 'impala' in sources:
-          source_type_filter.append('sourceType:HIVE OR sourceType:IMPALA')
-
-        filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
-        if source_type_filter:
-          filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
-
-        source_ids = self.get_cluster_source_ids()
-        if source_ids:
-          filter_query = source_ids + '(' + filter_query + ')'
-      else:
-        filter_query = query_s
-
-      params += (
-        ('query', filter_query),
-        ('offset', offset),
-        ('limit', CATALOG.FETCH_SIZE_SEARCH.get()),
-      )
-
-      LOG.info(params)
-      return self._root.get('entities', headers=self.__headers, params=params)
-    except RestException, e:
-      LOG.error('Failed to search for entities with search query: %s' % query_s)
-      if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
-      else:
-        raise CatalogApiException(e)
+    pass
 
 
   def suggest(self, prefix=None):
