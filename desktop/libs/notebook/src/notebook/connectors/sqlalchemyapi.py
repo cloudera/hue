@@ -94,10 +94,7 @@ class SqlAlchemyApi(Api):
     self.options = interpreter['options']
     self.engine = None # Currently instantiated by an execute()
 
-  @query_error_handler
-  def execute(self, notebook, snippet):
-    guid = uuid.uuid4().hex
-
+  def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
       vars = {'user': self.user.username}
       for _prop in self.options['session']['properties']:
@@ -105,10 +102,18 @@ class SqlAlchemyApi(Api):
           vars['USER'] = _prop['value']
         if _prop['name'] == 'password':
           vars['PASSWORD'] = _prop['value']
+      raw_url = Template(self.options['url'])
+      url = raw_url.safe_substitute(**vars)
+    else:
+      url = self.options['url']
+    return create_engine(url)
 
-    raw_url = Template(self.options['url'])
-    self.engine = create_engine(raw_url.safe_substitute(**vars))
+  @query_error_handler
+  def execute(self, notebook, snippet):
+    guid = uuid.uuid4().hex
 
+    if not self.engine:
+      self.engine = self._create_engine()
     connection = self.engine.connect()
     result = connection.execute(snippet['statement'])
     cache = {
