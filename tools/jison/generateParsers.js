@@ -33,6 +33,12 @@ const LICENSE = '// Licensed to Cloudera, Inc. under one\n' +
   '// See the License for the specific language governing permissions and\n' +
   '// limitations under the License.\n';
 
+const SQL_STATEMENTS_PARSER_JSDOC = '/**\n' +
+  ' * @param {string} input\n' +
+  ' *\n' +
+  ' * @return {SqlStatementsParserResult}\n' +
+  ' */\n';
+
 const JISON_FOLDER = 'desktop/core/src/desktop/js/parse/jison/';
 const TARGET_FOLDER = 'desktop/core/src/desktop/js/parse/';
 
@@ -78,7 +84,7 @@ const PARSERS = {
     sources: ['sqlStatementsParser.jison'],
     target: 'sqlStatementsParser.jison',
     afterParse: (contents) => new Promise(resolve => {
-      resolve(LICENSE + contents + 'export default sqlStatementsParser;\n');
+      resolve(LICENSE + contents.replace('parse: function parse', SQL_STATEMENTS_PARSER_JSDOC + 'parse: function parse') + 'export default sqlStatementsParser;\n');
     })
   },
   sqlSyntaxParser: {

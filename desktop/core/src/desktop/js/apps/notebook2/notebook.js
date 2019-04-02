@@ -423,6 +423,9 @@ class Notebook {
           komapping.fromJS(data.session, {}, session);
           if (self.getSession(session.type()) == null) {
             self.addSession(session);
+          } else {
+            const _session = self.getSession(session.type());
+            komapping.fromJS(data.session, {}, _session);
           }
           self.getSnippets(session.type()).forEach(snippet => {
             snippet.status('ready');
@@ -431,7 +434,7 @@ class Notebook {
             setTimeout(callback, 500);
           }
         } else if (data.status === 401) {
-          $(document).trigger('showAuthModal', { type: session.type() });
+          $(document).trigger('showAuthModal', { type: session.type(), message: data.message });
         } else {
           fail(data.message);
         }

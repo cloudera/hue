@@ -374,7 +374,7 @@ class Notebook {
             if (self.getSession(session.type()) == null) {
               self.addSession(session);
             } else {
-              var _session = self.getSession(session.type());
+              const _session = self.getSession(session.type());
               komapping.fromJS(data.session, {}, _session);
             }
             $.each(self.getSnippets(session.type()), (index, snippet) => {
