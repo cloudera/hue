@@ -141,6 +141,7 @@ class EditorViewModel {
 
     self.authSessionUsername = ko.observable(); // UI popup
     self.authSessionPassword = ko.observable();
+    self.authSessionMessage = ko.observable();
     self.authSessionType = ko.observable();
     self.authSessionCallback = ko.observable();
 

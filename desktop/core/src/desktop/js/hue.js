@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import '@babel/polyfill';
 import _ from 'lodash';
 import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
@@ -31,6 +32,8 @@ import qq from 'ext/fileuploader.custom';
 import sprintf from 'sprintf-js';
 
 import ko from 'ko/ko.all';
+
+import 'parse/parserTypeDefs';
 
 import 'utils/customIntervals';
 import 'utils/json.bigDataParse';

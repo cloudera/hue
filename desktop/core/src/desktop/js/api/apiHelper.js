@@ -25,6 +25,7 @@ import hueUtils from 'utils/hueUtils';
 
 const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
 const SAMPLE_API_PREFIX = '/notebook/api/sample/';
+const EXECUTE_API_PREFIX = '/notebook/api/execute/';
 const DOCUMENTS_API = '/desktop/api2/doc/';
 const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
@@ -1793,6 +1794,118 @@ class ApiHelper {
 
     waitForAvailable();
     return new CancellablePromise(deferred, undefined, cancellablePromises);
+  }
+
+  /**
+   * API function to execute an ExecutableStatement
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {ExecutableStatement} options.executable
+   * @param {ContextCompute} options.compute
+   *
+   * @return {Promise}
+   */
+  execute(options) {
+    const executable = options.executable;
+    const url = EXECUTE_API_PREFIX + executable.sourceType;
+    const deferred = $.Deferred();
+
+    // TODO: What do we actually need? And for what reasons....
+    const adaptNotebook2toNotebook = newModel => {
+      const snippet = {
+        id: newModel.snippetId || hueUtils.UUID(),
+        statement_raw: newModel.statement,
+        type: newModel.sourceType,
+        variables: [],
+        properties: { settings: [] },
+        statement: newModel.statement,
+        result: {
+          handle: newModel.handle
+        }
+      };
+
+      const notebook = {
+        id: newModel.notebookId,
+        type: newModel.sourceType,
+        snippets: [snippet],
+        name: '',
+        isSaved: false,
+        sessions: newModel.sessions
+      };
+
+      return {
+        notebook: JSON.stringify(notebook),
+        snippet: JSON.stringify(snippet)
+      };
+    };
+
+    this.simplePost(
+      url,
+      adaptNotebook2toNotebook({
+        compute: executable.compute,
+        statement: executable.getStatement(),
+        database: executable.database, // Not in use?
+        notebookId: executable.notebookId,
+        sessions: [], // { type: 'spark' } etc.
+        handle: executable.handle,
+        sourceType: executable.sourceType
+      }),
+      options
+    )
+      .done(response => {
+        if (response.handle) {
+          deferred.resolve(response.handle);
+        } else {
+          deferred.reject('No handle in execute response');
+        }
+      })
+      .fail(deferred.reject);
+
+    const promise = deferred.promise();
+
+    promise.cancel = () => {
+      const cancelDeferred = $.Deferred();
+      deferred
+        .done(handle => {
+          if (options.executable.handle !== handle) {
+            options.executable.handle = handle;
+          }
+          this.cancelExecute(options).always(cancelDeferred.resolve);
+        })
+        .fail(cancelDeferred.resolve);
+      return cancelDeferred;
+    };
+
+    return promise;
+  }
+
+  cancelExecute(options) {
+    const executable = options.executable;
+
+    // TODO: What do we actually need? And for what reasons....
+    const adaptNotebook2toNotebook = newModel => {
+      const snippet = {
+        type: newModel.sourceType,
+        result: {
+          handle: newModel.handle
+        }
+      };
+
+      return {
+        snippet: JSON.stringify(snippet)
+      };
+    };
+
+    return this.simplePost(
+      '/notebook/api/cancel_statement',
+      adaptNotebook2toNotebook({
+        sourceType: executable.sourceType,
+        handle: executable.handle
+      }),
+      { silenceErrors: options.silenceErrors }
+    );
   }
 
   /**

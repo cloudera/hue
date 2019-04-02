@@ -45,8 +45,11 @@ class CancellablePromise {
   cancel() {
     const self = this;
     if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
-      return;
+      return $.Deferred()
+        .resolve()
+        .promise();
     }
+
     self.cancelled = true;
     if (self.request) {
       apiHelper.cancelActiveRequest(self.request);
@@ -56,10 +59,11 @@ class CancellablePromise {
       self.deferred.reject();
     }
 
+    const cancelPromises = [];
     if (self.otherCancellables) {
       self.otherCancellables.forEach(cancellable => {
         if (cancellable.cancel) {
-          cancellable.cancel();
+          cancelPromises.push(cancellable.cancel());
         }
       });
     }
@@ -67,7 +71,7 @@ class CancellablePromise {
     while (self.cancelCallbacks.length) {
       self.cancelCallbacks.pop()();
     }
-    return self;
+    return $.when(cancelPromises);
   }
 
   onCancel(callback) {

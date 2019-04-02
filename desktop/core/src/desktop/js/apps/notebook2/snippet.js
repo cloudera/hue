@@ -22,6 +22,8 @@ import { markdown } from 'markdown';
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
+import { ExecutableStatement } from "./executableStatement";
+import Executor from './executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
@@ -29,6 +31,10 @@ import { NOTEBOOK_MAPPING } from 'apps/notebook2/notebook';
 import Result from 'apps/notebook2/result';
 import Session from 'apps/notebook2/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
+
+// TODO: Remove. Temporary here for debug
+window.ExecutableStatement = ExecutableStatement;
+window.Executor = Executor;
 
 const TYPE = {
   hive: 'hive',
@@ -1977,7 +1983,11 @@ class Snippet {
     } else if (data.status === 401) {
       // Auth required
       self.status(STATUS.expired);
-      $(document).trigger('showAuthModal', { type: self.type(), callback: self.execute });
+      $(document).trigger('showAuthModal', {
+        type: self.type(),
+        callback: self.execute,
+        message: data.message
+      });
     } else if (data.status === 1 || data.status === -1) {
       self.status(STATUS.failed);
       const match = ERROR_REGEX.exec(data.message);
