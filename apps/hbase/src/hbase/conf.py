@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from builtins import str
 import logging
 import os
 import sys
@@ -87,8 +89,8 @@ def config_validator(user):
       # Check connectivity
       api.connectCluster(cluster_name)
       api.getTableList(cluster_name)
-  except Exception, e:
-    print e
+  except Exception as e:
+    print(e)
     if 'Could not connect' in str(e):
       msg = "The application won't work without a running HBase Thrift Server v1."
     else:

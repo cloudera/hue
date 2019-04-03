@@ -95,7 +95,7 @@ def _parse_site():
   SITE_PATH = os.path.join(HBASE_CONF_DIR.get(), 'hbase-site.xml')
   try:
     data = file(SITE_PATH, 'r').read()
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (SITE_PATH, err))
       return
