@@ -19,6 +19,7 @@
 Tools to manipulate the .pth file in the virtualenv.
 """
 
+from builtins import object
 import glob
 import logging
 import os
