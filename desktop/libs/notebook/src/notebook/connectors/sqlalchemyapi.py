@@ -115,7 +115,7 @@ class SqlAlchemyApi(Api):
     if not self.engine:
       self.engine = self._create_engine()
     connection = self.engine.connect()
-    result = connection.execute(snippet['statement'])
+    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
     cache = {
       'connection': connection,
       'result': result,
@@ -217,7 +217,7 @@ class SqlAlchemyApi(Api):
     guid = uuid.uuid4().hex
 
     connection = self.engine.connect()
-    result = connection.execute(snippet['statement'])
+    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
 
     CONNECTION_CACHE[guid] = {
       'connection': connection,
@@ -340,7 +340,7 @@ class Assist():
     statement = "SELECT %s FROM `%s`.`%s` LIMIT %d" % (column, database, table, 100)
     connection = self.engine.connect()
     try:
-      result = connection.execute(statement)
+      result = connection.execution_options(stream_results=True).execute(statement)
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()
