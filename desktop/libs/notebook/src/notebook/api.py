@@ -123,14 +123,11 @@ def _execute_notebook(request, notebook, snippet):
 
   try:
     try:
-      session = notebook.get('sessions') and notebook['sessions'][0] # Session reference for snippet execution without persisting it
       if historify:
         history = _historify(notebook, request.user)
         notebook = Notebook(document=history).get_data()
 
       interpreter = get_api(request, snippet)
-      if snippet.get('interface') == 'sqlalchemy':
-        interpreter.options['session'] = session
 
       response['handle'] = interpreter.execute(notebook, snippet)
 
