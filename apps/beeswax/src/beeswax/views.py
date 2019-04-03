@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import next
+from builtins import str
 import json
 import logging
 import re
@@ -155,11 +157,11 @@ def delete_design(request):
     ids = request.POST.getlist('designs_selection')
     designs = dict([(design_id, authorized_get_design(request, design_id, owner_only=True)) for design_id in ids])
 
-    if None in designs.values():
-      LOG.error('Cannot delete non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
+    if None in list(designs.values()):
+      LOG.error('Cannot delete non-existent design(s) %s' % ','.join([key for key, name in list(designs.items()) if name is None]))
       return list_designs(request)
 
-    for design in designs.values():
+    for design in list(designs.values()):
       if request.POST.get('skipTrash', 'false') == 'false':
         design.doc.get().send_to_trash()
       else:
@@ -175,11 +177,11 @@ def restore_design(request):
     ids = request.POST.getlist('designs_selection')
     designs = dict([(design_id, authorized_get_design(request, design_id)) for design_id in ids])
 
-    if None in designs.values():
-      LOG.error('Cannot restore non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
+    if None in list(designs.values()):
+      LOG.error('Cannot restore non-existent design(s) %s' % ','.join([key for key, name in list(designs.items()) if name is None]))
       return list_designs(request)
 
-    for design in designs.values():
+    for design in list(designs.values()):
       design.doc.get().restore_from_trash()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
@@ -396,7 +398,7 @@ def download(request, id, format, user_agent=None):
     LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
 
     return data_export.download(query_history.get_handle(), format, db, user_agent=user_agent)
-  except Exception, e:
+  except Exception as e:
     if not hasattr(e, 'message') or not e.message:
       message = e
     else:
@@ -428,7 +430,7 @@ def execute_query(request, design_id=None, query_history_id=None):
           action = 'watch-results'
       else:
         action = 'editor-results'
-    except QueryServerException, e:
+    except QueryServerException as e:
       if 'Invalid query handle' in e.message or 'Invalid OperationHandle' in e.message:
         query_history.save_state(QueryHistory.STATE.expired)
         LOG.warn("Invalid query handle", exc_info=sys.exc_info())
@@ -478,7 +480,7 @@ def view_results(request, id, first_row=0):
 
   It understands the ``context`` GET parameter. (See execute_query().)
   """
-  first_row = long(first_row)
+  first_row = int(first_row)
   start_over = (first_row == 0)
   results = type('Result', (object,), {
                 'rows': 0,
@@ -519,7 +521,7 @@ def view_results(request, id, first_row=0):
       log = db.get_log(handle)
       columns = results.data_table.cols()
 
-  except Exception, ex:
+  except Exception as ex:
     LOG.exception('error fetching results')
 
     fetch_error = True
@@ -590,7 +592,7 @@ def configuration(request):
   if session:
     properties = json.loads(session.properties)
     # Redact passwords
-    for key, value in properties.items():
+    for key, value in list(properties.items()):
       if 'password' in key.lower():
         properties[key] = '*' * len(value)
   else:
@@ -612,7 +614,7 @@ def install_examples(request):
       db_name = request.POST.get('db_name', 'default')
       beeswax.management.commands.beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user)
       response['status'] = 0
-    except Exception, err:
+    except Exception as err:
       LOG.exception(err)
       response['message'] = str(err)
   else:
@@ -657,7 +659,7 @@ def query_done_cb(request, server_id):
 
     user.email_user(subject, body)
     message['message'] = 'sent'
-  except Exception, ex:
+  except Exception as ex:
     msg = "Failed to send query completion notification via e-mail: %s" % (ex)
     LOG.error(msg)
     message['message'] = msg
@@ -843,7 +845,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
 
   # Design type
   d_type = querydict.get(prefix + 'type')
-  if d_type and d_type in SavedQuery.TYPES_MAPPING.keys():
+  if d_type and d_type in list(SavedQuery.TYPES_MAPPING.keys()):
     db_queryset = db_queryset.filter(extra=str(SavedQuery.TYPES_MAPPING[d_type]))
 
   # Text search
@@ -859,7 +861,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
     else:
       sort_dir, sort_attr = '', sort_key
 
-    if not SORT_ATTR_TRANSLATION.has_key(sort_attr):
+    if sort_attr not in SORT_ATTR_TRANSLATION:
       LOG.warn('Bad parameter to list_designs: sort=%s' % (sort_key,))
       sort_dir, sort_attr = DEFAULT_SORT
   else:
@@ -955,7 +957,7 @@ def parse_out_jobs(log, engine='mr', with_state=False):
 def _copy_prefix(prefix, base_dict):
   """Copy keys starting with ``prefix``"""
   querydict = QueryDict(None, mutable=True)
-  for key, val in base_dict.iteritems():
+  for key, val in base_dict.items():
     if key.startswith(prefix):
       querydict[key] = val
   return querydict
@@ -1007,7 +1009,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   # Design type
   d_type = querydict.get(prefix + 'type')
   if d_type:
-    if d_type not in SavedQuery.TYPES_MAPPING.keys():
+    if d_type not in list(SavedQuery.TYPES_MAPPING.keys()):
       LOG.warn('Bad parameter to list_query_history: type=%s' % (d_type,))
     else:
       db_queryset = db_queryset.filter(design__type=SavedQuery.TYPES_MAPPING[d_type])
@@ -1024,7 +1026,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
     if sort_key[0] == '-':
       sort_dir, sort_attr = '-', sort_key[1:]
 
-    if not SORT_ATTR_TRANSLATION.has_key(sort_attr):
+    if sort_attr not in SORT_ATTR_TRANSLATION:
       LOG.warn('Bad parameter to list_query_history: sort=%s' % (sort_key,))
       sort_dir, sort_attr = DEFAULT_SORT
   else:
@@ -1074,7 +1076,7 @@ def _update_query_state(query_history):
       if state_enum is None:
         # Error was logged at the source
         return False
-    except Exception, e:
+    except Exception as e:
       LOG.error(e)
       state_enum = models.QueryHistory.STATE.failed
     query_history.save_state(state_enum)

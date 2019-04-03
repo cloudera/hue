@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import os
 import pwd
@@ -68,7 +69,7 @@ class Command(BaseCommand):
       sample_user = install_sample_user()
       self._install_queries(sample_user, app_name)
       self._install_tables(user, app_name, db_name, tables)
-    except Exception, ex:
+    except Exception as ex:
       exception = ex
 
     Document.objects.sync()
@@ -96,7 +97,7 @@ class Command(BaseCommand):
       table = SampleTable(table_dict, app_name, db_name)
       try:
         table.install(django_user)
-      except Exception, ex:
+      except Exception as ex:
         raise InstallException(_('Could not install table: %s') % ex)
 
   def _install_queries(self, django_user, app_name):
@@ -106,13 +107,13 @@ class Command(BaseCommand):
 
     # Filter design list to app-specific designs
     app_type = HQL if app_name == 'beeswax' else IMPALA
-    design_list = filter(lambda d: int(d['type']) == app_type, design_list)
+    design_list = [d for d in design_list if int(d['type']) == app_type]
 
     for design_dict in design_list:
       design = SampleQuery(design_dict)
       try:
         design.install(django_user)
-      except Exception, ex:
+      except Exception as ex:
         raise InstallException(_('Could not install query: %s') % ex)
 
 
@@ -135,7 +136,7 @@ class SampleTable(object):
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
     if self.partition_files:
-      for partition_spec, filename in self.partition_files.items():
+      for partition_spec, filename in list(self.partition_files.items()):
         filepath = os.path.join(self._data_dir, filename)
         self.partition_files[partition_spec] = filepath
         self._check_file_contents(filepath)
@@ -147,7 +148,7 @@ class SampleTable(object):
   def install(self, django_user):
     if self.create(django_user):
       if self.partition_files:
-        for partition_spec, filepath in self.partition_files.items():
+        for partition_spec, filepath in list(self.partition_files.items()):
           self.load_partition(django_user, partition_spec, filepath)
       else:
         self.load(django_user)
@@ -177,7 +178,7 @@ class SampleTable(object):
           LOG.error(msg)
           raise InstallException(msg)
         return True
-      except Exception, ex:
+      except Exception as ex:
         msg = _('Error creating table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
         LOG.error(msg)
         raise InstallException(msg)
@@ -278,7 +279,7 @@ class SampleTable(object):
         msg = _('Error loading table %(table)s: Operation timeout.') % {'table': self.name}
         LOG.error(msg)
         raise InstallException(msg)
-    except QueryServerException, ex:
+    except QueryServerException as ex:
       msg = _('Error loading table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
       LOG.error(msg)
       raise InstallException(msg)

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import re
 import thrift
@@ -98,7 +99,7 @@ class HiveDataTable(DataTable):
 
 
 
-class HiveMetastoreClient:
+class HiveMetastoreClient(object):
 
   def __init__(self, query_server, user):
     self.user = user
@@ -174,11 +175,11 @@ class HiveMetastoreClient:
         self._decode_map(sd.parameters)
 
       def _encode_map(self, mapp):
-        for key, value in mapp.iteritems():
+        for key, value in mapp.items():
           mapp[key] = smart_str(value, strings_only=True)
 
       def _decode_map(self, mapp):
-        for key, value in mapp.iteritems():
+        for key, value in mapp.items():
           mapp[key] = force_unicode(value, strings_only=True, errors='replace')
 
       def create_database(self, name, description):

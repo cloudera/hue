@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from nose.tools import assert_equal, assert_true, assert_raises
@@ -26,7 +27,7 @@ from beeswax.forms import _clean_terminator
 LOG = logging.getLogger(__name__)
 
 
-class TestCreateTable():
+class TestCreateTable(object):
 
   def test_custom_delimiter(self):
     # Any thing is good

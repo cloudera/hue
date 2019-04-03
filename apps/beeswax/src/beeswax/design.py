@@ -19,11 +19,15 @@
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import json
 import logging
 import os
 import re
-import urlparse
+import urllib.parse
 
 import django.http
 from django import forms
@@ -42,7 +46,7 @@ SERIALIZATION_VERSION = '0.4.1'
 def hql_query(hql, database='default', query_type=None, settings=None, file_resources=None, functions=None):
   data_dict = HQLdesign.get_default_data_dict()
 
-  if not (isinstance(hql, str) or isinstance(hql, unicode)):
+  if not (isinstance(hql, str) or isinstance(hql, str)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
 
   data_dict['query']['query'] = strip_trailing_semicolon(hql)
@@ -149,7 +153,7 @@ class HQLdesign(object):
   def loads(data):
     """Returns an HQLdesign from the serialized form"""
     dic = json.loads(data)
-    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
+    dic = dict([(str(k), dic.get(k)) for k in list(dic.keys())])
     if dic['VERSION'] != SERIALIZATION_VERSION:
       LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
 
@@ -189,7 +193,7 @@ class HQLdesign(object):
     configuration = []
 
     for f in self.file_resources:
-      if not urlparse.urlsplit(f['path']).scheme:
+      if not urllib.parse.urlsplit(f['path']).scheme:
         scheme = get_hdfs().fs_defaultfs
       else:
         scheme = ''

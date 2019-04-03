@@ -18,6 +18,7 @@
 """
 Common utils for beeswax.
 """
+from __future__ import print_function
 
 import re
 import time
@@ -56,7 +57,7 @@ def timing(fn):
     time1 = time.time()
     ret = fn(*args, **kwargs)
     time2 = time.time()
-    print '%s elapsed time: %0.3f ms' % (fn.func_name, (time2-time1)*1000.0)
+    print('%s elapsed time: %0.3f ms' % (fn.__name__, (time2-time1)*1000.0))
     return ret
   return decorator
 
