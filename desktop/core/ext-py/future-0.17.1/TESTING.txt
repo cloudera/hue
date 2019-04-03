@@ -1,0 +1,7 @@
+Currently the tests are passing on OS X and Linux on Python 2.7 and 3.4.
+
+The test suite can be run with:
+
+    $ tox
+
+which tests the module under a number of different python versions, where available.
