@@ -1,0 +1,49 @@
+The escape() function in this file in Django 1.4:
+
+    /home/user/VirtualEnvs/mezzanine/local/lib/python2.7/site-packages/django/utils/html.py
+
+atttempts to use the unicode replace method with byte strings. This
+causes this exception when running the Mezzanine tests using the newstr
+object:
+
+      File "/home/user/VirtualEnvs/mezzanine/local/lib/python2.7/site-packages/django/utils/html.py", line 36, in escape
+        return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+      File "/home/user/VirtualEnvs/mezzanine/local/lib/python2.7/site-packages/future-0.9.0_dev-py2.7.egg/future/builtins/backports/__init__.py", line 145, in wrapper
+        raise TypeError(errmsg.format(mytype))
+    TypeError: argument can't be <type 'str'>
+
+
+Comment to add to prevent Pylint from issuing warnings on ``from
+future.builtins import *``:
+
+    # pylint: disable=W0622,W0401
+
+INCOMPATIBLE: array.array()
+
+Python 2:
+	>>> array.array(b'b')
+	array.array(b'b')
+
+	>>> array.array(u'u')
+	TypeError: must be char, not unicode
+
+Python 3:
+	>>> array.array(b'b')
+	TypeError: must be a unicode character, not bytes
+
+	>>> array.array(u'b')
+	array('b')
+
+Maybe use on Py2:
+	>>> array.array(u'b'.encode('ascii')) ??
+
+Long int syntax (e.g. 1000000L) is incompatible with Py3.
+We probably shouldn't shadow int with long on Py2 because then isinstance(1, int) is False
+
+Python 2's bytes object is nothing like Python 3's bytes object!
+Running test_bytes.py from Py3 on Py2 (after fixing imports) gives this:
+
+--------------------------------------------------------------
+Ran 203 tests in 0.209s
+
+FAILED (failures=31, errors=55, skipped=1)
