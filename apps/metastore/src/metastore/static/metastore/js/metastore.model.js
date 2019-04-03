@@ -255,8 +255,8 @@ var MetastoreNamespace = (function () {
 
   MetastoreNamespace.prototype.reload = function () {
     var self = this;
-    if (!self.reloading() && self.catalogEntry()) {
-      self.reloading(true);
+    if (!self.loadingDatabases() && self.catalogEntry()) {
+      self.loadingDatabases(true);
       // Clear will publish when done
       self.catalogEntry().clearCache({ invalidate: self.sourceType === 'impala' ? 'invalidate' : 'cache' });
     }
