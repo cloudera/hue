@@ -6,6 +6,7 @@
 #  options string: py:new_style
 #
 
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 
 from thrift.transport import TTransport

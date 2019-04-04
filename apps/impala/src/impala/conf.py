@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 import os
 import sys
@@ -241,14 +242,14 @@ def config_validator(user):
         if handle:
           server.fetch(handle, rows=100)
           server.close(handle)
-    except StructuredThriftTransportException, ex:
+    except StructuredThriftTransportException as ex:
       if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
         msg = "Failed to authenticate to Impalad, check authentication configurations."
         LOG.exception(msg)
         res.append((NICE_NAME, _(msg)))
       else:
         raise ex
-  except Exception, ex:
+  except Exception as ex:
     msg = "No available Impalad to send queries to."
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))

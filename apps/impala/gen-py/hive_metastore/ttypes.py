@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 import fb303.ttypes
 
@@ -294,7 +296,7 @@ class Version(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -385,7 +387,7 @@ class FieldSchema(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -445,7 +447,7 @@ class Type(object):
         if ftype == TType.LIST:
           self.fields = []
           (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _elem5 = FieldSchema()
             _elem5.read(iprot)
             self.fields.append(_elem5)
@@ -498,7 +500,7 @@ class Type(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -561,7 +563,7 @@ class HiveObjectRef(object):
         if ftype == TType.LIST:
           self.partValues = []
           (_etype10, _size7) = iprot.readListBegin()
-          for _i11 in xrange(_size7):
+          for _i11 in range(_size7):
             _elem12 = iprot.readString()
             self.partValues.append(_elem12)
           iprot.readListEnd()
@@ -623,7 +625,7 @@ class HiveObjectRef(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -740,7 +742,7 @@ class PrivilegeGrantInfo(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -846,7 +848,7 @@ class HiveObjectPrivilege(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -882,7 +884,7 @@ class PrivilegeBag(object):
         if ftype == TType.LIST:
           self.privileges = []
           (_etype17, _size14) = iprot.readListBegin()
-          for _i18 in xrange(_size14):
+          for _i18 in range(_size14):
             _elem19 = HiveObjectPrivilege()
             _elem19.read(iprot)
             self.privileges.append(_elem19)
@@ -920,7 +922,7 @@ class PrivilegeBag(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -962,11 +964,11 @@ class PrincipalPrivilegeSet(object):
         if ftype == TType.MAP:
           self.userPrivileges = {}
           (_ktype22, _vtype23, _size21 ) = iprot.readMapBegin()
-          for _i25 in xrange(_size21):
+          for _i25 in range(_size21):
             _key26 = iprot.readString()
             _val27 = []
             (_etype31, _size28) = iprot.readListBegin()
-            for _i32 in xrange(_size28):
+            for _i32 in range(_size28):
               _elem33 = PrivilegeGrantInfo()
               _elem33.read(iprot)
               _val27.append(_elem33)
@@ -979,11 +981,11 @@ class PrincipalPrivilegeSet(object):
         if ftype == TType.MAP:
           self.groupPrivileges = {}
           (_ktype35, _vtype36, _size34 ) = iprot.readMapBegin()
-          for _i38 in xrange(_size34):
+          for _i38 in range(_size34):
             _key39 = iprot.readString()
             _val40 = []
             (_etype44, _size41) = iprot.readListBegin()
-            for _i45 in xrange(_size41):
+            for _i45 in range(_size41):
               _elem46 = PrivilegeGrantInfo()
               _elem46.read(iprot)
               _val40.append(_elem46)
@@ -996,11 +998,11 @@ class PrincipalPrivilegeSet(object):
         if ftype == TType.MAP:
           self.rolePrivileges = {}
           (_ktype48, _vtype49, _size47 ) = iprot.readMapBegin()
-          for _i51 in xrange(_size47):
+          for _i51 in range(_size47):
             _key52 = iprot.readString()
             _val53 = []
             (_etype57, _size54) = iprot.readListBegin()
-            for _i58 in xrange(_size54):
+            for _i58 in range(_size54):
               _elem59 = PrivilegeGrantInfo()
               _elem59.read(iprot)
               _val53.append(_elem59)
@@ -1022,7 +1024,7 @@ class PrincipalPrivilegeSet(object):
     if self.userPrivileges is not None:
       oprot.writeFieldBegin('userPrivileges', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.LIST, len(self.userPrivileges))
-      for kiter60,viter61 in self.userPrivileges.items():
+      for kiter60,viter61 in list(self.userPrivileges.items()):
         oprot.writeString(kiter60)
         oprot.writeListBegin(TType.STRUCT, len(viter61))
         for iter62 in viter61:
@@ -1033,7 +1035,7 @@ class PrincipalPrivilegeSet(object):
     if self.groupPrivileges is not None:
       oprot.writeFieldBegin('groupPrivileges', TType.MAP, 2)
       oprot.writeMapBegin(TType.STRING, TType.LIST, len(self.groupPrivileges))
-      for kiter63,viter64 in self.groupPrivileges.items():
+      for kiter63,viter64 in list(self.groupPrivileges.items()):
         oprot.writeString(kiter63)
         oprot.writeListBegin(TType.STRUCT, len(viter64))
         for iter65 in viter64:
@@ -1044,7 +1046,7 @@ class PrincipalPrivilegeSet(object):
     if self.rolePrivileges is not None:
       oprot.writeFieldBegin('rolePrivileges', TType.MAP, 3)
       oprot.writeMapBegin(TType.STRING, TType.LIST, len(self.rolePrivileges))
-      for kiter66,viter67 in self.rolePrivileges.items():
+      for kiter66,viter67 in list(self.rolePrivileges.items()):
         oprot.writeString(kiter66)
         oprot.writeListBegin(TType.STRUCT, len(viter67))
         for iter68 in viter67:
@@ -1068,7 +1070,7 @@ class PrincipalPrivilegeSet(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1160,7 +1162,7 @@ class GrantRevokePrivilegeRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1225,7 +1227,7 @@ class GrantRevokePrivilegeResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1316,7 +1318,7 @@ class Role(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1459,7 +1461,7 @@ class RolePrincipalGrant(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1541,7 +1543,7 @@ class GetRoleGrantsForPrincipalRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1577,7 +1579,7 @@ class GetRoleGrantsForPrincipalResponse(object):
         if ftype == TType.LIST:
           self.principalGrants = []
           (_etype72, _size69) = iprot.readListBegin()
-          for _i73 in xrange(_size69):
+          for _i73 in range(_size69):
             _elem74 = RolePrincipalGrant()
             _elem74.read(iprot)
             self.principalGrants.append(_elem74)
@@ -1617,7 +1619,7 @@ class GetRoleGrantsForPrincipalResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1684,7 +1686,7 @@ class GetPrincipalsInRoleRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1720,7 +1722,7 @@ class GetPrincipalsInRoleResponse(object):
         if ftype == TType.LIST:
           self.principalGrants = []
           (_etype79, _size76) = iprot.readListBegin()
-          for _i80 in xrange(_size76):
+          for _i80 in range(_size76):
             _elem81 = RolePrincipalGrant()
             _elem81.read(iprot)
             self.principalGrants.append(_elem81)
@@ -1760,7 +1762,7 @@ class GetPrincipalsInRoleResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1903,7 +1905,7 @@ class GrantRevokeRoleRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1968,7 +1970,7 @@ class GrantRevokeRoleResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2037,7 +2039,7 @@ class Database(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype84, _vtype85, _size83 ) = iprot.readMapBegin()
-          for _i87 in xrange(_size83):
+          for _i87 in range(_size83):
             _key88 = iprot.readString()
             _val89 = iprot.readString()
             self.parameters[_key88] = _val89
@@ -2085,7 +2087,7 @@ class Database(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter90,viter91 in self.parameters.items():
+      for kiter90,viter91 in list(self.parameters.items()):
         oprot.writeString(kiter90)
         oprot.writeString(viter91)
       oprot.writeMapEnd()
@@ -2122,7 +2124,7 @@ class Database(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2174,7 +2176,7 @@ class SerDeInfo(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype93, _vtype94, _size92 ) = iprot.readMapBegin()
-          for _i96 in xrange(_size92):
+          for _i96 in range(_size92):
             _key97 = iprot.readString()
             _val98 = iprot.readString()
             self.parameters[_key97] = _val98
@@ -2202,7 +2204,7 @@ class SerDeInfo(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 3)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter99,viter100 in self.parameters.items():
+      for kiter99,viter100 in list(self.parameters.items()):
         oprot.writeString(kiter99)
         oprot.writeString(viter100)
       oprot.writeMapEnd()
@@ -2223,7 +2225,7 @@ class SerDeInfo(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2301,7 +2303,7 @@ class Order(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2343,7 +2345,7 @@ class SkewedInfo(object):
         if ftype == TType.LIST:
           self.skewedColNames = []
           (_etype104, _size101) = iprot.readListBegin()
-          for _i105 in xrange(_size101):
+          for _i105 in range(_size101):
             _elem106 = iprot.readString()
             self.skewedColNames.append(_elem106)
           iprot.readListEnd()
@@ -2353,10 +2355,10 @@ class SkewedInfo(object):
         if ftype == TType.LIST:
           self.skewedColValues = []
           (_etype110, _size107) = iprot.readListBegin()
-          for _i111 in xrange(_size107):
+          for _i111 in range(_size107):
             _elem112 = []
             (_etype116, _size113) = iprot.readListBegin()
-            for _i117 in xrange(_size113):
+            for _i117 in range(_size113):
               _elem118 = iprot.readString()
               _elem112.append(_elem118)
             iprot.readListEnd()
@@ -2368,10 +2370,10 @@ class SkewedInfo(object):
         if ftype == TType.MAP:
           self.skewedColValueLocationMaps = {}
           (_ktype120, _vtype121, _size119 ) = iprot.readMapBegin()
-          for _i123 in xrange(_size119):
+          for _i123 in range(_size119):
             _key124 = []
             (_etype129, _size126) = iprot.readListBegin()
-            for _i130 in xrange(_size126):
+            for _i130 in range(_size126):
               _elem131 = iprot.readString()
               _key124.append(_elem131)
             iprot.readListEnd()
@@ -2410,7 +2412,7 @@ class SkewedInfo(object):
     if self.skewedColValueLocationMaps is not None:
       oprot.writeFieldBegin('skewedColValueLocationMaps', TType.MAP, 3)
       oprot.writeMapBegin(TType.LIST, TType.STRING, len(self.skewedColValueLocationMaps))
-      for kiter135,viter136 in self.skewedColValueLocationMaps.items():
+      for kiter135,viter136 in list(self.skewedColValueLocationMaps.items()):
         oprot.writeListBegin(TType.STRING, len(kiter135))
         for iter137 in kiter135:
           oprot.writeString(iter137)
@@ -2434,7 +2436,7 @@ class SkewedInfo(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2503,7 +2505,7 @@ class StorageDescriptor(object):
         if ftype == TType.LIST:
           self.cols = []
           (_etype141, _size138) = iprot.readListBegin()
-          for _i142 in xrange(_size138):
+          for _i142 in range(_size138):
             _elem143 = FieldSchema()
             _elem143.read(iprot)
             self.cols.append(_elem143)
@@ -2545,7 +2547,7 @@ class StorageDescriptor(object):
         if ftype == TType.LIST:
           self.bucketCols = []
           (_etype147, _size144) = iprot.readListBegin()
-          for _i148 in xrange(_size144):
+          for _i148 in range(_size144):
             _elem149 = iprot.readString()
             self.bucketCols.append(_elem149)
           iprot.readListEnd()
@@ -2555,7 +2557,7 @@ class StorageDescriptor(object):
         if ftype == TType.LIST:
           self.sortCols = []
           (_etype153, _size150) = iprot.readListBegin()
-          for _i154 in xrange(_size150):
+          for _i154 in range(_size150):
             _elem155 = Order()
             _elem155.read(iprot)
             self.sortCols.append(_elem155)
@@ -2566,7 +2568,7 @@ class StorageDescriptor(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype157, _vtype158, _size156 ) = iprot.readMapBegin()
-          for _i160 in xrange(_size156):
+          for _i160 in range(_size156):
             _key161 = iprot.readString()
             _val162 = iprot.readString()
             self.parameters[_key161] = _val162
@@ -2642,7 +2644,7 @@ class StorageDescriptor(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 10)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter166,viter167 in self.parameters.items():
+      for kiter166,viter167 in list(self.parameters.items()):
         oprot.writeString(kiter166)
         oprot.writeString(viter167)
       oprot.writeMapEnd()
@@ -2680,7 +2682,7 @@ class StorageDescriptor(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2791,7 +2793,7 @@ class Table(object):
         if ftype == TType.LIST:
           self.partitionKeys = []
           (_etype171, _size168) = iprot.readListBegin()
-          for _i172 in xrange(_size168):
+          for _i172 in range(_size168):
             _elem173 = FieldSchema()
             _elem173.read(iprot)
             self.partitionKeys.append(_elem173)
@@ -2802,7 +2804,7 @@ class Table(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype175, _vtype176, _size174 ) = iprot.readMapBegin()
-          for _i178 in xrange(_size174):
+          for _i178 in range(_size174):
             _key179 = iprot.readString()
             _val180 = iprot.readString()
             self.parameters[_key179] = _val180
@@ -2883,7 +2885,7 @@ class Table(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 9)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter182,viter183 in self.parameters.items():
+      for kiter182,viter183 in list(self.parameters.items()):
         oprot.writeString(kiter182)
         oprot.writeString(viter183)
       oprot.writeMapEnd()
@@ -2935,7 +2937,7 @@ class Table(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2992,7 +2994,7 @@ class Partition(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype187, _size184) = iprot.readListBegin()
-          for _i188 in xrange(_size184):
+          for _i188 in range(_size184):
             _elem189 = iprot.readString()
             self.values.append(_elem189)
           iprot.readListEnd()
@@ -3028,7 +3030,7 @@ class Partition(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype191, _vtype192, _size190 ) = iprot.readMapBegin()
-          for _i194 in xrange(_size190):
+          for _i194 in range(_size190):
             _key195 = iprot.readString()
             _val196 = iprot.readString()
             self.parameters[_key195] = _val196
@@ -3081,7 +3083,7 @@ class Partition(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 7)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter198,viter199 in self.parameters.items():
+      for kiter198,viter199 in list(self.parameters.items()):
         oprot.writeString(kiter198)
         oprot.writeString(viter199)
       oprot.writeMapEnd()
@@ -3111,7 +3113,7 @@ class Partition(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3162,7 +3164,7 @@ class PartitionWithoutSD(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype203, _size200) = iprot.readListBegin()
-          for _i204 in xrange(_size200):
+          for _i204 in range(_size200):
             _elem205 = iprot.readString()
             self.values.append(_elem205)
           iprot.readListEnd()
@@ -3187,7 +3189,7 @@ class PartitionWithoutSD(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype207, _vtype208, _size206 ) = iprot.readMapBegin()
-          for _i210 in xrange(_size206):
+          for _i210 in range(_size206):
             _key211 = iprot.readString()
             _val212 = iprot.readString()
             self.parameters[_key211] = _val212
@@ -3232,7 +3234,7 @@ class PartitionWithoutSD(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 5)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter214,viter215 in self.parameters.items():
+      for kiter214,viter215 in list(self.parameters.items()):
         oprot.writeString(kiter214)
         oprot.writeString(viter215)
       oprot.writeMapEnd()
@@ -3260,7 +3262,7 @@ class PartitionWithoutSD(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3299,7 +3301,7 @@ class PartitionSpecWithSharedSD(object):
         if ftype == TType.LIST:
           self.partitions = []
           (_etype219, _size216) = iprot.readListBegin()
-          for _i220 in xrange(_size216):
+          for _i220 in range(_size216):
             _elem221 = PartitionWithoutSD()
             _elem221.read(iprot)
             self.partitions.append(_elem221)
@@ -3348,7 +3350,7 @@ class PartitionSpecWithSharedSD(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3384,7 +3386,7 @@ class PartitionListComposingSpec(object):
         if ftype == TType.LIST:
           self.partitions = []
           (_etype226, _size223) = iprot.readListBegin()
-          for _i227 in xrange(_size223):
+          for _i227 in range(_size223):
             _elem228 = Partition()
             _elem228.read(iprot)
             self.partitions.append(_elem228)
@@ -3422,7 +3424,7 @@ class PartitionListComposingSpec(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3541,7 +3543,7 @@ class PartitionSpec(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3645,7 +3647,7 @@ class Index(object):
         if ftype == TType.MAP:
           self.parameters = {}
           (_ktype231, _vtype232, _size230 ) = iprot.readMapBegin()
-          for _i234 in xrange(_size230):
+          for _i234 in range(_size230):
             _key235 = iprot.readString()
             _val236 = iprot.readString()
             self.parameters[_key235] = _val236
@@ -3702,7 +3704,7 @@ class Index(object):
     if self.parameters is not None:
       oprot.writeFieldBegin('parameters', TType.MAP, 9)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.parameters))
-      for kiter237,viter238 in self.parameters.items():
+      for kiter237,viter238 in list(self.parameters.items()):
         oprot.writeString(kiter237)
         oprot.writeString(viter238)
       oprot.writeMapEnd()
@@ -3734,7 +3736,7 @@ class Index(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3831,7 +3833,7 @@ class BooleanColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3939,7 +3941,7 @@ class DoubleColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4047,7 +4049,7 @@ class LongColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4159,7 +4161,7 @@ class StringColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4256,7 +4258,7 @@ class BinaryColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4339,7 +4341,7 @@ class Decimal(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4449,7 +4451,7 @@ class DecimalColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4516,7 +4518,7 @@ class Date(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4626,7 +4628,7 @@ class DateColumnStatsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4776,7 +4778,7 @@ class ColumnStatisticsData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4874,7 +4876,7 @@ class ColumnStatisticsObj(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4997,7 +4999,7 @@ class ColumnStatisticsDesc(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5042,7 +5044,7 @@ class ColumnStatistics(object):
         if ftype == TType.LIST:
           self.statsObj = []
           (_etype242, _size239) = iprot.readListBegin()
-          for _i243 in xrange(_size239):
+          for _i243 in range(_size239):
             _elem244 = ColumnStatisticsObj()
             _elem244.read(iprot)
             self.statsObj.append(_elem244)
@@ -5089,7 +5091,7 @@ class ColumnStatistics(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5128,7 +5130,7 @@ class AggrStats(object):
         if ftype == TType.LIST:
           self.colStats = []
           (_etype249, _size246) = iprot.readListBegin()
-          for _i250 in xrange(_size246):
+          for _i250 in range(_size246):
             _elem251 = ColumnStatisticsObj()
             _elem251.read(iprot)
             self.colStats.append(_elem251)
@@ -5180,7 +5182,7 @@ class AggrStats(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5216,7 +5218,7 @@ class SetPartitionsStatsRequest(object):
         if ftype == TType.LIST:
           self.colStats = []
           (_etype256, _size253) = iprot.readListBegin()
-          for _i257 in xrange(_size253):
+          for _i257 in range(_size253):
             _elem258 = ColumnStatistics()
             _elem258.read(iprot)
             self.colStats.append(_elem258)
@@ -5256,7 +5258,7 @@ class SetPartitionsStatsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5295,7 +5297,7 @@ class Schema(object):
         if ftype == TType.LIST:
           self.fieldSchemas = []
           (_etype263, _size260) = iprot.readListBegin()
-          for _i264 in xrange(_size260):
+          for _i264 in range(_size260):
             _elem265 = FieldSchema()
             _elem265.read(iprot)
             self.fieldSchemas.append(_elem265)
@@ -5306,7 +5308,7 @@ class Schema(object):
         if ftype == TType.MAP:
           self.properties = {}
           (_ktype267, _vtype268, _size266 ) = iprot.readMapBegin()
-          for _i270 in xrange(_size266):
+          for _i270 in range(_size266):
             _key271 = iprot.readString()
             _val272 = iprot.readString()
             self.properties[_key271] = _val272
@@ -5333,7 +5335,7 @@ class Schema(object):
     if self.properties is not None:
       oprot.writeFieldBegin('properties', TType.MAP, 2)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.properties))
-      for kiter274,viter275 in self.properties.items():
+      for kiter274,viter275 in list(self.properties.items()):
         oprot.writeString(kiter274)
         oprot.writeString(viter275)
       oprot.writeMapEnd()
@@ -5353,7 +5355,7 @@ class Schema(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5389,7 +5391,7 @@ class EnvironmentContext(object):
         if ftype == TType.MAP:
           self.properties = {}
           (_ktype277, _vtype278, _size276 ) = iprot.readMapBegin()
-          for _i280 in xrange(_size276):
+          for _i280 in range(_size276):
             _key281 = iprot.readString()
             _val282 = iprot.readString()
             self.properties[_key281] = _val282
@@ -5409,7 +5411,7 @@ class EnvironmentContext(object):
     if self.properties is not None:
       oprot.writeFieldBegin('properties', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.properties))
-      for kiter283,viter284 in self.properties.items():
+      for kiter283,viter284 in list(self.properties.items()):
         oprot.writeString(kiter283)
         oprot.writeString(viter284)
       oprot.writeMapEnd()
@@ -5428,7 +5430,7 @@ class EnvironmentContext(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5467,7 +5469,7 @@ class PartitionsByExprResult(object):
         if ftype == TType.LIST:
           self.partitions = []
           (_etype288, _size285) = iprot.readListBegin()
-          for _i289 in xrange(_size285):
+          for _i289 in range(_size285):
             _elem290 = Partition()
             _elem290.read(iprot)
             self.partitions.append(_elem290)
@@ -5519,7 +5521,7 @@ class PartitionsByExprResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5642,7 +5644,7 @@ class PartitionsByExprRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5678,7 +5680,7 @@ class TableStatsResult(object):
         if ftype == TType.LIST:
           self.tableStats = []
           (_etype295, _size292) = iprot.readListBegin()
-          for _i296 in xrange(_size292):
+          for _i296 in range(_size292):
             _elem297 = ColumnStatisticsObj()
             _elem297.read(iprot)
             self.tableStats.append(_elem297)
@@ -5718,7 +5720,7 @@ class TableStatsResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5754,11 +5756,11 @@ class PartitionsStatsResult(object):
         if ftype == TType.MAP:
           self.partStats = {}
           (_ktype300, _vtype301, _size299 ) = iprot.readMapBegin()
-          for _i303 in xrange(_size299):
+          for _i303 in range(_size299):
             _key304 = iprot.readString()
             _val305 = []
             (_etype309, _size306) = iprot.readListBegin()
-            for _i310 in xrange(_size306):
+            for _i310 in range(_size306):
               _elem311 = ColumnStatisticsObj()
               _elem311.read(iprot)
               _val305.append(_elem311)
@@ -5780,7 +5782,7 @@ class PartitionsStatsResult(object):
     if self.partStats is not None:
       oprot.writeFieldBegin('partStats', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.LIST, len(self.partStats))
-      for kiter312,viter313 in self.partStats.items():
+      for kiter312,viter313 in list(self.partStats.items()):
         oprot.writeString(kiter312)
         oprot.writeListBegin(TType.STRUCT, len(viter313))
         for iter314 in viter313:
@@ -5804,7 +5806,7 @@ class PartitionsStatsResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5856,7 +5858,7 @@ class TableStatsRequest(object):
         if ftype == TType.LIST:
           self.colNames = []
           (_etype318, _size315) = iprot.readListBegin()
-          for _i319 in xrange(_size315):
+          for _i319 in range(_size315):
             _elem320 = iprot.readString()
             self.colNames.append(_elem320)
           iprot.readListEnd()
@@ -5909,7 +5911,7 @@ class TableStatsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5964,7 +5966,7 @@ class PartitionsStatsRequest(object):
         if ftype == TType.LIST:
           self.colNames = []
           (_etype325, _size322) = iprot.readListBegin()
-          for _i326 in xrange(_size322):
+          for _i326 in range(_size322):
             _elem327 = iprot.readString()
             self.colNames.append(_elem327)
           iprot.readListEnd()
@@ -5974,7 +5976,7 @@ class PartitionsStatsRequest(object):
         if ftype == TType.LIST:
           self.partNames = []
           (_etype331, _size328) = iprot.readListBegin()
-          for _i332 in xrange(_size328):
+          for _i332 in range(_size328):
             _elem333 = iprot.readString()
             self.partNames.append(_elem333)
           iprot.readListEnd()
@@ -6037,7 +6039,7 @@ class PartitionsStatsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6073,7 +6075,7 @@ class AddPartitionsResult(object):
         if ftype == TType.LIST:
           self.partitions = []
           (_etype339, _size336) = iprot.readListBegin()
-          for _i340 in xrange(_size336):
+          for _i340 in range(_size336):
             _elem341 = Partition()
             _elem341.read(iprot)
             self.partitions.append(_elem341)
@@ -6111,7 +6113,7 @@ class AddPartitionsResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6169,7 +6171,7 @@ class AddPartitionsRequest(object):
         if ftype == TType.LIST:
           self.parts = []
           (_etype346, _size343) = iprot.readListBegin()
-          for _i347 in xrange(_size343):
+          for _i347 in range(_size343):
             _elem348 = Partition()
             _elem348.read(iprot)
             self.parts.append(_elem348)
@@ -6245,7 +6247,7 @@ class AddPartitionsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6281,7 +6283,7 @@ class DropPartitionsResult(object):
         if ftype == TType.LIST:
           self.partitions = []
           (_etype353, _size350) = iprot.readListBegin()
-          for _i354 in xrange(_size350):
+          for _i354 in range(_size350):
             _elem355 = Partition()
             _elem355.read(iprot)
             self.partitions.append(_elem355)
@@ -6319,7 +6321,7 @@ class DropPartitionsResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6399,7 +6401,7 @@ class DropPartitionsExpr(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6438,7 +6440,7 @@ class RequestPartsSpec(object):
         if ftype == TType.LIST:
           self.names = []
           (_etype360, _size357) = iprot.readListBegin()
-          for _i361 in xrange(_size357):
+          for _i361 in range(_size357):
             _elem362 = iprot.readString()
             self.names.append(_elem362)
           iprot.readListEnd()
@@ -6448,7 +6450,7 @@ class RequestPartsSpec(object):
         if ftype == TType.LIST:
           self.exprs = []
           (_etype366, _size363) = iprot.readListBegin()
-          for _i367 in xrange(_size363):
+          for _i367 in range(_size363):
             _elem368 = DropPartitionsExpr()
             _elem368.read(iprot)
             self.exprs.append(_elem368)
@@ -6494,7 +6496,7 @@ class RequestPartsSpec(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6658,7 +6660,7 @@ class DropPartitionsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6736,7 +6738,7 @@ class ResourceUri(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6828,7 +6830,7 @@ class Function(object):
         if ftype == TType.LIST:
           self.resourceUris = []
           (_etype374, _size371) = iprot.readListBegin()
-          for _i375 in xrange(_size371):
+          for _i375 in range(_size371):
             _elem376 = ResourceUri()
             _elem376.read(iprot)
             self.resourceUris.append(_elem376)
@@ -6901,7 +6903,7 @@ class Function(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7013,7 +7015,7 @@ class TxnInfo(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7057,7 +7059,7 @@ class GetOpenTxnsInfoResponse(object):
         if ftype == TType.LIST:
           self.open_txns = []
           (_etype381, _size378) = iprot.readListBegin()
-          for _i382 in xrange(_size378):
+          for _i382 in range(_size378):
             _elem383 = TxnInfo()
             _elem383.read(iprot)
             self.open_txns.append(_elem383)
@@ -7104,7 +7106,7 @@ class GetOpenTxnsInfoResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7148,7 +7150,7 @@ class GetOpenTxnsResponse(object):
         if ftype == TType.SET:
           self.open_txns = set()
           (_etype388, _size385) = iprot.readSetBegin()
-          for _i389 in xrange(_size385):
+          for _i389 in range(_size385):
             _elem390 = iprot.readI64()
             self.open_txns.add(_elem390)
           iprot.readSetEnd()
@@ -7194,7 +7196,7 @@ class GetOpenTxnsResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7291,7 +7293,7 @@ class OpenTxnRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7327,7 +7329,7 @@ class OpenTxnsResponse(object):
         if ftype == TType.LIST:
           self.txn_ids = []
           (_etype395, _size392) = iprot.readListBegin()
-          for _i396 in xrange(_size392):
+          for _i396 in range(_size392):
             _elem397 = iprot.readI64()
             self.txn_ids.append(_elem397)
           iprot.readListEnd()
@@ -7366,7 +7368,7 @@ class OpenTxnsResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7433,7 +7435,7 @@ class AbortTxnRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7500,7 +7502,7 @@ class CommitTxnRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7623,7 +7625,7 @@ class LockComponent(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7668,7 +7670,7 @@ class LockRequest(object):
         if ftype == TType.LIST:
           self.component = []
           (_etype402, _size399) = iprot.readListBegin()
-          for _i403 in xrange(_size399):
+          for _i403 in range(_size399):
             _elem404 = LockComponent()
             _elem404.read(iprot)
             self.component.append(_elem404)
@@ -7742,7 +7744,7 @@ class LockRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7824,7 +7826,7 @@ class LockResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7891,7 +7893,7 @@ class CheckLockRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -7958,7 +7960,7 @@ class UnlockRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8004,7 +8006,7 @@ class ShowLocksRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8213,7 +8215,7 @@ class ShowLocksResponseElement(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8249,7 +8251,7 @@ class ShowLocksResponse(object):
         if ftype == TType.LIST:
           self.locks = []
           (_etype409, _size406) = iprot.readListBegin()
-          for _i410 in xrange(_size406):
+          for _i410 in range(_size406):
             _elem411 = ShowLocksResponseElement()
             _elem411.read(iprot)
             self.locks.append(_elem411)
@@ -8287,7 +8289,7 @@ class ShowLocksResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8365,7 +8367,7 @@ class HeartbeatRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8447,7 +8449,7 @@ class HeartbeatTxnRangeRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8486,7 +8488,7 @@ class HeartbeatTxnRangeResponse(object):
         if ftype == TType.SET:
           self.aborted = set()
           (_etype416, _size413) = iprot.readSetBegin()
-          for _i417 in xrange(_size413):
+          for _i417 in range(_size413):
             _elem418 = iprot.readI64()
             self.aborted.add(_elem418)
           iprot.readSetEnd()
@@ -8496,7 +8498,7 @@ class HeartbeatTxnRangeResponse(object):
         if ftype == TType.SET:
           self.nosuch = set()
           (_etype422, _size419) = iprot.readSetBegin()
-          for _i423 in xrange(_size419):
+          for _i423 in range(_size419):
             _elem424 = iprot.readI64()
             self.nosuch.add(_elem424)
           iprot.readSetEnd()
@@ -8545,7 +8547,7 @@ class HeartbeatTxnRangeResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8668,7 +8670,7 @@ class CompactionRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8714,7 +8716,7 @@ class ShowCompactRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8878,7 +8880,7 @@ class ShowCompactResponseElement(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -8914,7 +8916,7 @@ class ShowCompactResponse(object):
         if ftype == TType.LIST:
           self.compacts = []
           (_etype430, _size427) = iprot.readListBegin()
-          for _i431 in xrange(_size427):
+          for _i431 in range(_size427):
             _elem432 = ShowCompactResponseElement()
             _elem432.read(iprot)
             self.compacts.append(_elem432)
@@ -8954,7 +8956,7 @@ class ShowCompactResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9014,7 +9016,7 @@ class AddDynamicPartitions(object):
         if ftype == TType.LIST:
           self.partitionnames = []
           (_etype437, _size434) = iprot.readListBegin()
-          for _i438 in xrange(_size434):
+          for _i438 in range(_size434):
             _elem439 = iprot.readString()
             self.partitionnames.append(_elem439)
           iprot.readListEnd()
@@ -9074,7 +9076,7 @@ class AddDynamicPartitions(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9154,7 +9156,7 @@ class NotificationEventRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9292,7 +9294,7 @@ class NotificationEvent(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9328,7 +9330,7 @@ class NotificationEventResponse(object):
         if ftype == TType.LIST:
           self.events = []
           (_etype444, _size441) = iprot.readListBegin()
-          for _i445 in xrange(_size441):
+          for _i445 in range(_size441):
             _elem446 = NotificationEvent()
             _elem446.read(iprot)
             self.events.append(_elem446)
@@ -9368,7 +9370,7 @@ class NotificationEventResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9435,7 +9437,7 @@ class CurrentNotificationEventId(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9471,7 +9473,7 @@ class InsertEventRequestData(object):
         if ftype == TType.LIST:
           self.filesAdded = []
           (_etype451, _size448) = iprot.readListBegin()
-          for _i452 in xrange(_size448):
+          for _i452 in range(_size448):
             _elem453 = iprot.readString()
             self.filesAdded.append(_elem453)
           iprot.readListEnd()
@@ -9510,7 +9512,7 @@ class InsertEventRequestData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9576,7 +9578,7 @@ class FireEventRequestData(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9645,7 +9647,7 @@ class FireEventRequest(object):
         if ftype == TType.LIST:
           self.partitionVals = []
           (_etype458, _size455) = iprot.readListBegin()
-          for _i459 in xrange(_size455):
+          for _i459 in range(_size455):
             _elem460 = iprot.readString()
             self.partitionVals.append(_elem460)
           iprot.readListEnd()
@@ -9706,7 +9708,7 @@ class FireEventRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9752,7 +9754,7 @@ class FireEventResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9830,7 +9832,7 @@ class MetadataPpdResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9869,7 +9871,7 @@ class GetFileMetadataByExprResult(object):
         if ftype == TType.MAP:
           self.metadata = {}
           (_ktype463, _vtype464, _size462 ) = iprot.readMapBegin()
-          for _i466 in xrange(_size462):
+          for _i466 in range(_size462):
             _key467 = iprot.readI64()
             _val468 = MetadataPpdResult()
             _val468.read(iprot)
@@ -9895,7 +9897,7 @@ class GetFileMetadataByExprResult(object):
     if self.metadata is not None:
       oprot.writeFieldBegin('metadata', TType.MAP, 1)
       oprot.writeMapBegin(TType.I64, TType.STRUCT, len(self.metadata))
-      for kiter469,viter470 in self.metadata.items():
+      for kiter469,viter470 in list(self.metadata.items()):
         oprot.writeI64(kiter469)
         viter470.write(oprot)
       oprot.writeMapEnd()
@@ -9923,7 +9925,7 @@ class GetFileMetadataByExprResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -9968,7 +9970,7 @@ class GetFileMetadataByExprRequest(object):
         if ftype == TType.LIST:
           self.fileIds = []
           (_etype474, _size471) = iprot.readListBegin()
-          for _i475 in xrange(_size471):
+          for _i475 in range(_size471):
             _elem476 = iprot.readI64()
             self.fileIds.append(_elem476)
           iprot.readListEnd()
@@ -10039,7 +10041,7 @@ class GetFileMetadataByExprRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10078,7 +10080,7 @@ class GetFileMetadataResult(object):
         if ftype == TType.MAP:
           self.metadata = {}
           (_ktype479, _vtype480, _size478 ) = iprot.readMapBegin()
-          for _i482 in xrange(_size478):
+          for _i482 in range(_size478):
             _key483 = iprot.readI64()
             _val484 = iprot.readString()
             self.metadata[_key483] = _val484
@@ -10103,7 +10105,7 @@ class GetFileMetadataResult(object):
     if self.metadata is not None:
       oprot.writeFieldBegin('metadata', TType.MAP, 1)
       oprot.writeMapBegin(TType.I64, TType.STRING, len(self.metadata))
-      for kiter485,viter486 in self.metadata.items():
+      for kiter485,viter486 in list(self.metadata.items()):
         oprot.writeI64(kiter485)
         oprot.writeString(viter486)
       oprot.writeMapEnd()
@@ -10131,7 +10133,7 @@ class GetFileMetadataResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10167,7 +10169,7 @@ class GetFileMetadataRequest(object):
         if ftype == TType.LIST:
           self.fileIds = []
           (_etype490, _size487) = iprot.readListBegin()
-          for _i491 in xrange(_size487):
+          for _i491 in range(_size487):
             _elem492 = iprot.readI64()
             self.fileIds.append(_elem492)
           iprot.readListEnd()
@@ -10206,7 +10208,7 @@ class GetFileMetadataRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10252,7 +10254,7 @@ class PutFileMetadataResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10291,7 +10293,7 @@ class PutFileMetadataRequest(object):
         if ftype == TType.LIST:
           self.fileIds = []
           (_etype497, _size494) = iprot.readListBegin()
-          for _i498 in xrange(_size494):
+          for _i498 in range(_size494):
             _elem499 = iprot.readI64()
             self.fileIds.append(_elem499)
           iprot.readListEnd()
@@ -10301,7 +10303,7 @@ class PutFileMetadataRequest(object):
         if ftype == TType.LIST:
           self.metadata = []
           (_etype503, _size500) = iprot.readListBegin()
-          for _i504 in xrange(_size500):
+          for _i504 in range(_size500):
             _elem505 = iprot.readString()
             self.metadata.append(_elem505)
           iprot.readListEnd()
@@ -10350,7 +10352,7 @@ class PutFileMetadataRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10396,7 +10398,7 @@ class ClearFileMetadataResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10432,7 +10434,7 @@ class ClearFileMetadataRequest(object):
         if ftype == TType.LIST:
           self.fileIds = []
           (_etype511, _size508) = iprot.readListBegin()
-          for _i512 in xrange(_size508):
+          for _i512 in range(_size508):
             _elem513 = iprot.readI64()
             self.fileIds.append(_elem513)
           iprot.readListEnd()
@@ -10471,7 +10473,7 @@ class ClearFileMetadataRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10507,7 +10509,7 @@ class GetAllFunctionsResponse(object):
         if ftype == TType.LIST:
           self.functions = []
           (_etype518, _size515) = iprot.readListBegin()
-          for _i519 in xrange(_size515):
+          for _i519 in range(_size515):
             _elem520 = Function()
             _elem520.read(iprot)
             self.functions.append(_elem520)
@@ -10545,7 +10547,7 @@ class GetAllFunctionsResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10655,7 +10657,7 @@ class TableMeta(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10723,7 +10725,7 @@ class MetaException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10791,7 +10793,7 @@ class UnknownTableException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10859,7 +10861,7 @@ class UnknownDBException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10927,7 +10929,7 @@ class AlreadyExistsException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -10995,7 +10997,7 @@ class InvalidPartitionException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11063,7 +11065,7 @@ class UnknownPartitionException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11131,7 +11133,7 @@ class InvalidObjectException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11199,7 +11201,7 @@ class NoSuchObjectException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11267,7 +11269,7 @@ class IndexAlreadyExistsException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11335,7 +11337,7 @@ class InvalidOperationException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11403,7 +11405,7 @@ class ConfigValSecurityException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11471,7 +11473,7 @@ class InvalidInputException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11539,7 +11541,7 @@ class NoSuchTxnException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11607,7 +11609,7 @@ class TxnAbortedException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11675,7 +11677,7 @@ class TxnOpenException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -11743,7 +11745,7 @@ class NoSuchLockException(TException):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):

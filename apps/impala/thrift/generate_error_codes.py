@@ -21,6 +21,7 @@
 #
 # TODO Add support for SQL Error Codes
 #      https://msdn.microsoft.com/en-us/library/ms714687%28v=vs.85%29.aspx
+from __future__ import print_function
 error_codes = (
   ("OK", 1, ""),
 
@@ -260,11 +261,11 @@ fid = open(target_file, "w+")
 try:
   fid.write(preamble)
   fid.write("""\nenum TErrorCode {\n""")
-  fid.write(",\n".join(map(lambda x: "  %s" % x[0], error_codes)))
+  fid.write(",\n".join(["  %s" % x[0] for x in error_codes]))
   fid.write("\n}")
   fid.write("\n")
   fid.write("const list<string> TErrorMessage = [\n")
-  fid.write(",\n".join(map(lambda x: "  // %s\n  \"%s\"" %(x[0], x[2]), error_codes)))
+  fid.write(",\n".join(["  // %s\n  \"%s\"" %(x[0], x[2]) for x in error_codes]))
   fid.write("\n]")
 finally:
   fid.close()

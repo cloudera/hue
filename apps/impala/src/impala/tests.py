@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 import re
@@ -47,7 +48,7 @@ from impala.dbms import ImpalaDbms
 LOG = logging.getLogger(__name__)
 
 
-class MockDbms:
+class MockDbms(object):
 
   def get_databases(self):
     return ['db1', 'db2']
@@ -56,7 +57,7 @@ class MockDbms:
     return ['table1', 'table2']
 
 
-class TestMockedImpala:
+class TestMockedImpala(object):
 
   def setUp(self):
     self.client = make_logged_in_client()
@@ -105,7 +106,7 @@ class TestMockedImpala:
         impala_query.delete()
 
 
-class TestImpalaIntegration:
+class TestImpalaIntegration(object):
 
   @classmethod
   def setup_class(cls):
@@ -473,7 +474,7 @@ def test_ssl_validate():
         reset()
 
 
-class TestImpalaDbms():
+class TestImpalaDbms(object):
 
   def test_get_impala_nested_select(self):
     assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))

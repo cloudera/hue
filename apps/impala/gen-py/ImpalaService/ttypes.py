@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 import ExecStats.ttypes
 import Status.ttypes
@@ -151,7 +153,7 @@ class TInsertResult(object):
         if ftype == TType.MAP:
           self.rows_appended = {}
           (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _key5 = iprot.readString()
             _val6 = iprot.readI64()
             self.rows_appended[_key5] = _val6
@@ -171,7 +173,7 @@ class TInsertResult(object):
     if self.rows_appended is not None:
       oprot.writeFieldBegin('rows_appended', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.I64, len(self.rows_appended))
-      for kiter7,viter8 in self.rows_appended.items():
+      for kiter7,viter8 in list(self.rows_appended.items()):
         oprot.writeString(kiter7)
         oprot.writeI64(viter8)
       oprot.writeMapEnd()
@@ -192,7 +194,7 @@ class TInsertResult(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -257,7 +259,7 @@ class TPingImpalaServiceResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -339,7 +341,7 @@ class TResetTableReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -419,7 +421,7 @@ class TGetExecSummaryReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -501,7 +503,7 @@ class TGetExecSummaryResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -581,7 +583,7 @@ class TGetRuntimeProfileReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -662,7 +664,7 @@ class TGetRuntimeProfileResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):

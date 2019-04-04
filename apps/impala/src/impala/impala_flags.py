@@ -82,10 +82,10 @@ def _parse_impala_flags():
   try:
     impala_flags_path = os.path.join(conf.IMPALA_CONF_DIR.get(), 'impalad_flags')
     _IMPALA_FLAGS = dict(line.strip().split('=', 1) for line in open(impala_flags_path) if '=' in line)
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (impala_flags_path, err))
     _IMPALA_FLAGS = {}
-  except Exception, ex:
+  except Exception as ex:
     LOG.error('Failed to parse Impala config from "%s": %s' % (impala_flags_path, ex))
     _IMPALA_FLAGS = {}
