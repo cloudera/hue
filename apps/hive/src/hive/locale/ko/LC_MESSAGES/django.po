@@ -1,0 +1,140 @@
+# Korean translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/impala/api.py:50
+msgid "Successfully invalidated metadata"
+msgstr "메타데이터를 성공적으로 무효화함"
+
+#: src/impala/api.py:64
+#, python-format
+msgid "Successfully refreshed metadata for `%s`.`%s`"
+msgstr "`%s`.`%s`에 대한 메타데이터를 성공적으로 새로 고침"
+
+#: src/impala/api.py:79
+msgid "get_exec_summary requires a valid query_history_id"
+msgstr "get_exec_summary에 올바른 query_history_id가 필요함"
+
+#: src/impala/api.py:101
+msgid "get_runtime_profile requires a valid query_history_id"
+msgstr "get_runtime_profile에 올바른 query_history_id가 필요함"
+
+#: src/impala/conf.py:39
+msgid "Host of the Impala Server."
+msgstr "Impala 서버의 호스트입니다."
+
+#: src/impala/conf.py:44
+msgid "Port of the Impala Server."
+msgstr "Impala 서버의 포트입니다."
+
+#: src/impala/conf.py:50
+msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+msgstr "Impala의 Kerberos 원칙 이름입니다. 일반적으로 'impala/hostname.foo.com'입니다."
+
+#: src/impala/conf.py:56
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr "Impala와 통신할 때 가장 메커니즘을 켭니다/끕니다."
+
+#: src/impala/conf.py:62
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+"첫 행 다운로드를 위한 다시 가져오기를 지원하기 위해 Impala에 캐시하도록 요청하는 resultset의 첫 행 수입니다. 이 "
+"옵션 및 이전 버전과의 호환성을 사용하지 않으려면 0으로 설정합니다."
+
+#: src/impala/conf.py:72
+msgid "Timeout in seconds for Thrift calls."
+msgstr "Thrift 호출의 제한 시간(단위: 초)입니다."
+
+#: src/impala/conf.py:76
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+"사용자가 편집기 페이지를 나가면 Hue가 Impala 쿼리를 닫습니다. 이렇게 하면 Impala의 모든 쿼리 리소스가 비워지지만 "
+"해당 결과에 액세스할 수 없게 됩니다."
+
+#: src/impala/conf.py:84
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"QUERY_TIMEOUT_S > 0일 경우 Impala가 QUERY_TIMEOUT_S초 이내에 해당 쿼리에 대해 아무 작업(계산 "
+"또는 결과 다시 전송)도 하지 않으면 시간이 초과됩니다(예: 취소됨)."
+
+#: src/impala/conf.py:92
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within SESSION_TIMEOUT_S seconds. Default: 30 min."
+msgstr ""
+"SESSION_TIMEOUT_S > 0일 경우 Impala가 SESSION_TIMEOUT_S초 이내에 "
+"해당 세션에 대해 아무 작업(계산 또는 결과 다시 전송)도 하지 않으면 "
+"세션 시간이 초과됩니다(즉, 취소됨). 기본값: 30분."
+
+#: src/impala/conf.py:102
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
+msgstr "사용자에게 설정 권한이 있는 쉼표로 구분된 화이트리스트 포함 Impala 구성 속성 목록입니다."
+
+#: src/impala/conf.py:107
+msgid "Impala configuration directory, where impala_flags is located."
+msgstr "impala_flags가 위치한 Impala 구성 디렉토리입니다."
+
+#: src/impala/conf.py:113
+msgid "SSL configuration for the server."
+msgstr "서버에 대한 SSL 구성입니다."
+
+#: src/impala/conf.py:117
+msgid "SSL communication enabled for this server."
+msgstr "이 서버에 대해 SSL 통신이 설정되었습니다."
+
+#: src/impala/conf.py:124
+msgid "Path to Certificate Authority certificates."
+msgstr "인증 기관 인증서에 대한 경로입니다."
+
+#: src/impala/conf.py:131
+msgid "Path to the private key file, e.g. /etc/hue/key.pem"
+msgstr "개인 키 파일에 대한 경로(예: /etc/hue/key.pem)"
+
+#: src/impala/conf.py:138
+msgid "Path to the public certificate file, e.g. /etc/hue/cert.pem"
+msgstr "공용 인증서 파일에 대한 경로(예: /etc/hue/cert.pem)"
+
+#: src/impala/conf.py:145
+msgid "Choose whether Hue should validate certificates received from the server."
+msgstr "서버에서 받은 인증서의 유효성을 Hue에서 검사할 것인지 선택합니다."
+
+#: src/impala/conf.py:158
+msgid "Auth username of the hue user used for authentications."
+msgstr "인증에 사용된 Hue 사용자의 인증 사용자 이름입니다."
+
+#: src/impala/conf.py:172
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr "인증에 사용된 Hue 사용자의 LDAP/PAM/.. 암호입니다."
+
+#: src/impala/conf.py:178
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr "인증 암호를 생성하려면 이 스크립트를 실행합니다. `auth_password`가 설정되지 않은 경우 사용합니다."
