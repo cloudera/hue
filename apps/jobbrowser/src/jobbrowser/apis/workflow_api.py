@@ -33,7 +33,7 @@ try:
   from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json, \
       has_job_edition_permission
   has_oozie_installed = True
-except Exception, e:
+except Exception as e:
   LOG.warn('Some applications are not enabled for Job Browser v2: %s' % e)
   has_oozie_installed = False
 
@@ -128,7 +128,7 @@ class WorkflowApi(Api):
       workflow = oozie_api.get_job(jobid=appid)
       return {
         'properties': workflow.conf_dict,
-        'properties_display': [{'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.iteritems()],
+        'properties_display': [{'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.items()],
       }
 
     return {}
@@ -146,7 +146,7 @@ class WorkflowApi(Api):
   def _get_variables(self, workflow):
     parameters = []
 
-    for var, val in workflow.conf_dict.iteritems():
+    for var, val in workflow.conf_dict.items():
       if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path':
         link = ''
         if is_linkable(var, val):
@@ -174,7 +174,7 @@ class WorkflowActionApi(Api):
     common['properties']['conf'] = properties.pop('conf')
     common['properties']['externalId'] = properties.get('externalId', '')
     common['properties']['externalChildIDs'] = properties.get('externalChildIDs') and properties.pop('externalChildIDs').split(',')
-    common['properties']['properties'] = [{'name': key, 'value': val} for key, val in properties.iteritems()]
+    common['properties']['properties'] = [{'name': key, 'value': val} for key, val in properties.items()]
 
     common['properties']['workflow_id'] = appid.split('@', 1)[0]
 

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from datetime import datetime, timedelta
@@ -104,11 +105,10 @@ class YarnApi(JobBrowserApi):
 
     if kwargs['text']:
       text = kwargs['text'].lower()
-      jobs = filter(lambda job:
-                    text in job.name.lower() or
+      jobs = [job for job in jobs if text in job.name.lower() or
                     text in job.id.lower() or
                     text in job.user.lower() or
-                    text in job.queue.lower(), jobs)
+                    text in job.queue.lower()]
 
     return self.filter_jobs(user, jobs)
 
@@ -126,10 +126,9 @@ class YarnApi(JobBrowserApi):
   def filter_jobs(self, user, jobs, **kwargs):
     check_permission = not SHARE_JOBS.get() and not is_admin(user)
 
-    return filter(lambda job:
-                  not check_permission or
+    return [job for job in jobs if not check_permission or
                   is_admin(user) or
-                  job.user == user.username, jobs)
+                  job.user == user.username]
 
 
   def _get_job_from_history_server(self, job_id):
@@ -166,20 +165,20 @@ class YarnApi(JobBrowserApi):
           job = SparkJob(app, rm_api=self.resource_manager_api, hs_api=self.spark_history_server_api)
         else:
           job = Application(app, self.resource_manager_api)
-    except RestException, e:
+    except RestException as e:
       if e.code == 404:  # Job not found in RM so attempt to find job in JHS
         job = self._get_job_from_history_server(job_id)
       else:
         LOG.error("Job %s has expired: %s" % (app_id, e))
         raise JobExpired(app_id)
-    except PopupException, e:
+    except PopupException as e:
       if 'NotFoundException' in e.message:
         job = self._get_job_from_history_server(job_id)
       else:
         raise e
-    except ApplicationNotRunning, e:
+    except ApplicationNotRunning as e:
       raise e
-    except Exception, e:
+    except Exception as e:
       raise PopupException('Job %s could not be found: %s' % (jobid, e), detail=e)
 
     return job
@@ -190,11 +189,11 @@ class YarnApi(JobBrowserApi):
 
     try:
       app = self.resource_manager_api.app(app_id)['app']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(_('Job %s could not be found in Resource Manager: %s') % (jobid, e), detail=e)
-    except ApplicationNotRunning, e:
+    except ApplicationNotRunning as e:
       raise PopupException(_('Application is not running: %s') % e, detail=e)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('Job %s could not be found: %s') % (jobid, e), detail=e)
 
     return app

@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
   from oozie.views.dashboard import get_oozie_job_log, massaged_oozie_jobs_for_json, list_oozie_bundle
-except Exception, e:
+except Exception as e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 

@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from builtins import str
+from past.utils import old_div
+from builtins import object
 import datetime
 import logging
 import functools
@@ -106,6 +110,6 @@ def format_unixtime_ms(unixtime):
   Format a unix timestamp in ms to a human readable string
   """
   if unixtime:
-    return str(datetime.datetime.fromtimestamp(unixtime/1000).strftime("%x %X %Z"))
+    return str(datetime.datetime.fromtimestamp(old_div(unixtime,1000)).strftime("%x %X %Z"))
   else:
     return ""

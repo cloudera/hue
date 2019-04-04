@@ -15,15 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from builtins import filter
+from builtins import str
 import logging
 import re
 import string
 import time
-import urllib2
-import urlparse
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 
 from lxml import html
-from urllib import quote_plus
+from urllib.parse import quote_plus
 
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
@@ -72,7 +77,7 @@ def check_job_permission(view_func):
     jobid = kwargs['job']
     try:
       job = get_job(request, job_id=jobid)
-    except ApplicationNotRunning, e:
+    except ApplicationNotRunning as e:
       LOG.warn('Job %s has not yet been accepted by the RM, will poll for status.' % jobid)
       return job_not_assigned(request, jobid, request.path)
 
@@ -88,15 +93,15 @@ def check_job_permission(view_func):
 def get_job(request, job_id):
   try:
     job = get_api(request.user, request.jt).get_job(jobid=job_id)
-  except ApplicationNotRunning, e:
+  except ApplicationNotRunning as e:
     if e.job.get('state', '').lower() == 'accepted':
       rm_api = resource_manager_api.get_resource_manager(request.user)
       job = Application(e.job, rm_api)
     else:
       raise e  # Job has not yet been accepted by RM
-  except JobExpired, e:
+  except JobExpired as e:
     raise PopupException(_('Job %s has expired.') % job_id, detail=_('Cannot be found on the History Server.'))
-  except Exception, e:
+  except Exception as e:
     msg = 'Could not find job %s.'
     LOG.exception(msg % job_id)
     raise PopupException(_(msg) % job_id, detail=e)
@@ -118,9 +123,9 @@ def job_not_assigned(request, jobid, path):
     try:
       get_api(request.user, request.jt).get_job(jobid=jobid)
       result['status'] = 0
-    except ApplicationNotRunning, e:
+    except ApplicationNotRunning as e:
       result['status'] = 1
-    except Exception, e:
+    except Exception as e:
       result['message'] = _('Error polling job %s: %s') % (jobid, e)
 
     return JsonResponse(result, encoder=JSONEncoderForHTML)
@@ -149,7 +154,7 @@ def jobs(request):
           time_value=int(time_value),
           time_unit=time_unit
       )
-    except Exception, ex:
+    except Exception as ex:
       ex_message = str(ex)
       if 'Connection refused' in ex_message or 'standby RM' in ex_message:
         raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
@@ -287,7 +292,7 @@ def kill_job(request, job):
 
   try:
     job.kill()
-  except Exception, e:
+  except Exception as e:
     LOG.exception('Killing job')
     raise PopupException(e)
 
@@ -297,7 +302,7 @@ def kill_job(request, job):
   while time.time() - cur_time < 15:
     try:
       job = api.get_job(jobid=job.jobId)
-    except Exception, e:
+    except Exception as e:
       LOG.warn('Failed to get job with ID %s: %s' % (job.jobId, e))
     else:
       if job.status not in ["RUNNING", "QUEUED"]:
@@ -320,7 +325,7 @@ def job_executor_logs(request, job, attempt_index=0, name='syslog', offset=LOG_O
       log = job.history_server_api.download_executors_logs(request, job, name, offset)
     response['status'] = 0
     response['log'] = LinkJobLogs._make_hdfs_links(log)
-  except Exception, e:
+  except Exception as e:
     response['log'] = _('Failed to retrieve executor log: %s' % e)
 
   return JsonResponse(response)
@@ -360,9 +365,9 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
         log_link = app['amContainerLogs']
     elif app.get('amContainerLogs'):
       log_link = app.get('amContainerLogs')
-  except (KeyError, RestException), e:
+  except (KeyError, RestException) as e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
-  except Exception, e:
+  except Exception as e:
     raise Exception(_("Failed to get application for job %s: %s") % (job.jobId, e))
 
   if log_link:
@@ -374,7 +379,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
     if offset != 0:
       params['start'] = offset
 
-    root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+    root = Resource(get_log_client(log_link), urllib.parse.urlsplit(log_link)[2], urlencode=False)
     api_resp = None
 
     try:
@@ -383,7 +388,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
       response['status'] = 0
       response['log'] = LinkJobLogs._make_hdfs_links(log, is_embeddable)
-    except Exception, e:
+    except Exception as e:
       response['log'] = _('Failed to retrieve log: %s' % e)
       try:
         debug_info = '\nLog Link: %s' % log_link
@@ -501,7 +506,7 @@ def single_task_attempt(request, job, taskid, attemptid):
 
   try:
     attempt = task.get_attempt(attemptid)
-  except (KeyError, RestException), e:
+  except (KeyError, RestException) as e:
     raise PopupException(_("Cannot find attempt '%(id)s' in task") % {'id': attemptid}, e)
 
   return render("attempt.mako", request, {
@@ -520,7 +525,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
 
   try:
     attempt = task.get_attempt(attemptid)
-  except (KeyError, RestException), e:
+  except (KeyError, RestException) as e:
     raise KeyError(_("Cannot find attempt '%(id)s' in task") % {'id': attemptid}, e)
 
   first_log_tab = 0
@@ -539,7 +544,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
     log_tab = [i for i, log in enumerate(logs) if log]
     if log_tab:
       first_log_tab = log_tab[0]
-  except urllib2.URLError:
+  except urllib.error.URLError:
     logs = [_("Failed to retrieve log. TaskTracker not ready.")] * 4
 
   context = {
@@ -603,7 +608,7 @@ def single_tracker(request, trackerid):
 
   try:
     tracker = jt.get_tracker(trackerid)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('The tracker could not be contacted.'), detail=e)
   return render("tasktracker.mako", request, {'tracker':tracker})
 
@@ -612,7 +617,7 @@ def container(request, node_manager_http_address, containerid):
 
   try:
     tracker = jt.get_tracker(node_manager_http_address, containerid)
-  except Exception, e:
+  except Exception as e:
     # TODO: add a redirect of some kind
     raise PopupException(_('The container disappears as soon as the job finishes.'), detail=e)
   return render("container.mako", request, {'tracker':tracker})
@@ -663,7 +668,7 @@ def make_substitutions(conf):
         s = s.replace(substr, sub(conf[g], depth+1))
     return s
 
-  for k, v in conf.items():
+  for k, v in list(conf.items()):
     conf[k] = sub(v)
   return conf
 
@@ -707,7 +712,7 @@ def get_state_link(request, option=None, val='', VALID_OPTIONS = ("state", "user
   if option is not None:
     states[option] = val
 
-  return "&".join([ "%s=%s" % (key, quote_plus(value)) for key, value in states.iteritems() ])
+  return "&".join([ "%s=%s" % (key, quote_plus(value)) for key, value in states.items() ])
 
 
 ## All Unused below
@@ -767,10 +772,10 @@ def jobbrowser(request):
 
   status = request.jt.cluster_status()
   alljobs = [] #get_matching_jobs(request)
-  runningjobs = filter(check_job_state('RUNNING'), alljobs)
-  completedjobs = filter(check_job_state('COMPLETED'), alljobs)
-  failedjobs = filter(check_job_state('FAILED'), alljobs)
-  killedjobs = filter(check_job_state('KILLED'), alljobs)
+  runningjobs = list(filter(check_job_state('RUNNING'), alljobs))
+  completedjobs = list(filter(check_job_state('COMPLETED'), alljobs))
+  failedjobs = list(filter(check_job_state('FAILED'), alljobs))
+  killedjobs = list(filter(check_job_state('KILLED'), alljobs))
   jobqueues = request.jt.queues()
 
   return render("jobbrowser.html", request, {

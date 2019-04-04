@@ -15,11 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.utils import old_div
+from builtins import object
 import logging
 import os
 import re
 import time
-import urlparse
+import urllib.parse
 
 from lxml import html
 
@@ -33,7 +39,7 @@ from desktop.lib.view_util import big_filesizeformat, format_duration_in_millis
 from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 
-from itertools import izip
+
 
 from jobbrowser.models import format_unixtime_ms
 
@@ -45,7 +51,7 @@ class Application(object):
 
   def __init__(self, attrs, rm_api=None):
     self.api = rm_api
-    for attr in attrs.keys():
+    for attr in list(attrs.keys()):
       setattr(self, attr, attrs[attr])
 
     self._fixup()
@@ -145,7 +151,7 @@ class SparkJob(Application):
         actual_url = actual_url.strip('/').replace('jobs', '')
       self.trackingUrl = actual_url
       LOG.debug("SparkJob tracking URL: %s" % self.trackingUrl)
-    except Exception, e:
+    except Exception as e:
       LOG.warn("Failed to resolve Spark Job's actual tracking URL: %s" % e)
     finally:
       if resp is not None:
@@ -155,7 +161,7 @@ class SparkJob(Application):
     response = None
     try:
       response = function(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.warn('Spark resolve tracking URL returned a failed response: %s' % e)
     return response
 
@@ -195,7 +201,7 @@ class SparkJob(Application):
             big_filesizeformat(e.get('totalShuffleWrite', 0)),
             e.get('executorLogs', '')
           ])
-    except Exception, e:
+    except Exception as e:
       LOG.error('Failed to get Spark Job executors: %s' % e)
       # Prevent a nosedive. Don't create metrics if api changes or url is unreachable.
 
@@ -206,7 +212,7 @@ class SparkJob(Application):
       headers = ['executor_id', 'address', 'rdd_blocks', 'storage_memory', 'disk_used', 'active_tasks', 'failed_tasks',
                  'complete_tasks', 'task_time', 'input', 'shuffle_read', 'shuffle_write', 'logs']
       for executor in executors:
-        executor_data = dict(izip(headers, executor))
+        executor_data = dict(zip(headers, executor))
         executor_data.update({'id': executor_data['executor_id'] + '_executor_' + self.jobId, 'type': 'SPARK_EXECUTOR'})
         executor_list.append(executor_data)
     return executor_list
@@ -217,7 +223,7 @@ class Job(object):
   def __init__(self, api, attrs):
     self.api = api
     self.is_mr2 = True
-    for attr in attrs.keys():
+    for attr in list(attrs.keys()):
       if attr == 'acls':
         # 'acls' are actually not available in the API
         LOG.warn('Not using attribute: %s' % attrs[attr])
@@ -246,7 +252,7 @@ class Job(object):
 
       if self.desiredReduces > 0:
         if self.progress is not None:
-          self.progress = int((self.progress + self.reduces_percent_complete) / 2)
+          self.progress = int(old_div((self.progress + self.reduces_percent_complete), 2))
         else:
           self.progress = self.reduces_percent_complete
 
@@ -304,7 +310,7 @@ class Job(object):
       try:
         conf = self.api.conf(self.id)
         self._full_job_conf = conf['conf']
-      except TypeError, e:
+      except TypeError as e:
         LOG.exception('YARN API call failed to return all the data: %s' % conf)
     return self._full_job_conf
 
@@ -312,7 +318,7 @@ class Job(object):
   def conf_keys(self):
     try:
       return dict([(line['name'], line['value']) for line in self.full_job_conf['property']])
-    except Exception, e:
+    except Exception as e:
       LOG.error('Failed to parse conf_keys from YARN job configuration.')
       return None
 
@@ -339,7 +345,7 @@ class Job(object):
 class YarnV2Job(Job):
   def __init__(self, api, attrs):
     self.api = api
-    for attr in attrs.keys():
+    for attr in list(attrs.keys()):
       if attr == 'acls':
         # 'acls' are actually not available in the API
         LOG.warn('Not using attribute: %s' % attrs[attr])
@@ -388,7 +394,7 @@ class YarnV2Job(Job):
     setattr(self, 'finishTime', finishTime)
 
     try:
-      setattr(self, 'assignedContainerId', urlparse.urlsplit(self.amContainerLogs).path.split('/node/containerlogs/')[1].split('/')[0])
+      setattr(self, 'assignedContainerId', urllib.parse.urlsplit(self.amContainerLogs).path.split('/node/containerlogs/')[1].split('/')[0])
     except Exception:
       setattr(self, 'assignedContainerId', '')
 
@@ -412,7 +418,7 @@ class YarnV2Job(Job):
     return self._job_attempts
 
 # There's are tasks for Oozie workflow so we create a dummy one.
-class YarnTask:
+class YarnTask(object):
   def __init__(self, job):
     self.job = job
 
@@ -458,12 +464,12 @@ class KilledJob(Job):
     return {'jobAttempt': []}
 
 
-class Task:
+class Task(object):
 
   def __init__(self, job, attrs):
     self.job = job
     if attrs:
-      for key, value in attrs.iteritems():
+      for key, value in attrs.items():
         setattr(self, key, value)
     self.is_mr2 = True
 
@@ -509,12 +515,12 @@ class Task:
     return Attempt(self, json)
 
 
-class Attempt:
+class Attempt(object):
 
   def __init__(self, task, attrs):
     self.task = task
     if attrs:
-      for key, value in attrs.iteritems():
+      for key, value in attrs.items():
         setattr(self, key, value)
     self.is_mr2 = True
     self._fixup()
@@ -607,11 +613,11 @@ class Attempt:
       'doAs': user
     }
     log_link = re.sub('job_[^/]+', str(self.id), log_link)
-    root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+    root = Resource(get_log_client(log_link), urllib.parse.urlsplit(log_link)[2], urlencode=False)
     response = root.get('/', params=params)
     links = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]//a/@href')
-    parsed_links = map(lambda x: urlparse.urlsplit(x), links)
-    return map(lambda x: x and len(x) >= 2 and x[2].split('/')[-2] or '', parsed_links)
+    parsed_links = [urllib.parse.urlsplit(x) for x in links]
+    return [x and len(x) >= 2 and x[2].split('/')[-2] or '' for x in parsed_links]
 
   def get_task_log(self, offset=0):
     logs = []
@@ -637,10 +643,10 @@ class Attempt:
       response = None
       try:
         log_link = re.sub('job_[^/]+', str(self.id), log_link)
-        root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+        root = Resource(get_log_client(log_link), urllib.parse.urlsplit(log_link)[2], urlencode=False)
         response = root.get(link, params=params)
         log = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
-      except Exception, e:
+      except Exception as e:
         log = _('Failed to retrieve log: %s' % e)
         try:
           debug_info = '\nLog Link: %s' % log_link
@@ -658,7 +664,7 @@ class YarnV2Attempt(Attempt):
   def __init__(self, task, attrs):
     self.task = task
     if attrs:
-      for key, value in attrs.iteritems():
+      for key, value in attrs.items():
         setattr(self, key, value)
     self.is_mr2 = True
     self._fixup()
@@ -684,11 +690,11 @@ class YarnV2Attempt(Attempt):
     setattr(self, 'status', 'RUNNING' if self.finishedTime == 0 else 'SUCCEEDED')
     setattr(self, 'properties', {})
 
-class Container:
+class Container(object):
 
   def __init__(self, attrs):
     if attrs:
-      for key, value in attrs['container'].iteritems():
+      for key, value in attrs['container'].items():
         setattr(self, key, value)
     self.is_mr2 = True
 
