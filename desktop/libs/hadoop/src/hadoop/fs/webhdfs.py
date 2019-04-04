@@ -544,6 +544,12 @@ class WebHdfs(Hdfs):
       token = self.get_delegation_token(self.user)
       if token:
         params['delegation'] = token
+        # doas should not be present with delegation token as the token includes the username
+        # https://hadoop.apache.org/docs/r1.0.4/webhdfs.html
+        if 'doas' in params:
+          del params['doas']
+        if 'user.name' in params:
+          del params['user.name']
     quoted_path = urllib.quote(smart_str(path))
     return self._client._make_url(quoted_path, params)
 
