@@ -1927,6 +1927,18 @@
     # Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable.
     ## query_history_upload_limit=10000
 
+  [[catalog]]
+    # The type of Catalog: Apache Atlas, Cloudera Navigator...
+    ## interface=atlas
+    # Catalog API URL (without version suffix).
+    ## api_url=http://localhost:21000/atlas/v2
+
+    # Username of the CM user used for authentication.
+    ## server_user=hue
+    # Password of the user used for authentication.
+    ## server_password=
+
+  # Deprecated by [[catalog]]
   [[navigator]]
     # Navigator API URL (without version suffix).
     ## api_url=http://localhost:7187/api

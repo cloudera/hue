@@ -32,7 +32,7 @@ from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.catalog.base import get_api
 from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
-from metadata.conf import has_catalog, NAVIGATOR, has_catalog_file_search
+from metadata.conf import has_catalog, CATALOG, has_catalog_file_search
 
 
 LOG = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ def search_entities_interactive(request):
   """
   For search autocomplete.
   """
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   query_s = json.loads(request.POST.get('query_s', ''))
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
@@ -107,7 +107,7 @@ def search_entities_interactive(request):
 
   if response.get('facets'): # Remove empty facets
     for fname, fvalues in response['facets'].items():
-      if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+      if CATALOG.APPLY_SENTRY_PERMISSIONS.get():
         fvalues = []
       else:
         fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
@@ -129,7 +129,7 @@ def search_entities(request):
   """
   For displaying results.
   """
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   query_s = json.loads(request.POST.get('query_s', ''))
   query_s = smart_str(query_s)
 
@@ -219,7 +219,7 @@ def _highlight_tags(record, term):
 
 @error_handler
 def list_tags(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 25)
@@ -240,7 +240,7 @@ def list_tags(request):
 def find_entity(request):
   response = {'status': -1}
 
-  interface = request.GET.get('interface', 'navigator')
+  interface = request.GET.get('interface', CATALOG.INTERFACE.get())
   entity_type = request.GET.get('type', '')
   database = request.GET.get('database', '')
   table = request.GET.get('table', '')
@@ -288,7 +288,7 @@ def find_entity(request):
 def suggest(request):
   response = {'status': -1}
 
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   prefix = request.POST.get('prefix')
 
   api = get_api(request=request, interface=interface)
@@ -305,7 +305,7 @@ def suggest(request):
 def get_entity(request):
   response = {'status': -1}
 
-  interface = request.GET.get('interface', 'navigator')
+  interface = request.GET.get('interface', CATALOG.INTERFACE.get())
   entity_id = request.GET.get('id')
 
   api = get_api(request=request, interface=interface)
@@ -324,7 +324,7 @@ def get_entity(request):
 @require_POST
 @error_handler
 def add_tags(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   entity_id = json.loads(request.POST.get('id', '""'))
   tags = json.loads(request.POST.get('tags', "[]"))
 
@@ -351,7 +351,7 @@ def add_tags(request):
 @require_POST
 @error_handler
 def delete_tags(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   entity_id = json.loads(request.POST.get('id', '""'))
   tags = json.loads(request.POST.get('tags', '[]'))
 
@@ -378,7 +378,7 @@ def delete_tags(request):
 @require_POST
 @error_handler
 def update_properties(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   entity_id = json.loads(request.POST.get('id', '""'))
   properties = json.loads(request.POST.get('properties', '{}')) # Entity properties
   modified_custom_metadata = json.loads(request.POST.get('modifiedCustomMetadata', '{}')) # Aka "Custom Metadata"
@@ -411,7 +411,7 @@ def update_properties(request):
 def delete_metadata_properties(request):
   response = {'status': -1}
 
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   entity_id = json.loads(request.POST.get('id', '""'))
   keys = json.loads(request.POST.get('keys', '[]'))
 
@@ -438,7 +438,7 @@ def delete_metadata_properties(request):
 def get_lineage(request):
   response = {'status': -1, 'inputs': [], 'source_query': '', 'target_queries': [], 'targets': []}
 
-  interface = request.GET.get('interface', 'navigator')
+  interface = request.GET.get('interface', CATALOG.INTERFACE.get())
   entity_id = request.GET.get('id')
 
   api = get_api(request=request, interface=interface)
@@ -470,7 +470,7 @@ def get_lineage(request):
 
 @error_handler
 def create_namespace(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   namespace = request.POST.get('namespace')
   description = request.POST.get('description')
 
@@ -489,7 +489,7 @@ def create_namespace(request):
 
 @error_handler
 def get_namespace(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   namespace = request.POST.get('namespace')
 
   api = get_api(request=request, interface=interface)
@@ -514,7 +514,7 @@ def create_namespace_property(request):
   "type" : "TEXT",
   "createdDate" : "2018-04-02T22:36:19.001Z"
 }"""
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   namespace = request.POST.get('namespace')
   properties = json.loads(request.POST.get('properties', '{}'))
 
@@ -532,7 +532,7 @@ def map_namespace_property(request):
   namespace: "huecatalog",
   name: "relatedEntities"
   }"""
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   clazz = request.POST.get('class')
   properties = json.loads(request.POST.get('properties', '[]'))
 
@@ -545,7 +545,7 @@ def map_namespace_property(request):
 
 @error_handler
 def get_model_properties_mapping(request):
-  interface = request.POST.get('interface', 'navigator')
+  interface = request.POST.get('interface', CATALOG.INTERFACE.get())
 
   api = get_api(request=request, interface=interface)
 
