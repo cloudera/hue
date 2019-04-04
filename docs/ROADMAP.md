@@ -11,9 +11,10 @@ High Level Roadmap
 * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
 * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
 * [x] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
-* [ ] Result caching
-* [ ] Editor v2
+* [ ] Result caching [HUE-8787](https://issues.cloudera.org/browse/HUE-8787)
+* [ ] Editor v2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768)
 * [ ] Integrate with Apache Ranger [HUE-8748](https://issues.cloudera.org/browse/HUE-8748)
+* [ ] Document sharing improvements [HUE-8790](https://issues.cloudera.org/browse/HUE-8790)
 * [ ] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)
 * [ ] Integrate with Apache Knox [HUE-8750](https://issues.cloudera.org/browse/HUE-8750)
 * [ ] SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
