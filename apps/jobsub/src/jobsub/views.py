@@ -25,6 +25,7 @@ to the cluster.  A parameterized, submitted job design
 is a "job submission".  Submissions can be "watched".
 """
 
+from builtins import str
 import logging
 import time as py_time
 
