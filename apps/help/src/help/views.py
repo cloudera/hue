@@ -15,20 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop import appmanager
 from hadoop.fs import LocalSubFileSystem
 
 import markdown
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import os
 
 INDEX_FILENAMES = ("index.md", "index.html", "index.txt")
 
 def _unquote_path(path):
   """Normalizes paths."""
-  return urllib.unquote(path)
+  return urllib.parse.unquote(path)
 
 def get_help_fs(app_name):
   """
@@ -65,7 +68,7 @@ def view(request, app, path):
     raise PopupException("Could not find or read the file: %s (app %s)" % (path, app))
 
   content = fs.open(path, 'r').read()
-  content = unicode(content, 'utf-8', errors='replace')
+  content = str(content, 'utf-8', errors='replace')
   if path.lower().endswith(".md"):
     content = ('<div class="print rendered-markdown">' +
                markdown.markdown(content, ['extra']) +
