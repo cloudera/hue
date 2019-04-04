@@ -15,11 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import object
 import logging
 import socket
 import re
 
-from StringIO import StringIO
+from io import StringIO
 LOG = logging.getLogger(__name__)
 
 class Session(object):
@@ -92,7 +96,7 @@ class ZooKeeperStats(object):
 	    s.send(cmd)
 	    data = s.recv(2048)
 	    s.close()
-        except Exception, e:
+        except Exception as e:
 	    LOG.error('Problem connecting to host %s, exception raised : %s' % (self._host, e))
         return data
 
@@ -162,7 +166,7 @@ class ZooKeeperStats(object):
 
     def _parse_line(self, line):
         try:
-            key, value = map(str.strip, line.split('\t'))
+            key, value = list(map(str.strip, line.split('\t')))
         except ValueError:
             raise ValueError('Found invalid line: %s' % line)
 

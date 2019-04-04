@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import object
 from nose.tools import assert_true, assert_equal
 
 

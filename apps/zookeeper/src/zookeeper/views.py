@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import map
 import json
 import logging
 
@@ -45,7 +46,7 @@ def _get_overview(host_ports):
   zstats = {}
 
   for host_port in host_ports.split(','):
-    host, port = map(str.strip, host_port.split(':'))
+    host, port = list(map(str.strip, host_port.split(':')))
 
     zks = stats.ZooKeeperStats(host, port)
     zstats[host_port] = zks.get_stats() or {}
@@ -55,7 +56,7 @@ def _get_overview(host_ports):
 
 def _group_stats_by_role(stats):
   leader, followers = None, []
-  for host, stats in stats.items():
+  for host, stats in list(stats.items()):
     stats['host'] = host
 
     if stats.get('zk_server_state') == 'leader' or stats.get('zk_server_state') == 'standalone':
@@ -70,7 +71,7 @@ def _group_stats_by_role(stats):
 def index(request):
   try:
     overview = _get_global_overview()
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('Could not correctly connect to Zookeeper.'), detail=e)
 
   return render('index.mako', request, {

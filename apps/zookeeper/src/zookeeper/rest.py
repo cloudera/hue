@@ -15,23 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import object
 import json
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 from contextlib import contextmanager
 from desktop.conf import REST_CONN_TIMEOUT
 
 
-class RequestWithMethod(urllib2.Request):
+class RequestWithMethod(urllib.request.Request):
     """ Request class that know how to set the method name """
     def __init__(self, *args, **kwargs):
-        urllib2.Request.__init__(self, *args, **kwargs)
+        urllib.request.Request.__init__(self, *args, **kwargs)
         self._method = None
 
     def get_method(self):
         return self._method or \
-            urllib2.Request.get_method(self)
+            urllib.request.Request.get_method(self)
 
     def set_method(self, method):
         self._method = method
@@ -100,7 +104,7 @@ class ZooKeeper(object):
         resp = self._do_get(url)
         for child in resp.get('children', []):
             yield child if not uris else resp['child_uri_template']\
-              .replace('{child}', urllib2.quote(child))
+              .replace('{child}', urllib.parse.quote(child))
 
     def create(self, path, data=None, sequence=False, ephemeral=False):
         """ Create a new node. By default this call creates a persistent znode.
@@ -120,8 +124,8 @@ class ZooKeeper(object):
             if self._session:
                 flags['session'] = self._session
             else:
-                raise ZooKeeper.Error, 'You need a session to create an ephemeral node'
-        flags = urllib.urlencode(flags)
+                raise ZooKeeper.Error('You need a session to create an ephemeral node')
+        flags = urllib.parse.urlencode(flags)
 
         url = "%s/znodes/v1%s?op=create&name=%s&%s" % (self._base, head, name, flags)
 
@@ -129,7 +133,7 @@ class ZooKeeper(object):
 
     def set(self, path, data=None, version=-1, null=False):
         """ Set the value of node """
-        url = "%s/znodes/v1%s?%s" % (self._base, path, urllib.urlencode({
+        url = "%s/znodes/v1%s?%s" % (self._base, path, urllib.parse.urlencode({
                 'version': version,
                 'null': 'true' if null else 'false'
         }))
@@ -138,16 +142,16 @@ class ZooKeeper(object):
     def delete(self, path, version=-1):
         """ Delete a znode """
         if type(path) is list:
-            map(lambda el: self.delete(el, version), path)
+            list(map(lambda el: self.delete(el, version), path))
             return
 
         url = '%s/znodes/v1%s?%s' % (self._base, path, \
-            urllib.urlencode({
+            urllib.parse.urlencode({
                 'version':version
         }))
         try:
             return self._do_delete(url)
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             if e.code == 412:
                 raise ZooKeeper.WrongVersion(path)
             elif e.code == 404:
@@ -172,16 +176,16 @@ class ZooKeeper(object):
     def _do_get(self, uri):
         """ Send a GET request and convert errors to exceptions """
         try:
-            req = urllib2.Request(uri)
+            req = urllib.request.Request(uri)
             req.add_header("Accept", "application/json");
-            r = urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get())
+            r = urllib.request.urlopen(req, timeout=REST_CONN_TIMEOUT.get())
             resp = json.load(r)
 
             if 'Error' in resp:
                raise ZooKeeper.Error(resp['Error'])
 
             return resp
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             if e.code == 404:
                 raise ZooKeeper.NotFound(uri)
             raise
@@ -189,17 +193,17 @@ class ZooKeeper(object):
     def _do_post(self, uri, data=None):
         """ Send a POST request and convert errors to exceptions """
         try:
-            req = urllib2.Request(uri, {})
+            req = urllib.request.Request(uri, {})
             req.add_header('Content-Type', 'application/octet-stream')
             if data is not None:
                 req.add_data(data)
 
-            resp = json.load(urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get()))
+            resp = json.load(urllib.request.urlopen(req, timeout=REST_CONN_TIMEOUT.get()))
             if 'Error' in resp:
                 raise ZooKeeper.Error(resp['Error'])
             return resp
 
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             if e.code == 201:
                 return True
             elif e.code == 409:
@@ -213,7 +217,7 @@ class ZooKeeper(object):
         req = RequestWithMethod(uri)
         req.set_method('DELETE')
         req.add_header('Content-Type', 'application/octet-stream')
-        return urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get()).read()
+        return urllib.request.urlopen(req, timeout=REST_CONN_TIMEOUT.get()).read()
 
     def _do_put(self, uri, data):
         """ Send a PUT request """
@@ -224,8 +228,8 @@ class ZooKeeper(object):
             if data is not None:
                 req.add_data(data)
 
-            return urllib2.urlopen(req, timeout=REST_CONN_TIMEOUT.get()).read()
-        except urllib2.HTTPError, e:
+            return urllib.request.urlopen(req, timeout=REST_CONN_TIMEOUT.get()).read()
+        except urllib.error.HTTPError as e:
             if e.code == 412: # precondition failed
                 raise ZooKeeper.WrongVersion(uri)
             raise
