@@ -156,7 +156,7 @@ class Command(BaseCommand):
             description=data['description'],
             data=json.dumps(data)
           )
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Failed to create sample mapreduce job document: %s" % e)
         # Just to be sure we delete Doc2 object incase of exception.
         # Possible when there are mixed InnoDB and MyISAM tables
@@ -208,7 +208,7 @@ class Command(BaseCommand):
             description=data['description'],
             data=json.dumps(data)
           )
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Failed to create sample Java job document: %s" % e)
         # Just to be sure we delete Doc2 object incase of exception.
         # Possible when there are mixed InnoDB and MyISAM tables
@@ -261,7 +261,7 @@ class Command(BaseCommand):
             description=data['description'],
             data=json.dumps(data)
           )
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Failed to create sample Spark job document: %s" % e)
         # Just to be sure we delete Doc2 object incase of exception.
         # Possible when there are mixed InnoDB and MyISAM tables
@@ -312,7 +312,7 @@ class Command(BaseCommand):
             description=data['description'],
             data=json.dumps(data)
           )
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Failed to create sample PySpark job document: %s" % e)
         # Just to be sure we delete Doc2 object incase of exception.
         # Possible when there are mixed InnoDB and MyISAM tables

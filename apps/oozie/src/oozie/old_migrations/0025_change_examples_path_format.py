@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from past.builtins import basestring
 import datetime
 import json
 from south.db import db

@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from builtins import range
 import pyspark
 import random
 
@@ -27,8 +29,8 @@ def sample(p):
     x,y = random.random(),random.random()
     return 1 if x*x + y*y < 1 else 0
 
-count = sc.parallelize(xrange(0, NUM_SAMPLES)) \
+count = sc.parallelize(range(0, NUM_SAMPLES)) \
             .map(sample) \
             .reduce(lambda a, b: a + b)
 
-print "Pi is roughly %f" % (4.0 * count / NUM_SAMPLES)
+print("Pi is roughly %f" % (4.0 * count / NUM_SAMPLES))
