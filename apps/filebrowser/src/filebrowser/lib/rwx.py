@@ -17,6 +17,7 @@
 #
 # Utilities for dealing with file modes.
 
+from builtins import zip
 import stat
 
 def filetype(mode):
@@ -51,7 +52,7 @@ BITS = (stat.S_IRUSR, stat.S_IWUSR, stat.S_IXUSR,
     stat.S_ISVTX)
 
 def expand_mode(mode):
-  return map(lambda y: bool(mode & y), BITS)
+  return [bool(mode & y) for y in BITS]
 
 def compress_mode(tup):
   mode = 0

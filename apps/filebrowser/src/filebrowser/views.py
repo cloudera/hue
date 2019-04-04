@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import errno
 import logging
 import mimetypes
@@ -24,12 +28,12 @@ import parquet
 import posixpath
 import re
 import stat as stat_module
-import urllib
-from urlparse import urlparse
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import urlparse
 
 from bz2 import decompress
 from datetime import datetime
-from cStringIO import StringIO
+from io import StringIO
 from gzip import GzipFile
 
 from django.contrib.auth.models import User, Group
@@ -154,7 +158,7 @@ def download(request, path):
     # Verify read permissions on file first
     try:
         request.fs.read(path, offset=0, length=1)
-    except WebHdfsException, e:
+    except WebHdfsException as e:
         if e.code == 403:
             raise PopupException(_('User %s is not authorized to download file at path "%s"') %
                                  (request.user.username, path))
@@ -196,7 +200,7 @@ def view(request, path):
             return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path(path))))
 
     try:
-        decoded_path = urllib.unquote(path)
+        decoded_path = urllib.parse.unquote(path)
         if path != decoded_path:
           path = decoded_path
         stats = request.fs.stats(path)
@@ -204,7 +208,7 @@ def view(request, path):
             return listdir_paged(request, path)
         else:
             return display(request, path)
-    except S3FileSystemException, e:
+    except S3FileSystemException as e:
         msg = _("S3 filesystem exception.")
         if request.is_ajax():
             exception = {
@@ -213,7 +217,7 @@ def view(request, path):
             return JsonResponse(exception)
         else:
             raise PopupException(msg, detail=e)
-    except (IOError, WebHdfsException), e:
+    except (IOError, WebHdfsException) as e:
         msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
 
         if "Connection refused" in e.message:
@@ -249,7 +253,7 @@ def edit(request, path, form=None):
 
     try:
         stats = request.fs.stats(path)
-    except IOError, ioe:
+    except IOError as ioe:
         # A file not found is OK, otherwise re-raise
         if ioe.errno == errno.ENOENT:
             stats = None
@@ -270,7 +274,7 @@ def edit(request, path, form=None):
             f = request.fs.open(path)
             try:
                 try:
-                    current_contents = unicode(f.read(), encoding)
+                    current_contents = str(f.read(), encoding)
                 except UnicodeDecodeError:
                     raise PopupException(_("File is not encoded in %(encoding)s; cannot be edited: %(path)s.") % {'encoding': encoding, 'path': path})
             finally:
@@ -322,9 +326,9 @@ def save_file(request):
             do_overwrite_save(request.fs, path, data)
         else:
             request.fs.create(path, overwrite=False, data=data)
-    except WebHdfsException, e:
+    except WebHdfsException as e:
         raise PopupException(_("The file could not be saved"), detail=e.message.splitlines()[0])
-    except Exception, e:
+    except Exception as e:
         raise PopupException(_("The file could not be saved"), detail=e)
 
     request.path = reverse("filebrowser_views_edit", kwargs=dict(path=path))
@@ -338,7 +342,7 @@ def parse_breadcrumbs(path):
       if url and not url.endswith('/'):
         url += '/'
       url += part
-      breadcrumbs.append({'url': urllib.quote(url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''), 'label': part})
+      breadcrumbs.append({'url': urllib.parse.quote(url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''), 'label': part})
     return breadcrumbs
 
 
@@ -363,8 +367,8 @@ def listdir(request, path):
         'path': path,
         'file_filter': file_filter,
         'breadcrumbs': breadcrumbs,
-        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
-        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_dir_path': urllib.parse.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_request_path': urllib.parse.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'cwd_set': True,
         'is_superuser': request.user.username == request.fs.superuser,
@@ -453,7 +457,7 @@ def listdir_paged(request, path):
     # Filter first
     filter_str = request.GET.get('filter', None)
     if filter_str:
-        filtered_stats = filter(lambda sb: filter_str in sb['name'], all_stats)
+        filtered_stats = [sb for sb in all_stats if filter_str in sb['name']]
         all_stats = filtered_stats
 
     # Sort next
@@ -507,7 +511,7 @@ def listdir_paged(request, path):
     data = {
         'path': path,
         'breadcrumbs': breadcrumbs,
-        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_request_path': urllib.parse.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_trash_enabled': is_trash_enabled,
         'files': page.object_list if page else [],
         'page': _massage_page(page, paginator) if page else {},
@@ -517,14 +521,14 @@ def listdir_paged(request, path):
         # The following should probably be deprecated
         'cwd_set': True,
         'file_filter': 'any',
-        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_dir_path': urllib.parse.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
         'is_fs_superuser': is_fs_superuser,
         'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
         'supergroup': request.fs.supergroup,
         'is_sentry_managed': request.fs.is_sentry_managed(path),
-        'apps': appmanager.get_apps_dict(request.user).keys(),
+        'apps': list(appmanager.get_apps_dict(request.user).keys()),
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
         'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
         'is_embeddable': request.GET.get('is_embeddable', False),
@@ -586,7 +590,7 @@ def content_summary(request, path):
         stats.summary.update({'replication': replication_factor})
         response['status'] = 0
         response['summary'] = stats.summary
-    except WebHdfsException, e:
+    except WebHdfsException as e:
         response['message'] = _("The file could not be saved") + e.message.splitlines()[0]
     return JsonResponse(response)
 
@@ -661,7 +665,7 @@ def display(request, path):
     # Get contents as string for text mode, or at least try
     uni_contents = None
     if not mode or mode == 'text':
-        uni_contents = unicode(contents, encoding, errors='replace')
+        uni_contents = str(contents, encoding, errors='replace')
         is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
         # Auto-detect mode
         if not mode:
@@ -778,7 +782,7 @@ def _decompress_snappy(compressed_content):
     try:
         import snappy
         return snappy.decompress(compressed_content)
-    except Exception, e:
+    except Exception as e:
         raise PopupException(_('Failed to decompress snappy compressed file.'), detail=e)
 
 
@@ -813,7 +817,7 @@ def _read_avro(fhandle, path, offset, length, stats):
             data_file_reader.close()
 
         contents = "".join(contents_list)
-    except Exception, e:
+    except Exception as e:
         logging.exception('Could not read avro file at "%s": %s' % (path, e))
         raise PopupException(_("Failed to read Avro file."))
     return contents
@@ -828,7 +832,7 @@ def _read_parquet(fhandle, path, offset, length, stats):
         parquet._dump(data, ParquetOptions(limit=1000), out=dumped_data)
         dumped_data.seek(offset)
         return dumped_data.read()
-    except Exception, e:
+    except Exception as e:
         logging.exception('Could not read parquet file at "%s": %s' % (path, e))
         raise PopupException(_("Failed to read Parquet file."))
 
@@ -839,7 +843,7 @@ def _read_gzip(fhandle, path, offset, length, stats):
         raise PopupException(_("Offsets are not supported with Gzip compression."))
     try:
         contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
-    except Exception, e:
+    except Exception as e:
         logging.exception('Could not decompress file at "%s": %s' % (path, e))
         raise PopupException(_("Failed to decompress file."))
     return contents
@@ -849,7 +853,7 @@ def _read_bz2(fhandle, path, offset, length, stats):
     contents = ''
     try:
         contents = decompress(fhandle.read(length))
-    except Exception, e:
+    except Exception as e:
         logging.exception('Could not decompress file at "%s": %s' % (path, e))
         raise PopupException(_("Failed to decompress file."))
     return contents
@@ -860,7 +864,7 @@ def _read_simple(fhandle, path, offset, length, stats):
     try:
         fhandle.seek(offset)
         contents = fhandle.read(length)
-    except Exception, e:
+    except Exception as e:
         logging.exception('Could not read file at "%s": %s' % (path, e))
         raise PopupException(_("Failed to read file."))
     return contents
@@ -1062,17 +1066,17 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             args = arg_extractor(request, form, parameter_names)
             try:
                 op(*args)
-            except (IOError, WebHdfsException), e:
+            except (IOError, WebHdfsException) as e:
                 msg = _("Cannot perform operation.")
                 # TODO: Only apply this message for HDFS
                 if is_admin(request.user) and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 raise PopupException(msg, detail=e)
-            except S3FileSystemException, e:
+            except S3FileSystemException as e:
               msg = _("S3 filesystem exception.")
               raise PopupException(msg, detail=e)
-            except NotImplementedError, e:
+            except NotImplementedError as e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)
 
@@ -1085,7 +1089,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 if piggyback:
                     piggy_path = form.cleaned_data.get(piggyback)
                     ret["result"] = _massage_stats(request, stat_absolute_path(piggy_path ,request.fs.stats(piggy_path)))
-            except Exception, e:
+            except Exception as e:
                 # Hard to report these more naturally here.  These happen either
                 # because of a bug in the piggy-back code or because of a
                 # race condition.
@@ -1144,7 +1148,7 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(request.fs.join(urllib.unquote(path), urllib.unquote(name)))
+        request.fs.create(request.fs.join(urllib.parse.unquote(path), urllib.parse.unquote(name)))
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
@@ -1169,7 +1173,7 @@ def move(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.rename(urllib.unquote(arg['src_path']), urllib.unquote(arg['dest_path']))
+            request.fs.rename(urllib.parse.unquote(arg['src_path']), urllib.parse.unquote(arg['dest_path']))
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1263,7 +1267,7 @@ def upload_file(request):
     try:
         resp = _upload_file(request)
         response.update(resp)
-    except Exception, ex:
+    except Exception as ex:
         response['data'] = str(ex).split('\n', 1)[0]
         hdfs_file = request.FILES.get('hdfs_file')
         if hdfs_file and hasattr(hdfs_file, 'remove'):  # TODO: Call from proxyFS
@@ -1297,7 +1301,7 @@ def _upload_file(request):
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
 
-        except IOError, ex:
+        except IOError as ex:
             already_exists = False
             try:
                 already_exists = request.fs.exists(dest)
@@ -1331,7 +1335,7 @@ def extract_archive_using_batch_job(request):
     if upload_path and archive_name:
       try:
         response = extract_archive_in_hdfs(request, upload_path, archive_name)
-      except Exception, e:
+      except Exception as e:
         response['message'] = _('Exception occurred while extracting archive: %s' % e)
   else:
     response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
@@ -1352,7 +1356,7 @@ def compress_files_using_batch_job(request):
     if upload_path and file_names and archive_name:
       try:
         response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
-      except Exception, e:
+      except Exception as e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
     else:
       response['message'] = _('Error: Output directory is not set.');

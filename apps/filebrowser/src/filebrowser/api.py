@@ -32,7 +32,7 @@ def error_handler(view_fn):
     response = {}
     try:
       return view_fn(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error running %s' % view_fn)
       response['status'] = -1
       response['message'] = smart_unicode(e)
@@ -45,7 +45,7 @@ def get_filesystems(request):
   response = {}
 
   filesystems = {}
-  for k, v in FS_GETTERS.items():
+  for k, v in list(FS_GETTERS.items()):
     if not k.startswith('s3') or has_s3_access(request.user):
       filesystems[k] = v is not None
 

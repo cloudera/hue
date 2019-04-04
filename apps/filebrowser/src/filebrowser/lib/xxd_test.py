@@ -15,13 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
+from builtins import range
 import unittest
 import logging
 import random
-import StringIO
+import io
 import subprocess
 
-import xxd
+from . import xxd
 
 from nose.plugins.skip import SkipTest
 
@@ -88,8 +93,8 @@ class XxdTest(unittest.TestCase):
     (stdin, stderr) = p.communicate(random_text)
     self.assertFalse(stderr)
 
-    output = StringIO.StringIO()
-    xxd.main(StringIO.StringIO(random_text), output)
+    output = io.StringIO()
+    xxd.main(io.StringIO(random_text), output)
     self._verify_content(stdin, output.getvalue())
 
 if __name__ == "__main__":

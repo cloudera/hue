@@ -17,6 +17,10 @@
 """
 Implements xxd-like functionality.
 """
+from __future__ import division
+from builtins import map
+from builtins import range
+from past.utils import old_div
 import string
 import sys
 
@@ -60,11 +64,11 @@ def xxd(shift, data, bytes_per_line, bytes_per_sentence):
   @param shift: Shifts the returned offsets by this amount.
   """
   current = 0
-  for current in xrange(0, len(data), bytes_per_line):
+  for current in range(0, len(data), bytes_per_line):
     line = data[current:current+bytes_per_line]
     line_printable = mask_not_alphanumeric(line)[1]
-    line_ordinals = map(ord, line)
-    offsets = range(0, len(line_ordinals), bytes_per_sentence)
+    line_ordinals = list(map(ord, line))
+    offsets = list(range(0, len(line_ordinals), bytes_per_sentence))
     line_ordinal_words = [ line_ordinals[x:x+bytes_per_sentence] for x in offsets ]
 
     yield (shift + current, line_ordinal_words, line_printable)
@@ -90,7 +94,7 @@ def main(input, output):
         return "%02x" % ord
       hex = " ".join([ "".join(map(ashex, sentence)) for sentence in ordinals])
       # 2 characters per byte, 1 extra for spacing, and 1 extra at the end.
-      hex = hex.ljust(bytes_per_line*2 + (bytes_per_line/bytes_per_sentence) - 1)
+      hex = hex.ljust(bytes_per_line*2 + (old_div(bytes_per_line,bytes_per_sentence)) - 1)
       output.write("%07x: %s  %s\n" % (off, hex, printable))
 
     offset += len(data)
