@@ -160,7 +160,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                   <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                   <!-- ko case: 'text' -->Text<!-- /ko -->
                   <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                  <!-- ko case: $default -->SQL<!-- /ko -->
+                  <!-- ko case: $default --><span data-bind="text: editorTypeTitle()"></span><!-- /ko -->
                   <!-- /ko -->
                 </span>
               % else:
@@ -189,7 +189,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                 <!-- ko case: 'text' -->Text<!-- /ko -->
                 <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                <!-- ko case: $default -->SQL<!-- /ko -->
+                <!-- ko case: $default --><span data-bind="text: editorTypeTitle()"></span><!-- /ko -->
               <!-- /ko -->
               <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
