@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from base import SqoopClient
-from link import Link
-from connector import Connector
-from driver import Driver
-from job import Job
-from submission import Submission
+from .base import SqoopClient
+from .link import Link
+from .connector import Connector
+from .driver import Driver
+from .job import Job
+from .submission import Submission
