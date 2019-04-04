@@ -50,12 +50,12 @@ def config_validator(user):
 
   try:
     get_api(user).list_sentry_roles_by_group('*')
-  except Exception, e:
+  except Exception as e:
     res.append(('%s: Sentry Service' % NICE_NAME, _("Failed to connect to Sentry API (version 1).")))
 
   try:
     get_api2(user).list_sentry_roles_by_group('*')
-  except Exception, e:
+  except Exception as e:
     res.append(('%s: Sentry Service' % NICE_NAME, _("Failed to connect to Sentry API (version 2).")))
 
   return res
