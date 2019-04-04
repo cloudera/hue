@@ -64,4 +64,4 @@ REDIRECT_DOWNLOAD = Config(
   help=_(
     'Redirect client to WebHdfs or S3 for file download. Note: Turning this on will override notebook/redirect_whitelist for user selected file downloads on WebHdfs & S3.'),
   type=coerce_bool,
-  default=True)
+  default=False)
