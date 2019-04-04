@@ -49,11 +49,11 @@ const HBASE_API_PREFIX = '/hbase/api/';
 const SAVE_TO_FILE = '/filebrowser/save';
 
 const NAV_URLS = {
-  ADD_TAGS: '/metadata/api/navigator/add_tags',
-  DELETE_TAGS: '/metadata/api/navigator/delete_tags',
-  FIND_ENTITY: '/metadata/api/navigator/find_entity',
-  LIST_TAGS: '/metadata/api/navigator/list_tags',
-  UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties'
+  ADD_TAGS: '/metadata/api/catalog/add_tags',
+  DELETE_TAGS: '/metadata/api/catalog/delete_tags',
+  FIND_ENTITY: '/metadata/api/catalog/find_entity',
+  LIST_TAGS: '/metadata/api/catalog/list_tags',
+  UPDATE_PROPERTIES: '/metadata/api/catalog/update_properties'
 };
 
 const NAV_OPT_URLS = {

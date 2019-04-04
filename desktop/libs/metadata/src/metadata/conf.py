@@ -49,6 +49,10 @@ def default_catalog_config_dir():
   """Get from usual main Hue config directory"""
   return get_config_root()
 
+def default_catalog_interface():
+  """Detect if the configured catalog is Navigator or default to Atlas"""
+  return 'navigator' if default_navigator_url() else 'atlas'
+
 def default_navigator_config_dir():
   """Get from usual main Hue config directory"""
   return get_config_root()
@@ -221,27 +225,12 @@ DEFAULT_PUBLIC_KEY = Config(
 # Data Catalog
 
 def get_catalog_url():
-  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')[:-3]) or \
-      (NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3])
+  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')[:-3]) or get_navigator_url()
 
 def has_catalog(user):
   from desktop.auth.backend import is_admin
-  return bool(get_catalog_url() and get_navigator_auth_password()) \
+  return ((bool(get_catalog_url() and get_catalog_auth_password())) or has_navigator(user)) \
       and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
-
-
-def get_catalog_auth_type():
-  return CATALOG.AUTH_TYPE.get().lower()
-
-def get_catalog_auth_username():
-  '''Get the username to authenticate with.'''
-
-  if get_catalog_auth_type() == 'ldap':
-    return CATALOG.AUTH_LDAP_USERNAME.get()
-  elif get_catalog_auth_type() == 'saml':
-    return CATALOG.AUTH_SAML_USERNAME.get()
-  else:
-    return CATALOG.AUTH_CM_USERNAME.get()
 
 def get_catalog_auth_password():
   '''Get the password to authenticate with.'''
@@ -249,131 +238,54 @@ def get_catalog_auth_password():
 
   if CATALOG_AUTH_PASSWORD is None:
     try:
-      if get_catalog_auth_type() == 'ldap':
-        CATALOG_AUTH_PASSWORD = CATALOG.AUTH_LDAP_PASSWORD.get()
-      elif get_catalog_auth_type() == 'saml':
-        CATALOG_AUTH_PASSWORD = CATALOG.AUTH_SAML_PASSWORD.get()
-      else:
-        CATALOG_AUTH_PASSWORD = CATALOG.AUTH_CM_PASSWORD.get()
+      CATALOG_AUTH_PASSWORD = CATALOG.SERVER_PASSWORD.get()
     except CalledProcessError:
       LOG.exception('Could not read Catalog password file, need to restart Hue to re-enable it.')
 
   return CATALOG_AUTH_PASSWORD
 
-def get_catalog_cm_password():
-  '''Get default password from secured file'''
-  return CATALOG.AUTH_CM_PASSWORD_SCRIPT.get()
-
-def get_catalog_ldap_password():
-  '''Get default password from secured file'''
-  return CATALOG.AUTH_LDAP_PASSWORD_SCRIPT.get()
-
-def get_catalog_saml_password():
-  '''Get default password from secured file'''
-  return CATALOG.AUTH_SAML_PASSWORD_SCRIPT.get()
-
-def has_catalog_file_search(user):
-  return has_catalog(user) and CATALOG.ENABLE_FILE_SEARCH.get()
-
 CATALOG = ConfigSection(
   key='catalog',
   help=_t("""Configuration options for Catalog API"""),
   members=dict(
-    interface=Config(
+    INTERFACE=Config(
       key='interface',
       help=_t('Type of Catalog to connect to, e.g. Apache Atlas, Navigator...'),
-      default='atlas'),
+      dynamic_default=default_catalog_interface),
+
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Catalog API.'),
       dynamic_default=default_catalog_url),
-    AUTH_TYPE=Config(
-      key="navmetadataserver_auth_type",
-      help=_t("Which authentication to use: CM or external via LDAP or SAML."),
-      default='CMDB'),
 
-    AUTH_CM_USERNAME=Config(
+    SERVER_USER=Config(
       key="server_user",
       help=_t("Username of the CM user used for authentication."),
       dynamic_default=get_auth_username),
-    AUTH_CM_PASSWORD=Config(
+    SERVER_PASSWORD=Config(
       key="server_password",
-      help=_t("CM password of the user used for authentication."),
+      help=_t("Password of the user used for authentication."),
       private=True,
-      dynamic_default=get_catalog_cm_password),
-    AUTH_CM_PASSWORD_SCRIPT=Config(
-      key="navmetadataserver_cmdb_password_script",
-      help=_t("Execute this script to produce the CM password. This will be used when the plain password is not set."),
-      private=True,
-      type=coerce_password_from_script,
       default=None),
 
-    AUTH_LDAP_USERNAME=Config(
-      key="navmetadataserver_ldap_user",
-      help=_t("Username of the LDAP user used for authentication."),
-      dynamic_default=get_auth_username),
-    AUTH_LDAP_PASSWORD=Config(
-      key="navmetadataserver_ldap_password",
-      help=_t("LDAP password of the user used for authentication."),
-      private=True,
-      dynamic_default=get_catalog_ldap_password),
-    AUTH_LDAP_PASSWORD_SCRIPT=Config(
-      key="navmetadataserver_ldap_password_script",
-      help=_t("Execute this script to produce the LDAP password. This will be used when the plain password is not set."),
-      private=True,
-      type=coerce_password_from_script,
-      default=None),
-
-    AUTH_SAML_USERNAME=Config(
-      key="navmetadataserver_saml_user",
-      help=_t("Username of the SAML user used for authentication."),
-      dynamic_default=get_auth_username),
-    AUTH_SAML_PASSWORD=Config(
-      key="navmetadataserver_saml_password",
-      help=_t("SAML password of the user used for authentication."),
-      private=True,
-      dynamic_default=get_catalog_saml_password),
-    AUTH_SAML_PASSWORD_SCRIPT=Config(
-      key="navmetadataserver_saml_password_script",
-      help=_t("Execute this script to produce the SAML password. This will be used when the plain password  is not set."),
-      private=True,
-      type=coerce_password_from_script,
-      default=None),
-
-    CONF_DIR = Config(
-      key='conf_dir',
-      help=_t('Catalog configuration directory, where client.properties is located.'),
-      dynamic_default=default_catalog_config_dir
-    ),
-    APPLY_SENTRY_PERMISSIONS = Config(
-      key="apply_sentry_permissions",
-      help=_t("Perform privilege filtering. Default to true automatically if the cluster is secure. Only happening when using Sentry."),
-      dynamic_default=get_security_default,
-      type=coerce_bool
-    ),
-    FETCH_SIZE_SEARCH = Config(
-      key="fetch_size_search",
-      help=_t("Max number of items to fetch in one call in object search."),
-      default=450,
-      type=int
-    ),
     FETCH_SIZE_SEARCH_INTERACTIVE = Config(
       key="fetch_size_search_interactive",
       help=_t("Max number of items to fetch in one call in object search autocomplete."),
-      default=450,
+      default=25,
       type=int
     ),
-
-    ENABLE_FILE_SEARCH = Config(
-      key="enable_file_search",
-      help=_t("Enable to search HDFS, S3 files."),
-      type=coerce_bool,
-      default=False
-    )
   )
 )
 
 # Navigator is deprecated over generic Catalog above
+
+def get_navigator_url():
+  return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
+
+def has_navigator(user):
+  from desktop.auth.backend import is_admin
+  return bool(get_navigator_url() and get_navigator_auth_password()) \
+      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 def get_navigator_auth_type():
   return NAVIGATOR.AUTH_TYPE.get().lower()

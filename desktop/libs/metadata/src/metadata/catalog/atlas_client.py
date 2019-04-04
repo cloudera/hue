@@ -27,7 +27,7 @@ from desktop.lib.rest import resource
 from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
 from desktop.lib.rest.http_client import RestException
 
-from metadata.conf import CATALOG, get_catalog_auth_password, get_catalog_auth_username
+from metadata.conf import CATALOG, get_catalog_auth_password
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
 LOG = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ class AtlasApi(Api):
     super(AtlasApi, self).__init__(user)
 
     self._api_url = CATALOG.API_URL.get().strip('/')
-    self._username = get_catalog_auth_username()
+    self._username = CATALOG.SERVER_USER.get()
     self._password = get_catalog_auth_password()
 
     # Navigator does not support Kerberos authentication while other components usually requires it
@@ -79,9 +79,20 @@ class AtlasApi(Api):
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
-      pagination = {
-        'offset': offset,
-        'limit': CATALOG.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
+      query_data = {
+        "excludeDeletedEntities": True,
+        "includeSubClassifications": True,
+        "includeSubTypes": True,
+        "includeClassificationAttributes": True,
+        "entityFilters": None,
+        "tagFilters": None,
+        "attributes": None,
+        "query": "*",
+        "limit": CATALOG.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
+        "offset": offset,
+        "typeName": None,
+        "classification": None,
+        "termName": None
       }
 
       f = {
@@ -191,45 +202,44 @@ class AtlasApi(Api):
       search_terms = [term for term in query_s.strip().split()] if query_s else []
       query = []
       for term in search_terms:
-        if ':' not in term:
-          query.append(self._get_boosted_term(term))
-        else:
-          name, val = term.split(':')
-          if val: # Allow to type non default types, e.g for SQL: type:FIEL*
-            if name == 'type': # Make sure type value still makes sense for the source
-              term = '%s:%s' % (name, val.upper())
-              fq_type = entity_types
-            if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
-              # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
-              query.append('up_' + term)
-            else:
-              filterQueries.append(term)
+        query.append(term)
+        # if ':' not in term:
+        #   query.append(self._get_boosted_term(term))
+        # else:
+        #   name, val = term.split(':')
+        #   if val: # Allow to type non default types, e.g for SQL: type:FIEL*
+        #     if name == 'type': # Make sure type value still makes sense for the source
+        #       term = '%s:%s' % (name, val.upper())
+        #       fq_type = entity_types
+        #     if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
+        #       # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
+        #       query.append('up_' + term)
+        #     else:
+        #       filterQueries.append(term)
 
-      filterQueries.append('deleted:false')
+      # filterQueries.append('deleted:false')
 
-      body = {'query': ' '.join(query) or '*'}
-      if fq_type:
-        filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+      query_data['query'] = ' '.join(query) or '*'
 
-      source_ids = self.get_cluster_source_ids()
-      if source_ids:
-        body['query'] = source_ids + '(' + body['query'] + ')'
+      body = {}
+      # if fq_type:
+      #   filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
-      body['facetFields'] = facetFields or [] # Currently mandatory in API
-      if facetPrefix:
-        body['facetPrefix'] = facetPrefix
-      if facetRanges:
-        body['facetRanges'] = facetRanges
-      if filterQueries:
-        body['filterQueries'] = filterQueries
-      if firstClassEntitiesOnly:
-        body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
+      # body['facetFields'] = facetFields or [] # Currently mandatory in API
+      # if facetPrefix:
+      #   body['facetPrefix'] = facetPrefix
+      # if facetRanges:
+      #   body['facetRanges'] = facetRanges
+      # if filterQueries:
+      #   body['filterQueries'] = filterQueries
+      # if firstClassEntitiesOnly:
+      #   body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
 
-      data = json.dumps(body)
+      data = json.dumps(query_data)
       LOG.info(data)
 
-      response = self._root.get('/search/basic?typeName=hbase_table') #?limit=%(limit)s&offset=%(offset)s' % pagination)
-      response['results'] = [self._massage_entity(entity) for entity in response.pop('entities')]
+      response = self._root.post('/search/basic', data=data, contenttype=_JSON_CONTENT_TYPE)
+      response['results'] = [self._massage_entity(entity) for entity in response.pop('entities', [])]
 
       return response
     except RestException, e:
@@ -244,9 +254,9 @@ class AtlasApi(Api):
     return {
         "name": entity['attributes'].get('name', entity['attributes'].get('qualifiedName')),
         "description": entity['attributes'].get('description'),
-         "owner": entity.get('owner'),
-         "sourceType": entity['typeName'],
-         "partColNames":[
+        "owner": entity.get('owner'),
+        "sourceType": entity['typeName'],
+        "partColNames":[
             # "date"
          ],
          "type": "TABLE", # TODO
@@ -261,9 +271,9 @@ class AtlasApi(Api):
          "properties":{
          },
          "identity": entity['guid'],
-         "created": entity['attributes']['createTime'], #"2019-03-28T19:30:30.000Z",
+         "created": 'createTime' in entity['attributes'] and entity['attributes']['createTime'], #"2019-03-28T19:30:30.000Z",
          "parentPath": "/default",
-         "originalName": entity['attributes']['qualifiedName'],
+         "originalName": entity['attributes'].get('qualifiedName'),
         #  "lastAccessed":"1970-01-01T00:00:00.000Z"
         #  "clusteredByColNames":null,
         #  "outputFormat":"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
