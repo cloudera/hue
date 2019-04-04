@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 
@@ -104,7 +105,7 @@ def stop(request):
 
   try:
     api.get(request.fs, request.jt, request.user).stop(job_id)
-  except RestException, e:
+  except RestException as e:
     raise PopupException(_("Error stopping Pig script.") % e.message)
 
   return watch(request, job_id)
@@ -151,7 +152,7 @@ def copy(request):
 
   try:
     doc.can_read_or_exception(request.user)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(e)
 
   existing_script_data = pig_script.dict
@@ -246,7 +247,7 @@ def install_examples(request):
     try:
       pig_setup.Command().handle()
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 

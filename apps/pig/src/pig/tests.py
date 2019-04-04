@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import object
 import json
 import time
 
