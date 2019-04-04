@@ -16,12 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import json
 import ldap
 import re
 import sys
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
@@ -91,25 +95,25 @@ class LdapTestConnection(object):
   def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Returns info for a particular user via a case insensitive search """
     if find_by_dn:
-      data = filter(lambda attrs: attrs['dn'] == username_pattern, self._instance.users.values())
+      data = [attrs for attrs in list(self._instance.users.values()) if attrs['dn'] == username_pattern]
     else:
       username_pattern = "^%s$" % username_pattern.replace('.','\\.').replace('*', '.*')
       username_fsm = re.compile(username_pattern, flags=re.I)
-      usernames = filter(lambda username: username_fsm.match(username), self._instance.users.keys())
+      usernames = [username for username in list(self._instance.users.keys()) if username_fsm.match(username)]
       data = [self._instance.users.get(username) for username in usernames]
     return data
 
   def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
     if find_by_dn:
-      data = filter(lambda attrs: attrs['dn'] == groupname_pattern, self._instance.groups.values())
+      data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'] == groupname_pattern]
       # SCOPE_SUBTREE means we return all sub-entries of the desired entry along with the desired entry.
       if data and scope == ldap.SCOPE_SUBTREE:
-        sub_data = filter(lambda attrs: attrs['dn'].endswith(data[0]['dn']), self._instance.groups.values())
+        sub_data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'].endswith(data[0]['dn'])]
         data.extend(sub_data)
     else:
       groupname_pattern = "^%s$" % groupname_pattern.replace('.','\\.').replace('*', '.*')
-      groupnames = filter(lambda username: re.match(groupname_pattern, username), self._instance.groups.keys())
+      groupnames = [username for username in list(self._instance.groups.keys()) if re.match(groupname_pattern, username)]
       data = [self._instance.groups.get(groupname) for groupname in groupnames]
     return data
 
@@ -134,13 +138,13 @@ class LdapTestConnection(object):
 
   def find_users_of_group(self, dn):
     members = []
-    for group_info in self._instance.groups.values():
+    for group_info in list(self._instance.groups.values()):
       if group_info['dn'] == dn:
         members.extend(group_info['members'])
 
     members = set(members)
     users = []
-    for user_info in self._instance.users.values():
+    for user_info in list(self._instance.users.values()):
       if user_info['dn'] in members:
         users.append(user_info)
 
@@ -148,18 +152,18 @@ class LdapTestConnection(object):
 
   def find_groups_of_group(self, dn):
     members = []
-    for group_info in self._instance.groups.values():
+    for group_info in list(self._instance.groups.values()):
       if group_info['dn'] == dn:
         members.extend(group_info['members'])
 
     groups = []
-    for group_info in self._instance.groups.values():
+    for group_info in list(self._instance.groups.values()):
       if group_info['dn'] in members:
         groups.append(group_info)
 
     return groups
 
-  class Data:
+  class Data(object):
     def __init__(self):
       self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
@@ -574,7 +578,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
   def test_user_admin(self):
     FUNNY_NAME = 'أحمد@cloudera.com'
-    FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
+    FUNNY_NAME_QUOTED = urllib.parse.quote(FUNNY_NAME)
 
     resets = [
       useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default'),

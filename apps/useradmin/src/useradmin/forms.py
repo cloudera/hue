@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import re
 
@@ -252,7 +253,7 @@ class AddLdapUsersForm(forms.Form):
         validate_dn(username_pattern)
       else:
         validate_username(username_pattern)
-    except ValidationError, e:
+    except ValidationError as e:
       errors = self._errors.setdefault('username_pattern', ErrorList())
       errors.append(e.message)
       raise forms.ValidationError(e.message)
@@ -299,7 +300,7 @@ class AddLdapGroupsForm(forms.Form):
         validate_dn(groupname_pattern)
       else:
         validate_groupname(groupname_pattern)
-    except ValidationError, e:
+    except ValidationError as e:
       errors = self._errors.setdefault('groupname_pattern', ErrorList())
       errors.append(e.message)
       raise forms.ValidationError(e.message)
@@ -313,7 +314,7 @@ class GroupEditForm(forms.ModelForm):
   """
   GROUPNAME = re.compile('^%s$' % get_groupname_re_rule())
 
-  class Meta:
+  class Meta(object):
     model = Group
     fields = ("name",)
 
@@ -373,7 +374,7 @@ class PermissionsEditForm(forms.ModelForm):
   Form to manage the set of groups that have a particular permission.
   """
 
-  class Meta:
+  class Meta(object):
     model = Group
     fields = ()
 
