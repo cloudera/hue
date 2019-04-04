@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from libsolr.api import SolrApi
@@ -43,16 +44,16 @@ class SearchController(object):
   def get_all_indexes(self, show_all=False):
     indexes = []
     try:
-      indexes = self.get_solr_collections().keys()
+      indexes = list(self.get_solr_collections().keys())
     except:
       LOG.exception('failed to get indexes')
 
     try:
-      indexes += SolrApi(SOLR_URL.get(), self.user).aliases().keys()
+      indexes += list(SolrApi(SOLR_URL.get(), self.user).aliases().keys())
     except:
       LOG.exception('failed to get index aliases')
 
     if show_all or not indexes:
-      return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
+      return indexes + list(SolrApi(SOLR_URL.get(), self.user).cores().keys())
     else:
       return indexes
