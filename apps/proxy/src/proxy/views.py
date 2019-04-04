@@ -23,10 +23,13 @@
 # to create links (within the application) to trusted
 # URLs, by appending an HMAC to the parameters.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import logging
 import re
-from urllib2 import urlopen
-from urlparse import urlparse, urlunparse
+from urllib.request import urlopen
+from urllib.parse import urlparse, urlunparse
 
 from django.core import urlresolvers
 from django.http import HttpResponse
@@ -127,7 +130,7 @@ def _rewrite_url(url):
   try:
     # We may hit invalid urls. Return None to strip out the link entirely.
     out = _reverse(host, port, path)
-  except urlresolvers.NoReverseMatch, ex:
+  except urlresolvers.NoReverseMatch as ex:
     LOGGER.error("Encountered malformed URL '%s' when rewriting proxied page." % (url,))
     return None
 
