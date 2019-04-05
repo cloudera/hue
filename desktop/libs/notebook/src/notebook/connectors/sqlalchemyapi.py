@@ -210,30 +210,6 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
-    file_name = _get_snippet_name(notebook)
-    guid = uuid.uuid4().hex
-
-    engine = self._create_engine()
-    connection = engine.connect()
-    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
-
-    CONNECTION_CACHE[guid] = {
-      'connection': connection,
-      'result': result
-    }
-    db = FixedResult([col[0] if type(col) is dict or type(col) is tuple else col for col in result.cursor.description])
-
-    def callback():
-      connection = CONNECTION_CACHE.get(guid)
-      if connection:
-        connection['connection'].close()
-        del CONNECTION_CACHE[guid]
-
-    return data_export.download({'guid': guid}, format, db, id=snippet['id'], file_name=file_name, callback=callback)
-
-
-  @query_error_handler
   def close_statement(self, notebook, snippet):
     result = {'status': -1}
 
@@ -345,27 +321,3 @@ class Assist():
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()
-
-class FixedResultSet():
-  def __init__(self, metadata, data, has_more):
-    self.metadata = metadata
-    self.data = data
-    self.has_more = has_more
-
-  def cols(self):
-    return self.metadata
-
-  def rows(self):
-    return self.data if self.data is not None else []
-
-class FixedResult():
-  def __init__(self, metadata):
-    self.metadata = metadata
-
-  def fetch(self, handle=None, start_over=None, rows=None):
-    connection = CONNECTION_CACHE.get(handle['guid'])
-    if connection:
-      data = connection['result'].fetchmany(rows)
-      return FixedResultSet(self.metadata, data, data is not None and len(data) >= rows)
-    else:
-      return FixedResultSet([], [])

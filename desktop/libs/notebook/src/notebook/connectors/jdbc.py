@@ -124,12 +124,6 @@ class JdbcApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
-    file_name = _get_snippet_name(notebook)
-    data, description = query_and_fetch(self.db, snippet['statement'])
-    db = FixedResult(data, description)
-    return data_export.download(None, format, db, id=snippet['id'], file_name=file_name)
-
   def progress(self, snippet, logs):
     return 50
 

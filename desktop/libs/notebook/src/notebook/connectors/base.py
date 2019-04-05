@@ -23,6 +23,7 @@ import uuid
 from django.utils.translation import ugettext as _
 
 from desktop.conf import has_multi_cluster
+from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
@@ -431,11 +432,23 @@ class Api(object):
   def fetch_result(self, notebook, snippet, rows, start_over):
     pass
 
+  def can_start_over(self, notebook, snippet):
+    return False
+
   def fetch_result_size(self, notebook, snippet):
     raise OperationNotSupported()
 
-  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
-    pass
+  def download(self, notebook, snippet, file_format='csv'):
+    from beeswax import data_export #TODO: Move to notebook?
+    from beeswax import conf
+
+    result_wrapper = ResultWrapper(self, notebook, snippet)
+
+    max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
+    max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
+
+    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, max_bytes=max_bytes)
+    return export_csvxls.create_generator(content_generator, file_format)
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
@@ -463,6 +476,57 @@ class Api(object):
 
   def statement_similarity(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
 
+class ResultWrapper():
+  def __init__(self, api, notebook, snippet, callback=None):
+    self.api = api
+    self.notebook = notebook
+    self.snippet = snippet
+    self.callback = callback
+    self.should_close = False
+
+  def fetch(self, start_over=None, rows=None):
+    if start_over:
+      if not self.snippet['result']['handle'] or not self.api.can_start_over(self.notebook, self.snippet):
+        start_over = False
+        handle = self.api.execute(self.notebook, self.snippet)
+        self.snippet['result']['handle'] = handle
+        if self.callback and hasattr(self.callback, 'on_execute'):
+          self.callback.on_execute(handle)
+        self.should_close = True
+        self._until_available()
+    if self.snippet['result']['handle'].get('sync', False):
+      return self.snippet['result']['handle']['result']
+    else:
+      result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
+    return result
+
+  def _until_available(self):
+    if self.snippet['result']['handle'].get('sync', False):
+      return # Request is already completed
+    count = 0
+    sleep_seconds = 1
+    check_status_count = 0
+    while True:
+      response = self.api.check_status(self.notebook, self.snippet)
+      if self.callback and hasattr(self.callback, 'on_status'):
+        self.callback.on_status(response['status'])
+      if self.callback and hasattr(self.callback, 'on_log'):
+        log = self.api.get_log(self.notebook, self.snippet, startFrom=count)
+        self.callback.on_log(log)
+
+      if response['status'] not in ['waiting', 'running', 'submitted']:
+        break
+      check_status_count += 1
+      if check_status_count > 5:
+        sleep_seconds = 5
+      elif check_status_count > 10:
+        sleep_seconds = 10
+      time.sleep(sleep_seconds)
+
+  def close(self):
+    if self.should_close:
+      self.should_close = False
+      self.api.close_statement(self.notebook, self.snippet)
 
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)

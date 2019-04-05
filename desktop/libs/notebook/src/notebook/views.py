@@ -18,6 +18,8 @@
 import json
 import logging
 
+from beeswax.data_export import DOWNLOAD_COOKIE_AGE
+
 from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
@@ -25,6 +27,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR, TASK_SERVER
+from desktop.lib import export_csvxls
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -337,9 +340,21 @@ def download(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
+  user_agent = request.META.get('HTTP_USER_AGENT')
+  file_name = _get_snippet_name(notebook)
 
-  response = get_api(request, snippet).download(notebook, snippet, format=file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
+  content_generator = get_api(request, snippet).download(notebook, snippet, file_format=file_format)
+  response = export_csvxls.make_response(content_generator, file_format, file_name, user_agent=user_agent)
 
+  if snippet['id']:
+    response.set_cookie(
+      'download-%s' % snippet['id'],
+      json.dumps({
+        'truncated': 'false',
+        'row_counter': '0'
+      }),
+      max_age=DOWNLOAD_COOKIE_AGE
+    )
   if response:
     request.audit = {
       'operation': 'DOWNLOAD',

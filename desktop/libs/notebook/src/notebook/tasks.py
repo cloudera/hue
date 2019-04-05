@@ -33,13 +33,12 @@ from django.http import FileResponse, HttpRequest
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
-from desktop.lib.export_csvxls import FORMAT_TO_CONTENT_TYPE
+from desktop.lib import export_csvxls
 
-from notebook.connectors.base import get_api, QueryExpired
+from notebook.connectors.base import get_api, QueryExpired, ResultWrapper
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger(__name__)
-DOWNLOAD_COOKIE_AGE = 3600
 STATE_MAP = {
   'SUBMITTED': 'waiting',
   states.RECEIVED: 'waiting',
@@ -55,41 +54,56 @@ STATE_MAP = {
   states.IGNORED: 'ignored'
 }
 
+class ResultWrapperCallback(object):
+  def __init__(self, uuid, meta, log_file_handle):
+    self.meta = meta
+    self.uuid = uuid
+    self.log_file_handle = log_file_handle
+
+  def on_execute(self, handle):
+    if handle.get('sync', False) and handle['result'].get('data'):
+      handle_without_data = handle.copy()
+      handle_without_data['result'] = {}
+      for key in filter(lambda x: x != 'data', list(handle['result'].keys())):
+        handle_without_data['result'][key] = handle['result'][key]
+    else:
+      handle_without_data = handle
+    self.meta['handle'] = handle_without_data
+
+  def on_log(self, log):
+    os.write(self.log_file_handle, log)
+
+  def on_status(self, status):
+    self.meta['status'] = status
+    download_to_file.update_state(task_id=self.uuid, state='PROGRESS', meta=self.meta)
+
 #TODO: Add periodic cleanup task
 #TODO: move file paths to a file like API so we can change implementation
 #TODO: UI should be able to close a query that is available, but not expired
 @app.task()
-def download_to_file(notebook, snippet, file_format='csv', user_agent=None, postdict=None, user_id=None, create=False, store_data_type_in_header=False):
+def download_to_file(notebook, snippet, file_format='csv', postdict=None, user_id=None, max_rows=-1):
+  from beeswax import data_export
   download_to_file.update_state(task_id=notebook['uuid'], state='STARTED', meta={})
   request = _get_request(postdict, user_id)
   api = get_api(request, snippet)
-  if create:
-    handle = api.execute(notebook, snippet)
-  else:
-    handle = snippet['result']['handle']
 
   f, path = tempfile.mkstemp()
   f_log, path_log = tempfile.mkstemp()
   f_progress, path_progress = tempfile.mkstemp()
   try:
     os.write(f_progress, '0')
-    meta = {'row_counter': 0, 'file_path': path, 'handle': handle, 'log_path': path_log, 'progress_path': path_progress, 'status': 'running', 'truncated': False} #TODO: Truncated
-    download_to_file.update_state(task_id=notebook['uuid'], state='PROGRESS', meta=meta)
-    _until_available(notebook, snippet, api, f_log, handle, meta)
 
-    snippet['result']['handle'] = handle.copy()
-    #TODO: Move PREFETCH_RESULT_COUNT to front end
-    response = api.download(notebook, snippet, file_format, user_agent=user_agent, max_rows=TASK_SERVER.PREFETCH_RESULT_COUNT.get(), store_data_type_in_header=store_data_type_in_header)
+    meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'progress_path': path_progress, 'status': 'running', 'truncated': False} #TODO: Truncated
 
-    row_count = 0
+    result_wrapper = ResultWrapper(api, notebook, snippet, ResultWrapperCallback(notebook['uuid'], meta, f_log))
+    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move PREFETCH_RESULT_COUNT to front end
+    response = export_csvxls.create_generator(content_generator, file_format)
+
     for chunk in response:
       os.write(f, chunk)
-      row_count += chunk.count('\n')
-      meta['row_counter'] = row_count - 1
+      meta['row_counter'] = content_generator.row_counter
       download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
-    snippet['result']['handle'] = handle.copy()
-    api.close_statement(notebook, snippet)
   finally:
     os.close(f)
     os.close(f_log)
@@ -106,29 +120,6 @@ def close_statement_async(notebook, snippet, postdict=None, user_id=None):
   request = _get_request(postdict, user_id)
   get_api(request, snippet).close_statement(notebook, snippet)
 
-def _until_available(notebook, snippet, api, f, handle, meta):
-  count = 0
-  sleep_seconds = 1
-  check_status_count = 0
-  while True:
-    snippet['result']['handle'] = handle.copy()
-    response = api.check_status(notebook, snippet)
-    meta['status'] = response['status']
-    download_to_file.update_state(task_id=notebook['uuid'], state='PROGRESS', meta=meta)
-    snippet['result']['handle'] = handle.copy()
-    log = api.get_log(notebook, snippet, startFrom=count)
-    os.write(f, log)
-    count += log.count('\n')
-
-    if response['status'] not in ['waiting', 'running', 'submitted']:
-      break
-    check_status_count += 1
-    if check_status_count > 5:
-      sleep_seconds = 5
-    elif check_status_count > 10:
-      sleep_seconds = 10
-    time.sleep(sleep_seconds)
-
 #TODO: Convert csv to excel if needed
 def download(*args, **kwargs):
   result = download_to_file.AsyncResult(args[0]['uuid'])
@@ -138,18 +129,9 @@ def download(*args, **kwargs):
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
 
-  info = result.wait()
-  response = FileResponse(open(info['file_path'], 'rb'), content_type=FORMAT_TO_CONTENT_TYPE.get('csv', 'application/octet-stream'))
-  response['Content-Disposition'] = 'attachment; filename="%s.%s"' % (args[0]['uuid'], 'csv') #TODO: Add support for 3rd party (e.g. nginx file serving)
-  response.set_cookie(
-      'download-%s' % args[1]['id'],
-      json.dumps({
-        'truncated': info.get('truncated', False),
-        'row_counter': info.get('row_counter', 0)
-      }),
-      max_age=DOWNLOAD_COOKIE_AGE
-    )
-  return response
+  info = result.wait() # TODO: Start returning data even if we're not done
+
+  return export_csvxls.file_reader(open(info['file_path'], 'rb'))
 
 # Why we need this:
 # 1) There is no way in celery to differentiate between a task that was submitted, but not yet started and a task that has been GCed.
@@ -160,8 +142,7 @@ def _patch_status(notebook):
 
 def execute(*args, **kwargs):
   notebook = args[0]
-  kwargs['create'] = True
-  kwargs['store_data_type_in_header'] = True
+  kwargs['max_rows'] = TASK_SERVER.PREFETCH_RESULT_COUNT.get()
   _patch_status(notebook)
   download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
   return {'sync': False,
@@ -184,12 +165,7 @@ def check_status(*args, **kwargs):
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
 
-  info = result.info
-  if not info or not info.get('status'):
-    status = STATE_MAP[state]
-  else:
-    status = info.get('status')
-  return {'status': status}
+  return {'status': STATE_MAP[state]}
 
 def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id=None):
   result = download_to_file.AsyncResult(notebook['uuid'])
@@ -357,6 +333,7 @@ def _close_statement_async_id(notebook):
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()
   request.POST = postdict
+  LOG.info('fetching user with id ' + user_id)
   user = User.objects.get(id=user_id)
   user = rewrite_user(user)
   request.user = user

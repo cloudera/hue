@@ -52,6 +52,7 @@ from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.export_csvxls import file_reader
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.i18n import smart_str
@@ -77,7 +78,6 @@ from desktop.auth.backend import is_admin
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
-DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
 
 # Defaults for "xxd"-style output.
 # Sentences refer to groups of bytes printed together, within a line.
@@ -118,16 +118,6 @@ def index(request):
   return view(request, path)
 
 
-def _file_reader(fh):
-    """Generator that reads a file, chunk-by-chunk."""
-    while True:
-        chunk = fh.read(DOWNLOAD_CHUNK_SIZE)
-        if chunk == '':
-            fh.close()
-            break
-        yield chunk
-
-
 def download(request, path):
     """
     Downloads a file.
@@ -165,7 +155,7 @@ def download(request, path):
       response = HttpResponseRedirect(fh.read_url())
       setattr(response, 'redirect_override', True)
     else:
-      response = StreamingHttpResponse(_file_reader(fh), content_type=content_type)
+      response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
       response["Last-Modified"] = http_date(stats['mtime'])
       response["Content-Length"] = stats['size']
       response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
