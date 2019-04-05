@@ -518,6 +518,15 @@ class OnePageViewModel {
         }
       },
       {
+        url: '/desktop/connectors',
+        app: function() {
+          self.loadApp('connectors');
+          self.getActiveAppViewModel(viewModel => {
+            viewModel.fetchConnectors();
+          });
+        }
+      },
+      {
         url: '/desktop/download_logs',
         app: function() {
           location.href = '/desktop/download_logs';
