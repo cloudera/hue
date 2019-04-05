@@ -381,31 +381,16 @@ class HS2Api(Api):
       return {'status': -1}  # skipped
 
 
-  @query_error_handler
-  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
+  def can_start_over(self, notebook, snippet):
     try:
       db = self._get_db(snippet, cluster=self.cluster)
       handle = self._get_handle(snippet)
       # Test handle to verify if still valid
       db.fetch(handle, start_over=True, rows=1)
-
-      file_name = _get_snippet_name(notebook)
-
-      return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name, user_agent=user_agent, max_rows=max_rows, store_data_type_in_header=store_data_type_in_header)
-    except Exception, e:
-      title = 'The query result cannot be downloaded.'
-      LOG.exception(title)
-
-      if hasattr(e, 'message') and e.message:
-        if 'generic failure: Unable to find a callback: 32775' in e.message:
-          message = e.message + " " + _("Increase the sasl_max_buffer value in hue.ini")
-        elif 'query result cache exceeded its limit' in e.message:
-          message = e.message.replace("Restarting the fetch is not possible.", _("Please execute the query again."))
-        else:
-          message = e.message
-      else:
-        message = e
-      raise PopupException(_(title), detail=message)
+      can_start_over = True
+    except Exception as e:
+      raise e
+    return can_start_over
 
 
   @query_error_handler

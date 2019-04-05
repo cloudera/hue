@@ -107,16 +107,6 @@ class RdbmsApi(Api):
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format, user_agent=None, max_rows=None, store_data_type_in_header=False):
-
-    file_name = _get_snippet_name(notebook)
-    results = self._execute(notebook, snippet)
-    db = FixedResult(results)
-
-    return data_export.download(None, format, db, id=snippet['id'], file_name=file_name, user_agent=user_agent)
-
-
-  @query_error_handler
   def close_statement(self, notebook, snippet):
     return {'status': -1}
 
