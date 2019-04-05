@@ -417,6 +417,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_dump_config" class="embeddable"></div>
       <div id="embeddable_threads" class="embeddable"></div>
       <div id="embeddable_metrics" class="embeddable"></div>
+      <div id="embeddable_connectors" class="embeddable"></div>
       <div id="embeddable_403" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
@@ -562,6 +563,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
     threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
     metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
     sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
     jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
     % if other_apps:

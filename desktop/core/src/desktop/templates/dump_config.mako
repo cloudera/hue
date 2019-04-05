@@ -25,10 +25,11 @@ LOG = logging.getLogger(__name__)
 %>
 
 <%namespace name="layout" file="about_layout.mako" />
-%if not is_embeddable:
-${ commonheader(_('Configuration'), "about", user, request, "70px") | n,unicode }
-%endif
-${ layout.menubar(section='dump_config') }
+
+% if not is_embeddable:
+  ${ commonheader(_('Configuration'), "about", user, request, "70px") | n,unicode }
+% endif
+  ${ layout.menubar(section='dump_config') }
 
 <style type="text/css">
   .card-heading .pull-right {

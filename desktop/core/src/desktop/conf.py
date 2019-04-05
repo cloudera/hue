@@ -686,6 +686,24 @@ METRICS = ConfigSection(
   )
 )
 
+
+CONNECTORS = ConfigSection(
+  key='connectors',
+  help=_("""Configuration options for connectors to external services"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Enable connector page'),
+      default=False,
+      type=coerce_bool),
+   LIST=Config(
+      key='list',
+      default=['impala'],
+      type=coerce_csv),
+  )
+)
+
+
 DATABASE = ConfigSection(
   key='database',
   help=_("""Configuration options for specifying the Desktop Database.
@@ -1915,7 +1933,7 @@ def config_validator(user):
   # Validate if oozie email server is active
   try:
     from oozie.views.editor2 import _is_oozie_mail_enabled
-  
+
     if not _is_oozie_mail_enabled(user):
       res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
   except Exception, e:
