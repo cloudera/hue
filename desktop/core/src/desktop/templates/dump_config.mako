@@ -40,12 +40,12 @@ ${ layout.menubar(section='dump_config') }
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="card card-home">
-      <h2 class="card-heading simple">
-        <div class="pull-right muted">
-          ${_('Configuration files located in')} <code style="color: #0B7FAD">${conf_dir}</code>
-        </div>
-        ${_('Configuration Sections and Variables')}
-      </h2>
+      <div class="pull-right muted">
+        ${_('Configuration files located in')} <code style="color: #0B7FAD">${conf_dir}</code>
+      </div>
+      <h1 class="margin-top-20 margin-bottom-30">
+        ${_('Configuration Sections')}
+      </h1>
       <div class="card-body clearfix">
         <div class="span2">
           <ul class="nav nav-pills nav-stacked">
