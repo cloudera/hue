@@ -214,12 +214,13 @@ ${ layout.menubar(section='quick_start') }
 
           </div>
       </div>
-
-      <div class="form-actions">
-        <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
-        <a id="doneBtn" class="btn btn-primary disable-feedback hide">${ _('Done') }</a>
-        <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
+      <div class="card-body">
+        <div class="form-actions">
+          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+          <a id="doneBtn" class="btn btn-primary disable-feedback hide">${ _('Done') }</a>
+          <span class="pull-right muted" style="padding-right:30px">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
+        </div>
       </div>
       % else:
        <div class="card-body">
