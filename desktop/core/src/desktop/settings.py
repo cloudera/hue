@@ -27,7 +27,7 @@ import os
 import pkg_resources
 import sys
 
-from guppy import hpy
+#from guppy import hpy
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -588,9 +588,9 @@ if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE')
   raise Exception(_('SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s') % os.environ['REQUESTS_CA_BUNDLE'])
 
 # Memory
-if desktop.conf.MEMORY_PROFILER.get():
-  MEMORY_PROFILER = hpy()
-  MEMORY_PROFILER.setrelheap()
+#if desktop.conf.MEMORY_PROFILER.get():
+#  MEMORY_PROFILER = hpy()
+#  MEMORY_PROFILER.setrelheap()
 
 # Instrumentation
 if desktop.conf.INSTRUMENTATION.get():
