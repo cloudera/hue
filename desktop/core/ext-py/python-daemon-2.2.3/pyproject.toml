@@ -1,0 +1,16 @@
+# pyproject.toml
+# Build system requirements for Python code in this code base.
+# Documentation: <URL:https://www.python.org/dev/peps/pep-0518/>.
+
+[build-system]
+
+# Minimum requirements for the build system.
+requires = ["setuptools", "wheel", "docutils"]
+
+
+# Local-variables:
+# coding: utf-8
+# mode: conf
+# mode: toml
+# End:
+# vim: fileencoding=utf-8 filetype=toml :
