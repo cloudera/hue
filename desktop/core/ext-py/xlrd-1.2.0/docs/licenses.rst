@@ -1,0 +1,4 @@
+Licenses
+========
+
+.. literalinclude:: ../LICENSE
