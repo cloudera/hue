@@ -17,7 +17,6 @@
 
 import logging
 
-from django.urls import reverse, NoReverseMatch
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -37,6 +36,7 @@ class ImpalaConnector():
 
 
 class Connectors(models.Model):
+  type = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive-tez, '))  # Must be in lib
 
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -44,8 +44,7 @@ class Connectors(models.Model):
 
   category = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. query, browser, catalog...'))
   interface = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hiveserver2'))
-  type = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive-tez, '))
 
-  data = models.TextField(default='{}')
+  settings = models.TextField(default='{}')
 
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))

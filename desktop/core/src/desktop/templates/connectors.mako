@@ -31,9 +31,9 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonheader(_('Connectors'), "about", user, request) | n,unicode }
-%endif
+% endif
 
 
 <script type="text/javascript">
@@ -95,14 +95,14 @@ ${layout.menubar(section='connectors')}
         <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
           <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
         </li>
-        <!-- ko foreach: metrics() -->
-        <li data-bind="css: { 'active': $root.selectedMetric() === $data.category }">
-          <a href="javascript:void(0)" data-bind="text: $data.category, click: function(){ $root.selectedMetric($data.category) }"></a>
+        <!-- ko foreach: filteredMetrics() -->
+        <li data-bind="css: { 'active': $root.selectedMetric() === category }">
+          <a href="javascript:void(0)" data-bind="text: category, click: function(){ $root.selectedMetric(category) }"></a>
         </li>
         <!-- /ko -->
       </ul>
       <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
-          class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter metrics...') }">
+          class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter connectors...') }">
     </div>
 
     <div class="margin-top-10">
@@ -112,14 +112,14 @@ ${layout.menubar(section='connectors')}
           <thead>
             <tr>
               <th width="30%">${ _('Name') }</th>
-              <th>${ _('Value') }</th>
+              <th>${ _('Instances') }</th>
             </tr>
           </thead>
           <!-- ko if: $data.values -->
           <tbody data-bind="foreach: values">
             <tr>
               <td data-bind="text: name"></td>
-              <td data-bind="text: ''"></td>
+              <td data-bind="text: instances.length > 0 ? instances.length : ''"></td>
             </tr>
           </tbody>
           <!-- /ko -->
@@ -138,7 +138,7 @@ ${layout.menubar(section='connectors')}
         <thead>
           <tr>
             <th width="30%">${ _('Name') }</th>
-            <th>${ _('Value') }</th>
+            <th>${ _('Instances') }</th>
           </tr>
         </thead>
         <tfoot>
