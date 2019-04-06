@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odf2war">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odf2war</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+<refnamediv>
+<refname>odf2war</refname>
+<refpurpose>Convert ODF to KDE web archive</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odf2war</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>odf2war</command> is a program that will create 
+a KDE Web Archive (.war) that can be read by Konqueror filemanager. It 
+will write the web archive to stdout. The WAR plugin is part of the 
+kdeaddons package.
+</para>
+<para>
+&quot;Path&quot; is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odf2war odf-file
+</screen>
+</refsect1>
+<refsect1><title>See Also</title>
+<para>
+<command>odftools</command>(1),
+<command>odf2mht</command>(1)
+</para>
+</refsect1>
+</refentry>
+

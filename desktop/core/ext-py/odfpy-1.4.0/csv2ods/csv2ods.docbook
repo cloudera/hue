@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="csv2ods">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Agustin</firstname><surname>Henze</surname>
+    <contrib>Original author of csv-ods.py</contrib>
+    <email>agustinhenze at gmail.com</email></author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>csv2ods</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+    <refname>csv2ods</refname>
+    <refpurpose>Create OpenDocument spreadsheet from comma separated values</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>csv2ods</command>
+      <arg choice="plain">-i <replaceable>file.csv</replaceable></arg>
+      <arg choice="plain">-o <replaceable>file.ods</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para>
+This program reads a file in CSV format - table of columns delimited by commas,
+tabs or any other character. It then creates a spreadsheet. If a value looks like a number
+the cell is formatted as a number as well.
+</para>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>--version</term>
+        <listitem>
+          <para>
+Show program's version number and exit
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-h, --help</term>
+        <listitem>
+          <para>
+Show help message and exit
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-i <replaceable>INPUT</replaceable>, --input=<replaceable>INPUT</replaceable></term>
+        <listitem>
+          <para>
+                        File input in csv.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-o <replaceable>OUTPUT</replaceable>, --output=<replaceable>OUTPUT</replaceable></term>
+        <listitem>
+          <para>
+                        File output in ods.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-d <replaceable>DELIMITER</replaceable>, --delimiter=<replaceable>DELIMITER</replaceable></term>
+
+        <listitem>
+          <para>
+                        Specifies a one-character string to use as the field
+                        separator.  It defaults to ",".
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-c <replaceable>ENCODING</replaceable>, --encoding=<replaceable>ENCODING</replaceable></term>
+        <listitem>
+          <para>
+                        Specifies the encoding the file csv. It defaults to utf-8.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-t <replaceable>TABLENAME</replaceable>, --table=<replaceable>TABLENAME</replaceable></term>
+        <listitem>
+          <para>
+                        The table name in the output file.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-s <replaceable>SKIPINITIALSPACE</replaceable>, --skipinitialspace=<replaceable>SKIPINITIALSPACE</replaceable></term>
+        <listitem>
+          <para>
+                        Specifies how to interpret whitespace which
+                        immediately follows a delimiter.  It defaults to
+                        False, which
+                        means that whitespace immediately following a
+                        delimiter is part
+                        of the following field.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-l <replaceable>LINETERMINATOR</replaceable>, --lineterminator=<replaceable>LINETERMINATOR</replaceable></term>
+        <listitem>
+          <para>
+                        Specifies the character sequence which should
+                        terminate rows.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-q <replaceable>QUOTING</replaceable>, --quoting=<replaceable>QUOTING</replaceable></term>
+        <listitem>
+          <para>
+                        It can take on any of the following module constants:
+                        0 = QUOTE_MINIMAL means only when required, for
+                        example, when a field contains either the quotechar or
+                        the delimiter.
+                        1 = QUOTE_ALL means that quotes are always placed
+                        around fields.
+                        2 = QUOTE_NONNUMERIC means that quotes are always
+                        placed around fields which do not parse as integers or
+                        floating point numbers.
+                        3 = QUOTE_NONE means that quotes are never placed
+                        around fields.
+                        It defaults is QUOTE_MINIMAL.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-e <replaceable>ESCAPECHAR</replaceable>, --escapechar=<replaceable>ESCAPECHAR</replaceable></term>
+        <listitem>
+          <para>
+                        Specifies a one-character string used to escape the
+                        delimiter when quoting is set to QUOTE_NONE.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-r <replaceable>QUOTECHAR</replaceable>, --quotechar=<replaceable>QUOTECHAR</replaceable></term>
+        <listitem>
+          <para>
+                        Specifies a one-character string to use as the quoting
+                        character.  It defaults to ".
+</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>Example</title>
+    <screen>
+csv2ods -i /etc/passwd -o accounts.odt -d:
+</screen>
+  </refsect1>
+</refentry>

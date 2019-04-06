@@ -1,0 +1,192 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odfmeta">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odfmeta</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+
+<refnamediv>
+<refname>odfmeta</refname>
+<refpurpose>List or change the metadata of an ODF file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odfmeta</command>
+    <arg>-l</arg>
+    <arg>-v</arg>
+    <arg>-V</arg>
+    <arg>-c</arg>
+    <arg>-d</arg>
+    <arg rep="repeat">-x <replaceable>metafield</replaceable></arg>
+    <arg rep="repeat">-X <replaceable>metafield</replaceable></arg>
+    <arg rep="repeat">-a <replaceable>metafield</replaceable></arg>
+    <arg rep="repeat">-A <replaceable>metafield</replaceable></arg>
+    <arg rep="repeat">-I <replaceable>metafield</replaceable></arg>
+
+    <arg choice="opt">-o <replaceable>path</replaceable></arg>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>odfmeta</command> is a program that will list or change 
+the metadata in an OpenDocument file. This is useful for version 
+control systems. You can change title, keywords, description etc.
+</para>
+<para>
+<quote>Path</quote> is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<variablelist>
+
+<varlistentry>
+<term>-l</term>
+<listitem>
+<para>
+List (extract) all known metadata fields.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-v or -V</term>
+<listitem>
+<para>
+Print the version number of the ODF document <emphasis>format</emphasis>.
+If you use -V it will print "version:" before the number for compatibility with -X.
+The version number can't be modified.
+
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>-c</term>
+<listitem>
+<para>
+Make field values continous by normalizing white space.
+Might be convenient when postprocessing with standard (line  oriented) text utilities.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-d</term>
+<listitem>
+<para>
+Update the modification date to the current date and time.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-x <replaceable>metafield</replaceable></term>
+<listitem>
+<para>
+Extract the contents of this metafield from the file.
+Known field names are 
+creation-date,
+creator,
+date,
+description,
+editing-cycles,
+editing-duration,
+generator,
+initial-creator,
+keyword,
+language,
+print-date,
+printed-by,
+subject,
+title,
+user-defined.
+All other names are assumed to be user defined.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-X <replaceable>metafield</replaceable></term>
+<listitem>
+<para>
+Same as -x, but also preserves/includes the field name.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-a <replaceable>metafield</replaceable></term>
+<listitem>
+<para>
+Append a custom metafield to the metadata; but only if a similar field does not exist yet.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-A <replaceable>metafield</replaceable></term>
+<listitem>
+<para>
+Append a custom metafield to the metadata in any case.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-I <replaceable>metafield</replaceable></term>
+<listitem>
+<para>
+Append a custom metafield to the metadata and remove any existing similar field.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-o <replaceable>path</replaceable></term>
+<listitem>
+<para>
+Filename to write modified ODT file to.
+If no <option>-o</option> option is provided, the ODT file will be written to stdout.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</refsect1>
+
+<refsect1><title>Examples</title>
+<screen>
+odfmeta -l odf-file.odt
+odfmeta -I "title:The Little Engine That Could" -A subject:I-think-I-can -o newfile.odt source.odt
+</screen>
+</refsect1>
+
+<refsect1><title>See Also</title>
+<para>
+<command>formail</command>(1),
+<command>id3tag</command>(1)
+</para>
+</refsect1>
+
+<refsect1><title>Bugs</title>
+<para>
+All known versions of OpenOffice.org keep only four &lt;meta:user-defined&gt; elements.
+If you add more than those, you'll loose them next time you save with OpenOffice.org.
+KOffice keeps only one &lt;meta:keyword&gt; element.
+</para>
+</refsect1>
+
+</refentry>
+

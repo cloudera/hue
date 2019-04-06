@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odfsign">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odfsign</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+<refnamediv>
+<refname>odfsign</refname>
+<refpurpose>Verify a signed ODF document</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odfsign</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>odfsign</command> checks that the checksums
+used in the signature are correct.
+<emphasis>It does not check that the x509 digest is correct!</emphasis>
+Therefore it is currently of little use.
+</para>
+<para>
+&quot;Path&quot; is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odfsign odf-file
+</screen>
+</refsect1>
+<refsect1><title>See Also</title>
+<para>
+http://www.w3.org/TR/xmldsig-core
+</para>
+</refsect1>
+</refentry>
+

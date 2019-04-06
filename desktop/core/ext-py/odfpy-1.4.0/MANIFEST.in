@@ -1,0 +1,5 @@
+include *.txt api-for-odfpy.odt
+recursive-include * *.1 *.docbook Makefile
+recursive-include tests *.txt *.py runtests *.odt *.ods *.odp
+recursive-include examples *.txt *.py
+recursive-include contrib *.txt *.py

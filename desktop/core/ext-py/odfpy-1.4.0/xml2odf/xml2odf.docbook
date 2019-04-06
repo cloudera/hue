@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="xml2odf">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>xml2odf</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+
+<refnamediv>
+<refname>xml2odf</refname>
+<refpurpose>Create ODF package from OpenDocument in XML form</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>xml2odf</command>
+    <arg choice="opt">-o <replaceable>outputfile</replaceable></arg>
+    <arg choice="opt">-s</arg>
+    <arg choice="opt"><replaceable>inputfile</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+OpenDocument can be a complete office document in a single
+XML file. The script will take such a document and create a package.
+This is mainly useful as a postprocesser of a program producing XML,
+such as a stylesheet.
+</para>
+<para>
+<quote>Inputfile</quote> is assumed to be an
+OpenDocument file in XML form.
+If there is no inputfile, the program will read from standard input.
+
+The flag -s adds correct suffix to the filename according to what mime type
+is found in the XML file, in cause you don't know already what document
+type you are packaging.
+</para>
+<para>
+If output file is not specified output will be to standard out.
+</para>
+<para>
+Section 2.1.1 of <citetitle>Open Document Format for Office Applications</citetitle>
+says that the [content.xml] file contains the document content, along with the
+<emphasis>automatic styles</emphasis> needed for the document content.
+The [styles.xml] file contains all the named styles of a document, along with
+the <emphasis>automatic styles</emphasis> needed for the named styles.
+The application doesn't know which automatic style is needed for what, so
+it puts the same set of automatic styles into both files.
+</para>
+<para>
+One could assume that the inverse operation would be easier, but OpenOffice.org
+is quite happy to use the same names for two different automatic styles. For instance, a
+style used inside &lt;style:footer&gt; can have the same name as one used inside
+&lt;office:text&gt; but be a different paragraph style.
+This is reported as bug #90494 (http://www.openoffice.org/issues/show_bug.cgi?id=90494)
+</para>
+</refsect1>
+
+<refsect1><title>Example</title>
+<screen>
+xml2odf -o testdocument -s xml-file
+</screen>
+</refsect1>
+
+<refsect1><title>See Also</title>
+<para>
+<command>odftools</command>(1),
+<command>odf2xml</command>(1)
+</para>
+</refsect1>
+
+<refsect1><title>Bugs</title>
+<para>
+Doesn't handle external data -- images and such.
+</para>
+<para>
+The library used for the parsing of XML expands empty elements from
+&lt;element/&gt; to &lt;element&gt;&lt;/element&gt;. It should not have
+an effect on the document parsing.
+</para>
+</refsect1>
+
+</refentry>
+

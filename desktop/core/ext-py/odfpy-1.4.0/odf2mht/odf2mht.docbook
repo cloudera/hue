@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odf2mht">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+      <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odf2mht</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+<refnamediv>
+<refname>odf2mht</refname>
+<refpurpose>Convert ODF to HTML archive</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odf2mht</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>Odf2mht</command> is a program that will 
+create a MIME-encapsulated web archive (.mht) format where images are preserved.
+The file can be read by Internet Explorer, MS-Word and many email programs such as MS-Outlook.
+It will write the web archive to stdout.
+</para>
+<para>
+<quote>Path</quote> is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>References</title>
+<simplelist>
+<member>HTTRACK (http://www.httrack.com/) can create such archives with the -%M option.</member>
+<member>http://en.wikipedia.org/wiki/MHTML</member>
+<member>http://www.dsv.su.se/~jpalme/ietf/mhtml.html</member>
+<member>http://users.otenet.gr/~geosp/kmhtconvert/</member>
+<member>http://www.faqs.org/rfcs/rfc2557.html</member>
+</simplelist>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odf2mht example.odt &gt;example.mht
+</screen>
+</refsect1>
+
+<refsect1><title>Bugs</title>
+<para>
+IE6 seems to have problems with large MHT files.
+</para>
+</refsect1>
+<refsect1><title>See Also</title>
+<para>
+<command>odftools</command>(1),
+<command>odf2war</command>(1),
+<command>mailodf</command>(1)
+</para>
+</refsect1>
+</refentry>
+

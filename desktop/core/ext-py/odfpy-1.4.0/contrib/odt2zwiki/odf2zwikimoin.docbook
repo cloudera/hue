@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odf2zwikimoin">
+<refnamediv>
+<refname>odf2zwikimoin</refname>
+<refpurpose>Convert ODF to ZWiki MoinMoin format</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odf2zwikimoin</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>odf2zwikimoin</command> is a program that will create 
+a ZWiki MoinMoin format.
+See http://zwiki.org/.
+</para>
+<para>
+&quot;Path&quot; is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odf2zwikimoin odf-file
+</screen>
+</refsect1>
+</refentry>
+

@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odfimgimport">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+<refmeta>
+<refentrytitle>odfimgimport</refentrytitle>
+<manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>odfimgimport</refname>
+<refpurpose>Import external images</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odfimgimport</command>
+    <arg choice="opt">-q</arg>
+    <arg choice="opt">-o <replaceable>outputfile</replaceable></arg>
+    <arg choice="opt"><replaceable>inputfile</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+If you copy and paste html from your webbrowser to your word processor,
+the pictures in the pasted text will still load the images from the Internet.
+This script will import all images into the OpenDocument file.
+</para>
+<para>
+If you don't provide an input file, the program will read from stdin.
+If the program reads from stdin, it might not know how to resolve relative filenames.
+If you don't provide an output file, the program will import the pictures into the input file.
+</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<variablelist>
+
+<varlistentry>
+<term>-q</term>
+<listitem>
+<para>
+If there are images that can't be imported, odfimgimport will write how many has failed.
+The -q flag will prevent that.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-v</term>
+<listitem>
+<para>
+Verbose: Prints the URL of every image it tries to import and the result.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-o <replaceable>outputfile</replaceable></term>
+<listitem>
+<para>
+The file to save the output to. "-" is stdout. Defaults to the input file.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</refsect1>
+
+<refsect1><title>Example</title>
+<screen>
+odfimgimport -v -o newfile.odt oldfile.odt
+</screen>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odf2epub">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odf2epub</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+    <refname>odf2epub</refname>
+    <refpurpose>Convert ODF to an ePub ebook</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>odf2epub</command>
+      <arg choice="opt">-p </arg>
+      <arg choice="opt">-o <replaceable>outputfile</replaceable></arg>
+      <arg choice="opt">-c <replaceable>cover_image</replaceable></arg>
+      <arg choice="plain">
+        <replaceable>path</replaceable>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para><command>odf2epub</command> is a program that will create 
+an ebook (.epub) from the input file and will write the ebook to stdout or a file specified by -o.
+"Path" is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+    <para>
+If the document doesn't have a title in the properties, then the first heading of any level is used.
+</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>-c, --cover</term>
+        <listitem>
+          <para>
+The -c argument add a cover image to the EPUB file.
+Make sure the cover image itself is scaled to less than 1000px in width and height. Best practice
+is to use an image in JPG or PNG format at 600 pixels wide by 800 pixels in height.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-p, --plain</term>
+        <listitem>
+          <para>
+The -p flag will generate HTML without CSS.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-o, --output</term>
+        <listitem>
+          <para>
+Specify the output file with this flag. "-" implies standard out.
+</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Example</title>
+    <screen>
+odf2epub -o example.epub odf-file.odt
+</screen>
+  </refsect1>
+  <refsect1>
+    <title>Bugs</title>
+    <para>The EPUB format has the following limitations when running on a mobile  device.
+    If these limits are not adhered to, EPUB files <emphasis>might</emphasis> not work on mobile devices. Image Size: 10MB uncompressed.
+    Individual XHTML file sizes: 300k uncompressed/100k compressed. Odf2epub does not ensure
+    that these limits are adhered to.
+              </para>
+  </refsect1>
+  <refsect1>
+    <title>See Also</title>
+    <para><command>odf2xhtml</command>(1)</para>
+  </refsect1>
+</refentry>
