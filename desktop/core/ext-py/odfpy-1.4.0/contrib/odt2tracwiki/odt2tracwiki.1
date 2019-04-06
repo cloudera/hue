@@ -1,0 +1,57 @@
+'\" t
+.\"     Title: odt2tracwiki
+.\"    Author: S\(/oren Roug
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 01/09/2013
+.\"    Manual: User commands
+.\"    Source: odfpy
+.\"  Language: English
+.\"
+.TH "ODT2TRACWIKI" "1" "01/09/2013" "odfpy" "User commands"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+odt2tracwiki \- Convert ODF to Trac Wiki format
+.SH "SYNOPSIS"
+.HP \w'\fBodt2tracwiki\fR\ 'u
+\fBodt2tracwiki\fR \fIpath\fR
+.SH "DESCRIPTION"
+.PP
+\fBodt2tracwiki\fR
+is a program that will create a Trac Wiki format\&. See http://trac\&.edgewall\&.org/\&. I expect to add a feature that will upload the page with images to a Trac Wiki page using XML\-RPC\&. http://trac\-hacks\&.org/wiki/XmlRpcPlugin
+.PP
+"Path" is assumed to be an OpenDocument file of text, spreadsheet or presentation type\&.
+.SH "EXAMPLE"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+odt2tracwiki odf\-file
+.fi
+.if n \{\
+.RE
+.\}
+.SH "AUTHOR"
+.PP
+\fBS\(/oren Roug\fR
+.RS 4
+Original author
+.RE
