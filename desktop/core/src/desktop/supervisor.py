@@ -29,7 +29,8 @@ In order to have your application managed by supervisor, you need to add
 an entry_point to your application's egg with the name 'desktop.supervisor.specs'.
 This entry point should point to a SuperviseeSpec instance in your module.
 """
-from daemon.pidlockfile import PIDLockFile
+#from daemon.pidlockfile import PIDLockFile
+from daemon.pidfile import TimeoutPIDLockFile
 import daemon
 import exceptions
 import grp
@@ -112,17 +113,6 @@ class DjangoCommandSupervisee(SuperviseeSpec):
   @property
   def cmdv(self):
     return [ HUE_BIN, self.django_command ]
-
-
-class TimeOutPIDLockFile(PIDLockFile):
-  """A PIDLockFile subclass that passes through a timeout on acquisition."""
-  def __init__(self, lockfile, timeout, **kwargs):
-    PIDLockFile.__init__(self, lockfile, **kwargs)
-    self.timeout = timeout
-
-  def __enter__(self):
-    super(TimeOutPIDLockFile, self).acquire(timeout=self.timeout)
-    return self
 
 
 class Supervisor(threading.Thread):
