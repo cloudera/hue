@@ -35,7 +35,7 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.rest.http_client import RestException
-from desktop.lib.thrift_util import unpack_guid
+from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
@@ -442,7 +442,7 @@ class HS2Api(Api):
         'finished': job.get('finished', False)
       } for job in jobs_with_state]
     elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
-      query_id = unpack_guid(snippet['result']['handle']['guid'])
+      query_id = unpack_guid_base64(snippet['result']['handle']['guid'])
       progress = min(self.progress(snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
         'name': query_id,
@@ -766,17 +766,18 @@ DROP TABLE IF EXISTS `%(table)s`;
 
   def _get_handle(self, snippet):
     try:
-      snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+      handle = snippet['result']['handle'].copy()
+      handle['secret'], handle['guid'] = HiveServerQueryHandle.get_decoded(handle['secret'], handle['guid'])
     except KeyError:
       raise Exception('Operation has no valid handle attached')
     except binascii.Error:
       LOG.warn('Handle already base 64 decoded')
 
-    for key in snippet['result']['handle'].keys():
+    for key in handle.keys():
       if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
-        snippet['result']['handle'].pop(key)
+        handle.pop(key)
 
-    return HiveServerQueryHandle(**snippet['result']['handle'])
+    return HiveServerQueryHandle(**handle)
 
 
   def _get_db(self, snippet, async=False, cluster=None):
@@ -877,7 +878,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     guid = None
     if 'result' in snippet and 'handle' in snippet['result'] and 'guid' in snippet['result']['handle']:
       try:
-        guid = unpack_guid(base64.decodestring(snippet['result']['handle']['guid']))
+        guid = unpack_guid_base64(snippet['result']['handle']['guid'])
       except Exception, e:
         LOG.warn('Failed to decode operation handle guid: %s' % e)
     else:
