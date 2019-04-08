@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import base64
 import Queue
 import logging
 import socket
@@ -540,6 +540,9 @@ def _unpack_guid_secret_in_handle(str_args):
 
 def unpack_guid(guid):
   return "%016x:%016x" % struct.unpack(b"QQ", guid)
+
+def unpack_guid_base64(guid):
+  return "%016x:%016x" % struct.unpack(b"QQ", base64.decodestring(guid))
 
 def simpler_string(thrift_obj):
   """
