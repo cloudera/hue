@@ -135,6 +135,9 @@ ko.bindingHandlers.autocomplete = {
           if (options.limitWidthToInput) {
             ul.css('max-width', Math.max(options.minWidth, $element.outerWidth(true)) + 'px');
           }
+          ul.css('min-width', options.minWidth || $element.outerWidth(true));
+          ul.css('min-height', options.minHeight || '20px');
+
 
           ul.addClass(this.options.classPrefix + 'autocomplete');
           $.each(items, (index, item) => {

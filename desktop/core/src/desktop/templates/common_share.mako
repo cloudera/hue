@@ -65,8 +65,8 @@ from django.utils.translation import ugettext as _
     <div class="clearfix"></div>
     <div style="margin-top: 20px">
       <div class="input-append">
-      <div id="menu"></div>
-      <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection, appendTo: $('#menu') }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
+        <div id="menu" style="font-size: 14px;"></div>
+        <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection, appendTo: $('#menu') }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
         <div class="btn-group">
           <a id="documentShareAddBtn" class="btn"><span data-bind="text: selectedPermLabel"></span></a>
           <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
