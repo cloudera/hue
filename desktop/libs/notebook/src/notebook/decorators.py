@@ -79,7 +79,8 @@ def check_document_modify_permission():
 
       try:
         if notebook.get('id'):
-          doc2 = Document2.objects.get(id=notebook['id'])
+          doc2 = Document2.objects.get(uuid=notebook['parentSavedQueryUuid']) if notebook.get('parentSavedQueryUuid') else \
+            Document2.objects.get(id=notebook['id'])
           doc2.can_write_or_exception(request.user)
       except Document.DoesNotExist:
         raise PopupException(_('Document %(id)s does not exist') % {'id': notebook.get('id')})
