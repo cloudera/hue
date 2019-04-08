@@ -396,6 +396,19 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should handle "SELECT a as \'a\', b "b", c as `c` from d \'d\', e as "e", f as `f`;"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT a as \'a\', b "b", c as `c` from d \'d\', e as "e", f as `f`; ',
+        afterCursor: '',
+        noErrors: true,
+        dialect: 'impala',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest columns "SELECT IF(baa, boo, bee) AS b, | FROM testTable;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT IF(baa, boo, bee) AS b, ',
