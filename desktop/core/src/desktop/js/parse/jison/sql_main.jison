@@ -3721,12 +3721,16 @@ SimpleTable_EDIT
 OptionalCorrelationName
  :
  | RegularOrBacktickedIdentifier        -> { alias: $1, location: @1 }
+ | QuotedValue                          -> { alias: $1, location: @1 }
  | AnyAs RegularOrBacktickedIdentifier  -> { alias: $2, location: @2 }
+ | AnyAs QuotedValue                    -> { alias: $2, location: @2 }
  ;
 
 OptionalCorrelationName_EDIT
  : PartialBacktickedIdentifier
+ | QuotedValue_EDIT
  | AnyAs PartialBacktickedIdentifier
+ | AnyAs QuotedValue_EDIT
  | AnyAs 'CURSOR'
  ;
 
