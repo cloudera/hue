@@ -40,10 +40,10 @@ def _init_clients():
   CLIENT_CACHE = {}
   CLIENT_CACHE["azure"] = {}
   CLIENT_CACHE["adls"] = {}
-  for identifier in conf.AZURE_ACCOUNTS.keys():
+  for identifier in list(conf.AZURE_ACCOUNTS.keys()):
     CLIENT_CACHE["azure"][identifier] = _make_azure_client(identifier)
 
-  for identifier in conf.ADLS_CLUSTERS.keys():
+  for identifier in list(conf.ADLS_CLUSTERS.keys()):
     CLIENT_CACHE["adls"][identifier] = _make_adls_client(identifier)
 
 def _make_adls_client(identifier):

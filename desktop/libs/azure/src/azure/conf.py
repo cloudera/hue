@@ -123,7 +123,7 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_adls_enabled():
-  return ('default' in AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None)
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None)
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
@@ -139,7 +139,7 @@ def config_validator(user):
       headers = azure.client.get_client('default')._getheaders()
       if not headers.get('Authorization'):
         raise ValueError('Failed to obtain Azure authorization token')
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Failed to obtain Azure authorization token.')
       res.append(('azure', _t('Failed to obtain Azure authorization token, check your azure configuration.')))
 
