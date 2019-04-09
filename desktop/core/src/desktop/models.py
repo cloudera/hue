@@ -15,11 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import str
+from builtins import object
 import calendar
 import json
 import logging
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import uuid
 
 from collections import OrderedDict
@@ -36,7 +42,7 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from settings import HUE_DESKTOP_VERSION
+from .settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, has_adls_access
@@ -91,7 +97,7 @@ def _version_from_properties(f):
 PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
 
 class HueUser(auth_models.User):
-  class Meta:
+  class Meta(object):
     proxy = True
 
   def __init__(self, *args, **kwargs):
@@ -159,7 +165,7 @@ class DefaultConfiguration(models.Model):
 
   objects = DefaultConfigurationManager()
 
-  class Meta:
+  class Meta(object):
     ordering = ["app", "-is_default", "user"]
 
 
@@ -292,7 +298,7 @@ class DocumentTag(models.Model):
 
   objects = DocumentTagManager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('owner', 'tag')
 
 
@@ -434,7 +440,7 @@ class DocumentManager(models.Manager):
               if not job.managed:
                 doc.extra = 'jobsub'
                 doc.save()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing oozie')
 
     try:
@@ -446,7 +452,7 @@ class DocumentManager(models.Manager):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
             if job.is_trashed:
               doc.send_to_trash()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing beeswax')
 
     try:
@@ -456,7 +462,7 @@ class DocumentManager(models.Manager):
         with transaction.atomic():
           for job in find_jobs_with_no_doc(PigScript):
             Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing pig')
 
     try:
@@ -479,7 +485,7 @@ class DocumentManager(models.Manager):
                 dashboard_doc = Document2.objects.create(name=dashboard.label, uuid=_uuid, type='search-dashboard', owner=owner, description=dashboard.label, data=dashboard.properties)
                 Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
                 dashboard.save()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing search')
 
     try:
@@ -499,7 +505,7 @@ class DocumentManager(models.Manager):
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing Document2')
 
 
@@ -509,7 +515,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(tags=None):
           default_tag = DocumentTag.objects.get_default_tag(doc.owner)
           doc.tags.add(default_tag)
-      except Exception, e:
+      except Exception as e:
         LOG.exception('error adding at least one tag to docs')
 
       # Make sure all the sample user documents are shared.
@@ -524,7 +530,7 @@ class DocumentManager(models.Manager):
 
             doc.save()
             Document.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
-      except Exception, e:
+      except Exception as e:
         LOG.exception('error sharing sample user documents')
 
       # For now remove the default tag from the examples
@@ -532,7 +538,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
           default_tag = DocumentTag.objects.get_default_tag(doc.owner)
           doc.tags.remove(default_tag)
-      except Exception, e:
+      except Exception as e:
         LOG.exception('error removing default tags')
 
       # ------------------------------------------------------------------------
@@ -601,7 +607,7 @@ class DocumentManager(models.Manager):
           if docs.exists():
             LOG.info('Deleting %s documents' % docs.count())
             docs.delete()
-      except Exception, e:
+      except Exception as e:
         LOG.exception('Error in sync while attempting to delete documents with no object: %s' % e)
 
 
@@ -623,7 +629,7 @@ class Document(models.Model):
 
   objects = DocumentManager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('content_type', 'object_id')
 
   def __unicode__(self):
@@ -749,7 +755,7 @@ class Document(models.Model):
         return staticfiles_storage.url(apps[self.content_type.app_label].icon_path)
       else:
         return staticfiles_storage.url('desktop/art/icon_hue_48.png')
-    except Exception, e:
+    except Exception as e:
       LOG.warn(force_unicode(e))
       return staticfiles_storage.url('desktop/art/icon_hue_48.png')
 
@@ -765,7 +771,7 @@ class Document(models.Model):
 
     Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
     """
-    for name, perm in perms_dict.iteritems():
+    for name, perm in perms_dict.items():
       users = groups = None
       if perm.get('user_ids'):
         users = auth_models.User.objects.in_bulk(perm.get('user_ids'))
@@ -879,7 +885,7 @@ class DocumentPermission(models.Model):
 
   objects = DocumentPermissionManager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('doc', 'perms')
 
 
@@ -1089,7 +1095,7 @@ class Document2(models.Model):
 
   objects = Document2Manager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('uuid', 'version', 'is_history')
     ordering = ["-last_modified", "name"]
 
@@ -1106,7 +1112,7 @@ class Document2(models.Model):
 
   @property
   def path(self):
-    quoted_name = urllib.quote(self.name.encode('utf-8'))
+    quoted_name = urllib.parse.quote(self.name.encode('utf-8'))
     if self.parent_directory:
       return '%s/%s' % (self.parent_directory.path, quoted_name)
     else:
@@ -1340,7 +1346,7 @@ class Document2(models.Model):
         # For directories, update all children recursively with same permissions
         for child in self.children.all():
           child.share(user, name, users, groups)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_("Failed to share document: %s") % e)
     return self
 
@@ -1372,7 +1378,7 @@ class Document2(models.Model):
 
     try:
       doc = self.doc.get()
-    except Exception, e:
+    except Exception as e:
       LOG.error('Exception when retrieving document object for saved query: %s' % e)
       doc = Document.objects.link(
         self,
@@ -1464,7 +1470,7 @@ class Directory(Document2):
 
   objects = DirectoryManager()
 
-  class Meta:
+  class Meta(object):
     proxy = True
 
   def get_children_documents(self):
@@ -1531,7 +1537,7 @@ class Document2Permission(models.Model):
   # link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
   # embed
 
-  class Meta:
+  class Meta(object):
     unique_together = ('doc', 'perms')
 
   def to_dict(self):
@@ -1560,7 +1566,7 @@ def get_cluster_config(user):
 ANALYTIC_DB = 'altus'
 
 
-class ClusterConfig():
+class ClusterConfig(object):
   """
   Configuration of the apps and engines that each individual user sees on the core Hue.
   Fine grained Hue permissions and available apps are leveraged here in order to render the correct UI.
@@ -1621,7 +1627,7 @@ class ClusterConfig():
     if not apps:
       raise PopupException(_('No permission to any app.'))
 
-    default_app = apps.values()[0]
+    default_app = list(apps.values())[0]
     default_interpreter = default_app.get('interpreters')
 
     try:
@@ -1907,14 +1913,14 @@ class ClusterConfig():
       return None
 
 
-class Cluster():
+class Cluster(object):
 
   def __init__(self, user):
     self.user = user
     self.clusters = get_clusters(user)
 
     if len(self.clusters) == 1:
-      self.data = self.clusters.values()[0]
+      self.data = list(self.clusters.values())[0]
     elif IS_K8S_ONLY.get():
       self.data = self.clusters['AltusV2']
       self.data['type'] = 'altus' # To show simplified UI
@@ -1935,7 +1941,7 @@ def _get_apps(user, section=None):
   other_apps = []
   if user.is_authenticated():
     apps_list = appmanager.get_apps_dict(user)
-    apps = apps_list.values()
+    apps = list(apps_list.values())
     for app in apps:
       if app.display_name not in [
           'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',

@@ -16,14 +16,17 @@
 
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import filter
 import posixpath
-import urlparse
+import urllib.parse
 
 from desktop.lib.fs.proxyfs import ProxyFS
 
 
 def splitpath(path):
-  split = urlparse.urlparse(path)
+  split = urllib.parse.urlparse(path)
   if split.scheme and split.netloc:
     parts = [split.scheme + '://', split.netloc] + split.path.split('/')
   elif split.scheme and split.path:
@@ -33,7 +36,7 @@ def splitpath(path):
   else:
     parts = ['/'] + posixpath.normpath(path).split('/')
   # Filter empty parts out
-  return filter(len, parts)
+  return list(filter(len, parts))
 
 
 

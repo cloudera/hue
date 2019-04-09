@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 
 from django.contrib.auth.models import User
@@ -48,7 +49,7 @@ class Command(BaseCommand):
       try:
         user = User.objects.get(username=options['username'])
         users = [user]
-      except Exception, e:
+      except Exception as e:
         msg = 'Failed to get user with username %s: %s' % (options['username'], str(e))
         self.stdout.write(msg)
         LOG.exception(msg)
@@ -59,7 +60,7 @@ class Command(BaseCommand):
         self.stdout.write(msg)
         LOG.debug(msg)
         Document2.objects.create_user_directories(user)
-      except Exception, e:
+      except Exception as e:
         msg = 'Failed to create user directories for user %s: %s' % (user.username, str(e))
         self.stdout.write(msg)
         LOG.warn(msg)

@@ -53,7 +53,7 @@ def get_filesystem(name='default'):
 
 def _make_fs(name):
   fs_dict = {}
-  for schema, getter in FS_GETTERS.iteritems():
+  for schema, getter in FS_GETTERS.items():
     try:
       if getter is not None:
         fs = getter(name)
@@ -67,7 +67,7 @@ def _make_fs(name):
         raise exc_class, exc, tb
       else:
         logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, schema))
-    except Exception, e:
+    except Exception as e:
       logging.error('Failed to get filesystem called "%s" for "%s" schema: %s' % (name, schema, e))
   return ProxyFS(fs_dict, DEFAULT_SCHEMA)
 

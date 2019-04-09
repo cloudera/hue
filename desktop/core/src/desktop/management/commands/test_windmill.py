@@ -18,6 +18,7 @@
 Django management command that invokes windmill tests,
 after appropriate setup.
 """
+from builtins import object
 import sys
 import time
 from optparse import make_option

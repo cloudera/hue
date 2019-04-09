@@ -27,6 +27,7 @@ Direct Bind: requires nt_domain and ldap_username_pattern
 
 This script uses HUE libraries and works in HUE setup only.
 """
+from builtins import str
 import ldap
 import ldap.filter
 import logging

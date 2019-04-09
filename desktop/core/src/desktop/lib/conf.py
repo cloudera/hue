@@ -60,9 +60,13 @@ You _MUST_ define all Config, ConfigSection and UnspecifiedConfigSection objects
 application's conf.py. During startup, Desktop binds configuration files to your config
 variables.
 """
+from __future__ import print_function
 
 # The Config object unfortunately has a kwarg called "type", and everybody is
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 pytype = type
 
 from django.utils.encoding import smart_str
@@ -216,7 +220,7 @@ class Config(object):
     if dynamic_default is not None and not dynamic_default.__doc__ and not private:
       raise ValueError("Dynamic default '%s' must have __doc__ defined!" % (key,))
 
-    if pytype(default) in (int, long, float, complex, bool) and \
+    if pytype(default) in (int, int, float, complex, bool) and \
           not isinstance(type(default), pytype(default)):
       raise ValueError("%s: '%s' does not match that of the default value %r (%s)"
                       % (key, type, default, pytype(default)))
@@ -304,14 +308,14 @@ class Config(object):
       req_kw = "required"
     else:
       req_kw = "optional"
-    print >>out, indent_str + "Key: %s (%s)" % (self.get_presentable_key(), req_kw)
+    print(indent_str + "Key: %s (%s)" % (self.get_presentable_key(), req_kw), file=out)
     if self.default_value:
-      print >>out, indent_str + "  Default: %s" % repr(self.default)
+      print(indent_str + "  Default: %s" % repr(self.default), file=out)
     elif self.dynamic_default:
-      print >>out, indent_str + "  Dynamic default: %s" % self.dynamic_default.__doc__.strip()
+      print(indent_str + "  Dynamic default: %s" % self.dynamic_default.__doc__.strip(), file=out)
 
-    print >>out, self.get_presentable_help_text(indent=indent)
-    print >>out
+    print(self.get_presentable_help_text(indent=indent), file=out)
+    print(file=out)
 
   def get_presentable_help_text(self, indent=0):
     indent_str = " " * indent
@@ -354,7 +358,7 @@ class BoundContainer(BoundConfig):
       return self.bind_to.setdefault(self.grab_key, {})
 
   def keys(self):
-    return self.get_data_dict().keys()
+    return list(self.get_data_dict().keys())
 
 class BoundContainerWithGetAttr(BoundContainer):
   """
@@ -397,7 +401,7 @@ class ConfigSection(Config):
     """
     super(ConfigSection, self).__init__(key, default={}, **kwargs)
     self.members = members or {}
-    for member in members.itervalues():
+    for member in members.values():
       assert member.key is not _ANONYMOUS
 
 
@@ -408,12 +412,12 @@ class ConfigSection(Config):
     @param new_members  A dictionary of {key=Config(...), key2=Config(...)}.
     @param overwrite  Whether to overwrite the current member on key conflict.
     """
-    for member in new_members.itervalues():
+    for member in new_members.values():
       assert member.key is not _ANONYMOUS
     if not overwrite:
       new_members = new_members.copy()
-      for k in self.members.iterkeys():
-        if new_members.has_key(k):
+      for k in self.members.keys():
+        if k in new_members:
           del new_members[k]
     self.members.update(new_members)
 
@@ -429,7 +433,7 @@ class ConfigSection(Config):
     are bound configuration parameters.
     """
     return dict([(key, self.get_member(raw, key, prefix))
-                 for key in self.members.iterkeys()])
+                 for key in self.members.keys()])
 
   def get_member(self, data, attr, prefix):
     if self.key is not _ANONYMOUS:
@@ -440,15 +444,15 @@ class ConfigSection(Config):
     if self.private:
       return
     if not skip_header:
-      print >>out, (" " * indent) + "[%s]" % self.get_presentable_key()
-      print >>out, self.get_presentable_help_text(indent=indent)
-      print >>out
+      print((" " * indent) + "[%s]" % self.get_presentable_key(), file=out)
+      print(self.get_presentable_help_text(indent=indent), file=out)
+      print(file=out)
       new_indent = indent + 2
     else:
       new_indent = indent
 
     # We sort the configuration for canonicalization.
-    for programmer_key, config in sorted(self.members.iteritems(), key=lambda x: x[1].key):
+    for programmer_key, config in sorted(iter(self.members.items()), key=lambda x: x[1].key):
       config.print_help(out=out, indent=new_indent)
 
 class UnspecifiedConfigSection(Config):
@@ -481,7 +485,7 @@ class UnspecifiedConfigSection(Config):
     The keys are the keys specified by the user in the config file.
     """
     return OrderedDict([(key, self.get_member(raw, key, prefix))
-                 for key in raw.iterkeys()])
+                 for key in raw.keys()])
 
   def get_member(self, data, attr, prefix=''):
     tail = self.key + '.' + attr
@@ -492,10 +496,10 @@ class UnspecifiedConfigSection(Config):
   def print_help(self, out=sys.stdout, indent=0):
     indent_str = " " * indent
 
-    print >>out, indent_str + "[%s]" % self.get_presentable_key()
-    print >>out, self.get_presentable_help_text(indent=indent)
-    print >>out
-    print >>out, indent_str + "  Consists of some number of sections like:"
+    print(indent_str + "[%s]" % self.get_presentable_key(), file=out)
+    print(self.get_presentable_help_text(indent=indent), file=out)
+    print(file=out)
+    print(indent_str + "  Consists of some number of sections like:", file=out)
     self.each.print_help(out=out, indent=indent+2)
 
 def _configs_from_dir(conf_dir):
@@ -509,7 +513,7 @@ def _configs_from_dir(conf_dir):
     LOG.debug("Loading configuration from: %s" % filename)
     try:
       conf = ConfigObj(os.path.join(conf_dir, filename))
-    except ConfigObjError, ex:
+    except ConfigObjError as ex:
       LOG.error("Error in configuration file '%s': %s" % (os.path.join(conf_dir, filename), ex))
       raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
@@ -539,7 +543,7 @@ def _bind_module_members(module, data, section):
   Returns the dict of unbound configs.
   """
   members = {}
-  for key, val in module.__dict__.iteritems():
+  for key, val in module.__dict__.items():
     if not isinstance(val, Config):
       continue
 
@@ -658,7 +662,7 @@ def list_of_compiled_res(skip_empty=False):
   def fn(list_of_strings):
     if isinstance(list_of_strings, basestring):
       list_of_strings = list_of_strings.split(',')
-    list_of_strings = filter(lambda string: string if skip_empty else True, list_of_strings)
+    list_of_strings = [string for string in list_of_strings if string if skip_empty else True]
     return list(re.compile(x) for x in list_of_strings)
   return fn
 

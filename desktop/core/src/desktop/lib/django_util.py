@@ -17,6 +17,7 @@
 #
 # Utilities for django operations.
 
+from builtins import object
 import logging
 import re
 import json
@@ -53,7 +54,7 @@ GROUPNAME_RE_RULE = ".{,80}"
 
 
 # For backward compatibility for upgrades to Hue 2.2
-class PopupException: pass
+class PopupException(object): pass
 
 
 class Encoder(json.JSONEncoder):
@@ -113,7 +114,7 @@ def copy_query_dict(query_dict, attr_list):
   """
   res = QueryDict('', mutable=True)
   for attr in attr_list:
-    if query_dict.has_key(attr):
+    if attr in query_dict:
       res[attr] = query_dict.get(attr)
   return res
 
@@ -312,7 +313,7 @@ def update_if_dirty(model_instance, **kwargs):
   saves only if there's been a change.
   """
   dirty = False
-  for key, value in kwargs.items():
+  for key, value in list(kwargs.items()):
     if getattr(model_instance, key) != value:
       setattr(model_instance, key, value)
       dirty = True
@@ -344,7 +345,7 @@ class TruncatingModel(models.Model):
   Abstract class which truncates Text and Char fields to their configured
   maximum lengths, to avoid database field overflow errors.
   """
-  class Meta:
+  class Meta(object):
     abstract = True
 
   def __setattr__(self, name, value):

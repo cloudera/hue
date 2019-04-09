@@ -15,8 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import configobj
-from cStringIO import StringIO
+from io import StringIO
 import logging
 import re
 

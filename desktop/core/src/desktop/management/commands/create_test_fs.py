@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -28,4 +29,4 @@ class Command(BaseCommand):
     if not os.path.isdir(fs_dir):
       os.makedirs(fs_dir)
     fs_for_testing.create(fs_dir)
-    print _("Created fs in: %(dir)s") % {'dir': fs_dir}
+    print(_("Created fs in: %(dir)s") % {'dir': fs_dir})

@@ -39,7 +39,7 @@ class Migration(SchemaMigration):
 
                 DocumentTag.objects.filter(id__in=docs).delete()
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 
@@ -48,7 +48,7 @@ class Migration(SchemaMigration):
             # Adding unique constraint on 'DocumentTag', fields ['owner', 'tag']
             db.create_unique(u'desktop_documenttag', ['owner_id', 'tag'])
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 

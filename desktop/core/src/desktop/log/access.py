@@ -19,7 +19,9 @@
 Decorators and methods related to access log.
 This assumes a single-threaded server.
 """
+from __future__ import division
 
+from past.utils import old_div
 import logging
 import re
 import resource
@@ -73,7 +75,7 @@ class AccessInfo(dict):
   """
   def __init__(self, request):
     self['username'] = request.user.username or '-anon-'
-    if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+    if 'HTTP_X_FORWARDED_FOR' in request.META:
       self['remote_ip'] = request.META.get('HTTP_X_FORWARDED_FOR', '-')
     else:
       self['remote_ip'] = request.META.get('REMOTE_ADDR', '-')
@@ -94,7 +96,7 @@ class AccessInfo(dict):
     if sys.platform == 'darwin':
       rusage_denom = rusage_denom * 1024
     # get peak memory usage, bytes on OSX, Kilobytes on Linux
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / rusage_denom
+    return old_div(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, rusage_denom)
 
   def log(self, level, msg=None, start_time=None):
     is_instrumentation = desktop.conf.INSTRUMENTATION.get()

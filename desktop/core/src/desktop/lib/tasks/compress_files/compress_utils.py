@@ -53,9 +53,9 @@ def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 def _upload_compress_files_script_to_hdfs(fs):
   if not fs.exists('/user/' + DEFAULT_USER.get() + '/common/'):
     fs.do_as_user(DEFAULT_USER.get(), fs.mkdir, '/user/' + DEFAULT_USER.get() + '/common/')
-    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
+    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)
 
   if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'):
     fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, get_desktop_root() + '/core/src/desktop/lib/tasks/compress_files/compress_in_hdfs.sh',
                           '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh')
-    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
+    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)

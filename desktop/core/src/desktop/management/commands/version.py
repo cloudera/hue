@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import os
 
 from django.conf import settings
@@ -28,7 +29,7 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     cdh_path = os.path.join(get_desktop_root(), '..', 'cloudera', 'cdh_version.properties')
     if os.path.exists(cdh_path):
-      print open(cdh_path).read()
+      print(open(cdh_path).read())
     else:
-      print settings.HUE_DESKTOP_VERSION
+      print(settings.HUE_DESKTOP_VERSION)
 

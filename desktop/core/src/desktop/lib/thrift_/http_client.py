@@ -16,9 +16,11 @@
 # limitations under the License.
 #
 
+from future import standard_library
+standard_library.install_aliases()
 import logging
 
-from cStringIO import StringIO
+from io import StringIO
 
 from thrift.transport.TTransport import *
 

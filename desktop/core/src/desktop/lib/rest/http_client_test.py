@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 from requests import Response
 from requests.exceptions import HTTPError
 from desktop.conf import REST_CONN_TIMEOUT
@@ -38,7 +39,7 @@ def test_http_error_rest_exception():
   assert_equal(headers, exception._headers)
 
 
-class MockedSession():
+class MockedSession(object):
 
   def __init__(self, cookies=None):
     self.cookies = cookies or {}
@@ -47,7 +48,7 @@ class MockedSession():
     return MockedResponse()
 
 
-class MockedResponse():
+class MockedResponse(object):
   def __init__(self, status_code=200, cookies=None):
     self.status_code = status_code
     self.cookies = cookies

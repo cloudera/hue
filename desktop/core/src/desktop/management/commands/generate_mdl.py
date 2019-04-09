@@ -17,7 +17,9 @@
 """
 Dumps a Cloudera Manager Monitor Descriptor file.
 """
+from __future__ import print_function
 
+from past.builtins import cmp
 import json
 
 from django.core.management.base import BaseCommand
@@ -52,4 +54,4 @@ class Command(BaseCommand):
         ],
     }
 
-    print json.dumps(d)
+    print(json.dumps(d))

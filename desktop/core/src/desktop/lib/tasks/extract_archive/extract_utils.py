@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -43,7 +45,7 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
       shell_command='extract_archive_in_hdfs.sh',
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}, {'value': '-o=' + output_path}],
       archives=[],
-      files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + urllib.quote(file_name)}],
+      files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + urllib.parse.quote(file_name)}],
       env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}],
       last_executed=start_time
   )
@@ -54,9 +56,9 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
 def _upload_extract_archive_script_to_hdfs(fs):
   if not fs.exists('/user/' + DEFAULT_USER.get() + '/common/'):
     fs.do_as_user(DEFAULT_USER.get(), fs.mkdir, '/user/' + DEFAULT_USER.get() + '/common/')
-    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
+    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)
 
   if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'):
     fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, get_desktop_root() + '/core/src/desktop/lib/tasks/extract_archive/extract_in_hdfs.sh',
                           '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh')
-    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
+    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)

@@ -21,6 +21,7 @@ Note that this dump representation is not machine readable;
 this command is still a few steps away from dumping a ConfigObj-compatible,
 textual representation.
 """
+from __future__ import print_function
 from django.core.management.base import BaseCommand
 import desktop.appmanager
 import textwrap
@@ -36,16 +37,16 @@ class Command(BaseCommand):
 
   """Prints documentation for configuration."""
   def handle(self, *args, **options):
-    print _("Dumping configuration...")
-    print
+    print(_("Dumping configuration..."))
+    print()
     self.recurse(desktop.lib.conf.GLOBAL_CONFIG)
 
   def p(self, s):
-    print " "*self.indent + s
+    print(" "*self.indent + s)
 
   def fill(self, s):
-    print textwrap.fill(s.strip(),
-      initial_indent=" "*self.indent, subsequent_indent=" "*self.indent)
+    print(textwrap.fill(s.strip(),
+      initial_indent=" "*self.indent, subsequent_indent=" "*self.indent))
     
 
   def recurse(self, config_obj):
@@ -57,10 +58,10 @@ class Command(BaseCommand):
 
       self.p("%s:" % key)
       self.indent += 2
-      print textwrap.fill(config_obj.config.help or _("No help available."),
-        initial_indent=" "*self.indent, subsequent_indent=" "*self.indent)
-      print
-      for v in config_obj.get().values():
+      print(textwrap.fill(config_obj.config.help or _("No help available."),
+        initial_indent=" "*self.indent, subsequent_indent=" "*self.indent))
+      print()
+      for v in list(config_obj.get().values()):
         self.recurse(v)
       self.indent -= 2
 

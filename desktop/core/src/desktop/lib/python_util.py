@@ -17,6 +17,8 @@
 # 
 # Extra python utils
 
+from past.builtins import basestring
+from builtins import object
 import select
 import socket
 from django.utils.translation import ugettext as _

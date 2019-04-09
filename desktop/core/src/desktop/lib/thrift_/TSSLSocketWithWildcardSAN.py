@@ -15,6 +15,7 @@
 
 # This file comes from the Apache2 licenced file source code file https://github.com/apache/incubator-impala/blob/45ff0f9e674f54b35afb2b5eced0d6ec346890d6/shell/TSSLSocketWithWildcardSAN.py
 
+from builtins import map
 import re
 
 from thrift.transport import TSSLSocket
@@ -54,7 +55,7 @@ class TSSLSocketWithWildcardSAN(TSSLSocket.TSSLSocket):
       self._match_hostname(cert, self.host)
       self.is_valid = True
       return
-    except CertificateError, ce:
+    except CertificateError as ce:
       raise TTransportException(
         type=TTransportException.UNKNOWN,
         message='Certificate error with remote host: %s' % (ce))

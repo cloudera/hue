@@ -17,6 +17,7 @@
 #
 # Adapted from http://code.google.com/p/django-mako/source/browse/trunk/djangomako/shortcuts.py
 
+from builtins import str
 import os
 import tempfile
 
@@ -112,7 +113,7 @@ def render_to_string_normal(template_name, django_context):
     data_dict = django_context
 
   template = lookup.get_template(template_name)
-  data_dict = dict(map(lambda k: (str(k), data_dict.get(k)), data_dict.keys()))
+  data_dict = dict([(str(k), data_dict.get(k)) for k in list(data_dict.keys())])
   result = template.render(**data_dict)
   return i18n.smart_unicode(result)
 
@@ -138,7 +139,7 @@ def csrf_token(request):
   """
   Returns the rendered common footer
   """
-  csrf_token = unicode(csrf(request)["csrf_token"])
+  csrf_token = str(csrf(request)["csrf_token"])
   return str.format("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
 
 def static(path):

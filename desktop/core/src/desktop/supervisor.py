@@ -29,7 +29,11 @@ In order to have your application managed by supervisor, you need to add
 an entry_point to your application's egg with the name 'desktop.supervisor.specs'.
 This entry point should point to a SuperviseeSpec instance in your module.
 """
+from __future__ import print_function
 #from daemon.pidlockfile import PIDLockFile
+from builtins import str
+from builtins import range
+from builtins import object
 from daemon.pidfile import TimeoutPIDLockFile
 import daemon
 import exceptions
@@ -118,7 +122,7 @@ class DjangoCommandSupervisee(SuperviseeSpec):
 class Supervisor(threading.Thread):
   """A thread responsible for keeping the supervised subprocess running"""
   # States of the subprocess
-  STATES = (PENDING, RUNNING, FINISHED, ERROR) = range(4)
+  STATES = (PENDING, RUNNING, FINISHED, ERROR) = list(range(4))
 
   def __init__(self, cmdv, **kwargs):
     super(Supervisor, self).__init__()
@@ -166,7 +170,7 @@ class Supervisor(threading.Thread):
           return
 
         LOG.error("Process %s exited abnormally. Restarting it." % (proc_str,))
-    except MyBaseException, ex:
+    except MyBaseException as ex:
       LOG.exception("Uncaught exception. Supervisor exiting.")
       self.state = Supervisor.ERROR
 
@@ -259,19 +263,19 @@ def drop_privileges():
   """
   we_are_root = os.getuid() == 0
   if not we_are_root:
-    print >>sys.stdout, "[INFO] Not running as root, skipping privilege drop"
+    print("[INFO] Not running as root, skipping privilege drop", file=sys.stdout)
     return
 
   try:
     pw = pwd.getpwnam(SETUID_USER)
   except KeyError:
-    print >>sys.stderr, "[ERROR] Couldn't get user information for user " + SETUID_USER
+    print("[ERROR] Couldn't get user information for user " + SETUID_USER, file=sys.stderr)
     raise
 
   try:
     gr = grp.getgrnam(SETGID_GROUP)
   except KeyError:
-    print >>sys.stderr, "[ERROR] Couldn't get group information for group " + SETGID_GROUP
+    print("[ERROR] Couldn't get group information for group " + SETGID_GROUP, file=sys.stderr)
     raise
 
   # gid has to be set first
@@ -295,7 +299,7 @@ def main():
   log_dir = os.path.join(root, options.log_dir)
 
   if options.show_supervisees:
-    for name, supervisee in get_supervisees().iteritems():
+    for name, supervisee in get_supervisees().items():
       if name not in options.supervisee_exclusions:
         print(name)
     sys.exit(0)
@@ -341,7 +345,7 @@ def main():
         }
 
     context.open()
-  os.umask(022)
+  os.umask(0o22)
 
   # Log initialization must come after daemonization, which closes all open files.
   # Log statements before this point goes to stderr.
@@ -349,7 +353,7 @@ def main():
 
   sups = []
   try:
-    for name, supervisee in get_supervisees().iteritems():
+    for name, supervisee in get_supervisees().items():
 
       if name in options.supervisee_exclusions:
         continue
@@ -374,7 +378,7 @@ def main():
       sups.append(sup)
 
     wait_loop(sups, options)
-  except MyBaseException, ex:
+  except MyBaseException as ex:
     LOG.exception("Exception in supervisor main loop")
     shutdown(sups)      # shutdown() exits the process
 

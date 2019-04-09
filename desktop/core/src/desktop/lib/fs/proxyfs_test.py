@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 
 
+from builtins import object
 from nose.tools import assert_raises, assert_false, eq_
 from nose import SkipTest
 
@@ -156,7 +157,7 @@ def test_constructor_given_invalid_arguments():
 
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, filebrowser_action=None):
     self.user = None
     self._filebrowser_action = filebrowser_action

@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
@@ -33,7 +34,7 @@ from pig.models import PigScript
 from useradmin.models import get_default_user_group
 
 
-class TestDocModelTags():
+class TestDocModelTags(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="tag_user", recreate=True, is_superuser=False)
@@ -195,7 +196,7 @@ class TestDocModelTags():
     # todo no default tag on test user?
 
 
-class TestDocModelPermissions():
+class TestDocModelPermissions(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="perm_user", groupname="default", recreate=True, is_superuser=False)

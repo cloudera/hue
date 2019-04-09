@@ -16,7 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import StringIO
+from future import standard_library
+standard_library.install_aliases()
+import io
 
 from nose.tools import assert_equal
 from openpyxl import load_workbook
@@ -80,7 +82,7 @@ def test_export_xls():
 def _read_xls_sheet_data(response):
   content = ''.join(response.content)
 
-  data = StringIO.StringIO()
+  data = io.StringIO()
   data.write(content)
 
   wb = load_workbook(filename=data, read_only=True)

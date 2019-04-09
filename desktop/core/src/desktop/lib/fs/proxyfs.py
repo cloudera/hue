@@ -16,9 +16,12 @@
 
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 from django.contrib.auth.models import User
 
 from desktop.auth.backend import is_admin
@@ -31,7 +34,7 @@ class ProxyFS(object):
   def __init__(self, filesystems_dict, default_scheme):
     if default_scheme not in filesystems_dict:
       raise ValueError(
-        'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, filesystems_dict.keys()))
+        'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, list(filesystems_dict.keys())))
 
     self._fs_dict = filesystems_dict
     self._fs_set = set(self._fs_dict.values())
@@ -75,7 +78,7 @@ class ProxyFS(object):
       else:
         raise IOError("Missing permissions for %s on %s" % (self.user, path))
     except KeyError:
-      raise IOError('Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
+      raise IOError('Unknown scheme %s, available schemes: %s' % (scheme, list(self._fs_dict.keys())))
 
   def _get_fs_pair(self, src, dst):
     """

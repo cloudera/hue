@@ -20,6 +20,9 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
+from builtins import str
+from builtins import map
+from builtins import zip
 import gc
 import logging
 import os
@@ -346,9 +349,9 @@ EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 if os.getenv('DESKTOP_DB_CONFIG'):
   conn_string = os.getenv('DESKTOP_DB_CONFIG')
   logging.debug("DESKTOP_DB_CONFIG SET: %s" % (conn_string))
-  default_db = dict(zip(
+  default_db = dict(list(zip(
     ["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"],
-    conn_string.split(':')))
+    conn_string.split(':'))))
   default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
 else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))

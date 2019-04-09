@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from past.builtins import basestring
 import logging
 
 from string import Template
@@ -40,7 +41,7 @@ def recursive_walk(function, data):
 
   # Recurse into dicts:
   if isinstance(data, dict):
-    return dict( (key, recursive_walk(function, val)) for key, val in data.iteritems() )
+    return dict( (key, recursive_walk(function, val)) for key, val in data.items() )
 
   return function(data)
 
@@ -82,7 +83,7 @@ def substitute_variables(input_data, substitutions):
 def find_parameters(obj, fields=None):
   """Find parameters in the given fields"""
   if fields is None:
-    fields = [ k for k in obj.__dict__.keys() if not k.startswith('_') ]
+    fields = [ k for k in list(obj.__dict__.keys()) if not k.startswith('_') ]
 
   params = [ ]
   for field in fields:
@@ -98,7 +99,7 @@ def find_parameters(obj, fields=None):
 def bind_parameters(obj, substitutions, fields=None):
   """Bind the parameters to the given fields, changing their values."""
   if fields is None:
-    fields = [ k for k in obj.__dict__.keys() if not k.startswith('_') ]
+    fields = [ k for k in list(obj.__dict__.keys()) if not k.startswith('_') ]
 
   for field in fields:
     data = getattr(obj, field)

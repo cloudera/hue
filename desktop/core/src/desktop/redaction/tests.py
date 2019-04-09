@@ -15,6 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import range
+from builtins import object
 import json
 import logging
 import os
@@ -395,8 +400,8 @@ class TestRedactionLogFilter(object):
 
     class TestThread(threading.Thread):
       def run(self):
-        for i in xrange(500):
-          message = u''.join(random_utf8_char() for _ in xrange(128))
+        for i in range(500):
+          message = u''.join(random_utf8_char() for _ in range(128))
           redacted_message = policy.redact(message)
 
           if regex.search(redacted_message):
@@ -405,7 +410,7 @@ class TestRedactionLogFilter(object):
               break
 
     threads = []
-    for i in xrange(10):
+    for i in range(10):
       threads.append(TestThread())
 
     for thread in threads:

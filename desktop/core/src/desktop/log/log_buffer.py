@@ -22,6 +22,7 @@ of log message around for us to view in case of emergency.
 This log handler lets us do that.
 """
 
+from builtins import object
 import logging, collections
 
 class FixedBuffer(object):
