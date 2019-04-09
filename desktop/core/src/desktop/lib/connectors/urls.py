@@ -17,8 +17,13 @@
 
 from django.conf.urls import url
 
-from desktop.lib.connectors import views
+from desktop.lib.connectors import views, api
+
 
 urlpatterns = [
   url(r'^$', views.index, name='desktop.lib.connectors.views.index'),
+
+  url(r'^api/instances/?$', api.connectors, name='connectors.api.connectors'),
+  url(r'^api/types/?$', api.connector_types, name='connectors.api.connector_types'),
+  url(r'^api/instance/?$', api.connector, name='connectors.api.connector'),
 ]

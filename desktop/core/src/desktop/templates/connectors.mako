@@ -21,19 +21,15 @@ from desktop.views import commonheader, commonfooter
 %>
 
 <%
-MAIN_SCROLLABLE = is_embeddable and "'.page-content'" or "window"
+MAIN_SCROLLABLE = "'.page-content'"
 if conf.CUSTOM.BANNER_TOP_HTML.get():
-  TOP_SNAP = is_embeddable and "78px" or "106px"
+  TOP_SNAP = "78px"
 else:
-  TOP_SNAP = is_embeddable and "50px" or "106px"
+  TOP_SNAP = "50px"
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
-
-% if not is_embeddable:
-${ commonheader(_('Connectors'), "about", user, request) | n,unicode }
-% endif
 
 
 <script type="text/javascript">
@@ -42,39 +38,61 @@ ${ commonheader(_('Connectors'), "about", user, request) | n,unicode }
       var self = this;
 
       self.apiHelper = window.apiHelper;
-      self.metrics = ko.observableArray();
-      self.selectedMetric = ko.observable('All');
-      self.metricsFilter = ko.observable();
 
-      self.selectedMetrics = ko.pureComputed(function () {
-        return self.metrics().filter(function (metric) {
-          return self.selectedMetric() == 'All' || metric.category == self.selectedMetric();
+      self.section = ko.observable('connectors-page');
+
+      self.instances = ko.observableArray();
+      self.instance = ko.observable();
+
+      self.connectors = ko.observableArray();
+      self.selectedConnectorCategory = ko.observable('All');
+      self.connectorsFilter = ko.observable();
+      self.connector = ko.observable();
+
+      self.selectedConnectors = ko.pureComputed(function () {
+        return self.connectors().filter(function (connector) {
+          return self.selectedConnectorCategory() == 'All' || connector.category == self.selectedConnectorCategory();
         });
       });
-      self.filteredMetrics = ko.pureComputed(function () {
-        var metrics = self.selectedMetrics();
+      self.filteredConnectors = ko.pureComputed(function () {
+        var connectors = self.selectedConnectors();
 
-        if (self.metricsFilter()) {
-          var lowerQuery = self.metricsFilter().toLowerCase();
-          var filteredMetrics = []
-          metrics.forEach(function (metric) {
-            var _metric = {"category": metric.category, "values": []};
-            _metric.values = metric.values.filter(function (subMetricKey) {
+        if (self.connectorsFilter()) {
+          var lowerQuery = self.connectorsFilter().toLowerCase();
+          var filteredConnectors = []
+          connectors.forEach(function (connectors) {
+            var _connectors = {"category": connectors.category, "values": []};
+            _connectors.values = connectors.values.filter(function (subMetricKey) {
               return subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1;
             });
-            if (_metric.values.length > 0){
-              filteredMetrics.push(_metric);
+            if (_connectors.values.length > 0) {
+              filteredConnectors.push(_connectors);
             }
           });
-          metrics = filteredMetrics;
+          connectors = filteredConnectors;
         }
 
-        return metrics;
+        return connectors;
       });
 
+      self.addNewConnector = function () {
+        self.fetchConnectorTypes();
+        self.section('add-connector-page');
+      };
+
       self.fetchConnectors = function () {
-        self.apiHelper.simpleGet('/desktop/connectors/', {}, {successCallback: function (data) {
-          self.metrics(data.metric);
+        self.apiHelper.simpleGet('/desktop/connectors/api/instances/', {}, {successCallback: function (data) {
+          self.instances(data.connectors);
+        }});
+      };
+      self.fetchConnector = function () {
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/', {'id': 1}, {successCallback: function (data) {
+          self.instance(data.connector);
+        }});
+      };
+      self.fetchConnectorTypes = function () {
+        self.apiHelper.simpleGet('/desktop/connectors/api/types/', {}, {successCallback: function (data) {
+          self.connectors(data.connectors);
         }});
       };
     }
@@ -86,28 +104,129 @@ ${ commonheader(_('Connectors'), "about", user, request) | n,unicode }
   })();
 </script>
 
+
 ${layout.menubar(section='connectors')}
 
-<div id="connectorsComponents" class="container-fluid">
-  <div class="card card-small margin-top-10">
-    <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
-      <ul class="nav nav-pills">
-        <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
-          <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
-        </li>
-        <!-- ko foreach: filteredMetrics() -->
-        <li data-bind="css: { 'active': $root.selectedMetric() === category }">
-          <a href="javascript:void(0)" data-bind="text: category, click: function(){ $root.selectedMetric(category) }"></a>
-        </li>
-        <!-- /ko -->
-      </ul>
-      <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
-          class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter connectors...') }">
-    </div>
 
-    <div class="margin-top-10">
-      <div data-bind="foreach: filteredMetrics()">
-        <h4 data-bind="text: category"></h4>
+<div id="connectorsComponents" class="container-fluid">
+
+  <a href="javascript:void(0)" data-bind="click: function() { section('connectors-page'); }">
+    Connectors
+  </a>
+
+  <!-- ko if: section() == 'connectors-page' -->
+    <div data-bind="template: { name: 'connectors-page', data: $root.instances() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: section() == 'connector-page' -->
+    <div data-bind="template: { name: 'connector-page', data: $root.instance() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: section() == 'add-connector-page' -->
+    <div data-bind="template: { name: 'add-connector-page' }"></div>
+  <!-- /ko -->
+
+</div>
+
+
+<script type="text/html" id="connectors-page">
+  <div class="row-fluid">
+    <a href="javascript:void(0)" data-bind="click: $root.addNewConnector">
+      + Connector
+    </a>
+  </div>
+
+  <div class="margin-top-10">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th width="30%">${ _('Name') }</th>
+          <th>${ _('') }</th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: $data">
+        <tr data-bind="click: function() { $root.instance($data); $root.section('connector-page'); }">
+          <td data-bind="text: name"></td>
+          <td data-bind="text: ''"></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- ko ifnot: $data -->
+      ${ _('There are no connectors configured.') }
+      <a href="javascript:void(0)" data-bind="click: $root.addNewConnector">
+        ${ _('Add one ?') }
+      </a>
+    <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="connector-page">
+  <div class="row-fluid">
+    <span data-bind="text: name"></span>
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th width="30%">${ _('Name') }</th>
+          <th>${ _('Value') }</th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: settings">
+        <tr>
+          <td data-bind="text: name"></td>
+          <td data-bind="text: value"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</script>
+
+
+<script type="text/html" id="add-connector-page">
+  <div class="card card-small margin-top-10">
+      <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ TOP_SNAP }', triggerAdjust: 0 }">
+        <ul class="nav nav-pills">
+          <li data-bind="css: { 'active': $root.selectedConnectorCategory() === 'All' }">
+            <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedConnectorCategory('All') }"></a>
+          </li>
+          <!-- ko foreach: connectors() -->
+          <li data-bind="css: { 'active': $root.selectedConnectorCategory() === category }">
+            <a href="javascript:void(0)" data-bind="text: category, click: function(){ $root.selectedConnectorCategory(category) }"></a>
+          </li>
+          <!-- /ko -->
+        </ul>
+        <input type="text" data-bind="clearable: connectorsFilter, valueUpdate: 'afterkeydown'"
+            class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter connectors...') }">
+      </div>
+
+      <div class="margin-top-10">
+        <div data-bind="foreach: filteredConnectors()">
+          <h4 data-bind="text: category"></h4>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th width="30%">${ _('Name') }</th>
+                <th>${ _('Instances') }</th>
+              </tr>
+            </thead>
+            <!-- ko if: $data.values -->
+            <tbody data-bind="foreach: values">
+              <tr data-bind="click: function() { $root.instance(name); }">
+                <td data-bind="text: name"></td>
+                <td data-bind="text: instances.length > 0 ? instances.length : ''"></td>
+              </tr>
+            </tbody>
+            <!-- /ko -->
+            <!-- ko ifnot: $data.values -->
+            <tfoot>
+              <tr>
+                <td colspan="2">${ _('There are no connectors matching your filter') }</td>
+              </tr>
+            </tfoot>
+            <!-- /ko -->
+          </table>
+        </div>
+
+        <!-- ko if: filteredConnectors().length == 0 -->
         <table class="table table-condensed">
           <thead>
             <tr>
@@ -115,43 +234,13 @@ ${layout.menubar(section='connectors')}
               <th>${ _('Instances') }</th>
             </tr>
           </thead>
-          <!-- ko if: $data.values -->
-          <tbody data-bind="foreach: values">
-            <tr>
-              <td data-bind="text: name"></td>
-              <td data-bind="text: instances.length > 0 ? instances.length : ''"></td>
-            </tr>
-          </tbody>
-          <!-- /ko -->
-          <!-- ko ifnot: $data.values -->
           <tfoot>
             <tr>
-              <td colspan="2">${ _('There are no metrics matching your filter') }</td>
+              <td colspan="2">${ _('There are no connectors matching your filter') }</td>
             </tr>
           </tfoot>
-          <!-- /ko -->
-          </table>
+        </table>
+        <!-- /ko -->
       </div>
-
-      <!-- ko if: filteredMetrics().length == 0 -->
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th width="30%">${ _('Name') }</th>
-            <th>${ _('Instances') }</th>
-          </tr>
-        </thead>
-        <tfoot>
-          <tr>
-            <td colspan="2">${ _('There are no metrics matching your filter') }</td>
-          </tr>
-        </tfoot>
-      </table>
-      <!-- /ko -->
-  </div>
-</div>
-
-
-% if not is_embeddable:
- ${ commonfooter(request, messages) | n,unicode }
-% endif
+    </div>
+</script>
