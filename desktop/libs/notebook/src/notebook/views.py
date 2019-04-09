@@ -338,7 +338,7 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  response = get_api(request, snippet).download(notebook, snippet, file_format=file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
+  response = get_api(request, snippet).download(notebook, snippet, format=file_format, user_agent=request.META.get('HTTP_USER_AGENT'))
 
   if response:
     request.audit = {
