@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from nose.tools import assert_true, assert_equal, assert_not_equal
@@ -59,7 +60,7 @@ class MapreduceAPIMock(MapreduceApi):
     assert_equal(MapreduceAPIMock.EXPECTED_USERNAME, self.username)
 
 
-class TestMapReduceAPI():
+class TestMapReduceAPI(object):
 
   def setUp(self):
     if not hasattr(self, 'originalMapReduceApi'):

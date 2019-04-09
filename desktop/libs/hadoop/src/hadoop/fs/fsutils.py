@@ -29,7 +29,7 @@ def do_overwrite_save(fs, path, data):
         try:
             fs.create(path_dest, overwrite=False, data=data)
             logging.info("Wrote to " + path_dest)
-        except Exception, e:
+        except Exception as e:
             # An error occurred in writing, we should clean up
             # the tmp file if it exists, before re-raising
             try:

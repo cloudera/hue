@@ -29,8 +29,16 @@ We maintain this usage of paths as arguments.
 When possible, the interfaces here have fidelity to the
 native python interfaces.
 """
+from __future__ import division
 
-import __builtin__
+from future import standard_library
+from functools import reduce
+standard_library.install_aliases()
+from builtins import map
+from builtins import range
+from past.utils import old_div
+from builtins import object
+import builtins
 import errno
 import grp
 import logging
@@ -150,7 +158,7 @@ class LocalSubFileSystem(object):
     if paths is None and 0 not in users and 0 not in groups:
       paths = [0]
     # complicated way of taking the intersection of three lists.
-    assert not reduce(set.intersection, map(set, [paths, users, groups]))
+    assert not reduce(set.intersection, list(map(set, [paths, users, groups])))
     def wrapped(*args):
       self = args[0]
       newargs = list(args[1:])
@@ -166,7 +174,7 @@ class LocalSubFileSystem(object):
     return wrapped
 
   # These follow their namesakes.
-  open = _wrap(__builtin__.open)
+  open = _wrap(builtins.open)
   remove = _wrap(os.remove)
   mkdir = _wrap(os.mkdir)
   rmdir = _wrap(os.rmdir)
@@ -189,7 +197,7 @@ class LocalSubFileSystem(object):
     path = self._resolve_path(path)
     try:
       statobj = os.stat(path)
-    except OSError, ose:
+    except OSError as ose:
       if ose.errno == errno.ENOENT and not raise_on_fnf:
         return None
       raise
@@ -240,9 +248,9 @@ class FakeStatus(object):
     o = dict()
     GB = 1024*1024*1024
     o["bytesTotal"] = 5*GB
-    o["bytesUsed"] = 5*GB/2
+    o["bytesUsed"] = old_div(5*GB,2)
     o["bytesRemaining"] = 2*GB
-    o["bytesNonDfs"] = GB/2
+    o["bytesNonDfs"] = old_div(GB,2)
     o["liveDataNodes"] = 13
     o["deadDataNodes"] = 2
     o["upgradeStatus"] = dict(version=13, percentComplete=100, finalized=True)

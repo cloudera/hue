@@ -18,7 +18,11 @@
 """
 Return types from WebHDFS api calls.
 """
+from __future__ import division
 
+from builtins import oct
+from builtins import object
+from past.utils import old_div
 import stat
 
 from django.utils.encoding import smart_str
@@ -36,8 +40,8 @@ class WebHdfsStat(object):
     self.path = Hdfs.join(parent_path, self.name)
     self.isDir = file_status['type'] == 'DIRECTORY'
     self.type = file_status['type']
-    self.atime = file_status['accessTime'] / 1000
-    self.mtime = file_status['modificationTime'] / 1000
+    self.atime = old_div(file_status['accessTime'], 1000)
+    self.mtime = old_div(file_status['modificationTime'], 1000)
     self.user = file_status['owner']
     self.group = file_status['group']
     self.size = file_status['length']
@@ -86,7 +90,7 @@ class WebHdfsContentSummary(object):
   def __init__(self, summary):
     self.summary = summary
 
-    for k, v in summary.iteritems():
+    for k, v in summary.items():
       setattr(self, k, v)
 
   def __str__(self):

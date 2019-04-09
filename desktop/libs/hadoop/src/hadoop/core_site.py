@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import errno
 import logging
 import os.path
 
-import conf
-import confparse
+from . import conf
+from . import confparse
 
 __all = ['get_conf', 'get_trash_interval', 'get_s3a_access_key', 'get_s3a_secret_key']
 
@@ -66,7 +67,7 @@ def _parse_core_site():
       break
     except KeyError:
       data = ""
-    except IOError, err:
+    except IOError as err:
       if err.errno != errno.ENOENT:
         LOG.error('Cannot read from "%s": %s' % (_CORE_SITE_PATH, err))
         return

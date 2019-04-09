@@ -15,11 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import json
 import logging
 import posixpath
 import threading
-import urlparse
+import urllib.parse
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
@@ -154,7 +157,7 @@ class SparkHistoryServerApi(object):
     if log_links and log_name in log_links:
       log_link = log_links[log_name]
 
-      root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+      root = Resource(get_log_client(log_link), urllib.parse.urlsplit(log_link)[2], urlencode=False)
       response = root.get('', params=params)
       log = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
     return log

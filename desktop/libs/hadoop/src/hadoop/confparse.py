@@ -18,6 +18,7 @@
 Helper for parsing Hadoop style configuration.
 """
 
+from builtins import str
 import xml.parsers.expat
 
 class ConfParse(dict):

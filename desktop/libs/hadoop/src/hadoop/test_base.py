@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import object
 from hadoop import pseudo_hdfs4
 
 

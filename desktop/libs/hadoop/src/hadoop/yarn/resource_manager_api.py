@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 import posixpath
@@ -169,6 +170,6 @@ class ResourceManagerApi(object):
     response = None
     try:
       response = function(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('YARN RM returned a failed response: %s') % e)
     return response
