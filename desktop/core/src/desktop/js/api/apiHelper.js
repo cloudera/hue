@@ -1570,11 +1570,7 @@ class ApiHelper {
     if (options.path.length === 1) {
       url = '/metastore/databases/' + options.path[0] + '/metadata';
     } else {
-      url =
-        '/' +
-        (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) +
-        '/api/table/' +
-        options.path[0];
+      url = '/notebook/api/describe/' + options.path[0]
 
       if (options.path.length > 1) {
         url += '/' + options.path[1] + '/';
@@ -1591,7 +1587,7 @@ class ApiHelper {
       source_type: options.sourceType
     };
 
-    const request = self[options.path.length < 3 ? 'simplePost' : 'simpleGet'](url, data, {
+    const request = self['simplePost'](url, data, {
       silenceErrors: options.silenceErrors,
       successCallback: function(response) {
         if (options.path.length === 1) {

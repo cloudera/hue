@@ -97,3 +97,10 @@ urlpatterns += [
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
 ]
+
+# Table API
+urlpatterns += [
+  url(r'^api/describe/(?P<database>\w+)/?$', notebook_api.describe, name='api_describe_database'),
+  url(r'^api/describe/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', notebook_api.describe, name='api_describe_table'),
+  url(r'^api/describe/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', notebook_api.describe, name='api_describe_column'),
+]

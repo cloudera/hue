@@ -832,3 +832,14 @@ def _get_statement_from_file(user, fs, snippet):
     script_path = script_path.replace('hdfs://', '')
     if fs.do_as_user(user, fs.isfile, script_path):
       return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)
+
+def describe(request, database, table):
+  response = {'status': -1, 'message': ''}
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  source_type = request.POST.get('source_type', '')
+  snippet = {'type': source_type}
+
+  describe = get_api(request, snippet).describe(notebook, snippet, database, table)
+  response.update(describe)
+
+  return JsonResponse(response)

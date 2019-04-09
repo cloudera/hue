@@ -476,6 +476,56 @@ class Api(object):
 
   def statement_similarity(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
 
+  def describe(self, notebook, snippet, database=None, table=None, column=None):
+    if column:
+      response = self.describe_column(notebook, snippet, database=database, table=table, column=column)
+    elif table:
+      response = {
+          'status': 0,
+          'name': table or '',
+          'partition_keys': [],
+          'cols': [],
+          'path_location': '',
+          'hdfs_link': '',
+          'comment': '',
+          'is_view': False,
+          'properties': [],
+          'details': {'properties': {'table_type': ''}, 'stats': {}},
+          'stats': []
+      }
+      describe_table = self.describe_table(notebook, snippet, database, table)
+      response.update(describe_table)
+    else:
+      response = {
+        'status': 0,
+        'owner_name': '',
+        'owner_type': '',
+        'parameters': '',
+        'hdfs_link': '',
+        'message': ''
+      }
+      describe_database = self.describe_database(notebook, snippet, database)
+      response.update(describe_database)
+    return response
+
+  def describe_column(self, notebook, snippet, database=None, table=None, column=None):
+    return []
+
+  def describe_table(self, notebook, snippet, database=None, table=None):
+    response = {}
+    autocomplete = self.autocomplete(snippet, database=database, table=table)
+    response['cols'] = autocomplete['extended_columns'] if autocomplete and autocomplete.get('extended_columns') else [],
+    return response
+
+  def describe_database(self, notebook, snippet, database=None):
+    return {}
+
+def _get_snippet_name(notebook, unique=False, table_format=False):
+  name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
+  if table_format:
+    name = re.sub('[-|\s:]', '_', name)
+  return name
+
 class ResultWrapper():
   def __init__(self, api, notebook, snippet, callback=None):
     self.api = api
@@ -527,9 +577,3 @@ class ResultWrapper():
     if self.should_close:
       self.should_close = False
       self.api.close_statement(self.notebook, self.snippet)
-
-def _get_snippet_name(notebook, unique=False, table_format=False):
-  name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
-  if table_format:
-    name = re.sub('[-|\s:]', '_', name)
-  return name
