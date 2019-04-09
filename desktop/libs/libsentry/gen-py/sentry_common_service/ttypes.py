@@ -6,6 +6,7 @@
 #  options string: py:new_style
 #
 
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 
 from thrift.transport import TTransport
@@ -95,7 +96,7 @@ class TSentryResponseStatus(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):

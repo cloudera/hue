@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import threading
 
@@ -39,7 +40,7 @@ def ha_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except StructuredThriftTransportException, e:
+    except StructuredThriftTransportException as e:
       if not is_ha_enabled():
         raise PopupException(_('Failed to connect to Sentry server %s, and Sentry HA is not enabled.') % args[0].client.host, detail=e)
       else:
@@ -51,9 +52,9 @@ def ha_error_handler(func):
           return func(*args, **kwargs)
         else:
           raise PopupException(_('Failed to find an available Sentry server.'))
-    except (SentryException, PopupException), e:
+    except (SentryException, PopupException) as e:
       raise e
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('Encountered unexpected error in SentryApi.'), detail=e)
 
   return decorator
@@ -202,9 +203,9 @@ class SentryApi(object):
 
     _privileges = []
 
-    for authorizable, roles in response.privilegesMapByAuth.iteritems():
+    for authorizable, roles in response.privilegesMapByAuth.items():
       _roles = {}
-      for role, privileges in roles.privilegeMap.iteritems():
+      for role, privileges in roles.privilegeMap.items():
         _roles[role] = [self._massage_privilege(privilege) for privilege in privileges]
       _privileges.append((self._massage_authorizable(authorizable), _roles))
 

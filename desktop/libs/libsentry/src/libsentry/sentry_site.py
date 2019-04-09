@@ -116,7 +116,7 @@ def get_sentry_server(current_host=None):
         current_idx = hosts.index(current_host)
         LOG.debug("Current Sentry host, %s, index is: %d." % (current_host, current_idx))
         next_idx = (current_idx + 1) % len(servers)
-      except ValueError, e:
+      except ValueError as e:
         LOG.warn("Current host: %s not found in list of servers: %s" % (current_host, ','.join(hosts)))
 
     server = servers[next_idx]
@@ -148,7 +148,7 @@ def get_sentry_servers():
       else:
         port = PORT.get()
       servers.append({'hostname': host, 'port': int(port)})
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('Error in retrieving Sentry server properties.'), detail=e)
 
   LOG.debug("Sentry servers are: %s" % ', '.join(['%s:%d' % (s['hostname'], s['port']) for s in servers]))
@@ -166,7 +166,7 @@ def _parse_sites():
   try:
     from beeswax.conf import HIVE_CONF_DIR
     paths.append(('hive', os.path.join(HIVE_CONF_DIR.get(), 'sentry-site.xml')))
-  except Exception, e:
+  except Exception as e:
     LOG.error('Cannot read Hive sentry site: %s' % e)
 
   for name, path in paths:
@@ -176,7 +176,7 @@ def _parse_sites():
 def _parse_site(site_path):
   try:
     data = file(site_path, 'r').read()
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (site_path, err))
       return
