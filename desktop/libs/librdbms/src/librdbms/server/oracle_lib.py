@@ -19,7 +19,7 @@ import logging
 
 try:
   import cx_Oracle as Database
-except ImportError, e:
+except ImportError as e:
   from django.core.exceptions import ImproperlyConfigured
   raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 

@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from builtins import range
 from py4j.java_gateway import JavaGateway
 
 gateway = JavaGateway()
@@ -35,13 +37,13 @@ try:
 
       md = rs.getMetaData()
 
-      for i in xrange(md.getColumnCount()):
-        print md.getColumnTypeName(i + 1)
+      for i in range(md.getColumnCount()):
+        print(md.getColumnTypeName(i + 1))
 
-      while rs.next():
+      while next(rs):
         username = rs.getString("username")
         email = rs.getString("email")
-        print username, email
+        print(username, email)
     finally:
       rs.close()
   finally:

@@ -20,9 +20,9 @@ import logging
 try:
   try:
     from pysqlite2 import dbapi2 as Database
-  except ImportError, e1:
+  except ImportError as e1:
     from sqlite3 import dbapi2 as Database
-except ImportError, exc:
+except ImportError as exc:
   from django.core.exceptions import ImproperlyConfigured
   raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
 
