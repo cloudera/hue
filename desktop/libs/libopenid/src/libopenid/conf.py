@@ -28,7 +28,7 @@ BASEDIR = os.path.dirname(os.path.abspath(__file__))
 def dict_list_map(value):
   if isinstance(value, str):
     d = {}
-    for k, v in json.loads(value).iteritems():
+    for k, v in json.loads(value).items():
       d[k] = (v,)
     return d
   elif isinstance(value, dict):
