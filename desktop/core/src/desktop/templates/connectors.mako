@@ -85,9 +85,20 @@ else:
           self.instances(data.connectors);
         }});
       };
-      self.fetchConnector = function () {
-        self.apiHelper.simplePost('/desktop/connectors/api/instance/', {'id': 1}, {successCallback: function (data) {
+      self.fetchConnector = function (name) {
+        self.apiHelper.simpleGet('/desktop/connectors/api/instance/get/' + name, {successCallback: function (data) {
           self.instance(data.connector);
+        }});
+      };
+      self.deleteConnector = function (connector) {
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/delete', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
+          self.section('connectors-page');
+          self.fetchConnectors();
+        }});
+      };
+      self.updateConnector = function (connector) {
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
+          console.log('Success');
         }});
       };
       self.fetchConnectorTypes = function () {
@@ -163,6 +174,9 @@ ${layout.menubar(section='connectors')}
 <script type="text/html" id="connector-page">
   <div class="row-fluid">
     <span data-bind="text: name"></span>
+    <a href="javascript:void(0)" data-bind="click: $root.deleteConnector">
+      ${ _('Delete') }
+    </a>
     <table class="table table-condensed">
       <thead>
         <tr>
@@ -202,7 +216,7 @@ ${layout.menubar(section='connectors')}
       <div class="span10">
           <span class="pull-right">
             <a href="http://gethue.com" target="_blank">
-              <i class="fa fa-help"></i> ${ _('Help') }
+              <i class="fa fa-question-circle"></i> ${ _('Help') }
             </a>
           </span>
 

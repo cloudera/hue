@@ -25,5 +25,8 @@ urlpatterns = [
 
   url(r'^api/instances/?$', api.connectors, name='connectors.api.connectors'),
   url(r'^api/types/?$', api.connector_types, name='connectors.api.connector_types'),
-  url(r'^api/instance/?$', api.connector, name='connectors.api.connector'),
+
+  url(r'^api/instance/get/(?P<name>\w+)$', api.get_connector, name='connectors.api.get_connector'),
+  url(r'^api/instance/delete/?$', api.delete_connector, name='connectors.api.delete_connector'),
+  url(r'^api/instance/update/?$', api.update_connector, name='connectors.api.update_connector'),
 ]
