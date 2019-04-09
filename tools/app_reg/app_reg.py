@@ -101,7 +101,7 @@ def get_app_info(app_loc):
       LOG.error("Error getting application info from %s:\n%s" % (app_loc, stderr))
       raise OSError(stderr)
     LOG.debug("Command output:\n<<<\n%s\n>>>" % (stdout,))
-    return stdout.split('\n')[:4]
+    return stdout.decode().split('\n')[:4]
   finally:
     os.chdir(save_cwd)
 
