@@ -42,6 +42,9 @@ session at some point.
 Note: using the task server would not leverage any caching.
 '''
 
+from builtins import next
+from builtins import str
+from builtins import object
 import datetime
 import json
 import logging
@@ -71,13 +74,13 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except OperationalError, e:
+    except OperationalError as e:
       message = str(e)
       if '1045' in message: # 'Access denied' # MySQL
         raise AuthenticationRequired(message=message)
       else:
         raise e
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
@@ -178,7 +181,7 @@ class SqlAlchemyApi(Api):
           meta[index]['type'] = 'INT_TYPE'
         elif isinstance(col, float):
           meta[index]['type'] = 'FLOAT_TYPE'
-        elif isinstance(col, long):
+        elif isinstance(col, int):
           meta[index]['type'] = 'BIGINT_TYPE'
         elif isinstance(col, bool):
           meta[index]['type'] = 'BOOLEAN_TYPE'
@@ -320,7 +323,7 @@ class SqlAlchemyApi(Api):
     return "SELECT * FROM `%s`.`%s` LIMIT 1000" % (database, table)
 
 
-class Assist():
+class Assist(object):
 
   def __init__(self, db, engine):
     self.db = db
@@ -345,7 +348,7 @@ class Assist():
     finally:
       connection.close()
 
-class FixedResultSet():
+class FixedResultSet(object):
   def __init__(self, metadata, data, has_more):
     self.metadata = metadata
     self.data = data
@@ -357,7 +360,7 @@ class FixedResultSet():
   def rows(self):
     return self.data if self.data is not None else []
 
-class FixedResult():
+class FixedResult(object):
   def __init__(self, metadata):
     self.metadata = metadata
 

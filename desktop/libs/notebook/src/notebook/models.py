@@ -15,11 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import json
 import logging
 import math
 import numbers
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import uuid
 
 from django.utils.html import escape
@@ -108,7 +112,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'') if on_success_url else None,
+    'onSuccessUrl': urllib.parse.quote(on_success_url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'') if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
@@ -202,7 +206,7 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
   return editor
 
 
-class MockedDjangoRequest():
+class MockedDjangoRequest(object):
 
   def __init__(self, user, get=None, post=None, method='POST'):
     self.user = user
@@ -275,7 +279,7 @@ def import_saved_mapreduce_job(wf):
     files = json.loads(node.files)
     for filepath in files:
       snippet_properties['files'].append({'type': 'file', 'path': filepath})
-  except ValueError, e:
+  except ValueError as e:
     LOG.warn('Failed to parse files for mapreduce job design "%s".' % wf.name)
 
   snippet_properties['archives'] = []
@@ -283,7 +287,7 @@ def import_saved_mapreduce_job(wf):
     archives = json.loads(node.archives)
     for filepath in archives:
       snippet_properties['archives'].append(filepath)
-  except ValueError, e:
+  except ValueError as e:
     LOG.warn('Failed to parse archives for mapreduce job design "%s".' % wf.name)
 
   snippet_properties['hadoopProperties'] = []
@@ -292,7 +296,7 @@ def import_saved_mapreduce_job(wf):
     if properties:
       for prop in properties:
         snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-  except ValueError, e:
+  except ValueError as e:
     LOG.warn('Failed to parse job properties for mapreduce job design "%s".' % wf.name)
 
   snippet_properties['app_jar'] = node.jar_path
@@ -332,7 +336,7 @@ def import_saved_shell_job(wf):
             snippet_properties['arguments'].append(param['value'])
           else:
             snippet_properties['env_var'].append(param['value'])
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse parameters for shell job design "%s".' % wf.name)
 
     snippet_properties['hadoopProperties'] = []
@@ -341,7 +345,7 @@ def import_saved_shell_job(wf):
       if properties:
         for prop in properties:
           snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse job properties for shell job design "%s".' % wf.name)
 
     snippet_properties['files'] = []
@@ -349,7 +353,7 @@ def import_saved_shell_job(wf):
       files = json.loads(node.files)
       for filepath in files:
         snippet_properties['files'].append({'type': 'file', 'path': filepath})
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse files for shell job design "%s".' % wf.name)
 
     snippet_properties['archives'] = []
@@ -357,7 +361,7 @@ def import_saved_shell_job(wf):
       archives = json.loads(node.archives)
       for archive in archives:
         snippet_properties['archives'].append(archive['name'])
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse archives for shell job design "%s".' % wf.name)
 
     snippet_properties['capture_output'] = node.capture_output
@@ -396,7 +400,7 @@ def import_saved_java_job(wf):
       if properties:
         for prop in properties:
           snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse job properties for Java job design "%s".' % wf.name)
 
     snippet_properties['files'] = []
@@ -404,7 +408,7 @@ def import_saved_java_job(wf):
       files = json.loads(node.files)
       for filepath in files:
         snippet_properties['files'].append({'type': 'file', 'path': filepath})
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse files for Java job design "%s".' % wf.name)
 
     snippet_properties['archives'] = []
@@ -412,7 +416,7 @@ def import_saved_java_job(wf):
       archives = json.loads(node.archives)
       for archive in archives:
         snippet_properties['archives'].append(archive['name'])
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse archives for Java job design "%s".' % wf.name)
 
     snippet_properties['capture_output'] = node.capture_output

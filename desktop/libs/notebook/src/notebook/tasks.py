@@ -16,6 +16,8 @@
 # limitations under the License.
 from __future__ import absolute_import, unicode_literals
 
+from builtins import next
+from builtins import str
 import csv
 import os
 import json
