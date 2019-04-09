@@ -47,7 +47,6 @@ A Hue committer will commit your patch when it is is ready after being reviewed.
 
 Example of [commit](https://github.com/cloudera/hue/commit/968d58c72119e4055bb081ba023e02b8ac8534dd).
 
-If it is the first time, [please sign the CCLA](https://github.com/cloudera/hue/wiki/Ccla) that way we don't get sued later ;)
 
 ## Coding Style
 
