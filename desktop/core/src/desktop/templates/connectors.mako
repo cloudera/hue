@@ -183,8 +183,11 @@ ${layout.menubar(section='connectors')}
 
 <script type="text/html" id="add-connector-page">
   <div class="card card-small margin-top-10">
-      <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ TOP_SNAP }', triggerAdjust: 0 }">
-        <ul class="nav nav-pills">
+    ##<div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ TOP_SNAP }', triggerAdjust: 0 }">
+
+    <div class="card-body clearfix">
+      <div class="span2">
+        <ul class="nav nav-pills nav-stacked">
           <li data-bind="css: { 'active': $root.selectedConnectorCategory() === 'All' }">
             <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedConnectorCategory('All') }"></a>
           </li>
@@ -194,53 +197,66 @@ ${layout.menubar(section='connectors')}
           </li>
           <!-- /ko -->
         </ul>
-        <input type="text" data-bind="clearable: connectorsFilter, valueUpdate: 'afterkeydown'"
-            class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter connectors...') }">
       </div>
 
-      <div class="margin-top-10">
-        <div data-bind="foreach: filteredConnectors()">
-          <h4 data-bind="text: category"></h4>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th width="30%">${ _('Name') }</th>
-                <th>${ _('Instances') }</th>
-              </tr>
-            </thead>
-            <!-- ko if: $data.values -->
-            <tbody data-bind="foreach: values">
-              <tr data-bind="click: function() { $root.instance(name); }">
-                <td data-bind="text: name"></td>
-                <td data-bind="text: instances.length > 0 ? instances.length : ''"></td>
-              </tr>
-            </tbody>
-            <!-- /ko -->
-            <!-- ko ifnot: $data.values -->
-            <tfoot>
-              <tr>
-                <td colspan="2">${ _('There are no connectors matching your filter') }</td>
-              </tr>
-            </tfoot>
-            <!-- /ko -->
-          </table>
-        </div>
+      <div class="span10">
+          <span class="pull-right">
+            <a href="http://gethue.com" target="_blank">
+              <i class="fa fa-help"></i> ${ _('Help') }
+            </a>
+          </span>
 
-        <!-- ko if: filteredConnectors().length == 0 -->
-        <table class="table table-condensed">
-          <thead>
-            <tr>
-              <th width="30%">${ _('Name') }</th>
-              <th>${ _('Instances') }</th>
-            </tr>
-          </thead>
-          <tfoot>
-            <tr>
-              <td colspan="2">${ _('There are no connectors matching your filter') }</td>
-            </tr>
-          </tfoot>
-        </table>
-        <!-- /ko -->
+          <input type="text" data-bind="clearable: connectorsFilter, valueUpdate: 'afterkeydown'"
+              class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter...') }">
+
+          <div class="margin-top-10">
+            <div data-bind="foreach: filteredConnectors()">
+              <h4 data-bind="text: category"></h4>
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th width="30%">${ _('Name') }</th>
+                    <th>${ _('Instances') }</th>
+                  </tr>
+                </thead>
+                <!-- ko if: $data.values -->
+                <tbody data-bind="foreach: values">
+                  <tr data-bind="click: function() { $root.instance(name); }">
+                    <td data-bind="text: name"></td>
+                    <td data-bind="text: instances.length > 0 ? instances.length : ''"></td>
+                  </tr>
+                </tbody>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.values -->
+                <tfoot>
+                  <tr>
+                    <td colspan="2">${ _('There are no connectors matching your filter') }</td>
+                  </tr>
+                </tfoot>
+                <!-- /ko -->
+              </table>
+            </div>
+
+            <!-- ko if: filteredConnectors().length == 0 -->
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th width="30%">${ _('Name') }</th>
+                  <th>${ _('Instances') }</th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr>
+                  <td colspan="2">${ _('There are no connectors matching your filter') }</td>
+                </tr>
+              </tfoot>
+            </table>
+            <!-- /ko -->
+          </div>
+        </div>
       </div>
     </div>
+    ## </div>
+
+  </div>
 </script>
