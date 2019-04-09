@@ -18,9 +18,11 @@
 See desktop/auth/backend.py
 """
 
+from future import standard_library
+standard_library.install_aliases()
 import httplib2
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import cgi
 import logging
 
@@ -142,7 +144,7 @@ class OAuthBackend(DesktopBackendBase):
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_LINKEDIN.get()
             authentication_token_uri=liboauth.conf.AUTHORIZE_URL_LINKEDIN.get()
         
-        params = urllib.urlencode({
+        params = urllib.parse.urlencode({
            'code':code,
            'redirect_uri':redirect_uri,
            'client_id': consumer_key,
@@ -254,7 +256,7 @@ class OAuthBackend(DesktopBackendBase):
 
        consumer = oauth.Consumer(consumer_key, consumer_secret)
        client = oauth.Client(consumer)
-       resp, content = client.request(token_request_uri, "POST", body=urllib.urlencode({'oauth_callback': redirect_uri}))
+       resp, content = client.request(token_request_uri, "POST", body=urllib.parse.urlencode({'oauth_callback': redirect_uri}))
        if resp['status'] != '200':
            raise Exception(_("Invalid response from OAuth provider: %s") % resp)
        request.session['request_token'] = dict(cgi.parse_qsl(content))
@@ -267,7 +269,7 @@ class OAuthBackend(DesktopBackendBase):
 def map_username(username):
     username_map = liboauth.conf.USERNAME_MAP.get()
     if username_map:
-        for key, value in username_map.iteritems():
+        for key, value in username_map.items():
             username = username.replace(key, value)
     return ''.join([x for x in username if x.isalnum()])
 
