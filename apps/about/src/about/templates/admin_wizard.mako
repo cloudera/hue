@@ -19,10 +19,10 @@ from django.urls import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
-from desktop.views import commonheader, commonfooter
 from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
+from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
@@ -51,9 +51,9 @@ ${ layout.menubar(section='quick_start') }
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
-              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
-              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
-              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-flag"></i> ${_('Go!') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-book"></i> ${ _('Connectors') }</a></li>
+              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
+              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
             </ul>
            </div>
 
@@ -73,6 +73,10 @@ ${ layout.menubar(section='quick_start') }
           </div>
 
           <div id="step2" class="stepDetails hide">
+
+          </div>
+
+          <div id="step3" class="stepDetails hide">
             <div>
               <h3>${ _('Install individual application examples') }</h3>
               <ul class="unstyled samples">
@@ -159,7 +163,7 @@ ${ layout.menubar(section='quick_start') }
             </div>
           </div>
 
-          <div id="step3" class="stepDetails hide">
+          <div id="step4" class="stepDetails hide">
             <div>
               <h3>${ _('Create or import users') }</h3>
               <a href="${ url('useradmin.views.list_users') }"
@@ -180,21 +184,6 @@ ${ layout.menubar(section='quick_start') }
                    <i class="fa fa-question-circle"></i>
                 </a>
               </label>
-            </div>
-          </div>
-
-          <div id="step4" class="stepDetails hide">
-            <div>
-              <h3>${ _('Use the applications') }</h3>
-              % if is_embeddable:
-              <a href="/">
-                <i class="fa fa-home"></i> ${ _('Landing page') }
-              </a>
-              % else:
-                <a href="${ url('desktop_views_home2') }">
-                  <i class="fa fa-home"></i> ${ _('Home') }
-                </a>
-              % endif
             </div>
 
             % if not is_embeddable:

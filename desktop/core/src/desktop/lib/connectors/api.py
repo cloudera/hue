@@ -18,19 +18,21 @@
 import json
 import logging
 
-from desktop.lib.connectors.lib.impala import Impala
-from desktop.lib.connectors.lib.hive import Hive
+from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse, render
+from desktop.lib.connectors.lib.impala import Impala
+from desktop.lib.connectors.lib.hive import Hive
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
 
 CONNECTOR_TYPES = [
   {'name': connector.NAME, 'settings': connector.PROPERTIES}
-  for connector in [
-    Impala(), Hive()
-  ]
+    for connector in [
+      Impala(), Hive()
+    ]
 ]
 
 CONNECTORS = {
@@ -80,10 +82,45 @@ def connectors(request):
   })
 
 
-def connector(request):
-  insance = json.loads(request.POST.get('id', 'null'))
+def get_connector(request, name):
+  instance = _get_connector(name)
 
-  return JsonResponse(CONNECTOR_TYPES[0])
+  return JsonResponse(instance)
+
+
+def update_connector(request):
+  connector = json.loads(request.POST.get('connector'), '{}')
+
+  instance = _get_connector(connector['name'])
+  instance.update(connector)
+
+  return JsonResponse(instance)
+
+
+def delete_connector(request):
+  global CONNECTOR_TYPES
+
+  connector = json.loads(request.POST.get('connector'), '{}')
+
+  size_before = len(CONNECTOR_TYPES)
+  CONNECTOR_TYPES = filter(lambda _connector: _connector['name'] != connector['name'], CONNECTOR_TYPES)
+  size_after = len(CONNECTOR_TYPES)
+
+  if size_before == size_after + 1:
+    return JsonResponse({})
+  else:
+    raise PopupException(_('No connector with the name %(name)s found.') % connector)
+
+
+def _get_connector(name):
+  global CONNECTOR_TYPES
+
+  instance = filter(lambda connector: connector['name'] == name, CONNECTOR_TYPES)
+
+  if instance:
+    return instance[0]
+  else:
+    raise PopupException(_('No connector with the name %s found.') % name)
 
 
 def connector_types(request):
