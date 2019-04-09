@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import json
 import logging
 
@@ -44,12 +45,12 @@ def error_handler(view_fn):
 
     try:
       return view_fn(*args, **kwargs)
-    except KafkaApiException, e:
+    except KafkaApiException as e:
       try:
         response['message'] = json.loads(e.message)
       except Exception:
         response['message'] = force_unicode(e.message)
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(e)
       response['message'] = message
       LOG.exception(message)
@@ -105,9 +106,9 @@ def get_topics():
     try:
       manager = ManagerApi()
       broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
-      return [name for name in manager.get_kafka_topics(broker_host).keys() if not name.startswith('__')]
-    except Exception, e:
-      print e
+      return [name for name in list(manager.get_kafka_topics(broker_host).keys()) if not name.startswith('__')]
+    except Exception as e:
+      print(e)
       return ["traffic", "hueAccessLogs"]
 
 
