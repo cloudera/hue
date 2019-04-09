@@ -17,6 +17,7 @@
 #
 # Handling of data export
 
+from past.builtins import basestring
 import logging
 
 from django.utils.encoding import smart_str
@@ -62,7 +63,7 @@ def SearchDataAdapter(results, format, collection):
       for column in headers:
         if column not in data:
           row.append("")
-        elif isinstance(data[column], basestring) or isinstance(data[column], (int, long, float, complex)):
+        elif isinstance(data[column], basestring) or isinstance(data[column], (int, float, complex)):
           row.append(data[column])
         elif isinstance(data[column], list): # Multivalue field
           row.append([smart_str(val, errors='replace') for val in data[column]])
