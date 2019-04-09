@@ -3606,25 +3606,6 @@ const SqlFunctions = (function() {
 
   const MISC_FUNCTIONS = {
     hive: {
-      aes_decrypt: {
-        returnTypes: ['BINARY'],
-        arguments: [[{ type: 'BINARY' }], [{ type: 'BINARY' }, { type: 'STRING' }]],
-        signature: 'aes_decrypt(BINARY input, STRING|BINARY key)',
-        draggable: 'aes_decrypt()',
-        description:
-          "Decrypt input using AES (as of Hive 1.3.0). Key lengths of 128, 192 or 256 bits can be used. 192 and 256 bits keys can be used if Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files are installed. If either argument is NULL or the key length is not one of the permitted values, the return value is NULL. Example: aes_decrypt(unbase64('y6Ss+zCYObpCbgfWfyNWTw=='), '1234567890123456') = 'ABC'."
-      },
-      aes_encrypt: {
-        returnTypes: ['BINARY'],
-        arguments: [
-          [{ type: 'STRING' }, { type: 'BINARY' }],
-          [{ type: 'STRING' }, { type: 'BINARY' }]
-        ],
-        signature: 'aes_encrypt(STRING|BINARY input, STRING|BINARY key)',
-        draggable: 'aes_encrypt()',
-        description:
-          "Encrypt input using AES (as of Hive 1.3.0). Key lengths of 128, 192 or 256 bits can be used. 192 and 256 bits keys can be used if Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files are installed. If either argument is NULL or the key length is not one of the permitted values, the return value is NULL. Example: base64(aes_encrypt('ABC', '1234567890123456')) = 'y6Ss+zCYObpCbgfWfyNWTw=='."
-      },
       crc32: {
         returnTypes: ['BIGINT'],
         arguments: [[{ type: 'STRING' }, { type: 'BINARY' }]],
