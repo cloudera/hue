@@ -60,13 +60,13 @@ else:
         if (self.connectorsFilter()) {
           var lowerQuery = self.connectorsFilter().toLowerCase();
           var filteredConnectors = []
-          connectors.forEach(function (connectors) {
-            var _connectors = {"category": connectors.category, "values": []};
-            _connectors.values = connectors.values.filter(function (subMetricKey) {
+          connectors.forEach(function (connector) {
+            var _connector = {"category": connector.category(), "values": []};
+            _connector.values = connector.values.filter(function (subMetricKey) {
               return subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1;
             });
-            if (_connectors.values.length > 0) {
-              filteredConnectors.push(_connectors);
+            if (_connector.values.length > 0) {
+              filteredConnectors.push(_connector);
             }
           });
           connectors = filteredConnectors;
@@ -82,12 +82,18 @@ else:
 
       self.fetchConnectors = function () {
         self.apiHelper.simpleGet('/desktop/connectors/api/instances/', {}, {successCallback: function (data) {
-          self.instances(data.connectors);
+          self.instances(ko.mapping.fromJS(data.connectors));
         }});
       };
-      self.fetchConnector = function (name) {
-        self.apiHelper.simpleGet('/desktop/connectors/api/instance/get/' + name, {successCallback: function (data) {
-          self.instance(data.connector);
+      self.newConnector = function (type) {
+        self.apiHelper.simpleGet('/desktop/connectors/api/instance/new/' + type, {}, {successCallback: function (data) {
+          self.instance(ko.mapping.fromJS(data.connector));
+          self.section('connector-page');
+        }});
+      };
+      self.fetchConnector = function (id) {
+        self.apiHelper.simpleGet('/desktop/connectors/api/instance/get/' + id, {}, {successCallback: function (data) {
+          self.instance(ko.mapping.fromJS(data.connector));
         }});
       };
       self.deleteConnector = function (connector) {
@@ -98,6 +104,7 @@ else:
       };
       self.updateConnector = function (connector) {
         self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
+          connector.id(data.id)
           self.section('connectors-page');
           self.fetchConnectors();
         }});
@@ -123,7 +130,7 @@ ${layout.menubar(section='connectors')}
 <div id="connectorsComponents" class="container-fluid">
 
   <a href="javascript:void(0)" data-bind="click: function() { section('connectors-page'); }">
-    Connectors
+    ${ _('Connectors') }
   </a>
 
   <!-- ko if: section() == 'connectors-page' -->
@@ -153,13 +160,13 @@ ${layout.menubar(section='connectors')}
       <thead>
         <tr>
           <th width="30%">${ _('Name') }</th>
-          <th>${ _('') }</th>
+          <th>${ _('Type') }</th>
         </tr>
       </thead>
       <tbody data-bind="foreach: $data">
         <tr data-bind="click: function() { $root.instance($data); $root.section('connector-page'); }">
           <td data-bind="text: name"></td>
-          <td data-bind="input: value"></td>
+          <td data-bind="input: type"></td>
         </tr>
       </tbody>
     </table>
@@ -174,9 +181,17 @@ ${layout.menubar(section='connectors')}
 
 <script type="text/html" id="connector-page">
   <div class="row-fluid">
-    <span data-bind="text: name"></span>
+    <input data-bind="value: name">
+    (<span data-bind="text: type"></span>)
     <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
-      ${ _('Update') }
+      <!-- ko if: typeof id != 'undefined' -->
+        <!-- ko if: id -->
+          ${ _('Update') }
+        <!-- /ko -->
+        <!-- ko ifnot: id -->
+          ${ _('Save') }
+        <!-- /ko -->
+      <!-- /ko -->
     </a>
     <a href="javascript:void(0)" data-bind="click: $root.deleteConnector">
       ${ _('Delete') }
@@ -234,14 +249,14 @@ ${layout.menubar(section='connectors')}
                 <thead>
                   <tr>
                     <th width="30%">${ _('Name') }</th>
-                    <th>${ _('Instances') }</th>
+                    <th>${ _('Description') }</th>
                   </tr>
                 </thead>
                 <!-- ko if: $data.values -->
                 <tbody data-bind="foreach: values">
-                  <tr data-bind="click: function() { $root.instance(name); }">
+                  <tr data-bind="click: function() { $root.newConnector(type); }">
                     <td data-bind="text: name"></td>
-                    <td data-bind="text: instances.length > 0 ? instances.length : ''"></td>
+                    <td data-bind="text: description"></td>
                   </tr>
                 </tbody>
                 <!-- /ko -->
