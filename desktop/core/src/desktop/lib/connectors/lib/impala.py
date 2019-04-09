@@ -1,10 +1,11 @@
-class ImpalaConnector():
+
+class Impala():
   NAME = 'impala'
 
   VERSION = 1
   APP = 'notebook'
   INTERFACE = 'hiveserver2'
-  PROPERTIES = {
-    'server_host': '',
-    'server_port': '',
-  }
+  PROPERTIES = [
+    {'name': 'server_host', 'value': ''},
+    {'name': 'server_port', 'value': ''},
+  ]

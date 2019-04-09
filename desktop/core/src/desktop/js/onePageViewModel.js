@@ -522,7 +522,7 @@ class OnePageViewModel {
         app: function() {
           self.loadApp('connectors');
           self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchConnectors();
+            viewModel.fetchConnector();
           });
         }
       },

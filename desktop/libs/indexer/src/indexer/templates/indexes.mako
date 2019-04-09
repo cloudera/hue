@@ -138,7 +138,7 @@ ${ assist.assistPanel() }
 
 
           <div class="indexer-main">
-            <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
+            <!-- ko template: { name: 'indexes-breadcrumbs' } --><!-- /ko -->
 
             <!-- ko if: section() === 'list-indexes' -->
             <%actionbar:render>
