@@ -23,18 +23,6 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-class ImpalaConnector():
-  NAME = 'impala'
-
-  VERSION = 1
-  APP = 'notebook'
-  INTERFACE = 'hiveserver2'
-  PROPERTIES = {
-    'server_host': '',
-    'server_port': '',
-  }
-
-
 class Connectors(models.Model):
   type = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive-tez, '))  # Must be in lib
 

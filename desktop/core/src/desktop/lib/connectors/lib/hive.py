@@ -1,6 +1,7 @@
 
 class Hive():
-  NAME = 'hive'
+  NAME = 'Hive'
+  TYPE = 'hive'
 
   VERSION = 1
   APP = 'notebook'

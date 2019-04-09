@@ -1,6 +1,7 @@
 
 class Impala():
-  NAME = 'impala'
+  NAME = 'Impala'
+  TYPE = 'impala'
 
   VERSION = 1
   APP = 'notebook'

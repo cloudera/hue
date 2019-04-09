@@ -28,83 +28,121 @@ from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 
+
+INSTALLED_CONNECTORS = [
+  {'name': 'Impala', 'type': Impala().NAME, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
+  {'name': 'Hive', 'type': Hive().NAME, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
+]
+
 CONNECTOR_TYPES = [
-  {'name': connector.NAME, 'settings': connector.PROPERTIES}
+  {'name': connector.NAME, 'type': connector.TYPE, 'settings': connector.PROPERTIES, 'id': None, 'category': 'engines', 'description': ''}
     for connector in [
-      Impala(), Hive()
+      Impala(),
+      Hive()
     ]
 ]
 
-CONNECTORS = {
-  "timestamp": "2019-04-05T23:36:47.533981",
-  "connectors": [
-    {"category": "Query Engines", "values": [
-      {"name": "Impala", "id": 1, "instances": []},
-      {"name": "SQL Database", "id": 2, "instances": []},
-      {"name": "Hive", "id": 3, "instances": [1, 2]},
-      {"name": "Hive Tez", "id": 4, "instances": []},
-      {"name": "Hive LLAP", "id": 5, "instances": []},
-      {"name": "Druid", "id": 6, "instances": []},
-      {"name": "Kafka SQL", "id": 6, "instances": []},
-      {"name": "SparkSQL", "id": 6, "instances": []},
-      {"name": "Presto", "id": 6, "instances": []},
-      {"name": "Athena", "id": 6, "instances": []},
-      {"name": "Redshift", "id": 6, "instances": []},
-      {"name": "Big Query", "id": 6, "instances": []},
-      {"name": "Oracle", "id": 6, "instances": []},
-    ]},
-    {"category": "Browsers", "values": [
-      {"name": "HDFS", "id": 30, "instances": []},
-      {"name": "YARN", "id": 30, "instances": []},
-      {"name": "S3", "id": 31, "instances": []},
-      {"name": "ADLS", "id": 32, "instances": []}
-    ]},
-    {"category": "Catalogs", "values": [
-      {"name": "Navigator", "id": 7, "instances": []},
-      {"name": "Atlas", "id": 8, "instances": []}
-    ]},
-    {"category": "Optimizers", "values": [
-      {"name": "Optimizer", "id": 9, "instances": []}
-    ]},
-    {"category": "Schedulers", "values": [
-      {"name": "Oozie", "id": 10, "instances": []},
-      {"name": "Celery", "id": 11, "instances": []}
-    ]},
-    {"category": "Apps", "values": []},
-    {"category": "Plugins", "values": []},
-  ]
+CONNECTOR_TYPES += [
+  {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Hive Tez", 'type': 'hive-tez', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Hive LLAP", 'type': 'hive-llap', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Druid", 'type': 'druid', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Kafka SQL", 'type': 'kafka-sql', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "SparkSQL", 'type': 'spark-sql', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Presto", 'type': 'presto', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Athena", 'type': 'athena', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Redshift", 'type': 'redshift', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Big Query", 'type': 'bigquery', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Oracle", 'type': 'oracle', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+
+  {'name': "HDFS", 'type': 'hdfs', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "YARN", 'type': 'yarn', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "S3", 'type': 's3', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "ADLS", 'type': 'adls-v1', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
+
+  {'name': "Atlas", 'type': 'atlas', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
+  {'name': "Navigator", 'type': 'navigator', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
+
+  {'name': "Optimizer", 'type': 'optimizer', 'settings': {}, 'id': None, 'category': 'optimizers', 'description': ''},
+
+  {'name': "Oozie", 'type': 'oozie', 'settings': {}, 'id': None, 'category': 'schedulers', 'description': ''},
+  {'name': "Celery", 'type': 'celery', 'settings': {}, 'id': None, 'category': 'schedulers', 'description': '' },
+]
+
+CATEGORIES = [
+  {"name": "Query Engines", 'type': 'engines', 'description': ''},
+  {"name": "Browsers", 'type': 'browsers', 'description': ''},
+  {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
+  {"name": "Optimizers", 'type': 'optimizers', 'description': ''},
+  {"name": "Schedulers", 'type': 'schedulers', 'description': ''},
+  {"name": "Apps", 'type': 'apps', 'description': ''},
+  {"name": "Plugins", 'type': 'plugins', 'description': ''},
+]
+
+AVAILABLE_CONNECTORS = {
+  "connectors": [{
+    'category': category['name'],
+    'values': [_connector for _connector in CONNECTOR_TYPES if _connector['category'] == category['type']],
+    'description': category['description'],
+  } for category in CATEGORIES]
 }
 
 
 def connectors(request):
   return JsonResponse({
-    'connectors': CONNECTOR_TYPES
+    'connectors': INSTALLED_CONNECTORS
   })
 
 
-def get_connector(request, name):
-  instance = _get_connector(name)
+def new_connector(request, type):
+  instance = _get_connector_by_type(type)
+
+  return JsonResponse({'connector': instance})
+
+
+def get_connector(request, id):
+  instance = _get_connector_by_id(id)
 
   return JsonResponse(instance)
 
+CONNECTOR_IDS = 10
 
 def update_connector(request):
+  global CONNECTOR_IDS
+
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  instance = _get_connector(connector['name'])
-  instance.update(connector)
+  if connector.get('id'):
+    instance = _get_connector_by_id(connector['id'])
+    instance.update(connector)
+  else:
+    instance = connector
+    instance['id'] = CONNECTOR_IDS
+    CONNECTOR_IDS += 1
+    INSTALLED_CONNECTORS.append(instance)
 
   return JsonResponse(instance)
+
+
+def _get_connector_by_type(type):
+  global CONNECTOR_TYPES
+
+  instance = filter(lambda connector: connector['type'] == type, CONNECTOR_TYPES)
+
+  if instance:
+    return instance[0]
+  else:
+    raise PopupException(_('No connector with the type %s found.') % type)
 
 
 def delete_connector(request):
-  global CONNECTOR_TYPES
+  global INSTALLED_CONNECTORS
 
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  size_before = len(CONNECTOR_TYPES)
-  CONNECTOR_TYPES = filter(lambda _connector: _connector['name'] != connector['name'], CONNECTOR_TYPES)
-  size_after = len(CONNECTOR_TYPES)
+  size_before = len(INSTALLED_CONNECTORS)
+  INSTALLED_CONNECTORS = filter(lambda _connector: _connector['name'] != connector['name'], INSTALLED_CONNECTORS)
+  size_after = len(INSTALLED_CONNECTORS)
 
   if size_before == size_after + 1:
     return JsonResponse({})
@@ -112,18 +150,18 @@ def delete_connector(request):
     raise PopupException(_('No connector with the name %(name)s found.') % connector)
 
 
-def _get_connector(name):
-  global CONNECTOR_TYPES
+def _get_connector_by_id(id):
+  global INSTALLED_CONNECTORS
 
-  instance = filter(lambda connector: connector['name'] == name, CONNECTOR_TYPES)
+  instance = filter(lambda connector: connector['id'] == id, INSTALLED_CONNECTORS)
 
   if instance:
     return instance[0]
   else:
-    raise PopupException(_('No connector with the name %s found.') % name)
+    raise PopupException(_('No connector with the id %s found.') % id)
 
 
 def connector_types(request):
-  global CONNECTORS
+  global AVAILABLE_CONNECTORS
 
-  return JsonResponse(CONNECTORS)
+  return JsonResponse(AVAILABLE_CONNECTORS)
