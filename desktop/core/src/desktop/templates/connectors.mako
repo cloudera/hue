@@ -98,7 +98,8 @@ else:
       };
       self.updateConnector = function (connector) {
         self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
-          console.log('Success');
+          self.section('connectors-page');
+          self.fetchConnectors();
         }});
       };
       self.fetchConnectorTypes = function () {
@@ -158,7 +159,7 @@ ${layout.menubar(section='connectors')}
       <tbody data-bind="foreach: $data">
         <tr data-bind="click: function() { $root.instance($data); $root.section('connector-page'); }">
           <td data-bind="text: name"></td>
-          <td data-bind="text: ''"></td>
+          <td data-bind="input: value"></td>
         </tr>
       </tbody>
     </table>
@@ -174,6 +175,9 @@ ${layout.menubar(section='connectors')}
 <script type="text/html" id="connector-page">
   <div class="row-fluid">
     <span data-bind="text: name"></span>
+    <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
+      ${ _('Update') }
+    </a>
     <a href="javascript:void(0)" data-bind="click: $root.deleteConnector">
       ${ _('Delete') }
     </a>
@@ -187,7 +191,7 @@ ${layout.menubar(section='connectors')}
       <tbody data-bind="foreach: settings">
         <tr>
           <td data-bind="text: name"></td>
-          <td data-bind="text: value"></td>
+          <td><input data-bind="value: value"></td>
         </tr>
       </tbody>
     </table>
