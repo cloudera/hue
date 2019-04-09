@@ -252,7 +252,7 @@ class HiveServerTRow2(object):
     return HiveServerTColumnValue2(self.cols[pos]).val # Return the full column and its values
 
   def _get_col_position(self, column_name):
-    return filter(lambda i_col1: i_col1[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
+    return list(filter(lambda i_col1: i_col1[1].columnName == column_name, enumerate(self.schema.columns)))[0][0]
 
   def fields(self):
     try:

@@ -159,6 +159,8 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
     response['code'] = 503
     response['error'] = e.message
   except Exception as e:
+    import traceback
+    LOG.error(traceback.format_exc())
     LOG.warn('Autocomplete data fetching error: %s' % e)
     response['code'] = 500
     response['error'] = e.message
