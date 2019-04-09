@@ -19,6 +19,8 @@ import json
 import logging
 
 from desktop.lib.connectors.lib.impala import Impala
+from desktop.lib.connectors.lib.hive import Hive
+
 from desktop.lib.django_util import JsonResponse, render
 
 
@@ -27,7 +29,7 @@ LOG = logging.getLogger(__name__)
 CONNECTOR_TYPES = [
   {'name': connector.NAME, 'settings': connector.PROPERTIES}
   for connector in [
-    Impala()
+    Impala(), Hive()
   ]
 ]
 
