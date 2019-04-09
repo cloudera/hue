@@ -23,7 +23,6 @@ import threading
 import time
 
 from django.urls import reverse
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.conf import CLUSTER_ID
@@ -42,6 +41,10 @@ from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
 
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 LOG = logging.getLogger(__name__)
 

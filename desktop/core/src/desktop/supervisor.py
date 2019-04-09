@@ -35,8 +35,8 @@ from builtins import str
 from builtins import range
 from builtins import object
 from daemon.pidfile import TimeoutPIDLockFile
-import daemon
-import exceptions
+from daemon.daemon import DaemonContext
+#import exceptions
 import grp
 import logging
 import optparse
@@ -54,10 +54,10 @@ import desktop.lib.paths
 import desktop.log
 
 # BaseException not available on python 2.4
-try:
-  MyBaseException = exceptions.BaseException
-except AttributeError:
-  MyBaseException = exceptions.Exception
+#try:
+#  MyBaseException = BaseException
+#except AttributeError:
+#  MyBaseException = exceptions.Exception
 
 PROC_NAME = 'supervisor'
 LOG = logging.getLogger()
@@ -139,8 +139,13 @@ class Supervisor(threading.Thread):
       while True:
         self.state = Supervisor.RUNNING
         LOG.info("Starting process %s" % proc_str)
+        try:
+          null_file = file("/dev/null")
+        except NameError:
+          null_file = open("/dev/null")
+
         pipe = subprocess.Popen(self.cmdv, close_fds=True,
-                                stdin=file("/dev/null"),
+                                stdin=null_file,
                                 **self.popen_kwargs)
         LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
         CHILD_PIDS.append(pipe.pid)
@@ -170,7 +175,7 @@ class Supervisor(threading.Thread):
           return
 
         LOG.error("Process %s exited abnormally. Restarting it." % (proc_str,))
-    except MyBaseException as ex:
+    except BaseException as ex:
       LOG.exception("Uncaught exception. Supervisor exiting.")
       self.state = Supervisor.ERROR
 
@@ -332,8 +337,11 @@ def main():
     pidfile_context.break_lock()
 
   if options.daemonize:
-    outfile = file(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
-    context = daemon.DaemonContext(
+    try:
+      outfile = file(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
+    except NameError:
+      outfile = open(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
+    context = DaemonContext(
         working_directory=root,
         pidfile=pidfile_context,
         stdout=outfile,
@@ -364,7 +372,10 @@ def main():
         preexec_fn = None
 
       if options.daemonize:
-        log_stdout = file(os.path.join(log_dir, name + '.out'), 'a+', 0)
+        try:
+          log_stdout = file(os.path.join(log_dir, name + '.out'), 'a+', 0)
+        except NameError:
+          log_stdout = open(os.path.join(log_dir, name + '.out'), 'a+', 0)
         log_stderr = log_stdout
       else:
         # Passing None to subprocess.Popen later makes the subprocess inherit the
@@ -378,7 +389,7 @@ def main():
       sups.append(sup)
 
     wait_loop(sups, options)
-  except MyBaseException as ex:
+  except BaseException as ex:
     LOG.exception("Exception in supervisor main loop")
     shutdown(sups)      # shutdown() exits the process
 

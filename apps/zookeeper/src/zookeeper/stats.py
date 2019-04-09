@@ -92,12 +92,12 @@ class ZooKeeperStats(object):
         s.settimeout(self._timeout)
         data = ""
         try:
-	    s.connect(self._address)
-	    s.send(cmd)
-	    data = s.recv(2048)
-	    s.close()
+          s.connect(self._address)
+          s.send(cmd)
+          data = s.recv(2048)
+          s.close()
         except Exception as e:
-	    LOG.error('Problem connecting to host %s, exception raised : %s' % (self._host, e))
+          LOG.error('Problem connecting to host %s, exception raised : %s' % (self._host, e))
         return data
 
     def _parse(self, data):
@@ -119,7 +119,7 @@ class ZooKeeperStats(object):
 
         result = {}
         if not data:
-	    return result
+          return result
         h = StringIO(data)
 
         version = h.readline()

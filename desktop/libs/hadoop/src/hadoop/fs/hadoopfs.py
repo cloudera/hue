@@ -23,6 +23,7 @@ Only some utils and Hdfs are still used.
 Interfaces for Hadoop filesystem access via the HADOOP-4707 Thrift APIs.
 """
 from __future__ import division
+from io import open
 from past.builtins import cmp
 from future import standard_library
 standard_library.install_aliases()
@@ -37,7 +38,7 @@ import random
 import subprocess
 import urllib.parse
 
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from desktop.lib import i18n
@@ -45,6 +46,11 @@ from desktop.lib import i18n
 import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
+
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 
 LOG = logging.getLogger(__name__)
@@ -191,7 +197,7 @@ class Hdfs(object):
       finally:
         self.setuser(user)
 
-  def copyFromLocal(self, local_src, remote_dst, mode=0o755):
+  def copyFromLocal(self, local_src, remote_dst, mode='0755'):
     remote_dst = remote_dst.endswith(posixpath.sep) and remote_dst[:-1] or remote_dst
     local_src = local_src.endswith(posixpath.sep) and local_src[:-1] or local_src
 
@@ -201,7 +207,7 @@ class Hdfs(object):
       (basename, filename) = os.path.split(local_src)
       self._copy_file(local_src, self.isdir(remote_dst) and self.join(remote_dst, filename) or remote_dst)
 
-  def _copy_dir(self, local_dir, remote_dir, mode=0o755):
+  def _copy_dir(self, local_dir, remote_dir, mode='0755'):
     self.mkdir(remote_dir, mode=mode)
 
     for f in os.listdir(local_dir):
@@ -221,10 +227,10 @@ class Hdfs(object):
       else:
         LOG.info(_('%(remote_dst)s does not exist. Trying to copy.') % {'remote_dst': remote_dst})
 
-      src = file(local_src)
+      src = open(local_src)
       try:
         try:
-          self.create(remote_dst, permission=0o755)
+          self.create(remote_dst, permission='0755')
           chunk = src.read(chunk_size)
           while chunk:
             self.append(remote_dst, chunk)

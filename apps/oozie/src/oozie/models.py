@@ -40,7 +40,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 import django.utils.timezone as dtz
 
@@ -61,6 +61,10 @@ from oozie.timezones import TIMEZONES
 
 from desktop.auth.backend import is_admin
 
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 LOG = logging.getLogger(__name__)
 

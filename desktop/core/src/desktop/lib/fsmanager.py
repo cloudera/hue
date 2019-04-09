@@ -64,7 +64,7 @@ def _make_fs(name):
       if DEFAULT_SCHEMA == schema:
         logging.error('Can not get filesystem called "%s" for default schema "%s"' % (name, schema))
         exc_class, exc, tb = sys.exc_info()
-        raise exc_class, exc, tb
+        raise exc_class(exc).with_traceback(tb)
       else:
         logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, schema))
     except Exception as e:

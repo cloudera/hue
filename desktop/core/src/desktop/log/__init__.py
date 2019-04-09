@@ -62,7 +62,12 @@ def _read_log_conf(proc_name, log_dir):
     return None
 
   try:
-    raw = file(log_conf).read()
+    try:
+      log_conf_file = file(log_conf)
+    except NameError:
+      log_conf_file = open(log_conf)
+
+    raw = log_conf_file.read()
     sio = StringIO(CONF_RE.sub(_repl, raw))
     return sio
   except IOError as ex:

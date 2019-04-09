@@ -23,10 +23,13 @@ import logging
 import sys
 import traceback
 
-from django.utils.encoding import force_unicode
 
 import desktop.lib.django_util
 
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 LOG = logging.getLogger(__name__)
 

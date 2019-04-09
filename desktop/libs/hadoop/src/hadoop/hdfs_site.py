@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from io import open
 import errno
 import logging
 import os.path
@@ -82,7 +83,7 @@ def _parse_hdfs_site():
 
   try:
     hdfs_site_path = os.path.join(conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.get(), 'hdfs-site.xml')
-    data = file(hdfs_site_path, 'r').read()
+    data = open(hdfs_site_path).read()
   except KeyError:
     data = ""
   except IOError as err:

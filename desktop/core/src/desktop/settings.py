@@ -580,7 +580,12 @@ if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE')
 
 # Instrumentation
 if desktop.conf.INSTRUMENTATION.get():
-  gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+  try:
+    gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+  except AttributeError:
+    # https://stackoverflow.com/questions/37737753/watching-generation-lists-during-a-program-run
+    #gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_STATS)
+    gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
 
 if not desktop.conf.DATABASE_LOGGING.get():
   def disable_database_logging():

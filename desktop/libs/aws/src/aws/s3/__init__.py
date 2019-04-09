@@ -25,6 +25,7 @@ import sys
 import time
 
 from functools import wraps
+from future.utils import raise_
 
 from boto.exception import S3ResponseError
 from hadoop.fs import normpath as fs_normpath
@@ -55,7 +56,7 @@ def translate_s3_error(fn):
       _, exc, tb = sys.exc_info()
       logging.error('S3 error: %s' % exc)
       lookup = lookup_s3error(exc)
-      raise lookup.__class__, lookup, tb
+      raise_(lookup.__class__, lookup, tb)
   return wrapped
 
 

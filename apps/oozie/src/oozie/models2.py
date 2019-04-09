@@ -34,7 +34,6 @@ from xml.sax.saxutils import escape
 
 from django.urls import reverse
 from django.db.models import Q
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
@@ -56,6 +55,11 @@ from notebook.models import Notebook
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
+
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger(__name__)

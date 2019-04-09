@@ -28,6 +28,7 @@ import errno
 import logging
 import posixpath
 import stat
+import sys
 import threading
 import time
 import urllib.request, urllib.parse, urllib.error
@@ -96,7 +97,9 @@ class WebHdfs(Hdfs):
   def from_config(cls, hdfs_config):
     fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
 
-    return cls(url=_get_service_url(hdfs_config),
+    fs = None
+    try:
+      fs = cls(url=_get_service_url(hdfs_config),
                fs_defaultfs=fs_defaultfs,
                logical_name=hdfs_config.LOGICAL_NAME.get(),
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
@@ -104,6 +107,9 @@ class WebHdfs(Hdfs):
                temp_dir=hdfs_config.TEMP_DIR.get(),
                umask=get_umask_mode(),
                hdfs_supergroup=get_supergroup())
+    except Exception as e:
+      LOG.error("Problem initialize FS: %s" % e.with_traceback(sys.exc_info()[2]))
+    return fs
 
   def __str__(self):
     return "WebHdfs at %s" % self._url

@@ -66,6 +66,7 @@ from __future__ import print_function
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
 from builtins import str
 from past.builtins import basestring
+from builtins import filter
 from builtins import object
 pytype = type
 
@@ -662,7 +663,7 @@ def list_of_compiled_res(skip_empty=False):
   def fn(list_of_strings):
     if isinstance(list_of_strings, basestring):
       list_of_strings = list_of_strings.split(',')
-    list_of_strings = [string for string in list_of_strings if string if skip_empty else True]
+    list_of_strings = list(filter(lambda string: string if skip_empty else True, list_of_strings))
     return list(re.compile(x) for x in list_of_strings)
   return fn
 
@@ -728,4 +729,4 @@ def coerce_password_from_script(script):
 
   # whitespace may be significant in the password, but most files have a
   # trailing newline.
-  return stdout.strip('\n')
+  return stdout.decode('utf8').strip('\n')

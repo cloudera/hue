@@ -57,7 +57,10 @@ class AppRegistry(object):
 
   def _write(self, path):
     """Write out the registry to the given path"""
-    outfile = file(path, 'w')
+    try:
+      outfile = file(path, 'w')
+    except NameError:
+      outfile = open(path, 'w')
     json.dump(list(self._apps.values()), outfile, cls=AppJsonEncoder, indent=2)
     outfile.close()
 

@@ -34,10 +34,15 @@ from django.forms.fields import MultiValueField, CharField, ChoiceField, Boolean
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
 from django.utils import formats
 from django.utils.safestring import mark_safe
-from django.utils.encoding import python_2_unicode_compatible, force_unicode
+from django.utils.encoding import python_2_unicode_compatible
 
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
+
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 
 LOG = logging.getLogger(__name__)

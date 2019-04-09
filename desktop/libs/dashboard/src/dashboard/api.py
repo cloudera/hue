@@ -22,7 +22,6 @@ import json
 import logging
 import uuid
 
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.conf import ENABLE_DOWNLOAD
@@ -47,6 +46,10 @@ from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_fa
 from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
   NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
 
+try:
+    from django.utils.encoding import force_unicode
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode
 
 LOG = logging.getLogger(__name__)
 
