@@ -80,7 +80,7 @@ def _parse_sites():
 def _parse_property(file_path):
   try:
     return dict(line.strip().rsplit('=', 1) for line in open(file_path) if '=' in line)
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (file_path, err))
     return {}

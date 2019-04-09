@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from django.utils.translation import ugettext as _
@@ -25,7 +26,7 @@ from notebook.connectors.altus import _exec
 LOG = logging.getLogger(__name__)
 
 
-class WorkfloadAnalyticsClient():
+class WorkfloadAnalyticsClient(object):
 
   def __init__(self, user):
     self.user = user
@@ -47,7 +48,7 @@ class WorkfloadAnalyticsClient():
 
 
 
-class WorkloadAnalytics():
+class WorkloadAnalytics(object):
 
   def __init__(self, user): pass
 

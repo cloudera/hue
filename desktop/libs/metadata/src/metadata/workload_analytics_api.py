@@ -34,7 +34,7 @@ def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       response = {
         'status': -1,

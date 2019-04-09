@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 
@@ -36,7 +37,7 @@ def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       response = {
         'status': -1,
