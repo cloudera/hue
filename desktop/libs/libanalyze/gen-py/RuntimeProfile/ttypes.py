@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 import Metrics.ttypes
 
@@ -107,7 +109,7 @@ class TCounter(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -154,7 +156,7 @@ class TEventSequence(object):
         if ftype == TType.LIST:
           self.timestamps = []
           (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _elem5 = iprot.readI64()
             self.timestamps.append(_elem5)
           iprot.readListEnd()
@@ -164,7 +166,7 @@ class TEventSequence(object):
         if ftype == TType.LIST:
           self.labels = []
           (_etype9, _size6) = iprot.readListBegin()
-          for _i10 in xrange(_size6):
+          for _i10 in range(_size6):
             _elem11 = iprot.readString()
             self.labels.append(_elem11)
           iprot.readListEnd()
@@ -220,7 +222,7 @@ class TEventSequence(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -280,7 +282,7 @@ class TTimeSeriesCounter(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype17, _size14) = iprot.readListBegin()
-          for _i18 in xrange(_size14):
+          for _i18 in range(_size14):
             _elem19 = iprot.readI64()
             self.values.append(_elem19)
           iprot.readListEnd()
@@ -340,7 +342,7 @@ class TTimeSeriesCounter(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -482,7 +484,7 @@ class TSummaryStatsCounter(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -558,7 +560,7 @@ class TRuntimeProfileNode(object):
         if ftype == TType.LIST:
           self.counters = []
           (_etype24, _size21) = iprot.readListBegin()
-          for _i25 in xrange(_size21):
+          for _i25 in range(_size21):
             _elem26 = TCounter()
             _elem26.read(iprot)
             self.counters.append(_elem26)
@@ -579,7 +581,7 @@ class TRuntimeProfileNode(object):
         if ftype == TType.MAP:
           self.info_strings = {}
           (_ktype28, _vtype29, _size27 ) = iprot.readMapBegin()
-          for _i31 in xrange(_size27):
+          for _i31 in range(_size27):
             _key32 = iprot.readString()
             _val33 = iprot.readString()
             self.info_strings[_key32] = _val33
@@ -590,7 +592,7 @@ class TRuntimeProfileNode(object):
         if ftype == TType.LIST:
           self.info_strings_display_order = []
           (_etype37, _size34) = iprot.readListBegin()
-          for _i38 in xrange(_size34):
+          for _i38 in range(_size34):
             _elem39 = iprot.readString()
             self.info_strings_display_order.append(_elem39)
           iprot.readListEnd()
@@ -600,11 +602,11 @@ class TRuntimeProfileNode(object):
         if ftype == TType.MAP:
           self.child_counters_map = {}
           (_ktype41, _vtype42, _size40 ) = iprot.readMapBegin()
-          for _i44 in xrange(_size40):
+          for _i44 in range(_size40):
             _key45 = iprot.readString()
             _val46 = set()
             (_etype50, _size47) = iprot.readSetBegin()
-            for _i51 in xrange(_size47):
+            for _i51 in range(_size47):
               _elem52 = iprot.readString()
               _val46.add(_elem52)
             iprot.readSetEnd()
@@ -616,7 +618,7 @@ class TRuntimeProfileNode(object):
         if ftype == TType.LIST:
           self.event_sequences = []
           (_etype56, _size53) = iprot.readListBegin()
-          for _i57 in xrange(_size53):
+          for _i57 in range(_size53):
             _elem58 = TEventSequence()
             _elem58.read(iprot)
             self.event_sequences.append(_elem58)
@@ -627,7 +629,7 @@ class TRuntimeProfileNode(object):
         if ftype == TType.LIST:
           self.time_series_counters = []
           (_etype62, _size59) = iprot.readListBegin()
-          for _i63 in xrange(_size59):
+          for _i63 in range(_size59):
             _elem64 = TTimeSeriesCounter()
             _elem64.read(iprot)
             self.time_series_counters.append(_elem64)
@@ -638,7 +640,7 @@ class TRuntimeProfileNode(object):
         if ftype == TType.LIST:
           self.summary_stats_counters = []
           (_etype68, _size65) = iprot.readListBegin()
-          for _i69 in xrange(_size65):
+          for _i69 in range(_size65):
             _elem70 = TSummaryStatsCounter()
             _elem70.read(iprot)
             self.summary_stats_counters.append(_elem70)
@@ -681,7 +683,7 @@ class TRuntimeProfileNode(object):
     if self.info_strings is not None:
       oprot.writeFieldBegin('info_strings', TType.MAP, 6)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.info_strings))
-      for kiter72,viter73 in self.info_strings.items():
+      for kiter72,viter73 in list(self.info_strings.items()):
         oprot.writeString(kiter72)
         oprot.writeString(viter73)
       oprot.writeMapEnd()
@@ -696,7 +698,7 @@ class TRuntimeProfileNode(object):
     if self.child_counters_map is not None:
       oprot.writeFieldBegin('child_counters_map', TType.MAP, 8)
       oprot.writeMapBegin(TType.STRING, TType.SET, len(self.child_counters_map))
-      for kiter75,viter76 in self.child_counters_map.items():
+      for kiter75,viter76 in list(self.child_counters_map.items()):
         oprot.writeString(kiter75)
         oprot.writeSetBegin(TType.STRING, len(viter76))
         for iter77 in viter76:
@@ -765,7 +767,7 @@ class TRuntimeProfileNode(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -801,7 +803,7 @@ class TRuntimeProfileTree(object):
         if ftype == TType.LIST:
           self.nodes = []
           (_etype84, _size81) = iprot.readListBegin()
-          for _i85 in xrange(_size81):
+          for _i85 in range(_size81):
             _elem86 = TRuntimeProfileNode()
             _elem86.read(iprot)
             self.nodes.append(_elem86)
@@ -841,7 +843,7 @@ class TRuntimeProfileTree(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
