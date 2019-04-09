@@ -21,8 +21,10 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
+from future import standard_library
+standard_library.install_aliases()
 import logging
-import StringIO
+import io
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
@@ -81,7 +83,7 @@ class S3FileUploadHandler(FileUploadHandler):
         self._mp = self._bucket.initiate_multipart_upload(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
         raise StopFutureHandlers()
-      except (S3FileUploadError, S3FileSystemException), e:
+      except (S3FileUploadError, S3FileSystemException) as e:
         LOG.error("Encountered error in S3UploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()
@@ -95,7 +97,7 @@ class S3FileUploadHandler(FileUploadHandler):
         self._mp.upload_part_from_file(fp=fp, part_num=self._part_num)
         self._part_num += 1
         return None
-      except Exception, e:
+      except Exception as e:
         self._mp.cancel_upload()
         LOG.exception('Failed to upload file to S3 at %s: %s' % (self.target_path, e))
         raise StopUpload()
@@ -144,7 +146,7 @@ class S3FileUploadHandler(FileUploadHandler):
 
 
   def _get_file_part(self, raw_data):
-    fp = StringIO.StringIO()
+    fp = io.StringIO()
     fp.write(raw_data)
     fp.seek(0)
     return fp

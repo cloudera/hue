@@ -15,6 +15,7 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+from builtins import object
 import stat
 import posixpath
 
@@ -22,8 +23,8 @@ from aws.s3 import s3datetime_to_timestamp
 
 
 class S3Stat(object):
-  DIR_MODE = 0777 | stat.S_IFDIR
-  FILE_MODE = 0666 | stat.S_IFREG
+  DIR_MODE = 0o777 | stat.S_IFDIR
+  FILE_MODE = 0o666 | stat.S_IFREG
 
   def __init__(self, name, path, isDir, size, mtime):
     self.name = name

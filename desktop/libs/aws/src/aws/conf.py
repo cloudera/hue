@@ -204,7 +204,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return ('default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
+  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
 
 
 def has_iam_metadata():
@@ -214,7 +214,7 @@ def has_iam_metadata():
     if os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3] == 'ec2':
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
       return 'iam' in metadata
-  except Exception, e:
+  except Exception as e:
     LOG.exception("Encountered error when checking IAM metadata: %s" % e)
   return False
 
@@ -231,7 +231,7 @@ def config_validator(user):
     try:
       conn = aws.get_client('default').get_s3_connection()
       conn.get_canonical_user_id()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('AWS failed configuration check.')
       res.append(('aws', _t('Failed to connect to S3, check your AWS credentials.')))
 
