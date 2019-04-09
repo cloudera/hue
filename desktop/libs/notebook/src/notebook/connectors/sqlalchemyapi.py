@@ -59,10 +59,10 @@ from desktop.lib.i18n import force_unicode
 from beeswax import data_export
 from librdbms.server import dbms
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired, SessionExpired
+from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired
 from notebook.models import escape_rows
 
-ENGINE_CACHE = None
+
 CONNECTION_CACHE = {}
 LOG = logging.getLogger(__name__)
 
@@ -77,10 +77,6 @@ def query_error_handler(func):
         raise AuthenticationRequired(message=message)
       else:
         raise e
-    except SessionExpired, e:
-      raise e
-    except QueryExpired, e:
-      raise e
     except Exception, e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
@@ -94,15 +90,14 @@ def query_error_handler(func):
 class SqlAlchemyApi(Api):
 
   def __init__(self, user, interpreter=None):
-    global ENGINE_CACHE
     self.user = user
     self.options = interpreter['options']
-    self.engine = ENGINE_CACHE
+    self.engine = None # Currently instantiated by an execute()
 
-  def _create_engine(self, properties):
+  def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
       vars = {'user': self.user.username}
-      for _prop in properties:
+      for _prop in self.options['session']['properties']:
         if _prop['name'] == 'user':
           vars['USER'] = _prop['value']
         if _prop['name'] == 'password':
@@ -114,25 +109,11 @@ class SqlAlchemyApi(Api):
     return create_engine(url)
 
   @query_error_handler
-  def create_session(self, lang=None, properties=None):
-    if self.engine:
-      return {}
-
-    global ENGINE_CACHE
-    engine = self._create_engine(properties)
-    connection = engine.connect() # Try to connect so we can check if we can authenticate
-    connection.close()
-    self.engine = self.engine
-    ENGINE_CACHE = engine
-
-    return {}
-
-  @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
     if not self.engine:
-      raise SessionExpired()
+      self.engine = self._create_engine()
     connection = self.engine.connect()
     result = connection.execution_options(stream_results=True).execute(snippet['statement'])
     cache = {
@@ -173,8 +154,6 @@ class SqlAlchemyApi(Api):
   def fetch_result(self, notebook, snippet, rows, start_over):
     guid = snippet['result']['handle']['guid']
     cache = CONNECTION_CACHE.get(guid)
-    if not cache:
-      raise QueryExpired()
 
     if cache:
       data = cache['result'].fetchmany(rows)
@@ -219,8 +198,6 @@ class SqlAlchemyApi(Api):
     try:
       guid = snippet['result']['handle']['guid']
       connection = CONNECTION_CACHE.get(guid)
-      if not connection:
-        raise QueryExpired()
       if connection:
         connection['connection'].close()
         del CONNECTION_CACHE[guid]
@@ -239,8 +216,6 @@ class SqlAlchemyApi(Api):
     file_name = _get_snippet_name(notebook)
     guid = uuid.uuid4().hex
 
-    if not self.engine:
-      raise SessionExpired()
     connection = self.engine.connect()
     result = connection.execution_options(stream_results=True).execute(snippet['statement'])
 
@@ -266,8 +241,6 @@ class SqlAlchemyApi(Api):
     try:
       guid = snippet['result']['handle']['guid']
       connection = CONNECTION_CACHE.get('guid')
-      if not connection:
-        raise QueryExpired()
       if connection:
         connection['connection'].close()
         del CONNECTION_CACHE[guid]
@@ -278,8 +251,6 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    if not self.engine:
-      raise SessionExpired()
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)
@@ -316,8 +287,6 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
-    if not self.engine:
-      raise SessionExpired()
     inspector = inspect(self.engine)
 
     assist = Assist(inspector, self.engine)
