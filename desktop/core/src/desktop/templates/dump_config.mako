@@ -45,7 +45,7 @@ LOG = logging.getLogger(__name__)
         ${_('Configuration files located in')} <code style="color: #0B7FAD">${conf_dir}</code>
       </div>
       <h1 class="margin-top-20 margin-bottom-30">
-        ${_('Configuration Sections')}
+        ${_('Sections')}
       </h1>
       <div class="card-body clearfix">
         <div class="span2">
