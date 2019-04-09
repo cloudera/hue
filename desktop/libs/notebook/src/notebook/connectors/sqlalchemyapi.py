@@ -92,7 +92,6 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter=None):
     self.user = user
     self.options = interpreter['options']
-    self.engine = None # Currently instantiated by an execute()
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
@@ -112,9 +111,8 @@ class SqlAlchemyApi(Api):
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
-    if not self.engine:
-      self.engine = self._create_engine()
-    connection = self.engine.connect()
+    engine = self._create_engine()
+    connection = engine.connect()
     result = connection.execution_options(stream_results=True).execute(snippet['statement'])
     cache = {
       'connection': connection,
@@ -216,7 +214,8 @@ class SqlAlchemyApi(Api):
     file_name = _get_snippet_name(notebook)
     guid = uuid.uuid4().hex
 
-    connection = self.engine.connect()
+    engine = self._create_engine()
+    connection = engine.connect()
     result = connection.execution_options(stream_results=True).execute(snippet['statement'])
 
     CONNECTION_CACHE[guid] = {
@@ -251,9 +250,10 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    inspector = inspect(self.engine)
+    engine = self._create_engine()
+    inspector = inspect(engine)
 
-    assist = Assist(inspector, self.engine)
+    assist = Assist(inspector, engine)
     response = {'status': -1}
 
     if database is None:
@@ -287,9 +287,10 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
-    inspector = inspect(self.engine)
+    engine = self._create_engine()
+    inspector = inspect(engine)
 
-    assist = Assist(inspector, self.engine)
+    assist = Assist(inspector, engine)
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column)
