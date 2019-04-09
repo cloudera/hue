@@ -27,6 +27,11 @@ RUN apt-get update -y && apt-get install -y \
   git \
   sudo \
   maven \
+  gcc \
+  swig \
+  openssl \
+  xmlsec1 \
+  libxmlsec1-openssl \
    && rm -rf /var/lib/apt/lists/*
 
 RUN add-apt-repository -y ppa:webupd8team/java
