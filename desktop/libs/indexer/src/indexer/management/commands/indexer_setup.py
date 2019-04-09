@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import next
+from builtins import zip
 import itertools
 import logging
 import os
@@ -107,6 +109,6 @@ class Command(BaseCommand):
     with open(path) as fh:
       field_generator = utils.field_values_from_separated_file(fh, separator, quote_character)
       row = next(field_generator)
-      field_names = row.keys()
-      field_types = utils.get_field_types((row.values() for row in itertools.chain([row], field_generator)), iterations=51)
+      field_names = list(row.keys())
+      field_types = utils.get_field_types((list(row.values()) for row in itertools.chain([row], field_generator)), iterations=51)
       return [{'name': field[0], 'type': field[0] in fieldtypes and fieldtypes[field[0]] or field[1]} for field in zip(field_names, field_types)]

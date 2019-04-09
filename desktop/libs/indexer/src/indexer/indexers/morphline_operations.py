@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+from builtins import object
 from django.utils.translation import ugettext as _
 
 from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
 
 
-class Operator():
+class Operator(object):
 
   def __init__(self, name, args, output_type):
     self._name = name

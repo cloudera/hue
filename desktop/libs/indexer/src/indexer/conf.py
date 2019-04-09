@@ -15,9 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
 import logging
 import os
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from django.utils.translation import ugettext_lazy as _t
 

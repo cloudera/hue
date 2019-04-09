@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 import numbers
@@ -51,7 +52,7 @@ class CollectionManagerController(object):
     self.user = user
 
   def _format_flags(self, fields):
-    for name, properties in fields.items():
+    for name, properties in list(fields.items()):
       for (code, value) in FLAGS:
         if code in properties['flags']:
           properties[value] = True  # Add a new key-value boolean for the decoded flag
@@ -88,7 +89,7 @@ class CollectionManagerController(object):
       solr_cores = api.cores()
       for name in solr_cores:
         solr_cores[name]['isCoreOnly'] = True
-    except Exception, e:
+    except Exception as e:
       LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
 
     solr_cores.update(solr_collections)
@@ -102,7 +103,7 @@ class CollectionManagerController(object):
       autocomplete['collections'] = api.collections2()
       autocomplete['configs'] = api.configs()
 
-    except Exception, e:
+    except Exception as e:
       LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
 
     return autocomplete
@@ -113,7 +114,7 @@ class CollectionManagerController(object):
     try:
       field_data = api.fields(collection_or_core_name)
       fields = self._format_flags(field_data['schema']['fields'])
-    except Exception, e:
+    except Exception as e:
       LOG.warn('/luke call did not succeed: %s' % e)
       try:
         fields = api.schema_fields(collection_or_core_name)
@@ -159,7 +160,7 @@ class CollectionManagerController(object):
         try:
           zc.copy_path(root_node, config_root_path)
 
-        except Exception, e:
+        except Exception as e:
           zc.delete_path(root_node)
           raise PopupException(_('Error in copying Solr configurations: %s') % e)
       finally:
@@ -171,7 +172,7 @@ class CollectionManagerController(object):
         # Delete instance directory if we couldn't create a collection.
         try:
           zc.delete_path(root_node)
-        except Exception, e:
+        except Exception as e:
           raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
         raise PopupException(_('Could not create collection. Check error logs for more info.'))
 
@@ -211,7 +212,7 @@ class CollectionManagerController(object):
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
         with ZookeeperClient(hosts=client.get_zookeeper_host(), read_only=False) as zc:
           zc.delete_path(root_node)
-      except Exception, e:
+      except Exception as e:
         # Re-create collection so that we don't have an orphan config
         api.add_collection(name)
         raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
@@ -225,12 +226,12 @@ class CollectionManagerController(object):
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
     # Create only new fields
     # Fields that already exist, do not overwrite since there is no way to do that, currently.
-    old_field_names = api.fields(name)['schema']['fields'].keys()
-    new_fields = filter(lambda field: field['name'] not in old_field_names, fields)
+    old_field_names = list(api.fields(name)['schema']['fields'].keys())
+    new_fields = [field for field in fields if field['name'] not in old_field_names]
     new_fields_filtered = []
     for field in new_fields:
       new_field = {}
-      for attribute in filter(lambda attribute: attribute in field, ALLOWED_FIELD_ATTRIBUTES):
+      for attribute in [attribute for attribute in ALLOWED_FIELD_ATTRIBUTES if attribute in field]:
         new_field[attribute] = field[attribute]
       new_fields_filtered.append(new_field)
 
@@ -294,7 +295,7 @@ class CollectionManagerController(object):
             raise PopupException(_('Could not index the data. Check error logs for more info.'))
 
         row_count += len(dataset)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('Could not update index: %s') % e)
 
     return row_count

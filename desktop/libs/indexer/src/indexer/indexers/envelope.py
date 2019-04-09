@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+from builtins import object
 import logging
 import os
 
@@ -48,7 +49,7 @@ class EnvelopeIndexer(object):
     # Create workspace on hdfs
     self.fs.do_as_user(self.username, self.fs.mkdir, hdfs_workspace_path)
 
-    for config_name, config_content in configs.iteritems():
+    for config_name, config_content in configs.items():
       hdfs_config_path = os.path.join(hdfs_workspace_path, config_name)
       self.fs.do_as_user(self.username, self.fs.create, hdfs_config_path, data=config_content)
 

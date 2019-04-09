@@ -52,7 +52,7 @@ def get_db_component(request):
 
     format_['data'] = [{'name': element, 'value': element} for element in data]
     format_['status'] = 0
-  except Exception, e:
+  except Exception as e:
     message = _('Error accessing the database: %s') % e
     LOG.warn(message)
     format_['message'] = message
@@ -107,7 +107,7 @@ def jdbc_db_list(request):
 def get_drivers(request):
   format_ = {'data': [], 'status': 1}
   servers_dict = dict(get_server_choices())
-  format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in servers_dict.keys()]
+  format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in list(servers_dict.keys())]
   format_['data'].append({'value': 'jdbc', 'name': 'JDBC'})
 #   format_['data'].append({'value': 'sqlalchemy', 'name': 'SQL Alchemy'})
   format_['status'] = 0
@@ -172,7 +172,7 @@ def run_sqoop(request, source, destination, start_time):
       url = rdbms_host
 
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
-    request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0700, data=smart_str(rdbms_password))
+    request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0o700, data=smart_str(rdbms_password))
 
     lib_files = []
     if destination['sqoopJobLibPaths']:
