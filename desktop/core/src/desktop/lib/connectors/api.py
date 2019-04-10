@@ -29,21 +29,23 @@ from desktop.lib.exceptions_renderable import PopupException
 LOG = logging.getLogger(__name__)
 
 
-INSTALLED_CONNECTORS = [
-  {'name': 'Impala', 'type': Impala().NAME, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
-  {'name': 'Hive', 'type': Hive().NAME, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
-]
-
-CONNECTOR_TYPES = [
-  {'name': connector.NAME, 'type': connector.TYPE, 'settings': connector.PROPERTIES, 'id': None, 'category': 'engines', 'description': ''}
-    for connector in [
-      Impala(),
-      Hive()
-    ]
+# TODO: automatically load modules from lib module
+# TODO: offer to white/black list available connector classes
+CONNECTOR_TYPES = [{
+    'name': connector.NAME,
+    'type': connector.TYPE,
+    'interface': connector.INTERFACE,
+    'settings': connector.PROPERTIES,
+    'id': None,
+    'category': 'engines',
+    'description': ''
+    }
+  for connector in [
+    Impala(), Hive()
+  ]
 ]
 
 CONNECTOR_TYPES += [
-  {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Hive Tez", 'type': 'hive-tez', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Hive LLAP", 'type': 'hive-llap', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Druid", 'type': 'druid', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'engines', 'description': ''},
@@ -54,6 +56,8 @@ CONNECTOR_TYPES += [
   {'name': "Redshift", 'type': 'redshift', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Big Query", 'type': 'bigquery', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Oracle", 'type': 'oracle', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'settings': {}, 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
 
   {'name': "HDFS", 'type': 'hdfs', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
   {'name': "YARN", 'type': 'yarn', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
@@ -87,15 +91,27 @@ AVAILABLE_CONNECTORS = {
   } for category in CATEGORIES]
 }
 
+# TODO: persist in DB
+# TODO: remove installed connectors that don't have a connector or are blacklisted
+# TODO: load back from DB and apply type defaults, interface...
+# TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
+CONFIGURED_CONNECTORS = [
+  {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1},
+  {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2},
+  {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3},
+]
+
 
 def connectors(request):
   return JsonResponse({
-    'connectors': INSTALLED_CONNECTORS
+    'connectors': CONFIGURED_CONNECTORS
   })
 
 
 def new_connector(request, type):
   instance = _get_connector_by_type(type)
+
+  instance['connector_name'] = ''
 
   return JsonResponse({'connector': instance})
 
@@ -111,17 +127,21 @@ def update_connector(request):
   global CONNECTOR_IDS
 
   connector = json.loads(request.POST.get('connector'), '{}')
+  saved_as = False
 
   if connector.get('id'):
     instance = _get_connector_by_id(connector['id'])
     instance.update(connector)
   else:
+    saved_as = True
     instance = connector
     instance['id'] = CONNECTOR_IDS
+    instance['connector_name'] = instance['type']
+    instance['type'] = '%s-%s' % (instance['type'], CONNECTOR_IDS)
     CONNECTOR_IDS += 1
-    INSTALLED_CONNECTORS.append(instance)
+    CONFIGURED_CONNECTORS.append(instance)
 
-  return JsonResponse(instance)
+  return JsonResponse({'connector': instance, 'saved_as': saved_as})
 
 
 def _get_connector_by_type(type):
@@ -136,13 +156,13 @@ def _get_connector_by_type(type):
 
 
 def delete_connector(request):
-  global INSTALLED_CONNECTORS
+  global CONFIGURED_CONNECTORS
 
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  size_before = len(INSTALLED_CONNECTORS)
-  INSTALLED_CONNECTORS = filter(lambda _connector: _connector['name'] != connector['name'], INSTALLED_CONNECTORS)
-  size_after = len(INSTALLED_CONNECTORS)
+  size_before = len(CONFIGURED_CONNECTORS)
+  CONFIGURED_CONNECTORS = filter(lambda _connector: _connector['name'] != connector['name'], CONFIGURED_CONNECTORS)
+  size_after = len(CONFIGURED_CONNECTORS)
 
   if size_before == size_after + 1:
     return JsonResponse({})
@@ -151,9 +171,9 @@ def delete_connector(request):
 
 
 def _get_connector_by_id(id):
-  global INSTALLED_CONNECTORS
+  global CONFIGURED_CONNECTORS
 
-  instance = filter(lambda connector: connector['id'] == id, INSTALLED_CONNECTORS)
+  instance = filter(lambda connector: connector['id'] == id, CONFIGURED_CONNECTORS)
 
   if instance:
     return instance[0]

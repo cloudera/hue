@@ -61,7 +61,7 @@ else:
           var lowerQuery = self.connectorsFilter().toLowerCase();
           var filteredConnectors = []
           connectors.forEach(function (connector) {
-            var _connector = {"category": connector.category(), "values": []};
+            var _connector = {"category": connector.category, "values": []};
             _connector.values = connector.values.filter(function (subMetricKey) {
               return subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1;
             });
@@ -100,13 +100,15 @@ else:
         self.apiHelper.simplePost('/desktop/connectors/api/instance/delete', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
           self.section('connectors-page');
           self.fetchConnectors();
+          huePubSub.publish('cluster.config.refresh.config');
         }});
       };
       self.updateConnector = function (connector) {
         self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
-          connector.id(data.id)
+          connector.id(data.connector.id)
           self.section('connectors-page');
           self.fetchConnectors();
+          huePubSub.publish('cluster.config.refresh.config');
         }});
       };
       self.fetchConnectorTypes = function () {
@@ -166,7 +168,7 @@ ${layout.menubar(section='connectors')}
       <tbody data-bind="foreach: $data">
         <tr data-bind="click: function() { $root.instance($data); $root.section('connector-page'); }">
           <td data-bind="text: name"></td>
-          <td data-bind="input: type"></td>
+          <td data-bind="text: connector_name"></td>
         </tr>
       </tbody>
     </table>
@@ -182,19 +184,24 @@ ${layout.menubar(section='connectors')}
 <script type="text/html" id="connector-page">
   <div class="row-fluid">
     <input data-bind="value: name">
-    (<span data-bind="text: type"></span>)
-    <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
-      <!-- ko if: typeof id != 'undefined' -->
-        <!-- ko if: id -->
+    <!-- ko if: typeof id != 'undefined' -->
+      <!-- ko if: id -->
+        (<span data-bind="text: connector_name"></span>)
+        <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
           ${ _('Update') }
-        <!-- /ko -->
-        <!-- ko ifnot: id -->
-          ${ _('Save') }
-        <!-- /ko -->
+        </a>
+        <a href="javascript:void(0)" data-bind="click: $root.deleteConnector">
+          ${ _('Delete') }
+        </a>
       <!-- /ko -->
-    </a>
-    <a href="javascript:void(0)" data-bind="click: $root.deleteConnector">
-      ${ _('Delete') }
+      <!-- ko ifnot: id -->
+        <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
+          ${ _('Save') }
+        </a>
+      <!-- /ko -->
+    <!-- /ko -->
+    <a href="javascript:void(0)">
+      ${ _('Test connection') }
     </a>
     <table class="table table-condensed">
       <thead>
