@@ -55,16 +55,12 @@
                   </div>
                   {{ end }}
                 {{ end }}
-                {{$toc := (and (not .Params.disableToc) (not .Params.chapter))}}
                 <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
                     <span id="sidebar-toggle-span">
                         <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
                           <i class="fas fa-bars"></i>
                         </a>
                     </span>
-                  {{ if $toc }}
-                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
-                  {{ end }}
                   <span class="links">
                  {{$showBreadcrumb := (and (not .Params.disableBreadcrumb) (not .Site.Params.disableBreadcrumb))}}
                  {{if $showBreadcrumb}}
@@ -74,9 +70,6 @@
                  {{ end }}
                   </span>
                 </div>
-                {{ if $toc }}
-                    {{ partial "toc.html" . }}
-                {{ end }}
               </div>
             </div>
             {{ end }}
@@ -84,17 +77,23 @@
         {{ if .Params.chapter }}
           <div id="chapter">
         {{ end }}
-        <div id="body-inner">
-          {{if and (not .IsHome) (not .Params.chapter) }}
-            <h1>{{.Title}}</h1>
-          {{end}}
+        <div class="body-outer">
+          {{$toc := (and (not .Params.disableToc) (not .Params.chapter))}}
+          {{ if $toc }}
+              {{ partial "toc.html" . }}
+          {{ end }}
+          <div id="body-inner">
 
-        {{define "breadcrumb"}}
-          {{$parent := .page.Parent }}
-          {{ if $parent }}
-            {{ $value := (printf "<a href='%s'>%s</a> > %s" $parent.URL $parent.Title .value) }}
-            {{ template "breadcrumb" dict "page" $parent "value" $value }}
-          {{else}}
-            {{.value|safeHTML}}
+            {{if and (not .IsHome) (not .Params.chapter) }}
+              <h1>{{.Title}}</h1>
+            {{end}}
+
+          {{define "breadcrumb"}}
+            {{$parent := .page.Parent }}
+            {{ if $parent }}
+              {{ $value := (printf "<a href='%s'>%s</a> > %s" $parent.URL $parent.Title .value) }}
+              {{ template "breadcrumb" dict "page" $parent "value" $value }}
+            {{else}}
+              {{.value|safeHTML}}
+            {{end}}
           {{end}}
-        {{end}}
