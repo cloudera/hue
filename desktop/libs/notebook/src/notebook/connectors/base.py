@@ -27,7 +27,7 @@ from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-from notebook.conf import get_ordered_interpreters
+from notebook.conf import get_ordered_interpreters, CONNECTORS
 
 
 LOG = logging.getLogger(__name__)
@@ -313,13 +313,22 @@ def get_api(request, snippet):
         'is_sql': False
       }]
     else:
-      raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+      raise PopupException(_('Snippet type %(type)s is not configured.') % snippet)
 
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
+
+  if CONNECTORS.IS_ENABLED.get():
+    cluster = {
+      'connector': snippet['type'],
+      'id': interpreter['type'],
+    }
+    snippet['type'] = snippet['type'].split('-', 2)[0]
+    cluster.update(interpreter['options'])
+    print cluster
   # Multi cluster
-  if has_multi_cluster():
+  elif has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
     if cluster == '""' or cluster == 'undefined':
       cluster = None

@@ -21,7 +21,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled
+from desktop.conf import is_oozie_enabled, CONNECTORS
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 
@@ -44,7 +44,12 @@ def check_permissions(user, interpreter):
          (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py') and 'spark' not in user_apps) or \
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
+
+
 def get_ordered_interpreters(user=None):
+  from desktop.lib.connectors.api import CONFIGURED_CONNECTORS
+  global CONFIGURED_CONNECTORS
+
   if not INTERPRETERS.get():
     _default_interpreters(user)
 
@@ -53,7 +58,7 @@ def get_ordered_interpreters(user=None):
 
   user_interpreters = []
   for interpreter in interpreters:
-    if (check_permissions(user, interpreter)):
+    if check_permissions(user, interpreter):
       pass # Not allowed
     else:
       user_interpreters.append(interpreter)
@@ -62,19 +67,36 @@ def get_ordered_interpreters(user=None):
   if unknown_interpreters:
     raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
 
-  reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
+  if CONNECTORS.IS_ENABLED.get():
+    reordered_interpreters = [{
+        'name': i['name'],
+        'type': i['type'],
+        'interface': i['interface'],
+        'options': {setting['name']: setting['value'] for setting in i['settings']}
+      } for i in CONFIGURED_CONNECTORS
+    ]
+  else:
+    reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
+    reordered_interpreters = [{
+        'name': interpreters[i].NAME.get(),
+        'type': i,
+        'interface': interpreters[i].INTERFACE.get(),
+        'options': interpreters[i].OPTIONS.get()
+      } for i in reordered_interpreters
+    ]
 
   return [{
-      "name": interpreters[i].NAME.get(),
-      "type": i,
-      "interface": interpreters[i].INTERFACE.get(),
-      "options": interpreters[i].OPTIONS.get(),
-      "is_sql": interpreters[i].INTERFACE.get() in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "hms"],
-      "is_catalog": interpreters[i].INTERFACE.get() in ["hms",]
+      "name": i['name'],
+      "type": i['type'],
+      "interface": i['interface'],
+      "options": i['options'],
+      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "hms"],
+      "is_catalog": i['interface'] in ["hms",]
     }
     for i in reordered_interpreters
   ]
 
+# cf. admin wizard too
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
