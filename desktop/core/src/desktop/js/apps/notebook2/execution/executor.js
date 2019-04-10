@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import CancellablePromise from 'api/cancellablePromise';
-import { STATUS, ExecutableStatement } from './executableStatement';
+import { EXECUTION_STATUS, ExecutableStatement } from './executableStatement';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
+import huePubSub from "utils/huePubSub";
 
 const EXECUTION_FLOW = {
   step: 'step',
@@ -34,6 +34,7 @@ class Executor {
    * @param {ContextCompute} options.compute
    * @param {ContextNamespace} options.namespace
    * @param {EXECUTION_FLOW} [options.executionFlow] (default EXECUTION_FLOW.batch)
+   * @param {Session} [options.session]
    * @param {string} options.statement
    * @param {string} [options.database]
    */
@@ -82,12 +83,23 @@ class Executor {
       this.toExecute.push(new ExecutableStatement(options));
     }
 
-    this.status = STATUS.ready;
+    this.setStatus(EXECUTION_STATUS.ready);
+    this.setProgress(0);
+  }
+
+  setStatus(status) {
+    this.status = status;
+    huePubSub.publish('hue.executor.status.updated', this);
+  }
+
+  setProgress(progress) {
+    this.progress = progress;
+    huePubSub.publish('hue.executor.progress.updated', this);
   }
 
   async cancel() {
-    if (this.currentExecutable && this.currentExecutable.status === STATUS.running) {
-      this.status = STATUS.canceling;
+    if (this.currentExecutable && this.currentExecutable.status === EXECUTION_STATUS.running) {
+      this.setStatus(EXECUTION_STATUS.canceling);
       return await this.currentExecutable.cancel();
     }
   }
@@ -96,11 +108,11 @@ class Executor {
     return new Promise((resolve, reject) => {
       const executeBatch = () => {
         if (this.toExecute.length === 0) {
-          this.status = STATUS.success;
+          this.setStatus(EXECUTION_STATUS.success);
           resolve(this.status);
         } else {
-          this.status = STATUS.running;
           this.currentExecutable = this.toExecute.shift();
+          this.setStatus(EXECUTION_STATUS.running);
           this.currentExecutable.execute().then(() => {
             this.executed.push(this.currentExecutable);
             this.currentExecutable = undefined;
@@ -110,7 +122,7 @@ class Executor {
                 .then(executeBatch)
                 .catch(reject);
             } else  {
-              this.status = this.toExecute.length ? STATUS.ready : STATUS.success;
+              this.setStatus(this.toExecute.length ? EXECUTION_STATUS.ready : EXECUTION_STATUS.success);
               resolve(this.status);
             }
           }).catch(reject);

@@ -22,15 +22,14 @@ import { markdown } from 'markdown';
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
-import { ExecutableStatement } from "./executableStatement";
-import Executor from './executor';
+import { ExecutableStatement } from 'apps/notebook2/execution/executableStatement';
+import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import { NOTEBOOK_MAPPING } from 'apps/notebook2/notebook';
 import Result from 'apps/notebook2/result';
 import Session from 'apps/notebook2/session';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
 
 // TODO: Remove. Temporary here for debug
 window.ExecutableStatement = ExecutableStatement;
@@ -724,7 +723,16 @@ class Snippet {
       return statement;
     });
 
-    self.result = new Result(snippet, snippet.result);
+    $.extend(
+      snippet,
+      snippet.chartType === 'lines' && {
+        // Retire line chart
+        chartType: 'bars',
+        chartTimelineType: 'line'
+      }
+    );
+
+    self.result = new Result(snippet.result);
     if (!self.result.hasSomeResults()) {
       self.currentQueryTab('queryHistory');
     }
@@ -833,6 +841,7 @@ class Snippet {
     self.chartType.subscribe(() => {
       $(document).trigger('forceChartDraw', self);
     });
+
 
     self.previousChartOptions = {};
 
@@ -1088,6 +1097,22 @@ class Snippet {
       optEnabled: false,
       timeout: self.parentVm.autocompleteTimeout
     });
+
+    self.executor = undefined;
+
+    const updateExecutorObservable = (executor, name) => {
+      if (executor === self.executor && self[name]() !== executor[name]) {
+        self[name](executor[name]);
+      }
+    };
+
+    huePubSub.subscribe('hue.executor.status.updated', executor => {
+      updateExecutorObservable(executor, 'status');
+    });
+
+    huePubSub.subscribe('hue.executor.progress.updated', executor => {
+      updateExecutorObservable(executor, 'progress');
+    })
   }
 
   ace(newVal) {
@@ -1281,210 +1306,55 @@ class Snippet {
   }
 
   execute(automaticallyTriggered) {
-    const self = this;
-    if (!automaticallyTriggered && self.ace()) {
-      const selectionRange = self.ace().getSelectionRange();
+    hueAnalytics.log('notebook', 'execute/' + this.type());
 
-      if (
-        self.lastExecutedSelectionRange &&
-        (selectionRange.start.row !== selectionRange.end.row &&
-          selectionRange.start.column !== selectionRange.end.column) &&
-        (selectionRange.start.row !== self.lastExecutedSelectionRange.start.row ||
-          selectionRange.start.column !== self.lastExecutedSelectionRange.start.column ||
-          selectionRange.end.row !== self.lastExecutedSelectionRange.end.row ||
-          selectionRange.end.column !== self.lastExecutedSelectionRange.end.column)
-      ) {
-        // Manual execute and there is a selection that is different from the last execute
-        self.result.cancelBatchExecution();
-      }
-      self.lastExecutedSelectionRange = selectionRange;
-    }
-
-    if (self.isCanceling()) {
-      return;
-    }
     const now = new Date().getTime();
-    if (now - self.lastExecuted() < 1000 || !self.isReady()) {
+    if (now - this.lastExecuted() < 1000) {
       return; // Prevent fast clicks
     }
+    this.lastExecuted(now);
 
-    if (!automaticallyTriggered) {
-      // Do not cancel statements that are parts of a set of steps to execute (e.g. import). Only cancel statements as requested by user
-      if (self.status() === STATUS.running || self.status() === STATUS.loading) {
-        self.cancel(); // TODO: Wait for cancel to finish
-      } else {
-        self.result.clear();
-      }
-    }
-
-    if (self.type() === TYPE.impala) {
-      self.showExecutionAnalysis(false);
+    if (this.type() === TYPE.impala) {
+      this.showExecutionAnalysis(false);
       huePubSub.publish('editor.clear.execution.analysis');
     }
 
-    self.status(STATUS.running);
-    self.statusForButtons(STATUS_FOR_BUTTONS.executing);
+    // Editor based execution
+    if (this.ace()) {
+      const selectionRange = this.ace().getSelectionRange();
 
-    if (self.isSqlDialect()) {
-      huePubSub.publish('editor.refresh.statement.locations', self);
+      if (this.isSqlDialect()) {
+        huePubSub.publish('editor.refresh.statement.locations', this);
+      }
+
+      huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: this });
+      this.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
     }
 
-    self.lastExecutedStatements = self.statement();
-
-    if (self.ace()) {
-      huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: self });
-      const selectionRange = self.ace().getSelectionRange();
-      self.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
-    }
-
-    self.previousChartOptions = self.parentVm.getPreviousChartOptions(self);
-    $(document).trigger('executeStarted', { vm: self.parentVm, snippet: self });
-    self.lastExecuted(now);
+    this.previousChartOptions = this.parentVm.getPreviousChartOptions(this);
+    $(document).trigger('executeStarted', { vm: this.parentVm, snippet: this });
     $('.jHueNotify').remove();
-    hueAnalytics.log('notebook', 'execute/' + self.type());
+    this.parentNotebook.forceHistoryInitialHeight(true);
+    this.errors([]);
+    huePubSub.publish('editor.clear.highlighted.errors', this.ace());
+    this.result.clear();
+    this.progress(0);
+    this.jobs([]);
 
-    self.parentNotebook.forceHistoryInitialHeight(true);
+    this.parentNotebook.historyCurrentPage(1);
 
-    if (self.result.handle()) {
-      self.close();
-    }
+    this.startLongOperationTimeout();
 
-    self.errors([]);
-    huePubSub.publish('editor.clear.highlighted.errors', self.ace());
-    self.result.clear();
-    self.progress(0);
-    self.jobs([]);
-    self.result.logs('');
-    self.result.statement_range({
-      start: {
-        row: 0,
-        column: 0
-      },
-      end: {
-        row: 0,
-        column: 0
-      }
-    });
-    self.parentNotebook.historyCurrentPage(1);
+    this.currentQueryTab('queryHistory');
 
-    // TODO: rename startLongOperationTimeout to startBlockingOperationTimeout
-    // TODO: stop blocking operation UI if there is one
-    // TODO: offer to stop blocking submit or fetch operation UI if there is one (add a new call to function for cancelBlockingOperation)
-    // TODO: stop current blocking operation if there is one
-    // TODO: handle jquery.dataTables.1.8.2.min.js:150 Uncaught TypeError: Cannot read property 'asSorting' of undefined on some cancels
-    // TODO: we should cancel blocking operation when leaving notebook (similar to unload())
-    // TODO: we should test when we go back to a query history of a blocking operation that we left
-    self.startLongOperationTimeout();
-
-    self.currentQueryTab('queryHistory');
-
-    self.executingBlockingOperation = $.post(
-      '/notebook/api/execute/' + self.type(),
-      {
-        notebook: self.parentVm.editorMode()
-          ? komapping.toJSON(self.parentNotebook, NOTEBOOK_MAPPING)
-          : komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
-        try {
-          if (self.isSqlDialect() && data && data.handle) {
-            self.lastExecutedStatement(sqlStatementsParser.parse(data.handle.statement)[0]);
-          } else {
-            self.lastExecutedStatement(null);
-          }
-        } catch (e) {
-          self.lastExecutedStatement(null);
-        }
-        self.statusForButtons(STATUS_FOR_BUTTONS.executed);
-        huePubSub.publish('ace.set.autoexpand', { autoExpand: true, snippet: self });
-        self.stopLongOperationTimeout();
-
-        if (self.parentVm.editorMode() && data.history_id) {
-          if (!self.parentVm.isNotificationManager()) {
-            const url = self.parentVm.URLS.editor + '?editor=' + data.history_id;
-            self.parentVm.changeURL(url);
-          }
-          self.parentNotebook.id(data.history_id);
-          self.parentNotebook.uuid(data.history_uuid);
-          self.parentNotebook.isHistory(true);
-          self.parentNotebook.parentSavedQueryUuid(data.history_parent_uuid);
-        }
-
-        if (data.status === 0) {
-          self.result.handle(data.handle);
-          self.result.hasResultset(data.handle.has_result_set);
-          if (data.handle.sync) {
-            self.loadData(data.result, 100);
-            self.status(STATUS.available);
-            self.progress(100);
-            self.result.endTime(new Date());
-          } else if (!self.parentNotebook.unloaded()) {
-            self.checkStatus();
-          }
-          if (self.parentVm.isOptimizerEnabled()) {
-            huePubSub.publish('editor.upload.query', data.history_id);
-          }
-        } else {
-          self.handleAjaxError(data, self.execute);
-          self.parentNotebook.isExecutingAll(false);
-        }
-
-        if (data.handle) {
-          if (self.parentVm.editorMode()) {
-            if (self.parentVm.isNotificationManager()) {
-              // Update task status
-              const tasks = self.parentNotebook
-                .history()
-                .filter(row => row.uuid() === self.parentNotebook.uuid());
-              if (tasks.length === 1) {
-                tasks[0].status(self.status());
-                self.result.logs(data.message);
-              }
-            } else {
-              self.parentNotebook.history.unshift(
-                self.parentNotebook.makeHistoryRecord(
-                  undefined,
-                  data.handle.statement,
-                  self.lastExecuted(),
-                  self.status(),
-                  self.parentNotebook.name(),
-                  self.parentNotebook.uuid()
-                )
-              );
-            }
-          }
-
-          if (data.handle.statements_count != null) {
-            self.result.statements_count(data.handle.statements_count);
-            self.result.statement_id(data.handle.statement_id);
-            self.result.previous_statement_hash(data.previous_statement_hash);
-
-            if (
-              data.handle.statements_count > 1 &&
-              data.handle.start != null &&
-              data.handle.end != null
-            ) {
-              self.result.statement_range({
-                start: data.handle.start,
-                end: data.handle.end
-              });
-            }
-          }
-        }
-      }
-    )
-      .fail(xhr => {
-        if (self.statusForButtons() !== STATUS_FOR_BUTTONS.canceled && xhr.status !== 502) {
-          // No error when manually canceled
-          $(document).trigger('error', xhr.responseText);
-        }
-        self.status(STATUS.failed);
-        self.statusForButtons(STATUS_FOR_BUTTONS.executed);
-      })
-      .always(() => {
-        self.executingBlockingOperation = null;
-      });
+    this.executor = new Executor({
+      compute: this.compute(),
+      database: this.database(),
+      sourceType: this.type(),
+      namespace: this.namespace(),
+      statement: this.statement(),
+      isSqlEngine: this.isSqlDialect()
+    }).executeNext();
   }
 
   explain() {
