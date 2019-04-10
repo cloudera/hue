@@ -3,6 +3,7 @@ This module contains the definition of the C{L{OpenIDStore}}
 interface.
 """
 
+from builtins import object
 class OpenIDStore(object):
     """
     This is the interface for the store objects the OpenID library

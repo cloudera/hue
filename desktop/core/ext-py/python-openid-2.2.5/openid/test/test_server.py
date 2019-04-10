@@ -1,5 +1,9 @@
 """Tests for openid.server.
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 from openid.server import server
 from openid import association, cryptutil, oidutil
 from openid.message import Message, OPENID_NS, OPENID2_NS, OPENID1_NS, \
@@ -10,7 +14,7 @@ import cgi
 import unittest
 import warnings
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 # In general, if you edit or add tests here, try to move in the direction
 # of testing smaller units.  For testing the external interfaces, we'll be
@@ -180,7 +184,7 @@ class TestDecode(unittest.TestCase):
             }
         try:
             result = self.decode(args)
-        except TypeError, err:
+        except TypeError as err:
             self.failUnless(str(err).find('values') != -1, err)
         else:
             self.fail("Expected TypeError, but got result %s" % (result,))
@@ -320,7 +324,7 @@ class TestDecode(unittest.TestCase):
             }
         try:
             result = self.decode(args)
-        except server.ProtocolError, err:
+        except server.ProtocolError as err:
             self.failUnless(err.openid_message)
         else:
             self.fail("Expected ProtocolError, instead returned with %s" %
@@ -336,7 +340,7 @@ class TestDecode(unittest.TestCase):
             }
         try:
             result = self.decode(args)
-        except server.UntrustedReturnURL, err:
+        except server.UntrustedReturnURL as err:
             self.failUnless(err.openid_message)
         else:
             self.fail("Expected UntrustedReturnURL, instead returned with %s" %
@@ -508,7 +512,7 @@ class TestDecode(unittest.TestCase):
 
         try:
             r = self.decode(args)
-        except server.ProtocolError, err:
+        except server.ProtocolError as err:
             # Assert that the ProtocolError does have a Message attached
             # to it, even though the request wasn't a well-formed Message.
             self.failUnless(err.openid_message)
@@ -552,7 +556,7 @@ class TestEncode(unittest.TestCase):
         self.failIf(response.renderAsForm())
         self.failUnless(response.whichEncoding() == server.ENCODE_URL)
         webresponse = self.encode(response)
-        self.failUnless(webresponse.headers.has_key('location'))
+        self.failUnless('location' in webresponse.headers)
 
     def test_id_res_OpenID2_POST(self):
         """
@@ -673,7 +677,7 @@ class TestEncode(unittest.TestCase):
             })
         webresponse = self.encode(response)
         self.failUnlessEqual(webresponse.code, server.HTTP_REDIRECT)
-        self.failUnless(webresponse.headers.has_key('location'))
+        self.failUnless('location' in webresponse.headers)
 
         location = webresponse.headers['location']
         self.failUnless(location.startswith(request.return_to),
@@ -699,7 +703,7 @@ class TestEncode(unittest.TestCase):
             })
         webresponse = self.encode(response)
         self.failUnlessEqual(webresponse.code, server.HTTP_REDIRECT)
-        self.failUnless(webresponse.headers.has_key('location'))
+        self.failUnless('location' in webresponse.headers)
 
     def test_cancelToForm(self):
         request = server.CheckIDRequest(
@@ -801,7 +805,7 @@ class TestSigningEncode(unittest.TestCase):
         self.request.assoc_handle = assoc_handle
         webresponse = self.encode(self.response)
         self.failUnlessEqual(webresponse.code, server.HTTP_REDIRECT)
-        self.failUnless(webresponse.headers.has_key('location'))
+        self.failUnless('location' in webresponse.headers)
 
         location = webresponse.headers['location']
         query = cgi.parse_qs(urlparse(location)[4])
@@ -812,7 +816,7 @@ class TestSigningEncode(unittest.TestCase):
     def test_idresDumb(self):
         webresponse = self.encode(self.response)
         self.failUnlessEqual(webresponse.code, server.HTTP_REDIRECT)
-        self.failUnless(webresponse.headers.has_key('location'))
+        self.failUnless('location' in webresponse.headers)
 
         location = webresponse.headers['location']
         query = cgi.parse_qs(urlparse(location)[4])
@@ -837,7 +841,7 @@ class TestSigningEncode(unittest.TestCase):
         response.fields.setArg(OPENID_NS, 'mode', 'cancel')
         webresponse = self.encode(response)
         self.failUnlessEqual(webresponse.code, server.HTTP_REDIRECT)
-        self.failUnless(webresponse.headers.has_key('location'))
+        self.failUnless('location' in webresponse.headers)
         location = webresponse.headers['location']
         query = cgi.parse_qs(urlparse(location)[4])
         self.failIf('openid.sig' in query, response.fields.toPostArgs())
@@ -890,7 +894,7 @@ class TestCheckID(unittest.TestCase):
         self.request.message = sentinel
         try:
             result = self.request.trustRootValid()
-        except server.MalformedTrustRoot, why:
+        except server.MalformedTrustRoot as why:
             self.failUnless(sentinel is why.openid_message)
         else:
             self.fail('Expected MalformedTrustRoot exception. Got %r'
@@ -928,7 +932,7 @@ class TestCheckID(unittest.TestCase):
 
         try:
             withVerifyReturnTo(vrfyExc, self.request.returnToVerified)
-        except Exception, e:
+        except Exception as e:
             self.failUnless(e is sentinel, e)
 
         # Ensure that True and False are passed through unchanged

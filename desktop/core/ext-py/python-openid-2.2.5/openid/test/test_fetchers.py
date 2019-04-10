@@ -1,7 +1,11 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import warnings
 import unittest
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import socket
 
 from openid import fetchers
@@ -16,7 +20,7 @@ def failUnlessResponseExpected(expected, actual):
     got_headers = dict(actual.headers)
     del got_headers['date']
     del got_headers['server']
-    for k, v in expected.headers.iteritems():
+    for k, v in expected.headers.items():
         assert got_headers[k] == v, (k, v, got_headers[k])
 
 def test_fetcher(fetcher, exc, server):
@@ -55,7 +59,7 @@ def test_fetcher(fetcher, exc, server):
         except (SystemExit, KeyboardInterrupt):
             pass
         except:
-            print fetcher, fetch_url
+            print(fetcher, fetch_url)
             raise
         else:
             failUnlessResponseExpected(expected, actual)
@@ -68,12 +72,12 @@ def test_fetcher(fetcher, exc, server):
             result = fetcher.fetch(err_url)
         except (KeyboardInterrupt, SystemExit):
             raise
-        except fetchers.HTTPError, why:
+        except fetchers.HTTPError as why:
             # This is raised by the Curl fetcher for bad cases
             # detected by the fetchers module, but it's a subclass of
             # HTTPFetchingError, so we have to catch it explicitly.
             assert exc
-        except fetchers.HTTPFetchingError, why:
+        except fetchers.HTTPFetchingError as why:
             assert not exc, (fetcher, exc, server)
         except:
             assert exc
@@ -89,7 +93,7 @@ def run_fetcher_tests(server):
         ]:
         try:
             exc_fetchers.append(klass())
-        except RuntimeError, why:
+        except RuntimeError as why:
             if why[0].startswith('Cannot find %s library' % (library_name,)):
                 try:
                     __import__(library_name)
@@ -113,7 +117,7 @@ def run_fetcher_tests(server):
     for f in non_exc_fetchers:
         test_fetcher(f, False, server)
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 class FetcherTestHandler(BaseHTTPRequestHandler):
     cases = {
@@ -273,7 +277,7 @@ class DefaultFetcherTest(unittest.TestCase):
             self.fail('Should not be wrapping exception')
         except:
             exc = sys.exc_info()[1]
-            self.failUnless(isinstance(exc, urllib2.URLError), exc)
+            self.failUnless(isinstance(exc, urllib.error.URLError), exc)
             pass
         else:
             self.fail('Should have raised an exception')

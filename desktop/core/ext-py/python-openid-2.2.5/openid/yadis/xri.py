@@ -4,12 +4,14 @@
 @see: XRI Syntax v2.0 at the U{OASIS XRI Technical Committee<http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=xri>}
 """
 
+from builtins import chr
 import re
+from functools import reduce
 
 XRI_AUTHORITIES = ['!', '=', '@', '+', '$', '(']
 
 try:
-    unichr(0x10000)
+    chr(0x10000)
 except ValueError:
     # narrow python build
     UCSCHAR = [
@@ -50,8 +52,7 @@ else:
 
 
 _escapeme_re = re.compile('[%s]' % (''.join(
-    map(lambda (m, n): u'%s-%s' % (unichr(m), unichr(n)),
-        UCSCHAR + IPRIVATE)),))
+    [u'%s-%s' % (chr(m_n[0]), chr(m_n[1])) for m_n in UCSCHAR + IPRIVATE]),))
 
 
 def identifierScheme(identifier):
@@ -147,7 +148,7 @@ def rootAuthority(xri):
         # IRI reference.  XXX: Can IRI authorities have segments?
         segments = authority.split('!')
         segments = reduce(list.__add__,
-            map(lambda s: s.split('*'), segments))
+            [s.split('*') for s in segments])
         root = segments[0]
 
     return XRI(root)

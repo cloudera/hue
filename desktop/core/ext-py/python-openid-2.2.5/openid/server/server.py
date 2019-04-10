@@ -116,6 +116,8 @@ From 1.1 to 2.0
 @group Response Encodings: ENCODE_KVFORM, ENCODE_HTML_FORM, ENCODE_URL
 """
 
+from builtins import str
+from builtins import object
 import time, warnings
 from copy import deepcopy
 
@@ -438,7 +440,7 @@ class AssociateRequest(OpenIDRequest):
 
         try:
             session = session_class.fromMessage(message)
-        except ValueError, why:
+        except ValueError as why:
             raise ProtocolError(message, 'Error parsing %s session: %s' %
                                 (session_class.session_type, why[0]))
 
@@ -1177,7 +1179,7 @@ class Signatory(object):
 
         try:
             valid = assoc.checkMessageSignature(message)
-        except ValueError, ex:
+        except ValueError as ex:
             oidutil.log("Error in verifying %s with %s: %s" % (message,
                                                                assoc,
                                                                ex))
@@ -1225,7 +1227,7 @@ class Signatory(object):
 
         try:
             signed_response.fields = assoc.signMessage(signed_response.fields)
-        except kvform.KVFormError, err:
+        except kvform.KVFormError as err:
             raise EncodingError(response, explanation=str(err))
         return signed_response
 
@@ -1425,7 +1427,7 @@ class Decoder(object):
 
         try:
             message = Message.fromPostArgs(query)
-        except InvalidOpenIDNamespace, err:
+        except InvalidOpenIDNamespace as err:
             # It's useful to have a Message attached to a ProtocolError, so we
             # override the bad ns value to build a Message out of it.  Kinda
             # kludgy, since it's made of lies, but the parts that aren't lies
@@ -1647,7 +1649,7 @@ class ProtocolError(Exception):
         self.openid_message = message
         self.reference = reference
         self.contact = contact
-        assert type(message) not in [str, unicode]
+        assert type(message) not in [str, str]
         Exception.__init__(self, text)
 
 

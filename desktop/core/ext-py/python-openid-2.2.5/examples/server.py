@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 __copyright__ = 'Copyright 2005-2008, Janrain, Inc.'
 
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from urlparse import urlparse
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse
 
 import time
-import Cookie
+import http.cookies
 import cgi
 import cgitb
 import sys
@@ -161,7 +164,7 @@ class ServerHandler(BaseHTTPRequestHandler):
     def setUser(self):
         cookies = self.headers.get('Cookie')
         if cookies:
-            morsel = Cookie.BaseCookie(cookies).get('user')
+            morsel = http.cookies.BaseCookie(cookies).get('user')
             if morsel:
                 self.user = morsel.value
 
@@ -178,7 +181,7 @@ class ServerHandler(BaseHTTPRequestHandler):
     def serverEndPoint(self, query):
         try:
             request = self.server.openid.decodeRequest(query)
-        except server.ProtocolError, why:
+        except server.ProtocolError as why:
             self.displayResponse(why)
             return
 
@@ -226,13 +229,13 @@ class ServerHandler(BaseHTTPRequestHandler):
     def displayResponse(self, response):
         try:
             webresponse = self.server.openid.encodeResponse(response)
-        except server.EncodingError, why:
+        except server.EncodingError as why:
             text = why.response.encodeToKVForm()
             self.showErrorPage('<pre>%s</pre>' % cgi.escape(text))
             return
 
         self.send_response(webresponse.code)
-        for header, value in webresponse.headers.iteritems():
+        for header, value in webresponse.headers.items():
             self.send_header(header, value)
         self.writeUserHeader()
         self.end_headers()
@@ -436,7 +439,7 @@ class ServerHandler(BaseHTTPRequestHandler):
         ident = self.server.base_url + path[1:]
 
         approved_trust_roots = []
-        for (aident, trust_root) in self.server.approved.keys():
+        for (aident, trust_root) in list(self.server.approved.keys()):
             if aident == ident:
                 trs = '<li><tt>%s</tt></li>\n' % cgi.escape(trust_root)
                 approved_trust_roots.append(trs)
@@ -682,8 +685,8 @@ def main(host, port, data_path):
 
     httpserver.setOpenIDServer(oidserver)
 
-    print 'Server running at:'
-    print httpserver.base_url
+    print('Server running at:')
+    print(httpserver.base_url)
     httpserver.serve_forever()
 
 if __name__ == '__main__':

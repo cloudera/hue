@@ -1,7 +1,10 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
 __all__ = ['findHTMLMeta', 'MetaNotFound']
 
-from HTMLParser import HTMLParser, HTMLParseError
-import htmlentitydefs
+from html.parser import HTMLParser
+import html.entities
 import re
 
 from openid.yadis.constants import YADIS_HEADER_NAME
@@ -39,12 +42,12 @@ def substituteMO(mo):
         codepoint = int(mo.group('dec'))
     else:
         assert mo.lastgroup == 'word'
-        codepoint = htmlentitydefs.name2codepoint.get(mo.group('word'))
+        codepoint = html.entities.name2codepoint.get(mo.group('word'))
 
     if codepoint is None:
         return mo.group()
     else:
-        return unichr(codepoint)
+        return chr(codepoint)
 
 def substituteEntities(s):
     return ent_re.sub(substituteMO, s)
@@ -180,11 +183,7 @@ def findHTMLMeta(stream):
         chunks.append(chunk)
         try:
             parser.feed(chunk)
-        except HTMLParseError, why:
-            # HTML parse error, so bail
-            chunks.append(stream.read())
-            break
-        except ParseDone, why:
+        except ParseDone as why:
             uri = why[0]
             if uri is None:
                 # Parse finished, but we may need the rest of the file

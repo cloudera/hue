@@ -187,9 +187,14 @@ USING THIS LIBRARY
     objects.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
 import cgi
 import copy
-from urlparse import urlparse, urldefrag
+from urllib.parse import urlparse, urldefrag
 
 from openid import fetchers
 
@@ -342,7 +347,7 @@ class Consumer(object):
         disco = Discovery(self.session, user_url, self.session_key_prefix)
         try:
             service = disco.getNextService(self._discover)
-        except fetchers.HTTPFetchingError, why:
+        except fetchers.HTTPFetchingError as why:
             raise DiscoveryFailure(
                 'Error fetching XRDS document: %s' % (why[0],), None)
 
@@ -378,7 +383,7 @@ class Consumer(object):
 
         try:
             auth_req.setAnonymous(anonymous)
-        except ValueError, why:
+        except ValueError as why:
             raise ProtocolError(str(why))
 
         return auth_req
@@ -639,12 +644,12 @@ class GenericConsumer(object):
     def _complete_id_res(self, message, endpoint, return_to):
         try:
             self._checkSetupNeeded(message)
-        except SetupNeededError, why:
+        except SetupNeededError as why:
             return SetupNeededResponse(endpoint, why.user_setup_url)
         else:
             try:
                 return self._doIdRes(message, endpoint, return_to)
-            except (ProtocolError, DiscoveryFailure), why:
+            except (ProtocolError, DiscoveryFailure) as why:
                 return FailureResponse(endpoint, why[0])
 
     def _completeInvalid(self, message, endpoint, _):
@@ -661,7 +666,7 @@ class GenericConsumer(object):
         # message.
         try:
             self._verifyReturnToArgs(message.toPostArgs())
-        except ProtocolError, why:
+        except ProtocolError as why:
             oidutil.log("Verifying return_to arguments: %s" % (why[0],))
             return False
 
@@ -768,7 +773,7 @@ class GenericConsumer(object):
 
         try:
             timestamp, salt = splitNonce(nonce)
-        except ValueError, why:
+        except ValueError as why:
             raise ProtocolError('Malformed nonce: %s' % (why[0],))
 
         if (self.store is not None and
@@ -867,7 +872,7 @@ class GenericConsumer(object):
         # Make sure all non-OpenID arguments in the response are also
         # in the signed return_to.
         bare_args = message.getArgs(BARE_NS)
-        for pair in bare_args.iteritems():
+        for pair in bare_args.items():
             if pair not in parsed_args:
                 raise ProtocolError("Parameter %s not in return_to URL" % (pair[0],))
 
@@ -930,7 +935,7 @@ class GenericConsumer(object):
             # case.
             try:
                 self._verifyDiscoverySingle(endpoint, to_match)
-            except ProtocolError, e:
+            except ProtocolError as e:
                 oidutil.log(
                     "Error attempting to use stored discovery information: " +
                     str(e))
@@ -975,7 +980,7 @@ class GenericConsumer(object):
                     self._verifyDiscoverySingle(endpoint, to_match)
                 except TypeURIMismatch:
                     self._verifyDiscoverySingle(endpoint, to_match_1_0)
-            except ProtocolError, e:
+            except ProtocolError as e:
                 oidutil.log("Error attempting to use stored discovery information: " +
                             str(e))
                 oidutil.log("Attempting discovery to verify endpoint")
@@ -1068,7 +1073,7 @@ class GenericConsumer(object):
                 try:
                     self._verifyDiscoverySingle(
                         endpoint, to_match_endpoint)
-                except ProtocolError, why:
+                except ProtocolError as why:
                     failure_messages.append(str(why))
                 else:
                     # It matches, so discover verification has
@@ -1096,7 +1101,7 @@ class GenericConsumer(object):
             return False
         try:
             response = self._makeKVPost(request, server_url)
-        except (fetchers.HTTPFetchingError, ServerError), e:
+        except (fetchers.HTTPFetchingError, ServerError) as e:
             oidutil.log('check_authentication failed: %s' % (e[0],))
             return False
         else:
@@ -1178,7 +1183,7 @@ class GenericConsumer(object):
         try:
             assoc = self._requestAssociation(
                 endpoint, assoc_type, session_type)
-        except ServerError, why:
+        except ServerError as why:
             supportedTypes = self._extractSupportedAssociationType(why,
                                                                    endpoint,
                                                                    assoc_type)
@@ -1190,7 +1195,7 @@ class GenericConsumer(object):
                 try:
                     assoc = self._requestAssociation(
                         endpoint, assoc_type, session_type)
-                except ServerError, why:
+                except ServerError as why:
                     # Do not keep trying, since it rejected the
                     # association type that it told us to use.
                     oidutil.log('Server %s refused its suggested association '
@@ -1260,17 +1265,17 @@ class GenericConsumer(object):
 
         try:
             response = self._makeKVPost(args, endpoint.server_url)
-        except fetchers.HTTPFetchingError, why:
+        except fetchers.HTTPFetchingError as why:
             oidutil.log('openid.associate request failed: %s' % (why[0],))
             return None
 
         try:
             assoc = self._extractAssociation(response, assoc_session)
-        except KeyError, why:
+        except KeyError as why:
             oidutil.log('Missing required parameter in response from %s: %s'
                         % (endpoint.server_url, why[0]))
             return None
-        except ProtocolError, why:
+        except ProtocolError as why:
             oidutil.log('Protocol error parsing response from %s: %s' % (
                 endpoint.server_url, why[0]))
             return None
@@ -1393,7 +1398,7 @@ class GenericConsumer(object):
             OPENID_NS, 'expires_in', no_default)
         try:
             expires_in = int(expires_in_str)
-        except ValueError, why:
+        except ValueError as why:
             raise ProtocolError('Invalid expires_in field: %s' % (why[0],))
 
         # OpenID 1 has funny association session behaviour.
@@ -1431,7 +1436,7 @@ class GenericConsumer(object):
         # type.
         try:
             secret = assoc_session.extractSecret(assoc_response)
-        except ValueError, why:
+        except ValueError as why:
             fmt = 'Malformed response for %s session: %s'
             raise ProtocolError(fmt % (assoc_session.session_type, why[0]))
 
@@ -1777,7 +1782,7 @@ class SuccessResponse(Response):
         """
         msg_args = self.message.getArgs(ns_uri)
 
-        for key in msg_args.iterkeys():
+        for key in msg_args.keys():
             if not self.isSigned(ns_uri, key):
                 oidutil.log("SuccessResponse.getSignedNS: (%s, %s) not signed."
                             % (ns_uri, key))

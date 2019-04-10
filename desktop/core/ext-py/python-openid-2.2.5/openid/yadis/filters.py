@@ -3,6 +3,7 @@ endpoint information out of a Yadis XRD file using the ElementTree XML
 parser.
 """
 
+from builtins import object
 __all__ = [
     'BasicServiceEndpoint',
     'mkFilter',

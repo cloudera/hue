@@ -9,6 +9,10 @@ It also implements relying party return_to URL verification, based on
 the realm.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 __all__ = [
     'TrustRoot',
     'RP_RETURN_TO_URL_TYPE',
@@ -21,7 +25,7 @@ from openid import oidutil
 from openid import urinorm
 from openid.yadis import services
 
-from urlparse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 import re
 
 ############################################
@@ -442,7 +446,7 @@ def verifyReturnTo(realm_str, return_to, _vrfy=getAllowedReturnURLs):
 
     try:
         allowable_urls = _vrfy(realm.buildDiscoveryURL())
-    except RealmVerificationRedirected, err:
+    except RealmVerificationRedirected as err:
         oidutil.log(str(err))
         return False
 

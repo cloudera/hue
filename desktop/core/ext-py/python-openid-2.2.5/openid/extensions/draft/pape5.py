@@ -6,6 +6,9 @@ Extension 1.0, Draft 5
 @since: 2.1.0
 """
 
+from builtins import str
+from builtins import filter
+from builtins import range
 __all__ = [
     'Request',
     'Response',
@@ -71,7 +74,7 @@ class PAPEExtension(Extension):
 
     def _generateAlias(self):
         """Return an unused auth level alias"""
-        for i in xrange(1000):
+        for i in range(1000):
             alias = 'cust%d' % (i,)
             if alias not in self.auth_level_aliases:
                 return alias
@@ -83,7 +86,7 @@ class PAPEExtension(Extension):
 
         @raises KeyError: if no alias is defined
         """
-        for (alias, existing_uri) in self.auth_level_aliases.iteritems():
+        for (alias, existing_uri) in self.auth_level_aliases.items():
             if auth_level_uri == existing_uri:
                 return alias
 
@@ -124,7 +127,7 @@ class Request(PAPEExtension):
             for auth_level in preferred_auth_level_types:
                 self.addAuthLevel(auth_level)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.preferred_auth_policies or
                     self.max_auth_age is not None or
                     self.preferred_auth_level_types)
@@ -262,8 +265,8 @@ class Request(PAPEExtension):
 
         @returntype: [str]
         """
-        return filter(self.preferred_auth_policies.__contains__,
-                      supported_types)
+        return list(filter(self.preferred_auth_policies.__contains__,
+                      supported_types))
 
 Request.ns_uri = ns_uri
 
@@ -292,7 +295,7 @@ class Response(PAPEExtension):
         if auth_levels is None:
             auth_levels = {}
 
-        for uri, level in auth_levels.iteritems():
+        for uri, level in auth_levels.items():
             self.setAuthLevel(uri, level)
 
     def setAuthLevel(self, level_uri, level, alias=None):
@@ -413,7 +416,7 @@ class Response(PAPEExtension):
 
         self.auth_policies = auth_policies
 
-        for (key, val) in args.iteritems():
+        for (key, val) in args.items():
             if key.startswith('auth_level.'):
                 alias = key[11:]
 
@@ -457,7 +460,7 @@ class Response(PAPEExtension):
                 'auth_policies':' '.join(self.auth_policies),
                 }
 
-        for level_type, level in self.auth_levels.iteritems():
+        for level_type, level in self.auth_levels.items():
             alias = self._getAlias(level_type)
             ns_args['auth_level.ns.%s' % (alias,)] = level_type
             ns_args['auth_level.%s' % (alias,)] = str(level)

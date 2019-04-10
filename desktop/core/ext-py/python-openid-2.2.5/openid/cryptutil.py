@@ -13,6 +13,9 @@ engine, but is currently found at:
 http://www.amk.ca/python/code/crypto
 """
 
+from builtins import map
+from builtins import range
+from builtins import object
 __all__ = [
     'base64ToLong',
     'binaryToLong',
@@ -97,7 +100,7 @@ except ImportError:
         reversed
     except NameError:
         def reversed(seq):
-            return map(seq.__getitem__, xrange(len(seq) - 1, -1, -1))
+            return list(map(seq.__getitem__, range(len(seq) - 1, -1, -1)))
 
     def longToBinary(l):
         if l == 0:
@@ -217,4 +220,4 @@ def randomString(length, chrs=None):
         return getBytes(length)
     else:
         n = len(chrs)
-        return ''.join([chrs[randrange(n)] for _ in xrange(length)])
+        return ''.join([chrs[randrange(n)] for _ in range(length)])

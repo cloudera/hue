@@ -1,3 +1,4 @@
+from builtins import str
 import unittest
 from openid import message
 from openid.test.support import OpenIDTestMixin
@@ -17,7 +18,7 @@ class DiscoveryVerificationTest(OpenIDTestMixin, TestIdRes):
     def failUnlessProtocolError(self, prefix, callable, *args, **kwargs):
         try:
             result = callable(*args, **kwargs)
-        except consumer.ProtocolError, e:
+        except consumer.ProtocolError as e:
             self.failUnless(
                 e[0].startswith(prefix),
                 'Expected message prefix %r, got message %r' % (prefix, e[0]))
@@ -149,7 +150,7 @@ class DiscoveryVerificationTest(OpenIDTestMixin, TestIdRes):
 
         try:
             r = self.consumer._verifyDiscoveryResults(msg, endpoint)
-        except consumer.ProtocolError, e:
+        except consumer.ProtocolError as e:
             # Should we make more ProtocolError subclasses?
             self.failUnless(str(e), text)
         else:

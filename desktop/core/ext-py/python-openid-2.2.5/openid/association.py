@@ -25,6 +25,8 @@ association.
     HMAC-SHA1/DH-SHA1 association types if available.
 """
 
+from builtins import str
+from builtins import object
 __all__ = [
     'default_negotiator',
     'encrypted_negotiator',
@@ -511,7 +513,7 @@ class Association(object):
 
         signed_message = message.copy()
         signed_message.setArg(OPENID_NS, 'assoc_handle', self.handle)
-        message_keys = signed_message.toPostArgs().keys()
+        message_keys = list(signed_message.toPostArgs().keys())
         signed_list = [k[7:] for k in message_keys
                        if k.startswith('openid.')]
         signed_list.append('signed')

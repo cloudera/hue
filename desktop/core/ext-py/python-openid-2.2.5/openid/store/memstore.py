@@ -1,5 +1,7 @@
 """A simple store using only in-process memory."""
 
+from builtins import str
+from builtins import object
 from openid.store import nonce
 
 import copy
@@ -29,7 +31,7 @@ class ServerAssocs(object):
         or None if there are no associations.
         """
         best = None
-        for assoc in self.assocs.values():
+        for assoc in list(self.assocs.values()):
             if best is None or best.issued < assoc.issued:
                 best = assoc
         return best
@@ -40,7 +42,7 @@ class ServerAssocs(object):
         @return: tuple of (removed associations, remaining associations)
         """
         remove = []
-        for handle, assoc in self.assocs.iteritems():
+        for handle, assoc in self.assocs.items():
             if assoc.getExpiresIn() == 0:
                 remove.append(handle)
         for handle in remove:
@@ -94,7 +96,7 @@ class MemoryStore(object):
     def cleanupNonces(self):
         now = time.time()
         expired = []
-        for anonce in self.nonces.iterkeys():
+        for anonce in self.nonces.keys():
             if abs(anonce[1] - now) > nonce.SKEW:
                 # removing items while iterating over the set could be bad.
                 expired.append(anonce)
@@ -106,7 +108,7 @@ class MemoryStore(object):
     def cleanupAssociations(self):
         remove_urls = []
         removed_assocs = 0
-        for server_url, assocs in self.server_assocs.iteritems():
+        for server_url, assocs in self.server_assocs.items():
             removed, remaining = assocs.cleanup()
             removed_assocs += removed
             if not remaining:

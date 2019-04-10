@@ -3,6 +3,7 @@
 This duplicates some things that are covered by test_consumer, but
 this works for now.
 """
+from builtins import object
 from openid import oidutil
 from openid.test.test_consumer import CatchLogs
 from openid.message import Message, OPENID2_NS, OPENID_NS, no_default
@@ -42,7 +43,7 @@ class BaseAssocTest(CatchLogs, unittest.TestCase):
     def failUnlessProtocolError(self, str_prefix, func, *args, **kwargs):
         try:
             result = func(*args, **kwargs)
-        except ProtocolError, e:
+        except ProtocolError as e:
             message = 'Expected prefix %r, got %r' % (str_prefix, e[0])
             self.failUnless(e[0].startswith(str_prefix), message)
         else:
@@ -119,7 +120,7 @@ class ExtractAssociationSessionTypeMismatch(BaseAssocTest):
     def mkTest(requested_session_type, response_session_type, openid1=False):
         def test(self):
             assoc_session = DummyAssocationSession(requested_session_type)
-            keys = association_response_values.keys()
+            keys = list(association_response_values.keys())
             if openid1:
                 keys.remove('ns')
             msg = mkAssocResponse(*keys)

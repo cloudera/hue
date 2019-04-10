@@ -1,4 +1,5 @@
 
+from builtins import str
 from django import http
 from django.http import HttpResponseRedirect
 from django.views.generic.simple import direct_to_template
@@ -67,7 +68,7 @@ def startOpenID(request):
 
         try:
             auth_request = c.begin(openid_url)
-        except DiscoveryFailure, e:
+        except DiscoveryFailure as e:
             # Some other protocol-level failure occurred.
             error = "OpenID discovery error: %s" % (str(e),)
 
@@ -100,7 +101,7 @@ def startOpenID(request):
         # the response.
         requested_policies = []
         policy_prefix = 'policy_'
-        for k, v in request.POST.iteritems():
+        for k, v in request.POST.items():
             if k.startswith(policy_prefix):
                 policy_attr = k[len(policy_prefix):]
                 if policy_attr in PAPE_POLICIES:
@@ -194,8 +195,8 @@ def finishOpenID(request):
 
             consumer.SUCCESS:
             {'url': response.getDisplayIdentifier(),
-             'sreg': sreg_response and sreg_response.items(),
-             'ax': ax_items.items(),
+             'sreg': sreg_response and list(sreg_response.items()),
+             'ax': list(ax_items.items()),
              'pape': pape_response}
             }
 

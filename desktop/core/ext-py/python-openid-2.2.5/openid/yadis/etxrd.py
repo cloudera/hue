@@ -3,6 +3,7 @@
 ElementTree interface to an XRD document.
 """
 
+from builtins import object
 __all__ = [
     'nsTag',
     'mkXRDTag',
@@ -67,7 +68,7 @@ def parseXRDS(text):
     """
     try:
         element = ElementTree.XML(text)
-    except XMLError, why:
+    except XMLError as why:
         exc = XRDSError('Error parsing document as XML')
         exc.reason = why
         raise exc

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import map
 from openid.association import Association
 from openid.cryptutil import randomString
 from openid.store.nonce import mkNonce, split
@@ -268,7 +270,7 @@ def test_mysql():
         # Change this connect line to use the right user and password
         try:
             conn = MySQLdb.connect(user=db_user, passwd=db_passwd, host = db_host)
-        except MySQLdb.OperationalError, why:
+        except MySQLdb.OperationalError as why:
             if why[0] == 2005:
                 print ('Skipping MySQL store test (cannot connect '
                        'to test server on host %r)' % (db_host,))
@@ -382,7 +384,7 @@ test_functions = [
     ]
 
 def pyUnitTests():
-    tests = map(unittest.FunctionTestCase, test_functions)
+    tests = list(map(unittest.FunctionTestCase, test_functions))
     load = unittest.defaultTestLoader.loadTestsFromTestCase
     return unittest.TestSuite(tests)
 

@@ -1,3 +1,4 @@
+from builtins import str
 import unittest
 from openid.consumer.discover import \
      OpenIDServiceEndpoint, OPENID_1_1_TYPE, OPENID_1_0_TYPE

@@ -1,3 +1,4 @@
+from builtins import object
 from openid.extensions import sreg
 from openid.message import NamespaceMap, Message, registerNamespaceAlias
 from openid.server.server import OpenIDRequest, OpenIDResponse
@@ -445,7 +446,7 @@ class SRegResponseTest(unittest.TestCase):
         sreg_resp = sreg.SRegResponse.fromSuccessResponse(success_resp,
                                                           signed_only=False)
         self.failUnlessEqual([('nickname', 'The Mad Stork')],
-                             sreg_resp.items())
+                             list(sreg_resp.items()))
 
 class SendFieldsTest(unittest.TestCase):
     def test(self):

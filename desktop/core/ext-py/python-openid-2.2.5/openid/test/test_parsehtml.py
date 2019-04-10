@@ -1,5 +1,8 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 from openid.yadis.parsehtml import YadisHTMLParser, ParseDone
-from HTMLParser import HTMLParseError
+from html.parser import HTMLParseError
 
 import os.path, unittest, sys
 
@@ -17,7 +20,7 @@ class _TestCase(unittest.TestCase):
         p = YadisHTMLParser()
         try:
             p.feed(self.case)
-        except ParseDone, why:
+        except ParseDone as why:
             found = why[0]
 
             # make sure we protect outselves against accidental bogus

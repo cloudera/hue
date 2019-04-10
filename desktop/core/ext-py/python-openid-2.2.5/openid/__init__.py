@@ -23,6 +23,7 @@ module.
     and limitations under the License.
 """
 
+from builtins import map
 __version__ = '[library version:2.2.1]'[17:-1]
 
 __all__ = [
@@ -45,7 +46,7 @@ __all__ = [
 
 # Parse the version info
 try:
-    version_info = map(int, __version__.split('.'))
+    version_info = list(map(int, __version__.split('.')))
 except ValueError:
     version_info = (None, None, None)
 else:

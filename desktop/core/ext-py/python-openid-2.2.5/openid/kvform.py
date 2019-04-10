@@ -1,3 +1,4 @@
+from builtins import str
 __all__ = ['seqToKV', 'kvToSeq', 'dictToKV', 'kvToDict']
 
 from openid import oidutil
@@ -26,9 +27,9 @@ def seqToKV(seq, strict=False):
 
     lines = []
     for k, v in seq:
-        if isinstance(k, types.StringType):
+        if isinstance(k, bytes):
             k = k.decode('UTF8')
-        elif not isinstance(k, types.UnicodeType):
+        elif not isinstance(k, str):
             err('Converting key to string: %r' % k)
             k = str(k)
 
@@ -43,9 +44,9 @@ def seqToKV(seq, strict=False):
         if k.strip() != k:
             err('Key has whitespace at beginning or end: %r' % (k,))
 
-        if isinstance(v, types.StringType):
+        if isinstance(v, bytes):
             v = v.decode('UTF8')
-        elif not isinstance(v, types.UnicodeType):
+        elif not isinstance(v, str):
             err('Converting value to string: %r' % (v,))
             v = str(v)
 
@@ -115,7 +116,7 @@ def kvToSeq(data, strict=False):
     return pairs
 
 def dictToKV(d):
-    seq = d.items()
+    seq = list(d.items())
     seq.sort()
     return seqToKV(seq)
 

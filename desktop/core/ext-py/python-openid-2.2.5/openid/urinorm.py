@@ -1,3 +1,6 @@
+from builtins import str
+from builtins import chr
+from builtins import range
 import re
 
 # from appendix B of rfc 3986 (http://www.ietf.org/rfc/rfc3986.txt)
@@ -22,7 +25,7 @@ pct_encoded_pattern = r'%([0-9A-Fa-f]{2})'
 pct_encoded_re = re.compile(pct_encoded_pattern)
 
 try:
-    unichr(0x10000)
+    chr(0x10000)
 except ValueError:
     # narrow python build
     UCSCHAR = [
@@ -73,8 +76,7 @@ _unreserved[ord('~')] = True
 
 
 _escapeme_re = re.compile('[%s]' % (''.join(
-    map(lambda (m, n): u'%s-%s' % (unichr(m), unichr(n)),
-        UCSCHAR + IPRIVATE)),))
+    [u'%s-%s' % (chr(m_n[0]), chr(m_n[1])) for m_n in UCSCHAR + IPRIVATE]),))
 
 
 def _pct_escape_unicode(char_match):
@@ -137,7 +139,7 @@ def remove_dot_segments(path):
 
 
 def urinorm(uri):
-    if isinstance(uri, unicode):
+    if isinstance(uri, str):
         uri = _escapeme_re.sub(_pct_escape_unicode, uri).encode('ascii')
 
     illegal_mo = uri_illegal_char_re.search(uri)
@@ -171,7 +173,7 @@ def urinorm(uri):
     if '%' in host:
         host = host.lower()
         host = pct_encoded_re.sub(_pct_encoded_replace, host)
-        host = unicode(host, 'utf-8').encode('idna')
+        host = str(host, 'utf-8').encode('idna')
     else:
         host = host.lower()
 

@@ -6,6 +6,8 @@ Example of how to initialize a store database::
 
     python -c 'from openid.store import sqlstore; import pysqlite2.dbapi2; sqlstore.SQLiteStore(pysqlite2.dbapi2.connect("cstore.db")).createTables()'
 """
+from builtins import map
+from builtins import str
 import re
 import time
 
@@ -139,11 +141,11 @@ class SQLStore(OpenIDStore):
         # Currently the strings in our tables just have ascii in them,
         # so this ought to be safe.
         def unicode_to_str(arg):
-            if isinstance(arg, unicode):
+            if isinstance(arg, str):
                 return str(arg)
             else:
                 return arg
-        str_args = map(unicode_to_str, args)
+        str_args = list(map(unicode_to_str, args))
         self.cur.execute(sql, str_args)
 
     def __getattr__(self, attr):
@@ -349,7 +351,7 @@ class SQLiteStore(SQLStore):
         # message from the OperationalError.
         try:
             return super(SQLiteStore, self).useNonce(*args, **kwargs)
-        except self.exceptions.OperationalError, why:
+        except self.exceptions.OperationalError as why:
             if re.match('^columns .* are not unique$', why[0]):
                 return False
             else:

@@ -6,8 +6,11 @@
    tests with a mock fetcher instead of spawning threads with BaseHTTPServer.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import unittest
-import urlparse
+import urllib.parse
 import re
 import types
 
@@ -48,7 +51,7 @@ class TestFetcher(object):
     def fetch(self, url, headers, body):
         current_url = url
         while True:
-            parsed = urlparse.urlparse(current_url)
+            parsed = urllib.parse.urlparse(current_url)
             path = parsed[2][1:]
             try:
                 data = discoverdata.generateSample(path, self.base_url)

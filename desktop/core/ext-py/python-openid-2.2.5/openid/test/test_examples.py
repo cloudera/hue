@@ -1,8 +1,13 @@
 "Test some examples."
 
+from past.builtins import execfile
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import socket
 import os.path, unittest, sys, time
-from cStringIO import StringIO
+from io import StringIO
 
 import twill.commands, twill.parse, twill.unit
 
@@ -43,7 +48,7 @@ class TwillTest(twill.unit.TestInfo):
 def splitDir(d, count):
     # in python2.4 and above, it's easier to spell this as
     # d.rsplit(os.sep, count)
-    for i in xrange(count):
+    for i in range(count):
         d = os.path.dirname(d)
     return d
 
@@ -138,7 +143,7 @@ class TestServer(unittest.TestCase):
             finalURL = headers['Location']
             self.failUnless('openid.mode=id_res' in finalURL, finalURL)
             self.failUnless('openid.identity=' in finalURL, finalURL)
-        except twill.commands.TwillAssertionError, e:
+        except twill.commands.TwillAssertionError as e:
             msg = '%s\nFinal page:\n%s' % (
                 str(e), c.get_browser().get_html())
             self.fail(msg)
@@ -166,7 +171,7 @@ class TestServer(unittest.TestCase):
             headers = c.get_browser()._browser.response().info()
             finalURL = headers['Location']
             self.failUnless(finalURL.startswith(self.return_to))
-        except twill.commands.TwillAssertionError, e:
+        except twill.commands.TwillAssertionError as e:
             from traceback import format_exc
             msg = '%s\nTwill output:%s\nTwill errors:%s\nFinal page:\n%s' % (
                 format_exc(),

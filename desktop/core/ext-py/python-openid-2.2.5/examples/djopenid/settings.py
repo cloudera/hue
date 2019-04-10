@@ -6,7 +6,7 @@ import warnings
 
 try:
     import openid
-except ImportError, e:
+except ImportError as e:
     warnings.warn("Could not import OpenID library.  Please consult the djopenid README.")
     sys.exit(1)
 

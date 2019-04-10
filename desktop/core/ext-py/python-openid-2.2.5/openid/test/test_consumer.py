@@ -1,4 +1,8 @@
-import urlparse
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+import urllib.parse
 import cgi
 import time
 import warnings
@@ -36,13 +40,13 @@ assocs = [
 def mkSuccess(endpoint, q):
     """Convenience function to create a SuccessResponse with the given
     arguments, all signed."""
-    signed_list = ['openid.' + k for k in q.keys()]
+    signed_list = ['openid.' + k for k in list(q.keys())]
     return SuccessResponse(endpoint, Message.fromOpenIDArgs(q), signed_list)
 
 def parseQuery(qs):
     q = {}
     for (k, v) in cgi.parse_qsl(qs):
-        assert not q.has_key(k)
+        assert k not in q
         q[k] = v
     return q
 
@@ -74,7 +78,7 @@ def associate(qs, assoc_secret, assoc_handle):
 GOODSIG = "[A Good Signature]"
 
 
-class GoodAssociation:
+class GoodAssociation(object):
     expiresIn = 3600
     handle = "-blah-"
 
@@ -91,7 +95,8 @@ class GoodAssocStore(memstore.MemoryStore):
 
 
 class TestFetcher(object):
-    def __init__(self, user_url, user_page, (assoc_secret, assoc_handle)):
+    def __init__(self, user_url, user_page, xxx_todo_changeme):
+        (assoc_secret, assoc_handle) = xxx_todo_changeme
         self.get_responses = {user_url:self.response(user_url, 200, user_page)}
         self.assoc_secret = assoc_secret
         self.assoc_handle = assoc_handle
@@ -158,7 +163,7 @@ def _test_success(server_url, user_url, delegate_url, links, immediate=False):
 
         redirect_url = request.redirectURL(trust_root, return_to, immediate)
 
-        parsed = urlparse.urlparse(redirect_url)
+        parsed = urllib.parse.urlparse(redirect_url)
         qs = parsed[4]
         q = parseQuery(qs)
         new_return_to = q['openid.return_to']
@@ -173,7 +178,7 @@ def _test_success(server_url, user_url, delegate_url, links, immediate=False):
         assert new_return_to.startswith(return_to)
         assert redirect_url.startswith(server_url)
 
-        parsed = urlparse.urlparse(new_return_to)
+        parsed = urllib.parse.urlparse(new_return_to)
         query = parseQuery(parsed[4])
         query.update({
             'openid.mode':'id_res',
@@ -370,7 +375,7 @@ class TestQueryFormat(TestIdRes):
         query = {'openid.mode': ['cancel']}
         try:
             r = Message.fromPostArgs(query)
-        except TypeError, err:
+        except TypeError as err:
             self.failUnless(str(err).find('values') != -1, err)
         else:
             self.fail("expected TypeError, got this instead: %s" % (r,))
@@ -672,7 +677,7 @@ class TestSetupNeeded(TestIdRes):
     def failUnlessSetupNeeded(self, expected_setup_url, message):
         try:
             self.consumer._checkSetupNeeded(message)
-        except SetupNeededError, why:
+        except SetupNeededError as why:
             self.failUnlessEqual(expected_setup_url, why.user_setup_url)
         else:
             self.fail("Expected to find an immediate-mode response")
@@ -787,7 +792,7 @@ class IdResCheckForFieldsTest(TestIdRes):
             message = Message.fromOpenIDArgs(openid_args)
             try:
                 self.consumer._idResCheckForFields(message)
-            except ProtocolError, why:
+            except ProtocolError as why:
                 self.failUnless(why[0].startswith('Missing required'))
             else:
                 self.fail('Expected an error, but none occurred')
@@ -798,7 +803,7 @@ class IdResCheckForFieldsTest(TestIdRes):
             message = Message.fromOpenIDArgs(openid_args)
             try:
                 self.consumer._idResCheckForFields(message)
-            except ProtocolError, why:
+            except ProtocolError as why:
                 self.failUnless(why[0].endswith('not signed'))
             else:
                 self.fail('Expected an error, but none occurred')
@@ -1476,7 +1481,7 @@ class ConsumerTest(unittest.TestCase):
         def test():
             try:
                 self.consumer.begin('unused in this test')
-            except DiscoveryFailure, why:
+            except DiscoveryFailure as why:
                 self.failUnless(why[0].startswith('Error fetching'))
                 self.failIf(why[0].find('Unit test') == -1)
             else:
@@ -1492,7 +1497,7 @@ class ConsumerTest(unittest.TestCase):
         def test():
             try:
                 self.consumer.begin(url)
-            except DiscoveryFailure, why:
+            except DiscoveryFailure as why:
                 self.failUnless(why[0].startswith('No usable OpenID'))
                 self.failIf(why[0].find(url) == -1)
             else:
@@ -1766,7 +1771,7 @@ class TestDiscoveryVerification(unittest.TestCase):
         self.services = [endpoint]
         try:
             r = self.consumer._verifyDiscoveryResults(self.message, endpoint)
-        except ProtocolError, e:
+        except ProtocolError as e:
             # Should we make more ProtocolError subclasses?
             self.failUnless(str(e), text)
         else:
@@ -1793,7 +1798,7 @@ class TestDiscoveryVerification(unittest.TestCase):
 
         try:
             r = self.consumer._verifyDiscoveryResults(self.message, endpoint)
-        except ProtocolError, e:
+        except ProtocolError as e:
             self.failUnlessEqual(str(e), text)
         else:
             self.fail("Exepected ProtocolError, %r returned" % (r,))
@@ -2074,7 +2079,7 @@ class TestKVPost(unittest.TestCase):
         response.body = "error:bonk\nerror_code:7\n"
         try:
             r = _httpResponseToMessage(response, self.server_url)
-        except ServerError, e:
+        except ServerError as e:
             self.failUnlessEqual(e.error_text, 'bonk')
             self.failUnlessEqual(e.error_code, '7')
         else:

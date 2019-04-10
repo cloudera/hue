@@ -1,5 +1,6 @@
 # -*- test-case-name: openid.test.test_services -*-
 
+from builtins import str
 from openid.yadis.filters import mkFilter
 from openid.yadis.discover import discover, DiscoveryFailure
 from openid.yadis.etxrd import parseXRDS, iterServices, XRDSError
@@ -26,7 +27,7 @@ def getServiceEndpoints(input_url, flt=None):
     try:
         endpoints = applyFilter(result.normalized_uri,
                                 result.response_text, flt)
-    except XRDSError, err:
+    except XRDSError as err:
         raise DiscoveryFailure(str(err), None)
     return (result.normalized_uri, endpoints)
 

@@ -1,3 +1,5 @@
+from builtins import map
+from builtins import range
 import os.path
 from openid.dh import DiffieHellman, strxor
 
@@ -24,8 +26,8 @@ def test_strxor():
         ('', 'a'),
         ('foo', 'ba'),
         (NUL * 3, NUL * 4),
-        (''.join(map(chr, xrange(256))),
-         ''.join(map(chr, xrange(128)))),
+        (''.join(map(chr, range(256))),
+         ''.join(map(chr, range(128)))),
         ]
 
     for aa, bb in exc_cases:
@@ -55,9 +57,9 @@ def test_public():
     try:
         for line in f:
             parts = line.strip().split(' ')
-            dh._setPrivate(long(parts[0]))
+            dh._setPrivate(int(parts[0]))
 
-            assert dh.public == long(parts[1])
+            assert dh.public == int(parts[1])
     finally:
         f.close()
 

@@ -3,13 +3,16 @@
 This module contains the HTTP fetcher interface and several implementations.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 __all__ = ['fetch', 'getDefaultFetcher', 'setDefaultFetcher', 'HTTPResponse',
            'HTTPFetcher', 'createHTTPFetcher', 'HTTPFetchingError',
            'HTTPError']
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
-import cStringIO
+import io
 import sys
 
 import openid
@@ -186,7 +189,7 @@ class Urllib2Fetcher(HTTPFetcher):
 
     # Parameterized for the benefit of testing frameworks, see
     # http://trac.openidenabled.com/trac/ticket/85
-    urlopen = staticmethod(urllib2.urlopen)
+    urlopen = staticmethod(urllib.request.urlopen)
 
     def fetch(self, url, body=None, headers=None):
         if not _allowedURL(url):
@@ -199,14 +202,14 @@ class Urllib2Fetcher(HTTPFetcher):
             'User-Agent',
             "%s Python-urllib/%s" % (USER_AGENT, urllib2.__version__,))
 
-        req = urllib2.Request(url, data=body, headers=headers)
+        req = urllib.request.Request(url, data=body, headers=headers)
         try:
             f = self.urlopen(req)
             try:
                 return self._makeResponse(f)
             finally:
                 f.close()
-        except urllib2.HTTPError, why:
+        except urllib.error.HTTPError as why:
             try:
                 return self._makeResponse(why)
             finally:
@@ -216,7 +219,7 @@ class Urllib2Fetcher(HTTPFetcher):
         resp = HTTPResponse()
         resp.body = urllib2_response.read(MAX_RESPONSE_KB * 1024)
         resp.final_url = urllib2_response.geturl()
-        resp.headers = dict(urllib2_response.info().items())
+        resp.headers = dict(list(urllib2_response.info().items()))
 
         if hasattr(urllib2_response, 'code'):
             resp.status = urllib2_response.code
@@ -294,7 +297,7 @@ class CurlHTTPFetcher(HTTPFetcher):
 
         header_list = []
         if headers is not None:
-            for header_name, header_value in headers.iteritems():
+            for header_name, header_value in headers.items():
                 header_list.append('%s: %s' % (header_name, header_value))
 
         c = pycurl.Curl()
@@ -313,14 +316,14 @@ class CurlHTTPFetcher(HTTPFetcher):
                 if not self._checkURL(url):
                     raise HTTPError("Fetching URL not allowed: %r" % (url,))
 
-                data = cStringIO.StringIO()
+                data = io.StringIO()
                 def write_data(chunk):
                     if data.tell() > 1024*MAX_RESPONSE_KB:
                         return 0
                     else:
                         return data.write(chunk)
                     
-                response_header_data = cStringIO.StringIO()
+                response_header_data = io.StringIO()
                 c.setopt(pycurl.WRITEFUNCTION, write_data)
                 c.setopt(pycurl.HEADERFUNCTION, response_header_data.write)
                 c.setopt(pycurl.TIMEOUT, off)
@@ -422,6 +425,6 @@ class HTTPLib2Fetcher(HTTPFetcher):
         return HTTPResponse(
             body=content,
             final_url=final_url,
-            headers=dict(httplib2_response.items()),
+            headers=dict(list(httplib2_response.items())),
             status=httplib2_response.status,
             )

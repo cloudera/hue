@@ -1,3 +1,5 @@
+from builtins import zip
+from builtins import object
 from openid import message
 from openid import oidutil
 

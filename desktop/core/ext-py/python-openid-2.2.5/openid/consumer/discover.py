@@ -2,6 +2,11 @@
 """Functions to discover OpenID endpoints from identifiers.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import range
+from builtins import object
 __all__ = [
     'DiscoveryFailure',
     'OPENID_1_0_NS',
@@ -13,7 +18,7 @@ __all__ = [
     'discover',
     ]
 
-import urlparse
+import urllib.parse
 
 from openid import oidutil, fetchers, urinorm
 
@@ -90,7 +95,7 @@ class OpenIDServiceEndpoint(object):
         if self.claimed_id is None:
             return None
         else:
-            return urlparse.urldefrag(self.claimed_id)[0]
+            return urllib.parse.urldefrag(self.claimed_id)[0]
 
     def compatibilityMode(self):
         return self.preferredNamespace() != OPENID_2_0_MESSAGE_NS
@@ -304,10 +309,10 @@ def normalizeURL(url):
     DiscoveryFailure"""
     try:
         normalized = urinorm.urinorm(url)
-    except ValueError, why:
+    except ValueError as why:
         raise DiscoveryFailure('Normalizing identifier: %s' % (why[0],), None)
     else:
-        return urlparse.urldefrag(normalized)[0]
+        return urllib.parse.urldefrag(normalized)[0]
 
 def normalizeXRI(xri):
     """Normalize an XRI, stripping its scheme if present"""
@@ -324,7 +329,7 @@ def arrangeByType(service_list, preferred_types):
         that element.
 
         For Python 2.2 compatibility"""
-        return zip(range(len(elts)), elts)
+        return list(zip(list(range(len(elts))), elts))
 
     def bestMatchingService(service):
         """Return the index of the first matching type, or something
@@ -451,7 +456,7 @@ def discoverNoYadis(uri):
     return claimed_id, openid_services
 
 def discoverURI(uri):
-    parsed = urlparse.urlparse(uri)
+    parsed = urllib.parse.urlparse(uri)
     if parsed[0] and parsed[1]:
         if parsed[0] not in ['http', 'https']:
             raise DiscoveryFailure('URI scheme is not HTTP or HTTPS', None)

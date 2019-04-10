@@ -1,4 +1,5 @@
 
+from builtins import object
 from openid.extensions.draft import pape2 as pape
 from openid.message import *
 from openid.server import server
@@ -80,7 +81,7 @@ class PapeRequestTestCase(unittest.TestCase):
                                       pape.AUTH_MULTI_FACTOR_PHYSICAL])
         self.failUnlessEqual([pape.AUTH_MULTI_FACTOR], pt)
 
-class DummySuccessResponse:
+class DummySuccessResponse(object):
     def __init__(self, message, signed_stuff):
         self.message = message
         self.signed_stuff = signed_stuff

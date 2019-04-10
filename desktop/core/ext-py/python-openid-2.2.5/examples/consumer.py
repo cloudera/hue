@@ -6,11 +6,15 @@ Once you understand this example you'll know the basics of OpenID
 and using the Python OpenID library. You can then move on to more
 robust examples, and integrating OpenID into your application.
 """
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 __copyright__ = 'Copyright 2005-2008, Janrain, Inc.'
 
-from Cookie import SimpleCookie
+from http.cookies import SimpleCookie
 import cgi
-import urlparse
+import urllib.parse
 import cgitb
 import sys
 
@@ -18,7 +22,7 @@ def quoteattr(s):
     qs = cgi.escape(s, 1)
     return '"%s"' % (qs,)
 
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 try:
     import openid
@@ -126,7 +130,7 @@ class OpenIDRequestHandler(BaseHTTPRequestHandler):
         written to the requesting browser.
         """
         try:
-            self.parsed_uri = urlparse.urlparse(self.path)
+            self.parsed_uri = urllib.parse.urlparse(self.path)
             self.query = {}
             for k, v in cgi.parse_qsl(self.parsed_uri[4]):
                 self.query[k] = v.decode('utf-8')
@@ -171,7 +175,7 @@ class OpenIDRequestHandler(BaseHTTPRequestHandler):
         oidconsumer = self.getConsumer(stateless = use_stateless)
         try:
             request = oidconsumer.begin(openid_url)
-        except consumer.DiscoveryFailure, exc:
+        except consumer.DiscoveryFailure as exc:
             fetch_error_string = 'Error in discovery: %s' % (
                 cgi.escape(str(exc[0])))
             self.render(fetch_error_string,
@@ -298,7 +302,7 @@ class OpenIDRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(
                 '<div class="alert">No registration data was returned</div>')
         else:
-            sreg_list = sreg_data.items()
+            sreg_list = list(sreg_data.items())
             sreg_list.sort()
             self.wfile.write(
                 '<h2>Registration Data</h2>'
@@ -337,7 +341,7 @@ class OpenIDRequestHandler(BaseHTTPRequestHandler):
     def buildURL(self, action, **query):
         """Build a URL relative to the server base_url, with the given
         query parameters added."""
-        base = urlparse.urljoin(self.server.base_url, action)
+        base = urllib.parse.urljoin(self.server.base_url, action)
         return appendArgs(base, query)
 
     def notFound(self):
@@ -464,8 +468,8 @@ def main(host, port, data_path, weak_ssl=False):
     addr = (host, port)
     server = OpenIDHTTPServer(store, addr, OpenIDRequestHandler)
 
-    print 'Server running at:'
-    print server.base_url
+    print('Server running at:')
+    print(server.base_url)
     server.serve_forever()
 
 if __name__ == '__main__':

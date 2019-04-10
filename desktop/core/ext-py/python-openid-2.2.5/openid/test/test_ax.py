@@ -1,6 +1,7 @@
 """Tests for the attribute exchange extension module
 """
 
+from builtins import object
 import unittest
 from openid.extensions import ax
 from openid.message import NamespaceMap, Message, OPENID2_NS
@@ -238,7 +239,7 @@ class FetchRequestTest(unittest.TestCase):
             )
         self.msg.add(attr)
         ax_args = self.msg.getExtensionArgs()
-        for k, v in ax_args.iteritems():
+        for k, v in ax_args.items():
             if v == attr.type_uri and k.startswith('type.'):
                 alias = k[5:]
                 break
@@ -519,9 +520,9 @@ class FetchResponseTest(unittest.TestCase):
             'mode': 'id_res',
             'ns': OPENID2_NS,
             }
-        sf = ['openid.' + i for i in args.keys()]
+        sf = ['openid.' + i for i in list(args.keys())]
         msg = Message.fromOpenIDArgs(args)
-        class Endpoint:
+        class Endpoint(object):
             claimed_id = 'http://invalid.'
 
         oreq = SuccessResponse(Endpoint(), msg, signed_fields=sf)
@@ -537,9 +538,9 @@ class FetchResponseTest(unittest.TestCase):
             'ns.ax': ax.AXMessage.ns_uri,
             'ax.mode': 'fetch_response',
             }
-        sf = ['openid.' + i for i in args.keys()]
+        sf = ['openid.' + i for i in list(args.keys())]
         msg = Message.fromOpenIDArgs(args)
-        class Endpoint:
+        class Endpoint(object):
             claimed_id = 'http://invalid.'
 
         oreq = SuccessResponse(Endpoint(), msg, signed_fields=sf)
@@ -560,9 +561,9 @@ class FetchResponseTest(unittest.TestCase):
             'ax.count.'+name: '1',
             'ax.value.%s.1'%name: value,
             }
-        sf = ['openid.' + i for i in args.keys()]
+        sf = ['openid.' + i for i in list(args.keys())]
         msg = Message.fromOpenIDArgs(args)
-        class Endpoint:
+        class Endpoint(object):
             claimed_id = 'http://invalid.'
 
         resp = SuccessResponse(Endpoint(), msg, signed_fields=sf)

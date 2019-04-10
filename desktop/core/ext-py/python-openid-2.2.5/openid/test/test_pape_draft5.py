@@ -1,4 +1,5 @@
 
+from builtins import object
 from openid.extensions.draft import pape5 as pape
 from openid.message import *
 from openid.server import server
@@ -53,13 +54,13 @@ class PapeRequestTestCase(unittest.TestCase):
         # alias is None; we expect a new one to be generated.
         uri = 'http://another.example.com/'
         self.req.addAuthLevel(uri)
-        self.assert_(uri in self.req.auth_level_aliases.values())
+        self.assert_(uri in list(self.req.auth_level_aliases.values()))
 
         # We don't expect a new alias to be generated if one already
         # exists.
-        before_aliases = self.req.auth_level_aliases.keys()
+        before_aliases = list(self.req.auth_level_aliases.keys())
         self.req.addAuthLevel(uri)
-        after_aliases = self.req.auth_level_aliases.keys()
+        after_aliases = list(self.req.auth_level_aliases.keys())
         self.assertEqual(before_aliases, after_aliases)
 
     def test_add_policy_uri(self):
@@ -216,7 +217,7 @@ class PapeRequestTestCase(unittest.TestCase):
                                       pape.AUTH_MULTI_FACTOR_PHYSICAL])
         self.failUnlessEqual([pape.AUTH_MULTI_FACTOR], pt)
 
-class DummySuccessResponse:
+class DummySuccessResponse(object):
     def __init__(self, message, signed_stuff):
         self.message = message
         self.signed_stuff = signed_stuff

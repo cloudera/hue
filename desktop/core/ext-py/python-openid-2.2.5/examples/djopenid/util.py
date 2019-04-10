@@ -3,7 +3,9 @@
 Utility code for the Django example consumer and server.
 """
 
-from urlparse import urljoin
+from future import standard_library
+standard_library.install_aliases()
+from urllib.parse import urljoin
 
 from django.db import connection
 from django.template.context import RequestContext
@@ -64,13 +66,12 @@ def getOpenIDStore(filestore_path, table_prefix):
         s = types[settings.DATABASE_ENGINE](connection.connection,
                                             **tablenames)
     except KeyError:
-        raise ImproperlyConfigured, \
-              "Database engine %s not supported by OpenID library" % \
-              (settings.DATABASE_ENGINE,)
+        raise ImproperlyConfigured("Database engine %s not supported by OpenID library" % \
+              (settings.DATABASE_ENGINE,))
 
     try:
         s.createTables()
-    except (SystemExit, KeyboardInterrupt, MemoryError), e:
+    except (SystemExit, KeyboardInterrupt, MemoryError) as e:
         raise
     except:
         # XXX This is not the Right Way to do this, but because the
@@ -133,7 +134,7 @@ def normalDict(request_data):
     values are lists, because in OpenID, each key in the query arg set
     can have at most one value.
     """
-    return dict((k, v[0]) for k, v in request_data.iteritems())
+    return dict((k, v[0]) for k, v in request_data.items())
 
 def renderXRDS(request, type_uris, endpoint_urls):
     """Render an XRDS page with the specified type URIs and endpoint

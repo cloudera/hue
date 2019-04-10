@@ -3,6 +3,7 @@ This module contains an C{L{OpenIDStore}} implementation backed by
 flat files.
 """
 
+from builtins import range
 import string
 import os
 import os.path
@@ -24,8 +25,8 @@ except ImportError:
         for _ in range(5):
             name = os.tempnam(dir)
             try:
-                fd = os.open(name, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0600)
-            except OSError, why:
+                fd = os.open(name, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+            except OSError as why:
                 if why.errno != EEXIST:
                     raise
             else:
@@ -82,7 +83,7 @@ def _removeIfPresent(filename):
     """
     try:
         os.unlink(filename)
-    except OSError, why:
+    except OSError as why:
         if why.errno == ENOENT:
             # Someone beat us to it, but it's gone, so that's OK
             return 0
@@ -102,7 +103,7 @@ def _ensureDir(dir_name):
     """
     try:
         os.makedirs(dir_name)
-    except OSError, why:
+    except OSError as why:
         if why.errno != EEXIST or not os.path.isdir(dir_name):
             raise
 
@@ -220,7 +221,7 @@ class FileOpenIDStore(OpenIDStore):
 
             try:
                 os.rename(tmp, filename)
-            except OSError, why:
+            except OSError as why:
                 if why.errno != EEXIST:
                     raise
 
@@ -229,7 +230,7 @@ class FileOpenIDStore(OpenIDStore):
                 # file, but not in putting the temporary file in place.
                 try:
                     os.unlink(filename)
-                except OSError, why:
+                except OSError as why:
                     if why.errno == ENOENT:
                         pass
                     else:
@@ -289,7 +290,7 @@ class FileOpenIDStore(OpenIDStore):
     def _getAssociation(self, filename):
         try:
             assoc_file = file(filename, 'rb')
-        except IOError, why:
+        except IOError as why:
             if why.errno == ENOENT:
                 # No association exists for that URL and handle
                 return None
@@ -350,8 +351,8 @@ class FileOpenIDStore(OpenIDStore):
 
         filename = os.path.join(self.nonce_dir, filename)
         try:
-            fd = os.open(filename, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0200)
-        except OSError, why:
+            fd = os.open(filename, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o200)
+        except OSError as why:
             if why.errno == EEXIST:
                 return False
             else:
@@ -363,13 +364,11 @@ class FileOpenIDStore(OpenIDStore):
     def _allAssocs(self):
         all_associations = []
 
-        association_filenames = map(
-            lambda filename: os.path.join(self.association_dir, filename),
-            os.listdir(self.association_dir))
+        association_filenames = [os.path.join(self.association_dir, filename) for filename in os.listdir(self.association_dir)]
         for association_filename in association_filenames:
             try:
                 association_file = file(association_filename, 'rb')
-            except IOError, why:
+            except IOError as why:
                 if why.errno == ENOENT:
                     oidutil.log("%s disappeared during %s._allAssocs" % (
                         association_filename, self.__class__.__name__))

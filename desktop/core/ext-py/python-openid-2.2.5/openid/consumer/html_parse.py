@@ -67,6 +67,7 @@ The parser deals with invalid markup in these ways:
    comments and unclosed <![CDATA[blocks.
 """
 
+from builtins import filter
 __all__ = ['parseLinkAttrs']
 
 import re
@@ -166,7 +167,7 @@ replacements = {
     'quot':'"',
     }
 
-ent_replace = re.compile(r'&(%s);' % '|'.join(replacements.keys()))
+ent_replace = re.compile(r'&(%s);' % '|'.join(list(replacements.keys())))
 def replaceEnt(mo):
     "Replace the entities that are specified by OpenID"
     return replacements.get(mo.group(1), mo.group())
@@ -236,7 +237,7 @@ def findLinksRel(link_attrs_list, target_rel):
     as a relationship."""
     # XXX: TESTME
     matchesTarget = lambda attrs: linkHasRel(attrs, target_rel)
-    return filter(matchesTarget, link_attrs_list)
+    return list(filter(matchesTarget, link_attrs_list))
 
 def findFirstHref(link_attrs_list, target_rel):
     """Return the value of the href attribute for the first link tag

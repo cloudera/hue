@@ -1,5 +1,7 @@
 """Module to make discovery data test cases available"""
-import urlparse
+from future import standard_library
+standard_library.install_aliases()
+import urllib.parse
 import os.path
 
 from openid.yadis.discover import DiscoveryResult, DiscoveryFailure
@@ -85,7 +87,7 @@ def generateSample(test_name, base_url,
                    filename=default_test_file):
     try:
         template = getData(filename, test_name)
-    except IOError, why:
+    except IOError as why:
         import errno
         if why[0] == errno.ENOENT:
             raise KeyError(filename)
@@ -95,7 +97,7 @@ def generateSample(test_name, base_url,
     return fillTemplate(test_name, template, base_url, example_xrds)
 
 def generateResult(base_url, input_name, id_name, result_name, success):
-    input_url = urlparse.urljoin(base_url, input_name)
+    input_url = urllib.parse.urljoin(base_url, input_name)
 
     # If the name is None then we expect the protocol to fail, which
     # we represent by None
@@ -114,12 +116,12 @@ def generateResult(base_url, input_name, id_name, result_name, success):
     else:
         ctype = None
 
-    id_url = urlparse.urljoin(base_url, id_name)
+    id_url = urllib.parse.urljoin(base_url, id_name)
 
     result = DiscoveryResult(input_url)
     result.normalized_uri = id_url
     if success:
-        result.xrds_uri = urlparse.urljoin(base_url, result_name)
+        result.xrds_uri = urllib.parse.urljoin(base_url, result_name)
     result.content_type = ctype
     result.response_text = content
     return input_url, result

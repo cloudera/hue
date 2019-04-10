@@ -1,3 +1,4 @@
+from builtins import object
 from openid import message as message_module
 
 class Extension(object):

@@ -35,6 +35,8 @@ OpenID providers.
     namespace and XRD Type value
 """
 
+from builtins import str
+from past.builtins import basestring
 from openid.message import registerNamespaceAlias, \
      NamespaceAliasRegistrationError
 from openid.extension import Extension
@@ -44,7 +46,7 @@ try:
     basestring #pylint:disable-msg=W0104
 except NameError:
     # For Python 2.2
-    basestring = (str, unicode) #pylint:disable-msg=W0622
+    basestring = (str, str) #pylint:disable-msg=W0622
 
 __all__ = [
     'SRegRequest',
@@ -94,7 +96,7 @@ ns_uri = ns_uri_1_1
 
 try:
     registerNamespaceAlias(ns_uri_1_1, 'sreg')
-except NamespaceAliasRegistrationError, e:
+except NamespaceAliasRegistrationError as e:
     oidutil.log('registerNamespaceAlias(%r, %r) failed: %s' % (ns_uri_1_1,
                                                                'sreg', str(e),))
 
@@ -156,7 +158,7 @@ def getSRegNS(message):
         sreg_ns_uri = ns_uri_1_1
         try:
             message.namespaces.addAlias(ns_uri_1_1, 'sreg')
-        except KeyError, why:
+        except KeyError as why:
             # An alias for the string 'sreg' already exists, but it's
             # defined for something other than simple registration
             raise SRegNamespaceError(why[0])
@@ -489,16 +491,16 @@ class SRegResponse(Extension):
     def items(self):
         """All of the data values in this simple registration response
         """
-        return self.data.items()
+        return list(self.data.items())
 
     def iteritems(self):
-        return self.data.iteritems()
+        return iter(self.data.items())
 
     def keys(self):
-        return self.data.keys()
+        return list(self.data.keys())
 
     def iterkeys(self):
-        return self.data.iterkeys()
+        return iter(self.data.keys())
 
     def has_key(self, key):
         return key in self
@@ -514,5 +516,5 @@ class SRegResponse(Extension):
         checkFieldName(field_name)
         return self.data[field_name]
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.data)

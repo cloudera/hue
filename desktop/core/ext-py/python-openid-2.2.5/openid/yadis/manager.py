@@ -1,3 +1,4 @@
+from builtins import object
 class YadisServiceManager(object):
     """Holds the state of a list of selected Yadis services, managing
     storing it in a session and iterating over the services in order."""
@@ -24,7 +25,7 @@ class YadisServiceManager(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         """Return the next service
 
         self.current() will continue to return that service until the
@@ -106,7 +107,7 @@ class Discovery(object):
             manager = self.createManager(services, yadis_url)
 
         if manager:
-            service = manager.next()
+            service = next(manager)
             manager.store(self.session)
         else:
             service = None

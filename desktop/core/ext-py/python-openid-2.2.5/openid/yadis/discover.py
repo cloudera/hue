@@ -1,7 +1,10 @@
 # -*- test-case-name: openid.test.test_yadis_discover -*-
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 __all__ = ['discover', 'DiscoveryResult', 'DiscoveryFailure']
 
-from cStringIO import StringIO
+from io import StringIO
 
 from openid import fetchers
 

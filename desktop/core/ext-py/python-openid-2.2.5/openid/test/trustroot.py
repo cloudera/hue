@@ -1,3 +1,4 @@
+from builtins import map
 import os
 import unittest
 from openid.server.trustroot import TrustRoot
@@ -46,7 +47,7 @@ class _MatchTest(unittest.TestCase):
 def getTests(t, grps, head, dat):
     tests = []
     top = head.strip()
-    gdat = map(str.strip, dat.split('-' * 40 + '\n'))
+    gdat = list(map(str.strip, dat.split('-' * 40 + '\n')))
     assert not gdat[0]
     assert len(gdat) == (len(grps) * 2 + 1), (gdat, grps)
     i = 1
@@ -60,7 +61,7 @@ def getTests(t, grps, head, dat):
     return tests
 
 def parseTests(data):
-    parts = map(str.strip, data.split('=' * 40 + '\n'))
+    parts = list(map(str.strip, data.split('=' * 40 + '\n')))
     assert not parts[0]
     _, ph, pdat, mh, mdat = parts
 

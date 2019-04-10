@@ -1,3 +1,4 @@
+from builtins import chr
 from unittest import TestCase
 from openid.yadis import xri
 
@@ -37,7 +38,7 @@ class XriTransformationTestCase(TestCase):
         self.failUnlessEqual(xri.toIRINormal('@example'), 'xri://@example')
 
     try:
-        unichr(0x10000)
+        chr(0x10000)
     except ValueError:
         # bleh narrow python build
         def test_iri_to_url(self):

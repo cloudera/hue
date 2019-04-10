@@ -179,7 +179,7 @@ class TestCanonicalID(unittest.TestCase):
     #   somewhere in the resolution chain.
 
     def _getCanonicalID(self, iname, xrds, expectedID):
-        if isinstance(expectedID, (str, unicode, type(None))):
+        if isinstance(expectedID, (str, type(None))):
             cid = etxrd.getCanonicalID(iname, xrds)
             self.failUnlessEqual(cid, expectedID and xri.XRI(expectedID))
         elif issubclass(expectedID, etxrd.XRDSError):

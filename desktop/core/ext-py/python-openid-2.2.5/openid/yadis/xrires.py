@@ -2,7 +2,10 @@
 """XRI resolution.
 """
 
-from urllib import urlencode
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from urllib.parse import urlencode
 from openid import fetchers
 from openid.yadis import etxrd
 from openid.yadis.xri import toURINormal
@@ -102,7 +105,7 @@ def _appendArgs(url, args):
     """
     # to be merged with oidutil.appendArgs when we combine the projects.
     if hasattr(args, 'items'):
-        args = args.items()
+        args = list(args.items())
         args.sort()
 
     if len(args) == 0:
