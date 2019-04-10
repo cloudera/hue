@@ -1797,71 +1797,80 @@ class ApiHelper {
   }
 
   /**
+   *
+   * @param {ExecutableStatement} executable
+   *
+   * @return {{snippet: string, notebook: string}}
+   */
+  static adaptExecutableToNotebook(executable) {
+    const statement = executable.getStatement();
+    const snippet = {
+      type: executable.sourceType,
+      result: {
+        handle: executable.handle
+      },
+      status: executable.status,
+      id: executable.snippetId || hueUtils.UUID(),
+      statement_raw: statement,
+      statement: statement,
+      variables: [],
+      compute: executable.compute,
+      database: executable.database,
+      properties: { settings: [] },
+    };
+
+    const notebook = {
+      type: executable.sourceType,
+      snippets: [ snippet ],
+      id: executable.notebookId,
+      name: '',
+      isSaved: false,
+      sessions: executable.sessions || []
+    };
+
+    return {
+      snippet: JSON.stringify(snippet),
+      notebook: JSON.stringify(notebook)
+    };
+  }
+
+  /**
+   * @typedef {Object} ExecutionHandle
+   * @property {string} guid
+   * @property {boolean} has_more_statements
+   * @property {boolean} has_result_set
+   * @property {Object} log_context
+   * @property {number} modified_row_count
+   * @property {number} operation_type
+   * @property {string} previous_statement_hash
+   * @property {string} secret
+   * @property {string} session_guid
+   * @property {string} statement
+   * @property {number} statement_id
+   * @property {number} statements_count
+   */
+
+  /**
    * API function to execute an ExecutableStatement
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   *
    * @param {ExecutableStatement} options.executable
-   * @param {ContextCompute} options.compute
    *
-   * @return {Promise}
+   * @return {Promise<ExecutionHandle>}
    */
-  execute(options) {
+  executeStatement(options) {
     const executable = options.executable;
     const url = EXECUTE_API_PREFIX + executable.sourceType;
     const deferred = $.Deferred();
 
-    // TODO: What do we actually need? And for what reasons....
-    const adaptNotebook2toNotebook = newModel => {
-      const snippet = {
-        id: newModel.snippetId || hueUtils.UUID(),
-        statement_raw: newModel.statement,
-        type: newModel.sourceType,
-        variables: [],
-        properties: { settings: [] },
-        statement: newModel.statement,
-        result: {
-          handle: newModel.handle
-        }
-      };
-
-      const notebook = {
-        id: newModel.notebookId,
-        type: newModel.sourceType,
-        snippets: [snippet],
-        name: '',
-        isSaved: false,
-        sessions: newModel.sessions
-      };
-
-      return {
-        notebook: JSON.stringify(notebook),
-        snippet: JSON.stringify(snippet)
-      };
-    };
-
-    this.simplePost(
-      url,
-      adaptNotebook2toNotebook({
-        compute: executable.compute,
-        statement: executable.getStatement(),
-        database: executable.database, // Not in use?
-        notebookId: executable.notebookId,
-        sessions: [], // { type: 'spark' } etc.
-        handle: executable.handle,
-        sourceType: executable.sourceType
-      }),
-      options
-    )
-      .done(response => {
-        if (response.handle) {
-          deferred.resolve(response.handle);
-        } else {
-          deferred.reject('No handle in execute response');
-        }
-      })
-      .fail(deferred.reject);
+    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable), options).done(response => {
+      if (response.handle) {
+        deferred.resolve(response.handle);
+      } else {
+        deferred.reject('No handle in execute response');
+      }
+    }).fail(deferred.reject);
 
     const promise = deferred.promise();
 
@@ -1872,7 +1881,7 @@ class ApiHelper {
           if (options.executable.handle !== handle) {
             options.executable.handle = handle;
           }
-          this.cancelExecute(options).always(cancelDeferred.resolve);
+          this.cancelStatement(options).always(cancelDeferred.resolve);
         })
         .fail(cancelDeferred.resolve);
       return cancelDeferred;
@@ -1881,30 +1890,103 @@ class ApiHelper {
     return promise;
   }
 
-  cancelExecute(options) {
-    const executable = options.executable;
+  /**
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {ExecutableStatement} options.executable
+   *
+   * @return {CancellablePromise<string>}
+   */
+  checkExecutionStatus(options) {
+    const deferred = $.Deferred();
 
-    // TODO: What do we actually need? And for what reasons....
-    const adaptNotebook2toNotebook = newModel => {
-      const snippet = {
-        type: newModel.sourceType,
-        result: {
-          handle: newModel.handle
-        }
-      };
+    let request = this.simplePost(
+      '/notebook/api/check_status',
+      ApiHelper.adaptExecutableToNotebook(options.executable),
+      options
+    ).done(response => {
+      deferred.resolve(response.query_status)
+    }).fail(deferred.reject);
 
-      return {
-        snippet: JSON.stringify(snippet)
-      };
-    };
+    return new CancellablePromise(deferred, request);
 
+  }
+
+
+  /**
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {ExecutableStatement} options.executable
+   *
+   * @return {Promise}
+   */
+  cancelStatement(options) {
     return this.simplePost(
       '/notebook/api/cancel_statement',
-      adaptNotebook2toNotebook({
+      ApiHelper.adaptExecutableToNotebook(options.executable),
+      options
+    );
+  }
+
+  /**
+   * @typedef {Object} ResultResponseMeta
+   * @property {string} comment
+   * @property {string} name
+   * @property {string} type
+   */
+
+  /**
+   * @typedef {Object} ResultResponse
+   * @property {Object[]} data
+   * @property {boolean} has_more
+   * @property {boolean} isEscaped
+   * @property {ResultResponseMeta[]} meta
+   * @property {string} type
+   */
+
+  /**
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {ExecutableStatement} options.executable
+   * @param {number} options.rows
+   * @param {boolean} options.startOver
+   *
+   * @return {Promise<ResultResponse>}
+   */
+  async fetchResults(options) {
+    return new Promise((resolve, reject) => {
+
+      const data = ApiHelper.adaptExecutableToNotebook(options.executable);
+      data.rows = options.rows;
+      data.startOver = !!options.startOver;
+
+      this.simplePost('/notebook/api/fetch_result_data', data, options).done((response) => {
+        resolve(response.result);
+      }).fail(reject);
+    })
+  }
+
+  /**
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {ExecutableStatement} options.executable
+   *
+   * @return {Promise}
+   */
+  closeStatement(options) {
+    const executable = options.executable;
+
+    return this.simplePost(
+      '/notebook/api/close_statement',
+      ApiHelper.adaptExecutableToNotebook({
         sourceType: executable.sourceType,
         handle: executable.handle
       }),
-      { silenceErrors: options.silenceErrors }
+      options
     );
   }
 

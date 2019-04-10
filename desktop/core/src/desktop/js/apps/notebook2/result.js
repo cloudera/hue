@@ -50,17 +50,9 @@ const isStringColumn = type =>
   !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
 
 class Result {
-  constructor(snippet, result) {
+  constructor(result) {
     const self = this;
 
-    $.extend(
-      snippet,
-      snippet.chartType === 'lines' && {
-        // Retire line chart
-        chartType: 'bars',
-        chartTimelineType: 'line'
-      }
-    );
     self.id = ko.observable(result.id || hueUtils.UUID());
     self.type = ko.observable(result.type || 'table');
     self.hasResultset = ko.observable(result.hasResultset !== false).extend('throttle', 100);
