@@ -16,7 +16,7 @@
 
 import { EXECUTION_STATUS, ExecutableStatement } from './executableStatement';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
-import huePubSub from "utils/huePubSub";
+import huePubSub from 'utils/huePubSub';
 
 const EXECUTION_FLOW = {
   step: 'step',
@@ -108,24 +108,28 @@ class Executor {
     return new Promise((resolve, reject) => {
       const executeBatch = () => {
         if (this.toExecute.length === 0) {
-          this.setStatus(EXECUTION_STATUS.success);
-          resolve(this.status);
+          reject();
         } else {
           this.currentExecutable = this.toExecute.shift();
           this.setStatus(EXECUTION_STATUS.running);
-          this.currentExecutable.execute().then(() => {
-            this.executed.push(this.currentExecutable);
-            this.currentExecutable = undefined;
+          this.currentExecutable
+            .execute()
+            .then(executionResult => {
+              this.executed.push(this.currentExecutable);
+              this.currentExecutable = undefined;
 
-            if (this.canExecuteNextInBatch()) {
-              this.executeNext()
-                .then(executeBatch)
-                .catch(reject);
-            } else  {
-              this.setStatus(this.toExecute.length ? EXECUTION_STATUS.ready : EXECUTION_STATUS.success);
-              resolve(this.status);
-            }
-          }).catch(reject);
+              if (this.canExecuteNextInBatch()) {
+                this.executeNext()
+                  .then(executeBatch)
+                  .catch(reject);
+              } else {
+                this.setStatus(
+                  this.toExecute.length ? EXECUTION_STATUS.ready : EXECUTION_STATUS.success
+                );
+                resolve(executionResult);
+              }
+            })
+            .catch(reject);
         }
       };
 

@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import ko from 'knockout';
 
 import hueUtils from 'utils/hueUtils';
+import huePubSub from '../../utils/huePubSub';
 
 const adaptMeta = meta => {
   meta.forEach((item, index) => {
@@ -50,7 +50,7 @@ const isStringColumn = type =>
   !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
 
 class Result {
-  constructor(result) {
+  constructor(result, snippet) {
     const self = this;
 
     self.id = ko.observable(result.id || hueUtils.UUID());
@@ -58,6 +58,7 @@ class Result {
     self.hasResultset = ko.observable(result.hasResultset !== false).extend('throttle', 100);
     self.handle = ko.observable(result.handle || {});
     self.meta = ko.observableArray(result.meta || []);
+    self.snippet = snippet;
 
     adaptMeta(self.meta());
     self.meta.subscribe(() => {
@@ -231,6 +232,103 @@ class Result {
       type: self.type,
       handle: self.handle
     };
+  }
+
+  applyResultResponse(resultResponse) {}
+
+  /**
+   *
+   * @param {ExecutionResult} executionResult
+   * @return {Promise<*>}
+   */
+  async update(executionResult) {
+    this.executionResult = executionResult;
+
+    window.setTimeout(() => {
+      this.executionResult.fetchResultSize().then(rows => {
+        console.log(rows);
+      });
+    }, 2000);
+
+    await this.fetchMoreRows(100, false);
+
+    // TODO: load additional 100 in background
+    /*
+
+     if (result.has_more && rows > 0) {
+      setTimeout(() => {
+        self.fetchResultData(rows, false);
+      }, 500);
+    } else if (
+
+     */
+  }
+
+  async fetchMoreRows(rowCount, startOver) {
+    return new Promise((resolve, reject) => {
+      if (!this.executionResult) {
+        reject();
+      }
+      this.executionResult
+        .fetchRows({
+          rows: rowCount,
+          startOver: !!startOver
+        })
+        .then(resultResponse => {
+          const initialIndex = this.data().length;
+          const tempData = [];
+
+          resultResponse.data.forEach((row, index) => {
+            row.unshift(initialIndex + index + 1);
+            this.data.push(row);
+            tempData.push(row);
+          });
+
+          if (this.rows() == null || (this.rows() + '').indexOf('+') !== -1) {
+            this.rows(this.data().length + (resultResponse.has_more ? '+' : ''));
+          }
+
+          this.images(resultResponse.images || []);
+
+          huePubSub.publish('editor.render.data', {
+            data: tempData,
+            snippet: this.snippet,
+            initial: initialIndex === 0
+          });
+
+          if (!this.fetchedOnce()) {
+            resultResponse.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
+            this.meta(resultResponse.meta);
+            this.type(resultResponse.type);
+            this.fetchedOnce(true);
+          }
+
+          this.meta().forEach(meta => {
+            switch (meta.type) {
+              case 'TINYINT_TYPE':
+              case 'SMALLINT_TYPE':
+              case 'INT_TYPE':
+              case 'BIGINT_TYPE':
+              case 'FLOAT_TYPE':
+              case 'DOUBLE_TYPE':
+              case 'DECIMAL_TYPE':
+                meta.cssClass = 'sort-numeric';
+                break;
+              case 'TIMESTAMP_TYPE':
+              case 'DATE_TYPE':
+              case 'DATETIME_TYPE':
+                meta.cssClass = 'sort-date';
+                break;
+              default:
+                meta.cssClass = 'sort-string';
+            }
+          });
+
+          this.hasMore(resultResponse.has_more);
+          resolve();
+        })
+        .catch(reject);
+    });
   }
 }
 

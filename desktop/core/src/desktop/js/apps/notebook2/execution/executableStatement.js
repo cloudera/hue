@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import apiHelper from 'api/apiHelper';
-import { ExecutionResult } from "apps/notebook2/execution/executionResult";
+import { ExecutionResult } from 'apps/notebook2/execution/executionResult';
 import hueAnalytics from 'utils/hueAnalytics';
 
 /**
@@ -38,7 +38,6 @@ const EXECUTION_STATUS = {
 };
 
 class ExecutableStatement {
-
   /**
    * @param options
    * @param {string} options.sourceType
@@ -79,38 +78,47 @@ class ExecutableStatement {
       let statusCheckCount = 0;
       let checkStatusTimeout = -1;
 
-      const checkStatus = () => new Promise( (resolve, reject) => {
-        statusCheckCount++;
-        this.lastCancellable = apiHelper.checkExecutionStatus({ executable: this }).done(queryStatus => {
-          switch (queryStatus) {
-            case 'success':
-              this.progress = 99; // TODO: why 99 here (from old code)?
-              resolve();
-              break;
-            case 'available':
-              this.progress = 100;
-              resolve();
-              break;
-            case 'expired':
-              reject();
-              break;
-            case 'running':
-            case 'starting':
-            case 'waiting':
-              checkStatusTimeout = window.setTimeout(() => {
-                checkStatus().then(resolve).catch(reject);
-              }, statusCheckCount > 45 ? 5000 : 1000);
-              break;
-            default:
-              console.warn('Got unknown status ' + queryStatus);
-              reject();
-          }
-        }).fail(reject);
+      const checkStatus = () =>
+        new Promise((statusResolve, statusReject) => {
+          statusCheckCount++;
+          this.lastCancellable = apiHelper
+            .checkExecutionStatus({ executable: this })
+            .done(queryStatus => {
+              switch (queryStatus) {
+                case 'success':
+                  this.progress = 99; // TODO: why 99 here (from old code)?
+                  statusResolve();
+                  break;
+                case 'available':
+                  this.progress = 100;
+                  statusResolve();
+                  break;
+                case 'expired':
+                  statusReject();
+                  break;
+                case 'running':
+                case 'starting':
+                case 'waiting':
+                  checkStatusTimeout = window.setTimeout(
+                    () => {
+                      checkStatus()
+                        .then(statusResolve)
+                        .catch(statusReject);
+                    },
+                    statusCheckCount > 45 ? 5000 : 1000
+                  );
+                  break;
+                default:
+                  console.warn('Got unknown status ' + queryStatus);
+                  statusReject();
+              }
+            })
+            .fail(statusReject);
 
-        this.lastCancellable.onCancel(() => {
-          window.clearTimeout(checkStatusTimeout);
-        })
-      });
+          this.lastCancellable.onCancel(() => {
+            window.clearTimeout(checkStatusTimeout);
+          });
+        });
 
       hueAnalytics.log('notebook', 'execute/' + this.sourceType);
       this.status = EXECUTION_STATUS.executing;
@@ -122,20 +130,22 @@ class ExecutableStatement {
         .done(handle => {
           this.handle = handle;
 
-          checkStatus().then(() => {
-            this.result = new ExecutionResult(this);
-            this.status = EXECUTION_STATUS.done;
-            resolve(this.result);
-          }).catch(error => {
-            this.status = EXECUTION_STATUS.fail;
-            reject(error);
-          });
+          checkStatus()
+            .then(() => {
+              this.result = new ExecutionResult(this);
+              this.status = EXECUTION_STATUS.done;
+              resolve(this.result);
+            })
+            .catch(error => {
+              this.status = EXECUTION_STATUS.fail;
+              reject(error);
+            });
         })
         .fail(error => {
           this.status = EXECUTION_STATUS.fail;
           reject(error);
         });
-    })
+    });
   }
 
   async cancel() {
@@ -153,11 +163,11 @@ class ExecutableStatement {
       }
     });
   }
-  
+
   async close() {
     return new Promise(resolve => {
       if (this.status === EXECUTION_STATUS.executing) {
-        this.cancel().finally(resolve)
+        this.cancel().finally(resolve);
       } else if (this.status === EXECUTION_STATUS.done) {
         apiHelper.closeStatement({ executable: this }).finally(resolve);
       }

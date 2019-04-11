@@ -407,6 +407,7 @@ class ApiHelper {
    * @param {function} [options.successCallback]
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   * @param {string} [options.dataType] - Default: Intelligent Guess (xml, json, script, text, html)
    *
    * @return {Promise}
    */
@@ -414,16 +415,22 @@ class ApiHelper {
     const self = this;
     const deferred = $.Deferred();
 
-    const request = $.post(url, data, data => {
-      if (self.successResponseIsError(data)) {
-        deferred.reject(self.assistErrorCallback(options)(data));
-        return;
-      }
-      if (options && options.successCallback) {
-        options.successCallback(data);
-      }
-      deferred.resolve(data);
-    }).fail(self.assistErrorCallback(options));
+    const request = $.post({
+      url: url,
+      data: data,
+      dataType: options.dataType
+    })
+      .done(data => {
+        if (self.successResponseIsError(data)) {
+          deferred.reject(self.assistErrorCallback(options)(data));
+          return;
+        }
+        if (options && options.successCallback) {
+          options.successCallback(data);
+        }
+        deferred.resolve(data);
+      })
+      .fail(self.assistErrorCallback(options));
 
     request.fail(data => {
       deferred.reject(self.assistErrorCallback(options)(data));
@@ -1816,12 +1823,12 @@ class ApiHelper {
       variables: [],
       compute: executable.compute,
       database: executable.database,
-      properties: { settings: [] },
+      properties: { settings: [] }
     };
 
     const notebook = {
       type: executable.sourceType,
-      snippets: [ snippet ],
+      snippets: [snippet],
       id: executable.notebookId,
       name: '',
       isSaved: false,
@@ -1864,13 +1871,15 @@ class ApiHelper {
     const url = EXECUTE_API_PREFIX + executable.sourceType;
     const deferred = $.Deferred();
 
-    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable), options).done(response => {
-      if (response.handle) {
-        deferred.resolve(response.handle);
-      } else {
-        deferred.reject('No handle in execute response');
-      }
-    }).fail(deferred.reject);
+    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable), options)
+      .done(response => {
+        if (response.handle) {
+          deferred.resolve(response.handle);
+        } else {
+          deferred.reject('No handle in execute response');
+        }
+      })
+      .fail(deferred.reject);
 
     const promise = deferred.promise();
 
@@ -1901,18 +1910,18 @@ class ApiHelper {
   checkExecutionStatus(options) {
     const deferred = $.Deferred();
 
-    let request = this.simplePost(
+    const request = this.simplePost(
       '/notebook/api/check_status',
       ApiHelper.adaptExecutableToNotebook(options.executable),
       options
-    ).done(response => {
-      deferred.resolve(response.query_status)
-    }).fail(deferred.reject);
+    )
+      .done(response => {
+        deferred.resolve(response.query_status.status);
+      })
+      .fail(deferred.reject);
 
     return new CancellablePromise(deferred, request);
-
   }
-
 
   /**
    *
@@ -1958,15 +1967,47 @@ class ApiHelper {
    */
   async fetchResults(options) {
     return new Promise((resolve, reject) => {
-
       const data = ApiHelper.adaptExecutableToNotebook(options.executable);
       data.rows = options.rows;
       data.startOver = !!options.startOver;
 
-      this.simplePost('/notebook/api/fetch_result_data', data, options).done((response) => {
-        resolve(response.result);
-      }).fail(reject);
-    })
+      this.simplePost(
+        '/notebook/api/fetch_result_data',
+        data,
+        {
+          silenceErrors: options.silenceErrors,
+          dataType: 'text'
+        },
+        options
+      )
+        .done(response => {
+          const data = JSON.bigdataParse(response);
+          resolve(data.result);
+        })
+        .fail(reject);
+    });
+  }
+
+  /**
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {ExecutableStatement} options.executable
+   *
+   * @return {Promise<ResultResponse>}
+   */
+  async fetchResultSize(options) {
+    return new Promise((resolve, reject) => {
+      this.simplePost(
+        '/notebook/api/fetch_result_size',
+        ApiHelper.adaptExecutableToNotebook(options.executable),
+        options
+      )
+        .done(response => {
+          resolve(response.result);
+        })
+        .fail(reject);
+    });
   }
 
   /**
