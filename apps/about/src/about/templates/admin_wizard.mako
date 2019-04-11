@@ -77,7 +77,7 @@ ${ layout.menubar(section='quick_start') }
             % if CONNECTORS.IS_ENABLED.get():
               <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Configure') }</a>
             % else:
-              <a href=" url('desktop.views.dump_config') " target="_blank">${ _('Configuration') }</a>
+              <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>
               <br>
               <a href="http://gethue.com" target="_blank"> ${ _('Documentation') }</a>
             % endif

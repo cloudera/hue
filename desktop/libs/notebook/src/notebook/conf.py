@@ -37,7 +37,7 @@ def _remove_duplications(a_list):
 
 def check_permissions(user, interpreter):
   user_apps = appmanager.get_apps_dict(user)
-  return (interpreter == 'hive' and 'beeswax' not in user_apps) or \
+  return (interpreter == 'hive' and 'hive' not in user_apps) or \
          (interpreter == 'impala' and 'impala' not in user_apps) or \
          (interpreter == 'pig' and 'pig' not in user_apps) or \
          (interpreter == 'solr' and 'search' not in user_apps) or \
