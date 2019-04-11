@@ -678,3 +678,40 @@ jQuery.fn.highlight = function(words, options) {
         jQuery.highlight(this, re, settings.element, settings.className);
     });
 };
+
+$(window).on('DOMContentLoaded load resize scroll', function () {
+  function isElementInViewport (el) {
+
+    var rect     = el.getBoundingClientRect(),
+        vWidth   = window.innerWidth || doc.documentElement.clientWidth,
+        vHeight  = window.innerHeight || doc.documentElement.clientHeight,
+        efp      = function (x, y) { return document.elementFromPoint(x, y) };
+
+    // Return false if it's not in the viewport
+    if (rect.right < 0 || rect.bottom < 0
+            || rect.left > vWidth || rect.top > vHeight)
+        return false;
+
+    // Return true if any of its four corners are visible
+    return (
+          el.contains(efp(rect.left,  rect.top))
+      ||  el.contains(efp(rect.right, rect.top))
+      ||  el.contains(efp(rect.right, rect.bottom))
+      ||  el.contains(efp(rect.left,  rect.bottom))
+    );
+  }
+  var visible = 0;
+  $('#body-inner h1, #body-inner h2, #body-inner h3, #body-inner h4, #body-inner h5, #body-inner h6').each(function (i,e) {
+    if(isElementInViewport(e)) {
+      visible = $(e).attr('id');
+      if (visible) {
+        return false;
+      }
+    }
+  });
+
+  if(visible){
+    $('.toc ul li a').removeClass('active');
+    $('.toc ul li a[href="#'+visible+'"]').addClass('active');
+  }
+});

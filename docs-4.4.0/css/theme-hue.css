@@ -101,3 +101,33 @@ a:hover {
 #sidebar hr {
     border-color: var(--MENU-SECTION-HR-color);
 }
+
+.toc {
+  position: fixed;
+  top: 100px;
+  right: 0;
+  width: auto;
+  border-left: thin solid #ccc;
+}
+.toc .wrapper{
+  margin-left: 20px;
+}
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 5px;
+}
+.toc ul li a {
+  color: var(--MENU-SECTIONS-LINK-color);;
+}
+.toc h1, .toc h2, .toc h3, .toc h4, .toc h5, .toc h6 {
+  font-family: "Novacento Sans Wide", "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif;
+  color: #222;
+}
+.toc ul li a.active {
+  color: var(--MENU-SECTION-ACTIVE-CATEGORY-color);
+}
+
+.toc header {
+  padding-right: 15px;
+}
