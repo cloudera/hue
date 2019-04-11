@@ -22,14 +22,15 @@ from django.utils.translation import ugettext as _
 from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
+from desktop.conf import CONNECTORS
 from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonheader(_('Quick Start'), "quickstart", user, request, "70px") | n,unicode }
-%endif
+% endif
 
 ${ layout.menubar(section='quick_start') }
 
@@ -44,14 +45,13 @@ ${ layout.menubar(section='quick_start') }
       </h1>
 
      % if is_admin(user):
-
       <div class="margin-bottom-30">
          <div class="row-fluid">
 
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
-              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-icon-exchange"></i> ${ _('Connectors') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 1:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
               <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
               <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
             </ul>
@@ -73,7 +73,12 @@ ${ layout.menubar(section='quick_start') }
           </div>
 
           <div id="step2" class="stepDetails hide">
-
+            <h3>${ _('Configure connectors to data services') }</h3>
+            % if CONNECTORS.IS_ENABLED.get():
+              <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Connectors') }</a>
+            % else:
+              <a href="http://gethue.com" target="_blank"><i class="fa fa-exchange"></i> ${ _('Connectors') }</a>
+            % endif
           </div>
 
           <div id="step3" class="stepDetails hide">
@@ -201,7 +206,7 @@ ${ layout.menubar(section='quick_start') }
           </div>
           </div>
 
-          </div>
+        </div>
       </div>
       <div class="card-body">
         <div class="form-actions">
