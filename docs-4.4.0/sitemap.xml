@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://cloudera.github.io/hue/latest/releases/release-notes-4.4.0/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/latest/releases/release-notes-4.3.0/</loc>
     <lastmod>2019-03-13T18:28:08-07:00</lastmod>
   </url>
@@ -48,7 +53,22 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/latest/releases/release-notes-3.7.0/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://cloudera.github.io/hue/latest/releases/release-notes-3.6.0/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/latest/releases/release-notes-3.5.0/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://cloudera.github.io/hue/latest/releases/release-notes-3.0.0/</loc>
     <lastmod>2019-03-13T18:28:08-07:00</lastmod>
   </url>
   
@@ -213,6 +233,11 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/latest/developer/browsers/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/latest/administrator/configuration/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
@@ -238,6 +263,11 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/latest/developer/</loc>
+    <lastmod>2019-03-13T18:27:26-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/latest/administrator/administration/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
@@ -255,6 +285,11 @@
   <url>
     <loc>http://cloudera.github.io/hue/latest/administrator/configuration/files/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://cloudera.github.io/hue/latest/administrator/installation/starting/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
   </url>
   
   <url>
@@ -284,11 +319,6 @@
   
   <url>
     <loc>http://cloudera.github.io/hue/latest/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://cloudera.github.io/hue/latest/developer/</loc>
     <priority>0</priority>
   </url>
   

@@ -1128,3 +1128,19 @@ pre .copy-to-clipboard:hover {
 #searchResults {
     text-align: left;
 }
+
+.toc {
+  position: fixed;
+  top: 100px;
+  right: 0;
+  width: auto;
+  border-left: thin solid #ccc;
+}
+.toc .wrapper{
+  margin-left: 20px;
+}
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 5px;
+}
