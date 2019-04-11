@@ -73,11 +73,13 @@ ${ layout.menubar(section='quick_start') }
           </div>
 
           <div id="step2" class="stepDetails hide">
-            <h3>${ _('Configure connectors to data services') }</h3>
+            <h3>${ _('Connectors to data services') }</h3>
             % if CONNECTORS.IS_ENABLED.get():
-              <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Connectors') }</a>
+              <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Configure') }</a>
             % else:
-              <a href="http://gethue.com" target="_blank"><i class="fa fa-exchange"></i> ${ _('Connectors') }</a>
+              <a href=" url('desktop.views.dump_config') " target="_blank">${ _('Configuration') }</a>
+              <br>
+              <a href="http://gethue.com" target="_blank"> ${ _('Documentation') }</a>
             % endif
           </div>
 
