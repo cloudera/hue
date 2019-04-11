@@ -732,7 +732,7 @@ class Snippet {
       }
     );
 
-    self.result = new Result(snippet.result);
+    self.result = new Result(snippet.result, self);
     if (!self.result.hasSomeResults()) {
       self.currentQueryTab('queryHistory');
     }
@@ -841,7 +841,6 @@ class Snippet {
     self.chartType.subscribe(() => {
       $(document).trigger('forceChartDraw', self);
     });
-
 
     self.previousChartOptions = {};
 
@@ -1112,7 +1111,7 @@ class Snippet {
 
     huePubSub.subscribe('hue.executor.progress.updated', executor => {
       updateExecutorObservable(executor, 'progress');
-    })
+    });
   }
 
   ace(newVal) {
@@ -1347,6 +1346,10 @@ class Snippet {
 
     this.currentQueryTab('queryHistory');
 
+    if (this.executor && this.executor.isRunning()) {
+      this.executor.cancel();
+    }
+
     this.executor = new Executor({
       compute: this.compute(),
       database: this.database(),
@@ -1354,7 +1357,16 @@ class Snippet {
       namespace: this.namespace(),
       statement: this.statement(),
       isSqlEngine: this.isSqlDialect()
-    }).executeNext();
+    });
+
+    this.executor.executeNext().then(executionResult => {
+      this.stopLongOperationTimeout();
+      this.result.update(executionResult).then(() => {
+        if (this.result.data().length) {
+          this.currentQueryTab('queryResults');
+        }
+      });
+    });
   }
 
   explain() {
@@ -1436,59 +1448,56 @@ class Snippet {
     });
   }
 
+  // TODO: Switch to result.fetchMoreRows in ko mako
   fetchResult(rows, startOver) {
-    const self = this;
-    if (typeof startOver === 'undefined') {
-      startOver = true;
-    }
-    self.fetchResultData(rows, startOver);
-    //self.fetchResultMetadata(rows);
+    this.result.fetchMoreRows(rows, startOver);
   }
 
-  fetchResultData(rows, startOver) {
-    const self = this;
-    if (!self.isFetchingData) {
-      if (self.status() === STATUS.available) {
-        self.startLongOperationTimeout();
-        self.isFetchingData = true;
-        hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
-        $.post(
-          '/notebook/api/fetch_result_data',
-          {
-            notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-            snippet: komapping.toJSON(self.getContext()),
-            rows: rows,
-            startOver: startOver
-          },
-          data => {
-            self.stopLongOperationTimeout();
-            data = JSON.bigdataParse(data);
-            if (data.status === 0) {
-              self.showExecutionAnalysis(true);
-              self.loadData(data.result, rows);
-            } else {
-              self.handleAjaxError(data, () => {
-                self.isFetchingData = false;
-                self.fetchResultData(rows, startOver);
-              });
-              $(document).trigger('renderDataError', { snippet: self });
-            }
-          },
-          'text'
-        )
-          .fail(xhr => {
-            if (xhr.status !== 502) {
-              $(document).trigger('error', xhr.responseText);
-            }
-          })
-          .always(() => {
-            self.isFetchingData = false;
-          });
-      } else {
-        huePubSub.publish('editor.snippet.result.normal', self);
-      }
-    }
-  }
+  // fetchResultData(rows, startOver) {
+  //   console.log('fetchResultData');
+  //   const self = this;
+  //   if (!self.isFetchingData) {
+  //     if (self.status() === STATUS.available) {
+  //       self.startLongOperationTimeout();
+  //       self.isFetchingData = true;
+  //       hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
+  //       $.post(
+  //         '/notebook/api/fetch_result_data',
+  //         {
+  //           notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+  //           snippet: komapping.toJSON(self.getContext()),
+  //           rows: rows,
+  //           startOver: startOver
+  //         },
+  //         data => {
+  //           self.stopLongOperationTimeout();
+  //           data = JSON.bigdataParse(data);
+  //           if (data.status === 0) {
+  //             self.showExecutionAnalysis(true);
+  //             self.loadData(data.result, rows);
+  //           } else {
+  //             self.handleAjaxError(data, () => {
+  //               self.isFetchingData = false;
+  //               self.fetchResultData(rows, startOver);
+  //             });
+  //             $(document).trigger('renderDataError', { snippet: self });
+  //           }
+  //         },
+  //         'text'
+  //       )
+  //         .fail(xhr => {
+  //           if (xhr.status !== 502) {
+  //             $(document).trigger('error', xhr.responseText);
+  //           }
+  //         })
+  //         .always(() => {
+  //           self.isFetchingData = false;
+  //         });
+  //     } else {
+  //       huePubSub.publish('editor.snippet.result.normal', self);
+  //     }
+  //   }
+  // }
 
   fetchResultMetadata() {
     const self = this;
@@ -1927,77 +1936,26 @@ class Snippet {
     }
   }
 
-  loadData(result, rows) {
-    const self = this;
-    rows -= result.data.length;
-
-    if (result.data.length > 0) {
-      self.currentQueryTab('queryResults');
-    }
-
-    const _initialIndex = self.result.data().length;
-    const _tempData = [];
-    $.each(result.data, (index, row) => {
-      row.unshift(_initialIndex + index + 1);
-      self.result.data.push(row);
-      _tempData.push(row);
-    });
-
-    if (self.result.rows() == null || (self.result.rows() + '').indexOf('+') !== -1) {
-      self.result.rows(self.result.data().length + (result.has_more ? '+' : ''));
-    }
-
-    self.result.images(
-      typeof result.images != 'undefined' && result.images != null ? result.images : []
-    );
-
-    huePubSub.publish('editor.render.data', {
-      data: _tempData,
-      snippet: self,
-      initial: _initialIndex === 0
-    });
-
-    if (!self.result.fetchedOnce()) {
-      result.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
-      self.result.meta(result.meta);
-      self.result.type(result.type);
-      self.result.fetchedOnce(true);
-    }
-
-    self.result.meta().forEach(meta => {
-      if (
-        [
-          'TINYINT_TYPE',
-          'SMALLINT_TYPE',
-          'INT_TYPE',
-          'BIGINT_TYPE',
-          'FLOAT_TYPE',
-          'DOUBLE_TYPE',
-          'DECIMAL_TYPE'
-        ].indexOf(meta.type) !== -1
-      ) {
-        meta.cssClass = 'sort-numeric';
-      } else if (['TIMESTAMP_TYPE', 'DATE_TYPE', 'DATETIME_TYPE'].indexOf(meta.type) !== -1) {
-        meta.cssClass = 'sort-date';
-      } else {
-        meta.cssClass = 'sort-string';
-      }
-    });
-
-    self.result.hasMore(result.has_more);
-
-    if (result.has_more && rows > 0) {
-      setTimeout(() => {
-        self.fetchResultData(rows, false);
-      }, 500);
-    } else if (
-      !self.parentVm.editorMode() &&
-      !self.parentNotebook.isPresentationMode() &&
-      self.parentNotebook.snippets()[self.parentNotebook.snippets().length - 1] === self
-    ) {
-      self.parentNotebook.newSnippet();
-    }
-  }
+  // loadData(result, rows) {
+  //   const self = this;
+  //   rows -= result.data.length;
+  //
+  //   if (result.data.length > 0) {
+  //     self.currentQueryTab('queryResults');
+  //   }
+  //
+  //   if (result.has_more && rows > 0) {
+  //     setTimeout(() => {
+  //       self.fetchResultData(rows, false);
+  //     }, 500);
+  //   } else if (
+  //     !self.parentVm.editorMode() &&
+  //     !self.parentNotebook.isPresentationMode() &&
+  //     self.parentNotebook.snippets()[self.parentNotebook.snippets().length - 1] === self
+  //   ) {
+  //     self.parentNotebook.newSnippet();
+  //   }
+  // }
 
   nextQueriesPage() {
     const self = this;

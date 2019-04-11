@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import apiHelper from 'api/apiHelper';
-import hueAnalytics from 'utils/hueAnalytics';
 
 /**
  *  available +----> fetching +----> done
@@ -38,7 +37,6 @@ const RESULT_STATUS = {
 };
 
 class ExecutionResult {
-
   /**
    *
    * @param {ExecutableStatement} executable
@@ -46,6 +44,24 @@ class ExecutionResult {
   constructor(executable) {
     this.executable = executable;
     this.status = executable.handle.has_result_set ? RESULT_STATUS.available : RESULT_STATUS.done;
+  }
+
+  async fetchResultSize(options) {
+    return new Promise((resolve, reject) => {
+      if (this.status === RESULT_STATUS.fail) {
+        reject();
+        return;
+      }
+      apiHelper
+        .fetchResultSize({
+          executable: this.executable
+        })
+        .then(resultSizeResponse => {
+          console.log(resultSizeResponse);
+          resolve(resultSizeResponse);
+        })
+        .catch(reject);
+    });
   }
 
   /**
@@ -57,30 +73,33 @@ class ExecutionResult {
    *
    * @return {Promise}
    */
-  async fetch(options) {
+  async fetchRows(options) {
     return new Promise((resolve, reject) => {
       if (this.status !== RESULT_STATUS.available) {
         reject();
         return;
       }
       this.status = RESULT_STATUS.fetching;
-      apiHelper.fetchResults({
-        executable: this.executable,
-        rows: options.rows,
-        startOver: !!options.startOver
-      }).then((resultResponse) => {
-        if (resultResponse.has_more) {
-          this.status = RESULT_STATUS.available;
-        } else {
-          this.status = RESULT_STATUS.done;
-        }
-        console.log(resultResponse);
-        resolve(resultResponse);
-      }).catch((error) => {
-        this.status = RESULT_STATUS.fail;
-        reject(error);
-      })
-    })
+      apiHelper
+        .fetchResults({
+          executable: this.executable,
+          rows: options.rows,
+          startOver: !!options.startOver
+        })
+        .then(resultResponse => {
+          if (resultResponse.has_more) {
+            this.status = RESULT_STATUS.available;
+          } else {
+            this.status = RESULT_STATUS.done;
+          }
+          console.log(resultResponse);
+          resolve(resultResponse);
+        })
+        .catch(error => {
+          this.status = RESULT_STATUS.fail;
+          reject(error);
+        });
+    });
   }
 }
 

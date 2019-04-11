@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
+
 import ApiHelper from 'api/apiHelper';
 import { STATUS } from '../executableStatement';
 import Executor from '../executor';

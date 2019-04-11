@@ -14,15 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EXECUTION_STATUS, ExecutableStatement } from './executableStatement';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
-import huePubSub from "utils/huePubSub";
+const knownSessions = {};
 
-const knownSessions {
-  impala: {...},
-  presto: {...}
+class SessionManager {
+  constructor() {
+    console.warn('Not implemented yet.');
+  }
+
+  getSessions(interpreter) {
+    return knownSessions[interpreter];
+  }
 }
 
-getSession(interpreter) {
-
-}
+export default SessionManager;
