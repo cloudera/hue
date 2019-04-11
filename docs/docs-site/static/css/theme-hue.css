@@ -127,3 +127,7 @@ a:hover {
 .toc ul li a.active {
   color: var(--MENU-SECTION-ACTIVE-CATEGORY-color);
 }
+
+.toc header {
+  padding-right: 15px;
+}
