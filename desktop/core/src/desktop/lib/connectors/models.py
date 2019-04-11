@@ -23,16 +23,18 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-class Connectors(models.Model):
-  type = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive-tez, '))  # Must be in lib
+# TODO: persistence and migrations
 
-  name = models.CharField(default='', max_length=255)
-  description = models.TextField(default='')
-  uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
+# class Connectors(models.Model):
+#   type = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive-tez, '))  # Must be in lib
 
-  category = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. query, browser, catalog...'))
-  interface = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hiveserver2'))
+#   name = models.CharField(default='', max_length=255)
+#   description = models.TextField(default='')
+#   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
 
-  settings = models.TextField(default='{}')
+#   category = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. query, browser, catalog...'))
+#   interface = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hiveserver2'))
 
-  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
+#   settings = models.TextField(default='{}')
+
+#   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))

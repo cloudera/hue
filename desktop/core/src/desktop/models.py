@@ -1584,12 +1584,6 @@ class ClusterConfig():
     editors = app_config.get('editor')
     main_button_action = self.get_main_quick_action(app_config)
 
-    # Actually same references in editors
-    interpreters = [interpreter for interpreter in editors['interpreters'] if not interpreter['is_catalog']]
-    interpreter_names = [interpreter['type'] for interpreter in interpreters]
-    editors['interpreters'] = interpreters
-    editors['interpreter_names'] = interpreter_names
-
     if main_button_action.get('is_sql'):
       default_sql_interpreter = main_button_action['type']
     else:
@@ -1677,7 +1671,6 @@ class ClusterConfig():
         'tooltip': _('%s Query') % interpreter['type'].title(),
         'page': '/editor/?type=%(type)s' % interpreter,
         'is_sql': interpreter['is_sql'],
-        'is_catalog': interpreter['is_catalog']
       })
 
     if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
@@ -1693,7 +1686,6 @@ class ClusterConfig():
         'tooltip': _('Notebook'),
         'page': '/notebook',
         'is_sql': False,
-        'is_catalog': False
       })
 
     if interpreters:
