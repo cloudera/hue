@@ -92,7 +92,8 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "hms"],
+      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
+      "is_catalog": i['interface'] in ["hms",],
     }
     for i in reordered_interpreters
   ]

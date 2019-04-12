@@ -1608,6 +1608,7 @@ class ClusterConfig():
     apps = OrderedDict([app for app in [
       ('editor', self._get_editor()),
       ('dashboard', self._get_dashboard()),
+      ('catalogs', self._get_catalogs()),
       ('browser', self._get_browser()),
       ('scheduler', self._get_scheduler()),
       ('sdkapps', self._get_sdk_apps()),
@@ -1663,15 +1664,16 @@ class ClusterConfig():
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala')] #, 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
-      interpreters.append({
-        'name': interpreter['name'],
-        'type': interpreter['type'],
-        'displayName': interpreter['name'],
-        'buttonName': _('Query'),
-        'tooltip': _('%s Query') % interpreter['type'].title(),
-        'page': '/editor/?type=%(type)s' % interpreter,
-        'is_sql': interpreter['is_sql'],
-      })
+      if interpreter['interface'] != 'hms':
+        interpreters.append({
+          'name': interpreter['name'],
+          'type': interpreter['type'],
+          'displayName': interpreter['name'],
+          'buttonName': _('Query'),
+          'tooltip': _('%s Query') % interpreter['type'].title(),
+          'page': '/editor/?type=%(type)s' % interpreter,
+          'is_sql': interpreter['is_sql'],
+        })
 
     if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
       try:
@@ -1700,6 +1702,26 @@ class ClusterConfig():
       }
     else:
       return None
+
+  def _get_catalogs(self):
+    interpreters = []
+
+    _interpreters = get_ordered_interpreters(self.user)
+
+    for interpreter in _interpreters:
+      if interpreter['interface'] == 'hms':
+        interpreters.append({
+          'name': interpreter['name'],
+          'type': interpreter['type'],
+          'displayName': interpreter['name'],
+          'buttonName': _('Query'),
+          'tooltip': _('%s Query') % interpreter['type'].title(),
+          'page': '/editor/?type=%(type)s' % interpreter,
+          'is_sql': interpreter['is_sql'],
+          'is_catalog': interpreter['is_catalog'],
+        })
+
+    return interpreters if interpreters else None
 
   def _get_dashboard(self):
     interpreters = get_engines(self.user)
