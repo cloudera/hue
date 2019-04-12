@@ -131,7 +131,3 @@ a:hover {
 .toc header {
   padding-right: 15px;
 }
-
-#body-inner {
-  width: calc(100% - 300px);
-}
