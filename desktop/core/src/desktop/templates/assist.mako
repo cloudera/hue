@@ -1297,10 +1297,20 @@ from desktop.views import _ko
 
         if (self.sourceIndex['solr']) {
           huePubSub.subscribe('assist.collections.refresh', function() {
-            var namespace = self.sourceIndex['solr'].selectedNamespace();
-            dataCatalog.getEntry({ sourceType: 'solr', namespace: namespace, compute: namespace.compute(), path: [] }).done(function (entry) {
-              entry.clearCache({ cascade: true });
-            });
+            var solrSource = self.sourceIndex['solr'];
+            var doRefresh = function () {
+              if (solrSource.selectedNamespace()) {
+                var assistDbNamespace = solrSource.selectedNamespace();
+                dataCatalog.getEntry({ sourceType: 'solr', namespace: assistDbNamespace.namespace, compute: assistDbNamespace.compute(), path: [] }).done(function (entry) {
+                  entry.clearCache({ cascade: true });
+                });
+              }
+            };
+            if (!solrSource.hasNamespaces()) {
+              solrSource.loadNamespaces(true).done(doRefresh);
+            } else {
+              doRefresh();
+            }
           });
         }
 
