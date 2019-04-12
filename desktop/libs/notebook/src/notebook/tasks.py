@@ -333,7 +333,6 @@ def _close_statement_async_id(notebook):
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()
   request.POST = postdict
-  LOG.info('fetching user with id ' + user_id)
   user = User.objects.get(id=user_id)
   user = rewrite_user(user)
   request.user = user
