@@ -70,7 +70,7 @@
   ## django_server_email='hue@localhost.localdomain'
 
   # Email backend
-  ## django_email_backend=django.core.mail.backends.smtp.EmailBackend
+  django_email_backend=django.core.mail.backends.console.EmailBackend
 
   # Set to true to use CherryPy as the webserver, set to false
   # to use Gunicorn as the webserver. Defaults to CherryPy if
@@ -304,9 +304,9 @@
   # Administrators
   # ----------------
   [[django_admins]]
-    ## [[[admin1]]]
-    ## name=john
-    ## email=john@doe.com
+    [[[admin-1]]]
+     name=Hue
+     email=hue@localhost.com
 
   # UI customizations
   # -------------------
