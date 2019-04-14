@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import logging
 import math
@@ -22,9 +23,13 @@ import numbers
 import urllib
 import uuid
 
+from datetime import timedelta
+
+from django.contrib.auth.models import User
 from django.utils.html import escape
 
 from desktop.lib.i18n import smart_unicode
+from desktop.models import Document2
 
 from notebook.connectors.base import Notebook
 
@@ -459,3 +464,24 @@ def _update_property_value(properties, key, value):
   for prop in properties:
     if prop['key'] == key:
       prop.update({'value': value})
+
+
+class Anaytics():
+
+  @classmethod
+  def admin_stats(self):
+    stats = []
+    one_week = datetime.date.today() - timedelta(weeks=1)
+    one_month = datetime.date.today() - timedelta(days=30)
+    three_months = datetime.date.today() - timedelta(days=90)
+
+    stats.append(('Last modified', '1 week'))
+    stats.append(('Users', User.objects.filter(last_login__gte=one_week).count()))
+    stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_week, is_history=True, type__startswith='query-').count()))
+    stats.append(('Saved queries', Document2.objects.filter(last_modified__gte=one_week, is_history=False, type__startswith='query-').count()))
+
+    stats.append(('\nAll', ''))
+    stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
+    stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
+
+    return stats
