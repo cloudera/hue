@@ -1099,18 +1099,13 @@ class Snippet {
 
     self.executor = undefined;
 
-    const updateExecutorObservable = (executor, name) => {
-      if (executor === self.executor && self[name]() !== executor[name]) {
-        self[name](executor[name]);
+    huePubSub.subscribe('hue.executor.updated', details => {
+      const executable = details.executable;
+
+      if (details.executor === self.executor) {
+        self.status(executable.status);
+        self.progress(executable.progress);
       }
-    };
-
-    huePubSub.subscribe('hue.executor.status.updated', executor => {
-      updateExecutorObservable(executor, 'status');
-    });
-
-    huePubSub.subscribe('hue.executor.progress.updated', executor => {
-      updateExecutorObservable(executor, 'progress');
     });
   }
 

@@ -84,18 +84,19 @@ class Executor {
       this.toExecute.push(new ExecutableStatement(options));
     }
 
-    this.setStatus(EXECUTION_STATUS.ready);
-    this.setProgress(0);
-  }
-
-  setStatus(status) {
-    this.status = status;
-    huePubSub.publish('hue.executor.status.updated', this);
-  }
-
-  setProgress(progress) {
-    this.progress = progress;
-    huePubSub.publish('hue.executor.progress.updated', this);
+    huePubSub.subscribe('hue.executable.updated', executable => {
+      if (
+        executable === this.currentExecutable ||
+        this.executed.some(executed => {
+          executed === executable;
+        })
+      ) {
+        huePubSub.publish('hue.executor.updated', {
+          executable: executable,
+          executor: this
+        });
+      }
+    });
   }
 
   isRunning() {
@@ -104,7 +105,6 @@ class Executor {
 
   async cancel() {
     if (this.isRunning()) {
-      this.setStatus(EXECUTION_STATUS.canceling);
       return await this.currentExecutable.cancel();
     }
   }
@@ -116,7 +116,6 @@ class Executor {
           reject();
         } else {
           this.currentExecutable = this.toExecute.shift();
-          this.setStatus(EXECUTION_STATUS.running);
           this.currentExecutable
             .execute()
             .then(executionResult => {
@@ -128,9 +127,6 @@ class Executor {
                   .then(executeBatch)
                   .catch(reject);
               } else {
-                this.setStatus(
-                  this.toExecute.length ? EXECUTION_STATUS.ready : EXECUTION_STATUS.success
-                );
                 resolve(executionResult);
               }
             })
