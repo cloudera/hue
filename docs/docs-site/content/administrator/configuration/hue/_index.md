@@ -252,7 +252,7 @@ Read more about [Auditing User Administration Operations with Hue and Cloudera N
 
 ## Source Version Control
 
-By default Hue stores the [saved documents](/user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
+By default Hue stores the [saved documents]({{% param baseURL %}}user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
 
 **Note** This feature is experiemental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
 

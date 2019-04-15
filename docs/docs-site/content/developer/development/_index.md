@@ -12,7 +12,7 @@ This section goes into greater detail on how to build and reuse the components o
 
 ### Dependencies
 
-* The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
+* The OS specific install instructions are listed in the [install guide]({{% param baseURL %}}administrator/installation/dependencies/)
 * Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * Django (1.11 already included in the distribution)
 * Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
