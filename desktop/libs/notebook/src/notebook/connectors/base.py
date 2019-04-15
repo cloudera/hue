@@ -18,6 +18,7 @@
 import json
 import logging
 import re
+import time
 import uuid
 
 from django.utils.translation import ugettext as _
