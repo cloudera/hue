@@ -23,8 +23,8 @@ from desktop.lib.connectors import views, api
 urlpatterns = [
   url(r'^$', views.index, name='desktop.lib.connectors.views.index'),
 
-  url(r'^api/instances/?$', api.connectors, name='connectors.api.connectors'),
-  url(r'^api/types/?$', api.connector_types, name='connectors.api.connector_types'),
+  url(r'^api/types/?$', api.get_connector_classes, name='connectors.api.get_connector_classes'),
+  url(r'^api/instances/?$', api.get_installed_connectors, name='connectors.api.get_installed_connectors'),
 
   url(r'^api/instance/new/(?P<type>[\w\-]+)$', api.new_connector, name='connectors.api.new_connector'),
   url(r'^api/instance/get/(?P<id>\d+)$', api.get_connector, name='connectors.api.get_connector'),
