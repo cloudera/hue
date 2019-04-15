@@ -7,12 +7,12 @@ weight: 5
 
 ## Data Catalog
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsers/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog]({{% param baseURL %}}user/browsers/).
 
 
 ## Query Optimization
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor](/user/editor/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor]({{% param baseURL %}}user/editor/).
 
 ## YARN Cluster
 

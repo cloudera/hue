@@ -6,7 +6,7 @@ weight: 1
 ---
 
 The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
-It has one of the best SQL autocomplete and many [more features](/user/editor/).
+It has one of the best SQL autocomplete and many [more features]({{% param baseURL %}}administrator/configuration/editor/).
 
 It is available in Editor or Notebook. Dialects can be added to the main `[notebook]` section like this:
 
@@ -710,7 +710,7 @@ Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
 
 ### Custom
 
-A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/editor/).
+A series of native connectors interacting with the editor have been developed and are listed in the [developer section]({{% param baseURL %}}developer/editor/).
 
 ### JDBC
 

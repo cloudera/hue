@@ -10,7 +10,7 @@ are pretty functional and should still fit your needs. Any [contribution](https:
 
 ## SDK
 
-Check the [Developer guide](/developer/index.html) or contact the community about how to build your own custom app.
+Check the [Developer guide]({{% param baseURL %}}developer/index.html) or contact the community about how to build your own custom app.
 
 ## HBase Browser
 
