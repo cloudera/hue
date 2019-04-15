@@ -245,14 +245,15 @@ class Result {
    */
   async update(executionResult) {
     this.executionResult = executionResult;
-
-    window.setTimeout(() => {
-      this.executionResult.fetchResultSize().then(rows => {
-        console.log(rows);
-      });
-    }, 2000);
+    this.handle(this.executionResult.executable.handle);
 
     await this.fetchMoreRows(100, false);
+
+    window.setTimeout(() => {
+      this.executionResult.fetchResultSize().then(resultSize => {
+        this.rows(resultSize.rows);
+      });
+    }, 2000);
 
     // TODO: load additional 100 in background
     /*

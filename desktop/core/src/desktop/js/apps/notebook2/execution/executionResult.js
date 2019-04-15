@@ -52,15 +52,29 @@ class ExecutionResult {
         reject();
         return;
       }
-      apiHelper
-        .fetchResultSize({
-          executable: this.executable
-        })
-        .then(resultSizeResponse => {
-          console.log(resultSizeResponse);
-          resolve(resultSizeResponse);
-        })
-        .catch(reject);
+
+      let attempts = 0;
+      const waitForRows = () => {
+        attempts++;
+        if (attempts < 10) {
+          apiHelper
+            .fetchResultSize({
+              executable: this.executable
+            })
+            .then(resultSizeResponse => {
+              if (resultSizeResponse.rows !== null) {
+                resolve(resultSizeResponse);
+              } else {
+                window.setTimeout(waitForRows, 1000);
+              }
+            })
+            .catch(reject);
+        } else {
+          reject();
+        }
+      };
+
+      waitForRows();
     });
   }
 
@@ -92,7 +106,6 @@ class ExecutionResult {
           } else {
             this.status = RESULT_STATUS.done;
           }
-          console.log(resultResponse);
           resolve(resultResponse);
         })
         .catch(error => {
