@@ -411,7 +411,6 @@ textarea:focus, input[type="email"]:focus, input[type="number"]:focus, input[typ
     right: 0;
 }
 #body-inner {
-    width: calc(100% - 300px);
     margin-bottom: 5rem;
 }
 #chapter {
