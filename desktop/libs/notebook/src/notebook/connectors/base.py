@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import json
 import logging
 import re
@@ -29,6 +28,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
 from notebook.conf import get_ordered_interpreters, CONNECTORS
+from notebook.sql_utils import get_current_statement
 
 
 LOG = logging.getLogger(__name__)
@@ -530,6 +530,16 @@ class Api(object):
   def describe_database(self, notebook, snippet, database=None):
     return {}
 
+  def _get_current_statement(self, notebook, snippet):
+    should_close, resp = get_current_statement(snippet)
+    if should_close:
+      try:
+        self.close_statement(notebook, snippet)  # Close all the time past multi queries
+      except:
+        LOG.warn('Could not close previous multiquery query')
+
+    return resp
+
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
@@ -546,7 +556,7 @@ class ResultWrapper():
 
   def fetch(self, start_over=None, rows=None):
     if start_over:
-      if not self.snippet['result']['handle'] or not self.api.can_start_over(self.notebook, self.snippet):
+      if not self.snippet['result']['handle'] or not self.snippet['result']['handle'].get('guid') or not self.api.can_start_over(self.notebook, self.snippet):
         start_over = False
         handle = self.api.execute(self.notebook, self.snippet)
         self.snippet['result']['handle'] = handle

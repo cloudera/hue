@@ -74,7 +74,7 @@ from beeswax.conf import HIVE_SERVER_HOST, AUTH_USERNAME, AUTH_PASSWORD, AUTH_PA
 from beeswax.views import collapse_whitespace, _save_design, parse_out_jobs
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   fetch_query_result_data
-from beeswax.design import hql_query, strip_trailing_semicolon
+from beeswax.design import hql_query
 from beeswax.data_export import upload, download
 from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
 from beeswax.server import dbms
@@ -2184,19 +2184,6 @@ def test_history_page():
   do_view('q-user=:all')
 
 
-def teststrip_trailing_semicolon():
-  # Note that there are two queries (both an execute and an explain) scattered
-  # in this file that use semicolons all the way through.
-
-  # Single semicolon
-  assert_equal("foo", strip_trailing_semicolon("foo;\n"))
-  assert_equal("foo\n", strip_trailing_semicolon("foo\n;\n\n\n"))
-  # Multiple semicolons: strip only last one
-  assert_equal("fo;o;", strip_trailing_semicolon("fo;o;;     "))
-  # No semicolons
-  assert_equal("foo", strip_trailing_semicolon("foo"))
-
-
 def test_hadoop_extraction():
   sample_log = """
 Starting Job = job_201003191517_0002, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201003191517_0002
@@ -2348,14 +2335,6 @@ def test_search_log_line():
     """
   assert_false(search_log_line('FAILED: Parse Error', logs))
 
-
-def test_split_statements():
-  assert_equal([''], hql_query(";;;").statements)
-  assert_equal(["select * where id == '10'"], hql_query("select * where id == '10'").statements)
-  assert_equal(["select * where id == '10'"], hql_query("select * where id == '10';").statements)
-  assert_equal(['select', "select * where id == '10;' limit 100"], hql_query("select; select * where id == '10;' limit 100;").statements)
-  assert_equal(['select', "select * where id == \"10;\" limit 100"], hql_query("select; select * where id == \"10;\" limit 100;").statements)
-  assert_equal(['select', "select * where id == '\"10;\"\"\"' limit 100"], hql_query("select; select * where id == '\"10;\"\"\"' limit 100;").statements)
 
   query_with_comments = """--First query;
 select concat('--', name)  -- The '--' in quotes is not a comment

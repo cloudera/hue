@@ -36,6 +36,7 @@ from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls
 
 from notebook.connectors.base import get_api, QueryExpired, ResultWrapper
+from notebook.sql_utils import get_current_statement
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger(__name__)
@@ -142,10 +143,15 @@ def _patch_status(notebook):
 
 def execute(*args, **kwargs):
   notebook = args[0]
+  snippet = args[1]
   kwargs['max_rows'] = TASK_SERVER.PREFETCH_RESULT_COUNT.get()
   _patch_status(notebook)
   download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
-  return {'sync': False,
+
+  should_close, resp = get_current_statement(snippet) # This redoes some of the work in api.execute. Other option is to pass statement, but then we'd have to modify notebook.api.
+  #if should_close: #front end already calls close_statement for multi statement execution no need to do here. In addition, we'd have to figure out what was the previous guid.
+
+  resp.update({'sync': False,
       'has_result_set': True,
       'modified_row_count': 0,
       'guid': '',
@@ -154,7 +160,8 @@ def execute(*args, **kwargs):
         'data': [],
         'meta': [],
         'type': 'table'
-      }}
+      }})
+  return resp
 
 def check_status(*args, **kwargs):
   notebook = args[0]

@@ -30,6 +30,7 @@ from django import forms
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 
+from notebook.sql_utils import split_statements, strip_trailing_semicolon
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
 from hadoop.cluster import get_hdfs
 
@@ -232,74 +233,6 @@ class HQLdesign(object):
     return not self.__eq__(other)
 
 
-# Note: Might be replaceable by sqlparse.split
-def split_statements(hql):
-  """
-  Split statements at semicolons ignoring the ones inside quotes and comments.
-  The comment symbols that come inside quotes should be ignored.
-  """
-  statements = []
-  current = ''
-  prev = ''
-  between_quotes = None
-  is_comment = None
-  start_row = 0
-  start_col = 0
-  end_row = 0
-  end_col = len(hql) - 1
-
-  if hql.find(';') in (-1, len(hql) - 1):
-    return [((start_row, start_col), (end_row, end_col), hql)]
-
-  lines = hql.splitlines()
-
-  for row, line in enumerate(lines):
-    end_col = 0
-    end_row = row
-
-    if start_row == row and line.strip() == '':  # ignore leading whitespace rows
-      start_row += 1
-    elif current.strip() == '':  # reset start_row
-      start_row = row
-      start_col = 0
-
-    for col, c in enumerate(line):
-      current += c
-
-      if c in ('"', "'") and prev != '\\' and is_comment is None:
-        if between_quotes == c:
-          between_quotes = None
-        elif between_quotes is None:
-          between_quotes = c
-      elif c == '-' and prev == '-' and between_quotes is None and is_comment is None:
-        is_comment = True
-      elif c == ';':
-        if between_quotes is None and is_comment is None:
-          current = current.strip()
-          # Strip off the trailing semicolon
-          current = current[:-1]
-          if len(current) > 1:
-            statements.append(((start_row, start_col), (row, col + 1), current))
-            start_col = col + 1
-          current = ''
-      # This character holds no significance if it was escaped within a string
-      if prev == '\\' and between_quotes is not None:
-        c = ''
-      prev = c
-      end_col = col
-
-    is_comment = None
-    prev = os.linesep
-
-    if current != '':
-      current += os.linesep
-
-  if current and current != ';':
-    current = current.strip()
-    statements.append(((start_row, start_col), (end_row, end_col+1), current))
-
-  return statements
-
 def normalize_form_dict(form, attr_list):
   """
   normalize_form_dict(form, attr_list) -> A dictionary of (attr, value)
@@ -355,14 +288,3 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
 
   def __str__(self):
     return '%s: %s' % (self.__class__, self.query)
-
-
-_SEMICOLON_WHITESPACE = re.compile(";\s*$")
-
-def strip_trailing_semicolon(query):
-  """As a convenience, we remove trailing semicolons from queries."""
-  s = _SEMICOLON_WHITESPACE.split(query, 2)
-  if len(s) > 1:
-    assert len(s) == 2
-    assert s[1] == ''
-  return s[0]
