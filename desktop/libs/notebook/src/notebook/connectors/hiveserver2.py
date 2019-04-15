@@ -15,15 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import base64
 import binascii
 import copy
-import hashlib
 import logging
 import json
 import re
-import StringIO
-import struct
 import urllib
 
 from django.urls import reverse
@@ -33,7 +29,7 @@ from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.conf import BoundConfig
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import force_unicode, smart_str
+from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
@@ -51,7 +47,7 @@ try:
   from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
   from beeswax.data_export import upload
-  from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
+  from beeswax.design import hql_query
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
@@ -244,7 +240,7 @@ class HS2Api(Api):
   def execute(self, notebook, snippet):
     db = self._get_db(snippet, cluster=self.cluster)
 
-    statement = self._get_current_statement(db, snippet)
+    statement = self._get_current_statement(notebook, snippet)
     session = self._get_session(notebook, snippet['type'])
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
@@ -452,7 +448,7 @@ class HS2Api(Api):
       document.can_read_or_exception(self.user)
       notebook = Notebook(document=document).get_data()
       snippet = notebook['snippets'][0]
-      query = self._get_current_statement(db, snippet)['statement']
+      query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
 
     return _autocomplete(db, database, table, column, nested, query=query, cluster=self.cluster)
@@ -470,7 +466,7 @@ class HS2Api(Api):
   @query_error_handler
   def explain(self, notebook, snippet):
     db = self._get_db(snippet, cluster=self.cluster)
-    response = self._get_current_statement(db, snippet)
+    response = self._get_current_statement(notebook, snippet)
     session = self._get_session(notebook, snippet['type'])
 
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
@@ -505,7 +501,7 @@ class HS2Api(Api):
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
     db = self._get_db(snippet, cluster=self.cluster)
 
-    response = self._get_current_statement(db, snippet)
+    response = self._get_current_statement(notebook, snippet)
     session = self._get_session(notebook, snippet['type'])
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
@@ -527,9 +523,7 @@ class HS2Api(Api):
 
 
   def export_large_data_to_hdfs(self, notebook, snippet, destination):
-    db = self._get_db(snippet, cluster=self.cluster)
-
-    response = self._get_current_statement(db, snippet)
+    response = self._get_current_statement(notebook, snippet)
     session = self._get_session(notebook, snippet['type'])
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
@@ -561,9 +555,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def statement_risk(self, notebook, snippet):
-    db = self._get_db(snippet, cluster=self.cluster)
-
-    response = self._get_current_statement(db, snippet)
+    response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
     api = OptimizerApi(self.user)
@@ -572,9 +564,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
-    db = self._get_db(snippet, cluster=self.cluster)
-
-    response = self._get_current_statement(db, snippet)
+    response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
     api = OptimizerApi(self.user)
@@ -583,9 +573,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def statement_similarity(self, notebook, snippet, source_platform):
-    db = self._get_db(snippet, cluster=self.cluster)
-
-    response = self._get_current_statement(db, snippet)
+    response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
     api = OptimizerApi(self.user)
@@ -643,68 +631,6 @@ DROP TABLE IF EXISTS `%(table)s`;
       engine = DEFAULT_HIVE_ENGINE
 
     return engine
-
-
-  def _get_statements(self, hql_query):
-    hql_query = strip_trailing_semicolon(hql_query)
-    hql_query_sio = StringIO.StringIO(hql_query)
-
-    statements = []
-    for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):
-      statements.append({
-        'start': {
-          'row': start_row,
-          'column': start_col
-        },
-        'end': {
-          'row': end_row,
-          'column': end_col
-        },
-        'statement': strip_trailing_semicolon(statement.rstrip())
-      })
-    return statements
-
-
-  def _get_current_statement(self, db, snippet):
-    # Multiquery, if not first statement or arrived to the last query
-    statement_id = snippet['result']['handle'].get('statement_id', 0)
-    statements_count = snippet['result']['handle'].get('statements_count', 1)
-
-    statements = self._get_statements(snippet['statement'])
-
-    statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
-    previous_statement_hash = self.__compute_statement_hash(statements[statement_id]['statement'])
-    non_edited_statement = previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash')
-
-    if snippet['result']['handle'].get('has_more_statements'):
-      try:
-        handle = self._get_handle(snippet)
-        db.close_operation(handle)  # Close all the time past multi queries
-      except:
-        LOG.warn('Could not close previous multiquery query')
-
-      if non_edited_statement:
-        statement_id += 1
-    else:
-      if non_edited_statement:
-        statement_id = 0
-
-    if statements_count != len(statements):
-      statement_id = min(statement_id, len(statements) - 1)
-
-    resp = {
-      'statement_id': statement_id,
-      'has_more_statements': statement_id < len(statements) - 1,
-      'statements_count': len(statements),
-      'previous_statement_hash': self.__compute_statement_hash(statements[statement_id]['statement'])
-    }
-
-    resp.update(statements[statement_id])
-    return resp
-
-
-  def __compute_statement_hash(self, statement):
-    return hashlib.sha224(smart_str(statement)).hexdigest()
 
 
   def _prepare_hql_query(self, snippet, statement, session):
