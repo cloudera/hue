@@ -1356,7 +1356,8 @@ class Snippet {
       sourceType: this.type(),
       namespace: this.namespace(),
       statement: this.statement(),
-      isSqlEngine: this.isSqlDialect()
+      isSqlEngine: this.isSqlDialect(),
+      sessions: komapping.toJS(this.parentNotebook.sessions)
     });
 
     this.executor.executeNext().then(executionResult => {

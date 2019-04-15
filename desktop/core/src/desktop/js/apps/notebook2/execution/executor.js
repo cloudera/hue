@@ -34,7 +34,7 @@ class Executor {
    * @param {ContextCompute} options.compute
    * @param {ContextNamespace} options.namespace
    * @param {EXECUTION_FLOW} [options.executionFlow] (default EXECUTION_FLOW.batch)
-   * @param {Session} [options.session]
+   * @param {Session[]} [options.sessions]
    * @param {string} options.statement
    * @param {string} [options.database]
    */
@@ -73,6 +73,7 @@ class Executor {
                 compute: options.compute,
                 namespace: options.namespace,
                 database: database,
+                sessions: options.sessions,
                 parsedStatement: parsedStatement
               })
             );
