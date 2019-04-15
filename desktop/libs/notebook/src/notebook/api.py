@@ -381,7 +381,7 @@ def save_notebook(request):
 
 
 def _clear_sessions(notebook):
-  notebook['sessions'] = [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr')]
+  notebook['sessions'] = [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr', 'r')]
 
 
 def _historify(notebook, user):
@@ -524,7 +524,7 @@ def close_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
 
-  for session in [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr')]:
+  for session in [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr', 'r')]:
     try:
       response['result'].append(get_api(request, session).close_session(session))
     except QueryExpired:
