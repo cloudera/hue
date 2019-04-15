@@ -98,8 +98,12 @@ class Executor {
     huePubSub.publish('hue.executor.progress.updated', this);
   }
 
+  isRunning() {
+    return this.currentExecutable && this.currentExecutable.status === EXECUTION_STATUS.running;
+  }
+
   async cancel() {
-    if (this.currentExecutable && this.currentExecutable.status === EXECUTION_STATUS.running) {
+    if (this.isRunning()) {
       this.setStatus(EXECUTION_STATUS.canceling);
       return await this.currentExecutable.cancel();
     }

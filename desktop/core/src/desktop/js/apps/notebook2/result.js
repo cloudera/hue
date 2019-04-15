@@ -17,7 +17,9 @@
 import ko from 'knockout';
 
 import hueUtils from 'utils/hueUtils';
-import huePubSub from '../../utils/huePubSub';
+import huePubSub from 'utils/huePubSub';
+
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executableStatement';
 
 const adaptMeta = meta => {
   meta.forEach((item, index) => {
