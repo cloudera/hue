@@ -1578,7 +1578,7 @@ class ApiHelper {
     if (options.path.length === 1) {
       url = '/metastore/databases/' + options.path[0] + '/metadata';
     } else {
-      url = '/notebook/api/describe/' + options.path[0]
+      url = '/notebook/api/describe/' + options.path[0];
 
       if (options.path.length > 1) {
         url += '/' + options.path[1] + '/';

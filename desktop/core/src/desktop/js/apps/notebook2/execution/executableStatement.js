@@ -46,6 +46,7 @@ class ExecutableStatement {
    * @param {string} [options.statement] - Either supply a statement or a parsedStatement
    * @param {SqlStatementsParserResult} [options.parsedStatement] - Either supply a statement or a parsedStatement
    * @param {string} [options.database]
+   * @param {Session[]} [options.sessions]
    */
   constructor(options) {
     this.compute = options.compute;
@@ -54,11 +55,11 @@ class ExecutableStatement {
     this.sourceType = options.sourceType;
     this.parsedStatement = options.parsedStatement;
     this.statement = options.statement;
+    this.sessions = options.sessions;
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
 
-    this.executionResult = undefined;
     this.lastCancellable = undefined;
     this.status = EXECUTION_STATUS.ready;
     this.progress = 0;
