@@ -83,28 +83,43 @@ CATEGORIES = [
   {"name": "Plugins", 'type': 'plugins', 'description': ''},
 ]
 
-AVAILABLE_CONNECTORS = {
-  "connectors": [{
-    'category': category['name'],
-    'values': [_connector for _connector in CONNECTOR_TYPES if _connector['category'] == category['type']],
+
+def _group_category_connectors(connectors):
+  return [{
+    'category': category['type'],
+    'category_name': category['name'],
     'description': category['description'],
-  } for category in CATEGORIES]
-}
+    'values': [_connector for _connector in connectors if _connector['category'] == category['type']],
+  } for category in CATEGORIES
+]
+
+AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
+
 
 # TODO: persist in DB
 # TODO: remove installed connectors that don't have a connector or are blacklisted
-# TODO: load back from DB and apply type defaults, interface...
+# TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
 CONFIGURED_CONNECTORS = [
-  {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1},
-  {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2},
-  {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3},
+  {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
+  {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
+  {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3, 'category': 'engines', 'description': ''},
 ]
 
 
-def connectors(request):
+def get_connector_classes(request):
+  global AVAILABLE_CONNECTORS
+  global CATEGORIES
+
   return JsonResponse({
-    'connectors': CONFIGURED_CONNECTORS
+    'connectors': AVAILABLE_CONNECTORS,
+    'categories': CATEGORIES
+  })
+
+
+def get_installed_connectors(request):
+  return JsonResponse({
+    'connectors': _group_category_connectors(CONFIGURED_CONNECTORS),
   })
 
 
@@ -179,9 +194,3 @@ def _get_connector_by_id(id):
     return instance[0]
   else:
     raise PopupException(_('No connector with the id %s found.') % id)
-
-
-def connector_types(request):
-  global AVAILABLE_CONNECTORS
-
-  return JsonResponse(AVAILABLE_CONNECTORS)
