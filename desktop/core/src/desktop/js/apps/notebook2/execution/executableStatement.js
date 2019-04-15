@@ -19,22 +19,19 @@ import { ExecutionResult } from 'apps/notebook2/execution/executionResult';
 import hueAnalytics from 'utils/hueAnalytics';
 
 /**
- *  ready +----> executing +----> done +----> closed
- *                   +     |
- *                   |     +----> fail
- *                   |
- *                   +----> canceling +----> canceled
- *
  * @type { { canceling: string, canceled: string, fail: string, ready: string, executing: string, done: string } }
  */
 const EXECUTION_STATUS = {
+  available: 'available',
+  success: 'success',
+  expired: 'expired',
+  running: 'running',
+  starting: 'starting',
+  waiting: 'waiting',
   ready: 'ready',
-  executing: 'executing',
   canceled: 'canceled',
   canceling: 'canceling',
-  closed: 'closed',
-  done: 'done',
-  fail: 'fail'
+  closed: 'closed'
 };
 
 class ExecutableStatement {
@@ -85,7 +82,8 @@ class ExecutableStatement {
           this.lastCancellable = apiHelper
             .checkExecutionStatus({ executable: this })
             .done(queryStatus => {
-              switch (queryStatus) {
+              this.status = queryStatus;
+              switch (this.status) {
                 case 'success':
                   this.progress = 99; // TODO: why 99 here (from old code)?
                   statusResolve();
@@ -122,7 +120,7 @@ class ExecutableStatement {
         });
 
       hueAnalytics.log('notebook', 'execute/' + this.sourceType);
-      this.status = EXECUTION_STATUS.executing;
+      this.status = EXECUTION_STATUS.running;
 
       this.lastCancellable = apiHelper
         .executeStatement({
@@ -134,16 +132,13 @@ class ExecutableStatement {
           checkStatus()
             .then(() => {
               this.result = new ExecutionResult(this);
-              this.status = EXECUTION_STATUS.done;
               resolve(this.result);
             })
             .catch(error => {
-              this.status = EXECUTION_STATUS.fail;
               reject(error);
             });
         })
         .fail(error => {
-          this.status = EXECUTION_STATUS.fail;
           reject(error);
         });
     });
@@ -151,7 +146,7 @@ class ExecutableStatement {
 
   async cancel() {
     return new Promise(resolve => {
-      if (this.lastCancellable && this.status === EXECUTION_STATUS.executing) {
+      if (this.lastCancellable && this.status === EXECUTION_STATUS.running) {
         hueAnalytics.log('notebook', 'cancel/' + this.sourceType);
         this.status = EXECUTION_STATUS.canceling;
         this.lastCancellable.cancel().always(() => {
@@ -167,9 +162,9 @@ class ExecutableStatement {
 
   async close() {
     return new Promise(resolve => {
-      if (this.status === EXECUTION_STATUS.executing) {
+      if (this.status === EXECUTION_STATUS.running) {
         this.cancel().finally(resolve);
-      } else if (this.status === EXECUTION_STATUS.done) {
+      } else if (this.status !== EXECUTION_STATUS.closed) {
         apiHelper.closeStatement({ executable: this }).finally(resolve);
       }
     }).finally(() => {
