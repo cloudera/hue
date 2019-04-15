@@ -17,6 +17,7 @@
 import apiHelper from 'api/apiHelper';
 import { ExecutionResult } from 'apps/notebook2/execution/executionResult';
 import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 
 /**
  * @type { { canceling: string, canceled: string, fail: string, ready: string, executing: string, done: string } }
@@ -32,6 +33,10 @@ const EXECUTION_STATUS = {
   canceled: 'canceled',
   canceling: 'canceling',
   closed: 'closed'
+};
+
+const notifyUpdates = executable => {
+  huePubSub.publish('hue.executable.updated', executable);
 };
 
 class ExecutableStatement {
@@ -98,6 +103,7 @@ class ExecutableStatement {
                 case 'running':
                 case 'starting':
                 case 'waiting':
+                  notifyUpdates(this);
                   checkStatusTimeout = window.setTimeout(
                     () => {
                       checkStatus()
@@ -117,11 +123,15 @@ class ExecutableStatement {
           this.lastCancellable.onCancel(() => {
             window.clearTimeout(checkStatusTimeout);
           });
+        }).finally(() => {
+          notifyUpdates(this);
         });
 
       hueAnalytics.log('notebook', 'execute/' + this.sourceType);
       this.status = EXECUTION_STATUS.running;
+      this.progress = 0;
 
+      notifyUpdates(this);
       this.lastCancellable = apiHelper
         .executeStatement({
           executable: this
@@ -149,8 +159,10 @@ class ExecutableStatement {
       if (this.lastCancellable && this.status === EXECUTION_STATUS.running) {
         hueAnalytics.log('notebook', 'cancel/' + this.sourceType);
         this.status = EXECUTION_STATUS.canceling;
+        notifyUpdates(this);
         this.lastCancellable.cancel().always(() => {
           this.status = EXECUTION_STATUS.canceled;
+          notifyUpdates(this);
           resolve();
         });
         this.lastCancellable = undefined;
@@ -169,6 +181,7 @@ class ExecutableStatement {
       }
     }).finally(() => {
       this.status = EXECUTION_STATUS.closed;
+      notifyUpdates(this);
     });
   }
 }
