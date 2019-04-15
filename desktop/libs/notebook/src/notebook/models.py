@@ -26,6 +26,8 @@ import uuid
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.db.models import Count
+from django.db.models.functions import Trunc
 from django.utils.html import escape
 
 from desktop.lib.i18n import smart_unicode
@@ -469,7 +471,7 @@ def _update_property_value(properties, key, value):
 class Anaytics():
 
   @classmethod
-  def admin_stats(self):
+  def admin_stats(cls):
     stats = []
     one_week = datetime.date.today() - timedelta(weeks=1)
     one_month = datetime.date.today() - timedelta(days=30)
@@ -483,5 +485,34 @@ class Anaytics():
     stats.append(('\nAll', ''))
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
+
+    print(cls.user_stats(1))
+    print(cls.query_stats(69371))
+
+    return stats
+
+  @classmethod
+  def user_stats(cls, user_id):
+    stats = []
+    one_month = datetime.date.today() - timedelta(days=30)
+
+    user = User.objects.get(id=user_id)
+    queries = Document2.objects.filter(owner__id=user_id, type__startswith='query-', is_trashed=False, is_managed=False)
+
+    stats.append(('User', '%s - %s' % (user_id, user.username)))
+    stats.append(('Executions', queries.filter(is_history=True, type__startswith='query-').count()))
+    stats.append(('Saved', queries.filter(is_history=False, type__startswith='query-').count()))
+    last_month_daily = queries.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
+    stats.append(('Daily executions 30 days', last_month_daily))
+
+    return stats
+
+  @classmethod
+  def query_stats(cls, query_id):
+    stats = []
+
+    query = Document2.objects.get(id=query_id)
+    stats.append(('Query', '%s - %s' % (query_id, query.name)))
+    stats.append(('Executions', query.dependents.filter(is_history=True, type__startswith='query-').count()))
 
     return stats
