@@ -81,10 +81,10 @@ class ResultWrapperCallback(object):
 #TODO: move file paths to a file like API so we can change implementation
 #TODO: UI should be able to close a query that is available, but not expired
 @app.task()
-def download_to_file(notebook, snippet, file_format='csv', postdict=None, user_id=None, max_rows=-1):
+def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs):
   from beeswax import data_export
   download_to_file.update_state(task_id=notebook['uuid'], state='STARTED', meta={})
-  request = _get_request(postdict, user_id)
+  request = _get_request(**kwargs)
   api = get_api(request, snippet)
 
   f, path = tempfile.mkstemp()
@@ -111,13 +111,13 @@ def download_to_file(notebook, snippet, file_format='csv', postdict=None, user_i
   return meta
 
 @app.task(ignore_result=True)
-def cancel_async(notebook, snippet, postdict=None, user_id=None):
-  request = _get_request(postdict, user_id)
+def cancel_async(notebook, snippet, **kwargs):
+  request = _get_request(**kwargs)
   get_api(request, snippet).cancel(notebook, snippet)
 
 @app.task(ignore_result=True)
-def close_statement_async(notebook, snippet, postdict=None, user_id=None):
-  request = _get_request(postdict, user_id)
+def close_statement_async(notebook, snippet, **kwargs):
+  request = _get_request(**kwargs)
   get_api(request, snippet).close_statement(notebook, snippet)
 
 #TODO: Convert csv to excel if needed
