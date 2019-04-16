@@ -263,29 +263,29 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       skip = int(f.read())
   target = skip + rows
 
-  csv.field_size_limit(sys.maxsize)
-  with open(info.get('file_path'), 'r') as f:
-    csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
-    first = next(csv_reader)
-    for col in first:
-      split = col.split('|')
-      if len(split) > 1:
-        cols.append({'name': split[0], 'type': split[1], 'comment': None})
-      else:
-        cols.append({'name': split[0], 'type': 'STRING_TYPE', 'comment': None})
+  if info.get('handle', {}).get('has_result_set', False):
+    csv.field_size_limit(sys.maxsize)
     count = 0
-    for row in csv_reader:
-      count += 1
-      if count <= skip:
-        continue
-      data.append(row)
-      if count >= target:
-        break
+    with open(info.get('file_path'), 'r') as f:
+      csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+      first = next(csv_reader, None)
+      if first: # else no data to read
+        for col in first:
+          split = col.split('|')
+          split_type = split[1] if len(split) > 1 else 'STRING_TYPE'
+          cols.append({'name': split[0], 'type': split_type, 'comment': None})
+        for row in csv_reader:
+          count += 1
+          if count <= skip:
+            continue
+          data.append(row)
+          if count >= target:
+            break
 
-  with open(info.get('progress_path'), 'w') as f:
-    f.write(str(count))
-
-  results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
+    with open(info.get('progress_path'), 'w') as f:
+      f.write(str(count))
+  
+    results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
 
   return results
 
