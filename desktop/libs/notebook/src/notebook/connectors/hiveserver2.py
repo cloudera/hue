@@ -390,7 +390,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def progress(self, snippet, logs):
+  def progress(self, notebook, snippet, logs=''):
     if snippet['type'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
       total = int(match.group(1)) if match else 1
@@ -424,7 +424,7 @@ class HS2Api(Api):
       } for job in jobs_with_state]
     elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
       query_id = unpack_guid_base64(snippet['result']['handle']['guid'])
-      progress = min(self.progress(snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+      progress = min(self.progress(notebook, snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
         'name': query_id,
         'url': '/hue/jobbrowser#!id=%s' % query_id,

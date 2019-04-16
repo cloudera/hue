@@ -466,7 +466,7 @@ class Api(object):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     return {}
 
-  def progress(self, snippet, logs=None):
+  def progress(self, notebook, snippet, logs=None):
     return 50
 
   def get_jobs(self, notebook, snippet, logs):

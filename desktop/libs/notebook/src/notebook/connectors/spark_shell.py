@@ -340,9 +340,6 @@ class SparkApi(Api):
 
     return api.get_log(session['id'], startFrom=startFrom, size=size)
 
-  def progress(self, snippet, logs):
-    return 50
-
   def close_statement(self, notebook, snippet): # Individual statements cannot be closed
     pass
 

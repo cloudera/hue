@@ -34,6 +34,7 @@ from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls
+from desktop.lib import fsmanager
 
 from notebook.connectors.base import get_api, QueryExpired, ResultWrapper
 from notebook.sql_utils import get_current_statement
@@ -216,10 +217,24 @@ def get_jobs(notebook, snippet, logs, **kwargs): #Re implement to fetch updated 
 
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
-  #insiduous problem where each call in hive api transform the guid/secret to binary form. get_log does the transform, but not get_jobs. get_jobs called after get_log so usually not an issue. Our get_log implementation doesn't
-  if hasattr(api, '_get_handle'): # This is specific to impala, should be handled in hiveserver2
-    api._get_handle(snippet)
   return api.get_jobs(notebook, snippet, logs)
+
+def progress(notebook, snippet, logs=None, **kwargs):
+  result = download_to_file.AsyncResult(notebook['uuid'])
+  state = result.state
+  if state == states.PENDING:
+    raise QueryExpired()
+  elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
+    return 1
+  elif state in states.EXCEPTION_STATES:
+    result.maybe_reraise()
+    return 1
+
+  info = result.info
+  snippet['result']['handle'] = info.get('handle', {}).copy()
+  request = _get_request(**kwargs)
+  api = get_api(request, snippet)
+  return api.progress(notebook, snippet, logs=logs)
 
 def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
@@ -340,6 +355,9 @@ def _close_statement_async_id(notebook):
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()
   request.POST = postdict
+  request.fs_ref = 'default'
+  request.fs = fsmanager.get_filesystem(request.fs_ref)
+  request.jt = None
   user = User.objects.get(id=user_id)
   user = rewrite_user(user)
   request.user = user
