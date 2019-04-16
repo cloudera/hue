@@ -210,7 +210,7 @@ def _default_interpreters(user):
   interpreters = []
   apps = appmanager.get_apps_dict(user)
 
-  if 'beeswax' in apps:
+  if 'hive' in apps:
     interpreters.append(('hive', {
       'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
     }),)
