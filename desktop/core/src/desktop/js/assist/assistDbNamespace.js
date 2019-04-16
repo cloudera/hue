@@ -298,7 +298,7 @@ class AssistDbNamespace {
     let foundDb;
 
     const findDatabase = () => {
-      self.databases().foreach(db => {
+      self.databases().forEach(db => {
         db.highlight(false);
         if (db.databaseName === catalogEntry.path[0]) {
           foundDb = db;
