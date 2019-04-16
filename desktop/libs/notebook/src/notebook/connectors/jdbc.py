@@ -124,9 +124,6 @@ class JdbcApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  def progress(self, snippet, logs):
-    return 50
-
   @query_error_handler
   def close_statement(self, notebook, snippet):
     return {'status': -1}

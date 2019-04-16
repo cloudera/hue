@@ -281,7 +281,7 @@ class TestHiveserver2Api(object):
         INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
     """
 
-    assert_equal(self.api.progress(snippet, logs), 5)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 5)
 
     logs += """INFO  : Starting Job = job_1466104358744_0003, Tracking URL = http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
         INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1466104358744_0003
@@ -293,7 +293,7 @@ class TestHiveserver2Api(object):
         INFO  : Ended Job = job_1466104358744_0003
     """
 
-    assert_equal(self.api.progress(snippet, logs), 50)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 50)
 
     snippet = json.loads("""
         {
@@ -322,7 +322,7 @@ class TestHiveserver2Api(object):
 
     logs = "Query 734a81444c85be66:d05f3bb1a6c2d0a5: 0% Complete (1 out of 4693)"
 
-    assert_equal(self.api.progress(snippet, logs), 0)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 0)
 
     logs += """Query 734a81444c85be66:d05f3bb1a6c2d0a5: 20% Complete (4 out of 4693)
 
@@ -333,7 +333,7 @@ class TestHiveserver2Api(object):
     Query 734a81444c85be66:d05f3bb1a6c2d0a5: 50% Complete (234 out of 4693)
     """
 
-    assert_equal(self.api.progress(snippet, logs), 50)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 50)
 
 
   def test_get_jobs(self):

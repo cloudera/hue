@@ -69,10 +69,6 @@ class AltusAdbApi(Api):
     return '...'
 
 
-  def progress(self, snippet, logs):
-    return 50
-
-
   def get_jobs(self, notebook, snippet, logs):
     return []
 
