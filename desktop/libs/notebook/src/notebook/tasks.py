@@ -20,6 +20,7 @@ import csv
 import os
 import json
 import logging
+import sys
 import tempfile
 import time
 
@@ -262,6 +263,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       skip = int(f.read())
   target = skip + rows
 
+  csv.field_size_limit(sys.maxsize)
   with open(info.get('file_path'), 'r') as f:
     csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
     first = next(csv_reader)
