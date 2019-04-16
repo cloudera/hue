@@ -326,7 +326,7 @@ from desktop.views import _ko
     <!-- ko with: selectedSource -->
       <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' } --><!-- /ko -->
       <!-- ko with: selectedNamespace -->
-        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' } --><!-- /ko -->
         <!-- ko with: selectedDatabase -->
           <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
         <!-- /ko -->
@@ -744,8 +744,8 @@ from desktop.views import _ko
       <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
         <span>${ _('Error loading contents.') }</span>
       </div>
-      <!-- /ko -->
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-hbase-header-actions">

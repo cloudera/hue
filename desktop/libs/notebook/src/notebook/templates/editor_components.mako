@@ -566,46 +566,46 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <!-- ko ifnot: sessions().length -->
       <p>${ _('There are currently no active sessions, please reload the page.') }</p>
       <!-- /ko -->
+
       <!-- ko foreach: sessions -->
-      <h4 style="clear:left; display: inline-block">
-        <span data-bind="text: $parents[1].getSnippetName(type())"></span>
-        <!-- ko if: typeof session_id != 'undefined' && session_id -->
-          <span data-bind="text: session_id"></span>
-        <!-- /ko -->
-      </h4>
-      <div class="session-actions">
-        <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
-          <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
-        </a>
-        <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }">
-          <i class="fa fa-times"></i> ${ _('Close') }
-        </a>
-        % if conf.USE_DEFAULT_CONFIGURATION.get():
-          <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
-        % endif
-        % if not IS_EMBEDDED.get():
-        <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
-          <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
-            <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
+        <h4 style="clear:left; display: inline-block">
+          <span data-bind="text: $parents[1].getSnippetName(type())"></span>
+          <!-- ko if: typeof session_id != 'undefined' && session_id -->
+            <span data-bind="text: session_id"></span>
+          <!-- /ko -->
+        </h4>
+        <div class="session-actions">
+          <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
+            <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
           </a>
-        <!-- /ko -->
+          <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }">
+            <i class="fa fa-times"></i> ${ _('Close') }
+          </a>
+          % if conf.USE_DEFAULT_CONFIGURATION.get():
+            <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
+          % endif
+          % if not IS_EMBEDDED.get():
+          <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
+            <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
+              <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
+            </a>
+          <!-- /ko -->
+          % endif
+        </div>
+        % if conf.USE_DEFAULT_CONFIGURATION.get():
+        <div style="width:100%;">
+          <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+        </div>
         % endif
-      </div>
-      % if conf.USE_DEFAULT_CONFIGURATION.get():
-      <div style="width:100%;">
-        <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
-      </div>
-      % endif
-      <div style="clear:both; padding-left: 120px;">
-        <!-- ko if: availableNewProperties().length -->
-        <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
-                    properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
-                    selectedSessionProperty('');
-                   }" style="margin-left:10px;vertical-align: text-top;">
-        </a>
-        <!-- /ko -->
-      </div>
-      <!-- /ko -->
+        <div style="clear:both; padding-left: 120px;">
+          <!-- ko if: availableNewProperties().length -->
+          <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
+                      properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
+                      selectedSessionProperty('');
+                     }" style="margin-left:10px;vertical-align: text-top;">
+          </a>
+          <!-- /ko -->
+        </div>
       <!-- /ko -->
       <br/>
     </fieldset>

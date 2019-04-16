@@ -386,7 +386,23 @@
 </script>
 
 <script type="text/html" id="widget-template${ suffix }">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: { data: $data, isEnabled: $root.isGridster(), options: getDraggableOptions({ data: $data, parent: $parent }) }, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
+  <div data-bind="attr: { 'id': 'wdg_'+ id() }, css: klass,
+      draggable: {
+         data: $data,
+         isEnabled: $root.isGridster(),
+         options: getDraggableOptions({ data: $data, parent: $parent })
+      },
+      droppable: {
+        data: function() {
+          $root.collection.dropOnWidget(id())
+        },
+        options: {
+          greedy:true,
+          drop: function(event, ui) {
+            huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui })
+          }
+        }
+      }">
     <h2 class="card-heading simple" data-bind="attr: { title: $root.isGridster() ? '${ _ko('Drag to move') }' : '' }">
       <!-- ko ifnot: $root.isGridster -->
       <span data-bind="visible: $root.isEditing">

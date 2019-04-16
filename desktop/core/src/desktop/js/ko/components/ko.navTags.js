@@ -41,7 +41,6 @@ const TEMPLATE = `
       load: getSelectizeTags
     }"></textarea>
    <div class="selectize-error" style="display: none;"><i class="fa fa-exclamation-triangle"></i> <span class="message"></span></div>
-   <!-- /ko -->
   </div>
   <!-- /ko -->
 `;
