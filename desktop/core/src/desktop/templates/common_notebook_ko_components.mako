@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
-except ImportError, e:
+except ImportError as e:
   LOG.warn("Hive app is not enabled")
   DOWNLOAD_ROW_LIMIT = None
   DOWNLOAD_BYTES_LIMIT = None
