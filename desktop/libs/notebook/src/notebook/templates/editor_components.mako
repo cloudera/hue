@@ -394,7 +394,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko component: 'aceKeyboardShortcuts' --><!-- /ko -->
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -407,7 +407,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <pre data-bind="oneClickSelect, text: combinedContent"></pre>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
