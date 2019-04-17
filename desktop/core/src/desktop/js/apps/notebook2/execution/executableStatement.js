@@ -20,7 +20,8 @@ import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 
 /**
- * @type { { canceling: string, canceled: string, fail: string, ready: string, executing: string, done: string } }
+ *
+ * @type {{running: string, canceling: string, canceled: string, expired: string, waiting: string, success: string, ready: string, available: string, closed: string, starting: string}}
  */
 const EXECUTION_STATUS = {
   available: 'available',
