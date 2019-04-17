@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db.models.functions import Trunc
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2
@@ -486,33 +487,73 @@ class Anaytics():
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
 
-    print(cls.user_stats(1))
-    print(cls.query_stats(69371))
-
     return stats
 
   @classmethod
-  def user_stats(cls, user_id):
+  def user_stats(cls, user_id, user=None):
     stats = []
     one_month = datetime.date.today() - timedelta(days=30)
 
-    user = User.objects.get(id=user_id)
+    user = User.objects.get(id=user_id) if user is None else user
     queries = Document2.objects.filter(owner__id=user_id, type__startswith='query-', is_trashed=False, is_managed=False)
 
-    stats.append(('User', '%s - %s' % (user_id, user.username)))
-    stats.append(('Executions', queries.filter(is_history=True, type__startswith='query-').count()))
-    stats.append(('Saved', queries.filter(is_history=False, type__startswith='query-').count()))
+    stats.append({
+      'name': 'user',
+      'value': '%s - %s' % (user_id, user.username),'description': _('User info')
+    })
+    query_executions = queries.filter(is_history=True, type__startswith='query-')
+    stats.append({
+      'name': 'query_executions',
+      'values': query_executions.count(),
+      'description': _('Query executions count')
+    })
+    stats.append({
+      'name': 'saved_queries_count',
+      'value': queries.filter(is_history=False, type__startswith='query-').count(),
+      'description': _('Saved queries count')
+    })
+    stats.append({
+      'name': 'query_executions_30_days_count',
+      'value': query_executions.filter(last_modified__gte=one_month).count(),
+      'description': _('Query executions 30 days total')
+    })
     last_month_daily = queries.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
-    stats.append(('Daily executions 30 days', last_month_daily))
+    stats.append({
+      'name': 'query_executions_30_days_histogram',
+      'value': last_month_daily,
+      'description': _('Daily executions 30 days')
+    })
 
     return stats
 
   @classmethod
-  def query_stats(cls, query_id):
+  def query_stats(cls, query_id, query=None):
     stats = []
+    one_month = datetime.date.today() - timedelta(days=30)
 
-    query = Document2.objects.get(id=query_id)
-    stats.append(('Query', '%s - %s' % (query_id, query.name)))
-    stats.append(('Executions', query.dependents.filter(is_history=True, type__startswith='query-').count()))
+    query = Document2.objects.get(id=query_id) if query is None else query
+    stats.append({
+      'name': 'query',
+      'value': '%s - %s' % (query_id, query.name),
+      'description': _('Query info')
+    })
+    executions = query.dependents.filter(is_history=True, type__startswith='query-')
+    stats.append({
+      'name': 'execution_count',
+      'value': executions.count(),
+      'description': _('How many times executed')
+    })
+    stats.append({
+      'name': 'execution_count_shared',
+      'value': executions.exclude(owner=query.owner).count(),
+      'description': _('Executions by others')
+    })
+    last_month_daily = executions.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
+    stats.append({
+      'name': 'executions_30_days_histogram',
+      'value': last_month_daily,
+      'description': _('Daily executions 30 days')
+    })
+    # Could count number of "forks" (but would need to start tracking parent of Saved As query cf. saveAsNotebook)
 
     return stats
