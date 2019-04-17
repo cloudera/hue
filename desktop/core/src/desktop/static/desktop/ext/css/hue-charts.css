@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'HueCharts';
-	src:url('../ext/fonts/huecharts-regular.eot?121z71');
-	src:url('../ext/fonts/huecharts-regular.eot?#iefix121z71') format('embedded-opentype'),
-		url('../ext/fonts/huecharts-regular.woff?121z71') format('woff'),
-		url('../ext/fonts/huecharts-regular.ttf?121z71') format('truetype'),
-		url('../ext/fonts/huecharts-regular.svg?121z71#filetypes') format('svg');
+	src:url('../fonts/huecharts-regular.eot?121z71');
+	src:url('../fonts/huecharts-regular.eot?#iefix121z71') format('embedded-opentype'),
+		url('../fonts/huecharts-regular.woff?121z71') format('woff'),
+		url('../fonts/huecharts-regular.ttf?121z71') format('truetype'),
+		url('../fonts/huecharts-regular.svg?121z71#filetypes') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }

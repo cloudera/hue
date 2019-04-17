@@ -89,6 +89,15 @@
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 % endif
+  <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+
+  <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.markercluster.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.zoombox.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
   <script type="text/javascript">
 % if IS_EMBEDDED.get():
