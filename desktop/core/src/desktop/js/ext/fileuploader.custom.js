@@ -783,10 +783,10 @@ qq.UploadDropZone.prototype = {
         });
     },
     _isValidFileDrag: function(e){
-        var dt = e.dataTransfer,
-            // do not check dt.types.contains in webkit, because it crashes safari 4
-            isWebkit = navigator.userAgent.indexOf("AppleWebKit") > -1;
-            isIE9 = navigator.appVersion.indexOf("MSIE 9") > -1;
+        var dt = e.dataTransfer;
+        // do not check dt.types.contains in webkit, because it crashes safari 4
+        var isWebkit = navigator.userAgent.indexOf("AppleWebKit") > -1;
+        var isIE9 = navigator.appVersion.indexOf("MSIE 9") > -1;
 
         if (isIE9) return false;
 
