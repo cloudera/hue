@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=40, verbose_name='Solr index name pointing to')),
                 ('label', models.CharField(max_length=100, verbose_name='Friendlier name in UI')),
                 ('is_core_only', models.BooleanField(default=False)),
-                ('cores', models.TextField(default=b'{}', help_text='Solr json', verbose_name='Collection with cores data')),
-                ('properties', models.TextField(default=b'{}', help_text='Hue properties (e.g. results by pages number)', verbose_name='Properties')),
+                ('cores', models.TextField(default='{}', help_text='Solr json', verbose_name='Collection with cores data')),
+                ('properties', models.TextField(default='{}', help_text='Hue properties (e.g. results by pages number)', verbose_name='Properties')),
             ],
         ),
         migrations.CreateModel(

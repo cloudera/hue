@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('home_directory', models.CharField(max_length=1024, null=True)),
-                ('creation_method', models.CharField(default=b'HUE', max_length=64)),
+                ('creation_method', models.CharField(default='HUE', max_length=64)),
                 ('first_login', models.BooleanField(default=True, help_text='If this is users first login.', verbose_name='First Login')),
                 ('last_activity', models.DateTimeField(auto_now=True, db_index=True)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
