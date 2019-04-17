@@ -135,7 +135,7 @@ var MetastoreSource = (function () {
           if (database.catalogEntry === refreshedEntry) {
             database.load(function () {
               setState(previousState);
-            }, self.optimizerEnabled(), self.navigatorEnabled());
+            }, self.metastoreViewModel.optimizerEnabled(), self.metastoreViewModel.navigatorEnabled());
             return true;
           }
         })
