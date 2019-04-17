@@ -208,6 +208,7 @@ NonReservedKeyword
  | '<hive>TIMESTAMP'
  | '<hive>TINYINT'
  | '<hive>TOUCH'
+ | '<hive>TRANSACTIONAL'
  | '<hive>TRANSACTIONS'
  | '<hive>UNARCHIVE'
  | '<hive>UNIONTYPE'
@@ -418,6 +419,7 @@ NonStartingToken
  | '<hive>TEXTFILE'
  | '<hive>TIMESTAMP' |'<hive>USER'
  | '<hive>TINYINT'
+ | '<hive>TRANSACTIONAL'
  | '<hive>TRANSACTIONS'
  | '<hive>UNIONTYPE'
  | '<hive>USING'
@@ -1103,6 +1105,11 @@ OptionalHiveCascadeOrRestrict
 OptionalHiveTemporary
  :
  | '<hive>TEMPORARY'
+ ;
+
+OptionalHiveTransactional
+ :
+ | '<hive>TRANSACTIONAL'
  ;
 
 OptionalIfExists

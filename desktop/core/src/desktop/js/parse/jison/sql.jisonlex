@@ -196,6 +196,7 @@
 <hive>'TEXTFILE'                           { return '<hive>TEXTFILE'; }
 <hive>'TINYINT'                            { return '<hive>TINYINT'; }
 <hive>'TOUCH'                              { return '<hive>TOUCH'; }
+<hive>'TRANSACTIONAL'                      { return '<hive>TRANSACTIONAL'; }
 <hive>'TRANSACTIONS'                       { return '<hive>TRANSACTIONS'; }
 <hive>'UNARCHIVE'                          { return '<hive>UNARCHIVE'; }
 <hive>'UNIONTYPE'                          { return '<hive>UNIONTYPE'; }
