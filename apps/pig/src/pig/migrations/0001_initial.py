@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             name='PigScript',
             fields=[
                 ('document_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='pig.Document')),
-                ('data', models.TextField(default=b'{"name": "", "parameters": [], "script": "", "hadoopProperties": [], "properties": [], "resources": [], "job_id": null}')),
+                ('data', models.TextField(default='{"name": "", "parameters": [], "script": "", "hadoopProperties": [], "properties": [], "resources": [], "job_id": null}')),
             ],
             bases=('pig.document',),
         ),
