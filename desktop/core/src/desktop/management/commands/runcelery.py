@@ -16,9 +16,13 @@
 # limitations under the License.
 
 import logging
-from django.core.management.base import BaseCommand
 import os
 import sys
+
+from desktop.conf import DEV
+
+from django.core.management.base import BaseCommand
+from django.utils import autoreload
 from django.utils.translation import ugettext as _
 
 SERVER_HELP = r"""
@@ -59,7 +63,11 @@ class Command(BaseCommand):
 
 def runcelery(*args, **options):
   #CeleryCommand().handle_argv(['worker', '--app=desktop.celery', '--concurrency=1', '--loglevel=DEBUG'])
-  celery_main(['runcelery', 'worker', '--app=' + options['app'], '--concurrency=' + str(options['concurrency']), '--loglevel=' + options['loglevel']])
+  opts = ['runcelery', 'worker', '--app=' + options['app'], '--concurrency=' + str(options['concurrency']), '--loglevel=' + options['loglevel']]
+  if DEV.get():
+    autoreload.main(celery_main, (opts,))
+  else:
+    celery_main(opts)
   LOG.error("Failed to exec '%s' with argument '%s'" % args)
   sys.exit(-1)
 
