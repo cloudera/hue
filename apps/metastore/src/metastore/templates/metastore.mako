@@ -233,10 +233,10 @@ ${ components.menubar(is_embeddable) }
   <h4>${ _('Properties') } <i data-bind="visible: $parent.loadingDetails()" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
   <div class="row-fluid">
     <div class="metastore-property">
-      <!-- ko if: is_view -->
+      <!-- ko if: $parent.catalogEntry.isView() -->
         ${ _('View') }
       <!-- /ko -->
-      <!-- ko ifnot: is_view -->
+      <!-- ko ifnot: $parent.catalogEntry.isView() -->
         <span data-bind="visible: partition_keys.length" style="display: none;">
           <a class="pointer" data-bind="click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }">
             ${ _("Partitioned") }
@@ -245,7 +245,7 @@ ${ components.menubar(is_embeddable) }
         ${ _('Table') }
       <!-- /ko -->
     </div>
-    <!-- ko ifnot: is_view -->
+    <!-- ko ifnot: $parent.catalogEntry.isView() -->
     <div class="metastore-property">
       <!-- ko if: details.properties.table_type == 'MANAGED_TABLE' -->
         ${_('Managed')}
@@ -279,7 +279,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-table-stats">
-  <!-- ko if: tableDetails() && ! tableDetails().is_view -->
+  <!-- ko if: catalogEntry.isTable() -->
     <!-- ko with: tableDetails -->
     <h4>${ _('Stats') }
       <!-- ko ifnot: partition_keys.length -->
@@ -287,11 +287,11 @@ ${ components.menubar(is_embeddable) }
         <!-- ko if: $parent.refreshingTableStats -->
         <i class="fa fa-refresh fa-spin"></i>
         <!-- /ko -->
-        <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
+        <!-- ko ifnot: $parent.refreshingTableStats() -->
         <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
         <!-- /ko -->
         % endif
-        <span data-bind="visible: details.stats.COLUMN_STATS_ACCURATE == 'false' && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
+        <span data-bind="visible: details.stats.COLUMN_STATS_ACCURATE == 'false'" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
       <!-- /ko -->
     </h4>
     <div class="row-fluid">
@@ -683,8 +683,8 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
   <!-- ko if: loaded() && !hasErrors() -->
   <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
-  <div data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The view does not contain any data.') }</div>
-  <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The table does not contain any data.') }</div>
+  <div data-bind="visible: !rows().length && metastoreTable.catalogEntry.isView()" style="display: none;" class="empty-message">${ _('The view does not contain any data.') }</div>
+  <div data-bind="visible: !rows().length && !metastoreTable.catalogEntry.isView()" style="display: none;" class="empty-message">${ _('The table does not contain any data.') }</div>
   <!-- /ko -->
   <!-- ko if: hasErrors() -->
   <div class="empty-message alert" data-bind="text: errorMessage() || '${ _ko('Could not load the sample, see the server log for details.') }'"></div>
@@ -920,10 +920,10 @@ ${ components.menubar(is_embeddable) }
                         <a class="btn btn-default" data-bind="attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i> ${_('Browse Data')}</a>
                       % endif
                       % if has_write_access:
-                        <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: tableDetails() && !tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
+                        <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: tableDetails() && !catalogEntry.isView()" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
                       % endif
                       % if has_write_access:
-                        <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>
+                        <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && catalogEntry.isView() ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>
                       % endif
                       <a href="javascript: void(0);" class="btn btn-default" data-bind="click: reload" title="${_('Refresh the table')}"><i class="fa fa-refresh" data-bind="css: { 'fa-spin blue' : refreshing }"></i> ${_('Refresh')}</a>
                       <!-- /ko -->
