@@ -55,7 +55,7 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
   <div class="search-bar-header">
     <div class="search-bar-logo">
       <div class="app-header">
-        <a href="#" data-bind="hueLink: '${ url('dashboard:new_search') }'">
+        <a href="javascript: void(0)" data-bind="hueLink: '${ url('dashboard:new_search') }'">
           <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
           <!-- ko component: { name: 'hue-favorite-app', params: { app: 'dashboard' }} --><!-- /ko -->
         </a>

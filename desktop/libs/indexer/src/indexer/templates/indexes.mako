@@ -188,7 +188,7 @@ ${ assist.assistPanel() }
                 </ul>
               </div>
               <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('No') }</a>
                 <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
               </div>
             </form>
@@ -207,7 +207,7 @@ ${ assist.assistPanel() }
                 <!-- /ko -->
               </div>
               <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('No') }</a>
                 <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
               </div>
             </form>
@@ -243,7 +243,7 @@ ${ assist.assistPanel() }
               </table>
             </div>
             <div class="modal-footer">
-              <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+              <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
               <button class="btn btn-primary disable-feedback" data-bind="click: alias.create, enable: alias.chosenCollections().length > 0 && alias.name() !== ''">
                  ${ _('Create') }
               </button>

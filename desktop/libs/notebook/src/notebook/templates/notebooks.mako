@@ -155,7 +155,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
       % endif
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
   </form>
