@@ -125,6 +125,7 @@
 <hive>'INPUTFORMAT'                        { return '<hive>INPUTFORMAT'; }
 <hive>'ITEMS'                              { return '<hive>ITEMS'; }
 <hive>'JAR'                                { return '<hive>JAR'; }
+<hive>'JSONFILE'                           { return '<hive>JSONFILE'; }
 <hive>'KEY'                                { return '<hive>KEY'; }
 <hive>'KEYS'                               { return '<hive>KEYS'; }
 <hive>'LINES'                              { return '<hive>LINES'; }

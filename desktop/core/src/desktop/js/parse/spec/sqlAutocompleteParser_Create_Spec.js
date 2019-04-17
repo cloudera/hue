@@ -2715,6 +2715,7 @@ describe('sqlAutocompleteParser.js CREATE statements', () => {
             suggestKeywords: [
               'AVRO',
               'INPUTFORMAT',
+              'JSONFILE',
               'ORC',
               'PARQUET',
               'RCFILE',
