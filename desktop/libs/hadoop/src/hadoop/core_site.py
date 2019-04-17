@@ -18,11 +18,17 @@
 from __future__ import absolute_import
 import errno
 import logging
+import sys
 
 from hadoop import conf
 from hadoop import confparse
 
 from desktop.lib.paths import get_config_root_hadoop
+
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 __all = ['get_conf', 'get_trash_interval', 'get_s3a_access_key', 'get_s3a_secret_key']
 
@@ -66,7 +72,7 @@ def _parse_core_site():
 
   try:
     _CORE_SITE_PATH = get_config_root_hadoop('core-site.xml')
-    data = file(_CORE_SITE_PATH, 'r').read()
+    data = open_file(_CORE_SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_CORE_SITE_PATH, err))
