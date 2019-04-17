@@ -29,7 +29,8 @@ import os
 import pkg_resources
 import sys
 
-#from guppy import hpy
+if sys.version_info[0] < 3:
+  from guppy import hpy
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -574,15 +575,15 @@ if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE')
   raise Exception(_('SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s') % os.environ['REQUESTS_CA_BUNDLE'])
 
 # Memory
-#if desktop.conf.MEMORY_PROFILER.get():
-#  MEMORY_PROFILER = hpy()
-#  MEMORY_PROFILER.setrelheap()
+if sys.version_info[0] < 3 and desktop.conf.MEMORY_PROFILER.get():
+  MEMORY_PROFILER = hpy()
+  MEMORY_PROFILER.setrelheap()
 
 # Instrumentation
 if desktop.conf.INSTRUMENTATION.get():
-  try:
+  if sys.version_info[0] < 3:
     gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
-  except AttributeError:
+  else:
     # https://stackoverflow.com/questions/37737753/watching-generation-lists-during-a-program-run
     #gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_STATS)
     gc.set_debug(gc.DEBUG_UNCOLLECTABLE)

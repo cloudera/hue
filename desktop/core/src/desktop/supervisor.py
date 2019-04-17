@@ -30,13 +30,12 @@ an entry_point to your application's egg with the name 'desktop.supervisor.specs
 This entry point should point to a SuperviseeSpec instance in your module.
 """
 from __future__ import print_function
-#from daemon.pidlockfile import PIDLockFile
 from builtins import str
 from builtins import range
 from builtins import object
-from daemon.pidfile import TimeoutPIDLockFile
+
 from daemon.daemon import DaemonContext
-#import exceptions
+from daemon.pidfile import TimeoutPIDLockFile as TimeOutPIDLockFile
 import grp
 import logging
 import optparse
@@ -53,11 +52,11 @@ import desktop.lib.daemon_utils
 import desktop.lib.paths
 import desktop.log
 
-# BaseException not available on python 2.4
-#try:
-#  MyBaseException = BaseException
-#except AttributeError:
-#  MyBaseException = exceptions.Exception
+if sys.version_info[0] < 3:
+  DEVNULL = file("/dev/null")
+else:
+  from subprocess import DEVNULL  # Python 3
+
 
 PROC_NAME = 'supervisor'
 LOG = logging.getLogger()
@@ -139,13 +138,9 @@ class Supervisor(threading.Thread):
       while True:
         self.state = Supervisor.RUNNING
         LOG.info("Starting process %s" % proc_str)
-        try:
-          null_file = file("/dev/null")
-        except NameError:
-          null_file = open("/dev/null")
 
         pipe = subprocess.Popen(self.cmdv, close_fds=True,
-                                stdin=null_file,
+                                stdin=DEVNULL,
                                 **self.popen_kwargs)
         LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
         CHILD_PIDS.append(pipe.pid)
