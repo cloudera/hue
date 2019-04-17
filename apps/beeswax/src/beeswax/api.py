@@ -161,7 +161,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
   except Exception as e:
     LOG.warn('Autocomplete data fetching error: %s' % e)
     response['code'] = 500
-    response['error'] = e.message
+    response['error'] = e.args[0]
 
   return response
 
