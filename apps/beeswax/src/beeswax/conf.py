@@ -296,7 +296,7 @@ AUTH_PASSWORD_SCRIPT = Config(
 
 def get_use_sasl_default():
   """Get from hive_site or backward compatibility"""
-  from hive_site import get_hiveserver2_authentication, get_use_sasl  # Cyclic dependency
+  from beeswax.hive_site import get_hiveserver2_authentication, get_use_sasl  # Cyclic dependency
   use_sasl = get_use_sasl()
   if use_sasl is not None:
     return use_sasl.upper() == 'TRUE'

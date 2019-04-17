@@ -154,14 +154,14 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
         raise Exception('Could not find column `%s`.`%s`.`%s`' % (database, table, column))
   except (QueryServerTimeoutException, TTransportException) as e:
     response['code'] = 503
-    response['error'] = e.message
+    response['error'] = str(e)
   except TypeError as e:
     response['code'] = 500
     response['error'] = str(e)
   except Exception as e:
     LOG.warn('Autocomplete data fetching error: %s' % e)
     response['code'] = 500
-    response['error'] = e.message
+    response['error'] = str(e)
 
   return response
 

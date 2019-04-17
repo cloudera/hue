@@ -471,7 +471,10 @@ class SuperClient(object):
       while tries_left:
         # clear exception state so our re-raise can't reraise something
         # old. This isn't strictly necessary, but feels safer.
-        sys.exc_clear()
+        # py3 doesn't have this
+        if sys.version_info[0] == 2:
+          sys.exc_clear()
+
         try:
           if not self.transport.isOpen():
             self.transport.open()

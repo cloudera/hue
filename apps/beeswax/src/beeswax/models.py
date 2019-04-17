@@ -21,6 +21,7 @@ import base64
 import datetime
 import json
 import logging
+import sys
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -481,7 +482,10 @@ class HiveServerQueryHandle(QueryHandle):
 
   @classmethod
   def get_decoded(cls, secret, guid):
-    return base64.decodestring(secret), base64.decodestring(guid)
+    if sys.version_info[0] > 2:
+      return base64.b64decode(secret), base64.b64decode(guid)
+    else:
+      return base64.decodestring(secret), base64.decodestring(guid)
 
   def get_encoded(self):
     return base64.encodestring(self.secret), base64.encodestring(self.guid)
