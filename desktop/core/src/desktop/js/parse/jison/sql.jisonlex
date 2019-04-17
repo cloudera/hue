@@ -62,8 +62,10 @@
 <hive>'REFERENCES'                         { return '<hive>REFERENCES'; }
 <hive>'REVOKE'                             { return '<hive>REVOKE'; }
 <hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
+<hive>'SYNC'                               { return '<hive>SYNC'; }
 <hive>'TABLE'                              { return '<hive>TABLE'; }
 <hive>'TIMESTAMP'                          { return '<hive>TIMESTAMP'; }
+<hive>'UTC_TIMESTAMP'                      { return '<hive>UTC_TIMESTAMP'; }
 <hive>'USER'                               { return '<hive>USER'; }
 <hive>'USING'                              { return '<hive>USING'; }
 <hive>'VIEWS'                              { return '<hive>VIEWS'; }
