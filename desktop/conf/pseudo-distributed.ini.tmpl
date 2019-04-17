@@ -760,6 +760,10 @@
     # Create a new user from OpenID Connect on login if it doesn't exist
     ## create_users_on_login=true
 
+    # When creating a new user, which 'claims' attribute from the OIDC provider to be used for creating the username.
+    #      Default to 'preferred_username'. Possible values include: 'email'
+    ## oidc_username_attribute=preferred_username
+
     # The group of users will be created and updated as superuser. To use this feature, setup in Keycloak:
     # 1. add the name of the group here
     # 2. in Keycloak, go to your_realm --> your_clients --> Mappers, add a mapper
