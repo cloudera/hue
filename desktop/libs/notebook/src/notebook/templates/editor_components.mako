@@ -258,7 +258,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </a>
 
         <!-- ko if: $root.canSave() -->
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)"><span class="caret"></span></a>
         <ul class="dropdown-menu pull-right">
           <li>
             <a class="pointer" title="${ _ko('Whether to open in presentation or editor mode by default') }" data-bind="click: function() { isPresentationModeDefault(!isPresentationModeDefault()); }">
@@ -289,7 +289,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </a>
 
         <!-- ko if: $root.canSave -->
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)"><span class="caret"></span></a>
         <ul class="dropdown-menu pull-right">
           <li>
             <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
@@ -1222,7 +1222,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <!-- /ko -->
     <!-- /ko -->
 
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)">
       <span class="caret"></span>
     </a>
     <ul class="dropdown-menu pull-right">
