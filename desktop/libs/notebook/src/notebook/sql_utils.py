@@ -43,6 +43,9 @@ def get_statements(hql_query):
 
 def get_current_statement(snippet):
   # Multiquery, if not first statement or arrived to the last query
+  should_close = False
+  if not snippet['result'].get('handle'):
+    return should_close, {}
   statement_id = snippet['result']['handle'].get('statement_id', 0)
   statements_count = snippet['result']['handle'].get('statements_count', 1)
 
@@ -51,7 +54,7 @@ def get_current_statement(snippet):
   statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
   previous_statement_hash = compute_statement_hash(statements[statement_id]['statement'])
   non_edited_statement = previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash')
-  should_close = False
+
   if snippet['result']['handle'].get('has_more_statements'):
     should_close = True
     if non_edited_statement:
