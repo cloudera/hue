@@ -95,7 +95,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
   f_progress, path_progress = tempfile.mkstemp()
   try:
     os.write(f_progress, '0')
-
+    #TODO: We need to move this metadata somewhere else, it gets erased on exception and we can no longer cleanup the files.
     meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'progress_path': path_progress, 'status': 'running', 'truncated': False} #TODO: Truncated
 
     result_wrapper = ResultWrapper(api, notebook, snippet, ResultWrapperCallback(notebook['uuid'], meta, f_log))
@@ -184,7 +184,6 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return ''
   elif state in states.EXCEPTION_STATES:
-    result.maybe_reraise()
     return ''
 
   info = result.info
@@ -210,7 +209,6 @@ def get_jobs(notebook, snippet, logs, **kwargs): #Re implement to fetch updated 
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return []
   elif state in states.EXCEPTION_STATES:
-    result.maybe_reraise()
     return []
 
   info = result.info
@@ -228,7 +226,6 @@ def progress(notebook, snippet, logs=None, **kwargs):
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
     return 1
   elif state in states.EXCEPTION_STATES:
-    result.maybe_reraise()
     return 1
 
   info = result.info
