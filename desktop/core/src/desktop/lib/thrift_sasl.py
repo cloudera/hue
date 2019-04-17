@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# Licensed to Cloudera, Inc. under one
+# Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements. See the NOTICE file
 # distributed with this work for additional information
 # regarding copyright ownership. The ASF licenses this file
@@ -18,14 +17,23 @@
 #
 """ SASL transports for Thrift. """
 
-from future import standard_library
-standard_library.install_aliases()
-from io import StringIO
-from thrift.transport import TTransport
-from thrift.transport.TTransport import *
-from thrift.protocol import TBinaryProtocol
-import sasl
+# Initially copied from the Impala repo
+
+from __future__ import absolute_import
+
+import sys
 import struct
+
+from thrift.transport.TTransport import (TTransportException, TTransportBase, CReadableTransport)
+
+# TODO: Check whether the following distinction is necessary. Does not appear to
+# break anything when `io.BytesIO` is used everywhere, but there may be some edge
+# cases where things break down.
+if sys.version_info[0] == 3:
+    from io import BytesIO as BufferIO
+else:
+    from cStringIO import StringIO as BufferIO
+
 
 class TSaslClientTransport(TTransportBase, CReadableTransport):
   START = 1
@@ -37,20 +45,23 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
   def __init__(self, sasl_client_factory, mechanism, trans):
     """
     @param sasl_client_factory: a callable that returns a new sasl.Client object
-    @param mechanism: the SASL mechanism (e.g. "GSSAPI", "PLAIN")
+    @param mechanism: the SASL mechanism (e.g. "GSSAPI")
     @param trans: the underlying transport over which to communicate.
     """
     self._trans = trans
     self.sasl_client_factory = sasl_client_factory
     self.sasl = None
     self.mechanism = mechanism
-    self.__wbuf = StringIO()
-    self.__rbuf = StringIO()
+    self.__wbuf = BufferIO()
+    self.__rbuf = BufferIO()
     self.opened = False
     self.encode = None
 
   def isOpen(self):
     return self._trans.isOpen()
+
+  def is_open(self):
+    return self.isOpen()
 
   def open(self):
     if not self._trans.isOpen():
@@ -125,7 +136,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
       self._flushPlain(buffer)
 
     self._trans.flush()
-    self.__wbuf = StringIO()
+    self.__wbuf = BufferIO()
 
   def _flushEncoded(self, buffer):
     # sasl.ecnode() does the encoding and adds the length header, so nothing
@@ -149,11 +160,11 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
 
   def read(self, sz):
     ret = self.__rbuf.read(sz)
-    if len(ret) != 0:
+    if len(ret) == sz:
       return ret
 
     self._read_frame()
-    return self.__rbuf.read(sz)
+    return ret + self.__rbuf.read(sz - len(ret))
 
   def _read_frame(self):
     header = self._trans.readAll(4)
@@ -170,7 +181,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
     else:
       # If the frames are not encoded, just pass it through
       decoded = self._trans.readAll(length)
-    self.__rbuf = StringIO(decoded)
+    self.__rbuf = BufferIO(decoded)
 
   def close(self):
     self._trans.close()
@@ -189,5 +200,5 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
     while len(prefix) < reqlen:
       self._read_frame()
       prefix += self.__rbuf.getvalue()
-    self.__rbuf = StringIO(prefix)
+    self.__rbuf = BufferIO(prefix)
     return self.__rbuf

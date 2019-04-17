@@ -21,6 +21,7 @@ import base64
 import datetime
 import logging
 import json
+import sys
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -484,7 +485,10 @@ class HiveServerQueryHandle(QueryHandle):
 
   @classmethod
   def get_decoded(cls, secret, guid):
-    return base64.decodestring(secret), base64.decodestring(guid)
+    if sys.version_info[0] == 2:
+      return base64.decodestring(secret), base64.decodestring(guid)
+    else:
+      return base64.b64decode(secret), base64.b64decode(guid)
 
   def get_encoded(self):
     return base64.encodestring(self.secret), base64.encodestring(self.guid)

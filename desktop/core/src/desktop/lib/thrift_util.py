@@ -470,7 +470,12 @@ class SuperClient(object):
       while tries_left:
         # clear exception state so our re-raise can't reraise something
         # old. This isn't strictly necessary, but feels safer.
-        sys.exc_clear()
+        try:
+          sys.exc_clear()
+        except AttributeError as e:
+          # py3 doesn't have this
+          pass
+
         try:
           if not self.transport.isOpen():
             self.transport.open()
