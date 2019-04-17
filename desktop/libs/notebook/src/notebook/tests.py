@@ -18,6 +18,7 @@
 
 import json
 
+from collections import OrderedDict
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
@@ -37,12 +38,7 @@ from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
-
-
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+from notebook.models import Analytics
 
 
 class TestNotebookApi(object):
@@ -478,3 +474,20 @@ def test_get_interpreters_to_show():
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+
+
+class TestAnalytics():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_basic_stats(self):
+    try:
+      doc, created = Document2.objects.get_or_create(name='test_query_stats', type='query-hive', owner=self.user, data={})
+
+      Analytics.admin_stats()
+      Anaytics.user_stats(user=user)
+      Anaytics.query_stats(query=doc)
+    finally:
+      doc.delete()
