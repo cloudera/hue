@@ -684,7 +684,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     return None
 
   def filter_users_by_claims(self, claims):
-    username = claims.get('preferred_username')
+    username = claims.get(import_from_settings('OIDC_USERNAME_ATTRIBUTE', 'preferred_username'))
     if not username:
       return self.UserModel.objects.none()
     return self.UserModel.objects.filter(username__iexact=username)
@@ -699,7 +699,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     """Return object for a newly created user account."""
     # Overriding lib's logic, use preferred_username from oidc as username
 
-    username = claims.get('preferred_username', '')
+    username = claims.get(import_from_settings('OIDC_USERNAME_ATTRIBUTE', 'preferred_username'), '')
     email = claims.get('email', '')
     first_name = claims.get('given_name', '')
     last_name = claims.get('family_name', '')

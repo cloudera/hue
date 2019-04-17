@@ -1416,6 +1416,13 @@ OIDC = ConfigSection(
       default=True
     ),
 
+    OIDC_USERNAME_ATTRIBUTE=Config(
+      key="oidc_username_attribute",
+      help=_("The attribute to be used as username when creating and looking up the user."),
+      type=str,
+      default="preferred_username"
+    ),
+
     SUPERUSER_GROUP=Config(
       key="superuser_group",
       help=_("The group of users will be created and updated as superuser."),
