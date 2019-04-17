@@ -327,7 +327,7 @@ ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
 
 X_FRAME_OPTIONS = desktop.conf.X_FRAME_OPTIONS.get()
 
-# Configure hue admins
+# Configure admins
 ADMINS = []
 for admin in desktop.conf.DJANGO_ADMINS.get():
   admin_conf = desktop.conf.DJANGO_ADMINS[admin]
@@ -336,11 +336,10 @@ for admin in desktop.conf.DJANGO_ADMINS.get():
 ADMINS = tuple(ADMINS)
 MANAGERS = ADMINS
 
-# Server Email Address
 SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
-
-# Email backend
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
+EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
+
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
@@ -657,11 +656,11 @@ if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
 
 if desktop.conf.TASK_SERVER.ENABLED.get():
   CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
-  
+
   CELERY_ACCEPT_CONTENT = ['json']
   CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.RESULT_BACKEND.get()
   CELERY_TASK_SERIALIZER = 'json'
-  
+
   CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
 
 # %n will be replaced with the first part of the nodename.
