@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from io import open
 import errno
 import logging
 import os.path
@@ -63,7 +64,7 @@ def _parse_core_site():
   for indentifier in conf.HDFS_CLUSTERS.get():
     try:
       _CORE_SITE_PATH = os.path.join(conf.HDFS_CLUSTERS[indentifier].HADOOP_CONF_DIR.get(), 'core-site.xml') # Will KeyError and be empty as HADOOP_CONF_DIR does not exist anymore
-      data = file(_CORE_SITE_PATH, 'r').read()
+      data = open(_CORE_SITE_PATH).read()
       break
     except KeyError:
       data = ""

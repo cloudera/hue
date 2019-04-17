@@ -1004,7 +1004,7 @@ def safe_octal(octal_value):
   This correctly handles octal values specified as a string or as a numeric.
   """
   try:
-    return oct(octal_value)
+    return oct(octal_value).replace('o', '') # fix py3 octal value with 0o prefix
   except TypeError:
     return str(octal_value)
 
