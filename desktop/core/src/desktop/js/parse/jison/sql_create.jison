@@ -1159,6 +1159,7 @@ StoredAs_EDIT
 FileFormat
  : '<hive>AVRO'
  | '<hive>INPUTFORMAT' QuotedValue '<hive>OUTPUTFORMAT' QuotedValue
+ | '<hive>JSONFILE'
  | '<hive>ORC'
  | '<hive>PARQUET'
  | '<hive>RCFILE'

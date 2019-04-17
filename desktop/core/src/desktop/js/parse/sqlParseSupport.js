@@ -1578,6 +1578,7 @@ const initSqlParser = function(parser) {
       parser.suggestKeywords([
         'AVRO',
         'INPUTFORMAT',
+        'JSONFILE',
         'ORC',
         'PARQUET',
         'RCFILE',
