@@ -19,24 +19,28 @@ import logging
 import os
 import sys
 
-from desktop.conf import DEV
+from desktop import conf
+from desktop.lib.daemon_utils import drop_privileges_if_necessary
 
 from django.core.management.base import BaseCommand
 from django.utils import autoreload
 from django.utils.translation import ugettext as _
 
 SERVER_HELP = r"""
-  Run Hue using either the CherryPy server or the Spawning server, based on
-  the current configuration.
+  Run celery worker.
 """
 
 from celery.bin.celery import CeleryCommand
 from celery.bin.celery import main as celery_main
 
 LOG = logging.getLogger(__name__)
+CELERY_OPTIONS = {
+  'server_user': conf.SERVER_USER.get(),
+  'server_group': conf.SERVER_GROUP.get(),
+}
 
 class Command(BaseCommand):
-  help = _("Web server for Hue.")
+  help = SERVER_HELP
   def add_arguments(self, parser):
     parser.add_argument('worker')
     parser.add_argument(
@@ -64,7 +68,8 @@ class Command(BaseCommand):
 def runcelery(*args, **options):
   #CeleryCommand().handle_argv(['worker', '--app=desktop.celery', '--concurrency=1', '--loglevel=DEBUG'])
   opts = ['runcelery', 'worker', '--app=' + options['app'], '--concurrency=' + str(options['concurrency']), '--loglevel=' + options['loglevel']]
-  if DEV.get():
+  drop_privileges_if_necessary(CELERY_OPTIONS)
+  if conf.DEV.get():
     autoreload.main(celery_main, (opts,))
   else:
     celery_main(opts)
