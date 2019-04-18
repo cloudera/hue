@@ -95,7 +95,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
   f_log, path_log = tempfile.mkstemp()
   try:
     #TODO: We need to move this metadata somewhere else, it gets erased on exception and we can no longer cleanup the files.
-    meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'status': 'running', 'truncated': False} #TODO: Truncated
+    meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'status': 'running', 'truncated': False}
 
     result_wrapper = ResultWrapper(api, notebook, snippet, ResultWrapperCallback(notebook['uuid'], meta, f_log))
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move PREFETCH_RESULT_COUNT to front end
@@ -104,6 +104,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
     for chunk in response:
       os.write(f, chunk)
       meta['row_counter'] = content_generator.row_counter
+      meta['truncated'] = content_generator.is_truncated
       download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
   finally:
