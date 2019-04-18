@@ -26,6 +26,7 @@ import os.path
 import re
 import sys
 
+from django.utils.encoding import force_text
 from io import StringIO
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler
@@ -62,12 +63,7 @@ def _read_log_conf(proc_name, log_dir):
     return None
 
   try:
-    try:
-      log_conf_file = file(log_conf)
-    except NameError:
-      log_conf_file = open(log_conf)
-
-    raw = log_conf_file.read()
+    raw = force_text(open(log_conf, 'rt').read())
     sio = StringIO(CONF_RE.sub(_repl, raw))
     return sio
   except IOError as ex:

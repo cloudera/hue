@@ -89,6 +89,7 @@ try:
 except ImportError:
   from ordereddict import OrderedDict # Python 2.6
 
+type_of_str = type('') # avoid collision builtins str
 
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
@@ -646,7 +647,7 @@ def coerce_string(value):
     return value
 
 def coerce_csv(value):
-  if isinstance(value, str):
+  if isinstance(value, type_of_str):
     return value.split(',')
   elif isinstance(value, list):
     return value
