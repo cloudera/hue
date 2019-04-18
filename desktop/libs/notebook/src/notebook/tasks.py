@@ -27,6 +27,7 @@ import time
 from celery.utils.log import get_task_logger
 from celery import states
 
+from django.core.cache import caches
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
@@ -92,11 +93,9 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   f, path = tempfile.mkstemp()
   f_log, path_log = tempfile.mkstemp()
-  f_progress, path_progress = tempfile.mkstemp()
   try:
-    os.write(f_progress, '0')
     #TODO: We need to move this metadata somewhere else, it gets erased on exception and we can no longer cleanup the files.
-    meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'progress_path': path_progress, 'status': 'running', 'truncated': False} #TODO: Truncated
+    meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'status': 'running', 'truncated': False} #TODO: Truncated
 
     result_wrapper = ResultWrapper(api, notebook, snippet, ResultWrapperCallback(notebook['uuid'], meta, f_log))
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move PREFETCH_RESULT_COUNT to front end
@@ -110,7 +109,6 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
   finally:
     os.close(f)
     os.close(f_log)
-    os.close(f_progress)
   return meta
 
 @app.task(ignore_result=True)
@@ -256,8 +254,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   info = result.info
   skip = 0
   if not start_over:
-    with open(info.get('progress_path'), 'r') as f:
-      skip = int(f.read())
+    skip = caches['default'].get(_fetch_progress_key(notebook), default=0)
   target = skip + rows
 
   if info.get('handle', {}).get('has_result_set', False):
@@ -279,9 +276,8 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
           if count >= target:
             break
 
-    with open(info.get('progress_path'), 'w') as f:
-      f.write(str(count))
-  
+    caches['default'].set(_fetch_progress_key(notebook), count, timeout=None)
+
     results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
 
   return results
@@ -320,7 +316,7 @@ def cancel(*args, **kwargs):
   result.forget()
   os.remove(info.get('file_path'))
   os.remove(info.get('log_path'))
-  os.remove(info.get('progress_path'))
+  caches['default'].delete(_fetch_progress_key(notebook))
   return {'status': 0}
 
 def close_statement(*args, **kwargs):
@@ -342,8 +338,20 @@ def close_statement(*args, **kwargs):
   result.forget()
   os.remove(info.get('file_path'))
   os.remove(info.get('log_path'))
-  os.remove(info.get('progress_path'))
+  caches['default'].delete(_fetch_progress_key(notebook))
   return {'status': 0}
+
+def _log_key(notebook):
+  return notebook['uuid'] + '_log'
+
+def _result_key(notebook):
+  return notebook['uuid'] + '_result'
+
+def _fetch_progress_key(notebook):
+  return notebook['uuid'] + '_fetch_progress'
+
+def _meta_key(notebook):
+  return notebook['uuid'] + '_fetch_progress'
 
 def _cancel_statement_async_id(notebook):
   return notebook['uuid'] + '_cancel'
