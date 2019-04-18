@@ -22,6 +22,8 @@ Hue is often run with:
 
 ### Task Server
 
+** Not fully supported yet**
+
 The task server is currently a work in progress to outsource all the blocking or resource intensive operations
 outside of the API server. Follow [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) for more information
 on when first usable task will be released.
@@ -38,7 +40,7 @@ In hue.ini, telling the API server that the Task Server is available:
     [[task_server]]
     enabled=true
 
-Starting the  Task server:
+Starting the Task server:
 
     ./build/env/bin/celery worker -l info -A desktop
 
@@ -51,13 +53,25 @@ Running a test tasks:
     debug_task.delay()
     debug_task.delay().get() # Works if result backend is setup and task_server is true in the hue.ini
 
-Starting the Task Scheduler server:
+Task Scheduler server
 
-    ./build/env/bin/celery -A core beat -l info
+For schedules configured statically in Python:
 
-or when Django Celery Beat is enabled:
+    ./build/env/bin/celery -A desktop beat -l info
 
-    ./build/env/bin/celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+For schedules configured dynamically via a table with Django Celery Beat:
+
+    [desktop]
+    [[task_server]]
+    beat_enabled=false
+
+Then:
+
+    ./build/env/bin/celery -A desktop beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+Note: the first time the tables need to be created with:
+
+    ./build/env/bin/hue migrate
 
 ### Monitoring
 
