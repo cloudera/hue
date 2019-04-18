@@ -21,7 +21,7 @@ from django.core import mail
 from django.core.management.base import BaseCommand
 
 
-from notebook.models import Anaytics
+from notebook.models import Analytics
 
 
 class Command(BaseCommand):
@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     print('Starting...')
-    stats = Anaytics.admin_stats()
+    stats = Analytics.admin_stats()
     msg = '\n\n'.join(['%s\t=\t%s' % stat for stat in stats])
 
     mail.mail_admins(subject='Query Stats', message=msg, fail_silently=True)

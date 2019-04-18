@@ -487,7 +487,7 @@ class TestAnalytics():
       doc, created = Document2.objects.get_or_create(name='test_query_stats', type='query-hive', owner=self.user, data={})
 
       Analytics.admin_stats()
-      Anaytics.user_stats(user=user)
-      Anaytics.query_stats(query=doc)
+      Analytics.user_stats(user=self.user)
+      Analytics.query_stats(query=doc)
     finally:
       doc.delete()
