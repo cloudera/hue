@@ -20,14 +20,16 @@ tarball, you'll need these library development packages and tools installed on y
 
     sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
 
+
 **Install Node.js**
 
-On Ubuntu 16.04 or less:
-
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
     sudo apt-get install -y nodejs
 
+
 **Install Oracle JDK**
+
+On Ubuntu 16.04 or less only:
 
     sudo add-apt-repository ppa:webupd8team/java
     sudo apt-get update
