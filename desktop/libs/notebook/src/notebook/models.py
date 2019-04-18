@@ -469,7 +469,7 @@ def _update_property_value(properties, key, value):
       prop.update({'value': value})
 
 
-class Anaytics():
+class Analytics():
 
   @classmethod
   def admin_stats(cls):
@@ -490,7 +490,7 @@ class Anaytics():
     return stats
 
   @classmethod
-  def user_stats(cls, user_id, user=None):
+  def user_stats(cls, user_id=None, user=None):
     stats = []
     one_month = datetime.date.today() - timedelta(days=30)
 
@@ -527,7 +527,7 @@ class Anaytics():
     return stats
 
   @classmethod
-  def query_stats(cls, query_id, query=None):
+  def query_stats(cls, query_id=None, query=None):
     stats = []
     one_month = datetime.date.today() - timedelta(days=30)
 
