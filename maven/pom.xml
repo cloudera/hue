@@ -38,7 +38,7 @@
 
   <properties>
     <minJavaVersion>1.7</minJavaVersion>
-    <maxJavaVersion>10.0</maxJavaVersion>
+    <maxJavaVersion>12.0</maxJavaVersion>
     <sourceJavaVersion>1.7</sourceJavaVersion>
     <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
