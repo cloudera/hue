@@ -1004,7 +1004,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
           <!-- ko if: !$root.isResultFullScreenMode() -->
             <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
           <!-- /ko -->
@@ -1716,7 +1716,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="visible: status() === 'running' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
     <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
       <div class="progress-snippet progress" data-bind="css: {
-        'progress-starting': progress() == 0 && status() == 'running',
+        'progress-starting': progress() == 0 && (status() == 'running' || status() == 'starting'),
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
         'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
@@ -1790,7 +1790,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
     </div>
     <!-- ko if: !isCanceling() -->
-    <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel operation') }">
+    <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting'" title="${ _('Cancel operation') }">
       <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
     <!-- /ko -->
@@ -1806,7 +1806,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
       <!-- /ko -->
       <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
-      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading' && status() != 'starting', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
         <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : ! $parent.isBatchable() }"></i>
       </a>
       <!-- /ko -->

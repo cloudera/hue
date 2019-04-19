@@ -42,7 +42,7 @@ class SparkBatchApi(Api):
     elif snippet['type'] == 'py':
         properties = {
             'file': snippet['properties'].get('py_file'),
-            'args': snippet['properties'].get('argument'),
+            'args': snippet['properties'].get('argument', []),
         }
     else:
         properties = {
