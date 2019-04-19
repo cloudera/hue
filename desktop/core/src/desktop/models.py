@@ -785,6 +785,17 @@ class Document(models.Model):
       return staticfiles_storage.url('desktop/art/icon_hue_48.png')
 
   def share(self, users, groups, name='read'):
+    if True:
+      for user in users:
+        # get_groups()
+        # add message
+        # email task
+        pass
+      for group in groups:
+        # for each user in group:
+        #  if user not already above
+        #    add message / email task
+        pass
     DocumentPermission.objects.filter(document=self, name=name).update(users=users, groups=groups, add=True)
 
   def unshare(self, users, groups, name='read'):
