@@ -1628,6 +1628,7 @@ class Snippet {
             (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
             (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
             (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
+            (['py'].indexOf(self.type()) != -1 && self.properties().py_file().length > 0) ||
             (['distcp'].indexOf(self.type()) != -1 &&
               self.properties().source_path().length > 0 &&
               self.properties().destination_path().length > 0))) ||
@@ -2255,8 +2256,10 @@ class Snippet {
                 if (!notebook.unloaded()) {
                   self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
                 }
-              } else if (self.status() === 'available') {
-                self.fetchResult(100);
+              } else if (self.status() === 'available' || self.status() === 'success') {
+                if (self.status() === 'available') {
+                  self.fetchResult(100);
+                }
                 self.progress(100);
                 if (self.isSqlDialect()) {
                   if (self.result.handle().has_result_set) {
@@ -2283,8 +2286,6 @@ class Snippet {
                 if (!self.result.handle().has_more_statements && vm.successUrl()) {
                   window.location.href = vm.successUrl(); // Not used anymore in Hue 4
                 }
-              } else if (self.status() === 'success') {
-                self.progress(99);
               }
             } else if (data.status === -3) {
               self.status('expired');
