@@ -8,6 +8,7 @@ High Level Roadmap
 * [ ] Python 3 support [HUE-8737](https://issues.cloudera.org/browse/HUE-8737)
 * [ ] Docker [HUE-8743](https://issues.cloudera.org/browse/HUE-8743)
 * [ ] Kubernetes [HUE-8744](https://issues.cloudera.org/browse/HUE-8744)
+* [ ] Reference architecture [HUE-8815](https://issues.cloudera.org/browse/HUE-8815)
 * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
 * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
 * [x] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
