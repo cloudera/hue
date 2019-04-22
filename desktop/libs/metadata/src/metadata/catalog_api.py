@@ -32,7 +32,7 @@ from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.catalog.base import get_api
 from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
-from metadata.conf import has_catalog, CATALOG, has_catalog_file_search
+from metadata.conf import has_catalog, CATALOG, has_catalog_file_search, NAVIGATOR
 
 
 LOG = logging.getLogger(__name__)
@@ -107,7 +107,8 @@ def search_entities_interactive(request):
 
   if response.get('facets'): # Remove empty facets
     for fname, fvalues in response['facets'].items():
-      if CATALOG.APPLY_SENTRY_PERMISSIONS.get():
+      # Should be a CATALOG option at some point for hidding table with no access / asking for access.
+      if interface == 'navigator' and NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
         fvalues = []
       else:
         fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
