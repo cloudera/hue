@@ -26,6 +26,7 @@ import uuid
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
 from django.utils.html import escape
@@ -480,11 +481,13 @@ class Analytics():
 
     stats.append(('Last modified', '1 week'))
     stats.append(('Users', User.objects.filter(last_login__gte=one_week).count()))
+    stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_week).count()))
     stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_week, is_history=True, type__startswith='query-').count()))
     stats.append(('Saved queries', Document2.objects.filter(last_modified__gte=one_week, is_history=False, type__startswith='query-').count()))
 
     stats.append(('\nAll', ''))
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
+    stats.append(('Sessions 30 days', Session.objects.filter(expire_date__gte=one_month).count()))
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
 
     return stats

@@ -31,7 +31,7 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     print('Starting...')
     stats = Analytics.admin_stats()
-    msg = '\n\n'.join(['%s\t=\t%s' % stat for stat in stats])
+    msg = '\n'.join(['%s\t=\t%s' % stat for stat in stats])
 
     mail.mail_admins(subject='Query Stats', message=msg, fail_silently=True)
 
