@@ -713,6 +713,7 @@ Other things to update:
 * Update http://gethue.com 'Release' menu
 * Update http://demo.gethue.com/
 * Update Docker image https://hub.docker.com/u/gethue/
+* Update release date on https://en.wikipedia.org/wiki/Hue_(Software)
 
 Instructions:
 
