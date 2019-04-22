@@ -811,14 +811,17 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     return profile
 
+
   def _get_impala_profile_plan(self, query_id, profile):
     query_plan_re = "Query \(id=%(query_id)s\):.+?Execution Profile %(query_id)s" % {'query_id': query_id}
     query_plan_match = re.search(query_plan_re, profile, re.MULTILINE | re.DOTALL)
     return query_plan_match.group() if query_plan_match else None
 
+
   def describe_column(self, notebook, snippet, database=None, table=None, column=None):
     db = self._get_db(snippet, self.cluster)
     return db.get_table_columns_stats(database, table, column)
+
 
   def describe_table(self, notebook, snippet, database=None, table=None):
     db = self._get_db(snippet, self.cluster)
@@ -836,7 +839,7 @@ DROP TABLE IF EXISTS `%(table)s`;
       'details': tb.details,
       'stats': tb.stats
     }
-    
+
 
   def describe_database(self, notebook, snippet, database=None):
     db = self._get_db(snippet, self.cluster)
