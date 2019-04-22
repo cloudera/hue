@@ -833,13 +833,16 @@ def _get_statement_from_file(user, fs, snippet):
     if fs.do_as_user(user, fs.isfile, script_path):
       return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)
 
-def describe(request, database, table):
+
+@require_POST
+@api_error_handler
+def describe(request, database, table, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
   snippet = {'type': source_type}
 
-  describe = get_api(request, snippet).describe(notebook, snippet, database, table)
+  describe = get_api(request, snippet).describe(notebook, snippet, database, table, column=column)
   response.update(describe)
 
   return JsonResponse(response)
