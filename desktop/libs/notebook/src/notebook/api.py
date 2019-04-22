@@ -324,7 +324,7 @@ def get_logs(request):
   response['logs'] = logs.strip()
   response['progress'] = min(db.progress(notebook, snippet, logs=full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
-  response['isFullLogs'] = isinstance(db, (OozieApi, DataEngApi))
+  response['isFullLogs'] = db.get_log_is_full_log(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)

@@ -1677,6 +1677,18 @@ TASK_SERVER = ConfigSection(
       type=coerce_positive_integer,
       help=_('Number of rows to prefetch to Hue storage')
     ),
+    RESULT_FILE_STORAGE = Config(
+      key='result_file_storage',
+      type=str,
+      help=_('Django file storage class to use to temporarily store query results'),
+      default='{}'
+    ),
+    EXECUTION_STORAGE = Config(
+      key='execution_storage',
+      type=str,
+      help=_('Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.'),
+      default='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
+    ),
 ))
 
 

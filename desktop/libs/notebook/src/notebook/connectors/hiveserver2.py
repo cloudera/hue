@@ -840,7 +840,9 @@ DROP TABLE IF EXISTS `%(table)s`;
       'stats': tb.stats
     }
 
-
   def describe_database(self, notebook, snippet, database=None):
     db = self._get_db(snippet, self.cluster)
     return db.get_database(database)
+
+  def get_log_is_full_log(self, notebook, snippet):
+    return snippet['type'] != 'hive' and snippet['type'] != 'impala'
