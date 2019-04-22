@@ -21,6 +21,7 @@
 # as local_settings.py.
 
 import gc
+import json
 import logging
 import os
 import pkg_resources
@@ -383,6 +384,9 @@ CACHES = {
         'LOCATION': 'unique-hue'
     }
 }
+CACHES_CELERY_KEY = 'celery'
+if desktop.conf.TASK_SERVER.ENABLED.get():
+  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()

@@ -17,17 +17,16 @@
 from __future__ import absolute_import, unicode_literals
 
 import csv
-import os
 import json
 import logging
+import StringIO
 import sys
-import tempfile
-import time
 
 from celery.utils.log import get_task_logger
 from celery import states
 
 from django.core.cache import caches
+from django.core.files.storage import get_storage_class
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
@@ -37,6 +36,7 @@ from desktop.celery import app
 from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib import fsmanager
+from desktop.settings import CACHES_CELERY_KEY
 
 from notebook.connectors.base import get_api, QueryExpired, ResultWrapper
 from notebook.sql_utils import get_current_statement
@@ -57,12 +57,14 @@ STATE_MAP = {
   states.REJECTED: 'rejected',
   states.IGNORED: 'ignored'
 }
+storage_info = json.loads(TASK_SERVER.RESULT_FILE_STORAGE.get())
+storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
 
 class ResultWrapperCallback(object):
-  def __init__(self, uuid, meta, log_file_handle):
+  def __init__(self, uuid, meta, f_log):
     self.meta = meta
     self.uuid = uuid
-    self.log_file_handle = log_file_handle
+    self.f_log = f_log
 
   def on_execute(self, handle):
     if handle.get('sync', False) and handle['result'].get('data'):
@@ -75,14 +77,14 @@ class ResultWrapperCallback(object):
     self.meta['handle'] = handle_without_data
 
   def on_log(self, log):
-    os.write(self.log_file_handle, log)
+    self.f_log.write(log)
+    self.f_log.flush()
 
   def on_status(self, status):
     self.meta['status'] = status
     download_to_file.update_state(task_id=self.uuid, state='PROGRESS', meta=self.meta)
 
 #TODO: Add periodic cleanup task
-#TODO: move file paths to a file like API so we can change implementation
 #TODO: UI should be able to close a query that is available, but not expired
 @app.task()
 def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs):
@@ -91,25 +93,20 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
 
-  f, path = tempfile.mkstemp()
-  f_log, path_log = tempfile.mkstemp()
-  try:
-    #TODO: We need to move this metadata somewhere else, it gets erased on exception and we can no longer cleanup the files.
-    meta = {'row_counter': 0, 'file_path': path, 'handle': {}, 'log_path': path_log, 'status': 'running', 'truncated': False}
+  meta = {'row_counter': 0, 'handle': {}, 'status': '', 'truncated': False}
 
+  with storage.open(_log_key(notebook), 'wb') as f_log:
     result_wrapper = ResultWrapper(api, notebook, snippet, ResultWrapperCallback(notebook['uuid'], meta, f_log))
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move PREFETCH_RESULT_COUNT to front end
     response = export_csvxls.create_generator(content_generator, file_format)
 
-    for chunk in response:
-      os.write(f, chunk)
-      meta['row_counter'] = content_generator.row_counter
-      meta['truncated'] = content_generator.is_truncated
-      download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
+    with storage.open(_result_key(notebook), 'wb') as f:
+      for chunk in response:
+        f.write(chunk)
+        meta['row_counter'] = content_generator.row_counter
+        meta['truncated'] = content_generator.is_truncated
+        download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
-  finally:
-    os.close(f)
-    os.close(f_log)
   return meta
 
 @app.task(ignore_result=True)
@@ -124,6 +121,7 @@ def close_statement_async(notebook, snippet, **kwargs):
 
 #TODO: Convert csv to excel if needed
 def download(*args, **kwargs):
+  notebook = args[0]
   result = download_to_file.AsyncResult(args[0]['uuid'])
   state = result.state
   if state == states.PENDING:
@@ -133,7 +131,7 @@ def download(*args, **kwargs):
 
   info = result.wait() # TODO: Start returning data even if we're not done
 
-  return export_csvxls.file_reader(open(info['file_path'], 'rb'))
+  return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))
 
 # Why we need this:
 # 1) There is no way in celery to differentiate between a task that was submitted, but not yet started and a task that has been GCed.
@@ -185,20 +183,19 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
   elif state in states.EXCEPTION_STATES:
     return ''
 
-  info = result.info
   if not startFrom:
-    with open(info.get('log_path'), 'r') as f:
+    with storage.open(_log_key(notebook), 'r') as f:
       return f.read()
   else:
     count = 0
-    data = ''
-    with open(info.get('log_path'), 'r') as f:
+    output = StringIO.StringIO()
+    with storage.open(_log_key(notebook), 'r') as f:
       for line in f:
         count += 1
         if count <= startFrom:
           continue
-        data += line
-    return data
+        output.write(line)
+    return output.getvalue()
 
 def get_jobs(notebook, snippet, logs, **kwargs): #Re implement to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
@@ -255,13 +252,13 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   info = result.info
   skip = 0
   if not start_over:
-    skip = caches['default'].get(_fetch_progress_key(notebook), default=0)
+    skip = caches[CACHES_CELERY_KEY].get(_fetch_progress_key(notebook), default=0)
   target = skip + rows
 
   if info.get('handle', {}).get('has_result_set', False):
     csv.field_size_limit(sys.maxsize)
     count = 0
-    with open(info.get('file_path'), 'r') as f:
+    with storage.open(_result_key(notebook)) as f:
       csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
       first = next(csv_reader, None)
       if first: # else no data to read
@@ -277,7 +274,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
           if count >= target:
             break
 
-    caches['default'].set(_fetch_progress_key(notebook), count, timeout=None)
+    caches[CACHES_CELERY_KEY].set(_fetch_progress_key(notebook), count, timeout=None)
 
     results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
 
@@ -303,44 +300,49 @@ def cancel(*args, **kwargs):
   snippet = args[1]
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+  status = 0
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
-    return {'status': -1}
+    status = -1
   elif state in states.EXCEPTION_STATES:
-    result.maybe_reraise()
-    return {'status': -1}
+    status = -1
 
-  info = result.info
-  snippet['result']['handle'] = info.get('handle', {}).copy()
-  cancel_async.apply_async(args=args, kwargs=kwargs, task_id=_cancel_statement_async_id(notebook))
+  if status == 0:
+    info = result.info
+    snippet['result']['handle'] = info.get('handle', {}).copy()
+    cancel_async.apply_async(args=args, kwargs=kwargs, task_id=_cancel_statement_async_id(notebook))
+
   result.forget()
-  os.remove(info.get('file_path'))
-  os.remove(info.get('log_path'))
-  caches['default'].delete(_fetch_progress_key(notebook))
-  return {'status': 0}
+  _cleanup(notebook)
+  return {'status': status}
 
 def close_statement(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+  status = 0
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
-    return {'status': -1}
+    status = -1
   elif state in states.EXCEPTION_STATES:
-    result.maybe_reraise()
-    return {'status': -1}
+    status = -1
 
-  info = result.info
-  snippet['result']['handle'] = info.get('handle', {}).copy()
-  close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook))
+  if status == 0:
+    info = result.info
+    snippet['result']['handle'] = info.get('handle', {}).copy()
+    close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook))
+
   result.forget()
-  os.remove(info.get('file_path'))
-  os.remove(info.get('log_path'))
-  caches['default'].delete(_fetch_progress_key(notebook))
-  return {'status': 0}
+  _cleanup(notebook)
+  return {'status': status}
+
+def _cleanup(notebook):
+  storage.delete(_result_key(notebook))
+  storage.delete(_log_key(notebook))
+  caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook))
 
 def _log_key(notebook):
   return notebook['uuid'] + '_log'
@@ -349,9 +351,6 @@ def _result_key(notebook):
   return notebook['uuid'] + '_result'
 
 def _fetch_progress_key(notebook):
-  return notebook['uuid'] + '_fetch_progress'
-
-def _meta_key(notebook):
   return notebook['uuid'] + '_fetch_progress'
 
 def _cancel_statement_async_id(notebook):

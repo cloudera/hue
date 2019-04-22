@@ -541,6 +541,9 @@ class Api(object):
 
     return resp
 
+  def get_log_is_full_log(self, notebook, snippet):
+    return True
+
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
@@ -577,13 +580,18 @@ class ResultWrapper():
     count = 0
     sleep_seconds = 1
     check_status_count = 0
+    get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
     while True:
       response = self.api.check_status(self.notebook, self.snippet)
       if self.callback and hasattr(self.callback, 'on_status'):
         self.callback.on_status(response['status'])
       if self.callback and hasattr(self.callback, 'on_log'):
         log = self.api.get_log(self.notebook, self.snippet, startFrom=count)
+        if get_log_is_full_log:
+          log = log[count:]
+
         self.callback.on_log(log)
+        count += len(log)
 
       if response['status'] not in ['waiting', 'running', 'submitted']:
         break
