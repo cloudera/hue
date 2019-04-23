@@ -31,6 +31,7 @@ import json
 import re
 import io
 import struct
+import sys
 import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
@@ -266,6 +267,10 @@ class HS2Api(Api):
 
     # All good
     server_id, server_guid = handle.get()
+    if sys.version_info[0] == 3:
+      server_id = server_id.decode('utf-8')
+      server_guid = server_guid.decode('utf-8')
+
     response = {
       'secret': server_id,
       'guid': server_guid,
@@ -726,7 +731,10 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def __compute_statement_hash(self, statement):
-    return hashlib.sha224(smart_str(statement)).hexdigest()
+    if sys.version_info[0] == 3:
+      return hashlib.sha224(statement.encode()).hexdigest()
+    else:
+      return hashlib.sha224(smart_str(statement)).hexdigest()
 
 
   def _prepare_hql_query(self, snippet, statement, session):

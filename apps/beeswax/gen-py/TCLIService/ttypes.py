@@ -2646,7 +2646,7 @@ class TStringColumn(object):
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.nulls = iprot.readString()
+          self.nulls = iprot.readBinary()
         else:
           iprot.skip(ftype)
       else:
@@ -3220,12 +3220,12 @@ class THandleIdentifier(object):
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.guid = iprot.readString()
+          self.guid = iprot.readBinary()
         else:
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.secret = iprot.readString()
+          self.secret = iprot.readBinary()
         else:
           iprot.skip(ftype)
       else:
@@ -3240,11 +3240,11 @@ class THandleIdentifier(object):
     oprot.writeStructBegin('THandleIdentifier')
     if self.guid is not None:
       oprot.writeFieldBegin('guid', TType.STRING, 1)
-      oprot.writeString(self.guid)
+      oprot.writeBinary(self.guid)
       oprot.writeFieldEnd()
     if self.secret is not None:
       oprot.writeFieldBegin('secret', TType.STRING, 2)
-      oprot.writeString(self.secret)
+      oprot.writeBinary(self.secret)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -4197,7 +4197,7 @@ class TExecuteStatementReq(object):
       oprot.writeFieldEnd()
     if self.statement is not None:
       oprot.writeFieldBegin('statement', TType.STRING, 2)
-      oprot.writeString(self.statement)
+      oprot.writeBinary(self.statement)
       oprot.writeFieldEnd()
     if self.confOverlay is not None:
       oprot.writeFieldBegin('confOverlay', TType.MAP, 3)
