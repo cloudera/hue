@@ -418,6 +418,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_threads" class="embeddable"></div>
       <div id="embeddable_metrics" class="embeddable"></div>
       <div id="embeddable_connectors" class="embeddable"></div>
+      <div id="embeddable_analytics" class="embeddable"></div>
       <div id="embeddable_403" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
@@ -564,6 +565,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
     metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
     connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
+    analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
     sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
     jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
     % if other_apps:

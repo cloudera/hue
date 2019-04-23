@@ -527,6 +527,15 @@ class OnePageViewModel {
         }
       },
       {
+        url: '/desktop/analytics',
+        app: function() {
+          self.loadApp('analytics');
+          self.getActiveAppViewModel(viewModel => {
+            viewModel.fetchAnalytics();
+          });
+        }
+      },
+      {
         url: '/desktop/download_logs',
         app: function() {
           location.href = '/desktop/download_logs';
