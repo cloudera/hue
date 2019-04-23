@@ -222,7 +222,7 @@ class Snippet {
 
     self.inFocus.subscribe(newValue => {
       if (newValue) {
-        huePubSub.publish('active.snippet.type.changed', self.type());
+        huePubSub.publish('active.snippet.type.changed', { type: self.type(), isSqlDialect: self.isSqlDialect() });
       }
     });
 
