@@ -917,9 +917,13 @@ In hue.ini, telling the API server that the Task Server is available:
     [[task_server]]
     enabled=true
 
-Starting the  Task server:
+Starting the Task server:
 
-    ./build/env/bin/celery worker -l info -A desktop
+    ./build/env/bin/hue runcelery worker --concurrency=1
+
+Starting the Task server in a Cloudera Manager environment:
+
+    ./build/env/bin/hue runcelery worker --concurrency=1 --cm-managed
 
 Running a test tasks:
 
