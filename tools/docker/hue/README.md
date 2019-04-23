@@ -66,12 +66,16 @@ docker run -it -p 8888:8888 -v $PWD/tools/docker/hue/hue.ini:/usr/share/hue/desk
 or copy the [``desktop/conf.dist/hue.ini``](/desktop/conf.dist/hue.ini):
 
 ```
-cp /desktop/conf.dist/hue.ini .
+cp desktop/conf.dist/hue.ini .
 
 docker run -it -p 8888:8888 -v $PWD/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue
 ```
 
-Read more about configuring Hue on the [blog](http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/).
+*Note*
+
+If for example the database is pointing to your localhost, if using Docker on Linux just add the '--network="host"' parameter and the container will correctly point to it.
+
+    sudo docker run -it -p 8888:8888 -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" hue
 
 
 #### Docker Compose
