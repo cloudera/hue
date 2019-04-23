@@ -46,7 +46,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
   def __init__(self, sasl_client_factory, mechanism, trans):
     """
     @param sasl_client_factory: a callable that returns a new sasl.Client object
-    @param mechanism: the SASL mechanism (e.g. "GSSAPI")
+    @param mechanism: the SASL mechanism (e.g. "GSSAPI", "PLAIN")
     @param trans: the underlying transport over which to communicate.
     """
     self._trans = trans
