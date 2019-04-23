@@ -1,5 +1,5 @@
-registry: "docker-registry.infra.cloudera.com/cloudera/datawarehouse"
-tag: "v2"
+registry: "docker.io/gethue/hue"
+tag: "latest"
 aws:
   accessKeyId: ""
   secretAccessKey: ""
