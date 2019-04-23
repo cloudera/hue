@@ -51,7 +51,7 @@ if TASK_SERVER.ENABLED.get():
 class ApiWrapper(object):
   def __init__(self, request, snippet):
     self.request = request
-    self.snippet = snippet
+    self.api = _get_api(request, snippet)
   def __getattr__(self, name):
     if TASK_SERVER.ENABLED.get() and hasattr(ntasks, name):
       attr = object.__getattribute__(ntasks, name)
@@ -59,8 +59,7 @@ class ApiWrapper(object):
         return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
       return _method
     else:
-      api = _get_api(self.request, self.snippet)
-      return object.__getattribute__(api, name)
+      return object.__getattribute__(self.api, name)
 
 def get_api(request, snippet):
   return ApiWrapper(request, snippet)
