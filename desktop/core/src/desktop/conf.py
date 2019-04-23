@@ -23,10 +23,7 @@ import os
 import socket
 import stat
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+from collections import OrderedDict
 
 from django.db import connection
 from django.utils.translation import ugettext_lazy as _
@@ -41,6 +38,7 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
+
 
 LOG = logging.getLogger(__name__)
 
@@ -700,6 +698,18 @@ CONNECTORS = ConfigSection(
       key='list',
       default=['impala'],
       type=coerce_csv),
+  )
+)
+
+ANALYTICS = ConfigSection(
+  key='analytics',
+  help=_("""Configuration options for analytics user usage for admins"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Enable analytics page'),
+      default=False,
+      type=coerce_bool),
   )
 )
 
