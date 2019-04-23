@@ -84,7 +84,10 @@ def get_current_statement(snippet):
 
 
 def compute_statement_hash(statement):
-  return hashlib.sha224(smart_str(statement)).hexdigest()
+  if sys.version_info[0] > 2:
+    return hashlib.sha224(statement.encode()).hexdigest()
+  else:
+    return hashlib.sha224(smart_str(statement)).hexdigest()
 
 def split_statements(hql):
   """

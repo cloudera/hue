@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+import sys
+
 from builtins import range
 from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
@@ -2646,7 +2648,10 @@ class TStringColumn(object):
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.nulls = iprot.readString()
+          if sys.version_info[0] > 2:
+            self.nulls = iprot.readBinary()
+          else:
+            self.nulls = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -3220,12 +3225,18 @@ class THandleIdentifier(object):
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.guid = iprot.readString()
+          if sys.version_info[0] > 2:
+            self.guid = iprot.readBinary()
+          else:
+            self.guid = iprot.readString()
         else:
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.secret = iprot.readString()
+          if sys.version_info[0] > 2:
+            self.secret = iprot.readBinary()
+          else:
+            self.secret = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -3240,11 +3251,17 @@ class THandleIdentifier(object):
     oprot.writeStructBegin('THandleIdentifier')
     if self.guid is not None:
       oprot.writeFieldBegin('guid', TType.STRING, 1)
-      oprot.writeString(self.guid)
+      if sys.version_info[0] > 2:
+        oprot.writeBinary(self.guid)
+      else:
+        oprot.writeString(self.guid)
       oprot.writeFieldEnd()
     if self.secret is not None:
       oprot.writeFieldBegin('secret', TType.STRING, 2)
-      oprot.writeString(self.secret)
+      if sys.version_info[0] > 2:
+        oprot.writeBinary(self.secret)
+      else:
+        oprot.writeString(self.secret)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -4197,7 +4214,10 @@ class TExecuteStatementReq(object):
       oprot.writeFieldEnd()
     if self.statement is not None:
       oprot.writeFieldBegin('statement', TType.STRING, 2)
-      oprot.writeString(self.statement)
+      if sys.version_info[0] > 2:
+        oprot.writeBinary(self.statement)
+      else:
+        oprot.writeString(self.statement)
       oprot.writeFieldEnd()
     if self.confOverlay is not None:
       oprot.writeFieldBegin('confOverlay', TType.MAP, 3)

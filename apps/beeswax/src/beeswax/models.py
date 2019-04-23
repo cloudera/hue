@@ -488,7 +488,10 @@ class HiveServerQueryHandle(QueryHandle):
       return base64.decodestring(secret), base64.decodestring(guid)
 
   def get_encoded(self):
-    return base64.encodestring(self.secret), base64.encodestring(self.guid)
+    if sys.version_info[0] > 2:
+      return base64.b64encode(self.secret), base64.b64encode(self.guid)
+    else:
+      return base64.encodestring(self.secret), base64.encodestring(self.guid)
 
 
 # Deprecated. Could be removed.

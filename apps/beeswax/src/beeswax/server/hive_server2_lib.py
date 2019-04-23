@@ -18,12 +18,12 @@
 from builtins import next
 from builtins import filter
 from builtins import map
-from builtins import str
 from builtins import object
 import logging
 import itertools
 import json
 import re
+import sys
 
 
 from operator import itemgetter
@@ -295,7 +295,10 @@ class HiveServerTColumnValue2(object):
 
   @classmethod
   def mark_nulls(cls, values, bytestring):
-    mask = bytearray(bytestring)
+    if sys.version_info[0] < 3 or isinstance(bytestring, bytes):
+      mask = bytearray(bytestring)
+    else:
+      mask = bytearray(bytestring, 'utf-8')
 
     for n in mask:
       yield n & 0x01
@@ -310,7 +313,14 @@ class HiveServerTColumnValue2(object):
 
   @classmethod
   def set_nulls(cls, values, bytestring):
-    if bytestring == '' or re.match('^(\x00)+$', bytestring): # HS2 has just \x00 or '', Impala can have \x00\x00...
+    can_decode = True
+    if sys.version_info[0] == 3 and isinstance(bytestring, bytes):
+      try:
+        bytestring = bytestring.decode('utf-8')
+      except:
+        can_decode = False
+
+    if bytestring == '' or (can_decode and re.match('^(\x00)+$', bytestring)): # HS2 has just \x00 or '', Impala can have \x00\x00...
       return values
     else:
       _values = [None if is_null else value for value, is_null in zip(values, cls.mark_nulls(values, bytestring))]
