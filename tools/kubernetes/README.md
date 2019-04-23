@@ -31,15 +31,17 @@ kubectl delete pods `kubectl get pods | grep hue | grep -v postgres | cut -d" " 
 * OS: Ubuntu 16.04 or 18.04.
 * Nodes: 1 primary instance of m3.medium (1CPU 3GB).
 
-https://microk8s.io/#quick-start
+Quick start with https://microk8s.io/#quick-start
 
 ```
-sudo snap install microk8s --classicmicro
+sudo snap install microk8s --classic
 
 snap alias microk8s.kubectl kubectl
 
-k8s.enable metrics-server dns
+microk8s.enable metrics-server dns
 ```
+
+And
 
 ```
 sudo snap install helm --classic
