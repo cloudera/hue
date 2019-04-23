@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
-from desktop.conf import METRICS, CONNECTORS
+from desktop.conf import METRICS, CONNECTORS, ANALYTICS
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -49,6 +49,11 @@ def is_selected(section, matcher):
                 % if CONNECTORS.IS_ENABLED.get():
                 <li class="${is_selected(section, 'connectors')}">
                   <a href="${ url('desktop.lib.connectors.views.index') }">${_('Connectors')}</a>
+                </li>
+                % endif
+                % if ANALYTICS.IS_ENABLED.get():
+                <li class="${is_selected(section, 'analytics')}">
+                  <a href="${ url('desktop.lib.analytics.views.index') }">${_('Analytics')}</a>
                 </li>
                 % endif
                 <li class="${is_selected(section, 'log_view')}">
